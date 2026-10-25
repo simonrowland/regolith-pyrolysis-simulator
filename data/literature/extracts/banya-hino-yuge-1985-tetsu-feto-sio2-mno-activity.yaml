@@ -1,0 +1,6289 @@
+schema_version: literature_extract.v1
+source_id: banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
+source:
+  citation: Ban-Ya, S., Hino, M. and Yuge, N. (1985), “Activity of the Constituents in FetO-SiO2-MnO Slags in Equilibrium
+    with Solid Iron”, Tetsu-to-Hagane 71(7), 853–860.
+  year: 1985
+extraction:
+  method: MinerU Table 1 draft reconciled against the full page 854 PDF render; all 240 numeric cells and the table
+    row/column layout were checked. The table tool emitted both measured columns; row-specific compositions and
+    H2O/H2 ratios were bound from the remaining Table 1 columns. Table 2 was render-audited as thermodynamic context
+    and its temperature-dependent equation forms were not emitted as scalar values.
+  date: '2026-10-25'
+  worker: w1025b-bany85
+  audit_files:
+  - data/literature/extracts/audits/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.mapping.yaml
+  - data/literature/extracts/audits/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.audit.csv
+  - data/literature/extracts/audits/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.compare.txt
+  - data/literature/extracts/audits/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.audit.md
+review_status: draft
+species:
+  Fe_tO:
+    observations:
+    - observation_id: banya_hino_yuge_1985_run_101_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '101'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 3
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.100'
+        run_no_as_printed: '101'
+        composition_wt_pct:
+          FeO: '5.46'
+          Fe2O3: '0.46'
+          SiO2: '29.14'
+          MnO: '63.64'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '5.46'
+              Fe2O3: '0.46'
+              SiO2: '29.14'
+              MnO: '63.64'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '101'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.082'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '101'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '101'
+    - observation_id: banya_hino_yuge_1985_run_102_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '102'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 4
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.100'
+        run_no_as_printed: '102'
+        composition_wt_pct:
+          FeO: '6.73'
+          Fe2O3: '0.90'
+          SiO2: '34.26'
+          MnO: '57.06'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '6.73'
+              Fe2O3: '0.90'
+              SiO2: '34.26'
+              MnO: '57.06'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '102'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.083'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '102'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '102'
+    - observation_id: banya_hino_yuge_1985_run_103_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '103'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 5
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.100'
+        run_no_as_printed: '103'
+        composition_wt_pct:
+          FeO: '9.02'
+          Fe2O3: '1.23'
+          SiO2: '39.09'
+          MnO: '50.41'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '9.02'
+              Fe2O3: '1.23'
+              SiO2: '39.09'
+              MnO: '50.41'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '103'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.082'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '103'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '103'
+    - observation_id: banya_hino_yuge_1985_run_104_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '104'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 6
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.101'
+        run_no_as_printed: '104'
+        composition_wt_pct:
+          FeO: '4.03'
+          Fe2O3: '1.62'
+          SiO2: '23.88'
+          MnO: '71.42'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '4.03'
+              Fe2O3: '1.62'
+              SiO2: '23.88'
+              MnO: '71.42'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '104'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.083'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '104'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '104'
+    - observation_id: banya_hino_yuge_1985_run_301_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '301'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 7
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.299'
+        run_no_as_printed: '301'
+        composition_wt_pct:
+          FeO: '18.82'
+          Fe2O3: '0.52'
+          SiO2: '26.06'
+          MnO: '54.29'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '18.82'
+              Fe2O3: '0.52'
+              SiO2: '26.06'
+              MnO: '54.29'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '301'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.246'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '301'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '301'
+    - observation_id: banya_hino_yuge_1985_run_302_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '302'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 8
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.299'
+        run_no_as_printed: '302'
+        composition_wt_pct:
+          FeO: '22.73'
+          Fe2O3: '0.98'
+          SiO2: '33.16'
+          MnO: '42.98'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '22.73'
+              Fe2O3: '0.98'
+              SiO2: '33.16'
+              MnO: '42.98'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '302'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.245'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '302'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '302'
+    - observation_id: banya_hino_yuge_1985_run_303_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '303'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 9
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.299'
+        run_no_as_printed: '303'
+        composition_wt_pct:
+          FeO: '28.69'
+          Fe2O3: '2.29'
+          SiO2: '36.57'
+          MnO: '33.10'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '28.69'
+              Fe2O3: '2.29'
+              SiO2: '36.57'
+              MnO: '33.10'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '303'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.245'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '303'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '303'
+    - observation_id: banya_hino_yuge_1985_run_304_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '304'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 10
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.298'
+        run_no_as_printed: '304'
+        composition_wt_pct:
+          FeO: '32.92'
+          Fe2O3: '3.41'
+          SiO2: '40.73'
+          MnO: '23.76'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '32.92'
+              Fe2O3: '3.41'
+              SiO2: '40.73'
+              MnO: '23.76'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '304'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.245'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '304'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '304'
+    - observation_id: banya_hino_yuge_1985_run_306_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '306'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 11
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.297'
+        run_no_as_printed: '306'
+        composition_wt_pct:
+          FeO: '25.18'
+          Fe2O3: '2.43'
+          SiO2: '33.01'
+          MnO: '40.30'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '25.18'
+              Fe2O3: '2.43'
+              SiO2: '33.01'
+              MnO: '40.30'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '306'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.244'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '306'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '306'
+    - observation_id: banya_hino_yuge_1985_run_501_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '501'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 12
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.499'
+        run_no_as_printed: '501'
+        composition_wt_pct:
+          FeO: '35.31'
+          Fe2O3: '2.13'
+          SiO2: '25.76'
+          MnO: '36.42'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '35.31'
+              Fe2O3: '2.13'
+              SiO2: '25.76'
+              MnO: '36.42'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '501'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.409'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '501'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '501'
+    - observation_id: banya_hino_yuge_1985_run_502_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '502'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 13
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.500'
+        run_no_as_printed: '502'
+        composition_wt_pct:
+          FeO: '39.98'
+          Fe2O3: '3.10'
+          SiO2: '26.81'
+          MnO: '29.79'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '39.98'
+              Fe2O3: '3.10'
+              SiO2: '26.81'
+              MnO: '29.79'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '502'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.412'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '502'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '502'
+    - observation_id: banya_hino_yuge_1985_run_504_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '504'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 14
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.496'
+        run_no_as_printed: '504'
+        composition_wt_pct:
+          FeO: '53.03'
+          Fe2O3: '3.59'
+          SiO2: '30.83'
+          MnO: '13.14'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '53.03'
+              Fe2O3: '3.59'
+              SiO2: '30.83'
+              MnO: '13.14'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '504'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.408'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '504'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '504'
+    - observation_id: banya_hino_yuge_1985_run_505_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '505'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 15
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.499'
+        run_no_as_printed: '505'
+        composition_wt_pct:
+          FeO: '58.21'
+          Fe2O3: '2.56'
+          SiO2: '34.41'
+          MnO: '4.80'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '58.21'
+              Fe2O3: '2.56'
+              SiO2: '34.41'
+              MnO: '4.80'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '505'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.409'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '505'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '505'
+    - observation_id: banya_hino_yuge_1985_run_506_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '506'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 16
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.499'
+        run_no_as_printed: '506'
+        composition_wt_pct:
+          FeO: '56.14'
+          Fe2O3: '2.54'
+          SiO2: '32.48'
+          MnO: '8.67'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '56.14'
+              Fe2O3: '2.54'
+              SiO2: '32.48'
+              MnO: '8.67'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '506'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.411'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '506'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '506'
+    - observation_id: banya_hino_yuge_1985_run_508_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '508'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 17
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.500'
+        run_no_as_printed: '508'
+        composition_wt_pct:
+          FeO: '29.89'
+          Fe2O3: '3.45'
+          SiO2: '18.97'
+          MnO: '47.57'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '29.89'
+              Fe2O3: '3.45'
+              SiO2: '18.97'
+              MnO: '47.57'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '508'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.411'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '508'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '508'
+    - observation_id: banya_hino_yuge_1985_run_509_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '509'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 18
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.501'
+        run_no_as_printed: '509'
+        composition_wt_pct:
+          FeO: '57.09'
+          Fe2O3: '4.01'
+          SiO2: '34.44'
+          MnO: '4.77'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '57.09'
+              Fe2O3: '4.01'
+              SiO2: '34.44'
+              MnO: '4.77'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '509'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.411'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '509'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '509'
+    - observation_id: banya_hino_yuge_1985_run_510_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '510'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 19
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.499'
+        run_no_as_printed: '510'
+        composition_wt_pct:
+          FeO: '30.84'
+          Fe2O3: '3.28'
+          SiO2: '23.05'
+          MnO: '43.60'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '30.84'
+              Fe2O3: '3.28'
+              SiO2: '23.05'
+              MnO: '43.60'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '510'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.411'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '510'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '510'
+    - observation_id: banya_hino_yuge_1985_run_575_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '575'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 20
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.499'
+        run_no_as_printed: '575'
+        composition_wt_pct:
+          FeO: '45.40'
+          Fe2O3: '3.97'
+          SiO2: '27.74'
+          MnO: '22.27'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '45.40'
+              Fe2O3: '3.97'
+              SiO2: '27.74'
+              MnO: '22.27'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '575'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.410'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '575'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '575'
+    - observation_id: banya_hino_yuge_1985_run_500_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '500'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 21
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.502'
+        run_no_as_printed: '500'
+        composition_wt_pct:
+          FeO: '43.98'
+          Fe2O3: '4.87'
+          SiO2: '28.96'
+          MnO: '23.10'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '43.98'
+              Fe2O3: '4.87'
+              SiO2: '28.96'
+              MnO: '23.10'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '500'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.413'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '500'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '500'
+    - observation_id: banya_hino_yuge_1985_run_701_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '701'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 22
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.702'
+        run_no_as_printed: '701'
+        composition_wt_pct:
+          FeO: '54.44'
+          Fe2O3: '4.54'
+          SiO2: '20.52'
+          MnO: '20.50'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '54.44'
+              Fe2O3: '4.54'
+              SiO2: '20.52'
+              MnO: '20.50'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '701'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.576'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '701'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '701'
+    - observation_id: banya_hino_yuge_1985_run_702_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '702'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 23
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.700'
+        run_no_as_printed: '702'
+        composition_wt_pct:
+          FeO: '60.41'
+          Fe2O3: '4.43'
+          SiO2: '22.66'
+          MnO: '12.62'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '60.41'
+              Fe2O3: '4.43'
+              SiO2: '22.66'
+              MnO: '12.62'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '702'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.575'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '702'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '702'
+    - observation_id: banya_hino_yuge_1985_run_703_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '703'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 24
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.699'
+        run_no_as_printed: '703'
+        composition_wt_pct:
+          FeO: '66.35'
+          Fe2O3: '4.80'
+          SiO2: '23.41'
+          MnO: '4.46'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '66.35'
+              Fe2O3: '4.80'
+              SiO2: '23.41'
+              MnO: '4.46'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '703'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.574'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '703'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '703'
+    - observation_id: banya_hino_yuge_1985_run_704_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '704'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 25
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.700'
+        run_no_as_printed: '704'
+        composition_wt_pct:
+          FeO: '54.64'
+          Fe2O3: '5.16'
+          SiO2: '15.28'
+          MnO: '24.40'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '54.64'
+              Fe2O3: '5.16'
+              SiO2: '15.28'
+              MnO: '24.40'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '704'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.574'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '704'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '704'
+    - observation_id: banya_hino_yuge_1985_run_705_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '705'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 26
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.700'
+        run_no_as_printed: '705'
+        composition_wt_pct:
+          FeO: '52.03'
+          Fe2O3: '6.38'
+          SiO2: '14.83'
+          MnO: '26.97'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '52.03'
+              Fe2O3: '6.38'
+              SiO2: '14.83'
+              MnO: '26.97'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '705'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.577'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '705'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '705'
+    - observation_id: banya_hino_yuge_1985_run_706_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '706'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 27
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.700'
+        run_no_as_printed: '706'
+        composition_wt_pct:
+          FeO: '52.70'
+          Fe2O3: '4.69'
+          SiO2: '12.55'
+          MnO: '29.10'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '52.70'
+              Fe2O3: '4.69'
+              SiO2: '12.55'
+              MnO: '29.10'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '706'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.575'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '706'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '706'
+    - observation_id: banya_hino_yuge_1985_run_901_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '901'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 28
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.899'
+        run_no_as_printed: '901'
+        composition_wt_pct:
+          FeO: '77.65'
+          Fe2O3: '8.03'
+          SiO2: '10.37'
+          MnO: '3.44'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '77.65'
+              Fe2O3: '8.03'
+              SiO2: '10.37'
+              MnO: '3.44'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '901'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.738'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '901'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '901'
+    - observation_id: banya_hino_yuge_1985_run_902_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '902'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 29
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.901'
+        run_no_as_printed: '902'
+        composition_wt_pct:
+          FeO: '76.56'
+          Fe2O3: '8.98'
+          SiO2: '11.86'
+          MnO: '2.45'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '76.56'
+              Fe2O3: '8.98'
+              SiO2: '11.86'
+              MnO: '2.45'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '902'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.739'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '902'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '902'
+    - observation_id: banya_hino_yuge_1985_run_903_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '903'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 30
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.899'
+        run_no_as_printed: '903'
+        composition_wt_pct:
+          FeO: '76.92'
+          Fe2O3: '9.24'
+          SiO2: '13.00'
+          MnO: '1.00'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '76.92'
+              Fe2O3: '9.24'
+              SiO2: '13.00'
+              MnO: '1.00'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '903'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.738'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '903'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '903'
+    - observation_id: banya_hino_yuge_1985_run_904_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '904'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 31
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.896'
+        run_no_as_printed: '904'
+        composition_wt_pct:
+          FeO: '76.08'
+          Fe2O3: '10.12'
+          SiO2: '9.03'
+          MnO: '5.61'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '76.08'
+              Fe2O3: '10.12'
+              SiO2: '9.03'
+              MnO: '5.61'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '904'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.736'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '904'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '904'
+    - observation_id: banya_hino_yuge_1985_run_905_activity
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '905'
+        column_header: a_FetO
+        published_page: 854
+        table_row_number: 32
+        table_column_number: 8
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_direct
+        T_C: '1450'
+        activity: '0.902'
+        run_no_as_printed: '905'
+        composition_wt_pct:
+          FeO: '76.89'
+          Fe2O3: '9.64'
+          SiO2: '4.70'
+          MnO: '8.82'
+        composition_unit_as_printed: wt%
+        method_as_printed: Equilibrium measurement of the slag with H2O/H2 gas and solid iron; Fe_tO activity was
+          calculated from the measured equilibrium using the printed reaction.
+      phase: l
+      per: dimensionless
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: Table 1 reports a_FetO; Table 2 reaction 1 writes Fe_tO(l) in the equilibrium reaction used for this
+          activity.
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 854
+          table: '2'
+          row_label: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+      calculation_as_printed: The authors calculate a_FetO from the standard free energy of Table 2 reaction 1 at
+        1450 °C using the equilibrium relation (2).
+      calculation_locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 853
+        section: '3.1'
+        equations: 1–2
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '76.89'
+              Fe2O3: '9.64'
+              SiO2: '4.70'
+              MnO: '8.82'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '905'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.741'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '905'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '905'
+  Fe:
+    observations:
+    - observation_id: banya_hino_yuge_1985_run_101_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '101'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 3
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.076'
+        run_no_as_printed: '101'
+        composition_wt_pct:
+          FeO: '5.46'
+          Fe2O3: '0.46'
+          SiO2: '29.14'
+          MnO: '63.64'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '5.46'
+              Fe2O3: '0.46'
+              SiO2: '29.14'
+              MnO: '63.64'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '101'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.082'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '101'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '101'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_102_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '102'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 4
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.120'
+        run_no_as_printed: '102'
+        composition_wt_pct:
+          FeO: '6.73'
+          Fe2O3: '0.90'
+          SiO2: '34.26'
+          MnO: '57.06'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '6.73'
+              Fe2O3: '0.90'
+              SiO2: '34.26'
+              MnO: '57.06'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '102'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.083'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '102'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '102'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_103_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '103'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 5
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.123'
+        run_no_as_printed: '103'
+        composition_wt_pct:
+          FeO: '9.02'
+          Fe2O3: '1.23'
+          SiO2: '39.09'
+          MnO: '50.41'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '9.02'
+              Fe2O3: '1.23'
+              SiO2: '39.09'
+              MnO: '50.41'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '103'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.082'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '103'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '103'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_104_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '104'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 6
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.362'
+        run_no_as_printed: '104'
+        composition_wt_pct:
+          FeO: '4.03'
+          Fe2O3: '1.62'
+          SiO2: '23.88'
+          MnO: '71.42'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '4.03'
+              Fe2O3: '1.62'
+              SiO2: '23.88'
+              MnO: '71.42'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '104'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.083'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '104'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '104'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_301_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '301'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 7
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.025'
+        run_no_as_printed: '301'
+        composition_wt_pct:
+          FeO: '18.82'
+          Fe2O3: '0.52'
+          SiO2: '26.06'
+          MnO: '54.29'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '18.82'
+              Fe2O3: '0.52'
+              SiO2: '26.06'
+              MnO: '54.29'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '301'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.246'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '301'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '301'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_302_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '302'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 8
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.039'
+        run_no_as_printed: '302'
+        composition_wt_pct:
+          FeO: '22.73'
+          Fe2O3: '0.98'
+          SiO2: '33.16'
+          MnO: '42.98'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '22.73'
+              Fe2O3: '0.98'
+              SiO2: '33.16'
+              MnO: '42.98'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '302'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.245'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '302'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '302'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_303_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '303'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 9
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.072'
+        run_no_as_printed: '303'
+        composition_wt_pct:
+          FeO: '28.69'
+          Fe2O3: '2.29'
+          SiO2: '36.57'
+          MnO: '33.10'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '28.69'
+              Fe2O3: '2.29'
+              SiO2: '36.57'
+              MnO: '33.10'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '303'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.245'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '303'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '303'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_304_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '304'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 10
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.093'
+        run_no_as_printed: '304'
+        composition_wt_pct:
+          FeO: '32.92'
+          Fe2O3: '3.41'
+          SiO2: '40.73'
+          MnO: '23.76'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '32.92'
+              Fe2O3: '3.41'
+              SiO2: '40.73'
+              MnO: '23.76'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '304'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.245'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '304'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '304'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_306_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '306'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 11
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.087'
+        run_no_as_printed: '306'
+        composition_wt_pct:
+          FeO: '25.18'
+          Fe2O3: '2.43'
+          SiO2: '33.01'
+          MnO: '40.30'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '25.18'
+              Fe2O3: '2.43'
+              SiO2: '33.01'
+              MnO: '40.30'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '306'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.244'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '306'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '306'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_501_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '501'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 12
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.054'
+        run_no_as_printed: '501'
+        composition_wt_pct:
+          FeO: '35.31'
+          Fe2O3: '2.13'
+          SiO2: '25.76'
+          MnO: '36.42'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '35.31'
+              Fe2O3: '2.13'
+              SiO2: '25.76'
+              MnO: '36.42'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '501'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.409'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '501'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '501'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_502_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '502'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 13
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.070'
+        run_no_as_printed: '502'
+        composition_wt_pct:
+          FeO: '39.98'
+          Fe2O3: '3.10'
+          SiO2: '26.81'
+          MnO: '29.79'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '39.98'
+              Fe2O3: '3.10'
+              SiO2: '26.81'
+              MnO: '29.79'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '502'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.412'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '502'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '502'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_504_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '504'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 14
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.061'
+        run_no_as_printed: '504'
+        composition_wt_pct:
+          FeO: '53.03'
+          Fe2O3: '3.59'
+          SiO2: '30.83'
+          MnO: '13.14'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '53.03'
+              Fe2O3: '3.59'
+              SiO2: '30.83'
+              MnO: '13.14'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '504'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.408'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '504'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '504'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_505_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '505'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 15
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.040'
+        run_no_as_printed: '505'
+        composition_wt_pct:
+          FeO: '58.21'
+          Fe2O3: '2.56'
+          SiO2: '34.41'
+          MnO: '4.80'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '58.21'
+              Fe2O3: '2.56'
+              SiO2: '34.41'
+              MnO: '4.80'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '505'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.409'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '505'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '505'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_506_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '506'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 16
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.041'
+        run_no_as_printed: '506'
+        composition_wt_pct:
+          FeO: '56.14'
+          Fe2O3: '2.54'
+          SiO2: '32.48'
+          MnO: '8.67'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '56.14'
+              Fe2O3: '2.54'
+              SiO2: '32.48'
+              MnO: '8.67'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '506'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.411'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '506'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '506'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_508_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '508'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 17
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.104'
+        run_no_as_printed: '508'
+        composition_wt_pct:
+          FeO: '29.89'
+          Fe2O3: '3.45'
+          SiO2: '18.97'
+          MnO: '47.57'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '29.89'
+              Fe2O3: '3.45'
+              SiO2: '18.97'
+              MnO: '47.57'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '508'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.411'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '508'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '508'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_509_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '509'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 18
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.063'
+        run_no_as_printed: '509'
+        composition_wt_pct:
+          FeO: '57.09'
+          Fe2O3: '4.01'
+          SiO2: '34.44'
+          MnO: '4.77'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '57.09'
+              Fe2O3: '4.01'
+              SiO2: '34.44'
+              MnO: '4.77'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '509'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.411'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '509'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '509'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_510_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '510'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 19
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.096'
+        run_no_as_printed: '510'
+        composition_wt_pct:
+          FeO: '30.84'
+          Fe2O3: '3.28'
+          SiO2: '23.05'
+          MnO: '43.60'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '30.84'
+              Fe2O3: '3.28'
+              SiO2: '23.05'
+              MnO: '43.60'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '510'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.411'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '510'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '510'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_575_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '575'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 20
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.079'
+        run_no_as_printed: '575'
+        composition_wt_pct:
+          FeO: '45.40'
+          Fe2O3: '3.97'
+          SiO2: '27.74'
+          MnO: '22.27'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '45.40'
+              Fe2O3: '3.97'
+              SiO2: '27.74'
+              MnO: '22.27'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '575'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.410'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '575'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '575'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_500_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '500'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 21
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.100'
+        run_no_as_printed: '500'
+        composition_wt_pct:
+          FeO: '43.98'
+          Fe2O3: '4.87'
+          SiO2: '28.96'
+          MnO: '23.10'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '43.98'
+              Fe2O3: '4.87'
+              SiO2: '28.96'
+              MnO: '23.10'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '500'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.413'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '500'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '500'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_701_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '701'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 22
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.075'
+        run_no_as_printed: '701'
+        composition_wt_pct:
+          FeO: '54.44'
+          Fe2O3: '4.54'
+          SiO2: '20.52'
+          MnO: '20.50'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '54.44'
+              Fe2O3: '4.54'
+              SiO2: '20.52'
+              MnO: '20.50'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '701'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.576'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '701'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '701'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_702_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '702'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 23
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.066'
+        run_no_as_printed: '702'
+        composition_wt_pct:
+          FeO: '60.41'
+          Fe2O3: '4.43'
+          SiO2: '22.66'
+          MnO: '12.62'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '60.41'
+              Fe2O3: '4.43'
+              SiO2: '22.66'
+              MnO: '12.62'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '702'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.575'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '702'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '702'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_703_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '703'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 24
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.065'
+        run_no_as_printed: '703'
+        composition_wt_pct:
+          FeO: '66.35'
+          Fe2O3: '4.80'
+          SiO2: '23.41'
+          MnO: '4.46'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '66.35'
+              Fe2O3: '4.80'
+              SiO2: '23.41'
+              MnO: '4.46'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '703'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.574'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '703'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '703'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_704_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '704'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 25
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.085'
+        run_no_as_printed: '704'
+        composition_wt_pct:
+          FeO: '54.64'
+          Fe2O3: '5.16'
+          SiO2: '15.28'
+          MnO: '24.40'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '54.64'
+              Fe2O3: '5.16'
+              SiO2: '15.28'
+              MnO: '24.40'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '704'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.574'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '704'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '704'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_705_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '705'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 26
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.110'
+        run_no_as_printed: '705'
+        composition_wt_pct:
+          FeO: '52.03'
+          Fe2O3: '6.38'
+          SiO2: '14.83'
+          MnO: '26.97'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '52.03'
+              Fe2O3: '6.38'
+              SiO2: '14.83'
+              MnO: '26.97'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '705'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.577'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '705'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '705'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_706_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '706'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 27
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.080'
+        run_no_as_printed: '706'
+        composition_wt_pct:
+          FeO: '52.70'
+          Fe2O3: '4.69'
+          SiO2: '12.55'
+          MnO: '29.10'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '52.70'
+              Fe2O3: '4.69'
+              SiO2: '12.55'
+              MnO: '29.10'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '706'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.575'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '706'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '706'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_901_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '901'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 28
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.093'
+        run_no_as_printed: '901'
+        composition_wt_pct:
+          FeO: '77.65'
+          Fe2O3: '8.03'
+          SiO2: '10.37'
+          MnO: '3.44'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '77.65'
+              Fe2O3: '8.03'
+              SiO2: '10.37'
+              MnO: '3.44'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '901'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.738'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '901'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '901'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_902_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '902'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 29
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.106'
+        run_no_as_printed: '902'
+        composition_wt_pct:
+          FeO: '76.56'
+          Fe2O3: '8.98'
+          SiO2: '11.86'
+          MnO: '2.45'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '76.56'
+              Fe2O3: '8.98'
+              SiO2: '11.86'
+              MnO: '2.45'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '902'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.739'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '902'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '902'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_903_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '903'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 30
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.108'
+        run_no_as_printed: '903'
+        composition_wt_pct:
+          FeO: '76.92'
+          Fe2O3: '9.24'
+          SiO2: '13.00'
+          MnO: '1.00'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '76.92'
+              Fe2O3: '9.24'
+              SiO2: '13.00'
+              MnO: '1.00'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '903'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.738'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '903'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '903'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_904_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '904'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 31
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.120'
+        run_no_as_printed: '904'
+        composition_wt_pct:
+          FeO: '76.08'
+          Fe2O3: '10.12'
+          SiO2: '9.03'
+          MnO: '5.61'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '76.08'
+              Fe2O3: '10.12'
+              SiO2: '9.03'
+              MnO: '5.61'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '904'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.736'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '904'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '904'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+    - observation_id: banya_hino_yuge_1985_run_905_fe3_fe2_ratio
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '905'
+        column_header: X_Fe3+/X_Fe2+
+        published_page: 854
+        table_row_number: 32
+        table_column_number: 7
+      units: dimensionless ratio
+      values:
+        quantity: valence_ratio
+        method_class: measured_direct
+        T_C: '1450'
+        value: '0.113'
+        run_no_as_printed: '905'
+        composition_wt_pct:
+          FeO: '76.89'
+          Fe2O3: '9.64'
+          SiO2: '4.70'
+          MnO: '8.82'
+        composition_unit_as_printed: wt%
+        method_as_printed: Fe2+ and total iron were determined by dichromate titration; the printed Fe3+/Fe2+ ratio
+          is reported for the rapidly quenched slag.
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+      phase: glass
+      experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+      regime: quench_equilibration
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1450'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            note: Table 1 caption states 1450 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              FeO: '76.89'
+              Fe2O3: '9.64'
+              SiO2: '4.70'
+              MnO: '8.82'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '905'
+        fO2_control:
+          state:
+            tag: value
+            value:
+              channel: gas_mix
+              gas_ratio:
+                numerator_species: H2O
+                denominator_species: H2
+                value:
+                  state:
+                    tag: value
+                    value: '0.741'
+                  locator:
+                    page: 2
+                    pdf_page_index: 1
+                    published_page: 854
+                    table: '1'
+                    row_label: '905'
+                basis: partial_pressure
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 854
+            table: '1'
+            row_label: '905'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 853
+            section: 2. 実験方法
+            note: The method states that the slag was rapidly quenched and solidified; it does not state whether
+              Fe3+/Fe2+ was preserved or altered.
+experiments:
+- experiment_id: banya_hino_yuge_1985_gas_equilibration_1450c
+  series: Table 1 FetO-SiO2-MnO slag runs in equilibrium with solid iron at 1450 °C.
+  method: quench_equilibration
+  method_as_printed: A 4 g slag sample was placed in a pure iron crucible, equilibrated with an H2O/H2 mixed gas
+    at 1450 °C, then rapidly quenched and solidified. The source says preliminary experiments found about 6 h sufficient
+    to reach equilibrium; it does not give a duration for each Table 1 run.
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 853
+    section: 2. 実験方法
+fidelity_samples:
+- path: species.Fe_tO.observations[banya_hino_yuge_1985_run_101_activity].values.activity
+  value: '0.100'
+  locator:
+    page: 2
+    published_page: 854
+    table: '1'
+    row_label: 101
+- path: species.Fe_tO.observations[banya_hino_yuge_1985_run_301_activity].values.activity
+  value: '0.299'
+  locator:
+    page: 2
+    published_page: 854
+    table: '1'
+    row_label: 301
+- path: species.Fe_tO.observations[banya_hino_yuge_1985_run_901_activity].values.activity
+  value: '0.899'
+  locator:
+    page: 2
+    published_page: 854
+    table: '1'
+    row_label: 901
+- path: species.Fe.observations[banya_hino_yuge_1985_run_101_fe3_fe2_ratio].values.value
+  value: '0.076'
+  locator:
+    page: 2
+    published_page: 854
+    table: '1'
+    row_label: 101
+- path: species.Fe.observations[banya_hino_yuge_1985_run_301_fe3_fe2_ratio].values.value
+  value: '0.025'
+  locator:
+    page: 2
+    published_page: 854
+    table: '1'
+    row_label: 301
+- path: species.Fe.observations[banya_hino_yuge_1985_run_901_fe3_fe2_ratio].values.value
+  value: '0.093'
+  locator:
+    page: 2
+    published_page: 854
+    table: '1'
+    row_label: 901

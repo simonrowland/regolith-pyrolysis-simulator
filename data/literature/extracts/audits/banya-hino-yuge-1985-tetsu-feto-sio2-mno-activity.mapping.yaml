@@ -1,0 +1,49 @@
+source_id: banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
+source:
+  citation: Ban-Ya, S., Hino, M. and Yuge, N. (1985), “Activity of the Constituents in FetO-SiO2-MnO Slags
+    in Equilibrium with Solid Iron”, Tetsu-to-Hagane 71(7), 853–860.
+  year: 1985
+extraction:
+  method: MinerU Table 1 cells checked against the page 854 render; Table 2 is supporting standard free
+    energy data outside the melt activity observations.
+  date: '2026-10-25'
+  worker: w1025b-bany85
+review_status: draft
+tables:
+- page: 2
+  table_index: 1
+  published_page: 854
+  experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+  rows: all
+  temperature: &id001
+    as_printed: '1450'
+    unit: C
+    locator:
+      published_page: 854
+      table: '1'
+      note: Table 1 caption states 1450 C
+  type: activity_coefficient
+  quantity: activity
+  unit: dimensionless activity
+  evidence_class: measured_direct
+  phase: l
+  per: dimensionless
+  values:
+  - column: 8
+    species: Fe_tO
+  regime: quench_equilibration
+- page: 2
+  table_index: 1
+  published_page: 854
+  experiment: banya_hino_yuge_1985_gas_equilibration_1450c
+  rows: all
+  temperature: *id001
+  type: concentration_series
+  quantity: valence_ratio
+  unit: dimensionless ratio
+  evidence_class: measured_direct
+  phase: glass
+  values:
+  - column: 7
+    species: Fe
+  regime: quench_equilibration
