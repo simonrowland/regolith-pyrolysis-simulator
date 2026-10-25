@@ -38,10 +38,7 @@ from simulator.transport_constants import (
 GAS_CONSTANT_J_MOL_K = GAS_CONSTANT
 BOLTZMANN_CONSTANT_J_K = BOLTZMANN
 
-# Keep the runtime pipe law's historical six-significant-figure R, derived
-# from the physical-constants owner: rounding 8.31446261815324 to 5 decimal
-# places gives 8.31446 J/(mol K). The relocation must preserve float.hex pins.
-PIPE_GAS_CONSTANT_J_MOL_K = round(GAS_CONSTANT_J_MOL_K, 5)
+PIPE_GAS_CONSTANT_J_MOL_K = GAS_CONSTANT
 
 LONG_TUBE_L_OVER_D_MIN = 10.0
 
@@ -1341,8 +1338,7 @@ def pipe_pressure_capacity_fraction(d, L, M_avg, eta, T_K, p_upstream_Pa, p_down
     ) / vacuum
 
 
-# Historical source/deposition R is intentionally retained for bit identity.
-SURFACE_GAS_CONSTANT_J_MOL_K = 8.314462618
+SURFACE_GAS_CONSTANT_J_MOL_K = GAS_CONSTANT
 DEFAULT_SHERWOOD_LAMINAR = 3.66
 DEFAULT_CARRIER_GAS = 'N2'
 SUPPORTED_CARRIER_GAS_LABELS = 'He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), O2/pO2, CO2/pCO2'

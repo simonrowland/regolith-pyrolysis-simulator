@@ -9,7 +9,7 @@ from typing import Any
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, GAS_CONSTANT
 from simulator.scalar_boundary import is_declared_real_scalar
 
-_OVERHEAD_EOS_GAS_CONSTANT_J_PER_MOL_K = 8.31446
+_OVERHEAD_EOS_GAS_CONSTANT_J_PER_MOL_K = GAS_CONSTANT
 
 DEFAULT_VACUUM_FLOOR_BAR = 1.0e-9
 MOON_VACUUM_FLOOR_BAR = 1.3e-12
@@ -62,8 +62,7 @@ def ideal_gas_partial_pressures_bar(
 ) -> dict[str, float]:
     """Project finite ideal-gas inventories to partial pressures in bar.
 
-    The six-significant-digit gas constant preserves the legacy provider's
-    numeric result; the state module keeps its own copy for existing callers.
+    All ideal-gas projections use the physical-constants owner.
     Algebra: p_bar=nRT/V/1e5. R*T/V has J/m³ = Pa, then 1e5 Pa/bar converts
     units; zero V or T retains the legacy empty-result limit.
     """
