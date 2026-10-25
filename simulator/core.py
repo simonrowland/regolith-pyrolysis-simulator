@@ -1333,7 +1333,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- Current state ---
         self.melt = MeltState()
         self.inventory = ProcessInventory()
-        self.train = CondensationTrain.create_default()
+        self.train = CondensationTrain.create_default(self.setpoints)
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar: Dict[str, float] = {}
 
@@ -1647,7 +1647,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.update_total_mass()
 
         # Reset condensation train
-        self.train = CondensationTrain.create_default()
+        self.train = CondensationTrain.create_default(self.setpoints)
+        if self._condensation_model is not None:
+            self._condensation_model.train = self.train
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}

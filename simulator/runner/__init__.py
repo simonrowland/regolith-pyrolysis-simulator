@@ -53,7 +53,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.backends import (
     BackendSelectionPolicy,
 )
-from simulator.config import ConfigBundle, load_config_bundle
+from simulator.config import ConfigBundle, _load_setpoints_file, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import iron_oxide_values
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
@@ -1305,7 +1305,10 @@ class PyrolysisRun:
 
     def _load_setpoints(self) -> dict:
         path = self.setpoints_path or (DATA_DIR / "setpoints.yaml")
-        return _load_yaml(path)
+        try:
+            return _load_setpoints_file(path)
+        except FileNotFoundError as exc:
+            raise RunnerError(str(exc)) from exc
 
     def _load_vapor_pressures(self) -> dict:
         path = self.vapor_pressures_path or (DATA_DIR / "vapor_pressures.yaml")

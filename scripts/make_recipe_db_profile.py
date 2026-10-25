@@ -28,6 +28,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+from simulator.config import _load_setpoints_file  # noqa: E402
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     canonical_objective_metric,
@@ -600,9 +601,10 @@ def _setpoint_campaign_key(campaign: str) -> str:
 
 def _setpoint_campaign_config(campaign: str) -> Mapping[str, Any]:
     src = REPO_ROOT / "data" / "setpoints.yaml"
-    loaded = load_cached_safe_yaml(src.read_text())
-    if not isinstance(loaded, Mapping):
-        raise SystemExit(f"invalid setpoints file: {src}")
+    try:
+        loaded = _load_setpoints_file(src)
+    except TypeError as exc:
+        raise SystemExit(f"invalid setpoints file: {src}") from exc
     campaigns = loaded.get("campaigns")
     if not isinstance(campaigns, Mapping):
         raise SystemExit(f"setpoints missing campaigns mapping: {src}")
