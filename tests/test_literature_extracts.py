@@ -5224,8 +5224,8 @@ def test_aithala_wds_compositions_join_vf_redox_rows():
         assert printed["original_FeOT_wt_pct"].locator.page == 14
 
 
-def test_matzen_experimental_average_composition_joins_redox_rows():
-    """The Table 1 mean composition reaches all Syn-MB1 redox observations."""
+def test_matzen_experimental_average_does_not_fill_unprinted_run_compositions():
+    """The Table 1 pooled mean remains separate from run compositions."""
     path = EXTRACTS / "matzen-2022-martian-basalt-redox.yaml"
     doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     rows = _migrate_redox_extract(path)
@@ -5250,44 +5250,29 @@ def test_matzen_experimental_average_composition_joins_redox_rows():
     assert printed == expected_printed
     assert "Cr2O3" not in printed and "K2O" not in printed
     assert "below detection" in composition_row["values"]["composition_basis"]
+    notes = doc["starting_compositions"]["notes"]
+    footnote_g = next(
+        note
+        for note in notes
+        if isinstance(note, str) and note.startswith("Table 1 footnote g:")
+    )
+    footnote_h = next(
+        note
+        for note in notes
+        if isinstance(note, str) and note.startswith("Table 1 footnote h:")
+    )
+    assert footnote_g == (
+        "Table 1 footnote g: The average and standard deviation for Na2O includes "
+        "only those experiments where Na2O was above the detection limit: "
+        "experiments 11, 13, 57, 60, and 61"
+    )
+    assert footnote_h == (
+        "Table 1 footnote h: The average and standard deviation for NiO excludes "
+        "the two experiments 30 and 57 where NiO was below the detection limit."
+    )
     assert len(rows) == 24
-    assert all(row.identity.composition.is_value for row in rows)
-
-    expected_centers = {
-        "SiO2": Decimal("50.33"),
-        "TiO2": Decimal("1.00"),
-        "Al2O3": Decimal("10.09"),
-        "FeOT": Decimal("18.13"),
-        "MnO": Decimal("0.37"),
-        "MgO": Decimal("11.76"),
-        "CaO": Decimal("6.89"),
-        "Na2O": Decimal("0.06"),
-        "NiO": Decimal("0.33"),
-    }
-    by_id = {row.observation_id.split("::")[1]: row for row in rows}
-    pinned_rows = {
-        "matzen_2022_run_11_method_a",
-        "matzen_2022_run_30_method_b",
-        "matzen_2022_run_61_method_a",
-    }
-    assert pinned_rows <= by_id.keys()
-    for row in rows:
-        composition = row.point_conditions["composition"]
-        assert composition.locator.page == 38
-        assert composition.locator.table == 1
-        params = dict(composition.inference.parameters)
-        assert {
-            oxide: params[f"original_{oxide}_wt_pct"].state.value
-            for oxide in expected_centers
-        } == expected_centers
-        assert not {"Cr2O3", "K2O"}.intersection(
-            dict(row.identity.composition.value.components)
-        )
-        if row.observation_id.rsplit("::", 1)[-1] in pinned_rows:
-            assert all(
-                params[f"original_{oxide}_wt_pct"].locator.page == 38
-                for oxide in ("SiO2", "FeOT", "NiO")
-            )
+    assert all(row.identity.composition.is_unknown for row in rows)
+    assert all("composition" not in row.point_conditions for row in rows)
 
 
 def test_jayasuriya_d60_pressure_reaches_only_its_redox_rows():
