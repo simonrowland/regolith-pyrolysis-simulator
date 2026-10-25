@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 from decimal import Decimal
 from pathlib import Path
 
@@ -9,6 +10,33 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ID = "sugawara-1999-fe-na-loss-gas-mixing-furnace"
 EXTRACT = ROOT / "data/literature/extracts" / f"{SOURCE_ID}.yaml"
+AUDIT = ROOT / "data/literature/extracts/audits" / f"{SOURCE_ID}.audit.csv"
+
+
+def test_sugawara_1999_table6_audit_count_provenance() -> None:
+    with AUDIT.open(encoding="utf-8", newline="") as audit_file:
+        rows = list(csv.DictReader(audit_file))
+
+    assert not any(
+        "MinerU omitted empty n° body cell" in row["verification"]
+        for row in rows
+    )
+    counts = [row for row in rows if row["column_header"] == "n° (number of analyses)"]
+    assert len(counts) == 18
+    mineru_counts = [row for row in counts if row["mineru_text"]]
+    render_transcribed_counts = [row for row in counts if not row["mineru_text"]]
+    assert len(mineru_counts) == 13
+    assert all(
+        "MinerU draft column-7 value is printed n° count" in row["verification"]
+        and "render-checked" in row["verification"]
+        for row in mineru_counts
+    )
+    assert len(render_transcribed_counts) == 5
+    assert all(
+        "printed n° count absent from MinerU draft; transcribed from render"
+        in row["verification"]
+        for row in render_transcribed_counts
+    )
 
 
 def _assert_table6_phase_render_pins(document: dict) -> None:
