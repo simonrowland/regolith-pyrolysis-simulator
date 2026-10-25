@@ -7979,6 +7979,12 @@ def _series_census(
                     expected = _census_expected_point(item, q_token, units)
                     stored_obs = by_id.get(oid)
                     if stored_obs is None:
+                        if len(series) == 1:
+                            stable_id = f"{source_id}::{raw_id}"
+                            candidate = by_id.get(stable_id)
+                            if candidate is not None and stable_id not in used_stable_ids:
+                                stored_obs = candidate
+                    if stored_obs is None:
                         stable_points = [
                             observation
                             for observation in stored_observations
@@ -8126,14 +8132,13 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # Sato (1976) contributes 54 numeric Table 2/3 activity cells and 55 numeric
     # Table 1 oxygen-fugacity cells (109 total), already included by the fresh store.
     assert census.get("fugacity") == 55
-    # Twelve repeated Fedkin table cells are no longer counted through the retired
-    # mirror; the KEMS owner extract retains the cells (Fedkin et al. 2006, Table 3,
-    # p. 212, DOI 10.1016/j.gca.2005.08.014).
-    # 7baaf334b, merged in r17a3 4679aa7d9, then keeps that owner Table 3 as
-    # context, so those 12 cells are not series points either. 5227cb93b had
-    # counted them (34->22). Printed series alphas that remain are Shirai 2000
-    # (6) and Zhang 2021 Table 4 (4).
-    assert census.get("evaporation_coefficient_alpha") == 10
+    # Fedkin's Table 3 cells remain context, but 18dd798e1 restores the two
+    # author-estimate Yu points (Na and K, Fig. 4, 1723 K) as observations.
+    # Shirai 2000 contributes six points and Zhang 2021 Table 4 contributes four.
+    assert per_source.get("kems-005-fedkin-2006") == {
+        "evaporation_coefficient_alpha": 2
+    }
+    assert census.get("evaporation_coefficient_alpha") == 12
     # Re-pinned with the d-032 store regen. _series_census skips a source with no
     # extracts-v2 sibling, and the pre-regen store was missing 26 sources' derived
     # files, so their series went uncounted: evaporation_rate 21->25,
