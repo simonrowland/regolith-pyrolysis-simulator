@@ -160,6 +160,7 @@ from simulator.battery.oxygen_balance import (
     OXYGEN_BALANCE_NOTICE_PREFIX,
     _cell_material_class,
     _cell_oxygen_class,
+    _contains_oxide_cell_material,
     has_own_engine_solved_oxygen_balance,
 )
 from simulator.battery.composition import composition_wt_pct
@@ -5289,13 +5290,17 @@ def _reactive_cell_not_modelled_notice(
     quantity: Quantity,
     materials: Sequence[Located[CellMaterial]] | None,
 ) -> Notice:
+    cell_materials = tuple(
+        item.state.value
+        for item in materials or ()
+        if item.state.is_value and isinstance(item.state.value, CellMaterial)
+    )
     cell_material = [
         {
             "field": "bench.cell_materials",
-            "value": item.state.value.value,
+            "value": material.value,
         }
-        for item in materials or ()
-        if item.state.is_value and isinstance(item.state.value, CellMaterial)
+        for material in cell_materials
     ]
     payload = json.dumps(
         {"cell_material": cell_material},
@@ -5303,12 +5308,18 @@ def _reactive_cell_not_modelled_notice(
         sort_keys=True,
         separators=(",", ":"),
     )
+    oxide_notice = _contains_oxide_cell_material(materials)
     return Notice(
         kind=NoticeKind.REACTIVE_CELL_NOT_MODELLED,
         affected_quantities=(quantity,),
         reason=(
-            "reactive cell: oxygen balance of the cell not modelled "
-            f"{payload}"
+            (
+                "oxide cell: possible cell–sample/vapour reaction; "
+                "oxygen balance of the cell not modelled "
+                if oxide_notice
+                else "reactive cell: oxygen balance of the cell not modelled "
+            )
+            + payload
         ),
         origin="score:predict_with_engine",
     )

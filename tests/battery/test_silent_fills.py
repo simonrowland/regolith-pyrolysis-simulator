@@ -322,7 +322,13 @@ def test_printed_oxygen_is_commanded(monkeypatch) -> None:
         ((CellMaterial.NB,), "reactive"),
         ((CellMaterial.C_GRAPHITE,), "reactive"),
         ((CellMaterial.RE,), "reactive"),
-        ((CellMaterial.AL2O3,), "not_inert"),
+        ((CellMaterial.AL2O3,), "reactive"),
+        ((CellMaterial.SIO2,), "reactive"),
+        ((CellMaterial.MGO,), "reactive"),
+        ((CellMaterial.ZRO2,), "reactive"),
+        ((CellMaterial.Y2O3,), "reactive"),
+        ((CellMaterial.THO2,), "reactive"),
+        ((CellMaterial.BEO,), "reactive"),
         ((CellMaterial.OTHER,), "not_inert"),
         ((), "unknown"),
     ),
@@ -430,8 +436,6 @@ def test_uniform_modelled_reactive_cell_requests_cell_oxide_reservoir(
 @pytest.mark.parametrize(
     ("engine", "materials", "reason"),
     (
-        (Engine.OPENIMCC, (CellMaterial.AL2O3,), "cell_material_not_inert"),
-        (Engine.VAPOROCK, (CellMaterial.PT, CellMaterial.AL2O3), "cell_material_not_inert"),
         (Engine.ALPHAMELTS, (CellMaterial.OTHER,), "cell_material_not_inert"),
     ),
 )
@@ -454,6 +458,60 @@ def test_noninert_knudsen_cell_refuses_oxygen_balance(
 
     assert opened == []
     assert prediction.refusal_detail["reason"] == reason
+
+
+def test_oxide_knudsen_cell_predicts_with_reaction_notice(monkeypatch) -> None:
+    observation, experiment = _kems_partial(
+        cell_material=None, fO2_Pa=Decimal("1e-8")
+    )
+    bench = _cell_material_bench((CellMaterial.AL2O3,))
+
+    def _open(name: str) -> object:
+        return types.SimpleNamespace(
+            name=name,
+            available=True,
+            unavailable_reason=None,
+            supports_intrinsic_fo2=False,
+        )
+
+    def _cell(*_args, **_kwargs):
+        return types.SimpleNamespace(
+            status="ok",
+            refusal_reason=None,
+            hostname="test",
+            exit_code=0,
+            exit_signal=None,
+            notices=[],
+            engine_reason=None,
+            melt_activities={},
+            gas_partial_pressures_Pa={"K": 1.25},
+        )
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        isolated=False,
+    )
+
+    assert prediction.value == pytest.approx(1.25)
+    notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+    )
+    assert "Al2O3" in notice.reason
+    assert "possible cell–sample/vapour reaction" in notice.reason
 
 
 @pytest.mark.parametrize(
@@ -486,7 +544,7 @@ def test_unmodelled_reactive_knudsen_cell_predicts_with_notice(
 
     assert prediction.refusal_detail.get("reason") != "reactive_cell_oxygen_reservoir"
     assert any(
-        "reactive cell: oxygen balance of the cell not modelled" in notice.reason
+        notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
         for notice in prediction.notices
     )
     # Without printed fo2, p_partial still needs an oxygen input or omission.

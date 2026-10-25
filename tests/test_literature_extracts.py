@@ -1058,7 +1058,7 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
             "ohara-kems",
             "Alumina Knudsen cell with electrolytic-iron inner crucible",
             ("Al2O3", "Fe"),
-            "not_inert",
+            "reactive",
         ),
         (
             "kems-066-ichise-1977.yaml",
@@ -1072,14 +1072,14 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
             "rm6k",
             "homemade thoria (ThO2) Knudsen cell",
             ("ThO2",),
-            "not_inert",
+            "reactive",
         ),
         (
             "kems-069-furukawa-1976.yaml",
             "thoria-kems",
             "Laboratory-made thoria Knudsen cell",
             ("ThO2",),
-            "not_inert",
+            "reactive",
         ),
         (
             "kems-087-yamada-kato-1980.yaml",
@@ -1095,21 +1095,21 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
             ("Al2O3", "Ta"),
             "reactive",
         ),
-        ("kems-095-ueda-1986.yaml", "ueda-kems", "Y2O3", ("Y2O3",), "not_inert"),
+        ("kems-095-ueda-1986.yaml", "ueda-kems", "Y2O3", ("Y2O3",), "reactive"),
         (
             "kems-105-yamada-1983.yaml",
             "yamada-kato-rm6k",
             "Beryllia Knudsen cells for Fe-P-Al and Fe-P-Ti; alumina "
             "Knudsen cells for other Fe-P-i systems",
             ("BeO", "Al2O3"),
-            "not_inert",
+            "reactive",
         ),
         (
             "kems-111-ichise-1982.yaml",
             "rm6k",
             "Sintered alumina crucible",
             ("Al2O3",),
-            "not_inert",
+            "reactive",
         ),
         (
             "kems-112-ichise-1989.yaml",
@@ -1123,14 +1123,14 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
             "rm6e",
             "High-purity alumina SSA-S Knudsen cell",
             ("Al2O3",),
-            "not_inert",
+            "reactive",
         ),
         (
             "kems-118-yamamoto-1983.yaml",
             "rm-6e",
             "High-purity alumina SSA-S Knudsen-cell crucible",
             ("Al2O3",),
-            "not_inert",
+            "reactive",
         ),
         (
             "kems-119-furukawa-1975.yaml",
@@ -1139,7 +1139,7 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
             ("Al2O3", "Ta"),
             "reactive",
         ),
-        ("kems-120-ueshima-1984.yaml", "rm6k", "Alumina Knudsen cell", ("Al2O3",), "not_inert"),
+        ("kems-120-ueshima-1984.yaml", "rm6k", "Alumina Knudsen cell", ("Al2O3",), "reactive"),
         (
             "kems-137-bischof-2023.yaml",
             "finnigan-mat-271-ir",
@@ -1168,7 +1168,7 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
             ("C_graphite",),
             "reactive",
         ),
-        ("kems-188-nanjo-1976.yaml", "nanjo-kems", "Quartz Knudsen cell", ("SiO2",), "not_inert"),
+        ("kems-188-nanjo-1976.yaml", "nanjo-kems", "Quartz Knudsen cell", ("SiO2",), "reactive"),
         (
             "kems-ms2000-044.yaml",
             "alkali-silicate-kems",

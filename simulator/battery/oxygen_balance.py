@@ -30,6 +30,28 @@ _OXYGEN_GAS_ALPHA_SOURCE = (
     "absolute oxygen-gas alpha is not measured"
 )
 _MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
+_OXIDE_CELL_MATERIALS = frozenset(
+    {
+        CellMaterial.AL2O3,
+        CellMaterial.SIO2,
+        CellMaterial.MGO,
+        CellMaterial.ZRO2,
+        CellMaterial.Y2O3,
+        CellMaterial.THO2,
+        CellMaterial.BEO,
+    }
+)
+
+
+def _contains_oxide_cell_material(
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> bool:
+    return any(
+        material.state.is_value
+        and isinstance(material.state.value, CellMaterial)
+        and material.state.value in _OXIDE_CELL_MATERIALS
+        for material in materials or ()
+    )
 
 
 def _cell_material_class(
@@ -51,6 +73,7 @@ def _cell_material_class(
             CellMaterial.C_GRAPHITE,
             CellMaterial.RE,
         }
+        or material in _OXIDE_CELL_MATERIALS
         for material in values
     ):
         return "reactive"
