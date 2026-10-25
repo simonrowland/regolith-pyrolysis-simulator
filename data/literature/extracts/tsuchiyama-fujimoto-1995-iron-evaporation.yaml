@@ -1,0 +1,2033 @@
+schema_version: literature_extract.v1
+source_id: tsuchiyama-fujimoto-1995-iron-evaporation
+source:
+  citation: Tsuchiyama, A. and Fujimoto, S. (1995), Evaporation experiments of metallic iron in vacuum, Proceedings
+    of the NIPR Symposium on Antarctic Meteorites, 8, 205–213.
+  doi: 10.15094/00004677
+  year: 1995
+  url: https://doi.org/10.15094/00004677
+extraction:
+  method: MinerU table drafts checked against pdftotext-layout. Table 1 and Table 2 row/column assignments were
+    checked against 200 dpi renders of physical PDF pages 2 and 6. The two corpus MinerU passes are duplicate reads
+    of the same printed tables; their numeric cells agree. Table 2 standard deviations and Table 1 run metadata
+    were hand-assembled because the table emitter cannot join adjacent columns. The paper also estimates pO2 under
+    a residual-air assumption; that estimate is retained as text and not mapped to fO2. Its alpha_v comparison uses
+    JANAF equilibrium-pressure inputs not stored here, so the reported alpha relation is quoted context, not model_derived.
+  date: '2026-10-25'
+  worker: w1025a-tsuch95
+  provenance_path: text/tsuchiyama-fujimoto-1995-iron-evaporation/pdftotext-layout.txt
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables:
+  - page: 2
+    table_index: 3
+    count: 0
+  - page: 6
+    table_index: 4
+    count: 0
+species:
+  Fe:
+    observations:
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1101
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1101'
+        table_row_number: 2
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1101; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1075'
+        value: '0.010'
+        run_as_printed: '1101'
+        duration_h_as_printed: '72'
+        initial_weight_mg_as_printed: '150.45'
+        final_weight_mg_as_printed: '149.51'
+        mass_loss_mg_as_printed: '0.94'
+        surface_area_mm2_as_printed: '94.260'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1102
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1102'
+        table_row_number: 3
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1102; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1075'
+        value: '0.0490'
+        run_as_printed: '1102'
+        duration_h_as_printed: '96'
+        initial_weight_mg_as_printed: '159.72'
+        final_weight_mg_as_printed: '154.87'
+        mass_loss_mg_as_printed: '4.85'
+        surface_area_mm2_as_printed: '98.895'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1103
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1103'
+        table_row_number: 4
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1103; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1075'
+        value: '0.0594'
+        run_as_printed: '1103'
+        duration_h_as_printed: '96'
+        initial_weight_mg_as_printed: '127.76'
+        final_weight_mg_as_printed: '122.28'
+        mass_loss_mg_as_printed: '5.48'
+        surface_area_mm2_as_printed: '92.240'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1151
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1151'
+        table_row_number: 5
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1151; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1123'
+        value: '0.1185'
+        run_as_printed: '1151'
+        duration_h_as_printed: '72'
+        initial_weight_mg_as_printed: '103.60'
+        final_weight_mg_as_printed: '93.50'
+        mass_loss_mg_as_printed: '10.10'
+        surface_area_mm2_as_printed: '85.255'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1153
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1153'
+        table_row_number: 6
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1153; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1123'
+        value: '0.2645'
+        run_as_printed: '1153'
+        duration_h_as_printed: '84'
+        initial_weight_mg_as_printed: '147.52'
+        final_weight_mg_as_printed: '123.10'
+        mass_loss_mg_as_printed: '24.42'
+        surface_area_mm2_as_printed: '92.320'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1154
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1154'
+        table_row_number: 7
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1154; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1123'
+        value: '0.2259'
+        run_as_printed: '1154'
+        duration_h_as_printed: '84'
+        initial_weight_mg_as_printed: '161.18'
+        final_weight_mg_as_printed: '138.72'
+        mass_loss_mg_as_printed: '22.46'
+        surface_area_mm2_as_printed: '99.410'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1152
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1152'
+        table_row_number: 8
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1152; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1123'
+        value: '0.1776'
+        run_as_printed: '1152'
+        duration_h_as_printed: '96'
+        initial_weight_mg_as_printed: '151.96'
+        final_weight_mg_as_printed: '134.73'
+        mass_loss_mg_as_printed: '17.23'
+        surface_area_mm2_as_printed: '97.020'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1201
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1201'
+        table_row_number: 9
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1201; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1170'
+        value: '0.1167'
+        run_as_printed: '1201'
+        duration_h_as_printed: '24'
+        initial_weight_mg_as_printed: '138.82'
+        final_weight_mg_as_printed: '128.20'
+        mass_loss_mg_as_printed: '10.62'
+        surface_area_mm2_as_printed: '91.020'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1202
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1202'
+        table_row_number: 10
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1202; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1170'
+        value: '0.1250'
+        run_as_printed: '1202'
+        duration_h_as_printed: '24'
+        initial_weight_mg_as_printed: '147.67'
+        final_weight_mg_as_printed: '136.60'
+        mass_loss_mg_as_printed: '11.07'
+        surface_area_mm2_as_printed: '88.556'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1203
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1203'
+        table_row_number: 11
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1203; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1170'
+        value: '0.1266'
+        run_as_printed: '1203'
+        duration_h_as_printed: '24'
+        initial_weight_mg_as_printed: '140.52'
+        final_weight_mg_as_printed: '128.49'
+        mass_loss_mg_as_printed: '12.03'
+        surface_area_mm2_as_printed: '95.050'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1204
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1204'
+        table_row_number: 12
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1204; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1170'
+        value: '0.2919'
+        run_as_printed: '1204'
+        duration_h_as_printed: '36'
+        initial_weight_mg_as_printed: '152.17'
+        final_weight_mg_as_printed: '123.48'
+        mass_loss_mg_as_printed: '28.69'
+        surface_area_mm2_as_printed: '98.300'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1253
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1253'
+        table_row_number: 13
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1253; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1220'
+        value: '0.1757'
+        run_as_printed: '1253'
+        duration_h_as_printed: '4'
+        initial_weight_mg_as_printed: '154.02'
+        final_weight_mg_as_printed: '137.94'
+        mass_loss_mg_as_printed: '16.08'
+        surface_area_mm2_as_printed: '91.540'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1251
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1251'
+        table_row_number: 14
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1251; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1220'
+        value: '0.1262'
+        run_as_printed: '1251'
+        duration_h_as_printed: '6'
+        initial_weight_mg_as_printed: '154.59'
+        final_weight_mg_as_printed: '141.95'
+        mass_loss_mg_as_printed: '12.64'
+        surface_area_mm2_as_printed: '100.200'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1252
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1252'
+        table_row_number: 15
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1252; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1220'
+        value: '0.2170'
+        run_as_printed: '1252'
+        duration_h_as_printed: '8'
+        initial_weight_mg_as_printed: '137.59'
+        final_weight_mg_as_printed: '117.30'
+        mass_loss_mg_as_printed: '20.29'
+        surface_area_mm2_as_printed: '93.525'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1303
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1303'
+        table_row_number: 16
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1303; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1265'
+        value: '0.1046'
+        run_as_printed: '1303'
+        duration_h_as_printed: '2'
+        initial_weight_mg_as_printed: '147.52'
+        final_weight_mg_as_printed: '137.41'
+        mass_loss_mg_as_printed: '10.11'
+        surface_area_mm2_as_printed: '96.700'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1302
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1302'
+        table_row_number: 17
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1302; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1265'
+        value: '0.1924'
+        run_as_printed: '1302'
+        duration_h_as_printed: '4'
+        initial_weight_mg_as_printed: '142.50'
+        final_weight_mg_as_printed: '124.64'
+        mass_loss_mg_as_printed: '17.86'
+        surface_area_mm2_as_printed: '92.830'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1301
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1301'
+        table_row_number: 18
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1301; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1265'
+        value: '1.1108'
+        run_as_printed: '1301'
+        duration_h_as_printed: '24'
+        initial_weight_mg_as_printed: '161.80'
+        final_weight_mg_as_printed: '54.47'
+        mass_loss_mg_as_printed: '107.33'
+        surface_area_mm2_as_printed: '96.625'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1351
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1351'
+        table_row_number: 19
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1351; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1312'
+        value: '0.0755'
+        run_as_printed: '1351'
+        duration_h_as_printed: '0.5'
+        initial_weight_mg_as_printed: '132.11'
+        final_weight_mg_as_printed: '125.29'
+        mass_loss_mg_as_printed: '6.82'
+        surface_area_mm2_as_printed: '90.280'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1353
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1353'
+        table_row_number: 20
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1353; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1312'
+        value: '0.3284'
+        run_as_printed: '1353'
+        duration_h_as_printed: '0.75'
+        initial_weight_mg_as_printed: '110.51'
+        final_weight_mg_as_printed: '80.36'
+        mass_loss_mg_as_printed: '30.15'
+        surface_area_mm2_as_printed: '91.800'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table1_run_1352
+      type: mass_loss
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 206
+        table: '1'
+        row: '1352'
+        table_row_number: 21
+        table_column_number: 8
+        column_header: Delta M/S /mg mm^-2
+        note: Table 1 run 1352; row/cell assignment checked against the page 206 render.
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: gamma-Fe(s)
+      units: mg mm^-2
+      values:
+        quantity: mass_loss_areal_density
+        method_class: measured_tabulated
+        admission_status: typed_refusal
+        reason: The existing mass_loss_areal_density unit mapper does not accept the printed mg mm^-2 unit; the
+          experiment pressure is also a series interval, not a scalar identity pressure.
+        schema_gap: No current unit form admits the printed mass-loss-per-area unit mg mm^-2, and the scalar identity
+          cannot represent the printed total-pressure interval.
+        T_C: '1312'
+        value: '0.2594'
+        run_as_printed: '1352'
+        duration_h_as_printed: '1'
+        initial_weight_mg_as_printed: '133.68'
+        final_weight_mg_as_printed: '110.47'
+        mass_loss_mg_as_printed: '23.21'
+        surface_area_mm2_as_printed: '89.485'
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        starting_material_as_printed: 99.99% pure polycrystalline metallic iron
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table2_1075C
+      type: rate_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 210
+        table: '2'
+        row: '1075'
+        table_row_number: 2
+        table_column_number: 2
+        column_header: j_meas /mol m^-2 s^-1
+        note: Table 2 evaporation rate at 1075°C; row/cell checked against the page 210 render.
+      phase: cr
+      standard_state: gamma-Fe(s)
+      regime: langmuir_free_evaporation
+      condensed_form:
+        polymorph: gamma
+      units: mol m^-2 s^-1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        reason: The printed value is a mol Fe areal flux (mol m^-2 s^-1), which the existing evaporation_rate schema
+          does not represent. The printed total pressure is a series interval, not a scalar identity pressure; no
+          unit or pressure conversion is made.
+        schema_gap: No current quantity form represents the printed molar flux per area and time, and the scalar
+          identity pressure form cannot represent the printed total-pressure interval.
+        T_C: '1075'
+        evaporation_rate: '2.344e-6'
+        evaporation_rate_as_printed: 2.344 × 10^-6
+        standard_deviation_as_printed: 6.43 × 10^-7
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      uncertainty:
+        reported_status: printed
+        meaning: standard_deviation
+        as_published: 6.43 × 10^-7 mol m^-2 s^-1; confidence level not stated
+        confidence_level: not_stated
+      derived_from: &id001
+      - tsuchiyama_fujimoto_1995_table1_run_1101
+      - tsuchiyama_fujimoto_1995_table1_run_1102
+      - tsuchiyama_fujimoto_1995_table1_run_1103
+      derivation:
+        relation: The least-squares fit of Table 1 Delta M/S versus time gives j_meas, using Delta M/S = M_Fe j_meas
+          t as stated by the authors.
+        inputs: *id001
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table2_1123C
+      type: rate_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 210
+        table: '2'
+        row: '1123'
+        table_row_number: 3
+        table_column_number: 2
+        column_header: j_meas /mol m^-2 s^-1
+        note: Table 2 evaporation rate at 1123°C; row/cell checked against the page 210 render.
+      phase: cr
+      standard_state: gamma-Fe(s)
+      regime: langmuir_free_evaporation
+      condensed_form:
+        polymorph: gamma
+      units: mol m^-2 s^-1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        reason: The printed value is a mol Fe areal flux (mol m^-2 s^-1), which the existing evaporation_rate schema
+          does not represent. The printed total pressure is a series interval, not a scalar identity pressure; no
+          unit or pressure conversion is made.
+        schema_gap: No current quantity form represents the printed molar flux per area and time, and the scalar
+          identity pressure form cannot represent the printed total-pressure interval.
+        T_C: '1123'
+        evaporation_rate: '1.165e-5'
+        evaporation_rate_as_printed: 1.165 × 10^-5
+        standard_deviation_as_printed: 1.72 × 10^-6
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      uncertainty:
+        reported_status: printed
+        meaning: standard_deviation
+        as_published: 1.72 × 10^-6 mol m^-2 s^-1; confidence level not stated
+        confidence_level: not_stated
+      derived_from: &id002
+      - tsuchiyama_fujimoto_1995_table1_run_1151
+      - tsuchiyama_fujimoto_1995_table1_run_1153
+      - tsuchiyama_fujimoto_1995_table1_run_1154
+      - tsuchiyama_fujimoto_1995_table1_run_1152
+      derivation:
+        relation: The least-squares fit of Table 1 Delta M/S versus time gives j_meas, using Delta M/S = M_Fe j_meas
+          t as stated by the authors.
+        inputs: *id002
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table2_1170C
+      type: rate_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 210
+        table: '2'
+        row: '1170'
+        table_row_number: 4
+        table_column_number: 2
+        column_header: j_meas /mol m^-2 s^-1
+        note: Table 2 evaporation rate at 1170°C; row/cell checked against the page 210 render.
+      phase: cr
+      standard_state: gamma-Fe(s)
+      regime: langmuir_free_evaporation
+      condensed_form:
+        polymorph: gamma
+      units: mol m^-2 s^-1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        reason: The printed value is a mol Fe areal flux (mol m^-2 s^-1), which the existing evaporation_rate schema
+          does not represent. The printed total pressure is a series interval, not a scalar identity pressure; no
+          unit or pressure conversion is made.
+        schema_gap: No current quantity form represents the printed molar flux per area and time, and the scalar
+          identity pressure form cannot represent the printed total-pressure interval.
+        T_C: '1170'
+        evaporation_rate: '3.182e-5'
+        evaporation_rate_as_printed: 3.182 × 10^-5
+        standard_deviation_as_printed: 4.27 × 10^-6
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      uncertainty:
+        reported_status: printed
+        meaning: standard_deviation
+        as_published: 4.27 × 10^-6 mol m^-2 s^-1; confidence level not stated
+        confidence_level: not_stated
+      derived_from: &id003
+      - tsuchiyama_fujimoto_1995_table1_run_1201
+      - tsuchiyama_fujimoto_1995_table1_run_1202
+      - tsuchiyama_fujimoto_1995_table1_run_1203
+      - tsuchiyama_fujimoto_1995_table1_run_1204
+      derivation:
+        relation: The least-squares fit of Table 1 Delta M/S versus time gives j_meas, using Delta M/S = M_Fe j_meas
+          t as stated by the authors.
+        inputs: *id003
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table2_1220C
+      type: rate_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 210
+        table: '2'
+        row: '1220'
+        table_row_number: 5
+        table_column_number: 2
+        column_header: j_meas /mol m^-2 s^-1
+        note: Table 2 evaporation rate at 1220°C; row/cell checked against the page 210 render.
+      phase: cr
+      standard_state: gamma-Fe(s)
+      regime: langmuir_free_evaporation
+      condensed_form:
+        polymorph: gamma
+      units: mol m^-2 s^-1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        reason: The printed value is a mol Fe areal flux (mol m^-2 s^-1), which the existing evaporation_rate schema
+          does not represent. The printed total pressure is a series interval, not a scalar identity pressure; no
+          unit or pressure conversion is made.
+        schema_gap: No current quantity form represents the printed molar flux per area and time, and the scalar
+          identity pressure form cannot represent the printed total-pressure interval.
+        T_C: '1220'
+        evaporation_rate: '1.370e-4'
+        evaporation_rate_as_printed: 1.370 × 10^-4
+        standard_deviation_as_printed: 2.49 × 10^-5
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      uncertainty:
+        reported_status: printed
+        meaning: standard_deviation
+        as_published: 2.49 × 10^-5 mol m^-2 s^-1; confidence level not stated
+        confidence_level: not_stated
+      derived_from: &id004
+      - tsuchiyama_fujimoto_1995_table1_run_1253
+      - tsuchiyama_fujimoto_1995_table1_run_1251
+      - tsuchiyama_fujimoto_1995_table1_run_1252
+      derivation:
+        relation: The least-squares fit of Table 1 Delta M/S versus time gives j_meas, using Delta M/S = M_Fe j_meas
+          t as stated by the authors.
+        inputs: *id004
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table2_1265C
+      type: rate_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 210
+        table: '2'
+        row: '1265'
+        table_row_number: 6
+        table_column_number: 2
+        column_header: j_meas /mol m^-2 s^-1
+        note: Table 2 evaporation rate at 1265°C; row/cell checked against the page 210 render.
+      phase: cr
+      standard_state: gamma-Fe(s)
+      regime: langmuir_free_evaporation
+      condensed_form:
+        polymorph: gamma
+      units: mol m^-2 s^-1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        reason: The printed value is a mol Fe areal flux (mol m^-2 s^-1), which the existing evaporation_rate schema
+          does not represent. The printed total pressure is a series interval, not a scalar identity pressure; no
+          unit or pressure conversion is made.
+        schema_gap: No current quantity form represents the printed molar flux per area and time, and the scalar
+          identity pressure form cannot represent the printed total-pressure interval.
+        T_C: '1265'
+        evaporation_rate: '2.307e-4'
+        evaporation_rate_as_printed: 2.307 × 10^-4
+        standard_deviation_as_printed: 1.99 × 10^-6
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      uncertainty:
+        reported_status: printed
+        meaning: standard_deviation
+        as_published: 1.99 × 10^-6 mol m^-2 s^-1; confidence level not stated
+        confidence_level: not_stated
+      derived_from: &id005
+      - tsuchiyama_fujimoto_1995_table1_run_1303
+      - tsuchiyama_fujimoto_1995_table1_run_1302
+      - tsuchiyama_fujimoto_1995_table1_run_1301
+      derivation:
+        relation: The least-squares fit of Table 1 Delta M/S versus time gives j_meas, using Delta M/S = M_Fe j_meas
+          t as stated by the authors.
+        inputs: *id005
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    - observation_id: tsuchiyama_fujimoto_1995_table2_1312C
+      type: rate_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 210
+        table: '2'
+        row: '1312'
+        table_row_number: 7
+        table_column_number: 2
+        column_header: j_meas /mol m^-2 s^-1
+        note: Table 2 evaporation rate at 1312°C; row/cell checked against the page 210 render.
+      phase: cr
+      standard_state: gamma-Fe(s)
+      regime: langmuir_free_evaporation
+      condensed_form:
+        polymorph: gamma
+      units: mol m^-2 s^-1
+      values:
+        quantity: evaporation_rate
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        reason: The printed value is a mol Fe areal flux (mol m^-2 s^-1), which the existing evaporation_rate schema
+          does not represent. The printed total pressure is a series interval, not a scalar identity pressure; no
+          unit or pressure conversion is made.
+        schema_gap: No current quantity form represents the printed molar flux per area and time, and the scalar
+          identity pressure form cannot represent the printed total-pressure interval.
+        T_C: '1312'
+        evaporation_rate: '1.491e-3'
+        evaporation_rate_as_printed: 1.491 × 10^-3
+        standard_deviation_as_printed: 3.49 × 10^-4
+        pressure_as_printed: The pressure ranged from 10^-5 to 10^-6 Torr.
+        oxygen_partial_pressure_estimate_as_printed: About 10^-9 atm (3 × 10^-9 to 3 × 10^-10 atm) if residual gas
+          is assumed to be air; diffusion-pump oil back-diffusion may make pO2 slightly lower.
+        reservoir_as_printed: pure metallic Fe(s)
+        rail: vapour
+        phase_basis_as_printed: The source states gamma-iron is stable over the 1075–1312°C experiment range.
+      uncertainty:
+        reported_status: printed
+        meaning: standard_deviation
+        as_published: 3.49 × 10^-4 mol m^-2 s^-1; confidence level not stated
+        confidence_level: not_stated
+      derived_from: &id006
+      - tsuchiyama_fujimoto_1995_table1_run_1351
+      - tsuchiyama_fujimoto_1995_table1_run_1353
+      - tsuchiyama_fujimoto_1995_table1_run_1352
+      derivation:
+        relation: The least-squares fit of Table 1 Delta M/S versus time gives j_meas, using Delta M/S = M_Fe j_meas
+          t as stated by the authors.
+        inputs: *id006
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '0.00013332236842105263'
+              interval_high: '0.0013332236842105263'
+          locator:
+            page: 3
+            published_page: 207
+            section: 2. Experiments
+            note: The pressure ranged from 10^-5 to 10^-6 Torr.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 208
+            section: Results
+            note: The source estimates oxygen partial pressure under a residual-air assumption; it does not state
+              oxygen fugacity.
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 2
+            published_page: 206
+            section: 2. Experiments
+            note: The starting plates are 99.99% pure polycrystalline metallic iron; a full composition is not stated.
+    context:
+    - observation_id: tsuchiyama_fujimoto_1995_alpha_v_comparison_context
+      type: quoted_model_context
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 211
+        section: Discussion
+        note: Author comparison of measured rates with calculated Fe rates.
+      units: dimensionless alpha_v; T in K
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        attribution: Tsuchiyama and Fujimoto (1995), p. 211.
+        alpha_as_printed: about 0.5
+        relation_as_printed: ln(alpha_v) = -0.890 + 299/T
+        input_limitation: The comparison uses Fe(g) equilibrium-pressure data from JANAF (1971), which are not stored
+          in this extract.
+        correction_note: The authors state that correcting for surface wustite would bring alpha_v close to unity.
+fidelity_samples:
+- species: Fe
+  observation_id: tsuchiyama_fujimoto_1995_table1_run_1101
+  field: value
+  value: '0.010'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 206
+    table: '1'
+    row: '1101'
+    table_row_number: 2
+    table_column_number: 8
+- species: Fe
+  observation_id: tsuchiyama_fujimoto_1995_table1_run_1301
+  field: surface_area_mm2_as_printed
+  value: '96.625'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 206
+    table: '1'
+    row: '1301'
+    table_row_number: 18
+    table_column_number: 7
+- species: Fe
+  observation_id: tsuchiyama_fujimoto_1995_table2_1265C
+  field: evaporation_rate_as_printed
+  value: 2.307 × 10^-4
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 210
+    table: '2'
+    row: '1265'
+    table_row_number: 6
+    table_column_number: 2
+- species: Fe
+  observation_id: tsuchiyama_fujimoto_1995_table2_1312C
+  field: standard_deviation_as_printed
+  value: 3.49 × 10^-4
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 210
+    table: '2'
+    row: '1312'
+    table_row_number: 7
+    table_column_number: 3

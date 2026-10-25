@@ -756,6 +756,7 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                 "activity",
                 "gamma",
                 "T_m_K",
+                "evaporation_rate",
             )
             stored_points = values.get("points") or []
             if stored_points:
