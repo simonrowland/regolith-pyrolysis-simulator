@@ -73,7 +73,7 @@ def test_lamoreaux_1987_vapor_summaries_keep_printed_species_and_unknown_conditi
         "LH87_SiO2_vapor_speciation",
     }
     assert len(rows) == 6
-    assert rows["LH87_BeO_vapor_speciation"]["locator"]["published_page"] == 422
+    assert rows["LH87_BeO_vapor_speciation"]["locator"]["published_page"] == 426
     assert rows["LH87_BeO_vapor_speciation"]["values"]["species_by_condition_as_printed"]["oxidizing"] == [
         "BeO(g)", "Be2O2(g)", "Be3O3(g)", "Be4O4(g)", "Be5O5(g)"
     ]
@@ -86,6 +86,18 @@ def test_lamoreaux_1987_vapor_summaries_keep_printed_species_and_unknown_conditi
         assert row["point_conditions"]["atmosphere"]["state"]["tag"] == "unknown"
         assert "total_pressure_Pa" not in row["point_conditions"]
         assert "fO2_Pa" not in row["point_conditions"]
+    for observation_id in ("LH87_BeO_vapor_speciation", "LH87_MgO_vapor_speciation"):
+        row = rows[observation_id]
+        assert row["locator"]["page"] == 9
+        for axis in ("temperature_K", "atmosphere"):
+            assert row["point_conditions"][axis]["locator"]["published_page"] == 426
+    al_summary = rows["LH87_Al2O3_vapor_speciation"]
+    assert al_summary["locator"]["published_page"] == 431
+    assert "continues onto p. 432" in al_summary["locator"]["note"]
+    assert all(
+        al_summary["point_conditions"][axis]["locator"]["published_page"] == 431
+        for axis in ("temperature_K", "atmosphere")
+    )
 
 
 def test_lamoreaux_1987_table3_render_pins_and_selected_row_count():
@@ -121,6 +133,13 @@ def test_lamoreaux_1987_table3_render_pins_and_selected_row_count():
         assert "total_pressure_Pa" not in row["point_conditions"]
 
     assert rows["LH87_Si2O2_g_table3"]["values"]["status"] == "typed_refusal"
+    silicon_gef = next(
+        row
+        for row in document["species"]["SiO2"]["observations"]
+        if row["observation_id"] == "LH87_SiO2_table2_GEF_refusal"
+    )
+    assert silicon_gef["locator"]["published_page"] == 423
+    assert silicon_gef["point_conditions"]["temperature_K"]["locator"]["published_page"] == 423
 
     coefficient_refusals = [
         row

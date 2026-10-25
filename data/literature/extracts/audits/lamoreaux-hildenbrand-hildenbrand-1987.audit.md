@@ -56,7 +56,7 @@ The Table 2 system-level refusals cover printed species labels BeO(s/l/g), Be2O(
 
 ## Qualitative vapor species and conditions
 
-The six system summaries (Be-O p. 422; Mg-O p. 422; Ca-O p. 428; B-O p. 431; Al-O p. 432; Si-O p. 435) are recorded as `gas_speciation` typed refusals. They preserve the printed species, qualitative condition labels, reaction wording where given, and locators. The schema has no admitted representation for qualitative cross-regime vapor composition or unbalanced reaction prose.
+The six system summaries (Be-O p. 426; Mg-O p. 426; Ca-O p. 428; B-O p. 431; Al-O pp. 431–432; Si-O p. 435) are recorded as `gas_speciation` typed refusals. They preserve the printed species, qualitative condition labels, reaction wording where given, and locators. The schema has no admitted representation for qualitative cross-regime vapor composition or unbalanced reaction prose.
 
 No total pressure, single temperature, or numeric fO2 is assigned to these prose summaries. The numeric oxygen conditions are attached to calculated figures: 0.2 bar O2, congruent vaporization, and 10^-15 bar O2 or the metal-metal-oxide equilibrium pressure when higher. For B2O3, the reducing figure uses 10^-15 bar O2 up to 1923 K and the B-B2O3 equilibrium above that; for Al2O3 it uses 10^-15 bar O2 below 2230 K and the Al-Al2O3 equilibrium above. These are figure conditions only and are not promoted to thermodynamic table rows. Figure curves and their partial-pressure values are not digitized; they remain figure-read candidates.
 

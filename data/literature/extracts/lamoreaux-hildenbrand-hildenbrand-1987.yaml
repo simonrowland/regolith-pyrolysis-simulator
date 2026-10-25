@@ -208,9 +208,9 @@ species:
       type: gas_speciation
       locator:
         section: Be-O system
-        page: 5
-        published_page: 422
-        pdf_page_index: 4
+        page: 9
+        published_page: 426
+        pdf_page_index: 8
         note: Qualitative Be-O vapor species under neutral/reducing and oxidizing conditions
       phase: gas
       units: species and reaction wording as printed
@@ -220,18 +220,18 @@ species:
             tag: unknown
             reason: The qualitative summary gives no single temperature; figure values are excluded.
           locator:
-            page: 5
-            published_page: 422
-            pdf_page_index: 4
+            page: 9
+            published_page: 426
+            pdf_page_index: 8
             section: Be-O system
         atmosphere:
           state:
             tag: unknown
             reason: This summary compares neutral/reducing and oxidizing regimes rather than one atmosphere.
           locator:
-            page: 5
-            published_page: 422
-            pdf_page_index: 4
+            page: 9
+            published_page: 426
+            pdf_page_index: 8
             section: Be-O system
       values:
         quantity: vapor_species
@@ -430,9 +430,9 @@ species:
       type: gas_speciation
       locator:
         section: Mg-O system
-        page: 5
-        published_page: 422
-        pdf_page_index: 4
+        page: 9
+        published_page: 426
+        pdf_page_index: 8
         note: Qualitative Mg-O vapor species under neutral/reducing and oxidizing conditions
       phase: gas
       units: species and reaction wording as printed
@@ -442,18 +442,18 @@ species:
             tag: unknown
             reason: The qualitative summary gives no single temperature; figure values are excluded.
           locator:
-            page: 5
-            published_page: 422
-            pdf_page_index: 4
+            page: 9
+            published_page: 426
+            pdf_page_index: 8
             section: Mg-O system
         atmosphere:
           state:
             tag: unknown
             reason: This summary compares neutral/reducing and oxidizing regimes rather than one atmosphere.
           locator:
-            page: 5
-            published_page: 422
-            pdf_page_index: 4
+            page: 9
+            published_page: 426
+            pdf_page_index: 8
             section: Mg-O system
       values:
         quantity: vapor_species
@@ -818,10 +818,10 @@ species:
       type: gas_speciation
       locator:
         section: Al-O system
-        page: 15
-        published_page: 432
-        pdf_page_index: 14
-        note: Qualitative major gaseous aluminum species
+        page: 14
+        published_page: 431
+        pdf_page_index: 13
+        note: Qualitative major gaseous aluminum species; discussion continues onto p. 432
       phase: gas
       units: species and condition wording as printed
       point_conditions:
@@ -830,18 +830,18 @@ species:
             tag: unknown
             reason: The qualitative summary gives no single temperature; figure values are excluded.
           locator:
-            page: 15
-            published_page: 432
-            pdf_page_index: 14
+            page: 14
+            published_page: 431
+            pdf_page_index: 13
             section: Al-O system
         atmosphere:
           state:
             tag: unknown
             reason: The summary says the major species depend on conditions without specifying one atmosphere.
           locator:
-            page: 15
-            published_page: 432
-            pdf_page_index: 14
+            page: 14
+            published_page: 431
+            pdf_page_index: 13
             section: Al-O system
       values:
         quantity: vapor_species
@@ -1050,7 +1050,7 @@ species:
         attribution: Lamoreaux, Hildenbrand, and Brewer (1987), Si-O system review summary; thermodynamic input references are listed by species in Table 4.
     - observation_id: LH87_SiO2_table2_GEF_refusal
       type: gibbs_table
-      locator:
+      locator: &lh87_table2_p423
         table: Table 2
         page: 6
         published_page: 423
@@ -1060,7 +1060,7 @@ species:
       point_conditions:
         temperature_K:
           state: {tag: unknown, reason: The coefficients cover multiple printed temperature intervals.}
-          locator: *lh87_table2_p422
+          locator: *lh87_table2_p423
       values:
         quantity: gibbs_energy_function_coefficients
         method_class: quoted_attributed
