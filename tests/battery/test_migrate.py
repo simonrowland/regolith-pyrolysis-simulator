@@ -8249,13 +8249,19 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
     fields = QUANTITY_SOURCE_FIELDS[Quantity.ISOTOPE_DELTA]
-    assert fields == ("isotope_delta_isotope_delta",)
-    item = {fields[0]: "2.15"}
-    selected = select_declared_source(Quantity.ISOTOPE_DELTA, "per mil", item)
-    assert selected.amount is not None
-    assert _census_expected_point(
-        item, Quantity.ISOTOPE_DELTA.value, "per mil"
-    ) == selected.amount
+    assert fields == (
+        "isotope_delta_isotope_delta",
+        "delta25Mg_permil",
+        "delta26Mg_permil",
+    )
+    for field in fields:
+        item = {field: "2.15"}
+        selected = select_declared_source(Quantity.ISOTOPE_DELTA, "per mil", item)
+        assert selected.amount is not None
+        assert _census_expected_point(
+            item, Quantity.ISOTOPE_DELTA.value, "per mil"
+        ) == selected.amount
+
     # 82e127173: one decorated column is the point. Neuman prints this name.
     printed = {"isotope_delta_delta41K_NIST_SRM_3141a_permil": "-0.49"}
     selected_printed = select_declared_source(
@@ -8274,6 +8280,115 @@ def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
     assert _census_expected_point(
         both, Quantity.ISOTOPE_DELTA.value, "per mil"
     ) is None
+
+
+def test_mendybaev_table2_splits_isotopes_and_refuses_element_fractions() -> None:
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/mendybaev-2021-cai-low-pressure-h2-evap.yaml"
+    )
+    rows = migrator.result.observations.values()
+
+    def source_rows(observation_id: str):
+        return [row for row in rows if f"::{observation_id}::" in row.observation_id]
+
+    for element in ("Mg", "Si"):
+        unavailable = source_rows(f"mendybaev_2021_table2_fraction_{element}_unavailable")
+        assert len(unavailable) == 17
+        for row in unavailable:
+            assert quantity_token(row.identity) is None
+            assert row.value.kind is ValueKind.UNAVAILABLE
+            assert row.locator.published_page == 29
+            assert row.locator.table == "2"
+            reason = row.identity.quantity.reason or ""
+            assert "per_element_fraction_remaining" in reason
+            assert "f=(X/Al)residue/(X/Al)initial" in reason
+            assert row.identity.temperature_K.value == Decimal("1873.15")
+            condition = row.point_conditions["temperature_C"]
+            assert condition.state.value == Decimal("1600")
+            assert condition.locator.published_page == "7-8"
+
+    expected = {
+        "delta25Mg": {
+            "25Mg/24Mg": {
+                "CAI4B2-2": Decimal("-0.97"),
+                "CAI4B2-16": Decimal("0.04"),
+                "CAI4B2-12": Decimal("2.76"),
+                "CAI4B2-3": Decimal("19.70"),
+                "CAI4B2-14": Decimal("7.18"),
+                "CAI4B2-10": Decimal("15.12"),
+                "CAI4B2-1": Decimal("-1.66"),
+                "CAI4B2-25": Decimal("0.87"),
+                "CAI4B2-22": Decimal("2.51"),
+                "CAI4B2-21": Decimal("10.90"),
+                "CAI4B2-23": Decimal("20.90"),
+            }
+        },
+        "delta26Mg": {
+            "26Mg/24Mg": {
+                "CAI4B2-2": Decimal("-1.90"),
+                "CAI4B2-16": Decimal("0.06"),
+                "CAI4B2-12": Decimal("5.42"),
+                "CAI4B2-3": Decimal("38.89"),
+                "CAI4B2-14": Decimal("14.09"),
+                "CAI4B2-10": Decimal("29.81"),
+                "CAI4B2-1": Decimal("-3.21"),
+                "CAI4B2-25": Decimal("1.64"),
+                "CAI4B2-22": Decimal("4.89"),
+                "CAI4B2-21": Decimal("21.42"),
+                "CAI4B2-23": Decimal("41.51"),
+            }
+        },
+    }
+    expected_2std = {
+        "CAI4B2-2": Decimal("0.05"),
+        "CAI4B2-16": Decimal("0.05"),
+        "CAI4B2-12": Decimal("0.05"),
+        "CAI4B2-3": Decimal("0.05"),
+        "CAI4B2-14": Decimal("0.05"),
+        "CAI4B2-10": Decimal("0.05"),
+        "CAI4B2-1": Decimal("0.05"),
+        "CAI4B2-25": Decimal("0.06"),
+        "CAI4B2-22": Decimal("0.06"),
+        "CAI4B2-21": Decimal("0.06"),
+        "CAI4B2-23": Decimal("0.06"),
+    }
+    from simulator.battery.score import rail_for_quantity
+
+    for observation_id, expected_by_ratio in expected.items():
+        isotope_rows = source_rows(f"mendybaev_2021_table2_{observation_id}")
+        assert len(isotope_rows) == 11
+        ratio, values = next(iter(expected_by_ratio.items()))
+        by_sample = {}
+        for row in isotope_rows:
+            assert quantity_token(row.identity) is Quantity.ISOTOPE_DELTA
+            assert row.identity.subtype.value == ratio
+            assert row.locator.published_page == 29
+            assert row.locator.table == "2"
+            assert row.identity.temperature_K.value == Decimal("1873.15")
+            condition = row.point_conditions["temperature_C"]
+            assert condition.state.value == Decimal("1600")
+            assert condition.locator.published_page == "7-8"
+            reference = row.provenance["isotope_reference"]
+            assert reference.state.value == "DSM-3"
+            assert reference.locator.published_page == 29
+            assert reference.locator.table == "2"
+            assert rail_for_quantity(Quantity.ISOTOPE_DELTA) is None
+            sample = row.observation_id.split("row=", 1)[1].split(":", 1)[0].upper()
+            assert row.value.point.as_tuple() == values[sample].as_tuple()
+            if observation_id == "delta25Mg":
+                uncertainty = row.uncertainty
+                assert uncertainty.kind is UncertaintyKind.PRINTED
+                assert uncertainty.value == expected_2std[sample]
+                assert uncertainty.value.as_tuple() == expected_2std[sample].as_tuple()
+                assert uncertainty.basis == "2sigma"
+                assert uncertainty.verbatim["sigma"] == str(expected_2std[sample])
+                assert uncertainty.verbatim["k"] == 2
+            else:
+                assert row.uncertainty.kind is UncertaintyKind.NONE
+                assert row.uncertainty.value is None
+            by_sample[sample] = row.value.point
+        assert by_sample == values
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
@@ -14611,6 +14726,7 @@ def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -
         for o in result.observations.values()
         if o.source_id == "kems-044-robinot-2026"
         and quantity_token(o.identity) in {Quantity.YIELD_FRACTION, Quantity.O2_YIELD}
+        and "hsc_expected_1p37_model" not in o.observation_id
     ]
     tokens = {quantity_token(o.identity) for o in robinot}
     assert Quantity.YIELD_FRACTION in tokens
@@ -14644,6 +14760,8 @@ def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -
     cardiff_vals = {float(o.value.point) for o in cardiff}
     assert 0.101 in cardiff_vals
     assert 0.16 in cardiff_vals
+
+
     assert 0.37 in cardiff_vals
     matchett = [
         o
@@ -14669,6 +14787,32 @@ def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -
         }
     }
     assert not forbidden
+
+
+def test_robinot_hsc_model_yield_maps_with_printed_conditions() -> None:
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/kems-044-robinot-2026.yaml"
+    )
+    observation = next(
+        row
+        for row in migrator.result.observations.values()
+        if "hsc_expected_1p37_model" in row.observation_id
+    )
+
+    assert quantity_token(observation.identity) is Quantity.YIELD_FRACTION
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.0137")
+    assert observation.value.approximate is True
+    assert observation.identity.temperature_K.value == Decimal("2073.15")
+    pressure = observation.point_conditions["total_pressure_Pa"]
+    assert pressure.state.value == Decimal("1000")
+    assert pressure.locator.published_page == 11
+    assert pressure.locator.pdf_page_index == 11
+    assert observation.locator.pdf_page_index == 11
+    assert observation.identity.species.formula == "O2"
+    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert observation.admission.status is AdmissionStatus.ADMITTED
 
 
 def test_robinot_peak_about_is_not_invented_as_point_t(tmp_path: Path) -> None:

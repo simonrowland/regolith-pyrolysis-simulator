@@ -500,6 +500,7 @@ QUANTITY_ALIASES = {
     "evaporation_coefficient_gamma_equals_alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "evaporation_coefficient_gamma_Si": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "o2_yield": Quantity.O2_YIELD,
+    "equilibrium_molecular_oxygen_yield": Quantity.YIELD_FRACTION,
     "mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
     "assembly_mass_loss_relative_to_initial_mass": Quantity.MASS_LOSS_FRACTION,
     "bulk_mass_loss_wt_pct": Quantity.MASS_LOSS_FRACTION,
@@ -6200,7 +6201,7 @@ def _rekey_ordinal_point_observation_id(
 
 def _percent_named_fraction_field(key: str, units: str | None) -> bool:
     lowered = str(key or "").strip().lower()
-    if lowered.endswith(("_pct", "_percent", "_wt_pct")):
+    if lowered.endswith(("_pct", "_percent", "_wt_pct", "_percent_about")):
         return True
     unit = str(units or "").strip().lower().replace(" ", "")
     return unit in _PERCENT_FRACTION_UNITS
@@ -9173,6 +9174,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.YIELD_FRACTION: (
         "yield_fraction",
         "mass_yield_percent",
+        "mass_yield_percent_about",
     ),
     Quantity.EVOLVED_GAS_YIELD: ("yield_ug_g",),
     Quantity.INTERACTION_PARAMETER: ("wagner_interaction_parameter", "epsilon"),
@@ -9184,7 +9186,11 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "T_C",
         "T",
     ),
-    Quantity.ISOTOPE_DELTA: ("isotope_delta_isotope_delta",),
+    Quantity.ISOTOPE_DELTA: (
+        "isotope_delta_isotope_delta",
+        "delta25Mg_permil",
+        "delta26Mg_permil",
+    ),
     Quantity.RESIDUE_COMPONENT_COMPOSITION: (
         "residue_ppm",
         "SiO2_wt_pct",
@@ -17494,6 +17500,10 @@ class Migrator:
 
         ident_kwargs: dict[str, Any] = {}
         q_token = quantity.value if quantity.is_value else None
+        if q_token is Quantity.ISOTOPE_DELTA:
+            isotope_ratio = values.get("isotope_ratio")
+            if isinstance(isotope_ratio, str) and isotope_ratio.strip():
+                ident_kwargs["subtype"] = State.of(isotope_ratio.strip())
         if q_token is Quantity.VALENCE_RATIO:
             raw_valence_quantity = values.get("quantity")
             try:
@@ -19706,6 +19716,15 @@ class Migrator:
                 extra_unc = raw_item.get(_WIMPENNY_DELTA_2SIGMA_FIELD)
                 if extra_unc not in (None, ""):
                     extra_unc_k = 2
+            if (
+                extra_unc is None
+                and q_for_species is Quantity.ISOTOPE_DELTA
+                and value_sel is not None
+                and value_sel.field_name == "delta25Mg_permil"
+            ):
+                extra_unc = raw_item.get("Mg_2std_permil")
+                if extra_unc not in (None, ""):
+                    extra_unc_k = 2
         else:
             if content_stable_id:
                 point_id = _exploded_point_id(parent_id, item, coord, raw_item, None)
@@ -19780,6 +19799,17 @@ class Migrator:
             if inherited_n is not None and exp_n is not None and inherited_n != exp_n:
                 ident_kwargs.pop("temperature_K", None)
         q_token_point = q_token
+        if (
+            q_token_point is Quantity.ISOTOPE_DELTA
+            and isinstance(parent_values, Mapping)
+            and isinstance(parent_values.get("isotope_reference"), str)
+            and parent_values["isotope_reference"].strip()
+        ):
+            provenance = dict(provenance or {})
+            provenance["isotope_reference"] = Located(
+                State.of(parent_values["isotope_reference"].strip()),
+                locator=point_locator,
+            )
         if (
             q_token_point is Quantity.ACTIVITY_COEFFICIENT
             and isinstance(raw_item, Mapping)

@@ -225,6 +225,116 @@ species:
         H2_2e-4_bar_CAIB2_as_printed: '0.98745±0.00026'
         uncertainty_convention: '±2σ'
         note: 'Figure 6 regression excludes B2-3; data normalized to the least evaporated sample to remove furnace-ramp fractionation.'
+    - observation_id: mendybaev_2021_table2_fraction_Mg_unavailable
+      type: concentration_series
+      locator:
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 29
+        table: '2'
+      T_C: 1600
+      phase: CAI4B2_evaporation_residue
+      regime: vacuum_or_H2_as_sample_group
+      units: dimensionless
+      point_conditions:
+        temperature_C:
+          state: {tag: value, value: 1600}
+          locator:
+            source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+            published_page: '7-8'
+            section: '3.1.1-3.1.2'
+            note: Table 2 residues came from the 1600 °C vacuum and H2 runs
+      values:
+        quantity: 'per_element_fraction_remaining_Mg_normalized_to_Al_and_reference_charge_f=(X/Al)residue/(X/Al)initial'
+        method_class: measured_direct
+        note: 'The printed Table 2 column is fraction evaporated; the controller ruling defines this as per-element fractions remaining normalized to Al and the CAI4B2-1 reference charge, f=(X/Al)residue/(X/Al)initial. This is not whole-sample mass loss and has no matching quantity enum.'
+        rows:
+        - {sample: CAI4B2-2, arm: H2_2e-4_bar, fraction_Mg: "0.031", T_C: 1600}
+        - {sample: CAI4B2-16, arm: H2_2e-4_bar, fraction_Mg: "0.112", T_C: 1600}
+        - {sample: CAI4B2-12, arm: H2_2e-4_bar, fraction_Mg: "0.292", T_C: 1600}
+        - {sample: CAI4B2-3, arm: H2_2e-4_bar, fraction_Mg: "0.869", T_C: 1600}
+        - {sample: CAI4B2-14, arm: H2_2e-4_bar, fraction_Mg: "0.518", T_C: 1600}
+        - {sample: CAI4B2-10, arm: H2_2e-4_bar, fraction_Mg: "0.747", T_C: 1600}
+        - {sample: CAI4B2-26, arm: H2_2e-4_bar, fraction_Mg: "0.449", T_C: 1600}
+        - {sample: CAI4B2-28, arm: H2_2e-4_bar, fraction_Mg: "0.624", T_C: 1600}
+        - {sample: CAI4B2-30, arm: H2_2e-4_bar, fraction_Mg: "1.000", T_C: 1600}
+        - {sample: CAI4B2-31, arm: H2_2e-4_bar, fraction_Mg: "0.250", T_C: 1600}
+        - {sample: CAI4B2-29, arm: H2_2e-4_bar, fraction_Mg: "0.533", T_C: 1600}
+        - {sample: CAI4B2-13, arm: H2_2e-4_bar, fraction_Mg: "0.341", T_C: 1600}
+        - {sample: CAI4B2-1, arm: vacuum, fraction_Mg: "0.000", T_C: 1600}
+        - {sample: CAI4B2-25, arm: vacuum, fraction_Mg: "0.105", T_C: 1600}
+        - {sample: CAI4B2-22, arm: vacuum, fraction_Mg: "0.26", T_C: 1600}
+        - {sample: CAI4B2-21, arm: vacuum, fraction_Mg: "0.642", T_C: 1600}
+        - {sample: CAI4B2-23, arm: vacuum, fraction_Mg: "0.832", T_C: 1600}
+    - observation_id: mendybaev_2021_table2_delta25Mg
+      type: concentration_series
+      locator:
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 29
+        table: '2'
+      T_C: 1600
+      phase: CAI4B2_evaporation_residue
+      regime: vacuum_or_H2_as_sample_group
+      units: permil
+      point_conditions:
+        temperature_C:
+          state: {tag: value, value: 1600}
+          locator:
+            source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+            published_page: '7-8'
+            section: '3.1.1-3.1.2'
+            note: Table 2 residues came from the 1600 °C vacuum and H2 runs
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        isotope_ratio: 25Mg/24Mg
+        isotope_reference: DSM-3
+        rows:
+        - {sample: CAI4B2-2, arm: H2_2e-4_bar, delta25Mg_permil: "-0.97", Mg_2std_permil: "0.05", T_C: 1600}
+        - {sample: CAI4B2-16, arm: H2_2e-4_bar, delta25Mg_permil: "0.04", Mg_2std_permil: "0.05", T_C: 1600}
+        - {sample: CAI4B2-12, arm: H2_2e-4_bar, delta25Mg_permil: "2.76", Mg_2std_permil: "0.05", T_C: 1600}
+        - {sample: CAI4B2-3, arm: H2_2e-4_bar, delta25Mg_permil: "19.70", Mg_2std_permil: "0.05", T_C: 1600}
+        - {sample: CAI4B2-14, arm: H2_2e-4_bar, delta25Mg_permil: "7.18", Mg_2std_permil: "0.05", T_C: 1600}
+        - {sample: CAI4B2-10, arm: H2_2e-4_bar, delta25Mg_permil: "15.12", Mg_2std_permil: "0.05", T_C: 1600}
+        - {sample: CAI4B2-1, arm: vacuum, delta25Mg_permil: "-1.66", Mg_2std_permil: "0.05", T_C: 1600}
+        - {sample: CAI4B2-25, arm: vacuum, delta25Mg_permil: "0.87", Mg_2std_permil: "0.06", T_C: 1600}
+        - {sample: CAI4B2-22, arm: vacuum, delta25Mg_permil: "2.51", Mg_2std_permil: "0.06", T_C: 1600}
+        - {sample: CAI4B2-21, arm: vacuum, delta25Mg_permil: "10.90", Mg_2std_permil: "0.06", T_C: 1600}
+        - {sample: CAI4B2-23, arm: vacuum, delta25Mg_permil: "20.90", Mg_2std_permil: "0.06", T_C: 1600}
+    - observation_id: mendybaev_2021_table2_delta26Mg
+      type: concentration_series
+      locator:
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 29
+        table: '2'
+      T_C: 1600
+      phase: CAI4B2_evaporation_residue
+      regime: vacuum_or_H2_as_sample_group
+      units: permil
+      point_conditions:
+        temperature_C:
+          state: {tag: value, value: 1600}
+          locator:
+            source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+            published_page: '7-8'
+            section: '3.1.1-3.1.2'
+            note: Table 2 residues came from the 1600 °C vacuum and H2 runs
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        isotope_ratio: 26Mg/24Mg
+        isotope_reference: DSM-3
+        rows:
+        - {sample: CAI4B2-2, arm: H2_2e-4_bar, delta26Mg_permil: "-1.90", T_C: 1600}
+        - {sample: CAI4B2-16, arm: H2_2e-4_bar, delta26Mg_permil: "0.06", T_C: 1600}
+        - {sample: CAI4B2-12, arm: H2_2e-4_bar, delta26Mg_permil: "5.42", T_C: 1600}
+        - {sample: CAI4B2-3, arm: H2_2e-4_bar, delta26Mg_permil: "38.89", T_C: 1600}
+        - {sample: CAI4B2-14, arm: H2_2e-4_bar, delta26Mg_permil: "14.09", T_C: 1600}
+        - {sample: CAI4B2-10, arm: H2_2e-4_bar, delta26Mg_permil: "29.81", T_C: 1600}
+        - {sample: CAI4B2-1, arm: vacuum, delta26Mg_permil: "-3.21", T_C: 1600}
+        - {sample: CAI4B2-25, arm: vacuum, delta26Mg_permil: "1.64", T_C: 1600}
+        - {sample: CAI4B2-22, arm: vacuum, delta26Mg_permil: "4.89", T_C: 1600}
+        - {sample: CAI4B2-21, arm: vacuum, delta26Mg_permil: "21.42", T_C: 1600}
+        - {sample: CAI4B2-23, arm: vacuum, delta26Mg_permil: "41.51", T_C: 1600}
   Si:
     observations:
     - observation_id: mendybaev_2021_si_evaporation_rates_by_arm
@@ -270,7 +380,7 @@ species:
         method_class: measured_direct_regression
         vacuum_and_H2_as_printed: '0.9910±0.0005'
         uncertainty_convention: 'analytical uncertainties less than symbol size; quoted regression uncertainty as printed'
-    - observation_id: mendybaev_2021_isotope_table2_readable_rows
+    - observation_id: mendybaev_2021_table2_fraction_Si_unavailable
       type: concentration_series
       locator:
         source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
@@ -279,29 +389,37 @@ species:
       T_C: 1600
       phase: CAI4B2_evaporation_residue
       regime: vacuum_or_H2_as_sample_group
-      units: 'fraction dimensionless; δ values ‰; 2 std ‰'
+      units: dimensionless
+      point_conditions:
+        temperature_C:
+          state: {tag: value, value: 1600}
+          locator:
+            source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+            published_page: '7-8'
+            section: '3.1.1-3.1.2'
+            note: Table 2 residues came from the 1600 °C vacuum and H2 runs
       values:
-        quantity: readable_table2_fraction_evaporated_and_Mg_isotopes
+        quantity: 'per_element_fraction_remaining_Si_normalized_to_Al_and_reference_charge_f=(X/Al)residue/(X/Al)initial'
         method_class: measured_direct
-        note: 'Table 2 contains no readable gas-arm column in the supplied PDF; sample group is retained separately from the arm conditions in Table 1. Si isotope columns and clipped right-hand columns are absent from the supplied PDF.'
+        note: 'The printed Table 2 column is fraction evaporated; the controller ruling defines this as per-element fractions remaining normalized to Al and the CAI4B2-1 reference charge, f=(X/Al)residue/(X/Al)initial. This is not whole-sample mass loss and has no matching quantity enum.'
         rows:
-        - {sample: CAI4B2-2, arm: H2_2e-4_bar, fraction_Mg: 0.031, fraction_Si: 0.020, delta25Mg_permil: -0.97, Mg_2std_permil: 0.05, delta26Mg_permil: -1.90}
-        - {sample: CAI4B2-16, arm: H2_2e-4_bar, fraction_Mg: 0.112, fraction_Si: 0.104, delta25Mg_permil: 0.04, Mg_2std_permil: 0.05, delta26Mg_permil: 0.06}
-        - {sample: CAI4B2-12, arm: H2_2e-4_bar, fraction_Mg: 0.292, fraction_Si: 0.221, delta25Mg_permil: 2.76, Mg_2std_permil: 0.05, delta26Mg_permil: 5.42}
-        - {sample: CAI4B2-3, arm: H2_2e-4_bar, fraction_Mg: 0.869, fraction_Si: 0.601, delta25Mg_permil: 19.70, Mg_2std_permil: 0.05, delta26Mg_permil: 38.89}
-        - {sample: CAI4B2-14, arm: H2_2e-4_bar, fraction_Mg: 0.518, fraction_Si: 0.35, delta25Mg_permil: 7.18, Mg_2std_permil: 0.05, delta26Mg_permil: 14.09}
-        - {sample: CAI4B2-10, arm: H2_2e-4_bar, fraction_Mg: 0.747, fraction_Si: 0.486, delta25Mg_permil: 15.12, Mg_2std_permil: 0.05, delta26Mg_permil: 29.81}
-        - {sample: CAI4B2-26, arm: H2_2e-4_bar, fraction_Mg: 0.449, fraction_Si: 0.337}
-        - {sample: CAI4B2-28, arm: H2_2e-4_bar, fraction_Mg: 0.624, fraction_Si: 0.432}
-        - {sample: CAI4B2-30, arm: H2_2e-4_bar, fraction_Mg: 1.000, fraction_Si: 0.974}
-        - {sample: CAI4B2-31, arm: H2_2e-4_bar, fraction_Mg: 0.250, fraction_Si: 0.148}
-        - {sample: CAI4B2-29, arm: H2_2e-4_bar, fraction_Mg: 0.533, fraction_Si: 0.406}
-        - {sample: CAI4B2-13, arm: H2_2e-4_bar, fraction_Mg: 0.341, fraction_Si: 0.251}
-        - {sample: CAI4B2-1, arm: vacuum, fraction_Mg: 0.000, fraction_Si: 0.000, delta25Mg_permil: -1.66, Mg_2std_permil: 0.05, delta26Mg_permil: -3.21}
-        - {sample: CAI4B2-25, arm: vacuum, fraction_Mg: 0.105, fraction_Si: 0.063, delta25Mg_permil: 0.87, Mg_2std_permil: 0.06, delta26Mg_permil: 1.64}
-        - {sample: CAI4B2-22, arm: vacuum, fraction_Mg: 0.26, fraction_Si: 0.150, delta25Mg_permil: 2.51, Mg_2std_permil: 0.06, delta26Mg_permil: 4.89}
-        - {sample: CAI4B2-21, arm: vacuum, fraction_Mg: 0.642, fraction_Si: 0.414, delta25Mg_permil: 10.90, Mg_2std_permil: 0.06, delta26Mg_permil: 21.42}
-        - {sample: CAI4B2-23, arm: vacuum, fraction_Mg: 0.832, fraction_Si: 0.555, delta25Mg_permil: 20.90, Mg_2std_permil: 0.06, delta26Mg_permil: 41.51}
+        - {sample: CAI4B2-2, arm: H2_2e-4_bar, fraction_Si: "0.020", T_C: 1600}
+        - {sample: CAI4B2-16, arm: H2_2e-4_bar, fraction_Si: "0.104", T_C: 1600}
+        - {sample: CAI4B2-12, arm: H2_2e-4_bar, fraction_Si: "0.221", T_C: 1600}
+        - {sample: CAI4B2-3, arm: H2_2e-4_bar, fraction_Si: "0.601", T_C: 1600}
+        - {sample: CAI4B2-14, arm: H2_2e-4_bar, fraction_Si: "0.35", T_C: 1600}
+        - {sample: CAI4B2-10, arm: H2_2e-4_bar, fraction_Si: "0.486", T_C: 1600}
+        - {sample: CAI4B2-26, arm: H2_2e-4_bar, fraction_Si: "0.337", T_C: 1600}
+        - {sample: CAI4B2-28, arm: H2_2e-4_bar, fraction_Si: "0.432", T_C: 1600}
+        - {sample: CAI4B2-30, arm: H2_2e-4_bar, fraction_Si: "0.974", T_C: 1600}
+        - {sample: CAI4B2-31, arm: H2_2e-4_bar, fraction_Si: "0.148", T_C: 1600}
+        - {sample: CAI4B2-29, arm: H2_2e-4_bar, fraction_Si: "0.406", T_C: 1600}
+        - {sample: CAI4B2-13, arm: H2_2e-4_bar, fraction_Si: "0.251", T_C: 1600}
+        - {sample: CAI4B2-1, arm: vacuum, fraction_Si: "0.000", T_C: 1600}
+        - {sample: CAI4B2-25, arm: vacuum, fraction_Si: "0.063", T_C: 1600}
+        - {sample: CAI4B2-22, arm: vacuum, fraction_Si: "0.150", T_C: 1600}
+        - {sample: CAI4B2-21, arm: vacuum, fraction_Si: "0.414", T_C: 1600}
+        - {sample: CAI4B2-23, arm: vacuum, fraction_Si: "0.555", T_C: 1600}
   total:
     observations:
     - observation_id: mendybaev_2021_weight_loss_rates_by_arm
