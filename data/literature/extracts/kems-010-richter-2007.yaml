@@ -59142,6 +59142,231 @@ species:
           T_C: 1600.0
           time_min: 4285.0
           mass_loss_pct: 48.5
+    - observation_id: richter_2007_mg_quoted_fits
+      experiment: type-b-cai-like-lab-melt
+      type: alpha
+      class_tag: model
+      locator:
+        source_path: raw/kems-010-richter-2007/kems-010-richter-2007.pdf
+        published_page: 5553
+        figure: '3'
+      quote: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0 = 25.3,
+        E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes are 2σ
+      units: gamma_o dimensionless; E kJ mol−1; J_o mol cm−2 s−1
+      values:
+        quantity: published_alpha_and_flux_arrhenius_fits
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        alpha_form:
+          expression: γ = γ0 exp(−E/RT)
+          gamma_o: 143.0
+          E_kJ_per_mol: 121.0
+        flux_form:
+          expression: J = J0 exp(−E/RT)
+          J_o_mol_cm2_s: 3810000.0
+          E_kJ_per_mol: 551.0
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+            published_page: 5552
+            figure: '2'
+          quote: The fits to the data correspond to J = J0e−E/RT with J0 = 3.81 × 10⁶ mol cm−2 s−1, E = 551 ± 63 kJ mol−1
+            for magnesium; J0 = 4.17 × 10⁷ mol cm−2 s−1, E = 576 ± 36 kJ mol−1 for silicon. All uncertainties and error envelopes
+            are 2σ
+      supersedes: richter_2007_mg_cai_langmuir_alpha_arrhenius
+      regime: combined_vacuum_and_finite_hydrogen_pressure_alpha_fit
+      uncertainty:
+        alpha_E_kJ_per_mol: 53.0
+        flux_E_kJ_per_mol: 63.0
+        convention: 2σ
+        quote: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0 =
+          25.3, E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes
+          are 2σ
+        flux_quote: The fits to the data correspond to J = J0e−E/RT with J0 = 3.81 × 10⁶ mol cm−2 s−1, E = 551 ± 63 kJ mol−1
+          for magnesium; J0 = 4.17 × 10⁷ mol cm−2 s−1, E = 576 ± 36 kJ mol−1 for silicon. All uncertainties and error envelopes
+          are 2σ
+        alpha_locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5553
+          figure: '3'
+        flux_locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5552
+          figure: '2'
+    - observation_id: richter_2007_table2_3537_1
+      type: rate_series
+      class_tag: inverse
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5559
+        table: '2'
+        paragraph: 3537-1
+      quote: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: 3537-1 | B1 | 3.26 | 14.9 | 30.4'
+      units: FMg ‰ amu−1; alpha dimensionless; evaporated magnesium %
+      values:
+        quantity: magnesium_loss_inferred_from_isotope_fractionation
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        sample: 3537-1
+        CAI_type: B1
+        FMg_permil_per_amu: 3.26
+        kinetic_isotope_alpha_Simon: 0.97978
+        kinetic_isotope_alpha_this_work: 0.991
+        Mg_evaporated_percent_Simon: 14.9
+        Mg_evaporated_percent_this_work: 30.4
+        field_classes:
+          FMg_permil_per_amu: measured_secondary
+          kinetic_isotope_alpha_Simon: model
+          kinetic_isotope_alpha_this_work: model
+          Mg_evaporated_percent_Simon: inverse
+          Mg_evaporated_percent_this_work: inverse
+        note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
+          not these laboratory evaporation residues.
+    - observation_id: richter_2007_table2_e107
+      type: rate_series
+      class_tag: inverse
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5559
+        table: '2'
+        paragraph: E107
+      quote: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: E107 | B2 | 1.99 | 9.4 | 19.9'
+      units: FMg ‰ amu−1; alpha dimensionless; evaporated magnesium %
+      values:
+        quantity: magnesium_loss_inferred_from_isotope_fractionation
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        sample: E107
+        CAI_type: B2
+        FMg_permil_per_amu: 1.99
+        kinetic_isotope_alpha_Simon: 0.97978
+        kinetic_isotope_alpha_this_work: 0.991
+        Mg_evaporated_percent_Simon: 9.4
+        Mg_evaporated_percent_this_work: 19.9
+        field_classes:
+          FMg_permil_per_amu: measured_secondary
+          kinetic_isotope_alpha_Simon: model
+          kinetic_isotope_alpha_this_work: model
+          Mg_evaporated_percent_Simon: inverse
+          Mg_evaporated_percent_this_work: inverse
+        note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
+          not these laboratory evaporation residues.
+    - observation_id: richter_2007_table2_f2_ts65
+      type: rate_series
+      class_tag: inverse
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5559
+        table: '2'
+        paragraph: F2 (TS65)
+      quote: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: F2 (TS65) | B2 | 6.12 | 26.0
+        | 49.2'
+      units: FMg ‰ amu−1; alpha dimensionless; evaporated magnesium %
+      values:
+        quantity: magnesium_loss_inferred_from_isotope_fractionation
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        sample: F2 (TS65)
+        CAI_type: B2
+        FMg_permil_per_amu: 6.12
+        kinetic_isotope_alpha_Simon: 0.97978
+        kinetic_isotope_alpha_this_work: 0.991
+        Mg_evaporated_percent_Simon: 26.0
+        Mg_evaporated_percent_this_work: 49.2
+        field_classes:
+          FMg_permil_per_amu: measured_secondary
+          kinetic_isotope_alpha_Simon: model
+          kinetic_isotope_alpha_this_work: model
+          Mg_evaporated_percent_Simon: inverse
+          Mg_evaporated_percent_this_work: inverse
+        note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
+          not these laboratory evaporation residues.
+    - observation_id: richter_2007_table2_golfball
+      type: rate_series
+      class_tag: inverse
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5559
+        table: '2'
+        paragraph: Golfball
+      quote: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: Golfball | B | 1.61 | 7.7 | 16.4'
+      units: FMg ‰ amu−1; alpha dimensionless; evaporated magnesium %
+      values:
+        quantity: magnesium_loss_inferred_from_isotope_fractionation
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        sample: Golfball
+        CAI_type: B
+        FMg_permil_per_amu: 1.61
+        kinetic_isotope_alpha_Simon: 0.97978
+        kinetic_isotope_alpha_this_work: 0.991
+        Mg_evaporated_percent_Simon: 7.7
+        Mg_evaporated_percent_this_work: 16.4
+        field_classes:
+          FMg_permil_per_amu: measured_secondary
+          kinetic_isotope_alpha_Simon: model
+          kinetic_isotope_alpha_this_work: model
+          Mg_evaporated_percent_Simon: inverse
+          Mg_evaporated_percent_this_work: inverse
+        note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
+          not these laboratory evaporation residues.
+    - observation_id: richter_2007_table2_ts33
+      type: rate_series
+      class_tag: inverse
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5559
+        table: '2'
+        paragraph: TS33
+      quote: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: TS33 | B1 | 4.01 | 18.0 | 35.9'
+      units: FMg ‰ amu−1; alpha dimensionless; evaporated magnesium %
+      values:
+        quantity: magnesium_loss_inferred_from_isotope_fractionation
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        sample: TS33
+        CAI_type: B1
+        FMg_permil_per_amu: 4.01
+        kinetic_isotope_alpha_Simon: 0.97978
+        kinetic_isotope_alpha_this_work: 0.991
+        Mg_evaporated_percent_Simon: 18.0
+        Mg_evaporated_percent_this_work: 35.9
+        field_classes:
+          FMg_permil_per_amu: measured_secondary
+          kinetic_isotope_alpha_Simon: model
+          kinetic_isotope_alpha_this_work: model
+          Mg_evaporated_percent_Simon: inverse
+          Mg_evaporated_percent_this_work: inverse
+        note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
+          not these laboratory evaporation residues.
+    - observation_id: richter_2007_table2_ts34
+      type: rate_series
+      class_tag: inverse
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5559
+        table: '2'
+        paragraph: TS34
+      quote: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: TS34 | B1 | 5.63 | 24.2 | 46.4'
+      units: FMg ‰ amu−1; alpha dimensionless; evaporated magnesium %
+      values:
+        quantity: magnesium_loss_inferred_from_isotope_fractionation
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        sample: TS34
+        CAI_type: B1
+        FMg_permil_per_amu: 5.63
+        kinetic_isotope_alpha_Simon: 0.97978
+        kinetic_isotope_alpha_this_work: 0.991
+        Mg_evaporated_percent_Simon: 24.2
+        Mg_evaporated_percent_this_work: 46.4
+        field_classes:
+          FMg_permil_per_amu: measured_secondary
+          kinetic_isotope_alpha_Simon: model
+          kinetic_isotope_alpha_this_work: model
+          Mg_evaporated_percent_Simon: inverse
+          Mg_evaporated_percent_this_work: inverse
+        note: Kinetic isotope fractionation alpha, not an HKL evaporation coefficient. Table estimates concern natural CAIs,
+          not these laboratory evaporation residues.
     context:
     - observation_id: richter_2007_table1_reduced_flux_context
       type: measured_reduced_flux_context
@@ -60919,6 +61144,26 @@ species:
       - cai-r3-7
       - cai-r3-8
       - cai-r3-9
+      - cai-r-13
+      - cai-r-14
+      - cai-r-15
+      - cai-r-16
+      - cai-r-17
+      - cai-r-6
+      - cai-r-7
+      - cai-r2-13
+      - cai-r2-14
+      - cai-r2-15
+      - cai-r2-17
+      - cai-r2-18
+      - cai-r2-19
+      - cai-r2-20
+      - cai-r2-21
+      - cai-r2-7
+      - cai-r2-8
+      - cai-r2-9
+      - cai-r3-12
+      - cai-r3-2
       units: dimensionless
       uncertainty_convention: 2_sigma
       superseded_note: "This Figure 3 coefficient fit supersedes the earlier extracted alpha-form copy because the paper prints the coefficient fit here. Figure 2's J0 and E fit is a distinct areal-flux fit, not an alternative alpha fit."
@@ -62128,6 +62373,56 @@ species:
       regime: langmuir_free_evaporation
       phase: l
       experiment: cai-r3-5
+    - observation_id: richter_2007_sio_quoted_fits
+      experiment: type-b-cai-like-lab-melt
+      type: alpha
+      class_tag: model
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5553
+        figure: '3'
+      quote: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0 = 25.3,
+        E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes are 2σ
+      units: gamma_o dimensionless; E kJ mol−1; J_o mol cm−2 s−1
+      values:
+        quantity: published_alpha_and_flux_arrhenius_fits
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        alpha_form:
+          expression: γ = γ0 exp(−E/RT)
+          gamma_o: 25.3
+          E_kJ_per_mol: 92.0
+        flux_form:
+          expression: J = J0 exp(−E/RT)
+          J_o_mol_cm2_s: 41700000.0
+          E_kJ_per_mol: 576.0
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+            published_page: 5552
+            figure: '2'
+          quote: The fits to the data correspond to J = J0e−E/RT with J0 = 3.81 × 10⁶ mol cm−2 s−1, E = 551 ± 63 kJ mol−1
+            for magnesium; J0 = 4.17 × 10⁷ mol cm−2 s−1, E = 576 ± 36 kJ mol−1 for silicon. All uncertainties and error envelopes
+            are 2σ
+      supersedes: richter_2007_sio_cai_langmuir_alpha_arrhenius
+      regime: combined_vacuum_and_finite_hydrogen_pressure_alpha_fit
+      uncertainty:
+        alpha_E_kJ_per_mol: 37.0
+        flux_E_kJ_per_mol: 36.0
+        convention: 2σ
+        quote: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0 =
+          25.3, E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes
+          are 2σ
+        flux_quote: The fits to the data correspond to J = J0e−E/RT with J0 = 3.81 × 10⁶ mol cm−2 s−1, E = 551 ± 63 kJ mol−1
+          for magnesium; J0 = 4.17 × 10⁷ mol cm−2 s−1, E = 576 ± 36 kJ mol−1 for silicon. All uncertainties and error envelopes
+          are 2σ
+        alpha_locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5553
+          figure: '3'
+        flux_locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5552
+          figure: '2'
     context:
     - observation_id: richter_2007_sio_cai_langmuir_alpha_arrhenius
       type: best_fit_model_context
@@ -62171,6 +62466,26 @@ species:
       - cai-r3-7
       - cai-r3-8
       - cai-r3-9
+      - cai-r-13
+      - cai-r-14
+      - cai-r-15
+      - cai-r-16
+      - cai-r-17
+      - cai-r-6
+      - cai-r-7
+      - cai-r2-13
+      - cai-r2-14
+      - cai-r2-15
+      - cai-r2-17
+      - cai-r2-18
+      - cai-r2-19
+      - cai-r2-20
+      - cai-r2-21
+      - cai-r2-7
+      - cai-r2-8
+      - cai-r2-9
+      - cai-r3-12
+      - cai-r3-2
       units: dimensionless
       uncertainty_convention: 2_sigma
       superseded_note: "This Figure 3 coefficient fit supersedes the earlier extracted alpha-form copy because the paper prints the coefficient fit here. Figure 2's J0 and E fit is a distinct areal-flux fit, not an alternative alpha fit."

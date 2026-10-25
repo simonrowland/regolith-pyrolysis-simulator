@@ -10,7 +10,7 @@ import pytest
 
 import simulator.battery.score as score_module
 from simulator.battery.enums import Engine, Quantity, RefusalReason
-from simulator.battery.migrate import LITERATURE, Migrator
+from simulator.battery.migrate import LITERATURE, Migrator, load_yaml
 from simulator.battery.residue import ResidueInventoryRefusal, _mass_loss_sourced_alphas
 from simulator.battery.score import predict_with_engine, quantity_token
 
@@ -63,6 +63,56 @@ def test_fig3_alphas_use_printed_fit_and_locator(fig3_source):
     assert fits["Mg"]["locator"]["figure"] == "3"
     assert fits["Mg"]["T_range_K"] == [1773.15, 2173.15]
     assert not fits["Mg"]["extrapolated"]
+
+
+def test_richter_printed_alpha_context_migrates_and_covers_mass_loss_rows():
+    source_path = LITERATURE / "extracts" / "kems-010-richter-2007.yaml"
+    document = load_yaml(source_path)
+    migrator = Migrator()
+    migrator._migrate_extract(source_path)
+    migrator.finalize()
+
+    contexts = {
+        context["species"]: context
+        for rows in migrator.result.context_by_work.values()
+        for context in rows
+    }
+    expected = {
+        "Mg": (143.0, 121000.0, 53000.0, "richter_2007_mg_cai_langmuir_alpha_arrhenius"),
+        "SiO": (25.3, 92000.0, 37000.0, "richter_2007_sio_cai_langmuir_alpha_arrhenius"),
+    }
+    assert set(contexts) == set(expected)
+    for species, (gamma_o, energy, uncertainty, observation_id) in expected.items():
+        context = contexts[species]
+        assert context["context_id"] == f"kems-010-richter-2007::context::{observation_id}"
+        assert context["values"]["alpha_form"]["gamma_o"] == gamma_o
+        assert context["values"]["alpha_form"]["E_J_per_mol"] == energy
+        assert context["values"]["alpha_form"]["E_uncertainty_J_per_mol"] == uncertainty
+        assert context["locator"]["published_page"] == 5553
+        assert context["locator"]["figure"] == "3"
+        assert context["T_range_K"] == [1773.15, 2173.15]
+        assert context["units"] == "dimensionless"
+        assert context["uncertainty_convention"] == "2_sigma"
+
+    rows = [
+        row for row in migrator.result.observations.values()
+        if quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+    ]
+    assert len(rows) == 50
+    linked_experiments = {
+        experiment
+        for context in contexts.values()
+        for experiment in context["applies_to_experiments"]
+    }
+    assert all(row.experiment_id.rsplit("::", 1)[-1] in linked_experiments for row in rows)
+    for row in rows:
+        fits = _mass_loss_sourced_alphas(
+            SimpleNamespace(experiment_id=row.experiment_id), document, 2073.15
+        )
+        assert set(fits) == {"Mg", "SiO"}
+        assert {fit["source_observation_id"] for fit in fits.values()} == {
+            context["observation_id"] for context in contexts.values()
+        }
 
 
 @pytest.mark.parametrize("temperature,extrapolated", [(1773.15, False), (2473.0, True)])
