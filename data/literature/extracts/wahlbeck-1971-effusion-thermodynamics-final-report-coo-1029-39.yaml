@@ -1,0 +1,748 @@
+schema_version: literature_extract.v1
+source_id: wahlbeck-1971-effusion-thermodynamics-final-report-coo-1029-39
+source:
+  citation: Wahlbeck, P. G. (1971). High Temperature Chemistry - Fundamentals of Effusion and Thermodynamics
+    of Materials. Final report, 1 June 1961 through 31 August 1971. COO-1029-39. Illinois Institute of
+    Technology.
+  doi: null
+  year: 1971
+  corpus_asset: raw/wahlbeck-1971-effusion-thermodynamics-final-report-coo-1029-39/wahlbeck-1971-effusion-thermodynamics-final-report-coo-1029-39.pdf
+extraction:
+  method: MinerU table draft emitted Table IX; the 11 row assignments and all run, temperature, and pressure
+    cells were checked against the rendered scan. Tesseract OCR was used as the second machine read; the
+    scan has no pdftotext text layer. See the audit for table inventory and cell checks.
+  date: '2026-10-25'
+  worker: w1025d-wahl71
+review_status: draft
+fidelity_samples:
+- path: species.TiO.observations[wahlbeck_1971_table_ix_tio_run02].values.pressure_atm
+  value: '3.1848e-7'
+  locator:
+    page: 36
+    pdf_page_index: 35
+    published_page: 31
+    table: IX
+    note: Table IX, Run 2, P_TiO cell, checked against rendered scan.
+- path: species.TiO.observations[wahlbeck_1971_table_ix_tio_run07].values.pressure_atm
+  value: '5.6656e-7'
+  locator:
+    page: 36
+    pdf_page_index: 35
+    published_page: 31
+    table: IX
+    note: Table IX, Run 7, P_TiO cell, checked against rendered scan.
+- path: species.TiO.observations[wahlbeck_1971_table_ix_tio_run12].values.pressure_atm
+  value: '0.8704e-7'
+  locator:
+    page: 36
+    pdf_page_index: 35
+    published_page: 31
+    table: IX
+    note: Table IX, Run 12, P_TiO cell, checked against rendered scan.
+benches:
+- id: wahlbeck_1971_w_knudsen_cell
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Tungsten Knudsen effusion cell suspended from a vacuum balance, with mass-spectrometric vapor
+        analysis
+    locator:
+      page: 33
+      pdf_page_index: 32
+      published_page: 28
+      section: 2. TiO(g) (Hung Yuan Wu)
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Tungsten (W) Knudsen effusion cell
+    locator:
+      page: 33
+      pdf_page_index: 32
+      published_page: 28
+      section: 2. TiO(g) (Hung Yuan Wu)
+  cell_materials:
+  - state:
+      tag: value
+      value: W
+    locator:
+      page: 33
+      pdf_page_index: 32
+      published_page: 28
+      section: 2. TiO(g) (Hung Yuan Wu)
+experiments:
+- experiment_id: wahlbeck_1971_tio_effusion
+  bench_id: wahlbeck_1971_w_knudsen_cell
+  method: knudsen_effusion
+  locator:
+    page: 33
+    pdf_page_index: 32
+    published_page: 28
+    section: 2. TiO(g) (Hung Yuan Wu)
+    note: TiO vapor pressure measurements with a tungsten Knudsen cell.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Mixture of Ti2O3(s) and Ti3O5(s)
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: IX
+  apparatus:
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1.445e-6'
+        locator:
+          page: 33
+          pdf_page_index: 32
+          published_page: 28
+          section: 2. TiO(g) (Hung Yuan Wu)
+          note: Printed effective area 0.01445 cm2; converted to square metres.
+species:
+  TiO:
+    observations:
+    - observation_id: wahlbeck_1971_table_ix_tio_run02
+      type: partial_pressure
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: IX
+        row_label: Run 2; 2010 K
+        column_header: $P_{TiO(g)}, atm$
+        note: 'Render-checked pressure cell: 3.1848 × 10⁻⁷ atm.'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        T_K: '2010'
+        pressure_atm: '3.1848e-7'
+        gas_species: TiO(g)
+        pressure_as_printed: 3.1848 × 10⁻⁷ atm
+        method: Knudsen-cell mass-loss reduction with the printed TiO:TiO2 pressure correction
+      phase: gas
+      experiment: wahlbeck_1971_tio_effusion
+      regime: knudsen_effusion
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2010'
+          locator:
+            page: 36
+            pdf_page_index: 35
+            table: IX
+            row_label: Run 2; 2010 K
+            column_header: True Temp °K
+            published_page: 31
+      derivation:
+        relation: TiO vapor pressure calculated from measured cell mass loss using the printed P_TiO:P_TiO2
+          ratio of 1.0:0.2.
+        output_unit: atm
+        locator:
+          page: 35
+          pdf_page_index: 34
+          published_page: 30
+          section: 2. TiO(g) (Hung Yuan Wu)
+          note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming P_TiO:P_TiO2
+            = 1.0:0.2.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 35
+            pdf_page_index: 34
+            published_page: 30
+            section: 2. TiO(g) (Hung Yuan Wu)
+            note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming
+              P_TiO:P_TiO2 = 1.0:0.2.
+    - observation_id: wahlbeck_1971_table_ix_tio_run03
+      type: partial_pressure
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: IX
+        row_label: Run 3; 2022 K
+        column_header: $P_{TiO(g)}, atm$
+        note: 'Render-checked pressure cell: 3.6856 × 10⁻⁷ atm.'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        T_K: '2022'
+        pressure_atm: '3.6856e-7'
+        gas_species: TiO(g)
+        pressure_as_printed: 3.6856 × 10⁻⁷ atm
+        method: Knudsen-cell mass-loss reduction with the printed TiO:TiO2 pressure correction
+      phase: gas
+      experiment: wahlbeck_1971_tio_effusion
+      regime: knudsen_effusion
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2022'
+          locator:
+            page: 36
+            pdf_page_index: 35
+            table: IX
+            row_label: Run 3; 2022 K
+            column_header: True Temp °K
+            published_page: 31
+      derivation:
+        relation: TiO vapor pressure calculated from measured cell mass loss using the printed P_TiO:P_TiO2
+          ratio of 1.0:0.2.
+        output_unit: atm
+        locator:
+          page: 35
+          pdf_page_index: 34
+          published_page: 30
+          section: 2. TiO(g) (Hung Yuan Wu)
+          note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming P_TiO:P_TiO2
+            = 1.0:0.2.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 35
+            pdf_page_index: 34
+            published_page: 30
+            section: 2. TiO(g) (Hung Yuan Wu)
+            note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming
+              P_TiO:P_TiO2 = 1.0:0.2.
+    - observation_id: wahlbeck_1971_table_ix_tio_run04
+      type: partial_pressure
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: IX
+        row_label: Run 4; 1995 K
+        column_header: $P_{TiO(g)}, atm$
+        note: 'Render-checked pressure cell: 2.7056 × 10⁻⁷ atm.'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        T_K: '1995'
+        pressure_atm: '2.7056e-7'
+        gas_species: TiO(g)
+        pressure_as_printed: 2.7056 × 10⁻⁷ atm
+        method: Knudsen-cell mass-loss reduction with the printed TiO:TiO2 pressure correction
+      phase: gas
+      experiment: wahlbeck_1971_tio_effusion
+      regime: knudsen_effusion
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1995'
+          locator:
+            page: 36
+            pdf_page_index: 35
+            table: IX
+            row_label: Run 4; 1995 K
+            column_header: True Temp °K
+            published_page: 31
+      derivation:
+        relation: TiO vapor pressure calculated from measured cell mass loss using the printed P_TiO:P_TiO2
+          ratio of 1.0:0.2.
+        output_unit: atm
+        locator:
+          page: 35
+          pdf_page_index: 34
+          published_page: 30
+          section: 2. TiO(g) (Hung Yuan Wu)
+          note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming P_TiO:P_TiO2
+            = 1.0:0.2.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 35
+            pdf_page_index: 34
+            published_page: 30
+            section: 2. TiO(g) (Hung Yuan Wu)
+            note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming
+              P_TiO:P_TiO2 = 1.0:0.2.
+    - observation_id: wahlbeck_1971_table_ix_tio_run05
+      type: partial_pressure
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: IX
+        row_label: Run 5; 2032 K
+        column_header: $P_{TiO(g)}, atm$
+        note: 'Render-checked pressure cell: 4.3096 × 10⁻⁷ atm.'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        T_K: '2032'
+        pressure_atm: '4.3096e-7'
+        gas_species: TiO(g)
+        pressure_as_printed: 4.3096 × 10⁻⁷ atm
+        method: Knudsen-cell mass-loss reduction with the printed TiO:TiO2 pressure correction
+      phase: gas
+      experiment: wahlbeck_1971_tio_effusion
+      regime: knudsen_effusion
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2032'
+          locator:
+            page: 36
+            pdf_page_index: 35
+            table: IX
+            row_label: Run 5; 2032 K
+            column_header: True Temp °K
+            published_page: 31
+      derivation:
+        relation: TiO vapor pressure calculated from measured cell mass loss using the printed P_TiO:P_TiO2
+          ratio of 1.0:0.2.
+        output_unit: atm
+        locator:
+          page: 35
+          pdf_page_index: 34
+          published_page: 30
+          section: 2. TiO(g) (Hung Yuan Wu)
+          note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming P_TiO:P_TiO2
+            = 1.0:0.2.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 35
+            pdf_page_index: 34
+            published_page: 30
+            section: 2. TiO(g) (Hung Yuan Wu)
+            note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming
+              P_TiO:P_TiO2 = 1.0:0.2.
+    - observation_id: wahlbeck_1971_table_ix_tio_run06
+      type: partial_pressure
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: IX
+        row_label: Run 6; 1977 K
+        column_header: $P_{TiO(g)}, atm$
+        note: 'Render-checked pressure cell: 1.6208 × 10⁻⁷ atm.'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        T_K: '1977'
+        pressure_atm: '1.6208e-7'
+        gas_species: TiO(g)
+        pressure_as_printed: 1.6208 × 10⁻⁷ atm
+        method: Knudsen-cell mass-loss reduction with the printed TiO:TiO2 pressure correction
+      phase: gas
+      experiment: wahlbeck_1971_tio_effusion
+      regime: knudsen_effusion
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1977'
+          locator:
+            page: 36
+            pdf_page_index: 35
+            table: IX
+            row_label: Run 6; 1977 K
+            column_header: True Temp °K
+            published_page: 31
+      derivation:
+        relation: TiO vapor pressure calculated from measured cell mass loss using the printed P_TiO:P_TiO2
+          ratio of 1.0:0.2.
+        output_unit: atm
+        locator:
+          page: 35
+          pdf_page_index: 34
+          published_page: 30
+          section: 2. TiO(g) (Hung Yuan Wu)
+          note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming P_TiO:P_TiO2
+            = 1.0:0.2.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 35
+            pdf_page_index: 34
+            published_page: 30
+            section: 2. TiO(g) (Hung Yuan Wu)
+            note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming
+              P_TiO:P_TiO2 = 1.0:0.2.
+    - observation_id: wahlbeck_1971_table_ix_tio_run07
+      type: partial_pressure
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: IX
+        row_label: Run 7; 2043 K
+        column_header: $P_{TiO(g)}, atm$
+        note: 'Render-checked pressure cell: 5.6656 × 10⁻⁷ atm.'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        T_K: '2043'
+        pressure_atm: '5.6656e-7'
+        gas_species: TiO(g)
+        pressure_as_printed: 5.6656 × 10⁻⁷ atm
+        method: Knudsen-cell mass-loss reduction with the printed TiO:TiO2 pressure correction
+      phase: gas
+      experiment: wahlbeck_1971_tio_effusion
+      regime: knudsen_effusion
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2043'
+          locator:
+            page: 36
+            pdf_page_index: 35
+            table: IX
+            row_label: Run 7; 2043 K
+            column_header: True Temp °K
+            published_page: 31
+      derivation:
+        relation: TiO vapor pressure calculated from measured cell mass loss using the printed P_TiO:P_TiO2
+          ratio of 1.0:0.2.
+        output_unit: atm
+        locator:
+          page: 35
+          pdf_page_index: 34
+          published_page: 30
+          section: 2. TiO(g) (Hung Yuan Wu)
+          note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming P_TiO:P_TiO2
+            = 1.0:0.2.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 35
+            pdf_page_index: 34
+            published_page: 30
+            section: 2. TiO(g) (Hung Yuan Wu)
+            note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming
+              P_TiO:P_TiO2 = 1.0:0.2.
+    - observation_id: wahlbeck_1971_table_ix_tio_run08
+      type: partial_pressure
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: IX
+        row_label: Run 8; 1968 K
+        column_header: $P_{TiO(g)}, atm$
+        note: 'Render-checked pressure cell: 1.3344 × 10⁻⁷ atm.'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        T_K: '1968'
+        pressure_atm: '1.3344e-7'
+        gas_species: TiO(g)
+        pressure_as_printed: 1.3344 × 10⁻⁷ atm
+        method: Knudsen-cell mass-loss reduction with the printed TiO:TiO2 pressure correction
+      phase: gas
+      experiment: wahlbeck_1971_tio_effusion
+      regime: knudsen_effusion
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1968'
+          locator:
+            page: 36
+            pdf_page_index: 35
+            table: IX
+            row_label: Run 8; 1968 K
+            column_header: True Temp °K
+            published_page: 31
+      derivation:
+        relation: TiO vapor pressure calculated from measured cell mass loss using the printed P_TiO:P_TiO2
+          ratio of 1.0:0.2.
+        output_unit: atm
+        locator:
+          page: 35
+          pdf_page_index: 34
+          published_page: 30
+          section: 2. TiO(g) (Hung Yuan Wu)
+          note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming P_TiO:P_TiO2
+            = 1.0:0.2.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 35
+            pdf_page_index: 34
+            published_page: 30
+            section: 2. TiO(g) (Hung Yuan Wu)
+            note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming
+              P_TiO:P_TiO2 = 1.0:0.2.
+    - observation_id: wahlbeck_1971_table_ix_tio_run09
+      type: partial_pressure
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: IX
+        row_label: Run 9; 1957 K
+        column_header: $P_{TiO(g)}, atm$
+        note: 'Render-checked pressure cell: 1.3328 × 10⁻⁷ atm.'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        T_K: '1957'
+        pressure_atm: '1.3328e-7'
+        gas_species: TiO(g)
+        pressure_as_printed: 1.3328 × 10⁻⁷ atm
+        method: Knudsen-cell mass-loss reduction with the printed TiO:TiO2 pressure correction
+      phase: gas
+      experiment: wahlbeck_1971_tio_effusion
+      regime: knudsen_effusion
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1957'
+          locator:
+            page: 36
+            pdf_page_index: 35
+            table: IX
+            row_label: Run 9; 1957 K
+            column_header: True Temp °K
+            published_page: 31
+      derivation:
+        relation: TiO vapor pressure calculated from measured cell mass loss using the printed P_TiO:P_TiO2
+          ratio of 1.0:0.2.
+        output_unit: atm
+        locator:
+          page: 35
+          pdf_page_index: 34
+          published_page: 30
+          section: 2. TiO(g) (Hung Yuan Wu)
+          note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming P_TiO:P_TiO2
+            = 1.0:0.2.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 35
+            pdf_page_index: 34
+            published_page: 30
+            section: 2. TiO(g) (Hung Yuan Wu)
+            note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming
+              P_TiO:P_TiO2 = 1.0:0.2.
+    - observation_id: wahlbeck_1971_table_ix_tio_run10
+      type: partial_pressure
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: IX
+        row_label: Run 10; 1947 K
+        column_header: $P_{TiO(g)}, atm$
+        note: 'Render-checked pressure cell: 0.8944 × 10⁻⁷ atm.'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        T_K: '1947'
+        pressure_atm: '0.8944e-7'
+        gas_species: TiO(g)
+        pressure_as_printed: 0.8944 × 10⁻⁷ atm
+        method: Knudsen-cell mass-loss reduction with the printed TiO:TiO2 pressure correction
+      phase: gas
+      experiment: wahlbeck_1971_tio_effusion
+      regime: knudsen_effusion
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1947'
+          locator:
+            page: 36
+            pdf_page_index: 35
+            table: IX
+            row_label: Run 10; 1947 K
+            column_header: True Temp °K
+            published_page: 31
+      derivation:
+        relation: TiO vapor pressure calculated from measured cell mass loss using the printed P_TiO:P_TiO2
+          ratio of 1.0:0.2.
+        output_unit: atm
+        locator:
+          page: 35
+          pdf_page_index: 34
+          published_page: 30
+          section: 2. TiO(g) (Hung Yuan Wu)
+          note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming P_TiO:P_TiO2
+            = 1.0:0.2.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 35
+            pdf_page_index: 34
+            published_page: 30
+            section: 2. TiO(g) (Hung Yuan Wu)
+            note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming
+              P_TiO:P_TiO2 = 1.0:0.2.
+    - observation_id: wahlbeck_1971_table_ix_tio_run11
+      type: partial_pressure
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: IX
+        row_label: Run 11; 1985 K
+        column_header: $P_{TiO(g)}, atm$
+        note: 'Render-checked pressure cell: 2.4624 × 10⁻⁷ atm.'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        T_K: '1985'
+        pressure_atm: '2.4624e-7'
+        gas_species: TiO(g)
+        pressure_as_printed: 2.4624 × 10⁻⁷ atm
+        method: Knudsen-cell mass-loss reduction with the printed TiO:TiO2 pressure correction
+      phase: gas
+      experiment: wahlbeck_1971_tio_effusion
+      regime: knudsen_effusion
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1985'
+          locator:
+            page: 36
+            pdf_page_index: 35
+            table: IX
+            row_label: Run 11; 1985 K
+            column_header: True Temp °K
+            published_page: 31
+      derivation:
+        relation: TiO vapor pressure calculated from measured cell mass loss using the printed P_TiO:P_TiO2
+          ratio of 1.0:0.2.
+        output_unit: atm
+        locator:
+          page: 35
+          pdf_page_index: 34
+          published_page: 30
+          section: 2. TiO(g) (Hung Yuan Wu)
+          note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming P_TiO:P_TiO2
+            = 1.0:0.2.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 35
+            pdf_page_index: 34
+            published_page: 30
+            section: 2. TiO(g) (Hung Yuan Wu)
+            note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming
+              P_TiO:P_TiO2 = 1.0:0.2.
+    - observation_id: wahlbeck_1971_table_ix_tio_run12
+      type: partial_pressure
+      locator:
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: IX
+        row_label: Run 12; 1936 K
+        column_header: $P_{TiO(g)}, atm$
+        note: 'Render-checked pressure cell: 0.8704 × 10⁻⁷ atm.'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        T_K: '1936'
+        pressure_atm: '0.8704e-7'
+        gas_species: TiO(g)
+        pressure_as_printed: 0.8704 × 10⁻⁷ atm
+        method: Knudsen-cell mass-loss reduction with the printed TiO:TiO2 pressure correction
+      phase: gas
+      experiment: wahlbeck_1971_tio_effusion
+      regime: knudsen_effusion
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1936'
+          locator:
+            page: 36
+            pdf_page_index: 35
+            table: IX
+            row_label: Run 12; 1936 K
+            column_header: True Temp °K
+            published_page: 31
+      derivation:
+        relation: TiO vapor pressure calculated from measured cell mass loss using the printed P_TiO:P_TiO2
+          ratio of 1.0:0.2.
+        output_unit: atm
+        locator:
+          page: 35
+          pdf_page_index: 34
+          published_page: 30
+          section: 2. TiO(g) (Hung Yuan Wu)
+          note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming P_TiO:P_TiO2
+            = 1.0:0.2.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 35
+            pdf_page_index: 34
+            published_page: 30
+            section: 2. TiO(g) (Hung Yuan Wu)
+            note: The text states that TiO vapor pressure was calculated from cell mass loss, assuming
+              P_TiO:P_TiO2 = 1.0:0.2.

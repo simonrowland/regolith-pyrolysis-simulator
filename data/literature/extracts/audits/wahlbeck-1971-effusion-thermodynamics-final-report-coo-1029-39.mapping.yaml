@@ -1,0 +1,35 @@
+source_id: wahlbeck-1971-effusion-thermodynamics-final-report-coo-1029-39
+source:
+  citation: >-
+    Wahlbeck, P. G. (1971). High Temperature Chemistry - Fundamentals of
+    Effusion and Thermodynamics of Materials. Final report, 1 June 1961
+    through 31 August 1971. COO-1029-39. Illinois Institute of Technology.
+  doi: null
+  year: 1971
+  corpus_asset: raw/wahlbeck-1971-effusion-thermodynamics-final-report-coo-1029-39/wahlbeck-1971-effusion-thermodynamics-final-report-coo-1029-39.pdf
+extraction:
+  method: >-
+    MinerU table draft emit; Table IX numeric cells and row/column assignments
+    checked against the rendered scan, with Tesseract OCR used as independent
+    machine read.
+  date: '2026-10-25'
+  worker: w1025d-wahl71
+review_status: draft
+tables:
+  # table_index selects the MinerU draft block; the extract uses printed Table IX.
+  - page: 36
+    table_index: 10
+    published_page: 31
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: measured_reduced
+    unit: atm
+    phase: gas
+    experiment: wahlbeck_1971_tio_effusion
+    regime: knudsen_effusion
+    temperature:
+      column: 2
+      unit: K
+    values:
+      - column: 3
+        species: TiO
