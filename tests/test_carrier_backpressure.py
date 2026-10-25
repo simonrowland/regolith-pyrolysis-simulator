@@ -248,14 +248,50 @@ def test_legacy_notice_is_exported_and_cleared_without_mutating_retained_report(
     assert retained['metadata']['backpressure_notice'] == notice
 
 
-def test_achievable_mars_pressure_does_not_report_inverse_roundoff(monkeypatch):
+def test_achievable_mars_pressure_does_not_report_inverse_roundoff():
     model = OverheadGasModel({'enabled': False})
     melt = MeltState(temperature_C=980.0, p_total_mbar=9.0)
     flux = EvaporationFlux(species_kg_hr={'CO2': 1e-6})
     flux.update_totals()
-    # Mars smoke's request and observed inversion overshoot (731 ulps Pa).
-    monkeypatch.setattr(model, '_vapor_pressure_mbar_from_flux',
-                        lambda *a, **kw: 900.0000000000831 / 100.0)
     state = model.estimate_transport_state(flux, melt)
     assert state['pipe_conductance_kg_hr'] >= flux.total_kg_hr
     assert state['pressure_mbar'] * 100.0 == 900.0
+
+
+def test_actual_mars_smoke_has_finite_flow_against_equal_outlet_pressure():
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.pumping_cost import process_pressure_state
+
+    # Fresh hour-20 replay: reproduce the reported 731 ulps using the real
+    # pipe law, geometry and formula owner, not a mocked inverse answer.
+    registry = {s: {'molar_mass_g_mol': resolve_species_formula(s).molar_mass_g_per_mol()}
+                for s in ('PO', 'PO2')}
+    model = OverheadGasModel({'enabled': False, 'downstream_pressure_bar': 0.009},
+                            species_formula_registry=registry)
+    model.pipe_diameter_m = 0.1
+    melt = MeltState(temperature_C=980.0, p_total_mbar=9.0)
+    flux = EvaporationFlux(species_kg_hr={
+        'PO': 1.409424886955813e-16, 'PO2': 8.20700666484637e-11})
+    flux.update_totals()
+    state = model.estimate_transport_state(flux, melt)
+    assert state['pressure_mbar'] * 100.0 == 900.0000000000831
+    assert state['pipe_conductance_kg_hr'] == 1.2724038678918379e-13
+    assert flux.total_kg_hr > state['pipe_conductance_kg_hr']
+    admission = process_pressure_state(
+        transport_pressure_pa=state['pressure_mbar'] * 100.0,
+        requested_pressure_pa=900.0, ambient_pressure_pa=610.0,
+        chamber_mol_per_s=4.5253049724259805e-13,
+        chamber_temperature_K=1253.15, pumping={},
+    )
+    assert admission['status'] == 'infeasible'
+
+
+def test_pipe_inverse_returns_the_admissible_bracket_side():
+    from simulator.transport_regime import pipe_mass_flow_kg_s, pipe_pressure_pa_for_mass_flow
+
+    source = 0.001
+    pressure = pipe_pressure_pa_for_mass_flow(
+        0.1, 1.0, 0.06297276, 1.8e-5, 1253.15, source, 900.0)
+    flow = pipe_mass_flow_kg_s(
+        0.1, 1.0, 0.06297276, 1.8e-5, 1253.15, pressure, 900.0)
+    assert flow <= source
