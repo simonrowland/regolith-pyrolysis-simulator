@@ -18540,6 +18540,9 @@ class Migrator:
         point_printed_composition: Located[Mapping[str, Any]] | None = None
         point_catalogue: Located[Composition] | None = None
         malformed_composition_amount: str | None = None
+        point_composition_role, point_composition_role_refusal = (
+            _declared_composition_role(raw_item, parent_values)
+        )
         if isinstance(raw_item, Mapping):
             q_for_species = (
                 quantity.value
@@ -19161,20 +19164,14 @@ class Migrator:
             else:
                 printed = point_printed_composition
                 residual = point_composition_located
-            role, role_refusal = _declared_composition_role(raw_item, parent_values)
-            if role_refusal is not None:
+            if point_composition_role_refusal is not None:
                 self.result.add_queue(
                     work.work_id,
                     point_locator,
                     ["composition"],
-                    role_refusal,
+                    point_composition_role_refusal,
                     source=source_key,
                     observation_id=point_id,
-                )
-            if residual is not None and role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
-                residual = replace(
-                    residual,
-                    state=State.of(replace(residual.state.value, proxy_flag=role)),
                 )
             extra_pc: dict[str, Located[Any]] = {}
             if printed is not None:
@@ -19617,6 +19614,32 @@ class Migrator:
                     locator=point_locator,
                 ),
             }
+        if point_composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+            composition_condition = (point_conditions or {}).get("composition")
+            if (
+                isinstance(composition_condition, Located)
+                and composition_condition.state.is_value
+                and isinstance(composition_condition.state.value, Composition)
+            ):
+                marked_composition = replace(
+                    composition_condition.state.value,
+                    proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                )
+                point_conditions = {
+                    **(point_conditions or {}),
+                    "composition": replace(
+                        composition_condition,
+                        state=State.of(marked_composition),
+                    ),
+                }
+                if (
+                    identity.composition is not None
+                    and identity.composition.is_value
+                ):
+                    identity = replace(
+                        identity,
+                        composition=State.of(marked_composition),
+                    )
         if identity.composition is None or not identity.composition.is_value:
             located_composition = (point_conditions or {}).get("composition")
             if (
