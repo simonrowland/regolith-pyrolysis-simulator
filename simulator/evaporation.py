@@ -3947,6 +3947,9 @@ class EvaporationMixin:
         for species, rate in evap_flux.species_kg_hr.items():
             # Reuse the source owner per carrier; never recover a small credit
             # by subtracting gross consuming traffic from its net.
+            # C7 freezes a one-hour tick: (mol/hr) * 1 hr is the interval mol
+            # compared with capacity_mol; no rate/amount conversion is implicit
+            # for a different timestep.
             oxygen = self._project_evaporation_overhead_source_mol_hr({species: rate}, {}).get('O2', 0.0)
             if oxygen >= 0.0:
                 credits.append(oxygen)
