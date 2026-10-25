@@ -367,6 +367,41 @@ def test_fraction_integrator_forwards_accepted_pressure_diagnostics() -> None:
     assert all(math.isfinite(value) for value in accepted)
 
 
+def test_fraction_integrator_types_missing_and_invalid_vacuum_pressures() -> None:
+    channels = (
+        ResidueChannel("Fe", "Fe", "FeO", 1.0, "pin"),
+        ResidueChannel("O2", "O2", None, 1.0, "pin"),
+    )
+    vacuum = ResiduePressureRegime("vacuum_balance", 100.0, 0.0)
+
+    def missing_fe_pressure(*_args):
+        return {"O2": 1.0e-5}
+
+    def root_above_bracket(_inventory, _temperature, logp, _regime):
+        displacement = logp - 10.0
+        return {
+            "Fe": 1.0e-10 * 10.0**(-0.5 * displacement),
+            "O2": 1.0e-20 * 10.0**displacement,
+        }
+
+    cases = (
+        (missing_fe_pressure, "residue_mass_loss_extent_unreachable", None),
+        (root_above_bracket, "residue_oxygen_balance_failed", "no root in the declared pO2 bracket"),
+    )
+    for pressure_model, reason, detail in cases:
+        with pytest.raises(ResidueInventoryRefusal) as error:
+            integrate_residue_fraction(_fraction_request(
+                channels=channels,
+                pressure_regime=vacuum,
+                pressure_model=pressure_model,
+                mass_loss_fraction=0.01,
+            ))
+
+        assert error.value.reason == reason
+        if detail is not None:
+            assert detail in error.value.detail
+
+
 def test_one_volatile_parent_with_refractory_remainder_matches_rayleigh_limit() -> None:
     initial = {"FeO": 1.0e-4, "SiO2": 1.0e-4}
     endpoint = 0.1

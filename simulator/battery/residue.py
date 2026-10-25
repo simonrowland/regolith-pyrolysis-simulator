@@ -1092,6 +1092,17 @@ def _residue_oxygen_balance(
         raise
 
 
+def _residue_oxygen_balance_refusal(error, pressure_at, active_parent_terms):
+    """Translate root errors, leaving the zero-parent-flux case to each path."""
+    low_pressure = pressure_at(-15.0)
+    if not any(
+        float(low_pressure.get(term.source.species, 0.0) or 0.0) > 0.0
+        for term in active_parent_terms
+    ):
+        return None
+    return ResidueInventoryRefusal("residue_oxygen_balance_failed", str(error))
+
+
 def _forward_accepted_pressure_evaluation(
     pressure_model: object,
     wrapper: Callable[..., Mapping[str, float]],
@@ -1290,19 +1301,14 @@ def integrate_residue_inventory(
             except ResidueInventoryRefusal:
                 raise
             except ValueError as exc:
-                # No positive parent pressure is the zero-flux limit, not a
-                # fabricated zero oxygen root. Other missing roots remain typed.
-                low_pressure = pressure_at(-15.0)
-                if not any(
-                    float(low_pressure.get(term.source.species, 0.0) or 0.0) > 0.0
-                    for term in active_parent_terms
-                ):
+                refusal = _residue_oxygen_balance_refusal(
+                    exc, pressure_at, active_parent_terms
+                )
+                if refusal is None:
                     pO2_steps.append(None)
                     bracket_boundary_steps.append(None)
                     continue
-                raise ResidueInventoryRefusal(
-                    "residue_oxygen_balance_failed", str(exc)
-                ) from exc
+                raise refusal from exc
             pO2_steps.append(balance.pO2_bar)
             bracket_boundary_steps.append(balance.bracket_boundary)
             pressures = balance.pressures_Pa
@@ -2023,6 +2029,9 @@ def integrate_residue_fraction(
                     if term.source.parent_oxide is not None
                     and trial_inventory.get(term.source.parent_oxide, 0.0) > 0.0
                 )
+                active_parent_terms = tuple(
+                    term for term in parent_terms if float(term.source.alpha) > 0.0
+                )
                 if not parent_terms:
                     return [0.0 for _amount in amounts]
 
@@ -2035,18 +2044,31 @@ def integrate_residue_fraction(
                     )
 
                 if buffered_logp is None:
-                    balance = _residue_oxygen_balance(
-                        live_terms,
-                        active_inventory,
-                        pressure_at,
-                        temperature,
-                        background_pressure,
-                        on_accepted_evaluation=(
-                            accepted_pressure_evaluation
-                            if callable(accepted_pressure_evaluation)
-                            else None
-                        ),
-                    )
+                    try:
+                        balance = _residue_oxygen_balance(
+                            live_terms,
+                            active_inventory,
+                            pressure_at,
+                            temperature,
+                            background_pressure,
+                            on_accepted_evaluation=(
+                                accepted_pressure_evaluation
+                                if callable(accepted_pressure_evaluation)
+                                else None
+                            ),
+                        )
+                    except ResidueInventoryRefusal:
+                        raise
+                    except ValueError as exc:
+                        refusal = _residue_oxygen_balance_refusal(
+                            exc, pressure_at, active_parent_terms
+                        )
+                        if refusal is not None:
+                            raise refusal from exc
+                        raise ResidueInventoryRefusal(
+                            "residue_mass_loss_extent_unreachable",
+                            f"no positive parent pressure at F={fraction:.17g}",
+                        ) from exc
                     pressures = balance.pressures_Pa
                 else:
                     pressures = pressure_at(buffered_logp)
