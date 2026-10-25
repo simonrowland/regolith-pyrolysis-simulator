@@ -114,6 +114,7 @@ from simulator.battery.records import (
     as_fraction,
     phase_token,
 )
+from simulator.accounting.formulas import parse_formula
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
     GAS_CONSTANT,
@@ -789,6 +790,22 @@ def _mixture_composition(identity: Identity) -> bool:
     return sum(1 for _name, amount in state.value.components if amount > 0) >= 2
 
 
+def _wall_deposition_oxygen_status(identity: Identity) -> bool | None:
+    composition = identity.composition
+    if composition is None or not composition.is_value or composition.value is None:
+        return False
+    formula = identity.species.formula
+    if formula in {"Na", "K", "Mg", "Fe"}:
+        return True
+    elements = formula_composition(formula)
+    if elements is None:
+        try:
+            elements = parse_formula(formula, species=formula).elements.items()
+        except ValueError:
+            return None
+    return dict(elements).get("O", 0) > 0
+
+
 def profile_for(identity: Identity) -> QuantityProfile:
     """Closed compared-axis profile for the declared quantity.
 
@@ -1011,6 +1028,60 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "exposure",
             "sample_mass_kg",
             "wall",
+        )
+    elif q in {
+        Quantity.WALL_DEPOSIT_AREAL_MASS,
+        Quantity.WALL_DEPOSITION_FLUX,
+    }:
+        req(
+            "temperature_K",
+            "reservoir",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "wall",
+        )
+        # Source state and carrier can be explicitly not applicable for an
+        # upstream partial-pressure source or carrier-free ballistic flow.
+        na("temperature_K", "reservoir", "composition", "fO2_Pa", "sweep_gas")
+        if _wall_deposition_oxygen_status(identity) is not False:
+            # Melt-source oxygen chemistry cannot mark fugacity N/A. An
+            # upstream source is represented by composition=N/A and remains
+            # allowed to omit melt fugacity.
+            permitted_na.discard("fO2_Pa")
+        if q is Quantity.WALL_DEPOSIT_AREAL_MASS:
+            req("exposure")
+        else:
+            na("exposure")
+        na(
+            "per",
+            "sample_mass_kg",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "subtype",
+        )
+    elif q is Quantity.WALL_DEW_TEMPERATURE:
+        # The result is a wall temperature; wall identity and transport
+        # conditions are optional for the local equilibrium inverse.
+        na(
+            "temperature_K",
+            "per",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "reservoir",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "exposure",
+            "sample_mass_kg",
+            "wall",
+            "subtype",
         )
     elif q in KINETIC_YIELD_QUANTITIES:
         req(
@@ -1384,6 +1455,25 @@ def _uncompared_axes_for(identity: Identity) -> frozenset[str]:
 
     if quantity_token(identity) is Quantity.P_PARTIAL:
         return _P_PARTIAL_UNCOMPARED_AXES
+    if quantity_token(identity) is Quantity.WALL_DEPOSITION_FLUX:
+        # Exposure duration may document a derived rate, but the normalized
+        # instantaneous flux identity is independent of that integration span.
+        return frozenset({"exposure"})
+    if quantity_token(identity) is Quantity.WALL_DEW_TEMPERATURE:
+        # Local-pressure dew inversion does not depend on transport metadata;
+        # retain any printed source/wall state without making it an identity.
+        return frozenset(
+            {
+                "temperature_K",
+                "reservoir",
+                "composition",
+                "fO2_Pa",
+                "total_pressure_Pa",
+                "sweep_gas",
+                "exposure",
+                "wall",
+            }
+        )
     return _melt_activity_uncompared_axes((identity,))
 
 
@@ -1966,6 +2056,7 @@ def _identity_equal(
             required=profile.required - omitted,
             permitted_not_applicable=profile.permitted_not_applicable - omitted,
         )
+    uncompared_axes = _uncompared_axes_for(left) | _uncompared_axes_for(right)
     mismatch: list[str] = []
     unknown: list[str] = []
     invalid: list[str] = []
@@ -1973,6 +2064,8 @@ def _identity_equal(
         # The caller uses this only for an explicit intrinsic-mode residual,
         # whose engine received no fO2 input.
         if ignore_fO2 and name == "fO2_Pa":
+            continue
+        if name in uncompared_axes and name not in profile.required:
             continue
         required = name in profile.required
         permitted_na = name in profile.permitted_not_applicable

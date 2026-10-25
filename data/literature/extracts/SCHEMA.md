@@ -1026,3 +1026,38 @@ python tools/extract_merge.py --by-species --coverage --consistency --outdir bui
 Coverage is species × source → `found` / `absent` relative to the U0 manifest
 (when the manifest is available) or the union of extract species keys.
 Consistency is the auto-computed multi-source disagreement report.
+
+## Wall-deposition observations (d-275)
+
+The wall-deposition rail has three distinct observables:
+
+| Quantity token | Unit | Required row identity and conditions |
+|---|---|---|
+| `wall_deposit_mass` | kg | Legacy extensive total. Its existing identity and sample-mass semantics are unchanged. |
+| `wall_deposit_areal_mass` | kg/m² | Deposited species, wall temperature/material/location, positive wall area, exposure duration, total pressure, carrier state, vapour-source mode and its source state, gas temperature, and located segment transport geometry. Sample mass is not an axis. |
+| `wall_deposition_flux` | kg/m²/s | Same wall, source, carrier, pressure, gas and geometry inputs as areal mass. Exposure duration is required only when deriving flux from a time series; a directly printed instantaneous flux does not need duration. Sample mass is not an axis. |
+| `wall_dew_temperature` | K | Deposited species and a positive located local wall species partial pressure. Wall temperature is the result. Material, wall area/location, total pressure, carrier and geometry are optional for the local equilibrium inverse; upstream pressure requires its located source location and sufficient transport inputs. |
+
+For areal mass and flux, use `identity.wall` for wall temperature,
+material, location and (when required) area. Do not use
+`apparatus.geometry.exposed_area_m2`, which describes the sample. Record the
+source and gas state in `point_conditions`; each condition must be a
+`{state: ..., locator: ...}` Located value. `vapour_source_kind` is `melt` or
+`upstream_partial_pressure`. Melt-source rows require the existing identity
+source temperature, reservoir and composition (and the source chemistry's
+required fO2). Upstream-source rows require `source_partial_pressure_Pa` and
+`source_location`. Carrier is the existing `identity.sweep_gas` including
+flow, or `point_conditions.carrier_mode` with a located value of `none`;
+absence does not mean vacuum. Never fill unprinted pressure, gas, material or
+geometry from defaults or another experiment.
+
+Segment transport geometry is located under `apparatus.geometry`:
+`pipe_inner_diameter_m`, `segment_length_m`, `segment_position_m`, and
+`flow_orientation`. In molecular flow, also locate the source-facing
+`line_of_sight_view_factor` (0–1). `point_conditions.gas_temperature_K` is
+also required for mass and flux. The areal-mass exposure duration is recorded
+through the existing `identity.exposure`. Dew rows may use local
+`point_conditions.wall_species_partial_pressure_Pa`; an upstream value is not
+a local wall pressure until the transport path is resolved. A condition
+omitted by the paper remains typed absent with its source locator; it is never
+replaced by nominal setpoints or assumed tube dimensions.

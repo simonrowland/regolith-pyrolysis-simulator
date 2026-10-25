@@ -876,6 +876,11 @@ class ApparatusGeometry:
     orifice_channel_length_m: Located[Value] | None = None
     orifice_count: Located[Value] | None = None
     orifice_shape: Located[str] | None = None
+    pipe_inner_diameter_m: Located[Value] | None = None
+    segment_length_m: Located[Value] | None = None
+    segment_position_m: Located[Value] | None = None
+    flow_orientation: Located[str] | None = None
+    line_of_sight_view_factor: Located[Value] | None = None
 
     def __post_init__(self) -> None:
         for name in (
@@ -888,6 +893,10 @@ class ApparatusGeometry:
             "chamber_volume_m3",
             "orifice_channel_length_m",
             "orifice_count",
+            "pipe_inner_diameter_m",
+            "segment_length_m",
+            "segment_position_m",
+            "line_of_sight_view_factor",
         ):
             object.__setattr__(self, name, _located_value(getattr(self, name)))
         for name in ("cell_internal_dimensions", "chamber_dimensions"):
