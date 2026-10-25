@@ -1550,7 +1550,7 @@ def test_docs_private_reference_in_nested_prose_and_provenance_path_is_refused()
         for error in errors
     )
     assert any(
-        "fixture-source.yaml:extraction.provenance_path" in error
+        "fixture-source.yaml: extraction.provenance_path" in error
         and "repository-portable" in error
         and "docs-private path refused for provenance_path" in error
         for error in errors
