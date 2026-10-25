@@ -1765,7 +1765,7 @@ class AtomLedger:
 
 
 def snapshot_atom_ledger(ledger: Any, *, _pressure_trial: bool = False) -> Any:
-    """Return an independently owned copy of every mutable ledger container."""
+    """Detach ledger state; read-only trials share committed journal rows."""
 
     snapshot = shallow_copy(ledger)
     memo = {}

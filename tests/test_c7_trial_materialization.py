@@ -11,6 +11,20 @@ from tests.magemin_test_support import close_test_owned_magemin_backend
 pytestmark = [pytest.mark.serial, pytest.mark.xdist_group('serial')]
 
 
+def test_trial_ledger_still_refuses_unbalanced_transitions():
+    from simulator.accounting.exceptions import UnbalancedTransitionError
+    from simulator.accounting.ledger import snapshot_atom_ledger
+    from tests.accounting.test_ledger_api import _api
+
+    original = _api().ledger
+    trial = snapshot_atom_ledger(original, _pressure_trial=True)
+    before = trial.mol_by_account()
+    with pytest.raises(UnbalancedTransitionError):
+        trial.move('invalid trial', 'process.cleaned_melt', 'process.overhead_gas',
+                   {'SiO2': 0.1}, credit_species_kg={'SiO2': 0.2})
+    assert trial.mol_by_account() == original.mol_by_account() == before
+
+
 def test_pressure_trials_keep_checks_without_materializing_diagnostics(monkeypatch):
     from simulator.accounting.ledger import LedgerTransition
     from simulator.vapour_rail import catalog

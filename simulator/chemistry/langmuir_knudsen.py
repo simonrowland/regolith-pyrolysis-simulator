@@ -646,6 +646,15 @@ def _solve_surface_oxygen_balance(
         else:
             break
     if not f_low < 0.0 < f_high:
+        if bulk == 0.0 and f_low >= 0.0:
+            # A consuming mass-action channel can vanish at vacuum: for
+            # p_i=C*(pO2/p_ref)**e, e>0 gives p_i -> 0 as pO2 -> 0+.
+            # With no bulk supply its only balance may be the physical zero
+            # endpoint. Accept only individually zero signed terms, never a
+            # finite unfunded sink or a small positive bracket residual.
+            zero = checked(0.0)
+            if not any(zero.balance_terms):
+                return zero
         raise OxygenClosureNonconvergence(
             f'no interior oxygen root: excess bracket {(low, high)}, residuals {(f_low, f_high)}')
     try:

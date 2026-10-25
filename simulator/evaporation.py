@@ -3945,7 +3945,9 @@ class EvaporationMixin:
         trial.__dict__.update({key: value for key, value in state.items()
                                if key != '_terminal_refusal_chem_registry_tables'})
         trial.atom_ledger = ledger
-        trial.condensation_model._pressure_trial = True
+        trial._pressure_trial = True
+        if trial._condensation_model is not None:
+            trial._condensation_model._pressure_trial = True
         trial.cost_ledger = copy.copy(self.cost_ledger)
         trial.cost_ledger.__dict__ = dict(cost_state)
         trial._chem_registry = copy.copy(self._chem_registry)
@@ -4010,10 +4012,22 @@ class EvaporationMixin:
         if mismatches:
             raise EvaporationFluxRefusal('oxygen_projection_commit_mismatch', {'signed_amounts_mol': mismatches})
 
-    def _evaporation_carrier_zero_reason(self, equilibrium=None):
+    def _evaporation_carrier_zero_reason(self, equilibrium=None, *, oxygen_bar=None):
         """Current inventory/phase proofs, or frozen step-start admission."""
         if getattr(self, '_frozen_evaporation_carriers', None) == frozenset():
             return 'frozen_carrier_set_empty'
+        oxygen = getattr(self, '_reaction_pO2_bar', None) if oxygen_bar is None else oxygen_bar
+        frozen = getattr(self, '_frozen_evaporation_carriers', None)
+        if oxygen == 0.0 and frozen:
+            phase = 'stage0' if self.melt.campaign.name in {'C0', 'C0B'} else 'hot_train'
+            evaluators = [self.vapour_rail_catalog.evaluator_for_hot_train(
+                species, process_phase=phase) for species in frozen]
+            # The catalog owns the mass-action powers. Every admitted source
+            # must vanish at zero oxygen; one inverse/constant channel defeats
+            # this proof. Settlement is checked separately in the signed solve.
+            if all(evaluator is not None and evaluator.pO2_exponent > 0.0
+                   for evaluator in evaluators):
+                return 'frozen_consuming_carriers_at_zero_oxygen'
         if self.melt.temperature_C + 273.15 < 400.0:
             return 'internal_analytical_below_400K'
         if not self.vapour_rail_catalog.build_request(self.atom_ledger.mol_by_account()):
@@ -4045,6 +4059,9 @@ class EvaporationMixin:
             initial = seed._get_equilibrium() if equilibrium is None else copy.deepcopy(equilibrium)
             seed._refresh_vapor_pressures_from_kernel(initial, include_diagnostic_shadows=False,
                                                       simulation_hour=int(self.melt.hour) + 1)
+            # Own the frozen condensation payload before cloning admission,
+            # so every pressure trial shares that same validated identity.
+            condensation_data = seed.condensation_model.vapor_pressure_data
             admission = seed._detached_evaporation_projection()
             raw_flux = admission._calculate_evaporation(
                 initial, overhead_partials_override_Pa=overhead_partials_override_Pa)
@@ -4062,7 +4079,7 @@ class EvaporationMixin:
             admission._apply_evaporation_carrier_batch(flux)
             data = admission.condensation_model.vapor_pressure_data
             if hasattr(data, '_route_catalog'):
-                seed.condensation_model.vapor_pressure_data._route_catalog = data._route_catalog
+                condensation_data._route_catalog = data._route_catalog
             amounts, _ = admission._evaporation_signed_amounts(start, before)
             seed._frozen_evaporation_carriers = frozenset(
                 key.removeprefix('carrier:') for key, value in amounts.items()
@@ -4141,7 +4158,9 @@ class EvaporationMixin:
             # of a trial pressure or rate cutoff. Settlement may still supply
             # oxygen, so check its individually signed terms before accepting 0.
             zero = None
-            if bulk == 0.0 and self._evaporation_carrier_zero_reason(equilibrium):
+            zero_reason = (self._evaporation_carrier_zero_reason(equilibrium, oxygen_bar=0.0)
+                           if bulk == 0.0 else None)
+            if bulk == 0.0 and zero_reason:
                 candidate = evaluate(0.0)
                 if not any(candidate.balance_terms):
                     zero = candidate
@@ -4203,6 +4222,9 @@ class EvaporationMixin:
                 'carrier admission flips at the solved surface oxygen; frozen-set solution used'
                 + f"; {item['species']}: {item['direction']}"
                 for item in projected._carrier_admission_flips]
+            if solved.reaction_pO2_bar == 0.0 and zero_reason == 'frozen_consuming_carriers_at_zero_oxygen':
+                projected._carrier_admission_notices.append(
+                    'oxygen-consuming carriers stop at zero oxygen; zero-bulk boundary prediction used')
             return solved
         except OxygenClosureNonconvergence as exc:
             raise EvaporationFluxRefusal('oxygen_closure_nonconvergence', {'detail': str(exc)}) from exc

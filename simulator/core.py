@@ -1420,6 +1420,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._condensation_model.configure_lab_geometry(
                     self.lab_geometry
                 )
+        self._condensation_model._pressure_trial = getattr(self, '_pressure_trial', False)
         return self._condensation_model
 
     @property
