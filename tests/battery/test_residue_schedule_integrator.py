@@ -70,6 +70,36 @@ def test_zero_duration_returns_the_starting_inventory_without_pressure_calls() -
     assert calls == 0
 
 
+def test_zero_duration_segment_inside_positive_schedule_is_skipped() -> None:
+    baseline_pressure_calls: list[float] = []
+    mixed_pressure_calls: list[float] = []
+
+    def pressure_model(calls: list[float]):
+        def evaluate(_inventory, _temperature_K, logp, _regime):
+            calls.append(logp)
+            return {"Fe": 1.0e-3}
+
+        return evaluate
+
+    before = ResidueThermalSegment(1800.0, 40.0)
+    after = ResidueThermalSegment(1800.0, 60.0)
+    baseline = integrate_residue_schedule(_request(
+        thermal_schedule=(before, after),
+        pressure_model=pressure_model(baseline_pressure_calls),
+    ))
+    mixed = integrate_residue_schedule(_request(
+        thermal_schedule=(
+            before,
+            ResidueThermalSegment(1800.0, 0.0),
+            after,
+        ),
+        pressure_model=pressure_model(mixed_pressure_calls),
+    ))
+
+    assert mixed.residue_mol == baseline.residue_mol
+    assert mixed_pressure_calls == baseline_pressure_calls
+
+
 def test_buffered_oxygen_exchange_closes_with_exhaustion_accounting() -> None:
     result = integrate_residue_schedule(
         _request(exhaustion_floor_mol=1.0e-15)

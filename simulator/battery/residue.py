@@ -1484,9 +1484,14 @@ def integrate_residue_schedule(
 
     initial_density: float | None = None
     if geometry.area_policy == "self_similar_sphere" and geometry.density_model is not None:
+        first_active_segment = next(
+            segment for segment in schedule if float(segment.duration_s) > 0.0
+        )
         try:
             initial_density = float(
-                geometry.density_model(initial_inventory, schedule[0].temperature_K)
+                geometry.density_model(
+                    initial_inventory, first_active_segment.temperature_K
+                )
             )
         except (TypeError, ValueError, ArithmeticError) as exc:
             raise ResidueInventoryRefusal("residue_density_invalid", str(exc)) from exc
@@ -1622,6 +1627,8 @@ def integrate_residue_schedule(
     stop = False
     for segment, active_channels in zip(schedule, channels_by_segment, strict=True):
         duration_s = float(segment.duration_s)
+        if duration_s == 0.0:
+            continue
         # Premise: each declared piecewise-isothermal interval has N equal
         # steps. Algebra: dt=duration/N; units are s, and N*dt returns the
         # printed interval. The one-step limit is the original isothermal run.
