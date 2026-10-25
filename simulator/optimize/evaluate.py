@@ -41,7 +41,11 @@ from simulator.backends import (
     resolve_backend,
 )
 from simulator.campaigns import CampaignPressureSetpointRefusal
-from simulator.chemistry.kernel import CHEMISTRY_KERNEL_RUN_INPUT_KEYS, ProposalRejected
+from simulator.chemistry.kernel import (
+    CHEMISTRY_KERNEL_RUN_INPUT_KEYS,
+    DEFAULT_LIQUID_FRACTION_PROVIDER,
+    ProposalRejected,
+)
 from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
     KnudsenRegimeRefusal,
@@ -2949,13 +2953,18 @@ def _build_eval_inputs_impl(
         if digest_key not in bundle.digests:
             raise EvaluationInputError(f"missing config digest {digest_key!r}")
 
-    diagnostic_chemistry_kernel = _diagnostic_chemistry_kernel_run_config(
-        run_options["chemistry_kernel"]
+    kernel_run_inputs = _chemistry_kernel_run_config(
+        {
+            'liquid_fraction_provider': (
+                bundle.setpoints.get('chemistry_kernel', {}) or {}
+            ).get('liquid_fraction_provider', DEFAULT_LIQUID_FRACTION_PROVIDER),
+            **run_options["chemistry_kernel"],
+        }
     )
     allow_unmeasured_alpha_fallback = bool(
         run_options["allow_unmeasured_alpha_fallback"]
     )
-    evalspec_chemistry_kernel = dict(diagnostic_chemistry_kernel)
+    evalspec_chemistry_kernel = dict(kernel_run_inputs)
     if allow_unmeasured_alpha_fallback:
         evalspec_chemistry_kernel["allow_unmeasured_alpha_fallback"] = True
     force_builtin_vapor_pressure = bool(run_options["force_builtin_vapor_pressure"])
@@ -2981,7 +2990,7 @@ def _build_eval_inputs_impl(
         c5_enabled=bool(run_options["c5_enabled"]),
         mre_target_species=str(run_options["mre_target_species"]),
         mre_max_voltage_V=float(run_options["mre_max_voltage_V"]),
-        chemistry_kernel=diagnostic_chemistry_kernel,
+        chemistry_kernel=kernel_run_inputs,
         allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
         allow_fallback_vapor=bool(run_options["allow_fallback_vapor"]),
         force_builtin_vapor_pressure=force_builtin_vapor_pressure,
@@ -3538,7 +3547,7 @@ def _vapor_pressure_provider_code_fingerprint(provider_id: str) -> str:
     return digest.hexdigest()
 
 
-def _diagnostic_chemistry_kernel_run_config(
+def _chemistry_kernel_run_config(
     chemistry_kernel: Mapping[str, Any],
 ) -> dict[str, Any]:
     if not isinstance(chemistry_kernel, MappingABC):

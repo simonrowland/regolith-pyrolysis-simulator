@@ -265,6 +265,15 @@ it does not introduce a new schema version.
 
 ## Run metadata
 
+`chemistry_kernel.liquid_fraction_provider` declares the liquidus/liquid-fraction
+gate independently of the main melt backend. Accepted values are `magemin`
+(default) and `analytical`, supplied in setpoints or `PyrolysisRun.chemistry_kernel`.
+The choice is resolved before hour 1 and recorded below. Unavailable declared
+MAGEMin produces a typed missing-input refusal at startup. Analytical gating
+uses the existing Kress91 floor prediction and qualifies every gated hour.
+Numerical MAGEMin failures refuse; stable domain refusals retain the qualified
+Kress91 extrapolation without dispatching another engine.
+
 ```jsonc
 "run_metadata": {
   "schema_version": "1.9.0",
@@ -277,6 +286,7 @@ it does not introduce a new schema version.
   "additives_kg":    {"C": 30.0},            // additive species -> kg
   "track":           "pyrolysis",            // or "mre_baseline"
   "backend":         "internal-analytical",  // canonical melt backend name (`stub` remains an accepted input alias)
+  "liquid_fraction_provider": "magemin",     // declared gate: "magemin" or "analytical"
   "started_at_utc":  "2026-05-15T00:00:00Z", // ISO8601 UTC
   "engines_used": {
     "active": {                               // flat intent -> authoritative provider_id
@@ -754,11 +764,17 @@ mole, energy, pressure, or partition arithmetic.
         "warning": true
       }
     },
-    "oxygen_reservoir": {                   // optional; present when an O2 exchange is clamped
+    "oxygen_reservoir": {                   // present for a gate record or clamped O2 exchange
       "exchange_o2_mol": 0.000001,          // ledger-committed exchange amount, mol O2
       "exchange_unbacked_o2_mol": 0.001594225928215942, // requested remainder, mol O2
       "exchange_direction": "melt_to_headspace",
-      "exchange_clamped": true
+      "exchange_clamped": true,
+      "liquid_fraction_gate": {
+        "provider": "magemin",
+        "redox": {...},                     // realized source, bounds, status and domain qualification
+        "liquid_fraction": {...},           // realized fraction and its qualification
+        "evaporation": {...}                // evaporation gate outcome, empty when disabled
+      }
     }
   },
   ...
@@ -935,9 +951,15 @@ incident, stuck, re-evaporated, and net continuous flux and has
     mirrors the ledger relative tolerance; it is a loud diagnostic tripwire,
     not a fitted chemistry coefficient.
   * `oxygen_reservoir` -- emitted by
-    `_oxygen_reservoir_exchange_observables` when the snapshot reports a
-    clamped exchange; carries the ledger-committed O2 amount, unbacked O2
-    remainder, direction, and clamp status from `HourSnapshot.oxygen_reservoir`.
+    `_oxygen_reservoir_exchange_observables` for gate diagnostics or a clamped
+    exchange. `liquid_fraction_gate` records the declared provider and realized
+    redox/fraction/evaporation outcomes. Analytical hours carry
+    `qualification: analytical_kress91_floor_prediction`. A stable MAGEMin
+    domain extension carries `gate_provider_refusal`, including its status,
+    reason, warnings and `out_of_domain_kress91_floor_prediction` qualification;
+    this survives cache replay. Exchange fields retain the ledger-committed O2
+    amount, unbacked remainder, direction and clamp status, including `false`
+    when only the gate record caused the diagnostics object to be emitted.
   * `mass_balance_error_category` -- added inline by `build_per_hour_summary`
     when `HourSnapshot.mass_balance_error_category` is a non-empty string; the
     categorical mass-balance-error label for that hour.

@@ -110,6 +110,7 @@ def _build_pt0_sim(store: PT0DeterminismStore | None):
         additives_kg={"K": 26.0, "Na": 12.0},
     )
     sim.configure_pt0_determinism_store(store)
+    register_synthetic_gate_curve_producer(sim)
     return sim
 
 
@@ -3354,6 +3355,29 @@ def test_pt1_projected_gate_notice_replays_into_run_metadata(tmp_path: Path) -> 
     assert metadata["composition_projected_liquidus_notice"]["notices"] == [
         notice
     ]
+
+
+def test_pt1_domain_gate_prediction_replays_with_qualification(tmp_path: Path) -> None:
+    db_path = tmp_path / 'domain-gate-notice.db'
+    capture = PT0DeterminismStore('capture', db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    curve = sim._freeze_gate_kress_floor_curve(None, [])
+    notice = {
+        'provider': 'magemin', 'status': 'out_of_domain',
+        'reason': 'silicate_window', 'authority': 'extrapolated',
+        'qualification': 'out_of_domain_kress91_floor_prediction',
+    }
+    curve['gate_provider_refusal'] = notice
+    seed_gate_curve_memo_record(sim, curve)
+    capture.capture_gate_curve(
+        sim, fO2_log=sim._compute_intrinsic_melt_fO2(), curve=curve,
+    )
+
+    replay_sim = _build_pt0_sim(PT0DeterminismStore('replay', db_path=db_path))
+    assert replay_sim._melt_redox_liquidus_gate_curve() == curve
+    assert replay_sim._make_snapshot().liquid_fraction_gate['redox'][
+        'gate_provider_refusal'
+    ] == notice
 
 
 def test_pt1_capture_equilibrium_rejects_internal_analytical_provider(

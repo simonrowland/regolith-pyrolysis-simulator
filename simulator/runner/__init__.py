@@ -54,6 +54,7 @@ from simulator.backends import (
     BackendSelectionPolicy,
 )
 from simulator.config import ConfigBundle, load_config_bundle
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import iron_oxide_values
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
@@ -855,8 +856,8 @@ def _deep_merge_setpoints(
         )
         if extra_keys:
             raise RunnerError(
-                "setpoints_patch may only contain diagnostic "
-                f"chemistry_kernel.{OXYGEN_SINK_CHANNEL_MODE_KEY}; "
+                "setpoints_patch may only contain "
+                f"chemistry_kernel.{OXYGEN_SINK_CHANNEL_MODE_KEY} or liquid_fraction_provider; "
                 "use fallback flags instead"
             )
         try:
@@ -1087,7 +1088,7 @@ class PyrolysisRun:
             session = SimSession()
             try:
                 session.start(self._session_config())
-            except CampaignPressureSetpointRefusal as exc:
+            except (CampaignPressureSetpointRefusal, EvaporationFluxRefusal) as exc:
                 execution = RunExecutor().execute_session(
                     session,
                     hours=int(self.hours),
@@ -1210,8 +1211,8 @@ class PyrolysisRun:
             )
             if extra_keys:
                 raise RunnerError(
-                    "PyrolysisRun.chemistry_kernel only accepts diagnostic "
-                    f"{OXYGEN_SINK_CHANNEL_MODE_KEY}"
+                    "PyrolysisRun.chemistry_kernel only accepts "
+                    f"{OXYGEN_SINK_CHANNEL_MODE_KEY} or liquid_fraction_provider"
                 )
             setpoints = _deep_merge_setpoints(
                 setpoints,
@@ -1397,6 +1398,7 @@ class PyrolysisRun:
             "backend": self.backend_name,
             "started_at_utc": started_at_utc,
             "engines_used": engines_used,
+            "liquid_fraction_provider": sim.record.liquid_fraction_provider,
             "kernel_commit_sha": kernel_commit_sha,
         }
         c3_credit_dose_kg = _c3_alkali_dosing_kg_by_species(
@@ -2500,12 +2502,10 @@ def _oxygen_reservoir_exchange_observables(
     snapshot: HourSnapshot,
 ) -> dict[str, Any]:
     reservoir = getattr(snapshot, "oxygen_reservoir", {}) or {}
-    if (
-        not isinstance(reservoir, Mapping)
-        or not reservoir.get("exchange_clamped")
+    if not isinstance(reservoir, Mapping) or not (
+        reservoir.get("exchange_clamped") or snapshot.liquid_fraction_gate
     ):
         return {}
-    # Unclamped exchanges need no warning row; keep existing normal rows stable.
     exchange = {
         "exchange_o2_mol": reservoir.get("exchange_o2_mol", 0.0),
         "exchange_unbacked_o2_mol": reservoir.get(
@@ -2514,6 +2514,8 @@ def _oxygen_reservoir_exchange_observables(
         "exchange_direction": reservoir.get("exchange_direction", ""),
         "exchange_clamped": reservoir.get("exchange_clamped", False),
     }
+    if snapshot.liquid_fraction_gate:
+        exchange['liquid_fraction_gate'] = snapshot.liquid_fraction_gate
     return {"oxygen_reservoir": _json_safe(exchange)}
 
 

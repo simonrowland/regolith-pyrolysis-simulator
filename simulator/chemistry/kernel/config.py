@@ -1,4 +1,4 @@
-"""Diagnostic-only chemistry-kernel configuration values."""
+"""Chemistry-kernel run inputs and diagnostic modes."""
 
 from __future__ import annotations
 
@@ -19,12 +19,16 @@ DEFAULT_OXYGEN_SINK_CHANNEL_MODE = OxygenSinkChannelMode.LEGACY_SOURCE_EQUILIBRI
 OXYGEN_SINK_CHANNEL_MODE_VALUES: tuple[str, ...] = tuple(
     mode.value for mode in OxygenSinkChannelMode
 )
-CHEMISTRY_KERNEL_RUN_INPUT_KEYS = frozenset({OXYGEN_SINK_CHANNEL_MODE_KEY})
+CHEMISTRY_KERNEL_RUN_INPUT_KEYS = frozenset({
+    OXYGEN_SINK_CHANNEL_MODE_KEY, "liquid_fraction_provider",
+})
 
 _AUTHORITY_OPT_IN_BOOL_KEYS = (
     "allow_fallback_vapor",
     "allow_unmeasured_alpha_fallback",
 )
+
+DEFAULT_LIQUID_FRACTION_PROVIDER = 'magemin'
 
 
 def normalize_oxygen_sink_channel_mode(value: Any = None) -> OxygenSinkChannelMode:
@@ -53,6 +57,12 @@ def normalize_chemistry_kernel_config(
     if not all(isinstance(key, str) for key in config):
         raise ValueError("chemistry_kernel keys must be strings")
     normalized = dict(config)
+    if 'liquid_fraction_provider' in normalized:
+        provider = normalized['liquid_fraction_provider']
+        if not isinstance(provider, str):
+            raise TypeError('liquid_fraction_provider must be a string')
+        if provider not in {'magemin', 'analytical'}:
+            raise ValueError('liquid_fraction_provider must be magemin or analytical')
     for key in _AUTHORITY_OPT_IN_BOOL_KEYS:
         if key in normalized and not isinstance(normalized[key], bool):
             raise TypeError(f"chemistry_kernel.{key} must be bool")

@@ -107,6 +107,7 @@ APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
     {"cached_interpolated", "cached_physics_bucket"}
 )
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
+GATE_CURVE_NOTICE_KEYS = ('composition_projected_notice', 'gate_provider_refusal')
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
@@ -3747,9 +3748,10 @@ def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
             for point in tuple(curve.get("path") or ())
         ],
     }
-    notice = curve.get("composition_projected_notice")
-    if isinstance(notice, Mapping):
-        payload["composition_projected_notice"] = _json_ready(notice)
+    for notice_key in GATE_CURVE_NOTICE_KEYS:
+        notice = curve.get(notice_key)
+        if isinstance(notice, Mapping):
+            payload[notice_key] = _json_ready(notice)
     return payload
 
 
@@ -3763,9 +3765,10 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
             for point in payload.get("path", ())
         ),
     }
-    notice = payload.get("composition_projected_notice")
-    if isinstance(notice, Mapping):
-        curve["composition_projected_notice"] = dict(notice)
+    for notice_key in GATE_CURVE_NOTICE_KEYS:
+        notice = payload.get(notice_key)
+        if isinstance(notice, Mapping):
+            curve[notice_key] = dict(notice)
     return curve
 
 
@@ -3837,6 +3840,8 @@ def _gate_provider_role_for_key(sim: Any) -> str:
         is not None
     ):
         return "authoritative"
+    if getattr(sim, '_liquid_fraction_provider', None) == 'magemin':
+        return "fallback"
     authorized_name = _cached_real_authorized_backend_name(sim)
     if (
         _is_alphamelts_authorized_name(authorized_name)

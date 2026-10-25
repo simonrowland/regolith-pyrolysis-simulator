@@ -1139,33 +1139,8 @@ def test_public_mol_serialization_projects_signed_dust() -> None:
     assert ledger.mol_by_account("process.cleaned_melt")["FeO"] < 0.0
 
 
-def test_direct_liquidus_backend_receives_projected_mol_and_refuses_real_negative() -> None:
-    ledger = _signed_dust_ledger()
-    calls: list[dict[str, object]] = []
-
-    def finder(**kwargs):
-        calls.append(kwargs)
-        raise RuntimeError("probe complete")
-
-    sim = SimpleNamespace(
-        atom_ledger=ledger,
-        backend=SimpleNamespace(find_liquidus_solidus=finder),
-        species_formula_registry={},
-    )
-    reasons: list[str] = []
-    assert EvaporationMixin._freeze_gate_curve_from_backend_liquidus(
-        sim, reasons, pressure_bar=1.0e-6, fO2_log=-9.0
-    ) is None
-    assert calls[0]["composition_mol_by_account"] == {
-        "process.cleaned_melt": {}
-    }
-
-    ledger._balances["process.cleaned_melt"]["FeO"] *= 10.0
-    with pytest.raises(AccountingError, match="negative outward mass"):
-        EvaporationMixin._freeze_gate_curve_from_backend_liquidus(
-            sim, [], pressure_bar=1.0e-6, fO2_log=-9.0
-        )
-    assert len(calls) == 1
+def test_freeze_gate_has_no_direct_backend_liquidus_fallback() -> None:
+    assert not hasattr(EvaporationMixin, '_freeze_gate_curve_from_backend_liquidus')
 
 
 def test_legacy_backend_composition_projects_dust_and_refuses_real_negative() -> None:
