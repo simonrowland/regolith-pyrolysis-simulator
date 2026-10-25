@@ -18,15 +18,20 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml"
 
 
-def test_sossi_start_inventory_contains_table1_host_and_starting_trace() -> None:
+def _sossi_first_experiment():
     source = yaml.safe_load(SOURCE.read_text())
     experiment = source["experiments"][0]
-    starting_trace_ppm = {
+    starting_trace = {
         element: source["species"][element]["observations"][0]["values"][
             "starting_measured_ppm"
         ]
         for element in ("Mn", "Ti")
     }
+    return source, experiment, starting_trace
+
+
+def test_sossi_start_inventory_contains_table1_host_and_starting_trace() -> None:
+    source, experiment, starting_trace_ppm = _sossi_first_experiment()
     inventory, sample_mass_kg, inventory_mass_kg = _sossi_initial_inventory(
         experiment, starting_trace_ppm
     )
@@ -71,6 +76,42 @@ def test_sossi_geometry_is_declared_from_bead_mass_without_residue_inputs() -> N
     ]
 
 
+def test_sossi_openimcc_primary_numeric_output_is_pinned() -> None:
+    pytest.importorskip("openimcc")
+    import simulator.battery.residue as residue
+
+    source, experiment, starting_trace = _sossi_first_experiment()
+    experiment_id = experiment["experiment_id"]
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+    prediction = residue._predict_sossi_residue_cohort(
+        [experiment],
+        catalog,
+        starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+        buffered_fO2_log_by_experiment={experiment_id: -10.0},
+        code_revision="d289-sossi-baseline-pin",
+        engine="openimcc",
+    )[0]
+
+    assert prediction.experiment_id == "sossi-2019-run-2m-15-07-16c"
+    assert {
+        geometry: {element: value.hex() for element, value in values.items()}
+        for geometry, values in prediction.geometry_element_ppm.items()
+    } == {
+        "pt_loop_bead_sphere_constant": {
+            "Mn": "0x1.380ebf6ad956fp+9",
+            "Ti": "0x1.053dfabbcdd7ap+10",
+        },
+        "pt_loop_bead_sphere_shrinking": {
+            "Mn": "0x1.380f05db83e81p+9",
+            "Ti": "0x1.053dfaace1440p+10",
+        },
+        "pt_loop_bead_disk_equivalent_volume": {
+            "Mn": "0x1.53525d49fdfadp+9",
+            "Ti": "0x1.053833f6c727dp+10",
+        },
+    }
+
+
 def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -> None:
     pytest.importorskip("openimcc")
     import openimcc
@@ -89,15 +130,8 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
         )
 
     monkeypatch.setattr(residue, "integrate_residue_inventory", no_evaporation)
-    source = yaml.safe_load(SOURCE.read_text())
-    experiment = source["experiments"][0]
+    source, experiment, starting_trace = _sossi_first_experiment()
     experiment_id = experiment["experiment_id"]
-    starting_trace = {
-        element: source["species"][element]["observations"][0]["values"][
-            "starting_measured_ppm"
-        ]
-        for element in ("Mn", "Ti")
-    }
     initial_inventory, _, _ = residue._sossi_initial_inventory(
         experiment, starting_trace
     )
