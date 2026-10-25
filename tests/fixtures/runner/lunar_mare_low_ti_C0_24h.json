@@ -689,7 +689,24 @@
           "status": "unavailable",
           "reason": "species_absent_from_latest_evaporation_series_diagnostic",
           "current_wall_deposit_flux_kg_hr": null,
-          "cumulative_wall_deposit_kg": null
+          "cumulative_wall_deposit_kg": null,
+          "wall_saturation_pressure_extrapolations": {
+            "stage_0_to_stage_1": {
+              "temperature_K": 1773.15,
+              "valid_range_K": null,
+              "authority_level": "extrapolated",
+              "reason": "wall_saturation_pressure_has_no_finite_valid_range",
+              "status": "extrapolated"
+            },
+            "stage_0_to_stage_1#2": {
+              "temperature_K": 2073.15,
+              "valid_range_K": null,
+              "authority_level": "extrapolated",
+              "reason": "wall_saturation_pressure_has_no_finite_valid_range",
+              "status": "extrapolated"
+            }
+          },
+          "authority_level": "extrapolated"
         },
         "Mg": {
           "status": "unavailable",
@@ -8790,11 +8807,11 @@
           "partial_pressure_Pa": 6.995892583409546e-08,
           "provenance": "existing_condensation_antoine_surface",
           "routing_authority": false,
-          "status": "refused_pressure_outside_certified_range",
-          "temperature_K": null,
+          "status": "extrapolated",
+          "temperature_K": 967.5778421063776,
           "valid_range_K": [
             1889.0,
-            2944.0
+            2755.0
           ]
         },
         "authority": "condensation_temperature_override",
@@ -8810,12 +8827,9 @@
           "partial_pressure_Pa": 0.0014211247307410596,
           "provenance": "existing_condensation_antoine_surface",
           "routing_authority": false,
-          "status": "refused_pressure_outside_certified_range",
-          "temperature_K": null,
-          "valid_range_K": [
-            1400.0,
-            1900.0
-          ]
+          "status": "extrapolated",
+          "temperature_K": 1313.7905002275402,
+          "valid_range_K": null
         },
         "authority": "condensation_temperature_override",
         "source": "Estimated/operator-routing override matching the Fe condenser band; no source-backed 1 mbar condensation-temperature row is declared.",
@@ -8830,11 +8844,11 @@
           "partial_pressure_Pa": 0.2473250649226641,
           "provenance": "existing_condensation_antoine_surface",
           "routing_authority": false,
-          "status": "refused_pressure_outside_certified_range",
-          "temperature_K": null,
+          "status": "extrapolated",
+          "temperature_K": 441.9835656929148,
           "valid_range_K": [
             679.4,
-            1600.0
+            1033.0
           ]
         },
         "authority": "condensation_temperature_override",
@@ -8850,8 +8864,8 @@
           "partial_pressure_Pa": 9.097463633687858e-06,
           "provenance": "existing_condensation_antoine_surface",
           "routing_authority": false,
-          "status": "refused_pressure_outside_certified_range",
-          "temperature_K": null,
+          "status": "extrapolated",
+          "temperature_K": 496.8716701375005,
           "valid_range_K": [
             701.0,
             1361.0
@@ -8870,11 +8884,11 @@
           "partial_pressure_Pa": 1.4945941420902151,
           "provenance": "existing_condensation_antoine_surface",
           "routing_authority": false,
-          "status": "refused_pressure_outside_certified_range",
-          "temperature_K": null,
+          "status": "extrapolated",
+          "temperature_K": 673.5315597722472,
           "valid_range_K": [
             924.0,
-            1600.0
+            1118.0
           ]
         },
         "authority": "condensation_temperature_override",
@@ -27586,7 +27600,7 @@
     },
     "condensation_antoine_extrapolation": {
       "engaged": true,
-      "total_count": 2179,
+      "total_count": 2434,
       "by_hour": [
         {
           "campaign": "C0",
@@ -27646,7 +27660,7 @@
           "campaign": "C0",
           "hour": 17,
           "campaign_hour": 17,
-          "count": 120
+          "count": 186
         },
         {
           "campaign": "C0",
@@ -27658,7 +27672,7 @@
           "campaign": "C2A_STAGED",
           "hour": 22,
           "campaign_hour": 0,
-          "count": 1019
+          "count": 1208
         }
       ]
     },
@@ -155984,6 +155998,15 @@
                   "reason": "wall_saturation_pressure_out_of_validated_range",
                   "status": "extrapolated"
                 }
+              },
+              "Fe": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1773.15,
+                  "valid_range_K": null,
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_has_no_finite_valid_range",
+                  "status": "extrapolated"
+                }
               }
             },
             "authority_level": "extrapolated",
@@ -166898,6 +166921,15 @@
                   "reason": "wall_saturation_pressure_out_of_validated_range",
                   "status": "extrapolated"
                 }
+              },
+              "Fe": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1773.15,
+                  "valid_range_K": null,
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_has_no_finite_valid_range",
+                  "status": "extrapolated"
+                }
               }
             },
             "authority_level": "extrapolated",
@@ -175298,6 +175330,15 @@
                   "reason": "wall_saturation_pressure_out_of_validated_range",
                   "status": "extrapolated"
                 }
+              },
+              "Fe": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1773.15,
+                  "valid_range_K": null,
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_has_no_finite_valid_range",
+                  "status": "extrapolated"
+                }
               }
             },
             "authority_level": "extrapolated",
@@ -183580,6 +183621,15 @@
                   "reason": "wall_saturation_pressure_out_of_validated_range",
                   "status": "extrapolated"
                 }
+              },
+              "Fe": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1773.15,
+                  "valid_range_K": null,
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_has_no_finite_valid_range",
+                  "status": "extrapolated"
+                }
               }
             },
             "authority_level": "extrapolated",
@@ -191860,6 +191910,15 @@
                   ],
                   "authority_level": "extrapolated",
                   "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                }
+              },
+              "Fe": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1773.15,
+                  "valid_range_K": null,
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_has_no_finite_valid_range",
                   "status": "extrapolated"
                 }
               }
@@ -207848,6 +207907,22 @@
                   "status": "extrapolated"
                 }
               },
+              "Fe": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1773.15,
+                  "valid_range_K": null,
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_has_no_finite_valid_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 2073.15,
+                  "valid_range_K": null,
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_has_no_finite_valid_range",
+                  "status": "extrapolated"
+                }
+              },
               "Mg": {
                 "stage_0_to_stage_1": {
                   "temperature_K": 2073.15,
@@ -222297,6 +222372,22 @@
                   ],
                   "authority_level": "extrapolated",
                   "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                }
+              },
+              "Fe": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1773.15,
+                  "valid_range_K": null,
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_has_no_finite_valid_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 2073.15,
+                  "valid_range_K": null,
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_has_no_finite_valid_range",
                   "status": "extrapolated"
                 }
               },

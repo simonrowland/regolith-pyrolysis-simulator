@@ -666,8 +666,12 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # under not_applicable_* instead of the refused/non-authoritative lists.
     # Every numeric leaf of this payload is unchanged, including the ledger
     # pin 7cc5144f.... The digest move is those authority fields only.
+    # 2026-10-25 wall-chunk2: dew diagnostics now use the selected wall
+    # segment's certified Antoine range and mark out-of-range roots as
+    # extrapolated or refused. Re-derived on the merged tree; this composes
+    # with the prior wall-deposition authority fields above.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "64045a5e11246bc8f4dac0e63102970fe5b58da8c8aeaea061d15d2b5116be58"
+        "c06a0eafe6cc98466c7ba7713b6795d7414af53e67cad4810083989c5002f338"
     )
 
 
