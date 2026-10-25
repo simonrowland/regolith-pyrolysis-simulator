@@ -9384,6 +9384,79 @@ def candidate_observation(
 _HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
 
 
+def _openimcc_liquid_row_extrapolated_notice(
+    *,
+    reason: str,
+    origin: str,
+    band: str,
+    authority: Authority | None = None,
+) -> Notice:
+    """One scored notice for an OpenIMCC liquid row used below its fitted floor."""
+
+    return Notice(
+        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+        affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+        reason=reason,
+        origin=origin,
+        band=band,
+        authority=authority,
+    )
+
+
+def _liquid_rows_below_floor_notices(
+    liquid_rows_used: object, *, origin: str
+) -> tuple[Notice, ...]:
+    """Carry each recorded below-floor liquid row onto a scored notice.
+
+    The reason is the provenance flag itself. The band is that row's fitted
+    interval, which is the certified band the flag was recorded against.
+    """
+
+    if isinstance(liquid_rows_used, (str, bytes)) or not isinstance(
+        liquid_rows_used, Sequence
+    ):
+        return ()
+    notices: list[Notice] = []
+    seen: set[tuple[str, str]] = set()
+    for row in liquid_rows_used:
+        if not isinstance(row, Mapping):
+            continue
+        liquid = row.get("liquid_row")
+        if not isinstance(liquid, Mapping) or not liquid.get(
+            "extrapolated_below_floor"
+        ):
+            continue
+        row_name = str(liquid.get("row") or row.get("parent") or "")
+        fit = liquid.get("T_fit_K")
+        band = row_name
+        if (
+            isinstance(fit, Sequence)
+            and not isinstance(fit, (str, bytes))
+            and len(fit) == 2
+        ):
+            try:
+                low = float(fit[0])
+                high = float(fit[1])
+            except (TypeError, ValueError):
+                pass
+            else:
+                if math.isfinite(low) and math.isfinite(high):
+                    band = f"{row_name} [{low:g}, {high:g}] K".strip()
+        key = (row_name, band)
+        if key in seen:
+            continue
+        seen.add(key)
+        notices.append(
+            _openimcc_liquid_row_extrapolated_notice(
+                reason="extrapolated_below_floor",
+                origin=origin,
+                band=band,
+                authority=Authority.EXTRAPOLATED,
+            )
+        )
+    return tuple(notices)
+
+
 def _is_residue_worker_infrastructure_failure(reason: object) -> bool:
     """A single slow cell is transient infrastructure, not a cohort refusal."""
     return str(reason).startswith(("engine_timeout:", "engine_transport_error:"))
@@ -9608,16 +9681,12 @@ def _hashimoto_residue_prediction(
                     band=f"N={integration.get('steps')}; N_cap=256",
                 )
             )
-        if primary.provenance.get("openimcc_liquid_row_extrapolated"):
-            notices.append(
-                Notice(
-                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                    reason="OpenIMCC liquid-row extrapolation below fitted temperature floor",
-                    origin="hashimoto-residue-addendum-a",
-                    band="liquid-row floors are recorded in provenance",
-                )
+        notices.extend(
+            _liquid_rows_below_floor_notices(
+                primary.provenance.get("liquid_rows_used"),
+                origin="hashimoto-residue-addendum-a",
             )
+        )
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -9913,6 +9982,12 @@ def _sossi_residue_prediction(
                     ),
                 )
             )
+        notices.extend(
+            _liquid_rows_below_floor_notices(
+                provenance.get("liquid_rows_used"),
+                origin="sossi-residue-r5",
+            )
+        )
         if any(
             details.get("status") == "unconverged_at_cap"
             for details in (provenance.get("integration") or {}).values()

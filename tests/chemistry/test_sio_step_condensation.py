@@ -7,28 +7,17 @@ import pytest
 from functools import lru_cache
 from typing import Any
 
-from simulator.runner import build_sio_yield_report
+from tests.studio_pin_support import sio_pin_values, sio_report_at_wall_temperature
 
 
 @lru_cache(maxsize=None)
 def _report_at_wall_T(liner_temperature_c: float) -> tuple[dict[str, Any], dict[str, float]]:
-    return build_sio_yield_report(
-        feedstock_id="lunar_mare_low_ti",
-        hours=24,
-        mass_kg=1000.0,
-        include_diagnostics=True,
-        liner_temperature_c=liner_temperature_c,
-        pO2_mbar=None,
-        # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
-        allow_unmeasured_alpha_fallback=True,
-    )
+    return sio_report_at_wall_temperature(liner_temperature_c)
 
 
 def _stage3_silica_kg(liner_temperature_c: float) -> float:
     report, _ = _report_at_wall_T(liner_temperature_c)
-    return float(
-        report["sio_to_silica_fume_kg"]["stage_3_sio_zone_product"]
-    )
+    return sio_pin_values(report)["sio_stage3_silica_kg"]
 
 
 def _terminal_escape_sio_mol(liner_temperature_c: float) -> float:
