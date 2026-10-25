@@ -3,7 +3,8 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
+from simulator.battery.migrate import Migrator
 from tests.battery.test_migrate import _migrate_real_extract
 
 
@@ -28,6 +29,7 @@ RICHTER07_FIT_EXPERIMENTS = {
     "cai-r3-18", "cai-r3-19", "cai-r3-20", "cai-r3-21", "cai-r3-4", "cai-r3-5",
     "cai-r3-7", "cai-r3-8", "cai-r3-9",
 }
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def _context_data_row(result, source_id: str, observation_id: str) -> dict:
@@ -177,19 +179,41 @@ def test_sossi_fitted_outputs_are_context_and_run_measurements_keep_conditions(t
 def _assert_fedkin_pins(result) -> None:
     assert result.validation.hard_issues == ()
     _assert_migrated_rows_keep_temperature_and_conditions(result, FEDKIN_SID)
-    assert not any(
-        "fedkin_2006_na_yu_langmuir" in row.observation_id
-        or "fedkin_2006_k_yu_langmuir" in row.observation_id
+    fedkin_rows = [
+        row for row in result.observations.values() if row.source_id == FEDKIN_SID
+    ]
+    assert len(fedkin_rows) == 2
+    points = {
+        row.observation_id.rsplit("::T=", 1)[0].split("::")[-1]: row
         for row in result.observations.values()
-    )
+        if row.source_id == FEDKIN_SID
+        and row.observation_id.rsplit("::T=", 1)[0].split("::")[-1]
+        in {"fedkin_2006_na_yu_langmuir", "fedkin_2006_k_yu_langmuir"}
+    }
+    assert set(points) == {
+        "fedkin_2006_na_yu_langmuir",
+        "fedkin_2006_k_yu_langmuir",
+    }
     for observation_id, expected in (
         ("fedkin_2006_na_yu_langmuir", Decimal("0.26")),
         ("fedkin_2006_k_yu_langmuir", Decimal("0.13")),
     ):
-        context = _context_data_row(result, FEDKIN_SID, observation_id)
-        assert context["type"] == "best_fit_model_context"
-        assert Decimal(str(context["values"]["alpha"])) == expected
-        assert context["values"]["system_note"]
+        row = points[observation_id]
+        assert row.value.kind is ValueKind.POINT
+        assert row.value.point == expected
+        assert row.evidence.class_.is_value
+        assert row.evidence.class_.value is EvidenceClass.AUTHOR_ESTIMATE
+        assert row.evidence.model
+        assert row.identity.temperature_K.is_value
+        assert row.identity.temperature_K.value == Decimal("1723.0")
+        temperature = row.point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == Decimal("1723.0")
+        assert temperature.locator is not None
+        pressure = row.point_conditions["total_pressure_Pa"]
+        assert pressure.state.is_value
+        assert pressure.state.value.point == Decimal("1.0")
+        assert pressure.locator is not None
 
     contexts = [
         context
@@ -211,6 +235,26 @@ def _assert_fedkin_pins(result) -> None:
     table4 = next(context for context in contexts if context.get("table") == "4")
     assert table4["locator"]["page"] == 14
     assert len(table4["values"]) == 4
+    assert {
+        context.get("observation_id") for context in contexts
+    } == {
+        "fedkin_2006_table3_hashimoto_fit_outputs",
+        "fedkin_2006_table4_inverse_fit_outputs",
+    }
+
+
+def test_fedkin_real_tree_migration_keeps_yu_points_without_queue() -> None:
+    migrator = Migrator(root=REPO_ROOT)
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts" / FEDKIN_EXTRACT
+    )
+    migrator.finalize()
+
+    _assert_fedkin_pins(migrator.result)
+    source_path = f"data/literature/extracts/{FEDKIN_EXTRACT}"
+    assert not [
+        entry for entry in migrator.result.queue if entry.source == source_path
+    ]
 
 
 def test_fedkin_table3_fit_outputs_are_context_and_yu_runs_keep_conditions(tmp_path: Path) -> None:
