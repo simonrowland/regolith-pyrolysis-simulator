@@ -7,7 +7,7 @@ from simulator.battery.validate import validate_corpus
 EXTRACT = REPO_ROOT / "data/literature/extracts/shornikov-2000-titania-melts.yaml"
 
 
-def test_figure_records_preserve_panels_standards_and_deferred_values():
+def test_figure_records_preserve_panels_standards_and_digitisation_status():
     extract = yaml.safe_load(EXTRACT.read_text())
     context = {
         item["observation_id"]: item
@@ -26,7 +26,17 @@ def test_figure_records_preserve_panels_standards_and_deferred_values():
     figures = {key: value for key, value in context.items() if value["type"] == "figure_record"}
     assert set(figures) == expected
 
-    for item in figures.values():
+    digitisation = {
+        "shornikov_2000_figure1_kems_vapor_pressures": "130 markers stored as figure_only partial_pressure observations (SiO 25, Ca 32, TiO 21, TiO2 30, O 22).",
+        "shornikov_2000_figure2a_casitio2_phase_diagram": "continuous liquidus and solidus; no filled marker paths; not sampled.",
+        "shornikov_2000_figure2b_casial2o4_phase_diagram": "continuous liquidus and solidus; no filled marker paths; not sampled.",
+        "shornikov_2000_figure2c_casitio2_oxide_activities": "92 markers stored as figure_only activity observations (SiO2 25, CaO 27, TiO2 40).",
+        "shornikov_2000_figure2d_casial2o4_oxide_activities": "23 markers stored as figure_only activity observations (SiO2 7, CaO 10, Al2O3 6).",
+        "shornikov_2000_figure2e_casitio2_compound_activities": "42 markers stored as figure_only activity observations (CaSiO3 21, CaTiO3 21). Two legend glyphs beside numerals 1 and 2 are refused in the audit.",
+        "shornikov_2000_figure2f_casial2o4_compound_activities": "14 markers stored as figure_only activity observations (CaSiO3 5, CaAl2O4 5, Ca2Al2SiO8 4).",
+        "shornikov_2000_figure3_normalized_formation_gibbs_energy": "30 data markers read in the audit sidecar (series 1, 6 circles; series 2, 24 squares). Not scored: the ordinate is ΔfG/RT. Two legend glyphs refused.",
+    }
+    for key, item in figures.items():
         assert item["locator"]["page"] == item["locator"]["pdf_page_index"] + 1
         assert item["panel"]
         assert item["values"]["species"]
@@ -34,7 +44,7 @@ def test_figure_records_preserve_panels_standards_and_deferred_values():
         assert item["values"]["temperature_as_printed"]
         assert item["values"]["axes_as_printed"]
         assert item["values"]["caption"]
-        assert item["values"]["digitisation"] == "deferred to a figure pass"
+        assert item["values"]["digitisation"] == digitisation[key]
         assert "points" not in item["values"]
         assert item["values"]["series"]
         assert all("marker_count" in series for series in item["values"]["series"])
@@ -85,7 +95,7 @@ def test_figure_records_preserve_panels_standards_and_deferred_values():
     )
     for panel in ("c", "d", "e", "f"):
         record = next(item for item in figures.values() if item["panel"] == panel)
-        assert "printed-form field for log activity" in record["values"]["schema_gap"]
+        assert all(series["marker_count"] > 0 for series in record["values"]["series"])
 
     model_anchor = context["shornikov_2000_model_activity_integration_limit"]
     assert model_anchor["values"]["evidence_class"] == "model_derived"
@@ -97,7 +107,7 @@ def test_figure_records_preserve_panels_standards_and_deferred_values():
     assert quoted_anchor["values"]["value_as_printed"] == "31.92 mole % TiO2"
 
 
-def test_context_only_extract_migrates_with_no_typed_observations():
+def test_figure_extract_migrates_figure_only_observations():
     migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -111,8 +121,6 @@ def test_context_only_extract_migrates_with_no_typed_observations():
     )
     assert report.hard_issues == ()
     assert len(result.works) == 1
-    assert result.observations == {}
-    # There are no typed quantities in this figure-deferred extract; if one is
-    # added later, its migrated species formula must be present and row-specific.
+    assert len(result.observations) == 301
     for observation in result.observations.values():
         assert observation.identity.species.formula
