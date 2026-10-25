@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import RefusalReason, UncertaintyKind, ValueKind
+from simulator.battery.enums import UncertaintyKind, ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT, convert_pressure_to_pa
 
 TOOLS = REPO_ROOT / "tools"
@@ -22,55 +22,6 @@ EXTRACT = (
     / "data/literature/extracts/shornikov-2017-spinel-evaporation.yaml"
 )
 EXPECTED_COMPOSITION = {"MgO": Decimal("0.5"), "Al2O3": Decimal("0.5")}
-_SOURCE_ID = "shornikov-2017-spinel-evaporation"
-# Eq. (14)-(17) inputs that name a Table 2 series or a Glushko constant
-# without an observation id. b-979 / d-053 flags each one.
-_UNRESOLVED_INPUTS = (
-    (
-        "shornikov_2017_table3_o_pressure_eq14",
-        12,
-        (
-            "Table 2 mgo pressure series at matching temperature.",
-            "Table 2 mg pressure series at matching temperature.",
-            "K10(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.",
-        ),
-    ),
-    (
-        "shornikov_2017_table3_o_pressure_eq15",
-        12,
-        (
-            "Table 2 alo pressure series at matching temperature.",
-            "Table 2 al pressure series at matching temperature.",
-            "K11(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.",
-        ),
-    ),
-    (
-        "shornikov_2017_table3_o_pressure_eq16",
-        10,
-        (
-            "Table 2 al2o pressure series at matching temperature.",
-            "Table 2 al pressure series at matching temperature.",
-            "K12(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.",
-        ),
-    ),
-    (
-        "shornikov_2017_table3_o_pressure_eq17",
-        12,
-        (
-            "Table 2 o2 pressure series at matching temperature.",
-            "K13(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.",
-        ),
-    ),
-)
-
-
-def _prose_lineage_detail(text: str) -> str:
-    return (
-        f"derived_from {text!r} is prose, not a resolvable "
-        "observation id; retained here, never minted as a pointer"
-    )
-
-
 def _observations(document: dict) -> list[dict]:
     return [
         observation
@@ -95,9 +46,10 @@ def test_table_cells_and_render_pins_are_complete_and_mutation_sensitive() -> No
         for row in table_3
         if row["observation_id"] == "shornikov_2017_table3_o_pressure_eq14"
     )
-    assert "K10(T)" in eq14["derivation"]["inputs"][2]
-    assert "[10]" in eq14["derivation"]["inputs"][2]
-    assert "K14(T)" not in eq14["derivation"]["inputs"][2]
+    assert eq14["derivation"]["inputs"] == eq14["derived_from"]
+    assert eq14["derivation"]["references"] == ["Glushko handbook [10], K10(T)"]
+    assert "K10(T)" in eq14["derivation"]["relation"]
+    assert "not numerically printed here" in eq14["derivation"]["relation"]
     eq8_9 = next(
         row
         for row in table_3
@@ -141,57 +93,25 @@ def test_isolated_migration_keeps_table_conditions_identity_and_unavailable_rows
     assert sum(len(rows) for rows in result.context_by_work.values()) == 8
     assert sum(record.value.kind is ValueKind.UNAVAILABLE for record in records) == 13
     assert result.validation is not None
-    # shornikov_2017_table2_al_partial_pressure resolves, and so do
-    # shornikov_2017_table2_al2o_not_detected_1851 and _1859. The Eq. (16)
-    # unavailable rows name those bare ids. Their wrapped prose is gone.
-    # Eq. (14)-(17) still list series descriptions and Glushko K10(T)-K13(T)
-    # constants. Those strings are not observation ids, so b-979 / d-053
-    # flags them. Each exploded child then keeps the printed_unresolved mark.
-    prose_issues = [
-        issue
-        for issue in result.validation.hard_issues
-        if issue.path.endswith(".derivation.inputs")
-    ]
-    unresolved_issues = [
-        issue
-        for issue in result.validation.hard_issues
-        if issue.path.endswith(".derivation")
-        and issue.detail.startswith("printed derivation inputs do not resolve")
-    ]
-    assert [
-        issue
-        for issue in result.validation.hard_issues
-        if issue not in prose_issues and issue not in unresolved_issues
-    ] == []
-    assert [
-        (issue.path, issue.reason, issue.detail) for issue in prose_issues
-    ] == [
-        (
-            f"observation[{_SOURCE_ID}::{observation_id}].derivation.inputs",
-            RefusalReason.CONDITIONAL_FIELD,
-            _prose_lineage_detail(text),
+    assert result.validation.hard_issues == ()
+    assert result.registry_issues == []
+    derived_rows = [
+        record
+        for record in records
+        if any(
+            f"shornikov_2017_table3_o_pressure_eq{equation}::" in record.observation_id
+            for equation in (14, 15, 16, 17)
         )
-        for observation_id, _points, texts in _UNRESOLVED_INPUTS
-        for text in texts
     ]
-    assert list(result.registry_issues) == prose_issues
-    unresolved_by_parent: dict[str, int] = {}
-    for issue in unresolved_issues:
-        observation_id = issue.path.split("[", 1)[1].split("]", 1)[0]
-        local = observation_id.split("::", 1)[1]
-        parent, _separator, _point = local.partition("::T=")
-        assert _separator == "::T="
-        assert issue.reason is RefusalReason.CONDITIONAL_FIELD
-        unresolved_by_parent[parent] = unresolved_by_parent.get(parent, 0) + 1
-    assert unresolved_by_parent == {
-        observation_id: points
-        for observation_id, points, _texts in _UNRESOLVED_INPUTS
-    }
-    assert not any(
-        "eq16_not_reported" in issue.path
-        or "Table 2 input series shornikov_2017_table2_" in issue.detail
-        for issue in result.validation.hard_issues
-    )
+    assert derived_rows
+    for record in derived_rows:
+        assert record.derived_from
+        assert all(parent in result.observations for parent in record.derived_from)
+        assert record.derivation is not None
+        assert set(record.derivation.inputs) == set(record.derived_from)
+        assert record.derivation.references
+        assert "Glushko handbook [10]" in record.derivation.references[0]
+        assert "not numerically printed here" in record.derivation.relation
     for record in records:
         if "eq16_not_reported" not in record.observation_id:
             continue
