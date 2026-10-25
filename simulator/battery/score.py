@@ -7315,7 +7315,7 @@ def _evaporation_ambient_pressure(
     observation: Observation,
     experiment: Experiment | None,
     partial_pressure_observations: Mapping[str, Observation] | Sequence[Observation] | None,
-) -> tuple[float | None, Notice | None, Mapping[str, object] | None]:
+) -> tuple[float | None, Notice | None, Mapping[str, object] | None, float | None]:
     """Resolve a printed gas partial, or the explicitly stated vacuum case."""
     identity = observation.identity
     temperature = (
@@ -7362,12 +7362,12 @@ def _evaporation_ambient_pressure(
             continue
         partials.add(float(candidate.value.point))
     if len(partials) == 1:
-        return next(iter(partials)), None, None
+        return next(iter(partials)), None, None, None
     if len(partials) > 1:
         return None, None, {
             "reason": "ambient_partial_pressure_ambiguous",
             "printed_values_Pa": sorted(partials),
-        }
+        }, None
     if (
         experiment is not None
         and experiment.method.is_value
@@ -7381,8 +7381,56 @@ def _evaporation_ambient_pressure(
                 "evaporation; P_ambient=0 Pa",
             ),
             None,
+            None,
         )
-    return None, None, {"reason": "ambient_partial_pressure_not_stated"}
+    sweep_states = [identity.sweep_gas]
+    if experiment is not None:
+        pressure_environment = experiment.pressure_environment
+        sweep_states.append(pressure_environment.sweep_gas.state)
+    flowing_species = set()
+    for sweep_state in sweep_states:
+        sweep_value = (
+            sweep_state.value
+            if sweep_state is not None and sweep_state.is_value else None
+        )
+        if sweep_value is None:
+            continue
+        if sweep_value.species and sweep_value.species.lower() != "none":
+            flowing_species.add(sweep_value.species.removesuffix("(g)"))
+        for component in getattr(sweep_value, "components", None) or ():
+            flowing_species.add(component.species.removesuffix("(g)"))
+        for alternative in getattr(sweep_value, "alternatives", None) or ():
+            if alternative.species and alternative.species.lower() != "none":
+                flowing_species.add(alternative.species.removesuffix("(g)"))
+            flowing_species.update(
+                component.species.removesuffix("(g)")
+                for component in getattr(alternative, "components", None) or ()
+            )
+    if identity.species.formula in flowing_species:
+        return None, None, {
+            "reason": "ambient_species_present_in_printed_sweep_gas",
+            "species": identity.species.formula,
+        }, None
+    total_pressure = identity.total_pressure_Pa
+    printed_pressure_bound = None
+    if total_pressure is not None and total_pressure.is_value:
+        printed_pressure_bound = total_pressure.value
+    elif experiment is not None:
+        pressure_state = experiment.pressure_environment.total_pressure_Pa.state
+        if pressure_state.is_value:
+            pressure_value = pressure_state.value
+            if pressure_value.kind is ValueKind.POINT:
+                printed_pressure_bound = pressure_value.point
+            elif (
+                pressure_value.kind is ValueKind.BOUND
+                and pressure_value.bound_operator in {"<", "<="}
+            ):
+                printed_pressure_bound = pressure_value.bound_value
+    if printed_pressure_bound is not None:
+        bound = float(printed_pressure_bound)
+        if math.isfinite(bound) and bound >= 0.0:
+            return 0.0, None, None, bound
+    return None, None, {"reason": "ambient_partial_pressure_not_stated"}, None
 
 
 def _predict_evaporation_rate(
@@ -7458,7 +7506,7 @@ def _predict_evaporation_rate(
             },
         )
 
-    ambient_pressure, ambient_notice, ambient_refusal = _evaporation_ambient_pressure(
+    ambient_pressure, ambient_notice, ambient_refusal, ambient_pressure_bound = _evaporation_ambient_pressure(
         observation, experiment, partial_pressure_observations
     )
     if ambient_refusal is not None or ambient_pressure is None:
@@ -7594,6 +7642,30 @@ def _predict_evaporation_rate(
             notices=pressure_prediction.notices,
         )
 
+    pressure_bound_notice = None
+    pressure_bound_extrapolated = False
+    if ambient_pressure_bound is not None:
+        # With J(P_bulk)=J(0)*(1-P_bulk/P_eq) and
+        # 0<=P_bulk<=P_total, setting P_bulk=0 gives the maximum flux and
+        # bounds its relative error by eps=P_total/P_eq.
+        relative_flux_error_bound = ambient_pressure_bound / equilibrium_pressure_pa
+        pressure_bound_extrapolated = relative_flux_error_bound > 0.01
+        pressure_bound_notice = Notice(
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            affected_quantities=(Quantity.EVAPORATION_RATE,),
+            reason=(
+                "ambient species partial pressure bounded by printed total pressure; "
+                f"P_bulk in [0, {ambient_pressure_bound:g}] Pa; "
+                f"relative_flux_error_bound={relative_flux_error_bound:g}"
+            ),
+            origin="score:_evaporation_ambient_pressure",
+            source="printed total chamber pressure",
+            band=f"relative flux error <= {relative_flux_error_bound:g}",
+            authority=(
+                Authority.EXTRAPOLATED if pressure_bound_extrapolated else Authority.CERTIFIED
+            ),
+        )
+
     from engines.builtin.evaporation_flux import _series_resistance_evaporation_flux_kg_m2_s
     from simulator.accounting.formulas import parse_formula
 
@@ -7635,6 +7707,8 @@ def _predict_evaporation_rate(
     notices = list(pressure_prediction.notices)
     if ambient_notice is not None:
         notices.append(ambient_notice)
+    if pressure_bound_notice is not None:
+        notices.append(pressure_bound_notice)
     if alpha.temperature_attributions:
         sampled_temperatures = tuple(
             temperature
@@ -7687,7 +7761,8 @@ def _predict_evaporation_rate(
         unit=unit,
         authority=(
             Authority.EXTRAPOLATED
-            if alpha.temperature_attributions else pressure_prediction.authority
+            if alpha.temperature_attributions or pressure_bound_extrapolated
+            else pressure_prediction.authority
         ),
         coefficient_basis="leave_one_paper_out_hkl",
         notices=tuple(notices),

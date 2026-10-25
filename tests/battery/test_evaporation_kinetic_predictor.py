@@ -656,6 +656,28 @@ def test_evaporation_rate_uses_engine_pressure_and_hkl_flux(formula):
 
 
 def test_non_vacuum_evaporation_requires_printed_ambient_pressure():
+    row = replace(
+        _kinetic_row("Mg"),
+        identity=replace(_kinetic_row("Mg").identity, total_pressure_Pa=None),
+    )
+    prediction = _predict_evaporation_rate(
+        Engine.INTERNAL_ANALYTICAL,
+        row,
+        experiment=None,
+        handles=None,
+        isolated=None,
+        bench=None,
+        alpha_observations=(_alpha("alpha-paper-b", "Mg", 0.1),
+                            _alpha("alpha-paper-c", "Mg", 0.3)),
+        partial_pressure_observations=(),
+        pressure_predictor=_pressure_prediction,
+    )
+
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail["reason"] == "ambient_partial_pressure_not_stated"
+
+
+def test_printed_total_pressure_bounds_unprinted_ambient_partial():
     row = _kinetic_row("Mg")
     prediction = _predict_evaporation_rate(
         Engine.INTERNAL_ANALYTICAL,
@@ -672,8 +694,71 @@ def test_non_vacuum_evaporation_requires_printed_ambient_pressure():
         pressure_predictor=_pressure_prediction,
     )
 
+    notice = next(
+        notice for notice in prediction.notices
+        if notice.origin == "score:_evaporation_ambient_pressure"
+    )
+    assert prediction.value is not None
+    assert "P_bulk in [0, 1e-05] Pa" in notice.reason
+    assert "relative_flux_error_bound=1e-07" in notice.reason
+    assert notice.authority is Authority.CERTIFIED
+    assert prediction.authority is Authority.CERTIFIED
+
+
+def test_printed_total_pressure_bound_over_one_percent_is_extrapolated():
+    row = _kinetic_row("Mg")
+    row = replace(
+        row,
+        identity=replace(row.identity, total_pressure_Pa=State.of(Decimal("2"))),
+    )
+    prediction = _predict_evaporation_rate(
+        Engine.INTERNAL_ANALYTICAL,
+        row,
+        experiment=None,
+        handles=None,
+        isolated=None,
+        bench=None,
+        alpha_observations=(_alpha("alpha-paper-b", "Mg", 0.1),
+                            _alpha("alpha-paper-c", "Mg", 0.3)),
+        partial_pressure_observations=(),
+        pressure_predictor=_pressure_prediction,
+    )
+
+    notice = next(
+        notice for notice in prediction.notices
+        if notice.origin == "score:_evaporation_ambient_pressure"
+    )
+    assert prediction.value is not None
+    assert "relative_flux_error_bound=0.02" in notice.reason
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert prediction.authority is Authority.EXTRAPOLATED
+
+
+def test_printed_sweep_gas_containing_evaporating_species_still_refuses():
+    row = _kinetic_row("Mg")
+    sweep = SweepIdentity(
+        species="Mg(g)",
+        flow_sccm=State.of(Decimal("10")),
+        partial_pressure_Pa=State.unknown("not stated"),
+    )
+    row = replace(row, identity=replace(row.identity, sweep_gas=State.of(sweep)))
+    prediction = _predict_evaporation_rate(
+        Engine.INTERNAL_ANALYTICAL,
+        row,
+        experiment=F.tabulation_experiment(
+            "kinetic-experiment", method=MethodToken.TABULATION
+        ),
+        handles=None,
+        isolated=None,
+        bench=None,
+        alpha_observations=(_alpha("alpha-paper-b", "Mg", 0.1),
+                            _alpha("alpha-paper-c", "Mg", 0.3)),
+        partial_pressure_observations=(),
+        pressure_predictor=_pressure_prediction,
+    )
+
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert prediction.refusal_detail["reason"] == "ambient_partial_pressure_not_stated"
+    assert prediction.refusal_detail["reason"] == "ambient_species_present_in_printed_sweep_gas"
 
 
 def test_printed_ambient_partial_pressure_is_subtracted():
