@@ -1,4 +1,4 @@
-"""Hot-hour production receipts after the pinned C7 R4 gas-constant move."""
+"""Hot-hour production receipts after the C7 R4 gas constant and pipe inverse moves."""
 import hashlib
 import json
 
@@ -101,7 +101,7 @@ def test_accepted_hot_hour_hex():
             'flux': '7ccb59e92f653c29e73d4730de9c11d799cdbd9310565c6e977e3565cf833fe3',
             'oxygen': '384e69e50af06874a8d1ffc9f454ab70e65f9ab363fc0f3551b2bf49bdb4f8ec',
             'ledger': 'dab2227b6b6848e3810336e0a2d3eb8d8b799c3764633372279549a73f17ed3c',
-            'condensation': 'df66c025d9f9d52390593e07f74276b4ce0599131d333faf8f0a8dc4d8500599',
+            'condensation': '4ca497f10ba0ca1b82cbd1a22cfbf26e074957b2d4a889d17214bf84ae070294',
         }
     finally:
         close_test_owned_magemin_backend(sim)
