@@ -122,6 +122,22 @@ def test_isolated_migration_maps_printed_conditions_and_leaves_unprinted_axes_un
             assert conditions["composition"]["locator"]["published_page"] == 854
             assert conditions["fO2_control"]["state"]["tag"] == "value"
             assert conditions["fO2_control"]["state"]["value"]["gas_ratio"]["value"]["state"]["tag"] == "value"
+            if suffix == "activity":
+                raw = _by_run(_document(), "Fe_tO")[run]
+                gas_ratio = conditions["fO2_control"]["state"]["value"][
+                    "gas_ratio"
+                ]
+                assert gas_ratio["value"]["state"]["value"] == raw[
+                    "point_conditions"
+                ]["fO2_control"]["state"]["value"]["gas_ratio"]["value"][
+                    "state"
+                ]["value"]
+                assert gas_ratio["value"]["locator"]["published_page"] == 854
+                assert gas_ratio["value"]["locator"]["table"] == "1"
+                assert gas_ratio["value"]["locator"]["row_label"] == run
+                assert row.evidence.class_.value.value == "quoted_attributed"
+                assert row.evidence.attribution.startswith("Ban-ya, Hino & Yuge (1985)")
+                assert "relation (2)" in raw["calculation_as_printed"]
             if suffix == "fe3_fe2_ratio":
                 assert identity["valence_basis"]["tag"] == "value"
                 assert conditions["quench_state"]["state"]["value"] == "not_stated"
