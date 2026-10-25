@@ -84,9 +84,12 @@ def test_isolated_migration_maps_each_heat_point_temperature_and_keeps_pressure_
         temperature = target.identity.temperature_K
         assert temperature is not None and temperature.is_value
         assert temperature.value == Decimal(str(source["values"]["T_K"]))
-        condition = source["point_conditions"]["temperature_K"]
-        assert condition["state"]["tag"] == "value"
-        assert condition["locator"]["page"] == source["locator"]["page"]
+        source_condition = source["point_conditions"]["temperature_K"]
+        assert source_condition["state"]["tag"] == "value"
+        condition = target.point_conditions["temperature_K"]
+        assert condition.state.is_value
+        assert condition.state.value == temperature.value
+        assert condition.locator.page == source["locator"]["page"]
         assert "total_pressure_Pa" not in source["point_conditions"]
         assert "pressure_basis_Pa" not in source["values"]
 
@@ -110,3 +113,53 @@ def test_isolated_migration_maps_each_heat_point_temperature_and_keeps_pressure_
         assert identity.total_pressure_Pa is not None and identity.total_pressure_Pa.is_not_applicable
         assert identity.fO2_Pa is not None and identity.fO2_Pa.is_not_applicable
         assert identity.standard_pressure_Pa is not None and identity.standard_pressure_Pa.is_unknown
+
+
+def test_table_ii_lineage_uses_only_measured_same_phase_table_i_rows() -> None:
+    document = _document()
+    source_rows = _observations(document)
+    table_i_by_phase: dict[str, set[str]] = {}
+    for row in source_rows.values():
+        if row["locator"].get("table") == "I":
+            table_i_by_phase.setdefault(row["phase_as_printed"], set()).add(
+                row["observation_id"]
+            )
+    table_ii_rows = [
+        row
+        for row in source_rows.values()
+        if row["locator"].get("table") == "II"
+        and row.get("values", {}).get("fit_equation_context_id")
+    ]
+    assert len(table_ii_rows) == 29
+
+    migrator = migrate_one_extract(root=ROOT, path=EXTRACT, index={}, aliases={})
+    migrator.finalize()
+    migrated = {
+        row.observation_id.split("::", 1)[1]: row
+        for row in migrator.result.observations.values()
+    }
+    for row in table_ii_rows:
+        expected_parents = table_i_by_phase[row["phase_as_printed"]]
+        assert row["derived_from"] == sorted(expected_parents)
+        assert row["derivation"]["inputs"] == sorted(expected_parents)
+        assert all(source_rows[parent]["locator"].get("table") == "I" for parent in row["derived_from"])
+        equation_context = next(
+            context
+            for context in document["species"]["Ca2SiO4"]["context"]
+            if context["observation_id"] == row["values"]["fit_equation_context_id"]
+        )
+        assert equation_context["values"]["equation_as_printed"] in row["derivation"]["relation"]
+
+        migrated_inputs = set(migrated[row["observation_id"]].derivation.inputs)
+        assert migrated_inputs == {
+            f"coughlin-obrien-1957-calcium-orthosilicate-heat-content::{parent}"
+            for parent in expected_parents
+        }
+
+    reference_phases = {"gamma": "gamma", "beta": "beta", "alpha-prime": "beta", "alpha": "beta"}
+    for row in source_rows.values():
+        if row["locator"].get("table") not in {"I", "II"}:
+            continue
+        if row.get("values", {}).get("reference_temperature_K") != 298.15:
+            continue
+        assert row["values"]["reference_polymorph_as_printed"] == reference_phases[row["phase_as_printed"]]
