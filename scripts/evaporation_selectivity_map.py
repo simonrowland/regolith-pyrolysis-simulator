@@ -18,6 +18,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+from simulator.config import _load_setpoints_file  # noqa: E402
 from simulator.core import PyrolysisSimulator
 from simulator.state import Atmosphere
 
@@ -67,7 +68,7 @@ def _temperature_grid(start_c: float, stop_c: float, step_c: float) -> list[floa
 
 
 def _build_sim(args: argparse.Namespace) -> PyrolysisSimulator:
-    setpoints = _load_yaml(REPO_ROOT / "data" / "setpoints.yaml")
+    setpoints = _load_setpoints_file(REPO_ROOT / "data" / "setpoints.yaml")
     feedstocks = _load_yaml(REPO_ROOT / "data" / "feedstocks.yaml")
     vapor_pressures = _load_yaml(REPO_ROOT / "data" / "vapor_pressures.yaml")
     additives = dict(args.additive or ())

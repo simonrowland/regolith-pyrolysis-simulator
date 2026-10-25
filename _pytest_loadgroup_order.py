@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Protocol
 
@@ -8,6 +9,7 @@ import pytest
 
 
 _HINTS_PATH = Path(__file__).with_name("tests") / "xdist_loadgroup_durations.json"
+_LOADGROUP_SUFFIX = re.compile(r"@[A-Za-z0-9_.-]+\Z")
 
 
 class _GroupedItem(Protocol):
@@ -36,6 +38,11 @@ def xdist_group_name(item: _GroupedItem) -> str | None:
         name = mark.args[0] if mark.args else mark.kwargs.get("name", "default")
         names.add(str(name))
     return "_".join(sorted(names)) if names else None
+
+
+def strip_loadgroup_suffix(nodeid: str) -> str:
+    match = _LOADGROUP_SUFFIX.search(nodeid)
+    return nodeid[: match.start()] if match else nodeid
 
 
 def order_items_longest_group_first(

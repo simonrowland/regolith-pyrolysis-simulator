@@ -1,0 +1,2066 @@
+schema_version: literature_extract.v1
+source_id: ferguson-nuth-2012-sio-vapor-pressure-mixture
+source:
+  citation: Ferguson, F. T. and Nuth, J. A. (2012), Vapor Pressure and Evaporation Coefficient of Silicon Monoxide
+    over a Mixture of Silicon and Silica, Journal of Chemical & Engineering Data.
+  doi: 10.1021/je200693d
+  year: 2012
+  corpus_asset: raw/ferguson-nuth-2012-sio-vapor-pressure-mixture/ferguson-nuth-2012-sio-vapor-pressure-mixture.pdf
+extraction:
+  method: Transcribed from MinerU machine tables and markdown, then checked cell-by-cell against rendered PDF pages
+    4–5. Apparent Table 1 pressure is kept raw and is not treated as equilibrium or total pressure. The Table 2
+    equilibrium pressure over Si(s)+SiO2(s) is retained as a typed refusal because the current p_sat identity cannot
+    encode that two-solid system. Printed alpha points use the existing coefficient quantity; they are reported
+    as measured_reduced from the authors’ weighted FITEXY reduction of their Table 1 effusion measurements.
+  date: '2026-10-23'
+  worker: wave53b-F68
+  review_status: draft
+schema_gaps:
+- Table 1 apparent measured pressure and its multi-column experimental data bundle have no quantity token; retained
+  as a typed refusal with all printed cells in values.points. Table 2 equilibrium pressure is over the two-solid
+  assemblage Si(s)+SiO2(s), which the current p_sat identity cannot encode; retained as a typed refusal with printed
+  values.
+species:
+  SiO:
+    observations:
+    - observation_id: ferguson_nuth_2012_table1_raw_effusion_rows
+      type: mass_loss
+      values:
+        printed_columns:
+          T_K: K
+          orifice_diameter_mm: mm
+          effusion_orifice_area_cm2: cm2
+          orifice_clausing_factor_WB: dimensionless
+          mass_loss_mg: mg
+          duration_s: s
+          mass_loss_rate_mg_min_as_printed: mg·min-1
+          f_parameter: dimensionless
+          apparent_pressure_Pa_as_printed: Pa
+        points:
+        - row: '1'
+          T_K: '1433'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '15.34'
+          duration_s: '21000'
+          mass_loss_rate_mg_min_as_printed: 0.0439 ± 0.0050
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 2.15 ± 0.27
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 1
+          value: '2.15'
+          table_row_number: 3
+          table_column_number: 9
+        - row: '2'
+          T_K: '1433'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '18.64'
+          duration_s: '21000'
+          mass_loss_rate_mg_min_as_printed: 0.0532 ± 0.0034
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 1.86 ± 0.15
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 2
+          value: '1.86'
+          table_row_number: 4
+          table_column_number: 9
+        - row: '3'
+          T_K: '1433'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '6.82'
+          duration_s: '32100'
+          mass_loss_rate_mg_min_as_printed: 0.013 ± 0.011
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 3.2 ± 2.9
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 3
+          value: '3.2'
+          table_row_number: 5
+          table_column_number: 9
+        - row: '4'
+          T_K: '1433'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '21.00'
+          duration_s: '21300'
+          mass_loss_rate_mg_min_as_printed: 0.0592 ± 0.0057
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 0.950 ± 0.096
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 4
+          value: '0.950'
+          table_row_number: 6
+          table_column_number: 9
+        - row: '5'
+          T_K: '1443'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '21.30'
+          duration_s: '17400'
+          mass_loss_rate_mg_min_as_printed: 0.07346 ± 0.00058
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 1.183 ± 0.036
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 5
+          value: '1.183'
+          table_row_number: 7
+          table_column_number: 9
+        - row: '6'
+          T_K: '1443'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '6.30'
+          duration_s: '17100'
+          mass_loss_rate_mg_min_as_printed: 0.02209 ± 0.00073
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 5.53 ± 0.99
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 6
+          value: '5.53'
+          table_row_number: 8
+          table_column_number: 9
+        - row: '7'
+          T_K: '1443'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '16.02'
+          duration_s: '17400'
+          mass_loss_rate_mg_min_as_printed: 0.05522 ± 0.00047
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 2.72 ± 0.16
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 7
+          value: '2.72'
+          table_row_number: 9
+          table_column_number: 9
+        - row: '8'
+          T_K: '1443'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '17.97'
+          duration_s: '17400'
+          mass_loss_rate_mg_min_as_printed: 0.06195 ± 0.00069
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 2.18 ± 0.10
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 8
+          value: '2.18'
+          table_row_number: 10
+          table_column_number: 9
+        - row: '9'
+          T_K: '1453'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '6.33'
+          duration_s: '14700'
+          mass_loss_rate_mg_min_as_printed: 0.02585 ± 0.00078
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 6.5 ± 1.2
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 9
+          value: '6.5'
+          table_row_number: 11
+          table_column_number: 9
+        - row: '10'
+          T_K: '1453'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '21.15'
+          duration_s: '14700'
+          mass_loss_rate_mg_min_as_printed: 0.08636 ± 0.00062
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 1.395 ± 0.043
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 10
+          value: '1.395'
+          table_row_number: 12
+          table_column_number: 9
+        - row: '11'
+          T_K: '1453'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '15.66'
+          duration_s: '14700'
+          mass_loss_rate_mg_min_as_printed: 0.0639 ± 0.0011
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 3.16 ± 0.19
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 11
+          value: '3.16'
+          table_row_number: 13
+          table_column_number: 9
+        - row: '12'
+          T_K: '1453'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '17.36'
+          duration_s: '14700'
+          mass_loss_rate_mg_min_as_printed: 0.07084 ± 0.00069
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 2.50 ± 0.12
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 12
+          value: '2.50'
+          table_row_number: 14
+          table_column_number: 9
+        - row: '13'
+          T_K: '1462'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '21.31'
+          duration_s: '12600'
+          mass_loss_rate_mg_min_as_printed: 0.10152 ± 0.00061
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 1.645 ± 0.050
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 13
+          value: '1.645'
+          table_row_number: 15
+          table_column_number: 9
+        - row: '14'
+          T_K: '1462'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '17.33'
+          duration_s: '12600'
+          mass_loss_rate_mg_min_as_printed: 0.08253 ± 0.00069
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 2.92 ± 0.14
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 14
+          value: '2.92'
+          table_row_number: 16
+          table_column_number: 9
+        - row: '15'
+          T_K: '1462'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '15.71'
+          duration_s: '12600'
+          mass_loss_rate_mg_min_as_printed: 0.0749 ± 0.0020
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 3.71 ± 0.23
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 15
+          value: '3.71'
+          table_row_number: 17
+          table_column_number: 9
+        - row: '16'
+          T_K: '1462'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '6.28'
+          duration_s: '12300'
+          mass_loss_rate_mg_min_as_printed: 0.0307 ± 0.0011
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 7.7 ± 1.4
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 16
+          value: '7.7'
+          table_row_number: 18
+          table_column_number: 9
+        - row: '17'
+          T_K: '1472'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '15.64'
+          duration_s: '10500'
+          mass_loss_rate_mg_min_as_printed: 0.0893 ± 0.0035
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 4.44 ± 0.31
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 17
+          value: '4.44'
+          table_row_number: 19
+          table_column_number: 9
+        - row: '18'
+          T_K: '1472'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '16.73'
+          duration_s: '10500'
+          mass_loss_rate_mg_min_as_printed: 0.09560 ± 0.00079
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 3.39 ± 0.16
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 18
+          value: '3.39'
+          table_row_number: 20
+          table_column_number: 9
+        - row: '19'
+          T_K: '1472'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '20.91'
+          duration_s: '10500'
+          mass_loss_rate_mg_min_as_printed: 0.11949 ± 0.00069
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 1.943 ± 0.059
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 19
+          value: '1.943'
+          table_row_number: 21
+          table_column_number: 9
+        - row: '20'
+          T_K: '1472'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '6.57'
+          duration_s: '10500'
+          mass_loss_rate_mg_min_as_printed: 0.0376 ± 0.0012
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 9.5 ± 1.7
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 20
+          value: '9.5'
+          table_row_number: 22
+          table_column_number: 9
+        - row: '21'
+          T_K: '1481'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '6.77'
+          duration_s: '9000'
+          mass_loss_rate_mg_min_as_printed: 0.0452 ± 0.0079
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 11.5 ± 2.8
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 21
+          value: '11.5'
+          table_row_number: 23
+          table_column_number: 9
+        - row: '22'
+          T_K: '1481'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '21.09'
+          duration_s: '9000'
+          mass_loss_rate_mg_min_as_printed: 0.14060 ± 0.00072
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 2.293 ± 0.069
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 22
+          value: '2.293'
+          table_row_number: 24
+          table_column_number: 9
+        - row: '23'
+          T_K: '1481'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '15.58'
+          duration_s: '9000'
+          mass_loss_rate_mg_min_as_printed: 0.10391 ± 0.00093
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 5.19 ± 0.30
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 23
+          value: '5.19'
+          table_row_number: 25
+          table_column_number: 9
+        - row: '24'
+          T_K: '1481'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '16.96'
+          duration_s: '9000'
+          mass_loss_rate_mg_min_as_printed: 0.11307 ± 0.00095
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 4.02 ± 0.19
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 24
+          value: '4.02'
+          table_row_number: 26
+          table_column_number: 9
+        - row: '25'
+          T_K: '1491'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '15.53'
+          duration_s: '7500'
+          mass_loss_rate_mg_min_as_printed: 0.1242 ± 0.0012
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 6.22 ± 0.36
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 25
+          value: '6.22'
+          table_row_number: 27
+          table_column_number: 9
+        - row: '26'
+          T_K: '1491'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '16.77'
+          duration_s: '7500'
+          mass_loss_rate_mg_min_as_printed: 0.1341 ± 0.0012
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 4.79 ± 0.23
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 26
+          value: '4.79'
+          table_row_number: 28
+          table_column_number: 9
+        - row: '27'
+          T_K: '1491'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '21.40'
+          duration_s: '7800'
+          mass_loss_rate_mg_min_as_printed: 0.16467 ± 0.00091
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 2.694 ± 0.081
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 27
+          value: '2.694'
+          table_row_number: 29
+          table_column_number: 9
+        - row: '28'
+          T_K: '1491'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '7.38'
+          duration_s: '7500'
+          mass_loss_rate_mg_min_as_printed: 0.0590 ± 0.0014
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 15.0 ± 2.7
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 28
+          value: '15.0'
+          table_row_number: 30
+          table_column_number: 9
+        - row: '29'
+          T_K: '1500'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '15.54'
+          duration_s: '6300'
+          mass_loss_rate_mg_min_as_printed: 0.14790 ± 0.00079
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 7.43 ± 0.42
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 29
+          value: '7.43'
+          table_row_number: 31
+          table_column_number: 9
+        - row: '30'
+          T_K: '1500'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '16.48'
+          duration_s: '6300'
+          mass_loss_rate_mg_min_as_printed: 0.1569 ± 0.0010
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 5.62 ± 0.26
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 30
+          value: '5.62'
+          table_row_number: 32
+          table_column_number: 9
+        - row: '31'
+          T_K: '1500'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '21.12'
+          duration_s: '6600'
+          mass_loss_rate_mg_min_as_printed: 0.1921 ± 0.0013
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 3.154 ± 0.096
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 31
+          value: '3.154'
+          table_row_number: 33
+          table_column_number: 9
+        - row: '32'
+          T_K: '1500'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '6.95'
+          duration_s: '6300'
+          mass_loss_rate_mg_min_as_printed: 0.0661 ± 0.0016
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 16.9 ± 3.0
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 32
+          value: '16.9'
+          table_row_number: 34
+          table_column_number: 9
+        - row: '33'
+          T_K: '1510'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '20.04'
+          duration_s: '5400'
+          mass_loss_rate_mg_min_as_printed: 0.2225 ± 0.0016
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 3.66 ± 0.11
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 33
+          value: '3.66'
+          table_row_number: 35
+          table_column_number: 9
+        - row: '34'
+          T_K: '1510'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '15.44'
+          duration_s: '5400'
+          mass_loss_rate_mg_min_as_printed: 0.1717 ± 0.0013
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 8.65 ± 0.50
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 34
+          value: '8.65'
+          table_row_number: 36
+          table_column_number: 9
+        - row: '35'
+          T_K: '1510'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '16.56'
+          duration_s: '5400'
+          mass_loss_rate_mg_min_as_printed: 0.18399 ± 0.00093
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 6.61 ± 0.31
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 35
+          value: '6.61'
+          table_row_number: 37
+          table_column_number: 9
+        - row: '36'
+          T_K: '1510'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '7.01'
+          duration_s: '5400'
+          mass_loss_rate_mg_min_as_printed: 0.07790 ± 0.00090
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 19.9 ± 3.5
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 36
+          value: '19.9'
+          table_row_number: 38
+          table_column_number: 9
+        - row: '37'
+          T_K: '1519'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '16.10'
+          duration_s: '4500'
+          mass_loss_rate_mg_min_as_printed: 0.2146 ± 0.0011
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 7.74 ± 0.36
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 37
+          value: '7.74'
+          table_row_number: 39
+          table_column_number: 9
+        - row: '38'
+          T_K: '1519'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '7.16'
+          duration_s: '4800'
+          mass_loss_rate_mg_min_as_printed: 0.0893 ± 0.0017
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 22.9 ± 4.1
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 38
+          value: '22.9'
+          table_row_number: 40
+          table_column_number: 9
+        - row: '39'
+          T_K: '1519'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '14.96'
+          duration_s: '4500'
+          mass_loss_rate_mg_min_as_printed: 0.19950 ± 0.00098
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 10.08 ± 0.58
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 39
+          value: '10.08'
+          table_row_number: 41
+          table_column_number: 9
+        - row: '40'
+          T_K: '1520'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '20.52'
+          duration_s: '4800'
+          mass_loss_rate_mg_min_as_printed: 0.2567 ± 0.0018
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 4.24 ± 0.13
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 40
+          value: '4.24'
+          table_row_number: 42
+          table_column_number: 9
+        - row: '41'
+          T_K: '1530'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '19.63'
+          duration_s: '3900'
+          mass_loss_rate_mg_min_as_printed: 0.3018 ± 0.0017
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 5.00 ± 0.15
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 41
+          value: '5.00'
+          table_row_number: 43
+          table_column_number: 9
+        - row: '42'
+          T_K: '1530'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '15.36'
+          duration_s: '3900'
+          mass_loss_rate_mg_min_as_printed: 0.2363 ± 0.0011
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 11.98 ± 0.68
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 42
+          value: '11.98'
+          table_row_number: 44
+          table_column_number: 9
+        - row: '43'
+          T_K: '1530'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '16.53'
+          duration_s: '3900'
+          mass_loss_rate_mg_min_as_printed: 0.2543 ± 0.0014
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 9.20 ± 0.43
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 43
+          value: '9.20'
+          table_row_number: 45
+          table_column_number: 9
+        - row: '44'
+          T_K: '1530'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '6.79'
+          duration_s: '3900'
+          mass_loss_rate_mg_min_as_printed: 0.1043 ± 0.0016
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 26.9 ± 4.7
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 44
+          value: '26.9'
+          table_row_number: 46
+          table_column_number: 9
+        - row: '45'
+          T_K: '1540'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '6.35'
+          duration_s: '3300'
+          mass_loss_rate_mg_min_as_printed: 0.1151 ± 0.0020
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 29.8 ± 5.3
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 45
+          value: '29.8'
+          table_row_number: 47
+          table_column_number: 9
+        - row: '46'
+          T_K: '1540'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '19.02'
+          duration_s: '3300'
+          mass_loss_rate_mg_min_as_printed: 0.3457 ± 0.0022
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 5.75 ± 0.17
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 46
+          value: '5.75'
+          table_row_number: 48
+          table_column_number: 9
+        - row: '47'
+          T_K: '1540'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '14.99'
+          duration_s: '3300'
+          mass_loss_rate_mg_min_as_printed: 0.2725 ± 0.0019
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 13.86 ± 0.79
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 47
+          value: '13.86'
+          table_row_number: 49
+          table_column_number: 9
+        - row: '48'
+          T_K: '1540'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '16.21'
+          duration_s: '3300'
+          mass_loss_rate_mg_min_as_printed: 0.2946 ± 0.0020
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 10.69 ± 0.50
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 48
+          value: '10.69'
+          table_row_number: 50
+          table_column_number: 9
+        - row: '49'
+          T_K: '1549'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '6.32'
+          duration_s: '2700'
+          mass_loss_rate_mg_min_as_printed: 0.1398 ± 0.0046
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 36.3 ± 6.5
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 49
+          value: '36.3'
+          table_row_number: 51
+          table_column_number: 9
+        - row: '50'
+          T_K: '1549'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '17.89'
+          duration_s: '2700'
+          mass_loss_rate_mg_min_as_printed: 0.3972 ± 0.0023
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 6.63 ± 0.20
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 50
+          value: '6.63'
+          table_row_number: 52
+          table_column_number: 9
+        - row: '51'
+          T_K: '1549'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '14.08'
+          duration_s: '2700'
+          mass_loss_rate_mg_min_as_printed: 0.3127 ± 0.0021
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 15.96 ± 0.91
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 51
+          value: '15.96'
+          table_row_number: 53
+          table_column_number: 9
+        - row: '52'
+          T_K: '1549'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '15.28'
+          duration_s: '2700'
+          mass_loss_rate_mg_min_as_printed: 0.3397 ± 0.0023
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 12.37 ± 0.58
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 52
+          value: '12.37'
+          table_row_number: 54
+          table_column_number: 9
+        - row: '53'
+          T_K: '1560'
+          orifice_diameter_mm: '0.57'
+          effusion_orifice_area_cm2: '0.00257'
+          orifice_clausing_factor_WB: '0.339'
+          mass_loss_mg: '4.64'
+          duration_s: '1800'
+          mass_loss_rate_mg_min_as_printed: 0.1540 ± 0.0032
+          f_parameter: '0.0027'
+          apparent_pressure_Pa_as_printed: 40.1 ± 7.1
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 53
+          value: '40.1'
+          table_row_number: 55
+          table_column_number: 9
+        - row: '54'
+          T_K: '1560'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '12.78'
+          duration_s: '2100'
+          mass_loss_rate_mg_min_as_printed: 0.3648 ± 0.0026
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 18.7 ± 1.1
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 54
+          value: '18.7'
+          table_row_number: 56
+          table_column_number: 9
+        - row: '55'
+          T_K: '1560'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '13.95'
+          duration_s: '2100'
+          mass_loss_rate_mg_min_as_printed: 0.3977 ± 0.0036
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 14.53 ± 0.68
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 55
+          value: '14.53'
+          table_row_number: 57
+          table_column_number: 9
+        - row: '56'
+          T_K: '1560'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '18.48'
+          duration_s: '2400'
+          mass_loss_rate_mg_min_as_printed: 0.4623 ± 0.0040
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 7.74 ± 0.24
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 56
+          value: '7.74'
+          table_row_number: 58
+          table_column_number: 9
+        - row: '57'
+          T_K: '1570'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '18.41'
+          duration_s: '2100'
+          mass_loss_rate_mg_min_as_printed: 0.5256 ± 0.0049
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 8.83 ± 0.27
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 57
+          value: '8.83'
+          table_row_number: 59
+          table_column_number: 9
+        - row: '58'
+          T_K: '1570'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '14.57'
+          duration_s: '2100'
+          mass_loss_rate_mg_min_as_printed: 0.4159 ± 0.0028
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 21.4 ± 1.2
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 58
+          value: '21.4'
+          table_row_number: 60
+          table_column_number: 9
+        - row: '59'
+          T_K: '1570'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '16.00'
+          duration_s: '2100'
+          mass_loss_rate_mg_min_as_printed: 0.4567 ± 0.0061
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 16.74 ± 0.81
+          locator:
+            table: '1'
+            page: 4
+            pdf_page_index: 3
+            note: Table 1 row 59
+          value: '16.74'
+          table_row_number: 61
+          table_column_number: 9
+        - row: '60'
+          T_K: '1579'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '14.18'
+          duration_s: '1800'
+          mass_loss_rate_mg_min_as_printed: 0.4726 ± 0.0030
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 24.3 ± 1.4
+          locator:
+            table: '1'
+            page: 5
+            pdf_page_index: 4
+            note: Table 1 row 60
+          value: '24.3'
+          table_row_number: 62
+          table_column_number: 9
+        - row: '61'
+          T_K: '1579'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '15.62'
+          duration_s: '1800'
+          mass_loss_rate_mg_min_as_printed: 0.5213 ± 0.0060
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 19.16 ± 0.91
+          locator:
+            table: '1'
+            page: 5
+            pdf_page_index: 4
+            note: Table 1 row 61
+          value: '19.16'
+          table_row_number: 63
+          table_column_number: 9
+        - row: '62'
+          T_K: '1579'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '14.83'
+          duration_s: '1500'
+          mass_loss_rate_mg_min_as_printed: 0.5927 ± 0.0041
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 9.98 ± 0.30
+          locator:
+            table: '1'
+            page: 5
+            pdf_page_index: 4
+            note: Table 1 row 62
+          value: '9.98'
+          table_row_number: 64
+          table_column_number: 9
+        - row: '63'
+          T_K: '1589'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '10.72'
+          duration_s: '1200'
+          mass_loss_rate_mg_min_as_printed: 0.5353 ± 0.0042
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 27.7 ± 1.6
+          locator:
+            table: '1'
+            page: 5
+            pdf_page_index: 4
+            note: Table 1 row 63
+          value: '27.7'
+          table_row_number: 65
+          table_column_number: 9
+        - row: '64'
+          T_K: '1589'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '11.91'
+          duration_s: '1200'
+          mass_loss_rate_mg_min_as_printed: 0.5944 ± 0.0086
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 21.9 ± 1.1
+          locator:
+            table: '1'
+            page: 5
+            pdf_page_index: 4
+            note: Table 1 row 64
+          value: '21.9'
+          table_row_number: 66
+          table_column_number: 9
+        - row: '65'
+          T_K: '1589'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '16.80'
+          duration_s: '1500'
+          mass_loss_rate_mg_min_as_printed: 0.6729 ± 0.0077
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 11.37 ± 0.36
+          locator:
+            table: '1'
+            page: 5
+            pdf_page_index: 4
+            note: Table 1 row 65
+          value: '11.37'
+          table_row_number: 67
+          table_column_number: 9
+        - row: '66'
+          T_K: '1598'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '18.94'
+          duration_s: '1500'
+          mass_loss_rate_mg_min_as_printed: 0.7555 ± 0.0091
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 12.80 ± 0.41
+          locator:
+            table: '1'
+            page: 5
+            pdf_page_index: 4
+            note: Table 1 row 66
+          value: '12.80'
+          table_row_number: 68
+          table_column_number: 9
+        - row: '67'
+          T_K: '1598'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '15.16'
+          duration_s: '1500'
+          mass_loss_rate_mg_min_as_printed: 0.6048 ± 0.0094
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 31.3 ± 1.8
+          locator:
+            table: '1'
+            page: 5
+            pdf_page_index: 4
+            note: Table 1 row 67
+          value: '31.3'
+          table_row_number: 69
+          table_column_number: 9
+        - row: '68'
+          T_K: '1598'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '16.89'
+          duration_s: '1500'
+          mass_loss_rate_mg_min_as_printed: 0.6743 ± 0.0080
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 24.9 ± 1.2
+          locator:
+            table: '1'
+            page: 5
+            pdf_page_index: 4
+            note: Table 1 row 68
+          value: '24.9'
+          table_row_number: 70
+          table_column_number: 9
+        - row: '69'
+          T_K: '1608'
+          orifice_diameter_mm: '1.72'
+          effusion_orifice_area_cm2: '0.02324'
+          orifice_clausing_factor_WB: '0.583'
+          mass_loss_mg: '16.83'
+          duration_s: '1200'
+          mass_loss_rate_mg_min_as_printed: 0.837 ± 0.013
+          f_parameter: '0.0428'
+          apparent_pressure_Pa_as_printed: 14.23 ± 0.48
+          locator:
+            table: '1'
+            page: 5
+            pdf_page_index: 4
+            note: Table 1 row 69
+          value: '14.23'
+          table_row_number: 71
+          table_column_number: 9
+        - row: '70'
+          T_K: '1608'
+          orifice_diameter_mm: '1.08'
+          effusion_orifice_area_cm2: '0.00925'
+          orifice_clausing_factor_WB: '0.479'
+          mass_loss_mg: '13.52'
+          duration_s: '1200'
+          mass_loss_rate_mg_min_as_printed: 0.673 ± 0.011
+          f_parameter: '0.0140'
+          apparent_pressure_Pa_as_printed: 35.0 ± 2.1
+          locator:
+            table: '1'
+            page: 5
+            pdf_page_index: 4
+            note: Table 1 row 70
+          value: '35.0'
+          table_row_number: 72
+          table_column_number: 9
+        - row: '71'
+          T_K: '1608'
+          orifice_diameter_mm: '1.24'
+          effusion_orifice_area_cm2: '0.01217'
+          orifice_clausing_factor_WB: '0.510'
+          mass_loss_mg: '15.13'
+          duration_s: '1200'
+          mass_loss_rate_mg_min_as_printed: 0.7544 ± 0.0098
+          f_parameter: '0.0196'
+          apparent_pressure_Pa_as_printed: 28.0 ± 1.3
+          locator:
+            table: '1'
+            page: 5
+            pdf_page_index: 4
+            note: Table 1 row 71
+          value: '28.0'
+          table_row_number: 73
+          table_column_number: 9
+        quantity: raw_multi_orifice_effusion_bundle
+      locator:
+        table: '1'
+        page: 4
+        pdf_page_index: 3
+        note: Continuation rows are on PDF page 5.
+      table_column_number: 9
+      units: mixed printed units
+    - observation_id: ferguson_nuth_2012_table2_equilibrium_pressure_rows
+      type: psat_series
+      values:
+        system_as_published: Si(s)+SiO2(s)
+        points:
+        - row: '1'
+          T_K: '1433'
+          equilibrium_pressure_Pa_as_printed: 5.7 ± 2.2
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 1
+          value: '5.7'
+          table_row_number: 3
+          table_column_number: 3
+        - row: '2'
+          T_K: '1443'
+          equilibrium_pressure_Pa_as_printed: 7.4 ± 1.4
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 2
+          value: '7.4'
+          table_row_number: 4
+          table_column_number: 3
+        - row: '3'
+          T_K: '1453'
+          equilibrium_pressure_Pa_as_printed: 8.3 ± 1.6
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 3
+          value: '8.3'
+          table_row_number: 5
+          table_column_number: 3
+        - row: '4'
+          T_K: '1462'
+          equilibrium_pressure_Pa_as_printed: 9.8 ± 1.9
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 4
+          value: '9.8'
+          table_row_number: 6
+          table_column_number: 3
+        - row: '5'
+          T_K: '1472'
+          equilibrium_pressure_Pa_as_printed: 12.0 ± 2.5
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 5
+          value: '12.0'
+          table_row_number: 7
+          table_column_number: 3
+        - row: '6'
+          T_K: '1481'
+          equilibrium_pressure_Pa_as_printed: 13.7 ± 3.2
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 6
+          value: '13.7'
+          table_row_number: 8
+          table_column_number: 3
+        - row: '7'
+          T_K: '1491'
+          equilibrium_pressure_Pa_as_printed: 19.1 ± 4.6
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 7
+          value: '19.1'
+          table_row_number: 9
+          table_column_number: 3
+        - row: '8'
+          T_K: '1500'
+          equilibrium_pressure_Pa_as_printed: 22.3 ± 5.1
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 8
+          value: '22.3'
+          table_row_number: 10
+          table_column_number: 3
+        - row: '9'
+          T_K: '1510'
+          equilibrium_pressure_Pa_as_printed: 26.6 ± 6.1
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 9
+          value: '26.6'
+          table_row_number: 11
+          table_column_number: 3
+        - row: '10'
+          T_K: '1520'
+          equilibrium_pressure_Pa_as_printed: 31.2 ± 7.1
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 10
+          value: '31.2'
+          table_row_number: 12
+          table_column_number: 3
+        - row: '11'
+          T_K: '1530'
+          equilibrium_pressure_Pa_as_printed: 37.2 ± 8.4
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 11
+          value: '37.2'
+          table_row_number: 13
+          table_column_number: 3
+        - row: '12'
+          T_K: '1540'
+          equilibrium_pressure_Pa_as_printed: 42.1 ± 9.0
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 12
+          value: '42.1'
+          table_row_number: 14
+          table_column_number: 3
+        - row: '13'
+          T_K: '1549'
+          equilibrium_pressure_Pa_as_printed: 51 ± 12
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 13
+          value: '51'
+          table_row_number: 15
+          table_column_number: 3
+        - row: '14'
+          T_K: '1560'
+          equilibrium_pressure_Pa_as_printed: 57 ± 12
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 14
+          value: '57'
+          table_row_number: 16
+          table_column_number: 3
+        - row: '15'
+          T_K: '1570'
+          equilibrium_pressure_Pa_as_printed: 69 ± 31
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 15
+          value: '69'
+          table_row_number: 17
+          table_column_number: 3
+        - row: '16'
+          T_K: '1579'
+          equilibrium_pressure_Pa_as_printed: 82 ± 39
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 16
+          value: '82'
+          table_row_number: 18
+          table_column_number: 3
+        - row: '17'
+          T_K: '1589'
+          equilibrium_pressure_Pa_as_printed: 94 ± 46
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 17
+          value: '94'
+          table_row_number: 19
+          table_column_number: 3
+        - row: '18'
+          T_K: '1598'
+          equilibrium_pressure_Pa_as_printed: 111 ± 59
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 18
+          value: '111'
+          table_row_number: 20
+          table_column_number: 3
+        - row: '19'
+          T_K: '1608'
+          equilibrium_pressure_Pa_as_printed: 128 ± 74
+          pdf_page: 5
+          locator:
+            table: '2'
+            page: 5
+            pdf_page_index: 4
+            note: Table 2 row 19
+          value: '128'
+          table_row_number: 21
+          table_column_number: 3
+        schema_gap: Equilibrium vapor pressure over Si(s)+SiO2(s) cannot be encoded by current p_sat identity (which
+          requires one condensed reservoir matching the gas species).
+        quantity: equilibrium_vapor_pressure_over_two_solid_assemblage
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: 'Typed refusal: the pressure identity supports one condensed reservoir, not the printed Si(s)+SiO2(s)
+          assemblage.'
+      table_column_number: 3
+      units: Pa
+    - observation_id: ferguson_nuth_2012_alpha_T1433
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1433 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0040 as printed; confidence level not stated
+      values:
+        alpha: '0.0089'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0089'
+        alpha_as_printed: 0.0089 ± 0.0040
+      T_K: '1433'
+      table_row_number: 3
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1443
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1443 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0020 as printed; confidence level not stated
+      values:
+        alpha: '0.0082'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0082'
+        alpha_as_printed: 0.0082 ± 0.0020
+      T_K: '1443'
+      table_row_number: 4
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1453
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1453 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0021 as printed; confidence level not stated
+      values:
+        alpha: '0.0086'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0086'
+        alpha_as_printed: 0.0086 ± 0.0021
+      T_K: '1453'
+      table_row_number: 5
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1462
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1462 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0021 as printed; confidence level not stated
+      values:
+        alpha: '0.0086'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0086'
+        alpha_as_printed: 0.0086 ± 0.0021
+      T_K: '1462'
+      table_row_number: 6
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1472
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1472 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0021 as printed; confidence level not stated
+      values:
+        alpha: '0.0082'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0082'
+        alpha_as_printed: 0.0082 ± 0.0021
+      T_K: '1472'
+      table_row_number: 7
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1481
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1481 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0025 as printed; confidence level not stated
+      values:
+        alpha: '0.0085'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0085'
+        alpha_as_printed: 0.0085 ± 0.0025
+      T_K: '1481'
+      table_row_number: 8
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1491
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1491 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0020 as printed; confidence level not stated
+      values:
+        alpha: '0.0069'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0069'
+        alpha_as_printed: 0.0069 ± 0.0020
+      T_K: '1491'
+      table_row_number: 9
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1500
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1500 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0019 as printed; confidence level not stated
+      values:
+        alpha: '0.0070'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0070'
+        alpha_as_printed: 0.0070 ± 0.0019
+      T_K: '1500'
+      table_row_number: 10
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1510
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1510 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0019 as printed; confidence level not stated
+      values:
+        alpha: '0.0068'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0068'
+        alpha_as_printed: 0.0068 ± 0.0019
+      T_K: '1510'
+      table_row_number: 11
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1520
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1520 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0018 as printed; confidence level not stated
+      values:
+        alpha: '0.0067'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0067'
+        alpha_as_printed: 0.0067 ± 0.0018
+      T_K: '1520'
+      table_row_number: 12
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1530
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1530 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0018 as printed; confidence level not stated
+      values:
+        alpha: '0.0066'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0066'
+        alpha_as_printed: 0.0066 ± 0.0018
+      T_K: '1530'
+      table_row_number: 13
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1540
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1540 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0018 as printed; confidence level not stated
+      values:
+        alpha: '0.0068'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0068'
+        alpha_as_printed: 0.0068 ± 0.0018
+      T_K: '1540'
+      table_row_number: 14
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1549
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1549 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0017 as printed; confidence level not stated
+      values:
+        alpha: '0.0064'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0064'
+        alpha_as_printed: 0.0064 ± 0.0017
+      T_K: '1549'
+      table_row_number: 15
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1560
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1560 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0017 as printed; confidence level not stated
+      values:
+        alpha: '0.0067'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0067'
+        alpha_as_printed: 0.0067 ± 0.0017
+      T_K: '1560'
+      table_row_number: 16
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1570
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1570 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0028 as printed; confidence level not stated
+      values:
+        alpha: '0.0063'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0063'
+        alpha_as_printed: 0.0063 ± 0.0028
+      T_K: '1570'
+      table_row_number: 17
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1579
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1579 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0027 as printed; confidence level not stated
+      values:
+        alpha: '0.0059'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0059'
+        alpha_as_printed: 0.0059 ± 0.0027
+      T_K: '1579'
+      table_row_number: 18
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1589
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1589 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0027 as printed; confidence level not stated
+      values:
+        alpha: '0.0059'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0059'
+        alpha_as_printed: 0.0059 ± 0.0027
+      T_K: '1589'
+      table_row_number: 19
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1598
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1598 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0027 as printed; confidence level not stated
+      values:
+        alpha: '0.0056'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0056'
+        alpha_as_printed: 0.0056 ± 0.0027
+      T_K: '1598'
+      table_row_number: 20
+      table_column_number: 2
+    - observation_id: ferguson_nuth_2012_alpha_T1608
+      type: alpha
+      phase: g
+      units: dimensionless
+      locator:
+        table: '2'
+        page: 5
+        pdf_page_index: 4
+        note: Table 2 row at 1608 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
+      uncertainty:
+        note: ±0.0027 as printed; confidence level not stated
+      values:
+        alpha: '0.0054'
+        method_class: measured_reduced
+        system_as_published: Si(s)+SiO2(s)
+        value: '0.0054'
+        alpha_as_printed: 0.0054 ± 0.0027
+      T_K: '1608'
+      table_row_number: 21
+      table_column_number: 2
+review_status: draft
+fidelity_samples:
+- path: species.SiO.observations[ferguson_nuth_2012_table1_raw_effusion_rows].values.points[0].mass_loss_rate_mg_min_as_printed
+  value: 0.0439 ± 0.0050
+  locator:
+    table: '1'
+    row: '1'
+    page: 4
+    pdf_page_index: 3
+- path: species.SiO.observations[ferguson_nuth_2012_table1_raw_effusion_rows].values.points[70].apparent_pressure_Pa_as_printed
+  value: 28.0 ± 1.3
+  locator:
+    table: '1'
+    row: '71'
+    page: 5
+    pdf_page_index: 4
+- path: species.SiO.observations[ferguson_nuth_2012_alpha_T1433].values.alpha_as_printed
+  value: 0.0089 ± 0.0040
+  locator:
+    table: '2'
+    page: 5
+    pdf_page_index: 4

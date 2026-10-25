@@ -5,9 +5,27 @@ from pathlib import Path
 import pytest
 
 from simulator.battery.enums import AmountBasis, BenchIdentityBasis, ValueKind
-from simulator.battery.records import Bench, BenchIdentity, Composition, Located, Sample, State, Value
+from simulator.battery.records import (
+    Bench,
+    BenchIdentity,
+    Composition,
+    Located,
+    Sample,
+    State,
+    Value,
+)
 from simulator.battery.migrate import REPO_ROOT
-from simulator.battery.waypoints import ReadinessStatus, WaypointAuthority, consumer_readiness, oxygen_condition, pressure_boundary, thermal_path
+from simulator.battery.consumer_inputs import collect_consumer_inputs
+from simulator.battery.waypoints import (
+    GapReason,
+    ReadinessStatus,
+    WaypointAuthority,
+    consumer_readiness,
+    normalized_composition,
+    oxygen_condition,
+    pressure_boundary,
+    thermal_path,
+)
 from tests.battery import factories
 
 
@@ -103,3 +121,142 @@ def test_engine_point_uses_observation_temperature_without_schedule():
     assert all(row.status is ReadinessStatus.READY for row in engines)
     assert all(row.status is not ReadinessStatus.READY for row in rows if row.consumer != "engine_point")
     assert all(row.status is ReadinessStatus.GAP for row in consumer_readiness(experiment, bench) if row.consumer == "engine_point")
+
+
+@pytest.mark.parametrize(
+    "source_id",
+    ("cottrell-2009-iron-xanes", "jugo-2010-sulfur-xanes"),
+)
+def test_readiness_keeps_raw_printed_composition_out_of_sample_charge(source_id):
+    extract = REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml"
+    migrator = factories.migrate_one_extract(REPO_ROOT, extract)
+    migrator.finalize()
+    observation = next(
+        obs
+        for obs in migrator.result.observations.values()
+        if obs.source_id == source_id
+        and obs.point_conditions
+        and obs.point_conditions.get("composition") is not None
+    )
+    composition = observation.point_conditions["composition"]
+    assert composition.state.is_value and isinstance(composition.state.value, dict)
+    experiment = migrator.result.experiments[observation.experiment_id]
+    bench = Bench(
+        "work::bench::one",
+        "work",
+        BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+    )
+
+    readiness = consumer_readiness(experiment, bench, observation)
+    assert readiness
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    composition_waypoint = inputs.waypoints["normalized_composition"]
+    assert composition_waypoint.absence is not None
+    assert composition_waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert composition_waypoint.absence.missing == (
+        f"observation[{observation.observation_id}].point_conditions.composition",
+    )
+
+    sample_composition = factories.located(
+        Composition("formula", (("MgO", Decimal("1")),), AmountBasis.MOL_INVENTORY)
+    )
+    experiment_with_sample = replace(
+        experiment,
+        sample=replace(experiment.sample, initial_composition=sample_composition),
+    )
+    sample_inputs = collect_consumer_inputs(experiment_with_sample, bench, observation)
+    assert not sample_inputs.charges
+    assert sample_inputs.charges.absence is not None
+    assert sample_inputs.charges.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert sample_inputs.charges.absence.missing == (
+        f"observation[{observation.observation_id}].point_conditions.composition",
+    )
+    assert sample_inputs.waypoints["normalized_composition"].selected is None
+    assert sample_inputs.waypoints["normalized_composition"].absence is not None
+
+
+def test_unknown_point_composition_suppresses_typed_sample_charge():
+    extract = REPO_ROOT / "data/literature/extracts/cottrell-2009-iron-xanes.yaml"
+    migrator = factories.migrate_one_extract(REPO_ROOT, extract)
+    migrator.finalize()
+    observation = next(
+        obs
+        for obs in migrator.result.observations.values()
+        if obs.observation_id.endswith(
+            "cottrell_2009_moore_wet_chemistry_quotes::point:3"
+        )
+    )
+    experiment = migrator.result.experiments[observation.experiment_id]
+    bench = Bench(
+        "work::bench::one",
+        "work",
+        BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+    )
+    experiment_with_sample = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=factories.located(
+                Composition(
+                    "formula",
+                    (("MgO", Decimal("1")),),
+                    AmountBasis.MOL_INVENTORY,
+                )
+            ),
+        ),
+    )
+
+    inputs = collect_consumer_inputs(experiment_with_sample, bench, observation)
+
+    assert not inputs.charges
+    assert inputs.waypoints["normalized_composition"].selected is None
+    absence = inputs.waypoints["normalized_composition"].absence
+    assert absence is not None
+    assert absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert absence.missing == (
+        f"observation[{observation.observation_id}].point_conditions.composition",
+    )
+
+
+def test_raw_point_map_suppresses_sample_printed_composition():
+    extract = REPO_ROOT / "data/literature/extracts/cottrell-2009-iron-xanes.yaml"
+    migrator = factories.migrate_one_extract(REPO_ROOT, extract)
+    migrator.finalize()
+    observation_id = (
+        "cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::"
+        "T=1623.15:row=aii_-35:h=c7e50fa38368"
+    )
+    observation = migrator.result.observations[observation_id]
+    experiment = migrator.result.experiments[observation.experiment_id]
+    bench = Bench(
+        "work::bench::one",
+        "work",
+        BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+    )
+    experiment_with_sample_print = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            printed_composition=factories.located({
+                "basis": "printed_oxides",
+                "amount_basis": "mass_percent",
+                "components": [["SiO2", "60"], ["MgO", "40"]],
+            }),
+        ),
+    )
+
+    composition = normalized_composition(
+        experiment_with_sample_print, bench, observation
+    )
+    assert composition.selected is None
+    assert composition.absence is not None
+    assert composition.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert composition.absence.missing == (
+        f"observation[{observation_id}].point_conditions.composition",
+    )
+    engine_point = next(
+        row
+        for row in consumer_readiness(experiment_with_sample_print, bench, observation)
+        if row.consumer == "engine_point" and row.engine == "internal-analytical"
+    )
+    assert engine_point.status is ReadinessStatus.GAP

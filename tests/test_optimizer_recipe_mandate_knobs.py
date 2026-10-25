@@ -15,7 +15,6 @@ from simulator.optimize.recipe import (
     FURNACE_MAX_T_C_PATH,
     MANDATE_LEVER_ALLOWLIST,
     MANDATE_LEVER_PATHS,
-    OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C,
     OVERHEAD_HEADSPACE_OFFSET_MAX_K,
     OVERHEAD_HEADSPACE_OFFSET_MIN_K,
     OVERHEAD_HOT_WALL_MAX_C,
@@ -178,7 +177,6 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
         "stage_5_to_stage_6": (stage_ranges[6][0], stage_ranges[5][1]),
         "stage_6_to_stage_7": (stage_ranges[7][0], stage_ranges[6][1]),
     }
-    assert dict(OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C) == downstream_bounds
     for segment_name, (low, high) in downstream_bounds.items():
         spec = schema.spec_for(
             _path(
@@ -188,7 +186,7 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
         )
         assert spec.low == low
         assert spec.high == high
-        assert "CondensationTrain.create_default" in spec.bounds_source
+        assert "setpoints.yaml condensation_train.metals_train" in spec.bounds_source
 
 
 def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:

@@ -227,10 +227,11 @@ def _wait_loop_settled(sid, *, timeout=40.0):
 
 
 def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=240.0):
-    """Answer every gate with its recommendation.
+    """Answer each gate with its recommendation and await terminal completion.
 
     Returns ``(decisions, counts, completion, status_counts)`` where
     ``status_counts`` tallies ``simulation_status`` payloads by their ``status``.
+    ``timeout`` is the maximum gap without a simulation tick or decision event.
 
     With ``perturb_each_gate`` (requires ``sid``) the test injects pacing
     pause+resume churn while parked at each gate BEFORE answering it, then waits
@@ -245,10 +246,12 @@ def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=2
     decisions = []
     completion = None
     terminal_status = None
-    deadline = time.time() + timeout
-    while time.time() < deadline:
+    last_progress_at = time.monotonic()
+    while True:
         for msg in client.get_received():
             counts[msg['name']] += 1
+            if msg['name'] in {'simulation_tick', 'decision_required'}:
+                last_progress_at = time.monotonic()
             if msg['name'] == 'simulation_status':
                 status_payload = msg['args'][0]
                 status_counts[status_payload.get('status')] += 1
@@ -267,16 +270,21 @@ def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=2
                     client.emit('resume_simulation', {'payload_version': 4})
                     _wait_loop_settled(sid)
                 client.emit('make_decision', {'choice': d['recommendation']})
+                last_progress_at = time.monotonic()
             elif msg['name'] == 'simulation_complete':
                 completion = msg['args'][0]
         if completion is not None:
             break
         if terminal_status is not None:
             break
+        if time.monotonic() - last_progress_at >= timeout:
+            break
         time.sleep(0.02)
     assert completion is not None, (
-        'run terminated before simulation_complete: '
-        f'{terminal_status or "no terminal event received"}'
+        'run did not emit simulation_complete: '
+        f'answered gates={decisions!r}; events={dict(counts)!r}; '
+        f'statuses={dict(status_counts)!r}; '
+        f'{terminal_status or f"no progress for {timeout:.1f}s"}'
     )
     return decisions, counts, completion, status_counts
 
@@ -374,15 +382,15 @@ def test_null_make_decision_while_parked_at_path_ab_is_rejected(client):
 
 
 # Nightly (2026-08-02 CI tiering): serial web full path (~391 s junit).
+# 2400s outer guard follows 1114s call at load ~79, Studio-2 (2026-10-23).
 @pytest.mark.nightly
-@pytest.mark.timeout(1200)
+@pytest.mark.timeout(2400)
 def test_pause_resume_around_every_gate_is_ledger_identical(client):
     """(b) pause/resume churn at every gate -> one gate each, correct routing, identical ledger.
 
-    Timeout is a hang-backstop, not a perf bar: measured 372s serial on
-    Studio 1 (ci-ydisp-final junit), so the 300s global default failed
-    deterministically there; 1200s ~= 3x measured per the contention-robust
-    ceiling policy."""
+    Timeout is a hang-backstop, not a perf bar: Studio 1 measured 372s serial
+    and Studio 2 measured 1114s at load ~79 (2026-10-23); 2400s gives roughly
+    2x margin over the loaded run."""
     base_decisions, base_counts, base_completion, _ = _drive_to_completion(
         _started(client))
     assert base_decisions == EXPECTED_DECISIONS

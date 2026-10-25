@@ -54,7 +54,8 @@ REPAIRED = {
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_albite_table_6_vitrification_quotes"): "Weill et al. (1980a); Waldbaum and Robie (1971); Hlabse and Kleppa (1968), Holm and Kleppa (1968); Kracek and Neuvonen (1952)",
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_sanidine_table_6_vitrification_quotes"): "Waldbaum and Robie (1971); Tamman (1903)",
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_nepheline_table_6_vitrification_quotes"): "Navrotsky et al. (1980)",
-    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_table_7_fusion_quotes"): "Weill et al. (1980b); Robie et al. (1978)",
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_table_7_fusion_quotes"): "Weill et al. (1980b)",
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_robie_table_7_fusion_quote"): "Robie et al. (1978)",
 }
 
 CONTEXT_REPAIRED = {
@@ -124,6 +125,15 @@ def test_page_repaired_name_reaches_evidence_attribution(tmp_path: Path, key, ex
     for obs in _migrated(_migrate_real_extract(tmp_path, name), raw_id):
         assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         assert obs.evidence.attribution == expected
+
+
+def test_anorthite_table_7_fusion_quotes_keep_separate_printed_values() -> None:
+    name = "stebbins-carmichael-weill-1983.yaml"
+    weill = _extract_values(name, "stebbins_1983_anorthite_table_7_fusion_quotes")
+    robie = _extract_values(name, "stebbins_1983_anorthite_robie_table_7_fusion_quote")
+
+    assert weill["preferred_estimate"] == 32.4
+    assert robie["estimate_from_glass_Cp_only"] == 19.4
 
 
 @pytest.mark.parametrize(

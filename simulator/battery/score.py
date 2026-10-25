@@ -1242,8 +1242,6 @@ def _missing_apparatus_fact(
         and allow_unknown_method
     ):
         return "method_unknown"
-    if name == "kems_calibration" and allow_calibration:
-        return "calibration"
     if name == "background_pressure_stated" and not getattr(check, "passed", True):
         return "background_pressure"
     if name == "orifice_knudsen" and not getattr(check, "passed", True):
@@ -1254,6 +1252,10 @@ def _missing_apparatus_fact(
     if name == "background_pressure" and not getattr(check, "passed", True):
         # A stated high or straddling background is an explicit invalid input,
         # not an unverified apparatus fact.
+        return None
+    if name == "in_cell_partial_pressure_sum" and not getattr(check, "passed", True):
+        if detail.get("printed_partial_pressure_sum_Pa") is None:
+            return "in_cell_partial_pressure_sum"
         return None
     if name == "geometry_determinants" and allow_calibration:
         missing = detail.get("missing")
@@ -1290,9 +1292,9 @@ def _unverified_apparatus_notices(
         return ()
     if reference.admission.status is not AdmissionStatus.ADMITTED:
         return ()
-    source_is_kems = bool(reference.source_id and reference.source_id.startswith("kems-"))
     author_reported_pressure = (
-        source_is_kems
+        experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
         and reference.evidence.original_method_class
         in {"measured", "measured_direct", "measured_tabulated"}
     )
@@ -1362,7 +1364,7 @@ def _unverified_apparatus_notices(
     allow_calibration = (
         author_reported_pressure or comparison_activity or calibration_flagged_activity
     )
-    missing: set[str] = set()
+    missing: dict[str, Mapping] = {}
     calibration_notice = None
     calibration_reason = None
     for check in gates.checks:
@@ -1374,7 +1376,7 @@ def _unverified_apparatus_notices(
                 (allow_calibration or calibration_flagged_partial_pressure)
                 and _has_calibration_not_grounded((check,))
             ):
-                missing.add("calibration_not_grounded")
+                missing["calibration_not_grounded"] = detail
                 notice_text = detail.get("calibration_notice")
                 if isinstance(notice_text, str):
                     calibration_notice = notice_text
@@ -1389,14 +1391,56 @@ def _unverified_apparatus_notices(
         )
         if fact is None:
             return ()
-        missing.add(fact)
+        missing[fact] = detail
     if not missing:
         return ()
-    return tuple(
-        Notice(
-            kind=NoticeKind.UNVERIFIED_APPARATUS,
-            affected_quantities=(quantity,),
-            reason=(
+    notices: list[Notice] = []
+    for fact in sorted(missing):
+        detail = missing[fact]
+        if fact == "in_cell_partial_pressure_sum":
+            pressure_detail = detail.get("pressure_sum_detail")
+            if isinstance(pressure_detail, Mapping):
+                detail = pressure_detail
+            original_reason = str(
+                detail.get("reason") or "printed in-cell pressure sum is unavailable"
+            )
+            pressure_limit = detail.get("pressure_limit_Pa")
+            limit_basis = detail.get("limit_basis")
+            limit_source = detail.get("limit_source")
+            regime_limit = (
+                f"{pressure_limit} Pa"
+                if pressure_limit is not None
+                else "unavailable"
+            )
+            limit_detail = "; ".join(
+                str(value) for value in (limit_source, limit_basis) if value
+            )
+            if limit_detail:
+                regime_limit += f" ({limit_detail})"
+            notices.append(
+                Notice(
+                    kind=NoticeKind.UNVERIFIED_APPARATUS,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        f"apparatus_unverified:{fact}; original_reason={original_reason}; "
+                        "authority=extrapolated; "
+                        f"regime_limit={regime_limit}"
+                    ),
+                    origin=reference.observation_id,
+                    band=(
+                        f"free-molecular in-cell pressure sum <= {pressure_limit} Pa"
+                        if pressure_limit is not None
+                        else "free-molecular in-cell pressure limit unavailable"
+                    ),
+                    authority=Authority.EXTRAPOLATED,
+                )
+            )
+            continue
+        notices.append(
+            Notice(
+                kind=NoticeKind.UNVERIFIED_APPARATUS,
+                affected_quantities=(quantity,),
+                reason=(
                 "calibration_not_grounded: "
                 f"{calibration_notice or 'Calibration is not grounded.'}"
                 + (
@@ -1411,11 +1455,11 @@ def _unverified_apparatus_notices(
                     if fact == "method_unknown"
                     else f"apparatus_unverified:{fact}"
                 )
-            ),
-            origin=reference.observation_id,
+                ),
+                origin=reference.observation_id,
+            )
         )
-        for fact in sorted(missing)
-    )
+    return tuple(notices)
 
 
 def _flagged_stratum_notices(
@@ -7946,7 +7990,11 @@ def predict_with_engine(
                 identity=identity,
             )
         if engine is Engine.INTERNAL_ANALYTICAL:
-            from engines.antoine import _antoine_log10_pressure
+            from engines.antoine import (
+                _AntoineCoefficientRefusal,
+                _antoine_log10_pressure,
+                _read_antoine_coefficients,
+            )
             from engines.builtin.vapor_pressure import (
                 COEFF_BLOCK_PURE_COMPONENT,
                 VaporPressureComputationError,
@@ -7961,9 +8009,25 @@ def predict_with_engine(
                 load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
             )
             row = vapor_pressure_data.get("metals", {}).get(formula)
-            coefficients, coefficient_block = wall_condensation_antoine_coefficients(
-                row, float(T)
-            )
+            try:
+                coefficients, coefficient_block = wall_condensation_antoine_coefficients(
+                    row, float(T)
+                )
+            except VaporPressureComputationError as exc:
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.INVALID_IDENTITY,
+                    refusal_detail={
+                        "reason": "static_equilibrium_pressure_invalid",
+                        "detail": str(exc),
+                        "formula": formula,
+                    },
+                    identity=identity,
+                )
             if coefficients.get("selection_refusal"):
                 left_basis = (
                     f"{coefficients.get('left_segment')}({coefficients.get('left_phase')})"
@@ -8027,19 +8091,20 @@ def predict_with_engine(
                     },
                     identity=identity,
                 )
-            log_pressure = _antoine_log10_pressure(
-                float(coefficients["A"]),
-                float(coefficients["B"]),
-                float(coefficients.get("C", 0.0)),
-                float(T),
-            )
             try:
+                A, B, C = _read_antoine_coefficients(coefficients)
+                log_pressure = _antoine_log10_pressure(A, B, C, float(T))
                 pressure = _pow10_pressure_or_raise(
                     log_pressure,
                     species=formula,
                     field="static_equilibrium_total_pressure_Pa",
                 )
-            except (OverflowError, VaporPressureComputationError):
+            except (
+                _AntoineCoefficientRefusal,
+                OverflowError,
+                VaporPressureComputationError,
+                ZeroDivisionError,
+            ) as exc:
                 return EnginePrediction(
                     engine=engine,
                     channel=channel,
@@ -8049,6 +8114,7 @@ def predict_with_engine(
                     refusal_reason=RefusalReason.INVALID_IDENTITY,
                     refusal_detail={
                         "reason": "static_equilibrium_pressure_invalid",
+                        "detail": str(exc),
                         "formula": formula,
                     },
                     identity=identity,

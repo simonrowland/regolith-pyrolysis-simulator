@@ -105,6 +105,7 @@ from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
 # owns that runner-format summary and returns it in ``StepResult``; this
 # adapter only emits it alongside the legacy ``simulation_tick`` payload.
 from web.feedstock_data import load_visible_feedstocks
+from simulator.config import _load_setpoints_file
 from web.advisory import (
     active_wall_species_from_flue,
     ceramic_rump_payload,
@@ -123,6 +124,8 @@ DATA_DIR = Path(__file__).parent.parent / 'data'
 
 def _load_yaml(filename):
     path = DATA_DIR / filename
+    if filename == 'setpoints.yaml':
+        return _load_setpoints_file(path)
     if not path.exists():
         return {}
     with open(path) as f:
