@@ -40,6 +40,29 @@ TABLE_V_RENDER_GRID = (
     ("0,997", "5,113"),
 )
 
+# Corrected appendix values were checked against the PDF page renders.
+APPENDIX_RENDER_BINDINGS = (
+    ((10, "0,025", "2", "17"), "ln_I23_over_I39_as_printed", "-2,237"),
+    ((10, "0,1", "1", "6"), "ln_I23_over_I39_as_printed", "-1,034"),
+    ((10, "0,1", "1", "7"), "ln_I23_over_I39_as_printed", "-0,935"),
+    ((10, "0,1", "1", "8"), "ln_I23_over_I39_as_printed", "-0,668"),
+    ((10, "0,1", "1", "9"), "ln_I23_over_I39_as_printed", "-0,451"),
+    ((10, "0,1", "2", "1"), "ln_I23_over_I39_as_printed", "-0,405"),
+    ((10, "0,1", "2", "2"), "ln_I23_over_I39_as_printed", "-0,762"),
+    ((10, "0,1", "2", "3"), "ln_I23_over_I39_as_printed", "-0,808"),
+    ((10, "0,1", "2", "4"), "ln_I23_over_I39_as_printed", "-0,936"),
+    ((10, "0,1", "2", "5"), "ln_I23_over_I39_as_printed", "-1,043"),
+    ((10, "0,1", "2", "6"), "ln_I23_over_I39_as_printed", "-1,119"),
+    ((10, "0,1", "2", "7"), "ln_I23_over_I39_as_printed", "-1,176"),
+    ((10, "0,1", "2", "8"), "ln_I23_over_I39_as_printed", "-1,325"),
+    ((10, "0,1", "2", "9"), "ln_I23_over_I39_as_printed", "-1,262"),
+    ((10, "0,1", "2", "10"), "ln_I23_over_I39_as_printed", "-1,373"),
+    ((10, "0,1", "2", "11"), "ln_I23_over_I39_as_printed", "-1,375"),
+    ((10, "0,1", "2", "24"), "ln_I23_over_I39_as_printed", "-0,744"),
+    ((10, "0,7", "2", "20"), "ln_I23_over_I39_as_printed", "2,066"),
+    ((11, "0,997", "2", "9"), "10^4_over_T_K_inverse_as_printed", "5,65"),
+)
+
 
 def _document():
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -104,6 +127,26 @@ def test_render_grids_and_printed_table_row_counts():
     assert table_iv["values"]["rows"][-1]["mixing_enthalpy_plusminus_width_kJ_mol_as_printed"] == "0"
     assert table_iv["values"]["uncertainty_notice"] == "confidence level not stated"
     assert len(_context(document, "Annexe")["values"]["rows"]) == 318
+
+    appendix_rows = _context(document, "Annexe")["values"]["rows"]
+    by_binding = {
+        (
+            row["pdf_page"],
+            row["xAb_series_as_assigned"],
+            row["assay_as_printed"],
+            row["run_as_printed"],
+        ): row
+        for row in appendix_rows
+    }
+    for binding, column, expected in APPENDIX_RENDER_BINDINGS:
+        assert by_binding[binding][column] == expected
+
+    printed_typo = by_binding[(10, "0,975", "2", "18")]
+    assert printed_typo["xAb_as_printed"] == "0,875"
+    assert "apparent source typo" in printed_typo["xAb_series_assignment_note"]
+    table_vi = _context(document, "VI")["values"]["rows"]
+    x_or_09 = next(row for row in table_vi if row["xOr_as_printed"] == "0,9")
+    assert x_or_09["partial_excess_G_Ab_kJ_mol_as_printed"] == "-24,63"
 
     addendum = _context(document, "Addendum")
     assert addendum["locator"] == {

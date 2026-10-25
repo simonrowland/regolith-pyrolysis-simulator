@@ -8,7 +8,7 @@ source:
   doi: 10.3406/bulmi.1983.7674
   year: 1983
 extraction:
-  method: MinerU table draft emit for Table VI activities; the remaining printed tables are retained as typed-refused context because their quantities have no matching schema token.
+  method: MinerU table draft emit for Table VI activities on the doubled spectrometry formula-unit basis stated in the addendum; the remaining printed tables are retained as typed-refused context because their quantities have no matching schema token.
   date: '2026-10-25'
   worker: w1025b-roge83
 review_status: draft
@@ -31,9 +31,9 @@ tables:
         table: 'VI'
     values:
       - column: 2
-        species: NaAlSi3O8
+        species: Na2Al2Si6O16
       - column: 3
-        species: KAlSi3O8
+        species: K2Al2Si6O16
     conditions:
       - key: fO2_Pa
         state: {tag: unknown, reason: not_published}

@@ -10,7 +10,8 @@ extraction:
   method: MinerU table draft conversion; Table VI activities emitted by the table tool and the remaining tables
     transcribed into context. Original machine text and OCR-redo hybrid-high were reconciled against the page renders.
     French decimal commas are retained in as_printed context fields; activity scalar fields use a decimal point
-    for migration.
+    for migration. The OCR-redo appendix rows were reassembled with render corrections from render_overrides.yaml;
+    literal xAb cells and assigned series are recorded separately.
   date: '2026-10-25'
   worker: w1025b-roge83
 review_status: draft
@@ -1540,7 +1541,7 @@ species:
           partial_excess_G_Or_kJ_mol_as_printed: -1,35
           integral_excess_G_kJ_mol_as_printed: -4,87
         - xOr_as_printed: 0,9
-          partial_excess_G_Ab_kJ_mol_as_printed: -24,53
+          partial_excess_G_Ab_kJ_mol_as_printed: -24,63
           partial_excess_G_Or_kJ_mol_as_printed: -0,35
           integral_excess_G_kJ_mol_as_printed: -2,78
         - xOr_as_printed: '1'
@@ -1567,6 +1568,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '1'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 8,26
           ln_I23_over_I39_as_printed: -2,420
           read_variant: hybrid-high
@@ -1574,6 +1576,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '2'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 7,81
           ln_I23_over_I39_as_printed: -2,497
           read_variant: hybrid-high
@@ -1581,6 +1584,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '3'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 7,47
           ln_I23_over_I39_as_printed: -2,750
           read_variant: hybrid-high
@@ -1588,6 +1592,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '4'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 7,14
           ln_I23_over_I39_as_printed: -2,734
           read_variant: hybrid-high
@@ -1595,6 +1600,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '5'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,84
           ln_I23_over_I39_as_printed: -2,927
           read_variant: hybrid-high
@@ -1602,6 +1608,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '6'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,63
           ln_I23_over_I39_as_printed: -2,946
           read_variant: hybrid-high
@@ -1609,6 +1616,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '7'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 5,77
           ln_I23_over_I39_as_printed: -3,405
           read_variant: hybrid-high
@@ -1616,6 +1624,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '8'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 5,62
           ln_I23_over_I39_as_printed: -3,575
           read_variant: hybrid-high
@@ -1623,6 +1632,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '9'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 5,70
           ln_I23_over_I39_as_printed: -3,620
           read_variant: hybrid-high
@@ -1630,6 +1640,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '10'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 5,81
           ln_I23_over_I39_as_printed: -3,556
           read_variant: hybrid-high
@@ -1637,6 +1648,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '11'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 5,99
           ln_I23_over_I39_as_printed: -3,439
           read_variant: hybrid-high
@@ -1644,6 +1656,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '12'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,15
           ln_I23_over_I39_as_printed: -3,359
           read_variant: hybrid-high
@@ -1651,6 +1664,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '13'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,35
           ln_I23_over_I39_as_printed: -3,277
           read_variant: hybrid-high
@@ -1658,6 +1672,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '14'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,57
           ln_I23_over_I39_as_printed: -3,206
           read_variant: hybrid-high
@@ -1665,6 +1680,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '15'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,88
           ln_I23_over_I39_as_printed: -3,113
           read_variant: hybrid-high
@@ -1672,6 +1688,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '16'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 7,29
           ln_I23_over_I39_as_printed: -3,029
           read_variant: hybrid-high
@@ -1679,6 +1696,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '1'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 8,19
           ln_I23_over_I39_as_printed: -2,481
           read_variant: hybrid-high
@@ -1686,6 +1704,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '2'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 7,72
           ln_I23_over_I39_as_printed: -2,645
           read_variant: hybrid-high
@@ -1693,6 +1712,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '3'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 7,21
           ln_I23_over_I39_as_printed: -2,878
           read_variant: hybrid-high
@@ -1700,6 +1720,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '4'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,92
           ln_I23_over_I39_as_printed: -2,959
           read_variant: hybrid-high
@@ -1707,6 +1728,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '5'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,64
           ln_I23_over_I39_as_printed: -3,056
           read_variant: hybrid-high
@@ -1714,6 +1736,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '6'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,33
           ln_I23_over_I39_as_printed: -3,235
           read_variant: hybrid-high
@@ -1721,6 +1744,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '7'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,35
           ln_I23_over_I39_as_printed: -3,330
           read_variant: hybrid-high
@@ -1728,6 +1752,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '8'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,14
           ln_I23_over_I39_as_printed: -3,420
           read_variant: hybrid-high
@@ -1735,6 +1760,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '9'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 5,99
           ln_I23_over_I39_as_printed: -3,520
           read_variant: hybrid-high
@@ -1742,6 +1768,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '10'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 5,78
           ln_I23_over_I39_as_printed: -3,387
           read_variant: hybrid-high
@@ -1749,6 +1776,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '11'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 5,73
           ln_I23_over_I39_as_printed: -3,590
           read_variant: hybrid-high
@@ -1756,6 +1784,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '12'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 5,76
           ln_I23_over_I39_as_printed: -3,620
           read_variant: hybrid-high
@@ -1763,6 +1792,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '13'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 5,89
           ln_I23_over_I39_as_printed: -3,620
           read_variant: hybrid-high
@@ -1770,6 +1800,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '14'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 5,98
           ln_I23_over_I39_as_printed: -3,650
           read_variant: hybrid-high
@@ -1777,6 +1808,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '15'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,16
           ln_I23_over_I39_as_printed: -3,547
           read_variant: hybrid-high
@@ -1784,6 +1816,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '16'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,39
           ln_I23_over_I39_as_printed: -3,506
           read_variant: hybrid-high
@@ -1791,6 +1824,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '17'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 6,65
           ln_I23_over_I39_as_printed: -3,400
           read_variant: hybrid-high
@@ -1798,6 +1832,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '18'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 7,00
           ln_I23_over_I39_as_printed: -3,354
           read_variant: hybrid-high
@@ -1805,6 +1840,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '19'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 7,42
           ln_I23_over_I39_as_printed: -3,036
           read_variant: hybrid-high
@@ -1812,6 +1848,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '20'
           xAb_as_printed: 0,003
+          xAb_series_as_assigned: 0,003
           10^4_over_T_K_inverse_as_printed: 7,94
           ln_I23_over_I39_as_printed: -2,813
           read_variant: hybrid-high
@@ -1819,6 +1856,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '1'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 7,84
           ln_I23_over_I39_as_printed: -1,732
           read_variant: hybrid-high
@@ -1826,6 +1864,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '2'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 7,57
           ln_I23_over_I39_as_printed: -2,023
           read_variant: hybrid-high
@@ -1833,6 +1872,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '3'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 7,55
           ln_I23_over_I39_as_printed: -2,021
           read_variant: hybrid-high
@@ -1840,6 +1880,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '4'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 5,25
           ln_I23_over_I39_as_printed: -2,091
           read_variant: hybrid-high
@@ -1847,6 +1888,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '5'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 7,03
           ln_I23_over_I39_as_printed: -2,220
           read_variant: hybrid-high
@@ -1854,6 +1896,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '6'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,77
           ln_I23_over_I39_as_printed: -2,238
           read_variant: hybrid-high
@@ -1861,6 +1904,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '7'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,55
           ln_I23_over_I39_as_printed: -2,400
           read_variant: hybrid-high
@@ -1868,6 +1912,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '8'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,36
           ln_I23_over_I39_as_printed: -2,392
           read_variant: hybrid-high
@@ -1875,6 +1920,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '9'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,18
           ln_I23_over_I39_as_printed: -2,513
           read_variant: hybrid-high
@@ -1882,6 +1928,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '10'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,07
           ln_I23_over_I39_as_printed: -2,453
           read_variant: hybrid-high
@@ -1889,6 +1936,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '11'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 5,80
           ln_I23_over_I39_as_printed: -2,449
           read_variant: hybrid-high
@@ -1896,6 +1944,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '12'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 5,95
           ln_I23_over_I39_as_printed: -2,590
           read_variant: hybrid-high
@@ -1903,6 +1952,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '13'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,10
           ln_I23_over_I39_as_printed: -2,525
           read_variant: hybrid-high
@@ -1910,6 +1960,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '14'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,16
           ln_I23_over_I39_as_printed: -2,483
           read_variant: hybrid-high
@@ -1917,6 +1968,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '15'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,50
           ln_I23_over_I39_as_printed: -2,556
           read_variant: hybrid-high
@@ -1924,6 +1976,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '16'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,67
           ln_I23_over_I39_as_printed: -2,324
           read_variant: hybrid-high
@@ -1931,6 +1984,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '17'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,91
           ln_I23_over_I39_as_printed: -2,092
           read_variant: hybrid-high
@@ -1938,6 +1992,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '18'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 7,17
           ln_I23_over_I39_as_printed: -2,112
           read_variant: hybrid-high
@@ -1945,6 +2000,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '19'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 7,37
           ln_I23_over_I39_as_printed: -1,913
           read_variant: hybrid-high
@@ -1952,6 +2008,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '20'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 7,71
           ln_I23_over_I39_as_printed: -1,872
           read_variant: hybrid-high
@@ -1959,6 +2016,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '1'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 8,26
           ln_I23_over_I39_as_printed: -1,728
           read_variant: hybrid-high
@@ -1966,6 +2024,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '2'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 7,57
           ln_I23_over_I39_as_printed: -1,973
           read_variant: hybrid-high
@@ -1973,6 +2032,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '3'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 7,12
           ln_I23_over_I39_as_printed: -2,165
           read_variant: hybrid-high
@@ -1980,6 +2040,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '4'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,79
           ln_I23_over_I39_as_printed: -2,317
           read_variant: hybrid-high
@@ -1987,6 +2048,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '5'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,51
           ln_I23_over_I39_as_printed: -2,461
           read_variant: hybrid-high
@@ -1994,6 +2056,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '6'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,29
           ln_I23_over_I39_as_printed: -2,580
           read_variant: hybrid-high
@@ -2001,6 +2064,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '7'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,15
           ln_I23_over_I39_as_printed: -2,369
           read_variant: hybrid-high
@@ -2008,6 +2072,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '8'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,13
           ln_I23_over_I39_as_printed: -2,367
           read_variant: hybrid-high
@@ -2015,6 +2080,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '9'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 5,97
           ln_I23_over_I39_as_printed: -2,526
           read_variant: hybrid-high
@@ -2022,6 +2088,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '10'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 5,85
           ln_I23_over_I39_as_printed: -2,627
           read_variant: hybrid-high
@@ -2029,6 +2096,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '11'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 5,68
           ln_I23_over_I39_as_printed: -2,704
           read_variant: hybrid-high
@@ -2036,6 +2104,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '12'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 5,80
           ln_I23_over_I39_as_printed: -2,621
           read_variant: hybrid-high
@@ -2043,6 +2112,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '13'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 5,91
           ln_I23_over_I39_as_printed: -2,593
           read_variant: hybrid-high
@@ -2050,6 +2120,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '14'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,06
           ln_I23_over_I39_as_printed: -2,509
           read_variant: hybrid-high
@@ -2057,6 +2128,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '15'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,26
           ln_I23_over_I39_as_printed: -2,428
           read_variant: hybrid-high
@@ -2064,6 +2136,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '16'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,47
           ln_I23_over_I39_as_printed: -2,405
           read_variant: hybrid-high
@@ -2071,13 +2144,15 @@ species:
           assay_as_printed: '2'
           run_as_printed: '17'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,74
-          ln_I23_over_I39_as_printed: -2,227
+          ln_I23_over_I39_as_printed: -2,237
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '18'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 6,95
           ln_I23_over_I39_as_printed: -2,227
           read_variant: hybrid-high
@@ -2085,6 +2160,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '19'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 7,21
           ln_I23_over_I39_as_printed: -1,996
           read_variant: hybrid-high
@@ -2092,6 +2168,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '20'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 7,61
           ln_I23_over_I39_as_printed: -1,959
           read_variant: hybrid-high
@@ -2099,6 +2176,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '21'
           xAb_as_printed: 0,025
+          xAb_series_as_assigned: 0,025
           10^4_over_T_K_inverse_as_printed: 8,40
           ln_I23_over_I39_as_printed: -1,610
           read_variant: hybrid-high
@@ -2106,6 +2184,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '1'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 8,29
           ln_I23_over_I39_as_printed: -0,814
           read_variant: hybrid-high
@@ -2113,6 +2192,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '2'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 7,83
           ln_I23_over_I39_as_printed: -0,746
           read_variant: hybrid-high
@@ -2120,6 +2200,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '3'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 7,08
           ln_I23_over_I39_as_printed: -1,198
           read_variant: hybrid-high
@@ -2127,6 +2208,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '4'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,76
           ln_I23_over_I39_as_printed: -1,073
           read_variant: hybrid-high
@@ -2134,6 +2216,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '5'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,49
           ln_I23_over_I39_as_printed: -1,156
           read_variant: hybrid-high
@@ -2141,111 +2224,127 @@ species:
           assay_as_printed: '1'
           run_as_printed: '6'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,84
-          ln_I23_over_I39_as_printed: -1,136
+          ln_I23_over_I39_as_printed: -1,034
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '1'
           run_as_printed: '7'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 7,26
-          ln_I23_over_I39_as_printed: -1,034
+          ln_I23_over_I39_as_printed: -0,935
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '1'
           run_as_printed: '8'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 7,76
-          ln_I23_over_I39_as_printed: -0,935
+          ln_I23_over_I39_as_printed: -0,668
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '1'
           run_as_printed: '9'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 8,40
-          ln_I23_over_I39_as_printed: -0,668
+          ln_I23_over_I39_as_printed: -0,451
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '1'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 8,43
-          ln_I23_over_I39_as_printed: -0,451
+          ln_I23_over_I39_as_printed: -0,405
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '2'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 7,96
-          ln_I23_over_I39_as_printed: -0,405
+          ln_I23_over_I39_as_printed: -0,762
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '3'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 7,62
-          ln_I23_over_I39_as_printed: -0,762
+          ln_I23_over_I39_as_printed: -0,808
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '4'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 7,28
-          ln_I23_over_I39_as_printed: -0,808
+          ln_I23_over_I39_as_printed: -0,936
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '5'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 7,02
-          ln_I23_over_I39_as_printed: -0,936
+          ln_I23_over_I39_as_printed: -1,043
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '6'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,80
-          ln_I23_over_I39_as_printed: -1,043
+          ln_I23_over_I39_as_printed: -1,119
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '7'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,56
-          ln_I23_over_I39_as_printed: -1,119
+          ln_I23_over_I39_as_printed: -1,176
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '8'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,43
-          ln_I23_over_I39_as_printed: -1,176
+          ln_I23_over_I39_as_printed: -1,325
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '9'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,39
-          ln_I23_over_I39_as_printed: -1,325
+          ln_I23_over_I39_as_printed: -1,262
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '10'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,20
-          ln_I23_over_I39_as_printed: -1,262
+          ln_I23_over_I39_as_printed: -1,373
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '11'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,03
-          ln_I23_over_I39_as_printed: -1,373
+          ln_I23_over_I39_as_printed: -1,375
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '12'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 5,94
           ln_I23_over_I39_as_printed: -1,441
           read_variant: hybrid-high
@@ -2253,6 +2352,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '13'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 5,78
           ln_I23_over_I39_as_printed: -1,630
           read_variant: hybrid-high
@@ -2260,6 +2360,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '14'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 5,68
           ln_I23_over_I39_as_printed: -1,411
           read_variant: hybrid-high
@@ -2267,6 +2368,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '15'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 5,58
           ln_I23_over_I39_as_printed: -1,697
           read_variant: hybrid-high
@@ -2274,6 +2376,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '16'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 5,44
           ln_I23_over_I39_as_printed: -1,549
           read_variant: hybrid-high
@@ -2281,6 +2384,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '17'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 5,64
           ln_I23_over_I39_as_printed: -1,645
           read_variant: hybrid-high
@@ -2288,6 +2392,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '18'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 5,80
           ln_I23_over_I39_as_printed: -1,614
           read_variant: hybrid-high
@@ -2295,6 +2400,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '19'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,02
           ln_I23_over_I39_as_printed: -1,555
           read_variant: hybrid-high
@@ -2302,6 +2408,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '20'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,20
           ln_I23_over_I39_as_printed: -1,488
           read_variant: hybrid-high
@@ -2309,6 +2416,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '21'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,36
           ln_I23_over_I39_as_printed: -1,420
           read_variant: hybrid-high
@@ -2316,6 +2424,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '22'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 6,70
           ln_I23_over_I39_as_printed: -1,303
           read_variant: hybrid-high
@@ -2323,6 +2432,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '23'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 7,13
           ln_I23_over_I39_as_printed: -1,195
           read_variant: hybrid-high
@@ -2330,13 +2440,15 @@ species:
           assay_as_printed: '2'
           run_as_printed: '24'
           xAb_as_printed: 0,1
+          xAb_series_as_assigned: 0,1
           10^4_over_T_K_inverse_as_printed: 7,56
-          ln_I23_over_I39_as_printed: -0,746
+          ln_I23_over_I39_as_printed: -0,744
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '1'
           run_as_printed: '1'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 8,24
           ln_I23_over_I39_as_printed: 0,510
           read_variant: hybrid-high
@@ -2344,6 +2456,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '2'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 7,81
           ln_I23_over_I39_as_printed: 0,474
           read_variant: hybrid-high
@@ -2351,6 +2464,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '3'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 7,47
           ln_I23_over_I39_as_printed: 0,329
           read_variant: hybrid-high
@@ -2358,6 +2472,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '4'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 7,15
           ln_I23_over_I39_as_printed: 0,422
           read_variant: hybrid-high
@@ -2365,6 +2480,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '5'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,89
           ln_I23_over_I39_as_printed: 0,226
           read_variant: hybrid-high
@@ -2372,6 +2488,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '6'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,65
           ln_I23_over_I39_as_printed: 0,251
           read_variant: hybrid-high
@@ -2379,6 +2496,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '7'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,45
           ln_I23_over_I39_as_printed: 0,150
           read_variant: hybrid-high
@@ -2386,6 +2504,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '8'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,74
           ln_I23_over_I39_as_printed: 0,254
           read_variant: hybrid-high
@@ -2393,6 +2512,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '9'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 7,00
           ln_I23_over_I39_as_printed: 0,355
           read_variant: hybrid-high
@@ -2400,6 +2520,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '10'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 7,40
           ln_I23_over_I39_as_printed: 0,532
           read_variant: hybrid-high
@@ -2407,6 +2528,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '1'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 8,42
           ln_I23_over_I39_as_printed: 0,662
           read_variant: render
@@ -2414,6 +2536,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '2'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 7,75
           ln_I23_over_I39_as_printed: 0,523
           read_variant: render
@@ -2421,6 +2544,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '3'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 7,25
           ln_I23_over_I39_as_printed: 0,372
           read_variant: render
@@ -2428,6 +2552,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '4'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,88
           ln_I23_over_I39_as_printed: 0,182
           read_variant: render
@@ -2435,6 +2560,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '5'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,57
           ln_I23_over_I39_as_printed: 0,132
           read_variant: render
@@ -2442,6 +2568,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '6'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,30
           ln_I23_over_I39_as_printed: 0,104
           read_variant: render
@@ -2449,6 +2576,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '7'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,11
           ln_I23_over_I39_as_printed: 0,034
           read_variant: render
@@ -2456,6 +2584,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '8'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 5,93
           ln_I23_over_I39_as_printed: 0,045
           read_variant: render
@@ -2463,6 +2592,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '9'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 5,70
           ln_I23_over_I39_as_printed: -0,188
           read_variant: render
@@ -2470,6 +2600,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '10'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 5,82
           ln_I23_over_I39_as_printed: -0,150
           read_variant: render
@@ -2477,6 +2608,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '11'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 5,91
           ln_I23_over_I39_as_printed: -0,152
           read_variant: render
@@ -2484,6 +2616,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '12'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,02
           ln_I23_over_I39_as_printed: -0,136
           read_variant: render
@@ -2491,6 +2624,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '13'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,11
           ln_I23_over_I39_as_printed: -0,110
           read_variant: render
@@ -2498,6 +2632,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '14'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,23
           ln_I23_over_I39_as_printed: -0,085
           read_variant: render
@@ -2505,6 +2640,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '15'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,47
           ln_I23_over_I39_as_printed: -0,025
           read_variant: render
@@ -2512,6 +2648,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '16'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 6,70
           ln_I23_over_I39_as_printed: 0,092
           read_variant: render
@@ -2519,6 +2656,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '17'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 7,06
           ln_I23_over_I39_as_printed: 0,244
           read_variant: render
@@ -2526,6 +2664,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '18'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 7,47
           ln_I23_over_I39_as_printed: 0,413
           read_variant: render
@@ -2533,6 +2672,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '19'
           xAb_as_printed: 0,3
+          xAb_series_as_assigned: 0,3
           10^4_over_T_K_inverse_as_printed: 7,99
           ln_I23_over_I39_as_printed: 0,693
           read_variant: render
@@ -2540,6 +2680,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '1'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 6,85
           ln_I23_over_I39_as_printed: 1,115
           read_variant: hybrid-high
@@ -2547,6 +2688,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '2'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 6,58
           ln_I23_over_I39_as_printed: 1,082
           read_variant: hybrid-high
@@ -2554,6 +2696,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '3'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 6,44
           ln_I23_over_I39_as_printed: 1,053
           read_variant: hybrid-high
@@ -2561,6 +2704,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '4'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 6,26
           ln_I23_over_I39_as_printed: 0,996
           read_variant: hybrid-high
@@ -2568,6 +2712,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '5'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 6,11
           ln_I23_over_I39_as_printed: 0,962
           read_variant: hybrid-high
@@ -2575,6 +2720,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '6'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 6,00
           ln_I23_over_I39_as_printed: 0,884
           read_variant: hybrid-high
@@ -2582,6 +2728,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '7'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 5,89
           ln_I23_over_I39_as_printed: 0,847
           read_variant: hybrid-high
@@ -2589,6 +2736,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '8'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 5,81
           ln_I23_over_I39_as_printed: 0,808
           read_variant: hybrid-high
@@ -2596,6 +2744,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '9'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 5,72
           ln_I23_over_I39_as_printed: 0,714
           read_variant: hybrid-high
@@ -2603,6 +2752,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '10'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 5,63
           ln_I23_over_I39_as_printed: 0,693
           read_variant: hybrid-high
@@ -2610,6 +2760,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '11'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 5,75
           ln_I23_over_I39_as_printed: 0,700
           read_variant: hybrid-high
@@ -2617,6 +2768,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '12'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 5,87
           ln_I23_over_I39_as_printed: 0,765
           read_variant: hybrid-high
@@ -2624,6 +2776,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '13'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 6,01
           ln_I23_over_I39_as_printed: 0,796
           read_variant: hybrid-high
@@ -2631,6 +2784,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '14'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 6,18
           ln_I23_over_I39_as_printed: 0,885
           read_variant: hybrid-high
@@ -2638,6 +2792,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '15'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 6,37
           ln_I23_over_I39_as_printed: 0,934
           read_variant: hybrid-high
@@ -2645,6 +2800,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '16'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 6,62
           ln_I23_over_I39_as_printed: 1,070
           read_variant: hybrid-high
@@ -2652,6 +2808,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '17'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 6,95
           ln_I23_over_I39_as_printed: 1,420
           read_variant: hybrid-high
@@ -2659,6 +2816,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '18'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 7,29
           ln_I23_over_I39_as_printed: 1,285
           read_variant: hybrid-high
@@ -2666,6 +2824,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '19'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 7,82
           ln_I23_over_I39_as_printed: 1,408
           read_variant: hybrid-high
@@ -2673,6 +2832,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '20'
           xAb_as_printed: 0,5
+          xAb_series_as_assigned: 0,5
           10^4_over_T_K_inverse_as_printed: 8,33
           ln_I23_over_I39_as_printed: 1,664
           read_variant: hybrid-high
@@ -2680,6 +2840,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '1'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 7,36
           ln_I23_over_I39_as_printed: 1,705
           read_variant: hybrid-high
@@ -2687,6 +2848,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '2'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 7,09
           ln_I23_over_I39_as_printed: 1,652
           read_variant: hybrid-high
@@ -2694,6 +2856,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '3'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,81
           ln_I23_over_I39_as_printed: 1,600
           read_variant: hybrid-high
@@ -2701,6 +2864,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '4'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,61
           ln_I23_over_I39_as_printed: 1,433
           read_variant: hybrid-high
@@ -2708,6 +2872,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '5'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,37
           ln_I23_over_I39_as_printed: 1,381
           read_variant: hybrid-high
@@ -2715,6 +2880,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '6'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,16
           ln_I23_over_I39_as_printed: 1,494
           read_variant: hybrid-high
@@ -2722,6 +2888,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '7'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,02
           ln_I23_over_I39_as_printed: 1,376
           read_variant: hybrid-high
@@ -2729,6 +2896,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '8'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 5,87
           ln_I23_over_I39_as_printed: 1,168
           read_variant: hybrid-high
@@ -2736,6 +2904,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '9'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 5,72
           ln_I23_over_I39_as_printed: 1,168
           read_variant: hybrid-high
@@ -2743,6 +2912,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '10'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 5,81
           ln_I23_over_I39_as_printed: 1,298
           read_variant: hybrid-high
@@ -2750,6 +2920,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '11'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 5,91
           ln_I23_over_I39_as_printed: 1,263
           read_variant: hybrid-high
@@ -2757,6 +2928,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '12'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,00
           ln_I23_over_I39_as_printed: 1,272
           read_variant: hybrid-high
@@ -2764,6 +2936,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '13'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,11
           ln_I23_over_I39_as_printed: 1,284
           read_variant: hybrid-high
@@ -2771,6 +2944,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '14'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,23
           ln_I23_over_I39_as_printed: 1,281
           read_variant: hybrid-high
@@ -2778,6 +2952,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '15'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,42
           ln_I23_over_I39_as_printed: 1,337
           read_variant: hybrid-high
@@ -2785,6 +2960,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '16'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,68
           ln_I23_over_I39_as_printed: 1,467
           read_variant: hybrid-high
@@ -2792,6 +2968,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '17'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,99
           ln_I23_over_I39_as_printed: 1,583
           read_variant: hybrid-high
@@ -2799,6 +2976,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '18'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 7,42
           ln_I23_over_I39_as_printed: 1,740
           read_variant: hybrid-high
@@ -2806,6 +2984,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '19'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 7,95
           ln_I23_over_I39_as_printed: 2,117
           read_variant: hybrid-high
@@ -2813,6 +2992,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '20'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 8,68
           ln_I23_over_I39_as_printed: 2,451
           read_variant: hybrid-high
@@ -2820,6 +3000,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '1'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 8,06
           ln_I23_over_I39_as_printed: 2,020
           read_variant: hybrid-high
@@ -2827,6 +3008,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '2'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 7,45
           ln_I23_over_I39_as_printed: 1,818
           read_variant: hybrid-high
@@ -2834,6 +3016,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '3'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 7,05
           ln_I23_over_I39_as_printed: 1,681
           read_variant: hybrid-high
@@ -2841,6 +3024,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '4'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,45
           ln_I23_over_I39_as_printed: 1,416
           read_variant: hybrid-high
@@ -2848,6 +3032,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '5'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,23
           ln_I23_over_I39_as_printed: 1,378
           read_variant: hybrid-high
@@ -2855,6 +3040,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '6'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,02
           ln_I23_over_I39_as_printed: 1,223
           read_variant: hybrid-high
@@ -2862,6 +3048,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '7'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 5,89
           ln_I23_over_I39_as_printed: 1,149
           read_variant: hybrid-high
@@ -2869,6 +3056,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '8'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 5,75
           ln_I23_over_I39_as_printed: 1,091
           read_variant: hybrid-high
@@ -2876,6 +3064,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '9'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 5,66
           ln_I23_over_I39_as_printed: 1,229
           read_variant: hybrid-high
@@ -2883,6 +3072,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '10'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 5,73
           ln_I23_over_I39_as_printed: 1,250
           read_variant: hybrid-high
@@ -2890,6 +3080,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '11'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 5,90
           ln_I23_over_I39_as_printed: 1,177
           read_variant: hybrid-high
@@ -2897,6 +3088,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '12'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 5,99
           ln_I23_over_I39_as_printed: 1,212
           read_variant: hybrid-high
@@ -2904,6 +3096,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '13'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,07
           ln_I23_over_I39_as_printed: 1,253
           read_variant: hybrid-high
@@ -2911,6 +3104,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '14'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,18
           ln_I23_over_I39_as_printed: 1,286
           read_variant: hybrid-high
@@ -2918,6 +3112,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '15'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,33
           ln_I23_over_I39_as_printed: 1,368
           read_variant: hybrid-high
@@ -2925,6 +3120,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '16'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,56
           ln_I23_over_I39_as_printed: 1,455
           read_variant: hybrid-high
@@ -2932,6 +3128,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '17'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 6,86
           ln_I23_over_I39_as_printed: 1,609
           read_variant: hybrid-high
@@ -2939,6 +3136,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '18'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 7,25
           ln_I23_over_I39_as_printed: 1,804
           read_variant: hybrid-high
@@ -2946,6 +3144,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '19'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 7,54
           ln_I23_over_I39_as_printed: 1,952
           read_variant: hybrid-high
@@ -2953,6 +3152,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '20'
           xAb_as_printed: 0,6
+          xAb_series_as_assigned: 0,6
           10^4_over_T_K_inverse_as_printed: 8,19
           ln_I23_over_I39_as_printed: 2,178
           read_variant: hybrid-high
@@ -2960,6 +3160,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '1'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 7,50
           ln_I23_over_I39_as_printed: 2,241
           read_variant: hybrid-high
@@ -2967,6 +3168,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '2'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 7,13
           ln_I23_over_I39_as_printed: 2,128
           read_variant: hybrid-high
@@ -2974,6 +3176,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '3'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,89
           ln_I23_over_I39_as_printed: 2,008
           read_variant: hybrid-high
@@ -2981,6 +3184,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '4'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,66
           ln_I23_over_I39_as_printed: 1,958
           read_variant: hybrid-high
@@ -2988,6 +3192,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '5'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,45
           ln_I23_over_I39_as_printed: 1,883
           read_variant: hybrid-high
@@ -2995,6 +3200,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '6'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,30
           ln_I23_over_I39_as_printed: 1,853
           read_variant: hybrid-high
@@ -3002,6 +3208,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '7'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,13
           ln_I23_over_I39_as_printed: 1,764
           read_variant: hybrid-high
@@ -3009,6 +3216,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '8'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,25
           ln_I23_over_I39_as_printed: 1,770
           read_variant: hybrid-high
@@ -3016,6 +3224,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '9'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,39
           ln_I23_over_I39_as_printed: 1,817
           read_variant: hybrid-high
@@ -3023,6 +3232,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '10'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,63
           ln_I23_over_I39_as_printed: 1,938
           read_variant: hybrid-high
@@ -3030,6 +3240,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '11'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,91
           ln_I23_over_I39_as_printed: 2,051
           read_variant: hybrid-high
@@ -3037,6 +3248,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '12'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 7,36
           ln_I23_over_I39_as_printed: 2,176
           read_variant: hybrid-high
@@ -3044,6 +3256,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '13'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 7,76
           ln_I23_over_I39_as_printed: 2,360
           read_variant: hybrid-high
@@ -3051,6 +3264,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '1'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 7,87
           ln_I23_over_I39_as_printed: 2,277
           read_variant: hybrid-high
@@ -3058,6 +3272,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '2'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 7,45
           ln_I23_over_I39_as_printed: 2,110
           read_variant: hybrid-high
@@ -3065,6 +3280,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '3'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 7,15
           ln_I23_over_I39_as_printed: 2,087
           read_variant: hybrid-high
@@ -3072,6 +3288,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '4'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,78
           ln_I23_over_I39_as_printed: 1,877
           read_variant: hybrid-high
@@ -3079,6 +3296,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '5'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,51
           ln_I23_over_I39_as_printed: 1,850
           read_variant: hybrid-high
@@ -3086,6 +3304,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '6'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,29
           ln_I23_over_I39_as_printed: 1,769
           read_variant: hybrid-high
@@ -3093,6 +3312,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '7'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,11
           ln_I23_over_I39_as_printed: 1,723
           read_variant: hybrid-high
@@ -3100,6 +3320,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '8'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 5,95
           ln_I23_over_I39_as_printed: 1,673
           read_variant: hybrid-high
@@ -3107,6 +3328,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '9'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 5,82
           ln_I23_over_I39_as_printed: 1,690
           read_variant: hybrid-high
@@ -3114,6 +3336,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '10'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 5,70
           ln_I23_over_I39_as_printed: 1,470
           read_variant: hybrid-high
@@ -3121,6 +3344,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '11'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 5,79
           ln_I23_over_I39_as_printed: 1,599
           read_variant: hybrid-high
@@ -3128,6 +3352,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '12'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 5,87
           ln_I23_over_I39_as_printed: 1,671
           read_variant: hybrid-high
@@ -3135,6 +3360,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '13'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 5,92
           ln_I23_over_I39_as_printed: 1,638
           read_variant: hybrid-high
@@ -3142,6 +3368,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '14'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,06
           ln_I23_over_I39_as_printed: 1,678
           read_variant: hybrid-high
@@ -3149,6 +3376,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '15'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,15
           ln_I23_over_I39_as_printed: 1,805
           read_variant: hybrid-high
@@ -3156,6 +3384,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '16'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,31
           ln_I23_over_I39_as_printed: 1,792
           read_variant: hybrid-high
@@ -3163,6 +3392,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '17'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,42
           ln_I23_over_I39_as_printed: 1,843
           read_variant: hybrid-high
@@ -3170,6 +3400,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '18'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,58
           ln_I23_over_I39_as_printed: 1,916
           read_variant: hybrid-high
@@ -3177,6 +3408,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '19'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,76
           ln_I23_over_I39_as_printed: 2,009
           read_variant: hybrid-high
@@ -3184,13 +3416,15 @@ species:
           assay_as_printed: '2'
           run_as_printed: '20'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 6,98
-          ln_I23_over_I39_as_printed: 2,006
+          ln_I23_over_I39_as_printed: 2,066
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '21'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 7,23
           ln_I23_over_I39_as_printed: 2,142
           read_variant: hybrid-high
@@ -3198,6 +3432,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '22'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 7,51
           ln_I23_over_I39_as_printed: 2,340
           read_variant: hybrid-high
@@ -3205,6 +3440,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '23'
           xAb_as_printed: 0,7
+          xAb_series_as_assigned: 0,7
           10^4_over_T_K_inverse_as_printed: 7,91
           ln_I23_over_I39_as_printed: 2,448
           read_variant: hybrid-high
@@ -3212,6 +3448,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '1'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,99
           ln_I23_over_I39_as_printed: 3,450
           read_variant: hybrid-high
@@ -3219,6 +3456,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '2'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,79
           ln_I23_over_I39_as_printed: 3,346
           read_variant: hybrid-high
@@ -3226,6 +3464,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '3'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,63
           ln_I23_over_I39_as_printed: 3,300
           read_variant: hybrid-high
@@ -3233,6 +3472,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '4'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,43
           ln_I23_over_I39_as_printed: 3,247
           read_variant: hybrid-high
@@ -3240,6 +3480,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '5'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,29
           ln_I23_over_I39_as_printed: 3,080
           read_variant: hybrid-high
@@ -3247,6 +3488,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '6'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,17
           ln_I23_over_I39_as_printed: 3,140
           read_variant: hybrid-high
@@ -3254,6 +3496,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '7'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 5,91
           ln_I23_over_I39_as_printed: 3,036
           read_variant: hybrid-high
@@ -3261,6 +3504,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '8'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 5,80
           ln_I23_over_I39_as_printed: 3,296
           read_variant: hybrid-high
@@ -3268,6 +3512,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '9'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,17
           ln_I23_over_I39_as_printed: 3,145
           read_variant: hybrid-high
@@ -3275,6 +3520,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '10'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,40
           ln_I23_over_I39_as_printed: 3,228
           read_variant: hybrid-high
@@ -3282,6 +3528,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '11'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,93
           ln_I23_over_I39_as_printed: 3,143
           read_variant: hybrid-high
@@ -3289,6 +3536,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '12'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 7,33
           ln_I23_over_I39_as_printed: 3,634
           read_variant: hybrid-high
@@ -3296,6 +3544,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '13'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 7,66
           ln_I23_over_I39_as_printed: 3,689
           read_variant: hybrid-high
@@ -3303,6 +3552,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '1'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 7,06
           ln_I23_over_I39_as_printed: 3,535
           read_variant: hybrid-high
@@ -3310,6 +3560,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '2'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,85
           ln_I23_over_I39_as_printed: 3,402
           read_variant: hybrid-high
@@ -3317,6 +3568,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '3'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,65
           ln_I23_over_I39_as_printed: 3,344
           read_variant: hybrid-high
@@ -3324,6 +3576,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '4'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,47
           ln_I23_over_I39_as_printed: 3,250
           read_variant: hybrid-high
@@ -3331,6 +3584,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '5'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,26
           ln_I23_over_I39_as_printed: 3,124
           read_variant: hybrid-high
@@ -3338,6 +3592,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '6'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 5,91
           ln_I23_over_I39_as_printed: 3,044
           read_variant: hybrid-high
@@ -3345,6 +3600,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '7'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 5,90
           ln_I23_over_I39_as_printed: 3,050
           read_variant: hybrid-high
@@ -3352,6 +3608,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '8'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,30
           ln_I23_over_I39_as_printed: 3,208
           read_variant: hybrid-high
@@ -3359,6 +3616,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '9'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,52
           ln_I23_over_I39_as_printed: 3,326
           read_variant: hybrid-high
@@ -3366,6 +3624,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '10'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 6,78
           ln_I23_over_I39_as_printed: 3,416
           read_variant: hybrid-high
@@ -3373,6 +3632,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '11'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 7,15
           ln_I23_over_I39_as_printed: 3,500
           read_variant: hybrid-high
@@ -3380,6 +3640,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '12'
           xAb_as_printed: 0,9
+          xAb_series_as_assigned: 0,9
           10^4_over_T_K_inverse_as_printed: 7,97
           ln_I23_over_I39_as_printed: 3,790
           read_variant: hybrid-high
@@ -3387,6 +3648,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '1'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,68
           ln_I23_over_I39_as_printed: 4,601
           read_variant: hybrid-high
@@ -3394,6 +3656,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '2'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,49
           ln_I23_over_I39_as_printed: 4,525
           read_variant: hybrid-high
@@ -3401,6 +3664,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '3'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,27
           ln_I23_over_I39_as_printed: 4,516
           read_variant: hybrid-high
@@ -3408,6 +3672,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '4'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,09
           ln_I23_over_I39_as_printed: 4,331
           read_variant: hybrid-high
@@ -3415,6 +3680,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '5'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 5,98
           ln_I23_over_I39_as_printed: 4,447
           read_variant: hybrid-high
@@ -3422,6 +3688,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '6'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 5,81
           ln_I23_over_I39_as_printed: 4,352
           read_variant: hybrid-high
@@ -3429,6 +3696,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '7'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 5,96
           ln_I23_over_I39_as_printed: 4,496
           read_variant: hybrid-high
@@ -3436,6 +3704,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '8'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,19
           ln_I23_over_I39_as_printed: 4,512
           read_variant: hybrid-high
@@ -3443,6 +3712,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '9'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,37
           ln_I23_over_I39_as_printed: 4,623
           read_variant: hybrid-high
@@ -3450,6 +3720,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '10'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,61
           ln_I23_over_I39_as_printed: 4,756
           read_variant: hybrid-high
@@ -3457,6 +3728,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '11'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,85
           ln_I23_over_I39_as_printed: 4,740
           read_variant: hybrid-high
@@ -3464,6 +3736,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '12'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 7,12
           ln_I23_over_I39_as_printed: 4,828
           read_variant: hybrid-high
@@ -3471,6 +3744,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '13'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 7,56
           ln_I23_over_I39_as_printed: 5,054
           read_variant: hybrid-high
@@ -3478,6 +3752,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '14'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 7,89
           ln_I23_over_I39_as_printed: 5,085
           read_variant: hybrid-high
@@ -3485,6 +3760,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '1'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 8,22
           ln_I23_over_I39_as_printed: 5,247
           read_variant: hybrid-high
@@ -3492,6 +3768,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '2'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 7,18
           ln_I23_over_I39_as_printed: 4,852
           read_variant: hybrid-high
@@ -3499,6 +3776,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '3'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,95
           ln_I23_over_I39_as_printed: 4,815
           read_variant: hybrid-high
@@ -3506,6 +3784,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '4'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,75
           ln_I23_over_I39_as_printed: 4,642
           read_variant: hybrid-high
@@ -3513,6 +3792,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '5'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,43
           ln_I23_over_I39_as_printed: 4,566
           read_variant: hybrid-high
@@ -3520,6 +3800,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '6'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,13
           ln_I23_over_I39_as_printed: 4,449
           read_variant: hybrid-high
@@ -3527,6 +3808,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '7'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 5,96
           ln_I23_over_I39_as_printed: 4,349
           read_variant: hybrid-high
@@ -3534,6 +3816,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '8'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 5,82
           ln_I23_over_I39_as_printed: 4,260
           read_variant: hybrid-high
@@ -3541,6 +3824,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '9'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 5,69
           ln_I23_over_I39_as_printed: 4,273
           read_variant: hybrid-high
@@ -3548,6 +3832,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '10'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 5,77
           ln_I23_over_I39_as_printed: 4,260
           read_variant: hybrid-high
@@ -3555,6 +3840,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '11'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 5,89
           ln_I23_over_I39_as_printed: 4,408
           read_variant: hybrid-high
@@ -3562,6 +3848,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '12'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,03
           ln_I23_over_I39_as_printed: 4,451
           read_variant: hybrid-high
@@ -3569,6 +3856,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '13'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,18
           ln_I23_over_I39_as_printed: 4,524
           read_variant: hybrid-high
@@ -3576,6 +3864,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '14'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,29
           ln_I23_over_I39_as_printed: 4,609
           read_variant: hybrid-high
@@ -3583,6 +3872,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '15'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,50
           ln_I23_over_I39_as_printed: 4,669
           read_variant: hybrid-high
@@ -3590,6 +3880,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '16'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 6,78
           ln_I23_over_I39_as_printed: 4,625
           read_variant: hybrid-high
@@ -3597,20 +3888,25 @@ species:
           assay_as_printed: '2'
           run_as_printed: '17'
           xAb_as_printed: 0,975
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 7,11
           ln_I23_over_I39_as_printed: 4,895
           read_variant: hybrid-high
         - pdf_page: 10
           assay_as_printed: '2'
           run_as_printed: '18'
-          xAb_as_printed: 0,975
+          xAb_as_printed: 0,875
+          xAb_series_as_assigned: 0,975
           10^4_over_T_K_inverse_as_printed: 7,65
           ln_I23_over_I39_as_printed: 5,116
           read_variant: hybrid-high
+          xAb_series_assignment_note: The printed xAb cell is 0,875 on the final row of the xAb=0,975 assay 2 series;
+            retain the literal and record the apparent source typo without normalizing it.
         - pdf_page: 11
           assay_as_printed: '1'
           run_as_printed: '1'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,88
           ln_I23_over_I39_as_printed: 5,010
           read_variant: hybrid-high
@@ -3618,6 +3914,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '2'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,70
           ln_I23_over_I39_as_printed: 4,970
           read_variant: hybrid-high
@@ -3625,6 +3922,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '3'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,51
           ln_I23_over_I39_as_printed: 4,899
           read_variant: hybrid-high
@@ -3632,6 +3930,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '4'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,30
           ln_I23_over_I39_as_printed: 4,749
           read_variant: hybrid-high
@@ -3639,6 +3938,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '5'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,52
           ln_I23_over_I39_as_printed: 4,889
           read_variant: hybrid-high
@@ -3646,6 +3946,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '6'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,78
           ln_I23_over_I39_as_printed: 4,934
           read_variant: hybrid-high
@@ -3653,6 +3954,7 @@ species:
           assay_as_printed: '1'
           run_as_printed: '7'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 7,09
           ln_I23_over_I39_as_printed: 5,100
           read_variant: hybrid-high
@@ -3660,6 +3962,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '1'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,87
           ln_I23_over_I39_as_printed: 5,116
           read_variant: hybrid-high
@@ -3667,6 +3970,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '2'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,60
           ln_I23_over_I39_as_printed: 4,888
           read_variant: hybrid-high
@@ -3674,6 +3978,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '3'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,37
           ln_I23_over_I39_as_printed: 4,787
           read_variant: hybrid-high
@@ -3681,6 +3986,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '4'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,15
           ln_I23_over_I39_as_printed: 4,750
           read_variant: hybrid-high
@@ -3688,6 +3994,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '5'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 5,97
           ln_I23_over_I39_as_printed: 4,573
           read_variant: hybrid-high
@@ -3695,6 +4002,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '6'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 5,83
           ln_I23_over_I39_as_printed: 4,605
           read_variant: hybrid-high
@@ -3702,6 +4010,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '7'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 5,72
           ln_I23_over_I39_as_printed: 4,451
           read_variant: hybrid-high
@@ -3709,6 +4018,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '8'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 5,59
           ln_I23_over_I39_as_printed: 4,394
           read_variant: hybrid-high
@@ -3716,13 +4026,15 @@ species:
           assay_as_printed: '2'
           run_as_printed: '9'
           xAb_as_printed: 0,997
-          10^4_over_T_K_inverse_as_printed: 5,63
+          xAb_series_as_assigned: 0,997
+          10^4_over_T_K_inverse_as_printed: 5,65
           ln_I23_over_I39_as_printed: 4,468
           read_variant: hybrid-high
         - pdf_page: 11
           assay_as_printed: '2'
           run_as_printed: '10'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 5,73
           ln_I23_over_I39_as_printed: 4,566
           read_variant: hybrid-high
@@ -3730,6 +4042,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '11'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 5,78
           ln_I23_over_I39_as_printed: 4,631
           read_variant: hybrid-high
@@ -3737,6 +4050,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '12'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 5,89
           ln_I23_over_I39_as_printed: 4,457
           read_variant: hybrid-high
@@ -3744,6 +4058,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '13'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 5,96
           ln_I23_over_I39_as_printed: 4,661
           read_variant: hybrid-high
@@ -3751,6 +4066,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '14'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,07
           ln_I23_over_I39_as_printed: 4,619
           read_variant: hybrid-high
@@ -3758,6 +4074,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '15'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,07
           ln_I23_over_I39_as_printed: 4,762
           read_variant: hybrid-high
@@ -3765,6 +4082,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '16'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,20
           ln_I23_over_I39_as_printed: 4,930
           read_variant: hybrid-high
@@ -3772,6 +4090,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '17'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,31
           ln_I23_over_I39_as_printed: 4,956
           read_variant: hybrid-high
@@ -3779,6 +4098,7 @@ species:
           assay_as_printed: '2'
           run_as_printed: '18'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,43
           ln_I23_over_I39_as_printed: 5,043
           read_variant: hybrid-high
@@ -3786,9 +4106,12 @@ species:
           assay_as_printed: '2'
           run_as_printed: '19'
           xAb_as_printed: 0,997
+          xAb_series_as_assigned: 0,997
           10^4_over_T_K_inverse_as_printed: 6,67
           ln_I23_over_I39_as_printed: 5,096
           read_variant: hybrid-high
+        row_binding_note: xAb_as_printed preserves the literal composition cell. xAb_series_as_assigned records
+          the appendix series that owns the assay/run row.
     - observation_id: rogez_1983_kems_cell_and_calibration
       type: apparatus
       locator:
