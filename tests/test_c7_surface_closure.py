@@ -461,6 +461,7 @@ def test_mixed_asteroid_zero_keeps_neutral_pressure():
     sim = simulation('s_type_asteroid_silicate')
     try:
         sim.melt.temperature_C = 1070.0
+        sim._reset_redox_source_diagnostics_for_hour()
         sim._frozen_evaporation_carriers = frozenset({'CrO2', 'CrO3', 'SiO2_gas'})
         sim._reaction_pO2_bar = 0.0
         assert sim._evaporation_carrier_zero_reason() == 'frozen_consuming_carriers_at_zero_oxygen'
@@ -469,6 +470,8 @@ def test_mixed_asteroid_zero_keeps_neutral_pressure():
         assert result.vapor_pressures_Pa.get('CrO2', 0.0) == 0.0
         assert result.vapor_pressures_Pa.get('CrO3', 0.0) == 0.0
         assert result.vapor_pressures_Pa['SiO2_gas'] > 0.0
+        legacy = sim._internal_analytical_equilibrium()
+        assert legacy.vapor_pressures_Pa == result.vapor_pressures_Pa
         flux = sim._calculate_evaporation(result)
         assert flux.species_kg_hr['SiO2_gas'] > 0.0
         solved = sim._solve_evaporative_oxygen_boundary(result)
@@ -527,41 +530,59 @@ def test_transport_bounded_batch_retains_internal_buffer_coproduct():
 
 
 def test_lunar_shaped_debit_resettles_at_inward_endpoint():
-    from engines.builtin.fe_redox_respeciation import BuiltinFeRedoxRespeciationProvider
-    from tests.chemistry.test_builtin_fe_redox_respeciation_provider import _request
+    from simulator.state import EvaporationFlux
     from tests.test_c7_pressure_excess import oxygen_transport
 
     bulk = 7.706491106080192e-26
     area_dt = 0.41006003303200633 * 3600.0
     stored = 0.00045222020932088954
     debit = 5.7520419261263434e-18 * area_dt
-    provider = BuiltinFeRedoxRespeciationProvider()
-    template = {'process.cleaned_melt': {'FeO': 10.0, 'SiO2': 20.0},
-                'process.overhead_gas': {'O2': 10.0}}
-    full = provider.dispatch(_request({}, template, fO2_log=-3.0))
-    # Scale the actual provider's finite Fe parcel to the captured debit;
-    # all composition ratios and thermodynamic inputs remain identical.
-    factor = debit / full.transition.debits['process.overhead_gas']['O2']
-    accounts = deepcopy(template)
-    accounts['process.cleaned_melt'] = {s: n * factor for s, n in template['process.cleaned_melt'].items()}
+    sim = simulation('s_type_asteroid_silicate')
+    try:
+        sim.melt.temperature_C = 1145.0
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+        sim.atom_ledger.load_external_mol('process.overhead_gas', {'O2': 1.0},
+            material_origin='feedstock', source='test unconstrained debit inventory')
+        sim._frozen_evaporation_carriers = frozenset({'Na', 'CrO2', 'CrO3'})
+        flux = EvaporationFlux(species_kg_hr={
+            'Na': 0.001, 'CrO2': 5.808349183114205e-10,
+            'CrO3': 3.3342076872338656e-10})
+        flux.update_totals()
+        full = sim._detached_evaporation_projection()
+        start = len(full.atom_ledger.transitions)
+        full._apply_evaporation_carrier_batch(deepcopy(flux))
+        amounts, _ = full._evaporation_signed_amounts(start, 0.0)
+        # Scale actual balanced carrier legs to the captured lunar debit and
+        # buffer coproduct, rather than copying a residual or stoichiometry law.
+        for species in ('CrO2', 'CrO3'):
+            flux.species_kg_hr[species] *= debit / -amounts['gas:O2']
+        flux.species_kg_hr['Na'] *= stored * area_dt / amounts['storage']
+        flux.update_totals()
 
-    def point(delta, *, bounded=False):
-        j = oxygen_transport(bulk, delta, film=True).flux_kg_s_m2 / 0.031998
-        controls = {'internal_o2_capacity_mol': max(0.0, -j) * area_dt} if bounded else {}
-        response = provider.dispatch(_request({}, accounts, fO2_log=-3.0, control_inputs=controls))
-        taken = response.transition.debits['process.overhead_gas']['O2']
-        return _SurfaceOxygenEvaluation(
-            bulk + delta, bulk, j, 0.0, {'internal_coproduct': stored},
-            -2.0 * taken / area_dt, 0.0, stored, -taken / area_dt,
-            oxygen_uptake_transport_limited=(
-                'oxygen_uptake_transport_limited' in response.diagnostic.get('flags', ())))
+        def point(delta, *, bounded=False):
+            j = oxygen_transport(bulk, delta, film=True).flux_kg_s_m2 / 0.031998
+            trial = sim._detached_evaporation_projection()
+            start = len(trial.atom_ledger.transitions)
+            trial._apply_evaporation_carrier_batch(deepcopy(flux),
+                oxygen_uptake_capacity_mol=(max(0.0, -j) * area_dt if bounded else None))
+            amounts, _ = trial._evaporation_signed_amounts(start, 0.0)
+            return _SurfaceOxygenEvaluation(
+                bulk + delta, bulk, j, 0.0,
+                {k: v / area_dt for k, v in amounts.items() if k.startswith('source:')},
+                2.0 * amounts['ferric_oxygen'] / area_dt,
+                amounts['other_oxygen'] / area_dt, amounts['storage'] / area_dt,
+                amounts['gas:O2'] / area_dt,
+                oxygen_uptake_transport_limited=trial._oxygen_uptake_transport_limited)
 
-    solved = _solve_surface_oxygen_balance(point, bulk_pO2_bar=bulk,
-        settle_inward_endpoint=lambda delta: point(delta, bounded=True))
-    assert solved.reaction_pO2_bar == 0.0
-    assert solved.oxygen_uptake_transport_limited
-    assert solved.storage_mol_m2_s == stored
-    assert solved.overhead_oxygen_mol_m2_s == pytest.approx(solved.oxygen_flux_mol_m2_s, rel=1e-12, abs=0.0)
+        solved = _solve_surface_oxygen_balance(point, bulk_pO2_bar=bulk,
+            settle_inward_endpoint=lambda delta: point(delta, bounded=True))
+        assert solved.reaction_pO2_bar == 0.0
+        assert solved.oxygen_uptake_transport_limited
+        assert solved.storage_mol_m2_s == pytest.approx(stored, rel=1e-12, abs=0.0)
+        assert solved.overhead_oxygen_mol_m2_s == pytest.approx(solved.oxygen_flux_mol_m2_s, rel=1e-12, abs=0.0)
+    finally:
+        close_test_owned_magemin_backend(sim)
 
 
 def test_finite_consuming_forcing_at_positive_bulk_still_refuses():
