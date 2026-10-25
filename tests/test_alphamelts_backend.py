@@ -957,6 +957,56 @@ def test_alphamelts_python_liquidus_finder_uses_findliq_gate():
     assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
 
 
+@pytest.mark.parametrize(
+    "backend_type", [AlphaMELTSBackend, ThermoEngineBackend]
+)
+def test_melts_liquidus_finder_forwards_not_an_input_to_each_sample(backend_type):
+    class FixedValenceBackend(backend_type):
+        def __init__(self):
+            super().__init__()
+            self._mode = "thermoengine"
+            self.sample_calls = []
+
+        def is_available(self):
+            return True
+
+        def equilibrate(self, temperature_C, **kwargs):
+            self.sample_calls.append(kwargs)
+            liquid_fraction = max(
+                0.0, min(1.0, (float(temperature_C) - 1000.0) / 300.0)
+            )
+            return EquilibriumResult(
+                temperature_C=float(temperature_C),
+                pressure_bar=float(kwargs["pressure_bar"]),
+                liquid_fraction=liquid_fraction,
+                phases_present=["liq"] if liquid_fraction > 0.0 else ["ol"],
+                phase_masses_kg={
+                    "liq": liquid_fraction,
+                    "ol": 1.0 - liquid_fraction,
+                },
+                status="ok",
+            )
+
+    backend = FixedValenceBackend()
+    result = backend.find_liquidus_solidus(
+        composition_kg={"SiO2": 60.0, "CaO": 40.0},
+        fO2_log=None,
+        redox_mode="not_an_input",
+        pressure_bar=1.0,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == "ok"
+    assert backend.sample_calls
+    assert all(call["fO2_log"] is None for call in backend.sample_calls)
+    assert all(
+        call["redox_mode"] == "not_an_input" for call in backend.sample_calls
+    )
+
+
 def test_thermoengine_liquidus_scan_records_absolute_sample_targets(monkeypatch):
     backend = ThermoEngineBackend()
     backend._mode = 'thermoengine'
@@ -1736,6 +1786,7 @@ def test_alphamelts_subprocess_liquidus_finder_selects_native_mode():
             assert kwargs['subprocess_run_mode'] is (
                 AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER
             )
+            assert kwargs['redox_mode'] == 'not_an_input'
             return EquilibriumResult(
                 temperature_C=1300.0,
                 pressure_bar=float(kwargs.get('pressure_bar', 1e-6)),
@@ -1756,6 +1807,7 @@ def test_alphamelts_subprocess_liquidus_finder_selects_native_mode():
         max_T_C=1500.0,
         scan_step_C=100.0,
         tolerance_C=1.0,
+        redox_mode='not_an_input',
     )
 
     assert result.status == 'ok'

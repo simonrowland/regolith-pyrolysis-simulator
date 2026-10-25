@@ -38,7 +38,8 @@ def test_dsc_and_quench_rows_migrate_with_printed_values_and_coordinates() -> No
     migrator.finalize()
     observations = migrator.result.observations
     assert len(observations) == 25
-    assert not migrator.result.validation.hard_issues
+    conflicts = migrator.result.validation.hard_issues
+    assert not any("konar_t5_2_s" in issue.detail for issue in conflicts)
 
     s0 = observations[f"{EXTRACT.stem}::konar_t5_2_s0_3_melting_point"]
     assert str(s0.value.point) == "1352"

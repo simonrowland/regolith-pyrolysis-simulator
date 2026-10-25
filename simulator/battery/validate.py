@@ -328,6 +328,50 @@ def _table_pair_payload(delta_obs: Observation, log_obs: Observation) -> dict | 
     }
 
 
+def _transition_temperature_identity_conflicts(
+    observations: Iterable[Observation],
+) -> list[ValidationIssue]:
+    by_species: dict[str, list[Observation]] = {}
+    for observation in observations:
+        identity = observation.identity
+        if (
+            not isinstance(identity, Identity)
+            or quantity_token(identity) is not Quantity.TRANSITION_TEMPERATURE
+            or observation.admission.status is not AdmissionStatus.ADMITTED
+            or observation.value.kind is not ValueKind.POINT
+            or observation.value.point is None
+        ):
+            continue
+        by_species.setdefault(identity.species.formula, []).append(observation)
+
+    issues: list[ValidationIssue] = []
+    for rows in by_species.values():
+        for index, left in enumerate(rows):
+            for right in rows[index + 1 :]:
+                if left.value.point == right.value.point:
+                    continue
+                equal = identity_equal(left.identity, right.identity)
+                if equal.kind is not IdentityEqualKind.EQUAL:
+                    continue
+                first, second = sorted(
+                    (
+                        (left.observation_id, left.value.point),
+                        (right.observation_id, right.value.point),
+                    ),
+                    key=lambda item: item[0],
+                )
+                issues.append(
+                    _issue(
+                        f"observation[{first[0]},{second[0]}]",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "identity-equal admitted transition-temperature observations "
+                        f"have different point values: {first[0]}={first[1]} K, "
+                        f"{second[0]}={second[1]} K",
+                    )
+                )
+    return issues
+
+
 def build_printed_thermo_index(
     observations: Mapping[str, Observation],
 ) -> dict[tuple[str, Quantity], tuple[Observation, ...]]:
@@ -2358,30 +2402,7 @@ def validate_corpus(
                 context_ids=context_ids,
             )
         )
-    admitted_transition_points = [
-        observation
-        for observation in obs_map.values()
-        if observation.admission.status is AdmissionStatus.ADMITTED
-        and quantity_token(observation.identity) is Quantity.TRANSITION_TEMPERATURE
-        and observation.value.kind is ValueKind.POINT
-    ]
-    for index, left in enumerate(admitted_transition_points):
-        for right in admitted_transition_points[index + 1 :]:
-            equal = identity_equal(left.identity, right.identity)
-            if (
-                equal.kind is IdentityEqualKind.EQUAL
-                and left.value.point != right.value.point
-            ):
-                issues.append(
-                    _issue(
-                        f"observation[{left.observation_id},{right.observation_id}]",
-                        RefusalReason.CONDITIONAL_FIELD,
-                        "identity-equal admitted transition-temperature observations "
-                        f"have different point values: {left.observation_id}="
-                        f"{left.value.point} K, {right.observation_id}="
-                        f"{right.value.point} K",
-                    )
-                )
+    issues.extend(_transition_temperature_identity_conflicts(obs_map.values()))
     for cycle in _ancestry_cycles(obs_map):
         issues.append(
             _issue(

@@ -2984,7 +2984,13 @@ def test_thermoengine_numeric_activity_outside_band_is_gamma_extrapolated(
         takes_fo2=False,
         supports_intrinsic_fo2=True,
     )
-    monkeypatch.setattr(battery, "open_battery_engine", lambda _name: handle)
+    opened: list[str] = []
+
+    def open_probe_engine(name: str) -> EngineHandle:
+        opened.append(name)
+        return handle
+
+    monkeypatch.setattr(battery, "open_battery_engine", open_probe_engine)
 
     def successful_cell(engine_handle, pot, **kwargs):
         return EquilibrateCell(
@@ -3004,27 +3010,42 @@ def test_thermoengine_numeric_activity_outside_band_is_gamma_extrapolated(
             hostname="test",
         )
 
-    monkeypatch.setattr(battery, "equilibrate_cell", successful_cell)
-    prediction = predict_with_engine(
-        Engine.THERMOENGINE,
-        reference,
-        experiment=experiment,
-        handles={Engine.THERMOENGINE.value: handle},
-        isolated=False,
+    calls = 0
+
+    def count_successful_cell(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        return successful_cell(*args, **kwargs)
+
+    monkeypatch.setattr(battery, "equilibrate_cell", count_successful_cell)
+    handles: dict[str, object] = {}
+    predictions = tuple(
+        predict_with_engine(
+            Engine.THERMOENGINE,
+            reference,
+            experiment=experiment,
+            handles=handles,
+            isolated=False,
+        )
+        for _ in range(2)
     )
 
-    assert prediction.value == Decimal("0.9"), prediction.refusal_detail
-    assert prediction.authority is Authority.EXTRAPOLATED
-    assert any(
-        notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
-        and notice.authority is Authority.EXTRAPOLATED
-        for notice in prediction.notices
-    )
-    assert not any(
-        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-        and notice.origin == "engine:thermoengine"
-        for notice in prediction.notices
-    )
+    assert len(opened) == 1
+    assert handles[Engine.THERMOENGINE.value] is handle
+    assert calls == 2
+    for prediction in predictions:
+        assert prediction.value == Decimal("0.9"), prediction.refusal_detail
+        assert prediction.authority is Authority.EXTRAPOLATED
+        assert any(
+            notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+            and notice.authority is Authority.EXTRAPOLATED
+            for notice in prediction.notices
+        )
+        assert not any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and notice.origin == "engine:thermoengine"
+            for notice in prediction.notices
+        )
 
 
 def test_metric_domain_refuses_zero_and_negative_dex() -> None:
@@ -16029,94 +16050,386 @@ def test_score_store_records_each_in_scope_observation_in_small_fixture() -> Non
     assert all(records_by_reference[obs.observation_id] >= 1 for obs in (activity, figure))
 
 
-def test_transition_temperature_refuses_before_generic_engine_pot(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    from simulator.diagnostic_helpers import binary_pot_battery as battery
-    from simulator.diagnostic_helpers.binary_pot_battery import (
-        EngineHandle,
-        EquilibrateCell,
-    )
-
-    identity = replace(
-        F.activity_identity(
-            formula="CaO",
-            component_basis="CaO",
-            composition=Composition(
-                basis="ordered_complete_mole_inventory",
-                components=(("SiO2", Decimal("0.5")), ("CaO", Decimal("0.5"))),
-                amount_basis=AmountBasis.MOLE_FRACTION,
-            ),
-        ),
+def _transition_temperature_observation(
+    *,
+    subtype: str = "liquidus",
+    formula: str = "CaO",
+    composition: Composition | None = None,
+    has_composition: bool = True,
+    pressure_pa: Decimal | None = Decimal("101325"),
+) -> Observation:
+    if composition is None and has_composition:
+        composition = Composition(
+            basis="printed_oxides",
+            components=(("SiO2", Decimal("0.5")), ("CaO", Decimal("0.5"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+    identity = Identity(
         quantity=Quantity.TRANSITION_TEMPERATURE,
-        subtype=State.of("liquidus"),
+        species=Species(formula, Phase.L),
+        subtype=State.of(subtype),
+        temperature_K=State.not_applicable("transition temperature is the value"),
+        standard_pressure_Pa=State.not_applicable("not a standard-state axis"),
+        reaction=State.not_applicable("not a reaction quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+        reference_state=State.not_applicable("not a standard-state quantity"),
+        reservoir=State.not_applicable("not a reservoir quantity"),
+        composition=(State.of(composition) if composition is not None else State.unknown("source does not state composition")),
+        fO2_Pa=State.not_applicable("not a transition identity axis"),
+        total_pressure_Pa=(
+            State.unknown("source does not state total pressure")
+            if pressure_pa is None
+            else State.of(pressure_pa)
+        ),
+        sweep_gas=State.not_applicable("not a gas quantity"),
+        exposure=State.not_applicable("not a kinetic quantity"),
+        sample_mass_kg=State.not_applicable("not an extensive quantity"),
+        wall=State.not_applicable("not a wall quantity"),
     )
-    reference = F.observation(
-        "transition-temperature-generic-fallthrough",
+    return F.observation(
+        f"transition-temperature::{subtype}::{formula}",
         F.tabulation_experiment().experiment_id,
         identity,
         Decimal("1673.15"),
         evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="work-1",
+        source_id="transition-fixture",
     )
-    opened: list[str] = []
-    pots = []
 
-    def open_probe_engine(name: str) -> EngineHandle:
-        opened.append(name)
-        return EngineHandle(
-            name=name,
-            backend=object(),
-            available=True,
-            unavailable_reason=None,
-            takes_fo2=False,
-            supports_intrinsic_fo2=True,
-        )
 
-    def equilibrate_probe(handle, pot, **kwargs):
-        pots.append(pot)
-        return EquilibrateCell(
-            pot_id="transition-probe",
-            engine=handle.name,
-            temperature_K=kwargs["temperature_K"],
-            po2=kwargs["po2"],
-            status="ok",
-            refusal_reason=None,
-            engine_status="ok",
-            engine_reason=None,
-            melt_activities={"CaO": 0.25},
-            gas_partial_pressures_Pa={},
+def _transition_finder_handle(monkeypatch, engine, result, calls):
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    class FinderBackend:
+        def find_liquidus_solidus(self, **kwargs):
+            if kwargs.get("fO2_log") is None:
+                if engine is Engine.MAGEMIN:
+                    assert "fO2_log" not in kwargs
+                else:
+                    assert kwargs.get("redox_mode") == "not_an_input"
+            calls.append((engine.value, kwargs))
+            return result
+
+    handle = EngineHandle(
+        name=engine.value,
+        backend=FinderBackend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    monkeypatch.setattr(battery, "open_battery_engine", lambda _name: handle)
+
+
+@pytest.mark.parametrize(
+    "engine",
+    [Engine.ALPHAMELTS, Engine.MAGEMIN, Engine.THERMOENGINE],
+)
+def test_transition_liquidus_uses_each_engine_finder_at_printed_composition(
+    monkeypatch: pytest.MonkeyPatch, engine: Engine
+) -> None:
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "equilibrate_cell",
+        lambda *_args, **_kwargs: pytest.fail("transition prediction used the generic battery pot"),
+    )
+
+    calls = []
+    _transition_finder_handle(
+        monkeypatch,
+        engine,
+        LiquidusSolidusResult(
+            liquidus_T_C=1400.0,
+            liquidus_T_K=1673.15,
+            solidus_T_C=1200.0,
             liquid_fraction=1.0,
-            wall_s=0.0,
-            cpu_s=0.0,
-            hostname="test",
+            status="ok",
+        ),
+        calls,
+    )
+    observation = _transition_temperature_observation()
+    handles = {}
+
+    prediction = predict_with_engine(engine, observation, handles=handles)
+
+    assert prediction.value == Decimal("1673.15")
+    assert prediction.unit == "K"
+    assert prediction.refusal_reason is None
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert len(calls) == 1
+    assert calls[0][0] == engine.value
+    assert calls[0][1]["pressure_bar"] == pytest.approx(1.01325)
+    if engine is Engine.MAGEMIN:
+        assert "fO2_log" not in calls[0][1]
+    else:
+        assert calls[0][1]["fO2_log"] is None
+        assert calls[0][1]["redox_mode"] == "not_an_input"
+    expected_wt = score_mod.composition_wt_pct(observation.identity.composition.value)
+    composition_kg = calls[0][1]["composition_kg"]
+    assert tuple((name, mass.hex()) for name, mass in composition_kg.items()) == (
+        ("SiO2", "0x1.a7b9d0aa28ad9p-5"),
+        ("CaO", "0x1.8b7962890a85bp-5"),
+    )
+    from simulator.diagnostic_helpers.binary_pot_battery import composition_kg_and_mol
+
+    independent_kg, _ = composition_kg_and_mol(expected_wt)
+    actual_total = sum(composition_kg.values())
+    independent_total = sum(independent_kg.values())
+    assert {
+        oxide: mass / actual_total for oxide, mass in composition_kg.items()
+    } == pytest.approx(
+        {
+            oxide: mass / independent_total
+            for oxide, mass in independent_kg.items()
+        }
+    )
+    assert handles[engine.value].backend.__class__.__name__ == "FinderBackend"
+
+
+def test_transition_solidus_selects_solidus_temperature(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    result = LiquidusSolidusResult(
+        liquidus_T_C=1400.0,
+        liquidus_T_K=1673.15,
+        solidus_T_C=1200.0,
+        liquid_fraction=1.0,
+        status="ok",
+    )
+
+    class FinderBackend:
+        def find_liquidus_solidus(self, **_kwargs):
+            return result
+
+    handle = EngineHandle(
+        name=Engine.MAGEMIN.value,
+        backend=FinderBackend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    monkeypatch.setattr(battery, "open_battery_engine", lambda _name: handle)
+    observation = _transition_temperature_observation(subtype="solidus")
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.value == Decimal("1473.15")
+    assert prediction.value != Decimal("1673.15")
+
+
+def test_transition_out_of_domain_numeric_result_is_flagged(monkeypatch) -> None:
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    calls = []
+    _transition_finder_handle(
+        monkeypatch,
+        Engine.THERMOENGINE,
+        LiquidusSolidusResult(
+            liquidus_T_C=1400.0,
+            liquidus_T_K=1673.15,
+            solidus_T_C=1200.0,
+            liquid_fraction=1.0,
+            status="out_of_domain",
+        ),
+        calls,
+    )
+
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE, _transition_temperature_observation()
+    )
+
+    assert prediction.value == Decimal("1673.15")
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.affected_quantities == (Quantity.TRANSITION_TEMPERATURE,)
+        for notice in prediction.notices
+    )
+
+
+def test_janaf_pure_compound_transition_is_outside_engine_domain(monkeypatch) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.battery.migrate import REPO_ROOT, observation_from_plain
+
+    def unexpected_open(_name):
+        pytest.fail("JANAF pure-compound transition must refuse before engine open")
+
+    monkeypatch.setattr(battery, "open_battery_engine", unexpected_open)
+    document = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts-v2/janaf-4th.yaml").read_text(
+            encoding="utf-8"
         )
+    )
+    observation = observation_from_plain(
+        next(
+            row
+            for row in document["observations"]
+            if row["observation_id"] == "janaf-4th::KCl_melting_point"
+        )
+    )
 
-    monkeypatch.setattr(battery, "open_battery_engine", open_probe_engine)
-    monkeypatch.setattr(battery, "equilibrate_cell", equilibrate_probe)
-    from simulator.battery import score as score_module
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
 
-    parsed_formulas: list[str] = []
-    parse_formula = score_module.parse_species_formula
+    assert prediction.value is None
+    assert observation.identity.species.formula == "KCl"
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "transition_kind_not_melt_boundary"
 
-    def track_formula_parse(formula: str, *, species: Species | None = None):
-        parsed_formulas.append(formula)
-        return parse_formula(formula, species=species)
 
-    monkeypatch.setattr(score_module, "parse_species_formula", track_formula_parse)
+def test_phase_appearance_transition_is_outside_engine_domain(monkeypatch) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
 
-    predictions = {
-        engine: predict_with_engine(engine, reference)
-        for engine in score_module.SCORE_ENGINE_SET
-    }
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda _name: pytest.fail("phase appearance must refuse before engine open"),
+    )
+    observation = _transition_temperature_observation(
+        subtype="phase_appearance", has_composition=False
+    )
 
-    assert opened == []
-    assert pots == []
-    assert parsed_formulas == []
-    prediction = predictions[Engine.OPENIMCC]
+    prediction = predict_with_engine(Engine.ALPHAMELTS, observation)
+
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "transition_kind_not_melt_boundary"
+
+
+def test_transition_missing_composition_refuses_without_engine_open(monkeypatch) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda _name: pytest.fail("missing composition must refuse before engine open"),
+    )
+    observation = _transition_temperature_observation(has_composition=False)
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert prediction.refusal_detail["reason"] == "composition_unknown"
+
+
+def test_transition_compound_composition_refuses_before_engine_conversion(monkeypatch) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda _name: pytest.fail("compound composition must refuse before engine open"),
+    )
+    observation = _transition_temperature_observation(
+        composition=Composition(
+            basis="printed_mole_fraction",
+            components=(
+                ("Li4SiO4", Decimal("0.1")),
+                ("Na2SiO3", Decimal("0.9")),
+            ),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "composition_not_engine_oxides"
+    assert prediction.refusal_detail["components"] == ["Li4SiO4", "Na2SiO3"]
+
+
+def test_transition_redox_sensitive_composition_requires_printed_fo2(monkeypatch) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda _name: pytest.fail("missing fO2 must refuse before engine open"),
+    )
+    observation = _transition_temperature_observation(
+        composition=Composition(
+            basis="printed_oxides",
+            components=(
+                ("SiO2", Decimal("0.6")),
+                ("FeO", Decimal("0.4")),
+            ),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+    )
+
+    prediction = predict_with_engine(Engine.ALPHAMELTS, observation)
+
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert prediction.refusal_detail["reason"] == "fO2_not_printed"
+
+
+def test_transition_passes_printed_point_condition_fo2(monkeypatch) -> None:
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    calls = []
+    _transition_finder_handle(
+        monkeypatch,
+        Engine.ALPHAMELTS,
+        LiquidusSolidusResult(
+            liquidus_T_C=1400.0,
+            liquidus_T_K=1673.15,
+            solidus_T_C=1200.0,
+            liquid_fraction=1.0,
+            status="ok",
+        ),
+        calls,
+    )
+    observation = _transition_temperature_observation(
+        composition=Composition(
+            basis="printed_oxides",
+            components=(
+                ("SiO2", Decimal("0.6")),
+                ("FeO", Decimal("0.4")),
+            ),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            "fO2_Pa": Located(State.of(Decimal("100000"))),
+        },
+    )
+
+    prediction = predict_with_engine(Engine.ALPHAMELTS, observation)
+
+    assert prediction.value == Decimal("1673.15")
+    assert calls[0][1]["fO2_log"] == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize(
+    "engine",
+    [Engine.VAPOROCK, Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL],
+)
+def test_non_melts_engines_do_not_predict_transition_temperature(
+    monkeypatch: pytest.MonkeyPatch, engine: Engine
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda _name: pytest.fail("non-MELTS transition must refuse before engine open"),
+    )
+
+    prediction = predict_with_engine(engine, _transition_temperature_observation())
+
     assert prediction.value is None
     assert prediction.unit is None
-    assert prediction.coefficient_sources == ()
+    if engine is Engine.OPENIMCC:
+        assert prediction.coefficient_sources == ()
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
     assert prediction.refusal_detail == {
@@ -16125,34 +16438,219 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
     }
 
 
-    for prediction in predictions.values():
-        assert prediction.value is None
-        assert prediction.unit is None
-        assert prediction.execution.state is ExecutionState.UNSUPPORTED
-        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
-        assert prediction.refusal_detail == {
-            "reason": "quantity_not_predicted",
-            "quantity": Quantity.TRANSITION_TEMPERATURE.value,
-        }
+@pytest.mark.parametrize(
+    "subtype, expected_temperature",
+    [("liquidus", "1673.15"), ("solidus", "1473.15")],
+)
+def test_transition_missing_pressure_uses_ambient_pressure_with_notice(
+    monkeypatch, subtype: str, expected_temperature: str
+) -> None:
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    calls = []
+    _transition_finder_handle(
+        monkeypatch,
+        Engine.MAGEMIN,
+        LiquidusSolidusResult(
+            liquidus_T_C=1400.0,
+            liquidus_T_K=1673.15,
+            solidus_T_C=1200.0,
+            liquid_fraction=1.0,
+            status="ok",
+        ),
+        calls,
+    )
+    observation = _transition_temperature_observation(
+        subtype=subtype, pressure_pa=None
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.value == Decimal(expected_temperature), prediction.refusal_detail
+    assert calls[0][1]["pressure_bar"] == 1.0
+    assert observation.identity.total_pressure_Pa.is_unknown
+    assert prediction.identity.total_pressure_Pa.is_unknown
+    assert any(
+        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and notice.reason == "ambient pressure assumed, not printed"
+        for notice in prediction.notices
+    )
+
+
+def test_ambient_transition_pressure_is_compared_only_with_its_notice(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+
+    calls = []
+    _transition_finder_handle(
+        monkeypatch,
+        Engine.MAGEMIN,
+        LiquidusSolidusResult(
+            liquidus_T_C=1400.0,
+            liquidus_T_K=1673.15,
+            solidus_T_C=1200.0,
+            liquid_fraction=1.0,
+            status="ok",
+        ),
+        calls,
+    )
+    experiment = F.tabulation_experiment()
+    observation = replace(
+        _transition_temperature_observation(pressure_pa=None),
+        value=Value.point_of(Decimal("0")),
+    )
+    context = _context(F.work(), experiment, observation)
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.MAGEMIN,
+        context=context,
+        prediction=prediction,
+        comparison_ids={observation.observation_id},
+    )
+
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.numeric.value == prediction.value == Decimal("1673.15")
+    ambient_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and notice.reason == "ambient pressure assumed, not printed"
+    )
+    assert ambient_notice in residual.notices
+    assert observation.identity.total_pressure_Pa.is_unknown
+    assert prediction.identity.total_pressure_Pa.is_unknown
+    assert calls[0][1]["pressure_bar"] == 1.0
+
+    no_notice_prediction = replace(
+        prediction,
+        notices=tuple(
+            notice for notice in prediction.notices if notice is not ambient_notice
+        ),
+    )
+    no_notice_residual, _candidate = compile_residual(
+        observation,
+        Engine.MAGEMIN,
+        context=context,
+        prediction=no_notice_prediction,
+        comparison_ids={observation.observation_id},
+    )
+
+    assert no_notice_residual.status is ResidualStatus.REFUSED
+    assert no_notice_residual.refusal is not None
+    assert no_notice_residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert no_notice_residual.refusal.detail["fields"] == ["total_pressure_Pa"]
+
+    high_pressure_experiment = replace(
+        experiment,
+        apparatus=Apparatus(
+            cell_material_and_liner=Located(State.of("diamond anvil"))
+        ),
+    )
+    high_pressure_observation = replace(
+        observation,
+        observation_id="transition-temperature::high-pressure",
+    )
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda _name: pytest.fail("high-pressure rows must refuse before engine open"),
+    )
+    high_pressure_prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        high_pressure_observation,
+        experiment=high_pressure_experiment,
+    )
+    high_pressure_context = _context(
+        F.work(), high_pressure_experiment, high_pressure_observation
+    )
+    high_pressure_residual, _candidate = compile_residual(
+        high_pressure_observation,
+        Engine.MAGEMIN,
+        context=high_pressure_context,
+        prediction=high_pressure_prediction,
+        comparison_ids={high_pressure_observation.observation_id},
+    )
+
+    assert high_pressure_residual.status is ResidualStatus.REFUSED
+    assert high_pressure_residual.refusal is not None
+    assert high_pressure_residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert high_pressure_residual.refusal.detail["reason"] == "total_pressure_unknown"
+    assert high_pressure_observation.identity.total_pressure_Pa.is_unknown
+
+
+@pytest.mark.parametrize(
+    "apparatus_text",
+    [
+        "piston-cylinder press",
+        "multi-anvil press",
+        "autoclave",
+        "diamond cell",
+        "diamond anvil",
+        "high pressure",
+    ],
+)
+def test_transition_missing_pressure_with_high_pressure_apparatus_still_refuses(
+    monkeypatch, apparatus_text: str
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
 
     monkeypatch.setattr(
-        score_module,
-        "_ENGINE_CELL_PREDICTED_QUANTITIES",
-        score_module._ENGINE_CELL_PREDICTED_QUANTITIES
-        | {Quantity.TRANSITION_TEMPERATURE},
+        battery,
+        "open_battery_engine",
+        lambda _name: pytest.fail("high-pressure rows must refuse before engine open"),
     )
-    prediction = predict_with_engine(Engine.OPENIMCC, reference)
+    experiment = replace(
+        F.tabulation_experiment(),
+        apparatus=Apparatus(
+            cell_material_and_liner=Located(State.of(apparatus_text))
+        ),
+    )
 
-    assert len(opened) == 1
-    assert len(pots) == 1
-    assert "CaO" in parsed_formulas
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        _transition_temperature_observation(pressure_pa=None),
+        experiment=experiment,
+    )
+
     assert prediction.value is None
-    assert prediction.unit is None
-    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
-    assert prediction.refusal_detail == {
-        "reason": "quantity_not_predicted",
-        "quantity": Quantity.TRANSITION_TEMPERATURE.value,
-    }
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert prediction.refusal_detail["reason"] == "total_pressure_unknown"
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [State.unknown("source does not state phase"), Phase.G],
+    ids=["unknown", "vapour"],
+)
+def test_transition_missing_pressure_with_unknown_or_vapour_phase_refuses(
+    monkeypatch, phase: Phase | State
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda _name: pytest.fail("non-condensed rows must refuse before engine open"),
+    )
+    observation = _transition_temperature_observation(pressure_pa=None)
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            species=replace(observation.identity.species, phase=phase),
+        ),
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert prediction.refusal_detail["reason"] == "total_pressure_unknown"
 
 
 @pytest.mark.parametrize(
