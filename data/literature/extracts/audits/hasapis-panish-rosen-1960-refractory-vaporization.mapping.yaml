@@ -1,0 +1,83 @@
+source_id: hasapis-panish-rosen-1960-refractory-vaporization
+source:
+  citation: "Hasapis, A. A., Panish, M. B., and Rosen, C. (October 1960). The Vaporization and Physical Properties of Certain Refractories. Part I. Techniques and Preliminary Studies. WADD Technical Report 60-463 Part I. Avco Corporation."
+  year: 1960
+  corpus_asset: raw/hasapis-panish-rosen-1960-refractory-vaporization/hasapis-panish-rosen-1960-refractory-vaporization.pdf
+extraction:
+  method: MinerU table draft with full page-render verification for Table 4; pdftotext produced no text on scanned pages.
+  date: '2026-10-25'
+  worker: w1025a-has60
+review_status: draft
+fidelity_samples:
+  - species: Al
+    observation_id: hasapis_panish_rosen_1960_refractory_vaporization_p040_t05_r02_c03
+    field: value
+    value: '≈ 0.4'
+    locator: {page: 40, published_page: 34, pdf_page_index: 39, table: '4', row: '2126', column: 'Al I+27'}
+  - species: Al
+    observation_id: hasapis_panish_rosen_1960_refractory_vaporization_p040_t05_r04_c04
+    field: value
+    value: '3.52'
+    locator: {page: 40, published_page: 34, pdf_page_index: 39, table: '4', row: '2273', column: 'log I+27 T'}
+  - species: WO2
+    observation_id: hasapis_panish_rosen_1960_refractory_vaporization_p040_t05_r09_c09
+    field: value
+    value: '1.3'
+    locator: {page: 40, published_page: 34, pdf_page_index: 39, table: '4', row: '2495', column: 'sum I+WO2'}
+tables:
+  - page: 40
+    table_index: 5
+    type: rate_series
+    quantity: ion_intensity
+    evidence_class: measured_direct
+    unit: ion current, unit not stated
+    phase: gas
+    regime: knudsen_effusion
+    experiment: hasapis-1960-alumina-tungsten-effusion
+    published_page: 34
+    temperature:
+      column: 1
+      unit: K
+    conditions:
+      - key: composition
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 40, published_page: 34, pdf_page_index: 39, table: '4', note: The Al2O3 and W mixture is named but its proportions are not printed.}
+      - key: total_pressure_Pa
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 40, published_page: 34, pdf_page_index: 39, table: '4', note: No total pressure is printed for this table.}
+      - key: fO2_Pa
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 40, published_page: 34, pdf_page_index: 39, table: '4', note: No oxygen fugacity is printed for this table.}
+    values:
+      - column: 3
+        species: Al
+        quantity: ion_intensity
+        unit: ion current, unit not stated
+      - column: 4
+        species: Al
+        quantity: log10_ion_current_times_temperature
+        unit: log I+T, as printed
+      - column: 5
+        species: AlO
+        quantity: ion_intensity
+        unit: ion current, unit not stated
+      - column: 6
+        species: AlO
+        quantity: log10_ion_current_times_temperature
+        unit: log I+T, as printed
+      - column: 7
+        species: Al2O
+        quantity: ion_intensity
+        unit: ion current, unit not stated
+      - column: 8
+        species: Al2O
+        quantity: log10_ion_current_times_temperature
+        unit: log I+T, as printed
+      - column: 9
+        species: WO2
+        quantity: ion_intensity
+        unit: ion current, unit not stated
+      - column: 10
+        species: WO2
+        quantity: log10_ion_current_times_temperature
+        unit: log I+T, as printed
