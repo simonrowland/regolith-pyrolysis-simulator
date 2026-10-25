@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass, field
 from enum import Enum
 import math
@@ -297,6 +298,7 @@ class SimSession:
     ) -> "SimSession":
         """Build, load, and start a simulator from explicit config."""
 
+        forecast_backend_resolvable = backend is None
         cached_real_config = None
         if config.backend_name == CACHED_REAL_BACKEND_NAME:
             cached_real_config = normalize_cached_real_config(
@@ -346,6 +348,16 @@ class SimSession:
                 stage0_subprocess_required=stage0_subprocess_required,
             )
         else:
+            configured_backend_name = canonical_backend_name(
+                str(config.backend_name)
+            )
+            selected_backend_name = canonical_backend_name(
+                str(getattr(backend, "backend_name", ""))
+            )
+            forecast_backend_resolvable = (
+                type(backend).__module__.startswith("simulator.melt_backend.")
+                and selected_backend_name == configured_backend_name
+            )
             assert_stage0_subprocess_backend_safe(
                 backend,
                 subprocess_required=stage0_subprocess_required,
@@ -394,6 +406,31 @@ class SimSession:
                 ),
             )
         )
+        if forecast_backend_resolvable:
+            forecast_backend_name = str(config.backend_name)
+            forecast_backend_policy = config.backend_policy
+            forecast_unavailable_error_cls = config.unavailable_error_cls
+            forecast_cached_real_config = copy.deepcopy(cached_real_config)
+            forecast_backend_config = copy.deepcopy(config.backend_config)
+            forecast_feedstock_id = str(config.feedstock_id)
+            forecast_feedstocks = copy.deepcopy(config.feedstocks)
+            forecast_subprocess_required = bool(stage0_subprocess_required)
+
+            def build_forecast_backend():
+                return resolve_backend(
+                    forecast_backend_name,
+                    forecast_backend_policy,
+                    unavailable_error_cls=forecast_unavailable_error_cls,
+                    cached_real_config=copy.deepcopy(
+                        forecast_cached_real_config
+                    ),
+                    backend_config=copy.deepcopy(forecast_backend_config),
+                    feedstock_id=forecast_feedstock_id,
+                    feedstocks=copy.deepcopy(forecast_feedstocks),
+                    stage0_subprocess_required=forecast_subprocess_required,
+                )
+
+            sim._c0_forecast_backend_factory = build_forecast_backend
         if config.imcc_activity_shadow:
             sim._imcc_activity_shadow_enabled = True
         sim._high_t_melt_activity = config.high_t_melt_activity
@@ -535,6 +572,7 @@ class SimSession:
 
     def adjust(self, param: str, value: Any, **kw: Any) -> None:
         sim = self._require_sim()
+        adjusted_c0_forecast_field: str | None = None
         if param == "stir_factor":
             # 0.5.2 Phase B P1: clamp at the operator boundary before
             # the axial value reaches evaporation diagnostics, metal
@@ -584,6 +622,8 @@ class SimSession:
                 # Only import locally to avoid a top-level cycle.
                 from simulator.state import Atmosphere
                 sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+            if sim.melt.campaign == CampaignPhase.C0:
+                adjusted_c0_forecast_field = "C0.pO2_mbar"
         elif param == "c4_max_temp":
             finite_value = _finite_float(value, "c4_max_temp")
             sim.c4_max_temp_C = finite_value
@@ -677,8 +717,15 @@ class SimSession:
                 if new_pO2 > 0.0:
                     from simulator.state import Atmosphere
                     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+            if (
+                campaign_name == CampaignPhase.C0.name
+                and sim.melt.campaign == CampaignPhase.C0
+            ):
+                adjusted_c0_forecast_field = f"C0.{field_name}"
         else:
             raise ValueError(f"unsupported session adjustment {param!r}")
+        if adjusted_c0_forecast_field is not None:
+            sim._handle_c0_forecast_adjustment(adjusted_c0_forecast_field)
         sim.melt.validate_melt_pressures()
 
     def pause(self) -> None:

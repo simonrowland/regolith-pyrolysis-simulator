@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -12,6 +14,7 @@ import simulator.session as session_module
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
 from simulator.campaigns import CampaignManager
 from simulator.feedstock_guard import is_blocked_feedstock
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.session import (
     DecisionPolicy,
     SimSession,
@@ -41,6 +44,54 @@ def _config(**overrides) -> SimSessionConfig:
     }
     values.update(overrides)
     return SimSessionConfig(**values)
+
+
+def _cross_surface_parity_setpoints() -> dict:
+    setpoints = _load_yaml("setpoints.yaml")
+    kernel = dict(setpoints.get("chemistry_kernel", {}) or {})
+    kernel["allow_unmeasured_alpha_fallback"] = True
+    series = dict(kernel.get("evaporation_series_resistance", {}) or {})
+    series["gas_resistance_enabled"] = False
+    kernel["evaporation_series_resistance"] = series
+    setpoints["chemistry_kernel"] = kernel
+    return setpoints
+
+
+def _pt0_store_state_bytes(store) -> bytes:
+    memory_state = {
+        name: getattr(store, name)
+        for name in (
+            "mode",
+            "entries",
+            "physics_bucket_entries",
+            "capture_sequence",
+            "replay_sequence",
+            "misses",
+            "cache_events",
+            "hits",
+            "live_fills",
+            "last_cache_state",
+            "quantize_live_controls",
+            "cache_tier_ceiling",
+            "cached_real_miss_policy",
+            "strict_vapor_gate",
+            "_control_quantization",
+        )
+    }
+    memory_bytes = json.dumps(
+        memory_state, sort_keys=True, separators=(",", ":"), default=str
+    ).encode("utf-8")
+    backing_bytes = bytearray()
+    if store.persistent_path is not None:
+        for suffix in ("", "-wal", "-shm"):
+            path = Path(f"{store.persistent_path}{suffix}")
+            backing_bytes.extend(suffix.encode("ascii"))
+            backing_bytes.extend(b"\0")
+            backing_bytes.extend(
+                path.read_bytes() if path.exists() else b"<absent>"
+            )
+            backing_bytes.extend(b"\0")
+    return memory_bytes + b"\0" + bytes(backing_bytes)
 
 
 def test_session_passes_stage0_subprocess_inputs_to_resolver(monkeypatch):
@@ -103,6 +154,66 @@ def test_cached_real_python_api_model_session_reaches_build_simulator(
         )
 
     assert reached == [model]
+
+
+def test_cached_real_capture_session_c0_forecast_computes_without_pt0_writes(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    class CachedRealForecastBackend(InternalAnalyticalBackend):
+        backend_name = "cached-real"
+
+    def resolve_cached_real(*_args, **_kwargs):
+        backend = CachedRealForecastBackend()
+        assert backend.initialize({})
+        return backend
+
+    monkeypatch.setattr(session_module, "resolve_backend", resolve_cached_real)
+    original_build_simulator = session_module.build_simulator
+    store_state: list[tuple[bytes, bytes]] = []
+    forecast_results: list[dict] = []
+
+    def build_simulator_with_pt0_guard(build_config):
+        sim = original_build_simulator(build_config)
+        original_predict = sim._predict_c0_exit
+
+        def predict_with_pt0_guard(*args, **kwargs):
+            store = sim._pt0_determinism_store
+            before = _pt0_store_state_bytes(store)
+            prediction = original_predict(*args, **kwargs)
+            after = _pt0_store_state_bytes(store)
+            store_state.append((before, after))
+            forecast_results.append(prediction)
+            return prediction
+
+        sim._predict_c0_exit = predict_with_pt0_guard
+        return sim
+
+    monkeypatch.setattr(
+        session_module, "build_simulator", build_simulator_with_pt0_guard
+    )
+    session = SimSession().start(
+        _config(
+            backend_name="cached-real",
+            reduced_real_cache={
+                "db_path": str(tmp_path / "cached-real-forecast.db"),
+                "miss_policy": "live-fill",
+                "authorized_backend_name": "alphamelts",
+                "authorized_mode": "python_api",
+                "authorized_model": "MELTSv1.0.2",
+            },
+        )
+    )
+
+    prediction = session.simulator.campaign_mgr.c0_exit_prediction
+    assert prediction["prediction_status"] == "ok"
+    assert prediction["T_exit_C"] is not None
+    assert prediction["forecast_engine"] == "cached-real"
+    assert session.simulator._pt0_determinism_store.mode == "capture"
+    assert forecast_results
+    assert forecast_results[-1]["T_exit_C"] is not None
+    assert store_state
+    assert all(before == after for before, after in store_state)
 
 
 def test_session_rejects_metallic_real_backend_before_resolver(monkeypatch):
@@ -472,6 +583,123 @@ def test_campaign_transition_zero_po2_override_leaves_atmosphere_at_default():
     # Atmosphere stays at C2A's documented default (PN2_SWEEP) —
     # operator only cleared the setpoint, not requested CONTROLLED_O2.
     assert sim.melt.atmosphere == Atmosphere.PN2_SWEEP
+
+
+def test_c0_forecast_reacts_to_web_ordered_ramp_override():
+    setpoints = _cross_surface_parity_setpoints()
+    configured_before_start = SimSession().start(
+        _config(
+            setpoints=setpoints,
+            runtime_campaign_overrides={
+                "C0": {"max_hours": 1.0, "ramp_rate": 2000.0}
+            },
+        )
+    )
+    started_before_adjustment = SimSession().start(
+        _config(setpoints=setpoints)
+    )
+    started_before_adjustment.adjust(
+        "campaign_override",
+        1.0,
+        campaign="C0",
+        field="max_hours",
+    )
+    started_before_adjustment.adjust(
+        "campaign_override",
+        2000.0,
+        campaign="C0",
+        field="ramp_rate",
+    )
+
+    def ledger_after_c0(session):
+        sim = session.simulator
+        steps = 0
+        while sim.melt.campaign == CampaignPhase.C0 and steps < 10:
+            sim.step()
+            steps += 1
+        assert sim.melt.campaign != CampaignPhase.C0
+        return json.dumps(
+            sim.atom_ledger.mol_by_account(),
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+
+    assert ledger_after_c0(configured_before_start) == ledger_after_c0(
+        started_before_adjustment
+    )
+
+
+def test_c0_forecast_adjustment_after_completed_hour_is_flagged():
+    session = SimSession().start(
+        _config(
+            setpoints=_cross_surface_parity_setpoints(),
+            runtime_campaign_overrides={"C0": {"max_hours": 2.0}},
+        )
+    )
+    sim = session.simulator
+    startup_prediction = deepcopy(sim.campaign_mgr.c0_exit_prediction)
+
+    first_hour = sim.step()
+    assert first_hour.campaign == CampaignPhase.C0
+    assert sim.melt.campaign == CampaignPhase.C0
+    assert sim.melt.campaign_hour == 1
+
+    session.adjust(
+        "campaign_override",
+        2000.0,
+        campaign="C0",
+        field="ramp_rate",
+    )
+    assert sim.campaign_mgr.c0_exit_prediction == startup_prediction
+
+    second_hour = sim.step()
+    expected_notice = {
+        "type": "c0_forecast_predates_adjustment",
+        "adjusted_fields": ["C0.ramp_rate"],
+        "campaign_hour": 1,
+        "loss_budget_re_evaluated": False,
+    }
+    assert second_hour.subsolidus_bakeout_diagnostic[
+        "forecast_adjustment_notices"
+    ] == [expected_notice]
+    assert sim.campaign_mgr.last_c0_exit[
+        "forecast_adjustment_notices"
+    ] == [expected_notice]
+
+
+def test_c0_post_step_pressure_adjustment_cannot_clear_computed_cap(
+    monkeypatch,
+):
+    session = SimSession().start(
+        _config(setpoints=_cross_surface_parity_setpoints())
+    )
+    sim = session.simulator
+    startup_prediction = deepcopy(sim.campaign_mgr.c0_exit_prediction)
+    startup_cap = startup_prediction["T_exit_C"]
+    assert startup_cap is not None
+
+    sim.step()
+    assert sim.melt.campaign == CampaignPhase.C0
+    assert sim.melt.campaign_hour == 1
+
+    calls = []
+
+    def no_acceptable_candidate():
+        calls.append(True)
+        return {**startup_prediction, "T_exit_C": None}
+
+    monkeypatch.setattr(sim, "_predict_c0_exit", no_acceptable_candidate)
+    session.adjust("pO2_mbar", 0.5)
+
+    assert calls == []
+    assert sim.campaign_mgr.c0_exit_prediction == startup_prediction
+    target_C, _ramp_rate = sim.campaign_mgr.get_temp_target(
+        CampaignPhase.C0,
+        sim.melt.campaign_hour,
+        sim.melt,
+    )
+    assert target_C is not None
+    assert target_C <= startup_cap
 
 
 def test_session_adjust_stir_state_writes_canonical_2_axis_state():

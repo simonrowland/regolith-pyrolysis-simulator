@@ -458,12 +458,38 @@ def sso2_owner_recipe_evidence(
 
 def _unmeasured_alpha_fallback_notice(sim: Any) -> dict[str, Any]:
     permitted = set(SSO2_UNMEASURED_ALPHA_FALLBACK_SPECIES)
-    engaged_species = {
-        str(species)
-        for species in (
-            getattr(sim, "_unmeasured_alpha_fallback_species_engaged", ()) or ()
-        )
+    setpoints = getattr(sim, "setpoints", {}) or {}
+    kernel_config = (
+        setpoints.get("chemistry_kernel", {}) or {}
+        if isinstance(setpoints, Mapping)
+        else {}
+    )
+    configured_scope = (
+        kernel_config.get("unmeasured_alpha_fallback_species")
+        if isinstance(kernel_config, Mapping)
+        else None
+    )
+    configured_scope_species = {
+        str(species) for species in (configured_scope or ())
     }
+    is_sso_scoped = (
+        configured_scope is not None
+        and configured_scope_species == permitted
+    )
+    # The simulator's engagement list is run-global. SSO-2 evidence may use it
+    # only when the run explicitly opted into the SSO trace-species scope;
+    # generic alpha-fallback runs do not become SSO-2 engagements.
+    engaged_species = (
+        {
+            str(species)
+            for species in (
+                getattr(sim, "_unmeasured_alpha_fallback_species_engaged", ())
+                or ()
+            )
+        }
+        if is_sso_scoped
+        else set()
+    )
     unexpected = engaged_species - permitted
     if unexpected:
         raise RuntimeError(
@@ -476,7 +502,11 @@ def _unmeasured_alpha_fallback_notice(sim: Any) -> dict[str, Any]:
     engagement = dict(
         degraded.get("unmeasured_alpha_evaporation_fallback", {}) or {}
     )
-    total_count = int(engagement.get("total_count", 0) or 0)
+    total_count = (
+        int(engagement.get("total_count", 0) or 0)
+        if is_sso_scoped and engaged_species
+        else 0
+    )
     return {
         "severity": "warning",
         "status": "engaged" if total_count > 0 else "not_engaged",

@@ -602,7 +602,9 @@ def test_lunar_payload_preserves_extrapolated_mg_wall_pressure(
     pareto = payload["run_metadata"]["pressure_coating_pareto_diagnostic"]
     magnesium = pareto["by_species"]["Mg"]
     assert magnesium["status"] == "unavailable"
-    assert magnesium["reason"] == "species_absent_from_latest_evaporation_series_diagnostic"
+    # Mg is present in the latest vapor-series diagnostic, but this run has no
+    # current committed wall-deposition quantity.
+    assert magnesium["reason"] == "current_wall_deposition_quantity_unavailable"
     assert magnesium["authority_level"] == "extrapolated"
     records = magnesium["wall_saturation_pressure_extrapolations"]
     assert records
@@ -619,55 +621,12 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     assert engagement["total_count"] >= 0
     assert engagement["engaged"] == (engagement["total_count"] > 0)
 
-    # Rebaselined 2026-08-18 (t-686) with the cause named, not to make a red
-    # test pass. The prior digest 6e75e35e... was produced by the pre-t-470
-    # rail; TWO intentional rail commits moved this whole-run hash, both
-    # bisected in one tree with the machine-local engines.local.toml held
-    # constant so the comparison could not be confounded:
-    #
-    #   2918b531 feat(rail): six analytical carriers live -- FIRST digest
-    #     mover. vapour_batch.n_requested 15 -> 21 (Al2O, AlO, CaO_gas, CrO3,
-    #     TiO, TiO2_gas). Run still status=ok over 24 h. Its parent 313a7d49
-    #     still hashes to 6e75e35e..., which is what pins the attribution.
-    #
-    #   dd62edf0 fix(rail): t-470 -- transitional-Knudsen band refuses instead
-    #     of silently zeroing -- FIRST status mover. status ok -> refused,
-    #     reason "" -> viscous_p_bulk_transport_out_of_domain, run length
-    #     24 h -> 14 h. End-of-run Kn 0.000273 (viscous, 10 mbar) -> 4.8646
-    #     (transitional, 0.000368 mbar). Its parent 23d48442 already reaches
-    #     Kn 4.8646 at hour 14 and used to continue straight through it.
-    #
-    # So the refusal is the HONEST number and the old 24-hour completion was
-    # the silent one. Nondeterminism is ruled out: two dumps at the tip are
-    # byte-identical, and checking out the pin commit in this same tree
-    # reproduces 6e75e35e... exactly.
-    #
-    # ★ WHAT THIS DIGEST NOW PINS: the default C0 recipe DIES AT HOUR 14
-    # because overhead pressure falls through the viscous-flow band that
-    # mandate section 4 requires (Kn well below 0.01). That is a recipe
-    # question -- raise pN2 before Kn crosses -- not a golden question, and it
-    # is tracked separately. This pin records what the code does; it does not
-    # bless the recipe.
-    #   sc130 wave 2 (2026-08-26) — THIRD intentional mover, prose-only.
-    #     1487 string leaves changed and ZERO numeric leaves (verified by a
-    #     typed structural diff of the full 6 MB payload, base vs wave-2):
-    #     melt_activity.py bucket-A citation/limitation corrections flow into
-    #     reported_activity_provenance / evidence_ref strings in this
-    #     serialization. Same run, same physics, same numbers. The hash also
-    #     changes shape here because the cache-sensitive engagement block
-    #     moved out of the hashed payload (b-238, above).
-    #     Recomputed on the CI machine class (mac-studio-256-1, ci-jobs tree).
-    # Rebaselined after 644fac1a changed out-of-domain C0/C0b transport from
-    # broad refusal to compute-and-mark. The C2A/C4 Knudsen safety gate is
-    # retained; this digest still excludes only the cache-sensitive block
-    # above.
-    # 2026-10-20 b-585 d-045: wall-deposit sticking authority now records
-    # inapplicable carriers (phosphorus vapours and Bi on this lunar C0)
-    # under not_applicable_* instead of the refused/non-authoritative lists.
-    # Every numeric leaf of this payload is unchanged, including the ledger
-    # pin 7cc5144f.... The digest move is those authority fields only.
+    # Rebaselined 2026-10-25 under d-195 + d-045 + d-252; sha256 ce211012904e18a104573b49a32ca1bd04acd1ef8f98c66da920eab8a6afe39a.
+    # Typed leaf diff: 1 d-195, 27,533 d-045, 195,428 d-252, 0 unexplained.
+    # C0 exits at h5 instead of h19; the 24 h regenerated trajectory reaches C3_NA and C4.
+    # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "64045a5e11246bc8f4dac0e63102970fe5b58da8c8aeaea061d15d2b5116be58"
+        "ce211012904e18a104573b49a32ca1bd04acd1ef8f98c66da920eab8a6afe39a"
     )
 
 
