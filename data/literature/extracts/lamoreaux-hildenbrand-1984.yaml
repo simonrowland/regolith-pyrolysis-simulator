@@ -468,7 +468,7 @@ species:
         note: K2O melting point and enthalpy of fusion; hand-transcribed because MinerU classified the body row as a header
         record: LH84_K2O_fusion
       T_range_K: [1190, 1190]
-      phase: solid_liquid
+      phase: cr
       units: K and kK as published
       uncertainty:
         T_m_uncertainty_K: 50
@@ -493,13 +493,13 @@ species:
         note: K2O(s) Gibbs energy function; the 600–890 K B coefficient is 5.772 in the render and MinerU, while pdftotext reads 5.172
         record: LH84_K2O_s_GEF_segments
       T_range_K: [298, 1190]
-      phase: solid
+      phase: cr
       standard_state: 1.01325 bar (1 atm), as printed on p. 153
       units: dimensionless GEF polynomial (A, 10^3 B, 10^6 C, 10^9 D)
       values:
         quantity: gibbs_energy_function_polynomial_segments
         formula: K2O
-        phase: solid
+        phase: cr
         method_class: quoted_attributed
         attribution: "Lamoreaux and Hildenbrand (1984), Table 2; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
         segments:
@@ -516,13 +516,13 @@ species:
         note: K2O(l) Gibbs energy function
         record: LH84_K2O_l_GEF_segments
       T_range_K: [1190, 3000]
-      phase: liquid
+      phase: l
       standard_state: 1.01325 bar (1 atm), as printed on p. 153
       units: dimensionless GEF polynomial (A, 10^3 B, 10^6 C, 10^9 D)
       values:
         quantity: gibbs_energy_function_polynomial_segments
         formula: K2O
-        phase: liquid
+        phase: l
         method_class: quoted_attributed
         attribution: "Lamoreaux and Hildenbrand (1984), Table 2; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
         segments:
@@ -560,12 +560,12 @@ species:
         note: K2O(s) enthalpy increment function
         record: LH84_K2O_s_enthalpy_increment
       T_range_K: [298, 1190]
-      phase: solid
+      phase: cr
       units: enthalpy-increment polynomial coefficients as printed
       values:
         quantity: enthalpy_increment_polynomial_segments
         formula: K2O
-        phase: solid
+        phase: cr
         method_class: quoted_attributed
         attribution: "Lamoreaux and Hildenbrand (1984), Table 3; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
         segments:
@@ -582,12 +582,12 @@ species:
         note: K2O(l) enthalpy increment function
         record: LH84_K2O_l_enthalpy_increment
       T_range_K: [1190, 3000]
-      phase: liquid
+      phase: l
       units: enthalpy-increment polynomial coefficients as printed
       values:
         quantity: enthalpy_increment_polynomial_segments
         formula: K2O
-        phase: liquid
+        phase: l
         method_class: quoted_attributed
         attribution: "Lamoreaux and Hildenbrand (1984), Table 3; evaluated compilation; underlying Table 5 references are outside the supplied excerpt."
         segments:
@@ -623,7 +623,7 @@ species:
         note: K2O(s) thermodynamic data at 298 K
         record: LH84_K2O_s_formation
       T_range_K: [298, 298]
-      phase: solid
+      phase: cr
       standard_state: 1.01325 bar, as printed on p. 153
       units: over_R in kK and dimensionless as published
       uncertainty:
@@ -632,7 +632,7 @@ species:
         note: confidence level not stated
       values:
         formula: K2O
-        phase: solid
+        phase: cr
         Delta_f_H_298_over_R_kK: -43.58
         Delta_f_H_298_over_R_uncertainty_kK: 0.25
         S_298_over_R: 11.32

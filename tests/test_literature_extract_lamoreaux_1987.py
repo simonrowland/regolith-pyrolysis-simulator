@@ -184,6 +184,13 @@ def test_lamoreaux_1987_isolated_migration_keeps_conditions_and_refusals():
     assert cristobalite.identity.species.polymorph.value is Polymorph.CRISTOBALITE_HIGH
     for block in document["species"].values():
         for observation in block.get("observations", []):
+            phase = observation.get("phase")
+            if phase in {"cr", "l"}:
+                row = by_id[observation["observation_id"]]
+                expected_phase = Phase.CR if phase == "cr" else Phase.L
+                assert row.identity.species.phase.value is expected_phase
+    for block in document["species"].values():
+        for observation in block.get("observations", []):
             observation_id = observation["observation_id"]
             if not observation_id.endswith("_fusion"):
                 continue

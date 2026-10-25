@@ -4,6 +4,9 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import Phase
+from simulator.battery.migrate import Migrator
+
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/lamoreaux-hildenbrand-1984.yaml"
@@ -52,3 +55,29 @@ def test_lamoreaux_k2o_rows_match_render_and_preserve_printed_row_counts():
 
     assert not any("point_conditions" in row for row in observations)
     assert not any("total_pressure_Pa" in row for row in observations)
+
+
+def test_lamoreaux_k2o_condensed_phase_tokens_survive_isolated_migration():
+    migrator = Migrator(root=ROOT, index=None, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+    result = migrator.result
+    assert not result.registry_issues
+    assert not result.validation.hard_issues
+    by_id = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in result.observations.values()
+        if row.source_id == "lamoreaux-hildenbrand-1984"
+    }
+    for observation_id in (
+        "LH84_K2O_fusion",
+        "LH84_K2O_s_GEF_segments",
+        "LH84_K2O_s_enthalpy_increment",
+        "LH84_K2O_s_formation",
+    ):
+        assert by_id[observation_id].identity.species.phase.value is Phase.CR
+    for observation_id in (
+        "LH84_K2O_l_GEF_segments",
+        "LH84_K2O_l_enthalpy_increment",
+    ):
+        assert by_id[observation_id].identity.species.phase.value is Phase.L
