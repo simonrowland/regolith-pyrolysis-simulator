@@ -14564,6 +14564,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # Re-enter the real flux controls at the accepted coordinate for
             # live diagnostics. A changed source is a refusal, never a re-solve.
             live_flux = self._apply_analytic_evaporation_depletion(self._calculate_evaporation(equilibrium))
+            uptake_capacity = getattr(projected, '_evaporation_oxygen_uptake_capacity_mol', None)
+            live_flux = self._bound_evaporation_oxygen_uptake(live_flux, uptake_capacity)
             planned_rates = dict(evap_flux.species_kg_hr)
             achieved_rates = dict(live_flux.species_kg_hr)
             self._verify_evaporation_projection(
@@ -14581,6 +14583,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'other_oxygen_mol_m2_s': boundary.other_oxygen_mol_m2_s,
                 'storage_mol_m2_s': boundary.storage_mol_m2_s,
                 'oxygen_flux_mol_m2_s': boundary.oxygen_flux_mol_m2_s,
+                'oxygen_uptake_transport_limited': boundary.oxygen_uptake_transport_limited,
                 'relative_residual': abs(boundary.residual) / gross if gross else 0.0,
                 'oxygen_series': oxygen_series,
                 'frozen_carriers': sorted(self._frozen_evaporation_carriers),
@@ -14623,7 +14626,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Each stage collects species based on its temperature.
         transition_start = len(self.atom_ledger.transitions)
         buffer_before = self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(OXYGEN_SPECIES, 0.0)
-        evap_flux, overhead_flux = self._apply_evaporation_carrier_batch(evap_flux)
+        evap_flux, overhead_flux = self._apply_evaporation_carrier_batch(evap_flux,
+            oxygen_uptake_capacity_mol=(uptake_capacity if boundary is not None else None))
         if boundary is not None:
             self._verify_evaporation_projection(predicted_amounts,
                 self._evaporation_signed_amounts(transition_start, buffer_before))

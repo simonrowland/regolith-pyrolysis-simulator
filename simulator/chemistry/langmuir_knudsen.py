@@ -552,8 +552,10 @@ class _SurfaceOxygenEvaluation:
     ferric_rate_mol_m2_s: float
     other_oxygen_mol_m2_s: float
     storage_mol_m2_s: float
+    overhead_oxygen_mol_m2_s: float
     payload: Any = None
     bulk_pO2_bar: float = 0.0
+    oxygen_uptake_transport_limited: bool = False
 
     @property
     def balance_terms(self) -> tuple[float, ...]:
@@ -567,7 +569,9 @@ class _SurfaceOxygenEvaluation:
 
     @property
     def residual(self) -> float:
-        return math.fsum(self.balance_terms)
+        return math.fsum((self.oxygen_flux_mol_m2_s,
+                          0.5 * self.atomic_oxygen_flux_mol_m2_s,
+                          -self.overhead_oxygen_mol_m2_s))
 
 
 def _log_oxygen_root(residual, low, high):
@@ -580,6 +584,7 @@ def _solve_surface_oxygen_balance(
     *,
     bulk_pO2_bar: float = 0.0,
     source_free_zero: _SurfaceOxygenEvaluation | None = None,
+    settle_inward_endpoint: Callable[[float], _SurfaceOxygenEvaluation] | None = None,
     bracket_log10_pO2_bar: tuple[float, float] = (-30.0, 0.0),
 ) -> _SurfaceOxygenEvaluation:
     """Close signed source/storage with an independently represented excess.
@@ -611,12 +616,13 @@ def _solve_surface_oxygen_balance(
 
     def checked(delta):
         result = evaluate(delta)
-        if not all(math.isfinite(value) for value in result.balance_terms):
+        if not all(math.isfinite(value) for value in (*result.balance_terms, result.residual)):
             raise OxygenClosureNonconvergence('nonfinite signed oxygen balance')
         return result
 
     def residual(u):
-        return checked(pressure_scale * math.sinh(u)).residual
+        delta = -bulk if bulk > 0.0 and u == math.asinh(-1.0) else pressure_scale * math.sinh(u)
+        return checked(delta).residual
 
     if bulk > 0.0:
         at_bulk = checked(0.0)
@@ -625,8 +631,18 @@ def _solve_surface_oxygen_balance(
         # Positive-source states bracket upward from exactly bulk. For a
         # consuming balance, approach the physical zero-surface boundary
         # from inside; the coordinate must never imply negative pressure.
-        low = (0.0 if at_bulk.residual < 0.0 else
-               math.nextafter(math.asinh(-1.0), 0.0))
+        low = 0.0
+        if at_bulk.residual > 0.0:
+            low = math.asinh(-1.0)
+            try:
+                at_zero = checked(-bulk)
+            except ValueError:
+                # Inverse powers have an open zero endpoint. Keep the closest
+                # representable interior coordinate for those admitted rails.
+                low = math.nextafter(low, 0.0)
+            else:
+                if at_zero.residual == 0.0:
+                    return at_zero
     else:
         low = math.asinh(10.0 ** low_log / pressure_scale)
     high = math.asinh(10.0 ** high_log / pressure_scale)
@@ -650,14 +666,23 @@ def _solve_surface_oxygen_balance(
             # A consuming mass-action channel can vanish at vacuum: for
             # p_i=C*(pO2/p_ref)**e, e>0 gives p_i -> 0 as pO2 -> 0+.
             # With no bulk supply its only balance may be the physical zero
-            # endpoint. Accept only individually zero signed terms, never a
+            # endpoint. The direct overhead balance must be zero, never a
             # finite unfunded sink or a small positive bracket residual.
             try:
                 zero = checked(0.0)
             except ValueError as exc:
                 raise OxygenClosureNonconvergence(f'zero endpoint unavailable: {exc}') from exc
-            if not any(zero.balance_terms):
+            if zero.residual == 0.0:
                 return zero
+        if f_low >= 0.0 and settle_inward_endpoint is not None:
+            delta = (-bulk if low == math.asinh(-1.0) else pressure_scale * math.sinh(low)) if bulk > 0.0 else 0.0
+            bounded = settle_inward_endpoint(delta)
+            # Use the same binary64 acceptance against the actual film/gas
+            # exchange, so an internal buffer cannot mask a finite forcing.
+            exchange = abs(bounded.oxygen_flux_mol_m2_s) + abs(bounded.overhead_oxygen_mol_m2_s)
+            if (bounded.oxygen_uptake_transport_limited
+                    and abs(bounded.residual) <= math.sqrt(math.ulp(1.0)) * exchange):
+                return bounded
         raise OxygenClosureNonconvergence(
             f'no interior oxygen root: excess bracket {(low, high)}, residuals {(f_low, f_high)}')
     try:

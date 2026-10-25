@@ -3919,8 +3919,46 @@ class EvaporationMixin:
                 effective_rates[species] = min(current_rate, allowed_rate)
         return effective_rates
 
-    def _apply_evaporation_carrier_batch(self, evap_flux):
+    def _bound_evaporation_oxygen_uptake(self, evap_flux, capacity_mol):
+        """Re-settle consuming mass-action responses against film delivery."""
+        if capacity_mol is None:
+            return evap_flux
+        draws = {}
+        fixed_draws = []
+        credits = []
+        for species, rate in evap_flux.species_kg_hr.items():
+            # Reuse the source owner per carrier; never recover a small credit
+            # by subtracting gross consuming traffic from its net.
+            oxygen = self._project_evaporation_overhead_source_mol_hr({species: rate}, {}).get('O2', 0.0)
+            if oxygen >= 0.0:
+                credits.append(oxygen)
+                continue
+            evaluator = self.vapour_rail_catalog.evaluator_for_hot_train(
+                species, process_phase=('stage0' if self.melt.campaign.name in {'C0', 'C0B'} else 'hot_train'))
+            if evaluator is not None and evaluator.pO2_exponent > 0.0:
+                draws[species] = -oxygen
+            else:
+                # A finite stoichiometric forcing is not a bounded response.
+                fixed_draws.append(-oxygen)
+        demand = math.fsum(draws.values())
+        # Net debit = responsive draw + fixed draw - gas credit (mol).
+        # Thus responsive draw <= film supply + credit - fixed draw.
+        # At zero supply a credit may still fund uptake; producer-only
+        # batches and an already feasible debit leave this clip idle.
+        available = max(0.0, math.fsum((capacity_mol, *credits, *(-v for v in fixed_draws))))
+        if demand > available:
+            evap_flux = copy.deepcopy(evap_flux)
+            for species in draws:
+                evap_flux.species_kg_hr[species] *= available / demand
+            evap_flux.update_totals()
+        return evap_flux
+
+    def _apply_evaporation_carrier_batch(self, evap_flux, *, oxygen_uptake_capacity_mol=None):
         """One carrier/finite-settlement path for projection and acceptance."""
+        original_rates = dict(evap_flux.species_kg_hr)
+        evap_flux = self._bound_evaporation_oxygen_uptake(evap_flux, oxygen_uptake_capacity_mol)
+        self._oxygen_uptake_transport_limited = evap_flux.species_kg_hr != original_rates
+        self._evaporation_oxygen_uptake_capacity_mol = oxygen_uptake_capacity_mol
         overhead_flux = evap_flux
         self._effective_transport_capacity_this_tick = self._controlled_o2_transport_capacity(evap_flux)
         self._ledger_committed_evap_flux_this_tick = evap_flux
@@ -4111,7 +4149,7 @@ class EvaporationMixin:
         config = controls['evaporation_series_resistance']
         empty_request = not self.vapour_rail_catalog.build_request(self.atom_ledger.mol_by_account())
 
-        def evaluate(excess):
+        def evaluate(excess, *, bound_uptake=False):
             oxygen = bulk + excess
             trial = self._detached_evaporation_projection()
             trial._reaction_pO2_bar = oxygen
@@ -4121,14 +4159,6 @@ class EvaporationMixin:
                                                            simulation_hour=int(self.melt.hour) + 1)
             flux = trial._apply_analytic_evaporation_depletion(trial._calculate_evaporation(
                 result, overhead_partials_override_Pa=partials))
-            start = len(trial.atom_ledger.transitions)
-            buffer_before = trial.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
-            # Preserve the proposed pre-routing batch: acceptance executes the
-            # identical owner once, then checks every signed term and carrier.
-            proposed_flux = copy.deepcopy(flux)
-            trial._apply_evaporation_carrier_batch(flux)
-            receipt = trial._evaporation_signed_amounts(start, buffer_before)
-            amounts, _ = receipt
             series = series_evaporation_flux(
                 'O2', oxygen * 100000.0, bulk * 100000.0,
                 self.melt.temperature_C + 273.15, mass, 1.0,
@@ -4143,6 +4173,27 @@ class EvaporationMixin:
                     frozen_skull_stir_clamped=False, frozen_skull_stir_ceiling='not applicable to oxygen'),
             )
             oxygen_flux = series.flux_kg_s_m2 / mass
+            # Every interval transition is partitioned into source/ferric/other:
+            # S_source+S_ferric+S_other = dn_overhead+dn_buffer (mol O2).
+            # Thus R*A*dt = j*A*dt - sum(S) + dn_buffer
+            #             = j*A*dt - dn_overhead. Internal coproduct cancels.
+            # Bound only gas-funded uptake: D <= max(0,-j)*A*dt (mol).
+            # As p_bulk -> 0 the inward supply tends to zero; an already
+            # feasible debit leaves the clip idle. Outward credit is unbounded
+            # by this uptake capacity and still requires its outward film root.
+            capacity = max(0.0, -oxygen_flux) * area_dt if bound_uptake else None
+            unbounded_rates = dict(flux.species_kg_hr)
+            flux = trial._bound_evaporation_oxygen_uptake(flux, capacity)
+            carrier_limited = flux.species_kg_hr != unbounded_rates
+            start = len(trial.atom_ledger.transitions)
+            buffer_before = trial.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
+            # Preserve the proposed pre-routing batch: acceptance executes the
+            # identical owner once, then checks every signed term and carrier.
+            proposed_flux = copy.deepcopy(flux)
+            trial._apply_evaporation_carrier_batch(flux, oxygen_uptake_capacity_mol=capacity)
+            trial._oxygen_uptake_transport_limited |= carrier_limited
+            receipt = trial._evaporation_signed_amounts(start, buffer_before)
+            amounts, _ = receipt
             # p_face = p_bulk + j*M*R_film, with the same owner's effective
             # film resistance (including its Stefan correction). Units:
             # (mol/m²/s)(kg/mol)(Pa*m²*s/kg)=Pa. R_film=0 gives EXACT bulk,
@@ -4156,8 +4207,10 @@ class EvaporationMixin:
                  if key.startswith('source:')},
                 2.0 * amounts['ferric_oxygen'] / area_dt,
                 amounts['other_oxygen'] / area_dt, amounts['storage'] / area_dt,
+                amounts.get('gas:O2', 0.0) / area_dt,
                 (proposed_flux, receipt, trial, result, series.as_diagnostic()),
                 bulk_pO2_bar=bulk,
+                oxygen_uptake_transport_limited=(bound_uptake and trial._oxygen_uptake_transport_limited),
             )
 
         try:
@@ -4167,17 +4220,20 @@ class EvaporationMixin:
             zero = None
             zero_reason = (self._evaporation_carrier_zero_reason(equilibrium, oxygen_bar=0.0)
                            if bulk == 0.0 else None)
-            if bulk == 0.0 and zero_reason:
+            if bulk == 0.0 and zero_reason and zero_reason != 'frozen_consuming_carriers_at_zero_oxygen':
                 candidate = evaluate(0.0)
                 if not any(candidate.balance_terms):
                     zero = candidate
             solved = _solve_surface_oxygen_balance(
                 evaluate, bulk_pO2_bar=bulk, source_free_zero=zero,
+                settle_inward_endpoint=lambda excess: evaluate(excess, bound_uptake=True),
                 bracket_log10_pO2_bar=(-12.0, 0.0))
             audit = self._detached_evaporation_projection()
             audit._frozen_evaporation_carriers = None
             audit._reaction_pO2_bar = solved.reaction_pO2_bar
-            admitted = set()
+            admitted = ({key.removeprefix('carrier:') for key, value in solved.payload[1][0].items()
+                         if key.startswith('carrier:') and value > 0.0}
+                        if zero_reason == 'frozen_consuming_carriers_at_zero_oxygen' else set())
             limit_basis = None
             if solved.reaction_pO2_bar > 0.0:
                 ordinary = copy.deepcopy(equilibrium)
@@ -4191,7 +4247,8 @@ class EvaporationMixin:
                 amounts, _ = audit._evaporation_signed_amounts(start, before)
                 admitted = {key.removeprefix('carrier:') for key, value in amounts.items()
                             if key.startswith('carrier:') and value > 0.0}
-            elif not audit._evaporation_carrier_zero_reason(equilibrium):
+            elif (zero_reason != 'frozen_consuming_carriers_at_zero_oxygen'
+                  and not audit._evaporation_carrier_zero_reason(equilibrium)):
                 # Reuse the existing depletion owner's exact positive-side
                 # endpoint, then the ordinary batch's stock/authority/leg gates.
                 # Candidates already passed the source provider's executable
@@ -4232,6 +4289,8 @@ class EvaporationMixin:
             if solved.reaction_pO2_bar == 0.0 and zero_reason == 'frozen_consuming_carriers_at_zero_oxygen':
                 projected._carrier_admission_notices.append(
                     'oxygen-consuming carriers stop at zero oxygen; zero-bulk boundary prediction used')
+            if solved.oxygen_uptake_transport_limited:
+                projected._carrier_admission_notices.append('oxygen_uptake_transport_limited')
             return solved
         except OxygenClosureNonconvergence as exc:
             raise EvaporationFluxRefusal('oxygen_closure_nonconvergence', {'detail': str(exc)}) from exc
