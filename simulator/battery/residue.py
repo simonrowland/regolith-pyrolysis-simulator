@@ -932,16 +932,39 @@ def _check_residue_atom_residual(element, residual, scale, context):
         )
 
 
-def _residue_atom_closure(initial_totals, final_totals, buffer_oxygen_exchange_mol=0.0):
+def _residue_atom_closure(
+    initial_totals,
+    final_totals,
+    buffer_oxygen_exchange_mol=0.0,
+    exhausted_totals=None,
+):
     """One scale-aware atom-closure check for both residue paths."""
-    closure = {
-        element: initial_totals.get(element, 0.0)
-        - final_totals.get(element, 0.0)
-        + (buffer_oxygen_exchange_mol if element == "O" else 0.0)
-        for element in sorted(set(initial_totals) | set(final_totals))
-    }
-    for element, residual in closure.items():
-        scale = max(abs(initial_totals.get(element, 0.0)), abs(final_totals.get(element, 0.0)), 1.0e-300)
+    elements = set(initial_totals) | set(final_totals)
+    if exhausted_totals is not None:
+        elements.update(exhausted_totals)
+    closure = {}
+    for element in sorted(elements):
+        adjustment = buffer_oxygen_exchange_mol if element == "O" else 0.0
+        if exhausted_totals is None:
+            residual = (
+                initial_totals.get(element, 0.0)
+                - final_totals.get(element, 0.0)
+                + adjustment
+            )
+            scale_final = final_totals.get(element, 0.0)
+        else:
+            exhausted = exhausted_totals.get(element, 0.0)
+            residual = (
+                initial_totals.get(element, 0.0)
+                - final_totals.get(element, 0.0)
+                - exhausted
+                + adjustment
+            )
+            scale_final = final_totals.get(element, 0.0) + exhausted
+        closure[element] = residual
+        scale = max(
+            abs(initial_totals.get(element, 0.0)), abs(scale_final), 1.0e-300
+        )
         _check_residue_atom_residual(element, residual, scale, "exceeds scale-aware tolerance")
     return closure
 
@@ -1748,14 +1771,14 @@ def integrate_residue_schedule(
         )
     initial_atoms = _atom_totals(initial_inventory, {})
     final_atoms = _atom_totals(inventory, evaporated)
+    exhausted_atoms = None
     if request.exhaustion_floor_mol is not None:
         exhausted_atoms = _atom_totals(exhausted, {})
-        final_atoms = {
-            element: final_atoms.get(element, 0.0) + exhausted_atoms.get(element, 0.0)
-            for element in set(final_atoms) | set(exhausted_atoms)
-        }
     atom_closure = _residue_atom_closure(
-        initial_atoms, final_atoms, buffer_oxygen_exchange_mol
+        initial_atoms,
+        final_atoms,
+        buffer_oxygen_exchange_mol,
+        exhausted_totals=exhausted_atoms,
     )
     pO2_floor = {
         "steps_at_floor": pO2_floor_steps,
