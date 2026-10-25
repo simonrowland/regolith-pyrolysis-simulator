@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase
+from simulator.battery.enums import Phase, PhaseRole
 from tests.battery.test_migrate import _migrate_real_extract
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -256,9 +256,28 @@ def test_isolated_migration_preserves_species_conditions_and_activity_standards(
             expected_f = source_row["point_conditions"]["fO2_log"]["state"]["value"]
             assert observation.point_conditions["fO2_log"].state.is_value
             assert observation.point_conditions["fO2_log"].state.value == Decimal(expected_f)
-        if source_row.get("phase") == "l":
-            assert observation.identity.species.phase.value is Phase.L
-            assert observation.point_conditions["total_pressure_Pa"].state.value == Decimal("101325")
+        if source_row["type"] == "equilibrium_phase_composition":
+            assert values["basis"] == "wt_percent"
+            assert values["phase_label_as_published"] in {"l", "glass"}
+            assert source_row["phase_as_measured"] in {
+                "quenched silicate glass",
+                "glass reference material analyzed for Pd by LA ICP-MS",
+            }
+            # Quenched experimental liquids are melt-role rows; analytical glass
+            # reference checks remain glass-role rows.
+            expected_role = (
+                PhaseRole.GLASS
+                if "reference material" in source_row["phase_as_measured"]
+                else PhaseRole.MELT
+            )
+            assert values["phase_label"] == expected_role.value
+            assert observation.identity.phase_role is not None
+            assert observation.identity.phase_role.value is expected_role
+            if source_row.get("phase") == "l":
+                assert observation.identity.species.phase.value is Phase.L
+                assert observation.point_conditions["total_pressure_Pa"].state.value == Decimal("101325")
+            else:
+                assert observation.identity.species.phase.value is Phase.GLASS
             assert observation.point_conditions["sample_id"].state.is_value
         if source_row["type"] == "activity_coefficient":
             assert observation.identity.reference_state is not None
