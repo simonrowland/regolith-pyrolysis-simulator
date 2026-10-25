@@ -29,6 +29,7 @@ from decimal import Decimal
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Callable, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
@@ -147,6 +148,7 @@ _ENGINE_THERMO_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
     Engine.OPENIMCC: _ENGINE_PURE_PHASE_QUANTITIES,
     Engine.THERMOENGINE: _ENGINE_PURE_PHASE_QUANTITIES,
     Engine.MAGEMIN: _ENGINE_PURE_PHASE_QUANTITIES,
+    Engine.ALPHAMELTS: _ENGINE_PURE_PHASE_QUANTITIES,
 }
 _H298_K = 298.15
 _PA_PER_BAR = Decimal("100000")
@@ -1199,6 +1201,13 @@ def _pure_phase_rows(engine: Engine) -> tuple[tuple[str, str, str | None], ...] 
 
 
 def _resolve_symbol(engine: Engine, identity: Identity) -> tuple[str | None, str]:
+    if engine is Engine.ALPHAMELTS:
+        if phase_token(identity.species) not in {Phase.CR, Phase.L}:
+            return None, "alphamelts-engine-does-not-report-phase-thermo"
+        formula = str(identity.species.formula)
+        if not _alphamelts_oxide_formula_moles(formula):
+            return None, "alphamelts-engine-does-not-report-phase-thermo"
+        return formula, ""
     if phase_token(identity.species) is not Phase.CR:
         return None, "pure-phase-is-crystal-only"
     rows = _pure_phase_rows(engine)
@@ -1365,11 +1374,11 @@ def _pure_phase_attempt(
             )
     symbol, why = _resolve_symbol(engine, identity)
     if symbol is None:
-        reason = (
-            RefusalReason.IDENTITY_UNKNOWN
-            if why == "species-formula-unparsed"
-            else RefusalReason.UNSUPPORTED
-        )
+        reason = RefusalReason.UNSUPPORTED
+        if why == "species-formula-unparsed":
+            reason = RefusalReason.IDENTITY_UNKNOWN
+        elif engine is Engine.ALPHAMELTS:
+            reason = RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
         return _refuse(reason, why, quantity=quantity, origin=origin, extra={"engine": engine.value})
     if not invoke_pure_phase:
         return _refuse(
@@ -1414,6 +1423,20 @@ def _pure_phase_attempt(
             extra={"engine": engine.value, "detail": str(exc)},
         )
     returned = getattr(props, "formula", None)
+    if engine is Engine.ALPHAMELTS:
+        phase_name = getattr(props, "_alphamelts_phase_name", None)
+        second_phase = getattr(second, "_alphamelts_phase_name", phase_name)
+        if phase_name is None or (
+            quantity is Quantity.H_MINUS_H298
+            and str(second_phase).casefold() != str(phase_name).casefold()
+        ):
+            return _refuse(
+                RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+                "alphamelts-engine-does-not-report-phase-thermo",
+                quantity=quantity,
+                origin=origin,
+                extra={"engine": engine.value, "formula": identity.species.formula},
+            )
     _is_comp, _is_internal, _is_sf04, parse_species_formula = _score_predicates()
     if returned and parse_species_formula(
         str(returned), species=identity.species
@@ -1448,15 +1471,259 @@ def _pure_phase_attempt(
             origin=origin,
             extra={"engine": engine.value},
         )
+    notices: tuple[Notice, ...] = ()
+    authority = Authority.BRIDGE
+    if engine is Engine.ALPHAMELTS:
+        collected_notices = list(getattr(props, "notices", ()) or ())
+        if second is not None and second is not props:
+            for notice in getattr(second, "notices", ()) or ():
+                if notice not in collected_notices:
+                    collected_notices.append(notice)
+        notices = tuple(collected_notices)
+        if notices:
+            authority = Authority.EXTRAPOLATED
+    call_evidence = f"pure-phase:{engine.value}:{symbol}:T={temperature_K}"
+    if engine is Engine.ALPHAMELTS:
+        call_evidence += f":phase={getattr(props, '_alphamelts_phase_name', '')}"
     return ThermoAttempt(
         value=value,
         unit=QUANTITY_UNITS[quantity],
-        authority=Authority.BRIDGE,
-        notices=(),
+        authority=authority,
+        notices=notices,
         refusal_reason=None,
         refusal_detail={},
-        call_evidence=f"pure-phase:{engine.value}:{symbol}:T={temperature_K}",
+        call_evidence=call_evidence,
     )
+
+
+def _alphamelts_oxide_formula_moles(formula: str) -> dict[str, float]:
+    """One mole of the species formula expressed in alphaMELTS oxide inputs."""
+
+    try:
+        from simulator.melt_backend.alphamelts import _oxide_component_stoichiometry
+
+        return dict(_oxide_component_stoichiometry(formula))
+    except (ImportError, TypeError, ValueError):
+        return {}
+
+
+def _alphamelts_phase_properties(
+    result: object,
+    identity: Identity,
+    formula: str,
+    oxide_moles: Mapping[str, float],
+) -> tuple[str, dict[str, float | None]] | None:
+    """Select one matching pure phase and put its extensive values per formula mole."""
+
+    phase_thermo = getattr(result, "phase_thermo", None)
+    phase_compositions = getattr(result, "phase_compositions", None)
+    phase_instances = getattr(result, "phase_instances", None)
+    if not isinstance(phase_thermo, Mapping):
+        return None
+    if not isinstance(phase_compositions, Mapping):
+        phase_compositions = {}
+    if not isinstance(phase_instances, Sequence):
+        phase_instances = ()
+
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.melt_backend.alphamelts import _activity_formula_atoms
+
+    target_atoms = dict(_activity_formula_atoms(formula))
+    if not target_atoms:
+        return None
+    phase = phase_token(identity.species)
+    polymorph = _poly_name(identity)
+    if phase not in {Phase.CR, Phase.L}:
+        return None
+
+    formula_molar_mass = resolve_species_formula(formula).molar_mass_kg_per_mol()
+    expected_oxide_mass = {
+        oxide: amount * resolve_species_formula(oxide).molar_mass_kg_per_mol()
+        for oxide, amount in oxide_moles.items()
+    }
+    total_oxide_mass = sum(expected_oxide_mass.values())
+    if formula_molar_mass <= 0.0 or total_oxide_mass <= 0.0:
+        return None
+    expected_oxide_wt_pct = {
+        oxide: 100.0 * mass / total_oxide_mass
+        for oxide, mass in expected_oxide_mass.items()
+    }
+
+    def normalized_name(value: object) -> str:
+        return re.sub(r"[^a-z0-9]+", "", str(value).casefold())
+
+    matches: list[tuple[str, dict[str, float | None]]] = []
+    for raw_phase, raw_properties in phase_thermo.items():
+        if not isinstance(raw_properties, Mapping):
+            continue
+        phase_name = normalized_name(raw_phase)
+        if phase is Phase.L:
+            if phase_name != "liquid":
+                continue
+        elif phase_name == "liquid" or (
+            polymorph and not _same_mineral(phase_name, polymorph)
+        ):
+            continue
+
+        if phase is Phase.CR:
+            instances = [
+                instance
+                for instance in phase_instances
+                if isinstance(instance, Mapping)
+                and normalized_name(instance.get("phase", "")) == phase_name
+            ]
+            if not instances:
+                continue
+            if any(
+                dict(
+                    _activity_formula_atoms(
+                        str(instance.get("formula_or_endmember_token") or "")
+                    )
+                )
+                != target_atoms
+                for instance in instances
+            ):
+                continue
+        else:
+            reported_composition = next(
+                (
+                    value
+                    for name, value in phase_compositions.items()
+                    if normalized_name(name) == phase_name
+                ),
+                None,
+            )
+            if not isinstance(reported_composition, Mapping):
+                continue
+            actual_wt_pct = {
+                str(name): float(value)
+                for name, value in reported_composition.items()
+                if float(value) > 0.0
+            }
+            if any(
+                abs(actual_wt_pct.get(oxide, 0.0) - expected) > 0.15
+                for oxide, expected in expected_oxide_wt_pct.items()
+            ) or any(
+                oxide not in expected_oxide_wt_pct and amount > 0.15
+                for oxide, amount in actual_wt_pct.items()
+            ):
+                continue
+
+        try:
+            reference_mass_kg = float(raw_properties["reference_mass_kg"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        formula_moles = reference_mass_kg / formula_molar_mass
+        if not math.isfinite(formula_moles) or formula_moles <= 0.0:
+            continue
+
+        # Premise: alphaMELTS Phase_main_tbl reports H in J and S/Cp in J/K,
+        # extensive on the same solver-phase mass basis as reference_mass_kg.
+        # Algebra: n_formula = m_phase / M_formula; divide each extensive
+        # property by n_formula to obtain the observed per-mole species basis.
+        # Unit check: J / mol = J/mol and (J/K) / mol = J/(K mol).
+        # Sanity: quartz at 298.15 K, S=68.988766 J/K on 0.1 kg gives
+        # 41.46 J/(mol K), matching JANAF O-037's 41.463 J/(mol K).
+        normalized: dict[str, float | None] = {}
+        for source, destination in (
+            ("enthalpy_J", "H_J_mol"),
+            ("entropy_J_K", "S_J_K_mol"),
+            ("heat_capacity_J_K", "Cp_J_K_mol"),
+        ):
+            try:
+                extensive = float(raw_properties[source])
+            except (KeyError, TypeError, ValueError):
+                normalized[destination] = None
+                continue
+            normalized[destination] = (
+                extensive / formula_moles
+                if math.isfinite(extensive)
+                else None
+            )
+        matches.append((str(raw_phase), normalized))
+
+    return matches[0] if len(matches) == 1 else None
+
+
+def _default_alphamelts_phase_result(
+    formula: str, temperature_K: float, pressure_bar: float
+):
+    """Run alphaMELTS on one formula-unit oxide composition."""
+
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
+    from simulator.melt_backend.pure_phase import PurePhaseAccessError
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+
+    oxide_moles = _alphamelts_oxide_formula_moles(formula)
+    if not oxide_moles:
+        raise PurePhaseAccessError(f"no alphaMELTS oxide composition for {formula}")
+    backend = _BACKENDS.get(Engine.ALPHAMELTS)
+    if backend is None:
+        backend = AlphaMELTSBackend()
+        if not backend.initialize({}):
+            raise PurePhaseAccessError("alphamelts-unavailable")
+        _BACKENDS[Engine.ALPHAMELTS] = backend
+    return backend.equilibrate(  # type: ignore[attr-defined]
+        temperature_C=float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET,
+        composition_mol=oxide_moles,
+        fO2_log=None,
+        pressure_bar=float(pressure_bar),
+        redox_mode=REDOX_MODE_NOT_AN_INPUT,
+        subprocess_run_mode="isothermal",
+    )
+
+
+def _alphamelts_domain_notices(
+    results: Sequence[object], quantity: Quantity, origin: str
+) -> tuple[Notice, ...]:
+    notices: list[Notice] = []
+    seen: set[tuple[str, str | None]] = set()
+    for result in results:
+        diagnostics = getattr(result, "diagnostics", None)
+        if not isinstance(diagnostics, Mapping):
+            diagnostics = {}
+        commissioning = diagnostics.get("commissioning_notice")
+        if isinstance(commissioning, Mapping):
+            band = commissioning.get("certified_band")
+            band_text = json.dumps(band, sort_keys=True, default=str)
+            warnings = commissioning.get("warnings") or ()
+            reason = "alphamelts-outside-certified-band"
+            if warnings:
+                reason += ": " + "; ".join(str(warning) for warning in warnings)
+            key = (reason, band_text)
+            if key in seen:
+                continue
+            seen.add(key)
+            notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(quantity,),
+                    reason=reason,
+                    origin=origin,
+                    band=band_text,
+                    authority=Authority.EXTRAPOLATED,
+                )
+            )
+        elif (
+            getattr(result, "status", None) == "out_of_domain"
+            or diagnostics.get("backend_status") == "out_of_domain"
+        ):
+            reason = "alphamelts-out-of-domain-result"
+            key = (reason, None)
+            if key in seen:
+                continue
+            seen.add(key)
+            notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(quantity,),
+                    reason=reason,
+                    origin=origin,
+                    authority=Authority.EXTRAPOLATED,
+                )
+            )
+    return tuple(notices)
 
 
 def _janaf_catalog_standard_pressure_Pa() -> Decimal | None:
@@ -2778,10 +3045,11 @@ def predict_thermo_attempt(
 ) -> ThermoAttempt:
     """Thermochemistry from that engine's own thermo, or a typed refusal.
 
-    Internal-analytical uses the Ellingham fit (JANAF-4th refit).
-    ThermoEngine and MAGEMin use pure-phase Cp, S, and H−H298.
-    Apparent G is not ΔfG(T) and is refused. Other engines have no
-    thermochemistry branch. A refusal carries no numeric value.
+    Internal-analytical uses the Ellingham fit (JANAF-4th refit). AlphaMELTS,
+    ThermoEngine, and MAGEMin use pure-phase Cp, S, and H−H298. VapoRock
+    evaluates supported JANAF gas rows, while OpenIMCC uses card-backed
+    pure-phase S, Cp, H−H298, and supported fusion pairs. Apparent G is not
+    ΔfG(T) and is refused. Unsupported engines and quantities carry no value.
     """
 
     identity = observation.identity
@@ -3064,6 +3332,46 @@ def predict_thermo_attempt(
     if engine is Engine.OPENIMCC:
         return _openimcc_pure_phase_attempt(
             identity, quantity, temperature_K, origin=origin
+        )
+    if engine is Engine.ALPHAMELTS:
+        formula = str(identity.species.formula)
+        oxide_moles = _alphamelts_oxide_formula_moles(formula)
+
+        def alphamelts_properties(_engine, species_formula, temp, pressure):
+            result = (
+                pure_phase(Engine.ALPHAMELTS, species_formula, temp, pressure)
+                if pure_phase is not None
+                else _default_alphamelts_phase_result(
+                    species_formula, temp, pressure
+                )
+            )
+            selected = _alphamelts_phase_properties(
+                result, identity, formula, oxide_moles
+            )
+            if selected is None:
+                return SimpleNamespace(
+                    formula=formula,
+                    _alphamelts_phase_name=None,
+                    absences=(),
+                    notices=(),
+                )
+            phase_name, properties = selected
+            return SimpleNamespace(
+                formula=formula,
+                _alphamelts_phase_name=phase_name,
+                absences=(),
+                notices=_alphamelts_domain_notices((result,), quantity, origin),
+                **properties,
+            )
+
+        return _pure_phase_attempt(
+            Engine.ALPHAMELTS,
+            identity,
+            quantity,
+            temperature_K,
+            origin=origin,
+            invoke_pure_phase=invoke_pure_phase,
+            pure_phase=alphamelts_properties,
         )
     if engine in {Engine.THERMOENGINE, Engine.MAGEMIN}:
         return _pure_phase_attempt(
