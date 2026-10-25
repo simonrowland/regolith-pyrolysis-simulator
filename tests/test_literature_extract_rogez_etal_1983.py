@@ -237,6 +237,13 @@ def test_isolated_migration_maps_printed_conditions_and_omits_unprinted_pressure
             "Na2Al2Si6O16": Decimal(x_ab),
             "K2Al2Si6O16": Decimal(x_or),
         }
+        assert (
+            observation.point_conditions["composition"].state.value.as_map()
+            == {
+                "Na2Al2Si6O16": Decimal(x_ab),
+                "K2Al2Si6O16": Decimal(x_or),
+            }
+        )
         assert observation.identity.temperature_K.is_value
         assert observation.identity.temperature_K.value == Decimal("1300")
         assert observation.identity.total_pressure_Pa.is_unknown
