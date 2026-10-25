@@ -2419,7 +2419,9 @@ def test_mathieu_2009_a6_2_activity_compositions_migrate() -> None:
             if row["observation_id"] == observation_id
         )
         assert source_row_data["values"]["composition_wt_pct"] == expected
-        assert source_row_data["values"]["composition_locator"] == {
+        printed_composition = source_row_data["values"]["printed_composition"]
+        assert printed_composition["value"] == expected
+        assert printed_composition["locator"] == {
             "pdf_page": page,
             "table": "A.6.2",
             "row": source_row,
@@ -2434,6 +2436,13 @@ def test_mathieu_2009_a6_2_activity_compositions_migrate() -> None:
                 {oxide: Decimal(str(value)) for oxide, value in expected.items()}
             ).as_map()
         )
+        conditions = migrated.point_conditions or {}
+        for condition_name in ("composition", "printed_composition"):
+            condition = conditions[condition_name]
+            assert condition.locator is not None
+            assert condition.locator.table == "A.6.2", condition_name
+            assert f"pdf_page={page}" in (condition.locator.note or ""), condition_name
+            assert source_row in (condition.locator.note or ""), condition_name
         assert "A.6.2" in source_row_data["values"]["composition_basis"]
         assert "after Na equilibration" in source_row_data["values"]["composition_basis"]
 

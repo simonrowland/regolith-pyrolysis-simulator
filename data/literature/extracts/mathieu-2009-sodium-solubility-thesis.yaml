@@ -6872,18 +6872,20 @@ species:
           - mathieu_2009_t38_acmas5_as1_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 21.07
-          MgO: 0.04
-          SiO2: 55.96
-          Al2O3: 22.63
-          CaO: 0.3
+        printed_composition:
+          value: &mathieu_a62_001
+            Na2O: 21.07
+            MgO: 0.04
+            SiO2: 55.96
+            Al2O3: 22.63
+            CaO: 0.3
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS5 AS1
+        composition_wt_pct: *mathieu_a62_001
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS5 AS1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -7011,18 +7013,20 @@ species:
           - mathieu_2009_t38_acmas5_as2_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 21.13
-          MgO: 0.01
-          SiO2: 48.07
-          Al2O3: 30.75
-          CaO: 0.04
+        printed_composition:
+          value: &mathieu_a62_002
+            Na2O: 21.13
+            MgO: 0.01
+            SiO2: 48.07
+            Al2O3: 30.75
+            CaO: 0.04
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS5 AS2
+        composition_wt_pct: *mathieu_a62_002
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS5 AS2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -7406,18 +7410,20 @@ species:
           - mathieu_2009_t38_acmas8_cas1_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 15.47
-          MgO: 0.01
-          SiO2: 51.16
-          Al2O3: 18.61
-          CaO: 14.68
+        printed_composition:
+          value: &mathieu_a62_003
+            Na2O: 15.47
+            MgO: 0.01
+            SiO2: 51.16
+            Al2O3: 18.61
+            CaO: 14.68
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS8 CAS1
+        composition_wt_pct: *mathieu_a62_003
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS8 CAS1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -7545,18 +7551,20 @@ species:
           - mathieu_2009_t38_acmas8_cas2_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 15.64
-          MgO: 0.02
-          SiO2: 47.37
-          Al2O3: 22.59
-          CaO: 14.34
+        printed_composition:
+          value: &mathieu_a62_004
+            Na2O: 15.64
+            MgO: 0.02
+            SiO2: 47.37
+            Al2O3: 22.59
+            CaO: 14.34
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS8 CAS2
+        composition_wt_pct: *mathieu_a62_004
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS8 CAS2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -7684,18 +7692,20 @@ species:
           - mathieu_2009_t38_acmas8_cas3_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 15.85
-          MgO: 0.01
-          SiO2: 43.41
-          Al2O3: 26.58
-          CaO: 14.12
+        printed_composition:
+          value: &mathieu_a62_005
+            Na2O: 15.85
+            MgO: 0.01
+            SiO2: 43.41
+            Al2O3: 26.58
+            CaO: 14.12
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS8 CAS3
+        composition_wt_pct: *mathieu_a62_005
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS8 CAS3
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -7823,18 +7833,20 @@ species:
           - mathieu_2009_t38_acmas9_cm1_0_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 13.17
-          MgO: 0.12
-          SiO2: 17.15
-          Al2O3: 45.49
-          CaO: 24.04
+        printed_composition:
+          value: &mathieu_a62_006
+            Na2O: 13.17
+            MgO: 0.12
+            SiO2: 17.15
+            Al2O3: 45.49
+            CaO: 24.04
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS9 CM1-0
+        composition_wt_pct: *mathieu_a62_006
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS9 CM1-0
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -7962,18 +7974,20 @@ species:
           - mathieu_2009_t38_acmas10_cm2_0_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 12.05
-          MgO: 0.39
-          SiO2: 21.05
-          Al2O3: 42.45
-          CaO: 24.04
+        printed_composition:
+          value: &mathieu_a62_007
+            Na2O: 12.05
+            MgO: 0.39
+            SiO2: 21.05
+            Al2O3: 42.45
+            CaO: 24.04
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS10 CM2-0
+        composition_wt_pct: *mathieu_a62_007
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS10 CM2-0
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -8101,18 +8115,20 @@ species:
           - mathieu_2009_t38_acmas11_cm3_0_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 11.78
-          MgO: 0.1
-          SiO2: 39.84
-          Al2O3: 25.56
-          CaO: 22.71
+        printed_composition:
+          value: &mathieu_a62_008
+            Na2O: 11.78
+            MgO: 0.1
+            SiO2: 39.84
+            Al2O3: 25.56
+            CaO: 22.71
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS11 CM3-0
+        composition_wt_pct: *mathieu_a62_008
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS11 CM3-0
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -8240,18 +8256,20 @@ species:
           - mathieu_2009_t38_acmas13_acs_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 0.79
-          MgO: 0.03
-          SiO2: 7.45
-          Al2O3: 42.62
-          CaO: 49.09
+        printed_composition:
+          value: &mathieu_a62_009
+            Na2O: 0.79
+            MgO: 0.03
+            SiO2: 7.45
+            Al2O3: 42.62
+            CaO: 49.09
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS13 ACS
+        composition_wt_pct: *mathieu_a62_009
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS13 ACS
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -8507,18 +8525,20 @@ species:
           - mathieu_2009_t38_acmas16_n2as10_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 25.61
-          MgO: 0.01
-          SiO2: 64.01
-          Al2O3: 10.36
-          CaO: 0.01
+        printed_composition:
+          value: &mathieu_a62_010
+            Na2O: 25.61
+            MgO: 0.01
+            SiO2: 64.01
+            Al2O3: 10.36
+            CaO: 0.01
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS16 N2AS10
+        composition_wt_pct: *mathieu_a62_010
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS16 N2AS10
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -9030,18 +9050,20 @@ species:
           - mathieu_2009_t38_acmas17_n2as4_5_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 22.39
-          MgO: 0.02
-          SiO2: 55.6
-          Al2O3: 21.93
-          CaO: 0.05
+        printed_composition:
+          value: &mathieu_a62_011
+            Na2O: 22.39
+            MgO: 0.02
+            SiO2: 55.6
+            Al2O3: 21.93
+            CaO: 0.05
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS17 N2AS4,5
+        composition_wt_pct: *mathieu_a62_011
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS17 N2AS4,5
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -9169,18 +9191,20 @@ species:
           - mathieu_2009_t38_acmas17_n2as6_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 23.58
-          MgO: 0.03
-          SiO2: 60.18
-          Al2O3: 16.2
-          CaO: 0.0
+        printed_composition:
+          value: &mathieu_a62_012
+            Na2O: 23.58
+            MgO: 0.03
+            SiO2: 60.18
+            Al2O3: 16.2
+            CaO: 0.0
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS17 N2AS6
+        composition_wt_pct: *mathieu_a62_012
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS17 N2AS6
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -9308,18 +9332,20 @@ species:
           - mathieu_2009_t38_acmas18_cma25s1_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 20.4
-          MgO: 13.06
-          SiO2: 44.84
-          Al2O3: 21.52
-          CaO: 0.18
+        printed_composition:
+          value: &mathieu_a62_013
+            Na2O: 20.4
+            MgO: 13.06
+            SiO2: 44.84
+            Al2O3: 21.52
+            CaO: 0.18
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS18 CMA25S1
+        composition_wt_pct: *mathieu_a62_013
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS18 CMA25S1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -9447,18 +9473,20 @@ species:
           - mathieu_2009_t38_acmas18_cma25s3_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 12.82
-          MgO: 0.05
-          SiO2: 41.51
-          Al2O3: 19.93
-          CaO: 25.68
+        printed_composition:
+          value: &mathieu_a62_014
+            Na2O: 12.82
+            MgO: 0.05
+            SiO2: 41.51
+            Al2O3: 19.93
+            CaO: 25.68
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS18 CMA25S3
+        composition_wt_pct: *mathieu_a62_014
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS18 CMA25S3
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -9586,18 +9614,20 @@ species:
           - mathieu_2009_t38_acmas20_nas4_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 23.4
-          MgO: 0.02
-          SiO2: 58.05
-          Al2O3: 18.48
-          CaO: 0.04
+        printed_composition:
+          value: &mathieu_a62_015
+            Na2O: 23.4
+            MgO: 0.02
+            SiO2: 58.05
+            Al2O3: 18.48
+            CaO: 0.04
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS20 NAS4
+        composition_wt_pct: *mathieu_a62_015
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS20 NAS4
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -9728,18 +9758,20 @@ species:
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 27.78 mol% Na2O, gamma = a/x = 7.6e-07, but the printed gamma 0.85 under the heading x10^-6 is 8.5e-07
           (ratio 1.12). Printed values are carried unchanged; the row is not admitted until the scale or value is resolved.'
-        composition_wt_pct:
-          Na2O: 22.32
-          MgO: 0.03
-          SiO2: 52.07
-          Al2O3: 25.57
-          CaO: 0.01
+        printed_composition:
+          value: &mathieu_a62_016
+            Na2O: 22.32
+            MgO: 0.03
+            SiO2: 52.07
+            Al2O3: 25.57
+            CaO: 0.01
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS20 NAS3
+        composition_wt_pct: *mathieu_a62_016
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS20 NAS3
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -9996,18 +10028,20 @@ species:
           - mathieu_2009_t38_acmas32_cas13_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 12.08
-          MgO: 0.03
-          SiO2: 32.52
-          Al2O3: 35.59
-          CaO: 19.78
+        printed_composition:
+          value: &mathieu_a62_017
+            Na2O: 12.08
+            MgO: 0.03
+            SiO2: 32.52
+            Al2O3: 35.59
+            CaO: 19.78
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS32 CAS13
+        composition_wt_pct: *mathieu_a62_017
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS32 CAS13
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -10264,18 +10298,20 @@ species:
           - mathieu_2009_t38_acmas34_cas16_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 20.9
-          MgO: 0.02
-          SiO2: 59.84
-          Al2O3: 11.3
-          CaO: 7.93
+        printed_composition:
+          value: &mathieu_a62_018
+            Na2O: 20.9
+            MgO: 0.02
+            SiO2: 59.84
+            Al2O3: 11.3
+            CaO: 7.93
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS34 CAS16
+        composition_wt_pct: *mathieu_a62_018
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS34 CAS16
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -10403,18 +10439,20 @@ species:
           - mathieu_2009_t38_acmas34_ncas4_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 19.66
-          MgO: 0.02
-          SiO2: 54.2
-          Al2O3: 20.84
-          CaO: 5.29
+        printed_composition:
+          value: &mathieu_a62_019
+            Na2O: 19.66
+            MgO: 0.02
+            SiO2: 54.2
+            Al2O3: 20.84
+            CaO: 5.29
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS34 NCAS4
+        composition_wt_pct: *mathieu_a62_019
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS34 NCAS4
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -10544,18 +10582,20 @@ species:
           - mathieu_2009_t38_acmas34_ca1_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 1.87
-          MgO: 0.01
-          SiO2: 0.0
-          Al2O3: 52.03
-          CaO: 46.09
+        printed_composition:
+          value: &mathieu_a62_020
+            Na2O: 1.87
+            MgO: 0.01
+            SiO2: 0.0
+            Al2O3: 52.03
+            CaO: 46.09
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS34 CA1
+        composition_wt_pct: *mathieu_a62_020
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS34 CA1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -10683,18 +10723,20 @@ species:
           - mathieu_2009_t38_acmas35_ncas5_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 19.03
-          MgO: 0.02
-          SiO2: 47.27
-          Al2O3: 26.92
-          CaO: 6.76
+        printed_composition:
+          value: &mathieu_a62_021
+            Na2O: 19.03
+            MgO: 0.02
+            SiO2: 47.27
+            Al2O3: 26.92
+            CaO: 6.76
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS35 NCAS5
+        composition_wt_pct: *mathieu_a62_021
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS35 NCAS5
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -10822,18 +10864,20 @@ species:
           - mathieu_2009_t38_acmas35_cas26_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 15.37
-          MgO: 0.01
-          SiO2: 44.86
-          Al2O3: 25.54
-          CaO: 14.22
+        printed_composition:
+          value: &mathieu_a62_022
+            Na2O: 15.37
+            MgO: 0.01
+            SiO2: 44.86
+            Al2O3: 25.54
+            CaO: 14.22
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS35 CAS26
+        composition_wt_pct: *mathieu_a62_022
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS35 CAS26
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -10967,18 +11011,20 @@ species:
           corrected 13.25 mol% Na2O, gamma = a/x = 1.59e-06, but the printed gamma 1.30 under the heading x10^-6 is
           1.3e-06 (ratio 0.816). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 12.63
-          MgO: 0.11
-          SiO2: 23.98
-          Al2O3: 46.58
-          CaO: 16.71
+        printed_composition:
+          value: &mathieu_a62_023
+            Na2O: 12.63
+            MgO: 0.11
+            SiO2: 23.98
+            Al2O3: 46.58
+            CaO: 16.71
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS35 NCAS3
+        composition_wt_pct: *mathieu_a62_023
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS35 NCAS3
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -11108,18 +11154,20 @@ species:
           - mathieu_2009_t38_acmas35_ncas1_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 15.16
-          MgO: 0.06
-          SiO2: 31.57
-          Al2O3: 40.2
-          CaO: 13.01
+        printed_composition:
+          value: &mathieu_a62_024
+            Na2O: 15.16
+            MgO: 0.06
+            SiO2: 31.57
+            Al2O3: 40.2
+            CaO: 13.01
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS35 NCAS1
+        composition_wt_pct: *mathieu_a62_024
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS35 NCAS1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -11249,18 +11297,20 @@ species:
           - mathieu_2009_t38_acmas35_ca2_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 0.49
-          MgO: 0.05
-          SiO2: 0.2
-          Al2O3: 51.12
-          CaO: 48.14
+        printed_composition:
+          value: &mathieu_a62_025
+            Na2O: 0.49
+            MgO: 0.05
+            SiO2: 0.2
+            Al2O3: 51.12
+            CaO: 48.14
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS35 CA2
+        composition_wt_pct: *mathieu_a62_025
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS35 CA2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -11388,18 +11438,20 @@ species:
           - mathieu_2009_t38_acmas37_cas25_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 17.49
-          MgO: 0.02
-          SiO2: 48.79
-          Al2O3: 21.81
-          CaO: 11.9
+        printed_composition:
+          value: &mathieu_a62_026
+            Na2O: 17.49
+            MgO: 0.02
+            SiO2: 48.79
+            Al2O3: 21.81
+            CaO: 11.9
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS37 CAS25
+        composition_wt_pct: *mathieu_a62_026
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS37 CAS25
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -11527,18 +11579,20 @@ species:
           - mathieu_2009_t38_acmas37_cas4_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 8.87
-          MgO: 0.01
-          SiO2: 23.47
-          Al2O3: 43.83
-          CaO: 23.81
+        printed_composition:
+          value: &mathieu_a62_027
+            Na2O: 8.87
+            MgO: 0.01
+            SiO2: 23.47
+            Al2O3: 43.83
+            CaO: 23.81
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS37 CAS4
+        composition_wt_pct: *mathieu_a62_027
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS37 CAS4
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -11668,18 +11722,20 @@ species:
           - mathieu_2009_t38_acmas37_cas8_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 6.58
-          MgO: 0.07
-          SiO2: 20.11
-          Al2O3: 45.87
-          CaO: 27.37
+        printed_composition:
+          value: &mathieu_a62_028
+            Na2O: 6.58
+            MgO: 0.07
+            SiO2: 20.11
+            Al2O3: 45.87
+            CaO: 27.37
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS37 CAS8
+        composition_wt_pct: *mathieu_a62_028
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS37 CAS8
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -11807,18 +11863,20 @@ species:
           - mathieu_2009_t38_acmas38_ncas6_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 21.1
-          MgO: 0.02
-          SiO2: 58.23
-          Al2O3: 16.41
-          CaO: 4.24
+        printed_composition:
+          value: &mathieu_a62_029
+            Na2O: 21.1
+            MgO: 0.02
+            SiO2: 58.23
+            Al2O3: 16.41
+            CaO: 4.24
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS38 NCAS6
+        composition_wt_pct: *mathieu_a62_029
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS38 NCAS6
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -11946,18 +12004,20 @@ species:
           - mathieu_2009_t38_acmas38_cas7_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 8.41
-          MgO: 0.02
-          SiO2: 36.43
-          Al2O3: 23.89
-          CaO: 31.25
+        printed_composition:
+          value: &mathieu_a62_030
+            Na2O: 8.41
+            MgO: 0.02
+            SiO2: 36.43
+            Al2O3: 23.89
+            CaO: 31.25
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS38 CAS7
+        composition_wt_pct: *mathieu_a62_030
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS38 CAS7
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -12087,18 +12147,20 @@ species:
           - mathieu_2009_t38_acmas39_cas9_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 8.7
-          MgO: 0.02
-          SiO2: 21.1
-          Al2O3: 46.37
-          CaO: 23.82
+        printed_composition:
+          value: &mathieu_a62_031
+            Na2O: 8.7
+            MgO: 0.02
+            SiO2: 21.1
+            Al2O3: 46.37
+            CaO: 23.82
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS39 CAS9
+        composition_wt_pct: *mathieu_a62_031
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS39 CAS9
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -12228,18 +12290,20 @@ species:
           - mathieu_2009_t38_acmas39_ncas7_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 4.3
-          MgO: 0.02
-          SiO2: 37.11
-          Al2O3: 14.64
-          CaO: 43.94
+        printed_composition:
+          value: &mathieu_a62_032
+            Na2O: 4.3
+            MgO: 0.02
+            SiO2: 37.11
+            Al2O3: 14.64
+            CaO: 43.94
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS39 NCAS7
+        composition_wt_pct: *mathieu_a62_032
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS39 NCAS7
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -12495,18 +12559,20 @@ species:
           - mathieu_2009_t38_acmas40_cmas19_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 15.82
-          MgO: 0.03
-          SiO2: 52.23
-          Al2O3: 6.79
-          CaO: 25.13
+        printed_composition:
+          value: &mathieu_a62_033
+            Na2O: 15.82
+            MgO: 0.03
+            SiO2: 52.23
+            Al2O3: 6.79
+            CaO: 25.13
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS40 CMAS19
+        composition_wt_pct: *mathieu_a62_033
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS40 CMAS19
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -12634,18 +12700,20 @@ species:
           - mathieu_2009_t38_acmas40_cmas20_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 14.8
-          MgO: 0.05
-          SiO2: 48.92
-          Al2O3: 13.18
-          CaO: 23.04
+        printed_composition:
+          value: &mathieu_a62_034
+            Na2O: 14.8
+            MgO: 0.05
+            SiO2: 48.92
+            Al2O3: 13.18
+            CaO: 23.04
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS40 CMAS20
+        composition_wt_pct: *mathieu_a62_034
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS40 CMAS20
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -12773,18 +12841,20 @@ species:
           - mathieu_2009_t38_acmas40_cmas21_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 14.38
-          MgO: 0.05
-          SiO2: 42.15
-          Al2O3: 23.62
-          CaO: 19.81
+        printed_composition:
+          value: &mathieu_a62_035
+            Na2O: 14.38
+            MgO: 0.05
+            SiO2: 42.15
+            Al2O3: 23.62
+            CaO: 19.81
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS40 CMAS21
+        composition_wt_pct: *mathieu_a62_035
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS40 CMAS21
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -12912,18 +12982,20 @@ species:
           - mathieu_2009_t38_acmas40_cmas22_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 14.5
-          MgO: 0.03
-          SiO2: 36.47
-          Al2O3: 31.66
-          CaO: 17.34
+        printed_composition:
+          value: &mathieu_a62_036
+            Na2O: 14.5
+            MgO: 0.03
+            SiO2: 36.47
+            Al2O3: 31.66
+            CaO: 17.34
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS40 CMAS22
+        composition_wt_pct: *mathieu_a62_036
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS40 CMAS22
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -13051,18 +13123,20 @@ species:
           - mathieu_2009_t38_acma5s22_cma5s2_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 12.42
-          MgO: 0.17
-          SiO2: 48.35
-          Al2O3: 7.64
-          CaO: 31.41
+        printed_composition:
+          value: &mathieu_a62_037
+            Na2O: 12.42
+            MgO: 0.17
+            SiO2: 48.35
+            Al2O3: 7.64
+            CaO: 31.41
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S22 CMA5S2
+        composition_wt_pct: *mathieu_a62_037
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S22 CMA5S2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -13190,18 +13264,20 @@ species:
           - mathieu_2009_t38_acma5s26_cma5s1_na2o_analysed
           - mathieu_2009_t38_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 6.91
-          MgO: 0.15
-          SiO2: 45.3
-          Al2O3: 7.5
-          CaO: 40.14
+        printed_composition:
+          value: &mathieu_a62_038
+            Na2O: 6.91
+            MgO: 0.15
+            SiO2: 45.3
+            Al2O3: 7.5
+            CaO: 40.14
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S26 CMA5S1
+        composition_wt_pct: *mathieu_a62_038
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S26 CMA5S1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -13317,18 +13393,20 @@ species:
           - mathieu_2009_t39_acmas5_as1_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 21.07
-          MgO: 0.04
-          SiO2: 55.96
-          Al2O3: 22.63
-          CaO: 0.3
+        printed_composition:
+          value: &mathieu_a62_039
+            Na2O: 21.07
+            MgO: 0.04
+            SiO2: 55.96
+            Al2O3: 22.63
+            CaO: 0.3
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS5 AS1
+        composition_wt_pct: *mathieu_a62_039
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS5 AS1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -13444,18 +13522,20 @@ species:
           - mathieu_2009_t39_acmas5_as2_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 21.13
-          MgO: 0.01
-          SiO2: 48.07
-          Al2O3: 30.75
-          CaO: 0.04
+        printed_composition:
+          value: &mathieu_a62_040
+            Na2O: 21.13
+            MgO: 0.01
+            SiO2: 48.07
+            Al2O3: 30.75
+            CaO: 0.04
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS5 AS2
+        composition_wt_pct: *mathieu_a62_040
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS5 AS2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -13689,18 +13769,20 @@ species:
           - mathieu_2009_t39_acmas16_n2as10_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 25.61
-          MgO: 0.01
-          SiO2: 64.01
-          Al2O3: 10.36
-          CaO: 0.01
+        printed_composition:
+          value: &mathieu_a62_041
+            Na2O: 25.61
+            MgO: 0.01
+            SiO2: 64.01
+            Al2O3: 10.36
+            CaO: 0.01
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS16 N2AS10
+        composition_wt_pct: *mathieu_a62_041
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS16 N2AS10
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -13816,18 +13898,20 @@ species:
           - mathieu_2009_t39_acmas17_n2as4_5_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 22.39
-          MgO: 0.02
-          SiO2: 55.6
-          Al2O3: 21.93
-          CaO: 0.05
+        printed_composition:
+          value: &mathieu_a62_042
+            Na2O: 22.39
+            MgO: 0.02
+            SiO2: 55.6
+            Al2O3: 21.93
+            CaO: 0.05
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS17 N2AS4,5
+        composition_wt_pct: *mathieu_a62_042
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS17 N2AS4,5
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -13943,18 +14027,20 @@ species:
           - mathieu_2009_t39_acmas17_n2as6_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 23.58
-          MgO: 0.03
-          SiO2: 60.18
-          Al2O3: 16.2
-          CaO: 0.0
+        printed_composition:
+          value: &mathieu_a62_043
+            Na2O: 23.58
+            MgO: 0.03
+            SiO2: 60.18
+            Al2O3: 16.2
+            CaO: 0.0
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS17 N2AS6
+        composition_wt_pct: *mathieu_a62_043
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS17 N2AS6
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -14070,18 +14156,20 @@ species:
           - mathieu_2009_t39_acmas18_cma25s1_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 20.4
-          MgO: 13.06
-          SiO2: 44.84
-          Al2O3: 21.52
-          CaO: 0.18
+        printed_composition:
+          value: &mathieu_a62_044
+            Na2O: 20.4
+            MgO: 13.06
+            SiO2: 44.84
+            Al2O3: 21.52
+            CaO: 0.18
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS18 CMA25S1
+        composition_wt_pct: *mathieu_a62_044
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS18 CMA25S1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -14197,18 +14285,20 @@ species:
           - mathieu_2009_t39_acmas18_cma25s2_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 19.48
-          MgO: 15.32
-          SiO2: 44.1
-          Al2O3: 20.96
-          CaO: 0.14
+        printed_composition:
+          value: &mathieu_a62_045
+            Na2O: 19.48
+            MgO: 15.32
+            SiO2: 44.1
+            Al2O3: 20.96
+            CaO: 0.14
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS18 CMA25S2
+        composition_wt_pct: *mathieu_a62_045
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS18 CMA25S2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -14327,18 +14417,20 @@ species:
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 27.78 mol% Na2O, gamma = a/x = 7.6e-07, but the printed gamma 0.85 under the heading x10^-6 is 8.5e-07
           (ratio 1.12). Printed values are carried unchanged; the row is not admitted until the scale or value is resolved.'
-        composition_wt_pct:
-          Na2O: 22.32
-          MgO: 0.03
-          SiO2: 52.07
-          Al2O3: 25.57
-          CaO: 0.01
+        printed_composition:
+          value: &mathieu_a62_046
+            Na2O: 22.32
+            MgO: 0.03
+            SiO2: 52.07
+            Al2O3: 25.57
+            CaO: 0.01
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS20 NAS3
+        composition_wt_pct: *mathieu_a62_046
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS20 NAS3
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -14456,18 +14548,20 @@ species:
           - mathieu_2009_t39_acmas29_mas11_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 17.27
-          MgO: 14.65
-          SiO2: 43.58
-          Al2O3: 24.41
-          CaO: 0.1
+        printed_composition:
+          value: &mathieu_a62_047
+            Na2O: 17.27
+            MgO: 14.65
+            SiO2: 43.58
+            Al2O3: 24.41
+            CaO: 0.1
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS29 MAS11
+        composition_wt_pct: *mathieu_a62_047
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS29 MAS11
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -14583,18 +14677,20 @@ species:
           - mathieu_2009_t39_acmas29_nmas4_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 19.86
-          MgO: 6.55
-          SiO2: 47.37
-          Al2O3: 26.15
-          CaO: 0.07
+        printed_composition:
+          value: &mathieu_a62_048
+            Na2O: 19.86
+            MgO: 6.55
+            SiO2: 47.37
+            Al2O3: 26.15
+            CaO: 0.07
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS29 NMAS4
+        composition_wt_pct: *mathieu_a62_048
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS29 NMAS4
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -14710,18 +14806,20 @@ species:
           - mathieu_2009_t39_acmas29_mas6_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 20.89
-          MgO: 10.68
-          SiO2: 57.18
-          Al2O3: 11.2
-          CaO: 0.05
+        printed_composition:
+          value: &mathieu_a62_049
+            Na2O: 20.89
+            MgO: 10.68
+            SiO2: 57.18
+            Al2O3: 11.2
+            CaO: 0.05
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS29 MAS6
+        composition_wt_pct: *mathieu_a62_049
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS29 MAS6
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -14837,18 +14935,20 @@ species:
           - mathieu_2009_t39_acmas29_mas1_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 18.71
-          MgO: 10.57
-          SiO2: 42.47
-          Al2O3: 28.21
-          CaO: 0.04
+        printed_composition:
+          value: &mathieu_a62_050
+            Na2O: 18.71
+            MgO: 10.57
+            SiO2: 42.47
+            Al2O3: 28.21
+            CaO: 0.04
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS29 MAS1
+        composition_wt_pct: *mathieu_a62_050
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS29 MAS1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -14966,18 +15066,20 @@ species:
           - mathieu_2009_t39_acmas30_mas5_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 18.52
-          MgO: 10.57
-          SiO2: 43.61
-          Al2O3: 27.23
-          CaO: 0.08
+        printed_composition:
+          value: &mathieu_a62_051
+            Na2O: 18.52
+            MgO: 10.57
+            SiO2: 43.61
+            Al2O3: 27.23
+            CaO: 0.08
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS30 MAS5
+        composition_wt_pct: *mathieu_a62_051
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS30 MAS5
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -15093,18 +15195,20 @@ species:
           - mathieu_2009_t39_acmas30_mas8_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 18.85
-          MgO: 13.72
-          SiO2: 51.77
-          Al2O3: 15.63
-          CaO: 0.04
+        printed_composition:
+          value: &mathieu_a62_052
+            Na2O: 18.85
+            MgO: 13.72
+            SiO2: 51.77
+            Al2O3: 15.63
+            CaO: 0.04
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS30 MAS8
+        composition_wt_pct: *mathieu_a62_052
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS30 MAS8
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -15220,18 +15324,20 @@ species:
           - mathieu_2009_t39_acmas30_mas2_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 19.34
-          MgO: 9.21
-          SiO2: 47.61
-          Al2O3: 23.8
-          CaO: 0.04
+        printed_composition:
+          value: &mathieu_a62_053
+            Na2O: 19.34
+            MgO: 9.21
+            SiO2: 47.61
+            Al2O3: 23.8
+            CaO: 0.04
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS30 MAS2
+        composition_wt_pct: *mathieu_a62_053
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS30 MAS2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -15347,18 +15453,20 @@ species:
           - mathieu_2009_t39_acmas32_mas13_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 20.13
-          MgO: 16.83
-          SiO2: 57.38
-          Al2O3: 5.6
-          CaO: 0.05
+        printed_composition:
+          value: &mathieu_a62_054
+            Na2O: 20.13
+            MgO: 16.83
+            SiO2: 57.38
+            Al2O3: 5.6
+            CaO: 0.05
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS32 MAS13
+        composition_wt_pct: *mathieu_a62_054
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS32 MAS13
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -15476,18 +15584,20 @@ species:
           - mathieu_2009_t39_acmas36_mas17_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 19.46
-          MgO: 12.64
-          SiO2: 48.29
-          Al2O3: 19.56
-          CaO: 0.06
+        printed_composition:
+          value: &mathieu_a62_055
+            Na2O: 19.46
+            MgO: 12.64
+            SiO2: 48.29
+            Al2O3: 19.56
+            CaO: 0.06
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS36 MAS17*
+        composition_wt_pct: *mathieu_a62_055
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS36 MAS17*
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -15605,18 +15715,20 @@ species:
           - mathieu_2009_t39_acmas36_mas12_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 16.77
-          MgO: 16.05
-          SiO2: 43.15
-          Al2O3: 23.95
-          CaO: 0.08
+        printed_composition:
+          value: &mathieu_a62_056
+            Na2O: 16.77
+            MgO: 16.05
+            SiO2: 43.15
+            Al2O3: 23.95
+            CaO: 0.08
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS36 MAS12
+        composition_wt_pct: *mathieu_a62_056
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS36 MAS12
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -15732,18 +15844,20 @@ species:
           - mathieu_2009_t39_acmas36_nmas3_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 21.19
-          MgO: 3.89
-          SiO2: 55.21
-          Al2O3: 19.69
-          CaO: 0.03
+        printed_composition:
+          value: &mathieu_a62_057
+            Na2O: 21.19
+            MgO: 3.89
+            SiO2: 55.21
+            Al2O3: 19.69
+            CaO: 0.03
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS36 NMAS3
+        composition_wt_pct: *mathieu_a62_057
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS36 NMAS3
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -15859,18 +15973,20 @@ species:
           - mathieu_2009_t39_acmas37_nmas1_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 23.82
-          MgO: 3.15
-          SiO2: 65.17
-          Al2O3: 7.84
-          CaO: 0.02
+        printed_composition:
+          value: &mathieu_a62_058
+            Na2O: 23.82
+            MgO: 3.15
+            SiO2: 65.17
+            Al2O3: 7.84
+            CaO: 0.02
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS37 NMAS1
+        composition_wt_pct: *mathieu_a62_058
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS37 NMAS1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -15986,18 +16102,20 @@ species:
           - mathieu_2009_t39_acmas39_mas3_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 20.7
-          MgO: 6.91
-          SiO2: 54.35
-          Al2O3: 17.99
-          CaO: 0.04
+        printed_composition:
+          value: &mathieu_a62_059
+            Na2O: 20.7
+            MgO: 6.91
+            SiO2: 54.35
+            Al2O3: 17.99
+            CaO: 0.04
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS39 MAS3
+        composition_wt_pct: *mathieu_a62_059
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS39 MAS3
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -16113,18 +16231,20 @@ species:
           - mathieu_2009_t39_acmas39_nmas2_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 22.54
-          MgO: 4.07
-          SiO2: 63.16
-          Al2O3: 10.21
-          CaO: 0.02
+        printed_composition:
+          value: &mathieu_a62_060
+            Na2O: 22.54
+            MgO: 4.07
+            SiO2: 63.16
+            Al2O3: 10.21
+            CaO: 0.02
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS39 NMAS2
+        composition_wt_pct: *mathieu_a62_060
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS39 NMAS2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -16242,18 +16362,20 @@ species:
           - mathieu_2009_t39_acmas39_mas10_na2o_analysed
           - mathieu_2009_t39_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 17.52
-          MgO: 15.52
-          SiO2: 43.25
-          Al2O3: 23.6
-          CaO: 0.11
+        printed_composition:
+          value: &mathieu_a62_061
+            Na2O: 17.52
+            MgO: 15.52
+            SiO2: 43.25
+            Al2O3: 23.6
+            CaO: 0.11
+          locator:
+            pdf_page: 339
+            table: A.6.2
+            row: ACMAS39 MAS10
+        composition_wt_pct: *mathieu_a62_061
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 339
-          table: A.6.2
-          row: ACMAS39 MAS10
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -16369,18 +16491,20 @@ species:
           - mathieu_2009_t40_acmas40_cmas19_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 15.82
-          MgO: 0.03
-          SiO2: 52.23
-          Al2O3: 6.79
-          CaO: 25.13
+        printed_composition:
+          value: &mathieu_a62_062
+            Na2O: 15.82
+            MgO: 0.03
+            SiO2: 52.23
+            Al2O3: 6.79
+            CaO: 25.13
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS40 CMAS19
+        composition_wt_pct: *mathieu_a62_062
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS40 CMAS19
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -16496,18 +16620,20 @@ species:
           - mathieu_2009_t40_acma5s22_cma5s2_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 12.42
-          MgO: 0.17
-          SiO2: 48.35
-          Al2O3: 7.64
-          CaO: 31.41
+        printed_composition:
+          value: &mathieu_a62_063
+            Na2O: 12.42
+            MgO: 0.17
+            SiO2: 48.35
+            Al2O3: 7.64
+            CaO: 31.41
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S22 CMA5S2
+        composition_wt_pct: *mathieu_a62_063
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S22 CMA5S2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -16623,18 +16749,20 @@ species:
           - mathieu_2009_t40_acma5s22_cma5s6_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 7.11
-          MgO: 2.94
-          SiO2: 42.85
-          Al2O3: 8.02
-          CaO: 39.09
+        printed_composition:
+          value: &mathieu_a62_064
+            Na2O: 7.11
+            MgO: 2.94
+            SiO2: 42.85
+            Al2O3: 8.02
+            CaO: 39.09
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S22 CMA5S6
+        composition_wt_pct: *mathieu_a62_064
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S22 CMA5S6
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -16750,18 +16878,20 @@ species:
           - mathieu_2009_t40_acma5s22_cma5s7_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 10.09
-          MgO: 3.48
-          SiO2: 46.45
-          Al2O3: 7.18
-          CaO: 32.8
+        printed_composition:
+          value: &mathieu_a62_065
+            Na2O: 10.09
+            MgO: 3.48
+            SiO2: 46.45
+            Al2O3: 7.18
+            CaO: 32.8
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S22 CMA5S7
+        composition_wt_pct: *mathieu_a62_065
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S22 CMA5S7
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -16877,18 +17007,20 @@ species:
           - mathieu_2009_t40_acma5s22_cma5s10_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 15.42
-          MgO: 8.22
-          SiO2: 49.87
-          Al2O3: 7.83
-          CaO: 18.66
+        printed_composition:
+          value: &mathieu_a62_066
+            Na2O: 15.42
+            MgO: 8.22
+            SiO2: 49.87
+            Al2O3: 7.83
+            CaO: 18.66
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S22 CMA5S10
+        composition_wt_pct: *mathieu_a62_066
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S22 CMA5S10
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -17004,18 +17136,20 @@ species:
           - mathieu_2009_t40_acma5s22_cma5s12_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 8.86
-          MgO: 12.45
-          SiO2: 42.06
-          Al2O3: 8.47
-          CaO: 28.15
+        printed_composition:
+          value: &mathieu_a62_067
+            Na2O: 8.86
+            MgO: 12.45
+            SiO2: 42.06
+            Al2O3: 8.47
+            CaO: 28.15
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S22 CMA5S12
+        composition_wt_pct: *mathieu_a62_067
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S22 CMA5S12
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -17131,18 +17265,20 @@ species:
           - mathieu_2009_t40_acma5s22_cma5s27_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 17.16
-          MgO: 0.08
-          SiO2: 52.89
-          Al2O3: 6.93
-          CaO: 22.94
+        printed_composition:
+          value: &mathieu_a62_068
+            Na2O: 17.16
+            MgO: 0.08
+            SiO2: 52.89
+            Al2O3: 6.93
+            CaO: 22.94
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S22 CMA5S27
+        composition_wt_pct: *mathieu_a62_068
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S22 CMA5S27
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -17258,18 +17394,20 @@ species:
           - mathieu_2009_t40_acma5s22_cma5s33_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 18.48
-          MgO: 8.83
-          SiO2: 53.08
-          Al2O3: 7.34
-          CaO: 12.26
+        printed_composition:
+          value: &mathieu_a62_069
+            Na2O: 18.48
+            MgO: 8.83
+            SiO2: 53.08
+            Al2O3: 7.34
+            CaO: 12.26
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S22 CMA5S33
+        composition_wt_pct: *mathieu_a62_069
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S22 CMA5S33
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -17385,18 +17523,20 @@ species:
           - mathieu_2009_t40_acma5s24_cma5s13_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 8.27
-          MgO: 12.33
-          SiO2: 43.3
-          Al2O3: 8.26
-          CaO: 27.83
+        printed_composition:
+          value: &mathieu_a62_070
+            Na2O: 8.27
+            MgO: 12.33
+            SiO2: 43.3
+            Al2O3: 8.26
+            CaO: 27.83
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S24 CMA5S13
+        composition_wt_pct: *mathieu_a62_070
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S24 CMA5S13
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -17512,18 +17652,20 @@ species:
           - mathieu_2009_t40_acma5s26_cma5s1_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 6.91
-          MgO: 0.15
-          SiO2: 45.3
-          Al2O3: 7.5
-          CaO: 40.14
+        printed_composition:
+          value: &mathieu_a62_071
+            Na2O: 6.91
+            MgO: 0.15
+            SiO2: 45.3
+            Al2O3: 7.5
+            CaO: 40.14
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S26 CMA5S1
+        composition_wt_pct: *mathieu_a62_071
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S26 CMA5S1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -17639,18 +17781,20 @@ species:
           - mathieu_2009_t40_acma5s26_cma5s8_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 5.35
-          MgO: 6.44
-          SiO2: 42.48
-          Al2O3: 7.92
-          CaO: 37.8
+        printed_composition:
+          value: &mathieu_a62_072
+            Na2O: 5.35
+            MgO: 6.44
+            SiO2: 42.48
+            Al2O3: 7.92
+            CaO: 37.8
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S26 CMA5S8
+        composition_wt_pct: *mathieu_a62_072
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S26 CMA5S8
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -17766,18 +17910,20 @@ species:
           - mathieu_2009_t40_acma5s26_cma5s9_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 9.38
-          MgO: 7.23
-          SiO2: 46.59
-          Al2O3: 7.67
-          CaO: 29.12
+        printed_composition:
+          value: &mathieu_a62_073
+            Na2O: 9.38
+            MgO: 7.23
+            SiO2: 46.59
+            Al2O3: 7.67
+            CaO: 29.12
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S26 CMA5S9
+        composition_wt_pct: *mathieu_a62_073
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S26 CMA5S9
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -17893,18 +18039,20 @@ species:
           - mathieu_2009_t40_acma5s26_cma5s11_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 4.27
-          MgO: 10.99
-          SiO2: 39.83
-          Al2O3: 8.27
-          CaO: 36.65
+        printed_composition:
+          value: &mathieu_a62_074
+            Na2O: 4.27
+            MgO: 10.99
+            SiO2: 39.83
+            Al2O3: 8.27
+            CaO: 36.65
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S26 CMA5S11
+        composition_wt_pct: *mathieu_a62_074
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S26 CMA5S11
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -18020,18 +18168,20 @@ species:
           - mathieu_2009_t40_acma5s29_cma5s14_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 15.13
-          MgO: 14.06
-          SiO2: 51.43
-          Al2O3: 7.57
-          CaO: 11.8
+        printed_composition:
+          value: &mathieu_a62_075
+            Na2O: 15.13
+            MgO: 14.06
+            SiO2: 51.43
+            Al2O3: 7.57
+            CaO: 11.8
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S29 CMA5S14
+        composition_wt_pct: *mathieu_a62_075
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S29 CMA5S14
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -18147,18 +18297,20 @@ species:
           - mathieu_2009_t40_acma5s29_cma5s15_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 3.42
-          MgO: 15.73
-          SiO2: 38.78
-          Al2O3: 8.59
-          CaO: 33.49
+        printed_composition:
+          value: &mathieu_a62_076
+            Na2O: 3.42
+            MgO: 15.73
+            SiO2: 38.78
+            Al2O3: 8.59
+            CaO: 33.49
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S29 CMA5S15
+        composition_wt_pct: *mathieu_a62_076
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S29 CMA5S15
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -18274,18 +18426,20 @@ species:
           - mathieu_2009_t40_acma5s29_cma5s16_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 6.1
-          MgO: 17.42
-          SiO2: 42.47
-          Al2O3: 8.54
-          CaO: 25.48
+        printed_composition:
+          value: &mathieu_a62_077
+            Na2O: 6.1
+            MgO: 17.42
+            SiO2: 42.47
+            Al2O3: 8.54
+            CaO: 25.48
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S29 CMA5S16
+        composition_wt_pct: *mathieu_a62_077
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S29 CMA5S16
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -18401,18 +18555,20 @@ species:
           - mathieu_2009_t40_acma5s29_cma5s31_na2o_analysed
           - mathieu_2009_t40_run_conditions
           output_unit: dimensionless
-        composition_wt_pct:
-          Na2O: 14.64
-          MgO: 3.44
-          SiO2: 52.65
-          Al2O3: 7.44
-          CaO: 21.83
+        printed_composition:
+          value: &mathieu_a62_078
+            Na2O: 14.64
+            MgO: 3.44
+            SiO2: 52.65
+            Al2O3: 7.44
+            CaO: 21.83
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA5S29 CMA5S31
+        composition_wt_pct: *mathieu_a62_078
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA5S29 CMA5S31
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -21492,18 +21648,20 @@ species:
           corrected 18.83 mol% Na2O, gamma = a/x = 1.12e-06, but the printed gamma 1.12 under the heading x10^-7 is
           1.12e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 16.61
-          MgO: 1.23
-          SiO2: 48.32
-          Al2O3: 19.11
-          CaO: 14.73
+        printed_composition:
+          value: &mathieu_a62_079
+            Na2O: 16.61
+            MgO: 1.23
+            SiO2: 48.32
+            Al2O3: 19.11
+            CaO: 14.73
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS5 Na1
+        composition_wt_pct: *mathieu_a62_079
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS5 Na1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -21631,18 +21789,20 @@ species:
           corrected 18.06 mol% Na2O, gamma = a/x = 1.17e-06, but the printed gamma 1.17 under the heading x10^-7 is
           1.17e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 16.09
-          MgO: 1.37
-          SiO2: 44.4
-          Al2O3: 23.26
-          CaO: 14.88
+        printed_composition:
+          value: &mathieu_a62_080
+            Na2O: 16.09
+            MgO: 1.37
+            SiO2: 44.4
+            Al2O3: 23.26
+            CaO: 14.88
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS5 Na2
+        composition_wt_pct: *mathieu_a62_080
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS5 Na2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -21770,18 +21930,20 @@ species:
           corrected 17.29 mol% Na2O, gamma = a/x = 1.22e-06, but the printed gamma 1.22 under the heading x10^-7 is
           1.22e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 15.33
-          MgO: 1.56
-          SiO2: 40.98
-          Al2O3: 27.43
-          CaO: 14.7
+        printed_composition:
+          value: &mathieu_a62_081
+            Na2O: 15.33
+            MgO: 1.56
+            SiO2: 40.98
+            Al2O3: 27.43
+            CaO: 14.7
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS5 Na3
+        composition_wt_pct: *mathieu_a62_081
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS5 Na3
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -21911,18 +22073,20 @@ species:
           corrected 12.12 mol% Na2O, gamma = a/x = 1.74e-06, but the printed gamma 1.74 under the heading x10^-7 is
           1.74e-07 (ratio 0.0999). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 11.27
-          MgO: 18.87
-          SiO2: 41.62
-          Al2O3: 17.62
-          CaO: 11.12
+        printed_composition:
+          value: &mathieu_a62_082
+            Na2O: 11.27
+            MgO: 18.87
+            SiO2: 41.62
+            Al2O3: 17.62
+            CaO: 11.12
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS7 MS4
+        composition_wt_pct: *mathieu_a62_082
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS7 MS4
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -22050,18 +22214,20 @@ species:
           corrected 11.68 mol% Na2O, gamma = a/x = 1.81e-06, but the printed gamma 1.81 under the heading x10^-7 is
           1.81e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 11.54
-          MgO: 22.59
-          SiO2: 47.9
-          Al2O3: 4.6
-          CaO: 13.37
+        printed_composition:
+          value: &mathieu_a62_083
+            Na2O: 11.54
+            MgO: 22.59
+            SiO2: 47.9
+            Al2O3: 4.6
+            CaO: 13.37
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS7 MS3
+        composition_wt_pct: *mathieu_a62_083
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS7 MS3
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -22189,18 +22355,20 @@ species:
           corrected 18.14 mol% Na2O, gamma = a/x = 1.16e-06, but the printed gamma 1.16 under the heading x10^-7 is
           1.16e-07 (ratio 0.0997). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 17.82
-          MgO: 22.01
-          SiO2: 55.61
-          Al2O3: 2.79
-          CaO: 2.64
+        printed_composition:
+          value: &mathieu_a62_084
+            Na2O: 17.82
+            MgO: 22.01
+            SiO2: 55.61
+            Al2O3: 2.79
+            CaO: 2.64
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS7 POP
+        composition_wt_pct: *mathieu_a62_084
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS7 POP
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -22326,18 +22494,20 @@ species:
           output_unit: dimensionless
         reason: 'source_internally_inconsistent: Tableau IV.7 prints corrected Na2O 0.00 mol% with gamma 1.27 x10^-7;
           gamma = a/x cannot hold with x = 0. Values carried as printed; not admitted.'
-        composition_wt_pct:
-          Na2O: 15.05
-          MgO: 4.73
-          SiO2: 45.47
-          Al2O3: 20.18
-          CaO: 14.56
+        printed_composition:
+          value: &mathieu_a62_085
+            Na2O: 15.05
+            MgO: 4.73
+            SiO2: 45.47
+            Al2O3: 20.18
+            CaO: 14.56
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS7 CMAS5
+        composition_wt_pct: *mathieu_a62_085
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS7 CMAS5
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -22465,18 +22635,20 @@ species:
           corrected 22.82 mol% Na2O, gamma = a/x = 9.25e-07, but the printed gamma 0.92 under the heading x10^-7 is
           9.2e-08 (ratio 0.0995). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 20.08
-          MgO: 4.35
-          SiO2: 57.71
-          Al2O3: 11.08
-          CaO: 6.77
+        printed_composition:
+          value: &mathieu_a62_086
+            Na2O: 20.08
+            MgO: 4.35
+            SiO2: 57.71
+            Al2O3: 11.08
+            CaO: 6.77
+          locator:
+            pdf_page: 335
+            table: A.6.2
+            row: ACMAS7 CMAS6
+        composition_wt_pct: *mathieu_a62_086
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 335
-          table: A.6.2
-          row: ACMAS7 CMAS6
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -22604,18 +22776,20 @@ species:
           corrected 14.90 mol% Na2O, gamma = a/x = 1.42e-06, but the printed gamma 1.42 under the heading x10^-7 is
           1.42e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 13.91
-          MgO: 1.72
-          SiO2: 17.1
-          Al2O3: 45.57
-          CaO: 21.67
+        printed_composition:
+          value: &mathieu_a62_087
+            Na2O: 13.91
+            MgO: 1.72
+            SiO2: 17.1
+            Al2O3: 45.57
+            CaO: 21.67
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS9 CM1-1
+        composition_wt_pct: *mathieu_a62_087
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS9 CM1-1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -22743,18 +22917,20 @@ species:
           corrected 15.28 mol% Na2O, gamma = a/x = 1.38e-06, but the printed gamma 1.38 under the heading x10^-7 is
           1.38e-07 (ratio 0.0999). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 14.36
-          MgO: 3.32
-          SiO2: 17.2
-          Al2O3: 45.58
-          CaO: 19.5
+        printed_composition:
+          value: &mathieu_a62_088
+            Na2O: 14.36
+            MgO: 3.32
+            SiO2: 17.2
+            Al2O3: 45.58
+            CaO: 19.5
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS9 CM1-2
+        composition_wt_pct: *mathieu_a62_088
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS9 CM1-2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -22882,18 +23058,20 @@ species:
           corrected 15.93 mol% Na2O, gamma = a/x = 1.32e-06, but the printed gamma 1.32 under the heading x10^-7 is
           1.32e-07 (ratio 0.0997). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 15.21
-          MgO: 7.03
-          SiO2: 17.49
-          Al2O3: 46.22
-          CaO: 14.02
+        printed_composition:
+          value: &mathieu_a62_089
+            Na2O: 15.21
+            MgO: 7.03
+            SiO2: 17.49
+            Al2O3: 46.22
+            CaO: 14.02
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS9 CM1-4
+        composition_wt_pct: *mathieu_a62_089
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS9 CM1-4
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -23021,18 +23199,20 @@ species:
           corrected 16.35 mol% Na2O, gamma = a/x = 1.29e-06, but the printed gamma 1.29 under the heading x10^-7 is
           1.29e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 15.67
-          MgO: 8.22
-          SiO2: 17.61
-          Al2O3: 46.01
-          CaO: 12.45
+        printed_composition:
+          value: &mathieu_a62_090
+            Na2O: 15.67
+            MgO: 8.22
+            SiO2: 17.61
+            Al2O3: 46.01
+            CaO: 12.45
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS9 CM1-5
+        composition_wt_pct: *mathieu_a62_090
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS9 CM1-5
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -23160,18 +23340,20 @@ species:
           corrected 14.21 mol% Na2O, gamma = a/x = 1.48e-06, but the printed gamma 1.48 under the heading x10^-7 is
           1.48e-07 (ratio 0.0997). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 12.79
-          MgO: 1.97
-          SiO2: 21.06
-          Al2O3: 42.19
-          CaO: 21.97
+        printed_composition:
+          value: &mathieu_a62_091
+            Na2O: 12.79
+            MgO: 1.97
+            SiO2: 21.06
+            Al2O3: 42.19
+            CaO: 21.97
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS10 CM2-1
+        composition_wt_pct: *mathieu_a62_091
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS10 CM2-1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -23299,18 +23481,20 @@ species:
           corrected 14.62 mol% Na2O, gamma = a/x = 1.44e-06, but the printed gamma 1.44 under the heading x10^-7 is
           1.44e-07 (ratio 0.0998). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 13.25
-          MgO: 3.52
-          SiO2: 21.1
-          Al2O3: 42.31
-          CaO: 19.81
+        printed_composition:
+          value: &mathieu_a62_092
+            Na2O: 13.25
+            MgO: 3.52
+            SiO2: 21.1
+            Al2O3: 42.31
+            CaO: 19.81
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS10 CM2-2
+        composition_wt_pct: *mathieu_a62_092
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS10 CM2-2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -23438,18 +23622,20 @@ species:
           corrected 15.55 mol% Na2O, gamma = a/x = 1.36e-06, but the printed gamma 1.36 under the heading x10^-7 is
           1.36e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 14.31
-          MgO: 7.15
-          SiO2: 20.36
-          Al2O3: 42.95
-          CaO: 15.19
+        printed_composition:
+          value: &mathieu_a62_093
+            Na2O: 14.31
+            MgO: 7.15
+            SiO2: 20.36
+            Al2O3: 42.95
+            CaO: 15.19
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS10 CM2-4
+        composition_wt_pct: *mathieu_a62_093
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS10 CM2-4
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -23577,18 +23763,20 @@ species:
           corrected 15.69 mol% Na2O, gamma = a/x = 1.34e-06, but the printed gamma 1.34 under the heading x10^-7 is
           1.34e-07 (ratio 0.0996). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 14.5
-          MgO: 8.15
-          SiO2: 21.24
-          Al2O3: 42.71
-          CaO: 13.35
+        printed_composition:
+          value: &mathieu_a62_094
+            Na2O: 14.5
+            MgO: 8.15
+            SiO2: 21.24
+            Al2O3: 42.71
+            CaO: 13.35
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS10 CM2-5
+        composition_wt_pct: *mathieu_a62_094
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS10 CM2-5
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -23716,18 +23904,20 @@ species:
           corrected 13.84 mol% Na2O, gamma = a/x = 1.52e-06, but the printed gamma 1.52 under the heading x10^-7 is
           1.52e-07 (ratio 0.0997). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 12.19
-          MgO: 1.75
-          SiO2: 40.08
-          Al2O3: 25.55
-          CaO: 20.42
+        printed_composition:
+          value: &mathieu_a62_095
+            Na2O: 12.19
+            MgO: 1.75
+            SiO2: 40.08
+            Al2O3: 25.55
+            CaO: 20.42
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS11 CM3-1
+        composition_wt_pct: *mathieu_a62_095
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS11 CM3-1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -23855,18 +24045,20 @@ species:
           corrected 14.53 mol% Na2O, gamma = a/x = 1.45e-06, but the printed gamma 1.45 under the heading x10^-7 is
           1.45e-07 (ratio 0.0999). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 12.89
-          MgO: 3.3
-          SiO2: 39.82
-          Al2O3: 25.66
-          CaO: 18.3
+        printed_composition:
+          value: &mathieu_a62_096
+            Na2O: 12.89
+            MgO: 3.3
+            SiO2: 39.82
+            Al2O3: 25.66
+            CaO: 18.3
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS11 CM3-2
+        composition_wt_pct: *mathieu_a62_096
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS11 CM3-2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -23994,18 +24186,20 @@ species:
           corrected 15.68 mol% Na2O, gamma = a/x = 1.35e-06, but the printed gamma 1.34 under the heading x10^-7 is
           1.34e-07 (ratio 0.0996). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 14.13
-          MgO: 7.29
-          SiO2: 40.0
-          Al2O3: 25.69
-          CaO: 12.87
+        printed_composition:
+          value: &mathieu_a62_097
+            Na2O: 14.13
+            MgO: 7.29
+            SiO2: 40.0
+            Al2O3: 25.69
+            CaO: 12.87
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS11 CM3-4
+        composition_wt_pct: *mathieu_a62_097
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS11 CM3-4
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -24133,18 +24327,20 @@ species:
           corrected 15.94 mol% Na2O, gamma = a/x = 1.32e-06, but the printed gamma 1.32 under the heading x10^-7 is
           1.32e-07 (ratio 0.0997). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 14.42
-          MgO: 8.27
-          SiO2: 40.01
-          Al2O3: 25.77
-          CaO: 11.52
+        printed_composition:
+          value: &mathieu_a62_098
+            Na2O: 14.42
+            MgO: 8.27
+            SiO2: 40.01
+            Al2O3: 25.77
+            CaO: 11.52
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS11 CM3-5
+        composition_wt_pct: *mathieu_a62_098
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS11 CM3-5
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -24272,18 +24468,20 @@ species:
           corrected 14.42 mol% Na2O, gamma = a/x = 1.46e-06, but the printed gamma 1.46 under the heading x10^-7 is
           1.46e-07 (ratio 0.0998). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 13.44
-          MgO: 11.36
-          SiO2: 48.51
-          Al2O3: 11.17
-          CaO: 15.49
+        printed_composition:
+          value: &mathieu_a62_099
+            Na2O: 13.44
+            MgO: 11.36
+            SiO2: 48.51
+            Al2O3: 11.17
+            CaO: 15.49
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS12 CMAS3
+        composition_wt_pct: *mathieu_a62_099
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS12 CMAS3
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -24411,18 +24609,20 @@ species:
           corrected 1.93 mol% Na2O, gamma = a/x = 1.09e-05, but the printed gamma 10.94 under the heading x10^-7 is
           1.09e-06 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 1.53
-          MgO: 4.48
-          SiO2: 9.5
-          Al2O3: 45.1
-          CaO: 39.38
+        printed_composition:
+          value: &mathieu_a62_100
+            Na2O: 1.53
+            MgO: 4.48
+            SiO2: 9.5
+            Al2O3: 45.1
+            CaO: 39.38
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS12 KHC1
+        composition_wt_pct: *mathieu_a62_100
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS12 KHC1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -24549,18 +24749,20 @@ species:
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 8.69 mol% Na2O, gamma = a/x = 2.43e-06, but the printed gamma 2.43 under the heading x10^-7 is 2.43e-07
           (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value is resolved.'
-        composition_wt_pct:
-          Na2O: 7.19
-          MgO: 3.55
-          SiO2: 28.68
-          Al2O3: 32.81
-          CaO: 27.75
+        printed_composition:
+          value: &mathieu_a62_101
+            Na2O: 7.19
+            MgO: 3.55
+            SiO2: 28.68
+            Al2O3: 32.81
+            CaO: 27.75
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS12 KHC2
+        composition_wt_pct: *mathieu_a62_101
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS12 KHC2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -24688,18 +24890,20 @@ species:
           corrected 15.70 mol% Na2O, gamma = a/x = 1.34e-06, but the printed gamma 1.34 under the heading x10^-7 is
           1.34e-07 (ratio 0.0997). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 13.44
-          MgO: 2.22
-          SiO2: 43.82
-          Al2O3: 21.83
-          CaO: 18.66
+        printed_composition:
+          value: &mathieu_a62_102
+            Na2O: 13.44
+            MgO: 2.22
+            SiO2: 43.82
+            Al2O3: 21.83
+            CaO: 18.66
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS12 KHC3
+        composition_wt_pct: *mathieu_a62_102
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS12 KHC3
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -24829,18 +25033,20 @@ species:
           corrected 21.16 mol% Na2O, gamma = a/x = 9.97e-07, but the printed gamma 1.00 under the heading x10^-7 is
           1e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 18.61
-          MgO: 1.29
-          SiO2: 57.13
-          Al2O3: 12.25
-          CaO: 10.67
+        printed_composition:
+          value: &mathieu_a62_103
+            Na2O: 18.61
+            MgO: 1.29
+            SiO2: 57.13
+            Al2O3: 12.25
+            CaO: 10.67
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS12 KHC4
+        composition_wt_pct: *mathieu_a62_103
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS12 KHC4
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -24970,18 +25176,20 @@ species:
           corrected 14.92 mol% Na2O, gamma = a/x = 1.41e-06, but the printed gamma 1.41 under the heading x10^-7 is
           1.41e-07 (ratio 0.0997). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 15.24
-          MgO: 15.36
-          SiO2: 51.12
-          Al2O3: 9.14
-          CaO: 9.11
+        printed_composition:
+          value: &mathieu_a62_104
+            Na2O: 15.24
+            MgO: 15.36
+            SiO2: 51.12
+            Al2O3: 9.14
+            CaO: 9.11
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS13 PO
+        composition_wt_pct: *mathieu_a62_104
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS13 PO
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -25111,18 +25319,20 @@ species:
           corrected 1.10 mol% Na2O, gamma = a/x = 1.92e-05, but the printed gamma 19.09 under the heading x10^-7 is
           1.91e-06 (ratio 0.0995). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 1.02
-          MgO: 8.2
-          SiO2: 13.96
-          Al2O3: 34.51
-          CaO: 42.31
+        printed_composition:
+          value: &mathieu_a62_105
+            Na2O: 1.02
+            MgO: 8.2
+            SiO2: 13.96
+            Al2O3: 34.51
+            CaO: 42.31
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS13 SPM
+        composition_wt_pct: *mathieu_a62_105
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS13 SPM
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -25249,18 +25459,20 @@ species:
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 8.91 mol% Na2O, gamma = a/x = 2.37e-06, but the printed gamma 2.37 under the heading x10^-7 is 2.37e-07
           (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value is resolved.'
-        composition_wt_pct:
-          Na2O: 8.99
-          MgO: 12.46
-          SiO2: 41.34
-          Al2O3: 13.48
-          CaO: 23.72
+        printed_composition:
+          value: &mathieu_a62_106
+            Na2O: 8.99
+            MgO: 12.46
+            SiO2: 41.34
+            Al2O3: 13.48
+            CaO: 23.72
+          locator:
+            pdf_page: 336
+            table: A.6.2
+            row: ACMAS13 MPF
+        composition_wt_pct: *mathieu_a62_106
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 336
-          table: A.6.2
-          row: ACMAS13 MPF
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -25388,18 +25600,20 @@ species:
           corrected 7.32 mol% Na2O, gamma = a/x = 2.88e-06, but the printed gamma 2.88 under the heading x10^-7 is 2.88e-07
           (ratio 0.0999). Printed values are carried unchanged; the row is not admitted until the scale or value is
           resolved.'
-        composition_wt_pct:
-          Na2O: 6.72
-          MgO: 5.34
-          SiO2: 31.12
-          Al2O3: 27.62
-          CaO: 29.19
+        printed_composition:
+          value: &mathieu_a62_107
+            Na2O: 6.72
+            MgO: 5.34
+            SiO2: 31.12
+            Al2O3: 27.62
+            CaO: 29.19
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS13 CAI-MS2
+        composition_wt_pct: *mathieu_a62_107
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS13 CAI-MS2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -25527,18 +25741,20 @@ species:
           corrected 21.14 mol% Na2O, gamma = a/x = 9.98e-07, but the printed gamma 1.00 under the heading x10^-7 is
           1e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 20.4
-          MgO: 13.06
-          SiO2: 44.84
-          Al2O3: 21.52
-          CaO: 0.18
+        printed_composition:
+          value: &mathieu_a62_108
+            Na2O: 20.4
+            MgO: 13.06
+            SiO2: 44.84
+            Al2O3: 21.52
+            CaO: 0.18
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS18 CMA25S1
+        composition_wt_pct: *mathieu_a62_108
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS18 CMA25S1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -25666,18 +25882,20 @@ species:
           corrected 10.74 mol% Na2O, gamma = a/x = 1.96e-06, but the printed gamma 1.96 under the heading x10^-7 is
           1.96e-07 (ratio 0.0998). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 10.34
-          MgO: 9.54
-          SiO2: 36.91
-          Al2O3: 21.68
-          CaO: 21.53
+        printed_composition:
+          value: &mathieu_a62_109
+            Na2O: 10.34
+            MgO: 9.54
+            SiO2: 36.91
+            Al2O3: 21.68
+            CaO: 21.53
+          locator:
+            pdf_page: 337
+            table: A.6.2
+            row: ACMAS18 CMA25S4
+        composition_wt_pct: *mathieu_a62_109
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 337
-          table: A.6.2
-          row: ACMAS18 CMA25S4
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -25806,18 +26024,20 @@ species:
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 8.76 mol% Na2O, gamma = a/x = 2.41e-06, but the printed gamma 2.41 under the heading x10^-7 is 2.41e-07
           (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value is resolved.'
-        composition_wt_pct:
-          Na2O: 8.74
-          MgO: 14.45
-          SiO2: 35.2
-          Al2O3: 20.27
-          CaO: 21.35
+        printed_composition:
+          value: &mathieu_a62_110
+            Na2O: 8.74
+            MgO: 14.45
+            SiO2: 35.2
+            Al2O3: 20.27
+            CaO: 21.35
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS18 CMA25S5
+        composition_wt_pct: *mathieu_a62_110
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS18 CMA25S5
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -25946,18 +26166,20 @@ species:
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 2.86 mol% Na2O, gamma = a/x = 7.38e-06, but the printed gamma 7.38 under the heading x10^-7 is 7.38e-07
           (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value is resolved.'
-        composition_wt_pct:
-          Na2O: 2.59
-          MgO: 9.48
-          SiO2: 28.16
-          Al2O3: 19.62
-          CaO: 40.15
+        printed_composition:
+          value: &mathieu_a62_111
+            Na2O: 2.59
+            MgO: 9.48
+            SiO2: 28.16
+            Al2O3: 19.62
+            CaO: 40.15
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS19 CMA25S7
+        composition_wt_pct: *mathieu_a62_111
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS19 CMA25S7
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -26086,18 +26308,20 @@ species:
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 2.20 mol% Na2O, gamma = a/x = 9.59e-06, but the printed gamma 9.59 under the heading x10^-7 is 9.59e-07
           (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value is resolved.'
-        composition_wt_pct:
-          Na2O: 1.99
-          MgO: 10.26
-          SiO2: 26.89
-          Al2O3: 20.71
-          CaO: 40.15
+        printed_composition:
+          value: &mathieu_a62_112
+            Na2O: 1.99
+            MgO: 10.26
+            SiO2: 26.89
+            Al2O3: 20.71
+            CaO: 40.15
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS19 CMA25S8
+        composition_wt_pct: *mathieu_a62_112
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS19 CMA25S8
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -26227,18 +26451,20 @@ species:
           corrected 0.35 mol% Na2O, gamma = a/x = 6.03e-05, but the printed gamma 60.40 under the heading x10^-7 is
           6.04e-06 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 0.3
-          MgO: 6.04
-          SiO2: 9.24
-          Al2O3: 30.53
-          CaO: 53.89
+        printed_composition:
+          value: &mathieu_a62_113
+            Na2O: 0.3
+            MgO: 6.04
+            SiO2: 9.24
+            Al2O3: 30.53
+            CaO: 53.89
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS19 CMA25S10
+        composition_wt_pct: *mathieu_a62_113
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS19 CMA25S10
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -26366,18 +26592,20 @@ species:
           corrected 0.50 mol% Na2O, gamma = a/x = 4.22e-05, but the printed gamma 42.42 under the heading x10^-7 is
           4.24e-06 (ratio 0.101). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 0.41
-          MgO: 7.09
-          SiO2: 5.52
-          Al2O3: 39.83
-          CaO: 47.15
+        printed_composition:
+          value: &mathieu_a62_114
+            Na2O: 0.41
+            MgO: 7.09
+            SiO2: 5.52
+            Al2O3: 39.83
+            CaO: 47.15
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS19 CMAS4
+        composition_wt_pct: *mathieu_a62_114
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS19 CMAS4
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -26505,18 +26733,20 @@ species:
           corrected 0.29 mol% Na2O, gamma = a/x = 7.28e-05, but the printed gamma 60.70 under the heading x10^-7 is
           6.07e-06 (ratio 0.0834). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 0.26
-          MgO: 6.42
-          SiO2: 0.26
-          Al2O3: 43.96
-          CaO: 49.1
+        printed_composition:
+          value: &mathieu_a62_115
+            Na2O: 0.26
+            MgO: 6.42
+            SiO2: 0.26
+            Al2O3: 43.96
+            CaO: 49.1
+          locator:
+            pdf_page: 338
+            table: A.6.2
+            row: ACMAS20 CAM1
+        composition_wt_pct: *mathieu_a62_115
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 338
-          table: A.6.2
-          row: ACMAS20 CAM1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -26644,18 +26874,20 @@ species:
           corrected 13.02 mol% Na2O, gamma = a/x = 1.62e-06, but the printed gamma 1.62 under the heading x10^-7 is
           1.62e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 13.12
-          MgO: 10.19
-          SiO2: 48.05
-          Al2O3: 7.16
-          CaO: 21.49
+        printed_composition:
+          value: &mathieu_a62_116
+            Na2O: 13.12
+            MgO: 10.19
+            SiO2: 48.05
+            Al2O3: 7.16
+            CaO: 21.49
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS41 CMAS7
+        composition_wt_pct: *mathieu_a62_116
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS41 CMAS7
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -26783,18 +27015,20 @@ species:
           corrected 12.62 mol% Na2O, gamma = a/x = 1.67e-06, but the printed gamma 1.67 under the heading x10^-7 is
           1.67e-07 (ratio 0.0999). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 12.35
-          MgO: 9.42
-          SiO2: 44.06
-          Al2O3: 13.98
-          CaO: 20.18
+        printed_composition:
+          value: &mathieu_a62_117
+            Na2O: 12.35
+            MgO: 9.42
+            SiO2: 44.06
+            Al2O3: 13.98
+            CaO: 20.18
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS41 CMAS8
+        composition_wt_pct: *mathieu_a62_117
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS41 CMAS8
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -26922,18 +27156,20 @@ species:
           corrected 13.45 mol% Na2O, gamma = a/x = 1.57e-06, but the printed gamma 1.57 under the heading x10^-7 is
           1.57e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 12.47
-          MgO: 8.06
-          SiO2: 37.59
-          Al2O3: 24.62
-          CaO: 17.26
+        printed_composition:
+          value: &mathieu_a62_118
+            Na2O: 12.47
+            MgO: 8.06
+            SiO2: 37.59
+            Al2O3: 24.62
+            CaO: 17.26
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS41 CMAS9
+        composition_wt_pct: *mathieu_a62_118
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS41 CMAS9
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -27061,18 +27297,20 @@ species:
           corrected 15.00 mol% Na2O, gamma = a/x = 1.41e-06, but the printed gamma 1.41 under the heading x10^-7 is
           1.41e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 13.3
-          MgO: 6.04
-          SiO2: 33.26
-          Al2O3: 32.03
-          CaO: 15.36
+        printed_composition:
+          value: &mathieu_a62_119
+            Na2O: 13.3
+            MgO: 6.04
+            SiO2: 33.26
+            Al2O3: 32.03
+            CaO: 15.36
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS41 CMAS10
+        composition_wt_pct: *mathieu_a62_119
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS41 CMAS10
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -27199,18 +27437,20 @@ species:
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 4.93 mol% Na2O, gamma = a/x = 4.28e-06, but the printed gamma 4.28 under the heading x10^-7 is 4.28e-07
           (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value is resolved.'
-        composition_wt_pct:
-          Na2O: 4.79
-          MgO: 9.03
-          SiO2: 40.46
-          Al2O3: 7.84
-          CaO: 37.87
+        printed_composition:
+          value: &mathieu_a62_120
+            Na2O: 4.79
+            MgO: 9.03
+            SiO2: 40.46
+            Al2O3: 7.84
+            CaO: 37.87
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS43 CMAS15
+        composition_wt_pct: *mathieu_a62_120
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS43 CMAS15
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -27337,18 +27577,20 @@ species:
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 5.28 mol% Na2O, gamma = a/x = 4e-06, but the printed gamma 4.00 under the heading x10^-7 is 4e-07
           (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value is resolved.'
-        composition_wt_pct:
-          Na2O: 4.95
-          MgO: 8.15
-          SiO2: 36.31
-          Al2O3: 15.21
-          CaO: 35.39
+        printed_composition:
+          value: &mathieu_a62_121
+            Na2O: 4.95
+            MgO: 8.15
+            SiO2: 36.31
+            Al2O3: 15.21
+            CaO: 35.39
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS43 CMAS16
+        composition_wt_pct: *mathieu_a62_121
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS43 CMAS16
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -27476,18 +27718,20 @@ species:
           corrected 6.82 mol% Na2O, gamma = a/x = 3.09e-06, but the printed gamma 3.09 under the heading x10^-7 is 3.09e-07
           (ratio 0.0999). Printed values are carried unchanged; the row is not admitted until the scale or value is
           resolved.'
-        composition_wt_pct:
-          Na2O: 6.04
-          MgO: 6.96
-          SiO2: 31.18
-          Al2O3: 26.71
-          CaO: 29.11
+        printed_composition:
+          value: &mathieu_a62_122
+            Na2O: 6.04
+            MgO: 6.96
+            SiO2: 31.18
+            Al2O3: 26.71
+            CaO: 29.11
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS43 CMAS17
+        composition_wt_pct: *mathieu_a62_122
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS43 CMAS17
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -27615,18 +27859,20 @@ species:
           corrected 8.67 mol% Na2O, gamma = a/x = 2.43e-06, but the printed gamma 2.43 under the heading x10^-7 is 2.43e-07
           (ratio 0.0998). Printed values are carried unchanged; the row is not admitted until the scale or value is
           resolved.'
-        composition_wt_pct:
-          Na2O: 7.32
-          MgO: 4.66
-          SiO2: 27.91
-          Al2O3: 33.91
-          CaO: 26.2
+        printed_composition:
+          value: &mathieu_a62_123
+            Na2O: 7.32
+            MgO: 4.66
+            SiO2: 27.91
+            Al2O3: 33.91
+            CaO: 26.2
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS43 CMAS18
+        composition_wt_pct: *mathieu_a62_123
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS43 CMAS18
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -27754,18 +28000,20 @@ species:
           corrected 13.09 mol% Na2O, gamma = a/x = 1.61e-06, but the printed gamma 1.61 under the heading x10^-7 is
           1.61e-07 (ratio 0.0999). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 13.72
-          MgO: 10.18
-          SiO2: 50.34
-          Al2O3: 4.36
-          CaO: 21.39
+        printed_composition:
+          value: &mathieu_a62_124
+            Na2O: 13.72
+            MgO: 10.18
+            SiO2: 50.34
+            Al2O3: 4.36
+            CaO: 21.39
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS44 CMAS23
+        composition_wt_pct: *mathieu_a62_124
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS44 CMAS23
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -27893,18 +28141,20 @@ species:
           corrected 12.70 mol% Na2O, gamma = a/x = 1.66e-06, but the printed gamma 0.66 under the heading x10^-7 is
           6.6e-08 (ratio 0.0397). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 13.11
-          MgO: 10.31
-          SiO2: 47.69
-          Al2O3: 8.73
-          CaO: 20.16
+        printed_composition:
+          value: &mathieu_a62_125
+            Na2O: 13.11
+            MgO: 10.31
+            SiO2: 47.69
+            Al2O3: 8.73
+            CaO: 20.16
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS44 CMAS24
+        composition_wt_pct: *mathieu_a62_125
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS44 CMAS24
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -28031,18 +28281,20 @@ species:
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 13.22 mol% Na2O, gamma = a/x = 1.6e-06, but the printed gamma 1.60 under the heading x10^-7 is 1.6e-07
           (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value is resolved.'
-        composition_wt_pct:
-          Na2O: 13.06
-          MgO: 8.72
-          SiO2: 43.08
-          Al2O3: 17.11
-          CaO: 18.03
+        printed_composition:
+          value: &mathieu_a62_126
+            Na2O: 13.06
+            MgO: 8.72
+            SiO2: 43.08
+            Al2O3: 17.11
+            CaO: 18.03
+          locator:
+            pdf_page: 340
+            table: A.6.2
+            row: ACMAS44 CMAS25
+        composition_wt_pct: *mathieu_a62_126
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 340
-          table: A.6.2
-          row: ACMAS44 CMAS25
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -28170,18 +28422,20 @@ species:
           corrected 13.01 mol% Na2O, gamma = a/x = 1.62e-06, but the printed gamma 1.62 under the heading x10^-7 is
           1.62e-07 (ratio 0.0999). Printed values are carried unchanged; the row is not admitted until the scale or
           value is resolved.'
-        composition_wt_pct:
-          Na2O: 13.82
-          MgO: 13.32
-          SiO2: 45.17
-          Al2O3: 13.76
-          CaO: 13.92
+        printed_composition:
+          value: &mathieu_a62_127
+            Na2O: 13.82
+            MgO: 13.32
+            SiO2: 45.17
+            Al2O3: 13.76
+            CaO: 13.92
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMAS44 CMAS26
+        composition_wt_pct: *mathieu_a62_127
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMAS44 CMAS26
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -28309,18 +28563,20 @@ species:
           corrected 13.53 mol% Na2O, gamma = a/x = 1.56e-06, but the printed gamma 1.56 under the heading x10^-7 is
           1.56e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 12.84
-          MgO: 4.67
-          SiO2: 45.3
-          Al2O3: 13.84
-          CaO: 23.36
+        printed_composition:
+          value: &mathieu_a62_128
+            Na2O: 12.84
+            MgO: 4.67
+            SiO2: 45.3
+            Al2O3: 13.84
+            CaO: 23.36
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMAS44 CMAS27
+        composition_wt_pct: *mathieu_a62_128
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMAS44 CMAS27
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -28448,18 +28704,20 @@ species:
           corrected 19.77 mol% Na2O, gamma = a/x = 1.07e-06, but the printed gamma 1.07 under the heading x10^-7 is
           1.07e-07 (ratio 0.1). Printed values are carried unchanged; the row is not admitted until the scale or value
           is resolved.'
-        composition_wt_pct:
-          Na2O: 19.15
-          MgO: 10.76
-          SiO2: 52.05
-          Al2O3: 13.08
-          CaO: 4.97
+        printed_composition:
+          value: &mathieu_a62_129
+            Na2O: 19.15
+            MgO: 10.76
+            SiO2: 52.05
+            Al2O3: 13.08
+            CaO: 4.97
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA16S24 CMA16S1
+        composition_wt_pct: *mathieu_a62_129
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA16S24 CMA16S1
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
@@ -28586,18 +28844,20 @@ species:
         reason: 'source_internally_inconsistent: with the caption source activity a_Na2O=2.11*10-07 and the printed
           corrected 5.35 mol% Na2O, gamma = a/x = 3.94e-06, but the printed gamma 3.97 under the heading x10^-7 is 3.97e-07
           (ratio 0.101). Printed values are carried unchanged; the row is not admitted until the scale or value is resolved.'
-        composition_wt_pct:
-          Na2O: 5.19
-          MgO: 7.74
-          SiO2: 37.1
-          Al2O3: 15.89
-          CaO: 34.09
+        printed_composition:
+          value: &mathieu_a62_130
+            Na2O: 5.19
+            MgO: 7.74
+            SiO2: 37.1
+            Al2O3: 15.89
+            CaO: 34.09
+          locator:
+            pdf_page: 341
+            table: A.6.2
+            row: ACMA16S24 CMA16S2
+        composition_wt_pct: *mathieu_a62_130
         composition_basis: analysed quenched-glass composition after Na equilibration, electron microprobe,
           wt% oxides; joined from appendix Table A.6.2 on exact run and composition label
-        composition_locator:
-          pdf_page: 341
-          table: A.6.2
-          row: ACMA16S24 CMA16S2
         oxygen_partial_pressure:
           value: '2.11E-6'
           units: atm
