@@ -49,6 +49,20 @@ def test_pressure_trials_keep_checks_without_materializing_diagnostics(monkeypat
             conservation_calls.append(1)
             return validate(transition, *args, **kwargs)
 
+        from simulator.core import PyrolysisSimulator
+        gate_record = PyrolysisSimulator._melt_redox_liquidus_gate_record
+        sweep_plan = PyrolysisSimulator._continuous_sweep_plan
+
+        def parent_gate_only(owner, *args, **kwargs):
+            assert not getattr(owner, '_pressure_trial', False), 'trial re-entered liquidus finder'
+            return gate_record(owner, *args, **kwargs)
+
+        def parent_sweep_only(owner, *args, **kwargs):
+            assert not getattr(owner, '_pressure_trial', False), 'trial re-entered sweep balance'
+            return sweep_plan(owner, *args, **kwargs)
+
+        monkeypatch.setattr(PyrolysisSimulator, '_melt_redox_liquidus_gate_record', parent_gate_only)
+        monkeypatch.setattr(PyrolysisSimulator, '_continuous_sweep_plan', parent_sweep_only)
         monkeypatch.setattr(catalog, 'compiled_catalog_for', compile_once)
         monkeypatch.setattr(LedgerTransition, 'validate_conservation', check)
         monkeypatch.setattr('simulator.diagnostics.wall_sticking_alpha_provenance_notice',
@@ -106,6 +120,7 @@ def test_pressure_trial_freezes_liquidus_and_sweep_boundary(monkeypatch):
         # Redox changes during a batch must not invalidate the hour's frozen
         # phase measurement or trigger another physical sweep ODE.
         trial.melt.oxygen_reservoir.melt_intrinsic_fO2_log += 2.0
+        trial._melt_redox_gate_authority_tick_hour = None
         trial.melt.sweep_mol_per_s = 1.0
         monkeypatch.setattr(trial, '_melt_redox_liquidus_gate_record',
                             lambda **kw: pytest.fail('pressure trial repeated liquidus lookup'))
