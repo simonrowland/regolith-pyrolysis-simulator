@@ -103,6 +103,55 @@ def test_open_zero_alkali_sio_window_reaches_stage3(monkeypatch):
     assert "stage_2_to_stage_4_bypass" not in {s.name for s in model.active_pipe_segments}
 
 
+def test_diverted_alkali_sio_numeric_pin():
+    """Pre-change pin: the isolated cartridge must preserve existing routing."""
+    model = _model("divert", hard_gate=False)
+    result = model.route(
+        EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}),
+        MeltState(temperature_C=1650, pO2_mbar=1e-5),
+    )
+    assert 3 not in result.condensed_by_stage_species
+    assert {sp: kg.hex() for sp, kg in result.condensed_by_stage_species[4].items()} == {
+        "SiO": "0x1.1ac1c176ddee6p-1",
+        "Na": "0x1.d08a5cd1c9aefp-12",
+        "K": "0x1.d96ca206ef36dp-15",
+    }
+    assert {sp: kg.hex() for sp, kg in result.remaining_by_species.items()} == {
+        "SiO": "0x1.5e35b5418eb60p-5",
+        "Na": "0x1.0d7674e54da9ep-12",
+        "K": "0x1.6d6fbb5c992edp-15",
+    }
+
+
+@pytest.mark.parametrize("oxygen_mol", [1.0, 1e-7, 0.0])
+def test_admitted_alkali_parcel_requires_reactive_stage3_uptake(oxygen_mol):
+    from simulator.accounting.formulas import resolve_species_formula
+
+    model = _model("through", hard_gate=False)
+    model.retained_vapor_mol = {"O2": oxygen_mol}
+    result = model.route(
+        EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}),
+        MeltState(temperature_C=1650, pO2_mbar=1e-5 if oxygen_mol else 0.0),
+    )
+    assert model.train.collection_route["stage3_route"] == "through"
+    assert model.last_stage3_route_diagnostic["capture_purity"] >= 0.98
+    stage3 = result.condensed_by_stage_species.get(3, {})
+    uptake_mol = {
+        sp: stage3.get(sp, 0.0) / resolve_species_formula(sp).molar_mass_kg_per_mol()
+        for sp in ("Na", "K")
+    }
+    if oxygen_mol == 0.0:
+        assert sum(uptake_mol.values()) == 0.0
+    else:
+        assert sum(uptake_mol.values()) > 0.0
+        if oxygen_mol == 1.0:
+            assert all(mol > 0.0 for mol in uptake_mol.values())
+        # 4 M + O2 -> 2 M2O: one mol O2 can bind four mol alkali atoms.
+        assert sum(uptake_mol.values()) <= 4.0 * oxygen_mol
+        if oxygen_mol == 1e-7:
+            assert sum(uptake_mol.values()) == pytest.approx(4.0 * oxygen_mol)
+
+
 @pytest.mark.parametrize("carrier", ["Na", "K", "Na2", "K2O", "NaCl", "Na2O"])
 @pytest.mark.parametrize("amount", [1.0, 1e-30])
 def test_open_refuses_every_positive_alkali_carrier_with_zero_capture(carrier, amount, monkeypatch):
