@@ -3173,9 +3173,50 @@ class CondensationModel:
 
         stage_route_by_species: dict[str, dict[str, Any]] = {}
         reactive_alkali: dict[str, dict[str, Any]] = {}
-        oxygen_mol = (_finite_nonnegative_value(
+        from simulator.evaporation import (
+            _evaporation_stoich, _project_evaporation_overhead_source_mol_hr,
+        )
+
+        stream_source = {}
+        if self.train.collection_route['stage3_route'] == 'through':
+            source_rates = {
+                sp: rate for sp, rate in evap_flux.species_kg_hr.items()
+                if carrier_authority_status_by_species.get(sp) not in non_debiting_carrier_statuses
+                and sp not in cleanup_offgas_authorization
+            }
+            source_stoich = {}
+            for sp in source_rates:
+                data = _species_vapor_data(sp, vapor_pressure_data=self.vapor_pressure_data)
+                if data.get('parent_oxide'):
+                    source_stoich[sp] = _evaporation_stoich(
+                        sp, data, self.species_formula_registry)
+            stream_source = _project_evaporation_overhead_source_mol_hr(
+                source_rates, source_stoich, self.species_formula_registry)
+        retained_oxygen_mol = (_finite_nonnegative_value(
             self.retained_vapor_mol.get('O2', 0.0), label='headspace O2 mol')
             if self.train.collection_route['stage3_route'] == 'through' else 0.0)
+        # Premise: each one-hour parcel carries its evaporation coproducts.
+        # The shared source owner projects sum(rate[kg/h]*O2_per_product[kg/kg]
+        # /M_O2[kg/mol])*1 h, excluding oxygen sent to the melt buffer.
+        # Thus n_available = n_retained + n_stream, including signed O2 sinks.
+        # For SiO2 -> SiO + 1/2 O2 this reduces to 0.5*rate_SiO/M_SiO + retained
+        # [mol]. Zero source recovers the retained-only budget; no terminal
+        # store or melt-buffer oxygen is available to this reaction.
+        oxygen_mol = max(0.0, retained_oxygen_mol + stream_source.get('O2', 0.0))
+        stream_po2_bar = None
+        vapor_mol = sum(mol for sp, mol in stream_source.items() if sp != 'O2')
+        if stream_source.get('O2', 0.0) > 0.0 and vapor_mol > 0.0:
+            # The reported vapor partials already include carrier dilution.
+            # For an ideal co-flowing parcel p_O2,source / sum(p_vapor) =
+            # n_O2,source / sum(n_vapor). The one-hour amounts share a time
+            # basis, so mol/mol is dimensionless; Pa/1e5 converts to bar.
+            # Add the ledger carried-in O2 partial pressure. Zero fresh
+            # source recovers the retained-headspace pressure exactly.
+            vapor_pressure_pa = sum(
+                self.wall_species_partial_pressures_pa.get(sp, 0.0)
+                for sp in stream_source if sp != 'O2')
+            stream_po2_bar = (
+                stream_source['O2'] / vapor_mol * vapor_pressure_pa / PA_PER_BAR)
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             if (
                 carrier_authority_status_by_species.get(species)
@@ -3203,6 +3244,7 @@ class CondensationModel:
             }
 
         for stage in self.train.active_stages:
+            stage_capture = {}
             for species, stage_route in stage_route_by_species.items():
                 rate_kg_hr = evap_flux.species_kg_hr[species]
                 remaining_kg = stage_route['remaining_kg']
@@ -3228,7 +3270,10 @@ class CondensationModel:
                 reaction = None
                 if stage.stage_number == 3 and species in ('Na', 'K'):
                     reaction = self._stage3_alkali_reaction(
-                        species, stage, melt, evap_flux, remaining_kg / rate_kg_hr)
+                        species, stage, melt, evap_flux, remaining_kg / rate_kg_hr,
+                        stream_po2_bar=stream_po2_bar)
+                    reaction.update(available_oxygen_mol=oxygen_mol,
+                                    stream_oxygen_mol=stream_source.get('O2', 0.0))
                     reactive_alkali[species] = reaction
                     if not reaction['favoured']:
                         # Elemental saturation is not a substitute for silica
@@ -3260,32 +3305,41 @@ class CondensationModel:
                         'flowing_pressure_pa': reaction['alkali_pressure_pa']}
                        if reaction is not None else {}),
                 )
-                condensed_kg = remaining_kg * eta
+                stage_capture[species] = remaining_kg * eta
                 if reaction is not None:
                     molar_mass = resolve_species_formula(
                         species, self.species_formula_registry).molar_mass_kg_per_mol()
-                    demand_mol = condensed_kg / molar_mass
-                    # 4 M + O2 -> 2 M2O. Both sides are mol per one-hour
-                    # parcel; zero headspace O2 proves zero reactive capture.
-                    uptake_mol = min(demand_mol, 4.0 * oxygen_mol)
-                    oxygen_mol -= uptake_mol / 4.0
-                    condensed_kg = uptake_mol * molar_mass
+                    reaction['transport_uptake_mol'] = stage_capture[species] / molar_mass
+
+            demand_mol = math.fsum(
+                reactive_alkali[sp]['transport_uptake_mol']
+                for sp in stage_capture if stage.stage_number == 3 and sp in reactive_alkali)
+            # 4 M + O2 -> 2 M2O. All D_i are computed before sharing oxidant:
+            # n_i=D_i*min(1,4*n_O2/sum(D)). mol/mol is dimensionless; the sum
+            # of O2 debits is <=n_O2, zero budget gives zero uptake, and ample
+            # O2 preserves every transport demand regardless of species order.
+            uptake_scale = min(1.0, 4.0 * oxygen_mol / demand_mol) if demand_mol else 0.0
+            if 0.0 < uptake_scale < 1.0:
+                # Round the shared cap downward so kg/mol projections cannot
+                # overdraw the available O2 by one floating-point ULP.
+                uptake_scale = math.nextafter(uptake_scale, 0.0)
+            for species, condensed_kg in stage_capture.items():
+                stage_route = stage_route_by_species[species]
+                if stage.stage_number == 3 and species in reactive_alkali:
+                    reaction = reactive_alkali[species]
+                    uptake_mol = reaction['transport_uptake_mol'] * uptake_scale
+                    condensed_kg *= uptake_scale
                     stage_route['reactive_kg'] = condensed_kg
                     reaction.update(
-                        transport_uptake_mol=demand_mol, uptake_mol=uptake_mol,
-                        oxygen_debit_mol=uptake_mol / 4.0,
+                        uptake_mol=uptake_mol, oxygen_debit_mol=uptake_mol / 4.0,
                         oxide_product_mol=uptake_mol / 2.0,
-                        oxidant_limited=uptake_mol < demand_mol)
+                        oxidant_limited=uptake_scale < 1.0)
                 elif condensed_kg > 1e-15:
-                    hkl_condensed_by_stage[stage.stage_number] = (
-                        hkl_condensed_by_stage.get(stage.stage_number, 0.0)
-                        + condensed_kg
-                    )
-                remaining_kg -= condensed_kg
-                remaining_after_stage[stage.stage_number] = max(
-                    0.0, remaining_kg
-                )
-                stage_route['remaining_kg'] = remaining_kg
+                    by_stage = stage_route['hkl_condensed_by_stage']
+                    by_stage[stage.stage_number] = by_stage.get(stage.stage_number, 0.0) + condensed_kg
+                stage_route['remaining_kg'] -= condensed_kg
+                stage_route['remaining_after_stage'][stage.stage_number] = max(
+                    0.0, stage_route['remaining_kg'])
 
         for species, stage_route in stage_route_by_species.items():
             rate_kg_hr = evap_flux.species_kg_hr[species]
@@ -4589,11 +4643,14 @@ class CondensationModel:
     def _stage3_alkali_reaction(
         self, species: str, stage: CondensationStage, melt: MeltState,
         evap_flux: EvaporationFlux, inlet_fraction: float,
+        *, stream_po2_bar: float | None = None,
     ) -> dict[str, Any]:
         from simulator.chemistry.ellingham_thermo import (
             ellingham_delta_g_kj_per_mol_o2, ellingham_authority_limit,
         )
-        from simulator.chemistry.melt_activity import melt_oxide_activity
+        from simulator.chemistry.melt_activity import (
+            melt_oxide_activity, _na_activity_reference_standard_delta_g_kj_per_mol_o2,
+        )
 
         temperature_K = _stage_midpoint_temperature_K(stage)
         oxide = {'Na': 'Na2O', 'K': 'K2O'}[species]
@@ -4626,25 +4683,35 @@ class CondensationModel:
                 label='stage3 headspace pO2_bar')
         except ValueError as exc:
             raise DepositionInputRefusal('stage3_reaction_gas', species, str(exc)) from exc
+        if stream_po2_bar is not None:
+            po2_bar += stream_po2_bar
         pressure_pa *= inlet_fraction
         # Ellingham basis: 4 M(g) + O2 -> 2 M2O, standard pressure 1 bar.
         # ln(Q/K) = 2 ln(a_M2O) - 4 ln(p_M/bar) - ln(pO2/bar)
         #             + dG°/(R T). All log arguments are dimensionless;
         # dG(kJ/mol)*1000/(R[J/mol/K]*T[K]) is dimensionless. Q<K favours
         # uptake; exact zero pO2 or alkali pressure cannot drive this sink.
+        # Match Na's pure-liquid activity reference through its existing
+        # thermochemistry owner; K's missing liquid reference is flagged below.
         log_q_over_k = None
         if po2_bar > 0.0 and pressure_pa > 0.0 and a_oxide > 0.0:
             log_q_over_k = (
                 2.0 * math.log(a_oxide) - 4.0 * math.log(pressure_pa / PA_PER_BAR)
                 - math.log(po2_bar)
-                + ellingham_delta_g_kj_per_mol_o2(species, temperature_K)
+                + (_na_activity_reference_standard_delta_g_kj_per_mol_o2(temperature_K)
+                   if species == 'Na' else ellingham_delta_g_kj_per_mol_o2(species, temperature_K))
                 * 1000.0 / (GAS_CONSTANT_J_MOL_K * temperature_K))
         return {
             'favoured': (log_q_over_k < 0.0 if log_q_over_k is not None
                          else po2_bar > 0.0 and pressure_pa > 0.0 and a_oxide == 0.0),
             'log_Q_over_K': log_q_over_k, 'temperature_K': temperature_K,
             'alkali_pressure_pa': pressure_pa, 'pO2_bar': po2_bar,
-            'pO2_source': 'oxygen_reservoir.headspace_ledger_pO2_bar',
+            'pO2_source': ('retained_plus_evaporation_stream' if stream_po2_bar is not None
+                           else 'oxygen_reservoir.headspace_ledger_pO2_bar'),
+            **({'reference_state_notice': {
+                'status': 'authority_extrapolated',
+                'message': 'reference-state mismatch: pure-liquid KO0.5 activity vs crystalline K2O dG; no K2O fusion data; authority extrapolated',
+            }} if species == 'K' else {}),
             'oxide_species': oxide, 'oxide_activity': a_oxide,
             'activity_model': activity.activity_model,
             'activity_authority_status': activity.authority_status,

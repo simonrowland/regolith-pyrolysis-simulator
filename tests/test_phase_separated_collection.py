@@ -148,6 +148,26 @@ def test_stage3_includes_reviewed_same_hour_stream_oxygen(sio_kg, retained, expe
     assert sum(r["uptake_mol"] for r in reactions.values()) > 4 * retained
 
 
+def test_stage3_coproduct_pressure_uses_measured_vapor_carrier_dilution():
+    from simulator.accounting.formulas import resolve_species_formula
+    model = _model("through", hard_gate=False)
+    rates = {"SiO": 1.0, "Na": 0.0007, "K": 0.0001}
+    mol = {sp: kg / resolve_species_formula(sp).molar_mass_kg_per_mol()
+           for sp, kg in rates.items()}
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={sp: 0.4 * n / mol["SiO"] for sp, n in mol.items()},
+    )
+    model.retained_vapor_mol = {"O2": 1e-7}
+    melt = MeltState(temperature_C=1650)
+    melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8
+    result = model.route(EvaporationFlux(rates), melt)
+    # SiO2 -> SiO + 1/2 O2 gives pO2_source = 0.5*pSiO by Dalton's law,
+    # independent of the 10 mbar carrier-gas total; mbar/1000 is bar.
+    for reaction in result.stage3_reactive_alkali_by_species.values():
+        assert reaction["pO2_bar"] == pytest.approx(1e-8 + 0.5 * 0.4 / 1000)
+
+
 @pytest.mark.parametrize("oxygen_mol", [1e-7, 1.0])
 def test_stage3_shared_oxygen_split_is_order_independent(monkeypatch, oxygen_mol):
     import simulator.evaporation as source_owner
@@ -170,16 +190,23 @@ def test_stage3_shared_oxygen_split_is_order_independent(monkeypatch, oxygen_mol
         assert results[0] == pytest.approx({"Na": 0.0304483264479, "K": 0.00255765595947}, rel=1e-10)
 
 
-def test_stage3_na_gate_matches_liquid_activity_reference():
+@pytest.mark.parametrize("po2,expected_log,favoured", [
+    (1e-8, -38.8286945826, True),
+    (1.06560249466e-25, 0.251711636707, False),
+])
+def test_stage3_na_gate_matches_liquid_activity_reference(monkeypatch, po2, expected_log, favoured):
+    import simulator.evaporation as source_owner
+    monkeypatch.setattr(source_owner, "_project_evaporation_overhead_source_mol_hr",
+                        lambda *args, **kwargs: {})
     model = _model("through", hard_gate=False)
     model.retained_vapor_mol = {"O2": 1.0}
     melt = MeltState(temperature_C=1650)
     # Geometric midpoint of the review's crystal and liquid critical pO2.
-    melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1.06560249466e-25
+    melt.oxygen_reservoir.headspace_ledger_pO2_bar = po2
     result = model.route(EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}), melt)
     reaction = result.stage3_reactive_alkali_by_species["Na"]
-    assert reaction["log_Q_over_K"] == pytest.approx(0.251711636707, abs=1e-9)
-    assert not reaction["favoured"]
+    assert reaction["log_Q_over_K"] == pytest.approx(expected_log, abs=1e-9)
+    assert reaction["favoured"] is favoured
 
 
 def test_stage3_k_evaluation_flags_missing_liquid_reference():
@@ -219,7 +246,10 @@ def test_same_hour_zero_retained_oxygen_kernel_capture_closes(order):
 
 
 @pytest.mark.parametrize("oxygen_mol", [1.0, 1e-7, 0.0])
-def test_admitted_alkali_parcel_requires_reactive_stage3_uptake(oxygen_mol):
+def test_admitted_alkali_parcel_requires_reactive_stage3_uptake(oxygen_mol, monkeypatch):
+    import simulator.evaporation as source_owner
+    monkeypatch.setattr(source_owner, "_project_evaporation_overhead_source_mol_hr",
+                        lambda *args, **kwargs: {})
     from simulator.accounting.formulas import resolve_species_formula
 
     model = _model("through", hard_gate=False)
@@ -250,7 +280,10 @@ def test_admitted_alkali_parcel_requires_reactive_stage3_uptake(oxygen_mol):
             assert sum(uptake_mol.values()) == pytest.approx(4.0 * oxygen_mol)
 
 
-def test_vanishing_oxygen_pressure_disables_reaction_despite_available_oxidant():
+def test_vanishing_oxygen_pressure_disables_reaction_despite_available_oxidant(monkeypatch):
+    import simulator.evaporation as source_owner
+    monkeypatch.setattr(source_owner, "_project_evaporation_overhead_source_mol_hr",
+                        lambda *args, **kwargs: {})
     model = _model("through", hard_gate=False)
     model.retained_vapor_mol = {"O2": 1.0}
     melt = MeltState(temperature_C=1650, pO2_mbar=1e-5)
@@ -266,7 +299,10 @@ def test_vanishing_oxygen_pressure_disables_reaction_despite_available_oxidant()
 
 
 @pytest.mark.parametrize('oxygen_mol', [1.0, 1e-7, 0.0])
-def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mol):
+def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mol, monkeypatch):
+    import simulator.evaporation as source_owner
+    monkeypatch.setattr(source_owner, "_project_evaporation_overhead_source_mol_hr",
+                        lambda *args, **kwargs: {})
     from simulator.accounting.formulas import resolve_species_formula
     from simulator.condensation import stage_purity_report
 

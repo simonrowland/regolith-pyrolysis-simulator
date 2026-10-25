@@ -167,6 +167,7 @@ def _evaporation_stoich(species: str, sp_data: dict, registry):
         'oxygen_destination': sp_data.get('oxygen_destination'),
     }
 
+
 def _validate_evaporation_stoich_atoms(
     parent_oxide: str,
     product_species: str,
@@ -199,6 +200,7 @@ def _validate_evaporation_stoich_atoms(
                 f"{element} atoms"
             )
 
+
 def _atom_moles_for_kg(species: str, kg: float, registry) -> dict:
     if kg <= 0.0:
         return {}
@@ -206,7 +208,6 @@ def _atom_moles_for_kg(species: str, kg: float, registry) -> dict:
         species, registry)
     species_moles = float(kg) / formula.molar_mass_kg_per_mol()
     return formula.atom_moles(species_moles)
-
 
 
 def _project_evaporation_overhead_source_mol_hr(
@@ -241,8 +242,9 @@ def _project_evaporation_overhead_source_mol_hr(
         )
         if (
             o2_kg_hr < 0.0
-            or vapor_oxygen_atoms > 0.0
-            or oxygen_destination == 'process.overhead_gas'
+            or (oxygen_destination != 'reservoir.fo2_buffer'
+                and (vapor_oxygen_atoms > 0.0
+                     or oxygen_destination == 'process.overhead_gas'))
         ):
             source_mol_hr['O2'] = (
                 source_mol_hr.get('O2', 0.0)
@@ -4260,6 +4262,25 @@ class EvaporationMixin:
                 evap_flux.species_kg_hr.keys()
             )
         )
+        if any(reaction.get('uptake_mol', 0.0) > 0.0 for reaction in
+               route_result.stage3_reactive_alkali_by_species.values()):
+            # Commit actual gas-side oxygen sources before reactions debit
+            # them. Allocation was computed from the complete parcel above;
+            # this only satisfies the ledger's per-transition no-overdraft
+            # invariant, including sources outside the default SiO-first order.
+            stoich_by_species = {
+                sp: self._evaporation_stoich(sp, (
+                    self.vapor_pressures.get('metals', {}).get(sp)
+                    or self.vapor_pressures.get('oxide_vapors', {}).get(sp) or {}))
+                for sp in species_order
+            }
+            source_species = {
+                sp for sp in species_order
+                if _project_evaporation_overhead_source_mol_hr(
+                    {sp: evap_flux.species_kg_hr[sp]}, stoich_by_species,
+                    self.species_formula_registry).get('O2', 0.0) > 0.0
+            }
+            species_order = tuple(sorted(species_order, key=lambda sp: sp not in source_species))
         residual_species_kg_hr = {
             species: max(0.0, float(rate_kg_hr) * phase_scalar)
             for species, rate_kg_hr in evap_flux.species_kg_hr.items()
@@ -4996,14 +5017,6 @@ class EvaporationMixin:
 
     def _evaporation_stoich(self, species: str, sp_data: dict):
         return _evaporation_stoich(species, sp_data, self.species_formula_registry)
-
-    def _validate_evaporation_stoich_atoms(
-        self, parent_oxide: str, product_species: str,
-        oxide_per_product_kg: float, O2_per_product_kg: float,
-    ) -> None:
-        _validate_evaporation_stoich_atoms(
-            parent_oxide, product_species, oxide_per_product_kg,
-            O2_per_product_kg, self.species_formula_registry)
 
     def _atom_moles_for_kg(self, species: str, kg: float) -> dict:
         return _atom_moles_for_kg(species, kg, self.species_formula_registry)
