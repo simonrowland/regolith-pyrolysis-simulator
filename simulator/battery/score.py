@@ -7401,24 +7401,7 @@ def _predict_evaporation_rate(
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
     formula = identity.species.formula
-    if formula in {"Na", "K"}:
-        return _input_refusal(
-            engine=engine,
-            channel=channel,
-            sources=sources,
-            identity=identity,
-            requested=identity.composition,
-            reason=RefusalReason.UNSUPPORTED,
-            detail={
-                "reason": "alkali_alpha_not_measured",
-                "formula": formula,
-                "detail": (
-                    "Na/K kinetic rows stay refused because available literature "
-                    "alpha values are predominantly assumed unity"
-                ),
-            },
-        )
-    if formula not in {"Mg", "SiO", "Fe", "Ca", "Al"}:
+    if formula not in {"Mg", "SiO", "Fe", "Ca", "Al", "Na", "K"}:
         return _input_refusal(
             engine=engine,
             channel=channel,
@@ -7667,7 +7650,7 @@ def _predict_evaporation_rate(
             f"cross-paper min/max={alpha.band[0]:g}/{alpha.band[1]:g}"
         ),
         origin="residue:estimate_loo_evaporation_alpha",
-        source=", ".join(alpha.contributing_source_ids),
+        source="; ".join(alpha.source_attributions),
         band=f"alpha=[{alpha.band[0]:g}, {alpha.band[1]:g}]",
     ))
     alpha_sources = (*pressure_prediction.coefficient_sources, *alpha.contributing_source_ids)

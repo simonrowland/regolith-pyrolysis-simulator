@@ -55,15 +55,26 @@ MELT = State.of(Composition(
 ))
 
 
-def _alpha(source: str, species: str, value: float, *, family: str = "cai"):
+def _alpha(
+    source: str,
+    species: str,
+    value: float,
+    *,
+    family: str = "cai",
+    method_class: str | None = None,
+    evidence_class: str = EvidenceClass.MEASURED_DIRECT.value,
+    owner_approved_printed_alkali_alpha: bool = False,
+):
     return EvaporationAlphaObservation(
         source_id=source,
         species=species,
         alpha=value,
-        evidence_class=EvidenceClass.MEASURED_DIRECT.value,
+        evidence_class=evidence_class,
         observation_id=f"{source}::{species}",
         temperature_K=T_K,
         melt_family=family,
+        method_class=method_class,
+        owner_approved_printed_alkali_alpha=owner_approved_printed_alkali_alpha,
     )
 
 
@@ -320,6 +331,38 @@ def test_alpha_collection_accepts_measured_store_observation():
     assert collected[0].temperature_K == T_K
 
 
+@pytest.mark.parametrize(
+    ("source_id", "formula", "value", "method_class"),
+    (
+        ("kems-006-zhang-2021", "Na", "0.14", "directly_reduced_measurement"),
+        ("kems-006-zhang-2021", "K", "0.13", "directly_reduced_measurement"),
+        ("ta-shirai-2000-lpsc", "Na", "0.08", "model_derived"),
+        ("kems-005-fedkin-2006", "Na", "0.26", "author_estimate"),
+        ("kems-005-fedkin-2006", "K", "0.13", "author_estimate"),
+    ),
+)
+def test_d290_named_printed_alkali_alphas_keep_source_and_method_class(
+    source_id, formula, value, method_class
+):
+    identity = Identity(
+        quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        species=Species(formula, Phase.G),
+        temperature_K=State.of(Decimal(str(T_K))),
+    )
+    observation = F.observation(
+        f"{source_id}-{formula}", "alpha-experiment", identity, Decimal(value),
+        evidence=EvidenceClass.MODEL_DERIVED,
+        source_id=source_id,
+    )
+
+    collected = collect_measured_evaporation_alphas((observation,))
+
+    assert len(collected) == 1
+    assert collected[0].source_id == source_id
+    assert collected[0].method_class == method_class
+    assert collected[0].owner_approved_printed_alkali_alpha is True
+
+
 def test_measured_context_arrhenius_is_evaluated_at_row_temperature():
     form = {
         "type": "arrhenius",
@@ -366,8 +409,70 @@ def test_measured_context_arrhenius_is_evaluated_at_row_temperature():
     assert estimate.value == pytest.approx((expected + 0.3) / 2.0)
 
 
+@pytest.mark.parametrize(
+    ("formula", "other_source", "other_method_class"),
+    (
+        ("Na", "ta-shirai-2000-lpsc", "model_derived"),
+        ("K", "kems-005-fedkin-2006", "author_estimate"),
+    ),
+)
+def test_alkali_rate_rows_use_only_other_papers_alpha_with_provenance(
+    formula, other_source, other_method_class
+):
+    own_source = "kems-006-zhang-2021"
+    alpha_rows = (
+        _alpha(
+            own_source,
+            formula,
+            0.9,
+            method_class="directly_reduced_measurement",
+            evidence_class=EvidenceClass.MODEL_DERIVED.value,
+            owner_approved_printed_alkali_alpha=True,
+        ),
+        _alpha(
+            other_source,
+            formula,
+            0.2,
+            method_class=other_method_class,
+            evidence_class=EvidenceClass.MODEL_DERIVED.value,
+            owner_approved_printed_alkali_alpha=True,
+        ),
+        _alpha(
+            "independent-third-paper", formula, 0.4,
+            method_class="measured_direct",
+        ),
+    )
+    row = replace(_kinetic_row(formula), source_id=own_source)
+    result = _predict_evaporation_rate(
+        Engine.INTERNAL_ANALYTICAL,
+        row,
+        experiment=F.tabulation_experiment(
+            "kinetic-experiment", method=MethodToken.LANGMUIR_FREE_EVAPORATION
+        ),
+        handles=None,
+        isolated=None,
+        bench=None,
+        alpha_observations=alpha_rows,
+        partial_pressure_observations=(),
+        pressure_predictor=_pressure_prediction,
+    )
+
+    assert result.value is not None
+    assert result.coefficient_basis == "leave_one_paper_out_hkl"
+    alpha_notice = next(
+        notice for notice in result.notices
+        if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+        and notice.origin == "residue:estimate_loo_evaporation_alpha"
+    )
+    assert own_source not in alpha_notice.source
+    assert other_source in alpha_notice.source
+    assert "independent-third-paper" in alpha_notice.source
+    assert f"method_class={other_method_class}" in alpha_notice.source
+    assert "method_class=measured_direct" in alpha_notice.source
+
+
 @pytest.mark.parametrize("formula", ["Na", "K"])
-def test_alkali_rate_rows_are_typed_refusals(formula):
+def test_alkali_rate_refuses_with_fewer_than_two_other_alpha_sources(formula):
     result = _predict_evaporation_rate(
         Engine.INTERNAL_ANALYTICAL,
         _kinetic_row(formula),
@@ -377,13 +482,13 @@ def test_alkali_rate_rows_are_typed_refusals(formula):
         handles=None,
         isolated=None,
         bench=None,
-        alpha_observations=(),
+        alpha_observations=(_alpha("only-other-paper", formula, 0.2),),
         partial_pressure_observations=(),
         pressure_predictor=_pressure_prediction,
     )
 
-    assert result.refusal_reason is RefusalReason.UNSUPPORTED
-    assert result.refusal_detail["reason"] == "alkali_alpha_not_measured"
+    assert result.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert result.refusal_detail["reason"] == "alpha_loo_insufficient_sources"
 
 
 @pytest.mark.parametrize("formula", ["Mg", "SiO", "Fe", "Ca", "Al"])

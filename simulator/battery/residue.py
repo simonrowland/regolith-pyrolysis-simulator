@@ -47,6 +47,16 @@ _HASHIMOTO_COMMON_UNITY_SOURCE = (
     "Hashimoto assumed alpha_i/alpha_j = 1 only; absolute alpha=1 is a "
     "declared sensitivity choice, not an author-established kinetic model"
 )
+_OWNER_APPROVED_ALKALI_ALPHA_SOURCES = frozenset({
+    "kems-006-zhang-2021",
+    "ta-shirai-2000-lpsc",
+    "kems-005-fedkin-2006",
+})
+_OWNER_APPROVED_ALKALI_ALPHA_METHOD_CLASSES = {
+    "kems-006-zhang-2021": "directly_reduced_measurement",
+    "ta-shirai-2000-lpsc": "model_derived",
+    "kems-005-fedkin-2006": "author_estimate",
+}
 
 
 class ResidueInventoryRefusal(ValueError):
@@ -70,6 +80,8 @@ class EvaporationAlphaObservation:
     temperature_K: float | None = None
     temperature_range_K: tuple[float, float] | None = None
     melt_family: str | None = None
+    method_class: str | None = None
+    owner_approved_printed_alkali_alpha: bool = False
 
 
 @dataclass(frozen=True)
@@ -81,6 +93,7 @@ class EvaporationAlphaEstimate:
     contributing_source_ids: tuple[str, ...]
     source_values: tuple[tuple[str, float], ...]
     melt_family_fallback: bool
+    source_attributions: tuple[str, ...] = ()
 
 
 def collect_measured_evaporation_alphas(
@@ -97,13 +110,16 @@ def collect_measured_evaporation_alphas(
         *, source_id: object, species: object, alpha: object,
         evidence_class: object, observation_id: object,
         temperature_K: object = None, temperature_range_K: object = None,
-        melt_family: object = None,
+        melt_family: object = None, method_class: object = None,
+        owner_approved_printed_alkali_alpha: bool = False,
     ) -> None:
         source = str(source_id or "")
         formula = str(species or "").removesuffix("(g)")
         evidence = str(getattr(evidence_class, "value", evidence_class) or "")
         observation = str(observation_id or "")
-        if not source or not formula or evidence not in MEASURED_EVIDENCE or not observation:
+        if not source or not formula or not observation:
+            return
+        if evidence not in MEASURED_EVIDENCE and not owner_approved_printed_alkali_alpha:
             return
         raw_range = None
         if temperature_range_K is not None:
@@ -143,6 +159,8 @@ def collect_measured_evaporation_alphas(
             temperature_K=temperature,
             temperature_range_K=raw_range,
             melt_family=family,
+            method_class=(str(method_class) if method_class else None),
+            owner_approved_printed_alkali_alpha=owner_approved_printed_alkali_alpha,
         ))
 
     for observation in observations:
@@ -173,14 +191,27 @@ def collect_measured_evaporation_alphas(
             )
         provenance = getattr(observation, "provenance", None)
         family = provenance.get("melt_family") if isinstance(provenance, Mapping) else None
+        source_id = getattr(observation, "source_id", None)
+        formula = getattr(getattr(identity, "species", None), "formula", None)
+        approved_alkali = (
+            formula in {"Na", "K"}
+            and source_id in _OWNER_APPROVED_ALKALI_ALPHA_SOURCES
+        )
+        method_class = getattr(getattr(observation, "evidence", None), "original_method_class", None)
+        if approved_alkali:
+            # Preserve the ruling's source method class where the typed row's
+            # evidence class is model-derived or the fit remains in context.
+            method_class = _OWNER_APPROVED_ALKALI_ALPHA_METHOD_CLASSES[source_id]
         append(
-            source_id=getattr(observation, "source_id", None),
-            species=getattr(getattr(identity, "species", None), "formula", None),
+            source_id=source_id,
+            species=formula,
             alpha=point,
             evidence_class=evidence,
             observation_id=getattr(observation, "observation_id", None),
             temperature_K=temperature,
             melt_family=family,
+            method_class=method_class,
+            owner_approved_printed_alkali_alpha=approved_alkali,
         )
 
     for document in source_documents:
@@ -196,7 +227,16 @@ def collect_measured_evaporation_alphas(
                 # as measured. A row type or a printed model fit alone is not
                 # evidence that the alpha itself was measured.
                 method_class = values.get("method_class")
-                if method_class is not None and method_class not in MEASURED_EVIDENCE:
+                formula = str(values.get("gas_species", formula)).removesuffix("(g)")
+                approved_alkali = (
+                    formula in {"Na", "K"}
+                    and source_id in _OWNER_APPROVED_ALKALI_ALPHA_SOURCES
+                )
+                if (
+                    method_class is not None
+                    and method_class not in MEASURED_EVIDENCE
+                    and not (approved_alkali and method_class == "author_estimate")
+                ):
                     continue
                 classifications = tuple(
                     str(getattr(value, "value", value)).lower()
@@ -210,10 +250,11 @@ def collect_measured_evaporation_alphas(
                     label in {"compilation_assessed", "model_derived", "model"}
                     or label.startswith("assumed")
                     for label in classifications
-                ):
+                ) and not approved_alkali:
                     continue
                 if "model" in str(row.get("type") or "").lower():
-                    continue
+                    if not approved_alkali:
+                        continue
                 context_semantics = " ".join(str(value).lower() for value in (
                     values.get("quantity"), values.get("alpha_kind"),
                     row.get("type"), row.get("regime"),
@@ -240,6 +281,8 @@ def collect_measured_evaporation_alphas(
                     temperature_K=row.get("temperature_K"),
                     temperature_range_K=row.get("T_range_K"),
                     melt_family=values.get("melt_family", row.get("melt_family")),
+                    method_class=method_class,
+                    owner_approved_printed_alkali_alpha=approved_alkali,
                 )
     return tuple(collected)
 
@@ -271,7 +314,14 @@ def estimate_loo_evaporation_alpha(
         row for row in observations
         if row.species == species
         and row.source_id != exclude_source_id
-        and row.evidence_class in MEASURED_EVIDENCE
+        and (
+            row.evidence_class in MEASURED_EVIDENCE
+            or (
+                row.owner_approved_printed_alkali_alpha
+                and species in {"Na", "K"}
+                and row.source_id in _OWNER_APPROVED_ALKALI_ALPHA_SOURCES
+            )
+        )
     )
     family_supported = bool(melt_family) and bool(candidates) and all(
         row.melt_family for row in candidates
@@ -281,6 +331,7 @@ def estimate_loo_evaporation_alpha(
         candidates = tuple(row for row in candidates if row.melt_family == melt_family)
 
     by_source: dict[str, list[float]] = defaultdict(list)
+    source_attributions: list[str] = []
     for row in candidates:
         temperature_range = row.temperature_range_K
         if temperature_range is not None and not (
@@ -304,6 +355,10 @@ def estimate_loo_evaporation_alpha(
             alpha_value = row.alpha
         if math.isfinite(alpha_value) and 0.0 < alpha_value <= 1.0:
             by_source[row.source_id].append(alpha_value)
+            source_attributions.append(
+                f"{row.source_id}::{row.observation_id}="
+                f"{alpha_value:g} (method_class={row.method_class or 'unspecified'})"
+            )
 
     source_values = tuple(sorted(
         (source_id, median(values)) for source_id, values in by_source.items()
@@ -321,6 +376,7 @@ def estimate_loo_evaporation_alpha(
         contributing_source_ids=tuple(source_id for source_id, _ in source_values),
         source_values=source_values,
         melt_family_fallback=family_fallback,
+        source_attributions=tuple(sorted(source_attributions)),
     )
 
 
