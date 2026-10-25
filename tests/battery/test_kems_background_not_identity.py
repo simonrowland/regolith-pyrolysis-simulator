@@ -381,18 +381,29 @@ def test_knudsen_engine_point_keeps_source_grounded_row_pressure() -> None:
         assert payload["pressure_bar"] == expected_bar
 
 
-def test_langmuir_free_evaporation_still_inherits_experiment_total(
+def test_langmuir_free_evaporation_keeps_printed_row_pressure(
     tmp_path: Path,
 ) -> None:
-    """Fedkin 2006 Table 3 is context, so no scored Langmuir row inherits 0.0013 Pa.
+    """Restored Fig. 4 Yu rows retain their printed row pressure.
 
-    The printed Hashimoto chamber pressure stays on the Table 3 equipment
-    context (1.3e-8 bar). 7baaf334b keeps those fit outputs out of observations.
+    The Hashimoto chamber pressure stays on the Table 3 equipment context
+    (1.3e-8 bar); it is not promoted to these observation identities.
     """
 
     result = _migrate_real_extract(tmp_path, "kems-005-fedkin-2006.yaml")
-    assert result.observations == {}
-    assert result.experiments == {}
+    assert len(result.observations) == 2
+    assert len(result.experiments) == 1
+    assert {
+        row.identity.species.formula: row.value.point
+        for row in result.observations.values()
+    } == {"Na": Decimal("0.26"), "K": Decimal("0.13")}
+    for row in result.observations.values():
+        assert row.identity.total_pressure_Pa is not None
+        assert row.identity.total_pressure_Pa.is_unknown
+        point_pressure = row.point_conditions["total_pressure_Pa"]
+        assert point_pressure.state.is_value
+        assert point_pressure.state.value.point == Decimal("1.0")
+        assert point_pressure.locator is not None
     table3 = next(
         context
         for records in result.context_by_work.values()
