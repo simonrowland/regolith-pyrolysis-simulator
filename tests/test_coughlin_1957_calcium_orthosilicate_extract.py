@@ -90,6 +90,14 @@ def test_isolated_migration_maps_each_heat_point_temperature_and_keeps_pressure_
         assert condition.state.is_value
         assert condition.state.value == temperature.value
         assert condition.locator.page == source["locator"]["page"]
+        reference_temperature = target.point_conditions["reference_temperature_K"]
+        assert reference_temperature.state.is_value
+        assert reference_temperature.state.value == Decimal("298.15")
+        assert reference_temperature.locator.page == source["locator"]["page"]
+        reference_phase = target.point_conditions["reference_polymorph_as_printed"]
+        assert reference_phase.state.is_value
+        assert reference_phase.state.value == source["values"]["reference_polymorph_as_printed"]
+        assert reference_phase.locator.page == source["locator"]["page"]
         assert "total_pressure_Pa" not in source["point_conditions"]
         assert "pressure_basis_Pa" not in source["values"]
 
