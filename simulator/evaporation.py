@@ -4465,11 +4465,17 @@ class EvaporationMixin:
                     getattr(route_result, 'condensation_authority_by_species', {})
                     .get(species, {})
                 ),
+                **({'stage3_reactive_alkali': dict(
+                    route_result.stage3_reactive_alkali_by_species[species])}
+                   if species in route_result.stage3_reactive_alkali_by_species else {}),
             },
             control_inputs={
                 'species': species,
                 'condensed_kg': float(condensed_kg),
                 'sp_data': dict(sp_data or {}),
+                **({'stage3_reactive_alkali': dict(
+                    route_result.stage3_reactive_alkali_by_species[species])}
+                   if species in route_result.stage3_reactive_alkali_by_species else {}),
                 'wall_deposit_fraction': wall_deposit_fraction,
                 'wall_deposit_account_fractions': wall_deposit_account_fractions,
                 'wall_temperature_K': (
@@ -4497,6 +4503,9 @@ class EvaporationMixin:
             return 0.0
 
         diagnostic = dict(kernel_result.diagnostic or {})
+        reaction = dict(diagnostic.get('stage3_reactive_alkali') or {})
+        if reaction:
+            route_result.stage3_reactive_alkali_by_species[species] = reaction
         self._record_wall_deposit_delta(species, diagnostic)
         self._record_wall_alkali_binding_diagnostic_state(diagnostic)
         return float(diagnostic.get('credited_condensed_kg', 0.0))
@@ -4987,6 +4996,12 @@ class EvaporationMixin:
         if intended_condensed_kg <= 1e-12:
             return
         scale = credited_condensed_kg / intended_condensed_kg
+        reaction = route_result.stage3_reactive_alkali_by_species.get(species, {})
+        reactive_vapor_kg = float(reaction.get('committed_vapor_kg', 0.0))
+        if reaction.get('uptake_mol', 0.0) > 0.0:
+            ordinary_intended_kg = intended_condensed_kg - route_result.condensed_by_stage_species.get(3, {}).get(species, 0.0)
+            scale = ((credited_condensed_kg - reactive_vapor_kg) / ordinary_intended_kg
+                     if ordinary_intended_kg > 1e-12 else 0.0)
         product_scale = {
             product: kg / credited_condensed_kg
             for product, kg in product_kg_by_species.items()
@@ -4999,7 +5014,11 @@ class EvaporationMixin:
             route_result.condensed_by_stage_species.items()
         ):
             projected_kg = stage_species.get(species, 0.0) * scale
-            if projected_kg <= 1e-12:
+            stage_products = (dict(reaction.get('committed_products_kg', {}))
+                              if stage_number == 3 and reaction.get('uptake_mol', 0.0) > 0.0
+                              else {product: projected_kg * fraction
+                                    for product, fraction in product_scale.items()})
+            if not any(kg > 1e-12 for kg in stage_products.values()):
                 continue
             stage = stages_by_number.get(stage_number)
             if stage is None:
@@ -5010,8 +5029,7 @@ class EvaporationMixin:
                 .get(species, 0.0)
                 > 0.0
             )
-            for product, product_fraction in product_scale.items():
-                stage_product_kg = projected_kg * product_fraction
+            for product, stage_product_kg in stage_products.items():
                 if stage_product_kg <= 1e-12:
                     continue
                 delta_key = (stage_number, product)

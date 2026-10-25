@@ -127,6 +127,7 @@ from simulator.physical_constants import (
     AVOGADRO,
     BOLTZMANN,
     CELSIUS_TO_KELVIN_OFFSET,
+    PA_PER_BAR,
 )
 from simulator.accounting.queries import (
     wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
@@ -1992,6 +1993,8 @@ class CondensationRouteResult:
         default_factory=dict)
     stage_area_geometry_provenance_notice: Dict[str, Any] = field(
         default_factory=dict)
+    stage3_reactive_alkali_by_species: Dict[str, Dict[str, Any]] = field(
+        default_factory=dict)
 
     def condensed_for_species(self, species: str) -> float:
         return sum(
@@ -2784,6 +2787,8 @@ class CondensationModel:
             'capture_purity': silica_rate / (silica_rate + oxide_rate)
                 if silica_rate + oxide_rate > 0.0 else None,
             'carriers': carriers, 'unavailable': unknown,
+            'reactive_alkali_silica': (
+                result.stage3_reactive_alkali_by_species if result is not None else {}),
         })
         if oxide_rate > allowed or unknown:
             finding = {**diagnostic,
@@ -3167,6 +3172,10 @@ class CondensationModel:
             self.operating_history[-1]['cold_spot_warnings'] = cold_spot_warnings
 
         stage_route_by_species: dict[str, dict[str, Any]] = {}
+        reactive_alkali: dict[str, dict[str, Any]] = {}
+        oxygen_mol = (_finite_nonnegative_value(
+            self.retained_vapor_mol.get('O2', 0.0), label='headspace O2 mol')
+            if self.train.collection_route['stage3_route'] == 'through' else 0.0)
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             if (
                 carrier_authority_status_by_species.get(species)
@@ -3188,6 +3197,7 @@ class CondensationModel:
             hkl_condensed_by_stage: Dict[int, float] = {}
             remaining_after_stage: Dict[int, float] = {}
             stage_alpha_records_by_stage: Dict[int, dict[str, Any]] = {}
+            reactive_kg = 0.0
             for stage in self.train.active_stages:
                 if remaining_kg <= 1e-15:
                     break
@@ -3204,6 +3214,16 @@ class CondensationModel:
                 stage_alpha_records_by_stage[stage.stage_number] = dict(
                     stage_alpha_record
                 )
+                reaction = None
+                if stage.stage_number == 3 and species in ('Na', 'K'):
+                    reaction = self._stage3_alkali_reaction(
+                        species, stage, melt, evap_flux, remaining_kg / rate_kg_hr)
+                    reactive_alkali[species] = reaction
+                    if not reaction['favoured']:
+                        # Elemental saturation is not a substitute for silica
+                        # reaction uptake when the chemical driving force is off.
+                        remaining_after_stage[3] = remaining_kg
+                        continue
                 eta = self._condensation_efficiency(
                     stage=stage,
                     species=species,
@@ -3225,9 +3245,27 @@ class CondensationModel:
                     efficiency_outcomes=efficiency_outcomes_by_species.setdefault(
                         species, []
                     ),
+                    **({'reactive_alkali_silica': True,
+                        'flowing_pressure_pa': reaction['alkali_pressure_pa']}
+                       if reaction is not None else {}),
                 )
                 condensed_kg = remaining_kg * eta
-                if condensed_kg > 1e-15:
+                if reaction is not None:
+                    molar_mass = resolve_species_formula(
+                        species, self.species_formula_registry).molar_mass_kg_per_mol()
+                    demand_mol = condensed_kg / molar_mass
+                    # 4 M + O2 -> 2 M2O. Both sides are mol per one-hour
+                    # parcel; zero headspace O2 proves zero reactive capture.
+                    uptake_mol = min(demand_mol, 4.0 * oxygen_mol)
+                    oxygen_mol -= uptake_mol / 4.0
+                    condensed_kg = uptake_mol * molar_mass
+                    reactive_kg = condensed_kg
+                    reaction.update(
+                        transport_uptake_mol=demand_mol, uptake_mol=uptake_mol,
+                        oxygen_debit_mol=uptake_mol / 4.0,
+                        oxide_product_mol=uptake_mol / 2.0,
+                        oxidant_limited=uptake_mol < demand_mol)
+                elif condensed_kg > 1e-15:
                     hkl_condensed_by_stage[stage.stage_number] = (
                         hkl_condensed_by_stage.get(stage.stage_number, 0.0)
                         + condensed_kg
@@ -3243,7 +3281,7 @@ class CondensationModel:
             capture_budget_alpha_record: dict[str, Any] = {}
             capture_budget_kg = _pressure_isolated_capture_budget_kg(
                 species,
-                rate_kg_hr,
+                rate_kg_hr - reactive_kg,
                 self.train.active_stages,
                 self.residence_time_s,
                 temps=self.condensation_temperatures_C,
@@ -3258,6 +3296,7 @@ class CondensationModel:
                 'segment_supply': segment_supply,
                 'capture_budget_kg': capture_budget_kg,
                 'capture_budget_alpha_record': capture_budget_alpha_record,
+                'reactive_kg': reactive_kg,
             }
 
         positive_wall_species = {
@@ -3454,6 +3493,10 @@ class CondensationModel:
                     capture_budget_alpha_record
                 )
             capture_budget_kg = float(stage_route['capture_budget_kg'])
+            reactive_kg = float(stage_route['reactive_kg'])
+            if reactive_kg > 0.0:
+                condensed_by_stage_species.setdefault(3, {})[species] = reactive_kg
+                impurity_by_stage_species.setdefault(3, {})[species] = reactive_kg
             if hkl_sink_total_kg <= 1e-15:
                 capture_budget_kg = 0.0
             elif capture_budget_kg > 0.0:
@@ -3479,8 +3522,8 @@ class CondensationModel:
                         segment_species[species] = (
                             segment_species.get(species, 0.0) + segment_kg)
                 wall_fraction = (
-                    wall_deposit_kg / capture_budget_kg
-                    if capture_budget_kg > 0.0 else 0.0
+                    wall_deposit_kg / (capture_budget_kg + reactive_kg)
+                    if capture_budget_kg + reactive_kg > 0.0 else 0.0
                 )
                 segment_fractions = _wall_segment_account_fractions(
                     wall_deposit_by_segment_species,
@@ -3511,7 +3554,7 @@ class CondensationModel:
                                 stage_impurity.get(species, 0.0)
                                 + condensed_kg)
             remaining_by_species[species] = max(
-                0.0, rate_kg_hr - capture_budget_kg)
+                0.0, rate_kg_hr - capture_budget_kg - reactive_kg)
 
         from simulator.diagnostics import (
             _status_bearing_alpha_record,
@@ -3705,9 +3748,9 @@ class CondensationModel:
             sticking_notice['alpha_s_extrapolation_warnings'] = (
                 alpha_extrapolation_warnings
             )
-        self.last_sticking_alpha_provenance_notice = copy.deepcopy(
-            sticking_notice
-        )
+        if reactive_alkali:
+            sticking_notice['reactive_alkali_silica_by_species'] = copy.deepcopy(reactive_alkali)
+        self.last_sticking_alpha_provenance_notice = copy.deepcopy(sticking_notice)
         if sticking_notice and self.operating_history:
             self.operating_history[-1][
                 'wall_sticking_alpha_provenance_notice'
@@ -3882,6 +3925,7 @@ class CondensationModel:
                 ] = copy.deepcopy(condensation_refusals_by_species)
 
         return CondensationRouteResult(
+            stage3_reactive_alkali_by_species=reactive_alkali,
             remaining_by_species=copy.deepcopy(remaining_by_species),
             retained_in_source_by_species=copy.deepcopy(
                 retained_in_source_by_species
@@ -4530,6 +4574,81 @@ class CondensationModel:
                 )
         return supply
 
+    def _stage3_alkali_reaction(
+        self, species: str, stage: CondensationStage, melt: MeltState,
+        evap_flux: EvaporationFlux, inlet_fraction: float,
+    ) -> dict[str, Any]:
+        from simulator.chemistry.ellingham_thermo import (
+            ellingham_delta_g_kj_per_mol_o2, ellingham_authority_limit,
+        )
+        from simulator.chemistry.melt_activity import melt_oxide_activity
+
+        temperature_K = _stage_midpoint_temperature_K(stage)
+        oxide = {'Na': 'Na2O', 'K': 'K2O'}[species]
+        # Prospective oxide-equivalent surface mixture: existing cartridge
+        # product plus this incoming parcel after 2 SiO -> Si + SiO2 and
+        # 2 M -> M2O. Structural silica has no ledger mass; its unknown
+        # amount is not invented as an activity dilution term. The existing
+        # gamma*X model is an uncertified, temperature-flagged estimate here.
+        product_mol = {
+            sp: kg / resolve_species_formula(sp, self.species_formula_registry).molar_mass_kg_per_mol()
+            for sp, kg in stage.collected_kg.items()
+            if sp in ('SiO2', 'Na2O', 'K2O') and kg > 0.0
+        }
+        for vapor, product in (('SiO', 'SiO2'), ('Na', 'Na2O'), ('K', 'K2O')):
+            mol = evap_flux.species_kg_hr.get(vapor, 0.0) / resolve_species_formula(
+                vapor, self.species_formula_registry).molar_mass_kg_per_mol()
+            product_mol[product] = product_mol.get(product, 0.0) + 0.5 * mol
+        activity = melt_oxide_activity(oxide, product_mol, temperature_K=temperature_K)
+        if activity is None:
+            raise DepositionInputRefusal('stage3_product_activity', product_mol,
+                                         'silicate product composition required')
+        a_oxide = activity.thermodynamic_parent_activity()
+        try:
+            pressure_pa = _finite_nonnegative_value(
+                self.wall_species_partial_pressures_pa.get(species), label=f'{species} partial pressure')
+            # pO2_mbar is the incoming sweep command; zero commanded O2
+            # does not remove the co-evolved oxygen in the actual headspace.
+            po2_bar = _finite_nonnegative_value(
+                melt.oxygen_reservoir.headspace_ledger_pO2_bar,
+                label='stage3 headspace pO2_bar')
+        except ValueError as exc:
+            raise DepositionInputRefusal('stage3_reaction_gas', species, str(exc)) from exc
+        pressure_pa *= inlet_fraction
+        # Ellingham basis: 4 M(g) + O2 -> 2 M2O, standard pressure 1 bar.
+        # ln(Q/K) = 2 ln(a_M2O) - 4 ln(p_M/bar) - ln(pO2/bar)
+        #             + dG°/(R T). All log arguments are dimensionless;
+        # dG(kJ/mol)*1000/(R[J/mol/K]*T[K]) is dimensionless. Q<K favours
+        # uptake; exact zero pO2 or alkali pressure cannot drive this sink.
+        log_q_over_k = None
+        if po2_bar > 0.0 and pressure_pa > 0.0 and a_oxide > 0.0:
+            log_q_over_k = (
+                2.0 * math.log(a_oxide) - 4.0 * math.log(pressure_pa / PA_PER_BAR)
+                - math.log(po2_bar)
+                + ellingham_delta_g_kj_per_mol_o2(species, temperature_K)
+                * 1000.0 / (GAS_CONSTANT_J_MOL_K * temperature_K))
+        return {
+            'favoured': (log_q_over_k < 0.0 if log_q_over_k is not None
+                         else po2_bar > 0.0 and pressure_pa > 0.0 and a_oxide == 0.0),
+            'log_Q_over_K': log_q_over_k, 'temperature_K': temperature_K,
+            'alkali_pressure_pa': pressure_pa, 'pO2_bar': po2_bar,
+            'pO2_source': 'oxygen_reservoir.headspace_ledger_pO2_bar',
+            'oxide_species': oxide, 'oxide_activity': a_oxide,
+            'activity_model': activity.activity_model,
+            'activity_authority_status': activity.authority_status,
+            'activity_valid_range_K': activity.valid_range_K,
+            'activity_evidence_tier': activity.evidence_tier,
+            'activity_basis': 'prospective_parcel_plus_collected_product',
+            'activity_warning': activity.warning,
+            'thermochemistry_limit': ellingham_authority_limit(
+                temperature_K, species=species, consumer='stage3_alkali_silica'),
+            'notice': 'reactive alkali-silica uptake; reaction probability uncertified (existing Na/K sticking alpha used)',
+            'silica_partner': 'structural substrate/deposit; no SiO2 ledger debit',
+            'output_status': 'status_bearing',
+            'uptake_mol': 0.0, 'oxygen_debit_mol': 0.0,
+            'oxidant_limited': False,
+        }
+
     def _condensation_efficiency(
         self,
         *,
@@ -4543,6 +4662,8 @@ class CondensationModel:
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
         antoine_extrapolation_warnings: list[str] | None = None,
         efficiency_outcomes: list[dict[str, Any]] | None = None,
+        reactive_alkali_silica: bool = False,
+        flowing_pressure_pa: float | None = None,
     ) -> float:
         """
         Condensation efficiency for one species in one stage.
@@ -4602,13 +4723,17 @@ class CondensationModel:
         # Resolve Antoine (or catalog) Psat at T_cond; uncovered segments and
         # range errors are typed refusals (b-127), never a fabricated 100 Pa.
         psat_notices = antoine_extrapolations if antoine_extrapolations is not None else {}
-        P_local_pa, psat_refused = _try_antoine_psat_pa(
-            species,
-            T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
-            vapor_pressure_data=self.vapor_pressure_data,
-            antoine_extrapolations=psat_notices,
-            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-        )
+        if reactive_alkali_silica:
+            P_local_pa = _finite_nonnegative_value(flowing_pressure_pa, label='reactive alkali pressure')
+            psat_refused = False
+        else:
+            P_local_pa, psat_refused = _try_antoine_psat_pa(
+                species,
+                T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
+                vapor_pressure_data=self.vapor_pressure_data,
+                antoine_extrapolations=psat_notices,
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            )
         domain_outcome = None
         if psat_refused or P_local_pa is None:
             notice = psat_notices.get(
@@ -4800,6 +4925,7 @@ class CondensationModel:
                 stable_condensation_product_backstop=(
                     _stable_condensation_product_backstop_authorized(species)
                 ),
+                equilibrium_pressure_pa=0.0 if reactive_alkali_silica else None,
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                 diagnostic_out=rate_diagnostic,
@@ -7113,6 +7239,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     diagnostic_out: MutableMapping[str, Any] | None = None,
+    equilibrium_pressure_pa: float | None = None,
 ) -> float:
     """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
     form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
@@ -7230,19 +7357,22 @@ def _series_resistance_deposition_flux_mol_m2_s(
         # Category 3 (see above): perfectly non-sticking surface; the
         # zero is real, not a refusal.
         return 0.0
-    driving_pressure_pa = _wall_deposition_driving_pressure_pa(
-        species,
-        P_local_pa,
-        T_surface_K,
-        vapor_pressure_data=vapor_pressure_data,
-        reactive_product_backstop=reactive_product_backstop,
-        stable_condensation_product_backstop=(
-            stable_condensation_product_backstop
-        ),
-        antoine_extrapolations=antoine_extrapolations,
-        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-        diagnostic_out=diagnostic_out,
-    )
+    if equilibrium_pressure_pa is None:
+        driving_pressure_pa = _wall_deposition_driving_pressure_pa(
+            species,
+            P_local_pa,
+            T_surface_K,
+            vapor_pressure_data=vapor_pressure_data,
+            reactive_product_backstop=reactive_product_backstop,
+            stable_condensation_product_backstop=stable_condensation_product_backstop,
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            diagnostic_out=diagnostic_out,
+        )
+    else:
+        equilibrium_pressure_pa = _finite_nonnegative_value(
+            equilibrium_pressure_pa, label='surface equilibrium pressure')
+        driving_pressure_pa = max(0.0, P_local_pa - equilibrium_pressure_pa)
     if driving_pressure_pa <= 0.0:
         return 0.0
 

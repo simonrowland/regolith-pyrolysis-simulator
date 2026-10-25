@@ -152,6 +152,75 @@ def test_admitted_alkali_parcel_requires_reactive_stage3_uptake(oxygen_mol):
             assert sum(uptake_mol.values()) == pytest.approx(4.0 * oxygen_mol)
 
 
+def test_vanishing_oxygen_pressure_disables_reaction_despite_available_oxidant():
+    model = _model("through", hard_gate=False)
+    model.retained_vapor_mol = {"O2": 1.0}
+    result = model.route(
+        EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}),
+        MeltState(temperature_C=1650, pO2_mbar=1e-200),
+    )
+    assert all(not r['favoured'] and r['log_Q_over_K'] > 0.0
+               for r in result.stage3_reactive_alkali_by_species.values())
+    assert result.condensed_by_stage_species[3].get('Na', 0.0) == 0.0
+    assert result.condensed_by_stage_species[3].get('K', 0.0) == 0.0
+
+
+@pytest.mark.parametrize('oxygen_mol', [1.0, 1e-7, 0.0])
+def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mol):
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.condensation import stage_purity_report
+
+    sim = _sim()
+    sim.load_batch('lunar_mare_low_ti', mass_kg=1.0)
+    sim.campaign_mgr.overrides['C0'] = {'stage3_route': 'through'}
+    sim.atom_ledger.load_external_mol('process.overhead_gas', {'O2': oxygen_mol},
+                                      material_origin='reagent')
+    model = _model('through', hard_gate=False)
+    model.train = sim.train
+    sim._condensation_model = model
+    sim.melt.pO2_mbar = 1e-5 if oxygen_mol else 0.0
+    model = sim.condensation_model
+    flux = EvaporationFlux({'SiO': 1.0, 'Na': 0.0007, 'K': 0.0001})
+    result = model.route(flux, sim.melt)
+    bypass = _model('divert', hard_gate=False).route(flux, sim.melt)
+    assert sim.train.collection_route['stage3_route'] == 'through'
+    registry = sim.species_formula_registry
+    sim.atom_ledger.load_external_mol('process.overhead_gas', {
+        sp: kg / resolve_species_formula(sp, registry).molar_mass_kg_per_mol()
+        for sp, kg in flux.species_kg_hr.items()}, material_origin='reagent')
+    first_transition = len(sim.atom_ledger.transitions)
+    for sp, rate in flux.species_kg_hr.items():
+        metadata = dict(sim.vapor_pressures['metals'].get(sp)
+                        or sim.vapor_pressures['oxide_vapors'].get(sp) or {})
+        credited = sim._dispatch_condensation_route(
+            sp, rate - result.remaining_by_species[sp], metadata, result)
+        sim._project_condensed_stage_collection(
+            result, sp, credited, sim._condensed_products_kg(sp, credited, metadata))
+    for transition in sim.atom_ledger.transitions[first_transition:]:
+        transition.validate_conservation(registry)
+        assert transition.debit_atom_moles(registry) == pytest.approx(
+            transition.credit_atom_moles(registry))
+    stage3 = sim.train.stages[3].collected_kg
+    oxide_mol = sum(stage3.get(oxide, 0.0) / resolve_species_formula(
+        oxide, registry).molar_mass_kg_per_mol() for oxide in ('Na2O', 'K2O'))
+    oxygen_left = sim.atom_ledger.physical_mol_by_account('process.overhead_gas').get('O2', 0.0)
+    # Each oxide formula unit requires one O atom, hence half a mol O2.
+    assert oxygen_mol - oxygen_left == pytest.approx(oxide_mol * 0.5)
+    assert oxide_mol * 0.5 <= oxygen_mol
+    assert not stage3.get('Na', 0.0) and not stage3.get('K', 0.0)
+    for sp in ('Na', 'K', 'Na2O', 'K2O', 'Si', 'SiO2'):
+        projected = sum(stage.collected_kg.get(sp, 0.0) for stage in sim.train.stages)
+        assert projected == pytest.approx(sim.atom_ledger.kg_by_account(
+            'process.condensation_train').get(sp, 0.0))
+    if oxygen_mol:
+        assert oxide_mol > 0.0
+        assert stage_purity_report(sim.train)['stage_3_sio_zone']['purity_fraction'] < 1.0
+        assert sum(sim.train.stages[4].collected_kg.get(sp, 0.0) for sp in ('Na', 'K')) < sum(
+            bypass.condensed_by_stage_species[4].get(sp, 0.0) for sp in ('Na', 'K'))
+        assert sum(stage3.get(oxide, 0.0) for oxide in ('Na2O', 'K2O')) / (
+            stage3['SiO2'] + sum(stage3.get(oxide, 0.0) for oxide in ('Na2O', 'K2O'))) <= 0.02
+
+
 @pytest.mark.parametrize("carrier", ["Na", "K", "Na2", "K2O", "NaCl", "Na2O"])
 @pytest.mark.parametrize("amount", [1.0, 1e-30])
 def test_open_refuses_every_positive_alkali_carrier_with_zero_capture(carrier, amount, monkeypatch):
