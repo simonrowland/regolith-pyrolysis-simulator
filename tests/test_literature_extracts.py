@@ -16,6 +16,7 @@ import hashlib
 import importlib.util
 import json
 import math
+import re
 import os
 import sys
 from collections import Counter
@@ -5899,17 +5900,14 @@ def test_katahira_2016_activity_rows_pin_render_and_migrate_all_conditions():
     context = species["context"]
     assert len(rows) == 47
     assert len(context) == 47
-    table_counts = Counter(
-        f"p{row['locator']['page']:03}_t{int(row['locator']['table']):02}"
-        for row in rows
-    )
+    table_counts = Counter(row["locator"]["table"] for row in rows)
     assert table_counts == {
-        "p003_t01": 8,
-        "p003_t02": 5,
-        "p004_t03": 8,
-        "p004_t04": 6,
-        "p004_t05": 13,
-        "p004_t06": 7,
+        "1(a)": 8,
+        "1(b)": 5,
+        "2(a)": 8,
+        "2(b)": 6,
+        "3(a)": 13,
+        "3(b)": 7,
     }
 
     by_sample = {row["values"]["sample_id_as_printed"]: row for row in rows}
@@ -5979,6 +5977,20 @@ def test_katahira_2016_activity_rows_pin_render_and_migrate_all_conditions():
         assert "total_pressure_Pa" not in conditions
 
     migrated_by_id = {item.observation_id.split("::", 1)[-1]: item for item in migrated}
+    published_tables = {
+        "p003_t01": "1(a)",
+        "p003_t02": "1(b)",
+        "p004_t03": "2(a)",
+        "p004_t04": "2(b)",
+        "p004_t05": "3(a)",
+        "p004_t06": "3(b)",
+    }
+    for item in migrated:
+        block = re.search(r"(p\d{3}_t\d{2})", item.observation_id)
+        assert block is not None
+        printed_table = published_tables[block.group(1)]
+        assert item.locator.table == printed_table
+        assert item.point_conditions["fO2_Pa"].locator.table == printed_table
     for sample in ("A01", "A06", "C25"):
         source_row = by_sample[sample]
         item = migrated_by_id[source_row["observation_id"]]

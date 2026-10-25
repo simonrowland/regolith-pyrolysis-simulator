@@ -241,7 +241,9 @@ def test_happy_path_keeps_verbatim_text_and_skips_dashes(tmp_path: Path) -> None
         "<tr><td>1859</td><td>-</td></tr>"
         "<tr><td>1914</td><td>0</td></tr></table>",
     )
-    document = _emit(tmp_path, draft_dir, _base_mapping(_pressure_table()))
+    mapping = _base_mapping(_pressure_table())
+    mapping["tables"][0]["published_table"] = "7(a)"
+    document = _emit(tmp_path, draft_dir, mapping)
     rows = _observations(document)
     assert [row["values"]["pressure_atm"] for row in rows] == ["1.25", "0"]
     assert [row["values"]["T_K"] for row in rows] == ["1851", "1914"]
@@ -254,12 +256,12 @@ def test_happy_path_keeps_verbatim_text_and_skips_dashes(tmp_path: Path) -> None
         assert row["mineru_flags"] == []
         assert "needs_render_check" not in row
         assert row["locator"]["page"] == 1
-        assert row["locator"]["table"] == "1"
+        assert row["locator"]["table"] == "7(a)"
         assert row["locator"]["row_label"] == row["values"]["T_K"]
         assert row["locator"]["column_header"] == "p Mg"
         temperature = row["point_conditions"]["temperature_K"]
         assert temperature["state"]["value"]["point"] == row["values"]["T_K"]
-        assert temperature["locator"]["table"] == "1"
+        assert temperature["locator"]["table"] == "7(a)"
         errors: list[str] = []
         validator._check_observation(row, "row", errors, set())
         assert errors == []

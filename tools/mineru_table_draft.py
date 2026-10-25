@@ -1077,6 +1077,7 @@ _TABLE_KEYS = frozenset(
     {
         "page",
         "table_index",
+        "published_table",
         "type",
         "quantity",
         "evidence_class",
@@ -1528,6 +1529,7 @@ def _locator(
     *,
     page: int,
     table_index: int,
+    published_table: str | None = None,
     row_label: str,
     column_header: str,
     published_page: Any,
@@ -1535,7 +1537,7 @@ def _locator(
     locator: dict[str, Any] = {
         "page": page,
         "pdf_page_index": page - 1,
-        "table": str(table_index),
+        "table": published_table or str(table_index),
         "row_label": _printed(row_label),
         "column_header": _printed(column_header),
     }
@@ -1734,6 +1736,7 @@ def _emit_table(
             temperature_locator = _locator(
                 page=page,
                 table_index=table_index,
+                published_table=spec.get("published_table"),
                 row_label=temperature_text,
                 column_header=headers.get(int(temperature["column"]), ""),
                 published_page=published_page,
@@ -1747,6 +1750,7 @@ def _emit_table(
                 temperature_locator = _locator(
                     page=page,
                     table_index=table_index,
+                    published_table=spec.get("published_table"),
                     row_label=temperature_text,
                     column_header=str(temperature.get("column_header") or ""),
                     published_page=published_page,
@@ -1815,6 +1819,7 @@ def _emit_table(
             locator = _locator(
                 page=page,
                 table_index=table_index,
+                published_table=spec.get("published_table"),
                 row_label=row_label,
                 column_header=headers.get(column, ""),
                 published_page=published_page,
