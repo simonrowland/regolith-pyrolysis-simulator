@@ -19,7 +19,7 @@ The table has eight printed body rows (draft coordinate rows 2–9). Columns 1 a
 | p. 40 / r08 | 2441 | 4.09 | 7.3 | 4.24 | 0.78 | 3.30 | 0.88 | 3.32 | 0.84 | 3.30 | b, render |
 | p. 40 / r09 | 2495 | 4.01 | 9.2 | 4.35 | 1.0 | 3.39 | 1.4 | 3.53 | 1.3 | 3.50 | b, render |
 
-The ten approximation-marked cells (all render-checked) are p. 40 r02c03; r03c03 and r03c07; r04c03, r04c05, r04c06, r04c07, and r04c09; and r05c05 and r05c07. The 10 dash cells are retained as blanks rather than observations. The remaining 44 numeric signal cells are the 44 `matched` rows in `hasapis-panish-rosen-1960-refractory-vaporization-mineru-compare.csv`.
+The nine approximate ion-current cells (all render-checked) are p. 40 r02c03; r03c03 and r03c07; r04c03, r04c05, r04c07, and r04c09; and r05c05 and r05c07. They are admitted with their printed strings retained and `approximate: true`. One additional approximate-form logarithm at r04c06 remains unavailable because the existing quantity vocabulary cannot represent it. The 10 dash cells are retained as blanks rather than observations. The remaining 44 numeric signal cells are the 44 `matched` rows in `hasapis-panish-rosen-1960-refractory-vaporization-mineru-compare.csv`.
 
 The focused test pins three rendered cells: Al current ≈0.4 at r02c03, Al log value 3.52 at r04c04, and summed WO2 current 1.3 at r09c09. The test also pins all eight temperatures and checks that changing a fidelity-pinned value fails the fidelity check.
 
@@ -30,7 +30,7 @@ The focused test pins three rendered cells: Al current ≈0.4 at r02c03, Al log 
 - The table does not print total pressure or oxygen fugacity. These remain unknown; no vacuum, ambient pressure, or oxygen fugacity is assumed.
 - The table and accompanying prose describe mass-spectrometer data from an effusion-cell study. The cell is described as a tungsten outer container; the footnote reads: “1/8-inch orifice in cylindrical cell of 3/16-inch height and inner diameter.”
 - The authors estimate Al:AlO:Al2O:WO2 ≈ 100:4:3:1.6 using estimated electron cross sections attributed to Otvos and Stevenson. That estimate is not a Table 4 cell, depends on external cross-section estimates, and is not entered as an observation.
-- The approximate ion-current values remain typed-refused as printed; the scalar value model does not carry the printed approximation qualifier. The `log I+T` columns also remain typed-refused because the existing quantity vocabulary has no token for a logarithm of ion current multiplied by temperature. These logarithms are not converted into vapor pressures.
+- The nine approximate ion-current values are admitted as numeric `ion_intensity` points with `approximate: true`; their raw printed strings remain in the extract. The other 18 direct ion-current points are exact-form values. The logarithmic columns remain unavailable because the existing quantity vocabulary has no token for the printed logarithmic signals; they are not converted into vapor pressures. For WO2, Table 4 prints `log ΣI+WO2` without T. No temperature multiplier is inferred.
 
 ## Other tables and figures in the report
 
@@ -44,6 +44,6 @@ The report's remaining sections describe apparatus, material compatibility, and 
 
 ## Isolated migration and expected store delta
 
-The real migrator read 54 source rows and emitted 54 observations: 18 numeric ion-intensity points and 36 unavailable values (nine approximate currents and 27 logarithmic signal values). It reported 0 hard issues. All 54 printed temperatures reached `point_conditions.temperature_K` and the corresponding identity temperature. For three exact ion-current rows, identity composition remains unknown because proportions are not printed; pressure and fO2 are not numeric identity values because the paper does not report them and the ion-intensity profile does not use those axes. The source extract explicitly records total pressure and fO2 as unknown for every observation.
+The real migrator read 54 source rows and emitted 54 observations: 27 numeric ion-intensity points (nine approximate) and 27 unavailable logarithmic signal values. It reported 0 hard issues. All 54 printed temperatures reached `point_conditions.temperature_K` and the corresponding identity temperature. For three exact ion-current rows, identity composition remains unknown because proportions are not printed; pressure and fO2 are not numeric identity values because the paper does not report them and the ion-intensity profile does not use those axes. The source extract explicitly records total pressure and fO2 as unknown for every observation.
 
-Expected store delta: one work, one experiment, and 54 observation records, of which 18 are numeric and 36 unavailable. No battery-store files are regenerated or committed in this extraction.
+Expected store delta: one work, one experiment, and 54 observation records, of which 27 are numeric (nine approximate) and 27 unavailable. No battery-store files are regenerated or committed in this extraction.

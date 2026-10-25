@@ -49,8 +49,9 @@ species:
         gas_species: Al(g)
         ion_as_printed: Al+
         ion_intensity_as_printed: ≈ 0.4
-        admission_status: typed_refusal
-        reason: The printed approximate ion-current form has no scalar uncertainty token; retain as printed.
+        ion_intensity: '0.4'
+        approximate: true
+        admission_status: admitted
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -203,8 +204,9 @@ species:
         gas_species: Al(g)
         ion_as_printed: Al+
         ion_intensity_as_printed: ≈ 1.6
-        admission_status: typed_refusal
-        reason: The printed approximate ion-current form has no scalar uncertainty token; retain as printed.
+        ion_intensity: '1.6'
+        approximate: true
+        admission_status: admitted
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -357,8 +359,9 @@ species:
         gas_species: Al(g)
         ion_as_printed: Al+
         ion_intensity_as_printed: ≈ 1.5
-        admission_status: typed_refusal
-        reason: The printed approximate ion-current form has no scalar uncertainty token; retain as printed.
+        ion_intensity: '1.5'
+        approximate: true
+        admission_status: admitted
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -1272,8 +1275,9 @@ species:
         gas_species: AlO(g)
         ion_as_printed: AlO+
         ion_intensity_as_printed: ≈ 0.08
-        admission_status: typed_refusal
-        reason: The printed approximate ion-current form has no scalar uncertainty token; retain as printed.
+        ion_intensity: '0.08'
+        approximate: true
+        admission_status: admitted
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -1426,8 +1430,9 @@ species:
         gas_species: AlO(g)
         ion_as_printed: AlO+
         ion_intensity_as_printed: ≈ 0.2
-        admission_status: typed_refusal
-        reason: The printed approximate ion-current form has no scalar uncertainty token; retain as printed.
+        ion_intensity: '0.2'
+        approximate: true
+        admission_status: admitted
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -2038,8 +2043,9 @@ species:
         gas_species: Al2O(g)
         ion_as_printed: Al2O+
         ion_intensity_as_printed: ≈ 0.1
-        admission_status: typed_refusal
-        reason: The printed approximate ion-current form has no scalar uncertainty token; retain as printed.
+        ion_intensity: '0.1'
+        approximate: true
+        admission_status: admitted
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -2192,8 +2198,9 @@ species:
         gas_species: Al2O(g)
         ion_as_printed: Al2O+
         ion_intensity_as_printed: ≈ 0.10
-        admission_status: typed_refusal
-        reason: The printed approximate ion-current form has no scalar uncertainty token; retain as printed.
+        ion_intensity: '0.10'
+        approximate: true
+        admission_status: admitted
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -2346,8 +2353,9 @@ species:
         gas_species: Al2O(g)
         ion_as_printed: Al2O+
         ion_intensity_as_printed: ≈ 0.4
-        admission_status: typed_refusal
-        reason: The printed approximate ion-current form has no scalar uncertainty token; retain as printed.
+        ion_intensity: '0.4'
+        approximate: true
+        admission_status: admitted
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -3170,10 +3178,10 @@ species:
         table_draft_index: 5
         table_row_number: 3
         table_column_number: 10
-      units: log I+T, as printed
+      units: log ΣI+WO2, as printed
       mineru_flags: []
       values:
-        quantity: log10_ion_current_times_temperature
+        quantity: log_ion_current_sum
         method_class: measured_direct
         T_K: '2260'
         value: '2.25'
@@ -3182,10 +3190,10 @@ species:
         sample_as_printed: mixture of Al2O3 and tungsten powder
         temperature_uncertainty_as_published: ± 10 K
         temperature_uncertainty_confidence_level: not_stated
-        log_ion_current_times_temperature_as_printed: '2.25'
+        log_ion_current_sum_as_printed: '2.25'
         admission_status: typed_refusal
-        reason: No stored quantity token represents the printed log I+T form; it is not an absolute vapour pressure.
-        schema_gap: log10 ion current multiplied by temperature has no existing quantity token.
+        reason: No stored quantity token represents the printed log ΣI+WO2 form; no temperature multiplier is inferred.
+        schema_gap: The printed logarithm of summed WO2 ion current has no existing quantity token.
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -3262,8 +3270,9 @@ species:
         gas_species: WO2(g)
         ion_as_printed: $\Sigma I_{WO_2}^{+}$
         ion_intensity_as_printed: ≈ 0.12
-        admission_status: typed_refusal
-        reason: The printed approximate ion-current form has no scalar uncertainty token; retain as printed.
+        ion_intensity: '0.12'
+        approximate: true
+        admission_status: admitted
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -3324,10 +3333,10 @@ species:
         table_draft_index: 5
         table_row_number: 4
         table_column_number: 10
-      units: log I+T, as printed
+      units: log ΣI+WO2, as printed
       mineru_flags: []
       values:
-        quantity: log10_ion_current_times_temperature
+        quantity: log_ion_current_sum
         method_class: measured_direct
         T_K: '2273'
         value: '2.43'
@@ -3336,10 +3345,10 @@ species:
         sample_as_printed: mixture of Al2O3 and tungsten powder
         temperature_uncertainty_as_published: ± 10 K
         temperature_uncertainty_confidence_level: not_stated
-        log_ion_current_times_temperature_as_printed: '2.43'
+        log_ion_current_sum_as_printed: '2.43'
         admission_status: typed_refusal
-        reason: No stored quantity token represents the printed log I+T form; it is not an absolute vapour pressure.
-        schema_gap: log10 ion current multiplied by temperature has no existing quantity token.
+        reason: No stored quantity token represents the printed log ΣI+WO2 form; no temperature multiplier is inferred.
+        schema_gap: The printed logarithm of summed WO2 ion current has no existing quantity token.
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -3476,10 +3485,10 @@ species:
         table_draft_index: 5
         table_row_number: 5
         table_column_number: 10
-      units: log I+T, as printed
+      units: log ΣI+WO2, as printed
       mineru_flags: []
       values:
-        quantity: log10_ion_current_times_temperature
+        quantity: log_ion_current_sum
         method_class: measured_direct
         T_K: '2345'
         value: '2.56'
@@ -3488,10 +3497,10 @@ species:
         sample_as_printed: mixture of Al2O3 and tungsten powder
         temperature_uncertainty_as_published: ± 10 K
         temperature_uncertainty_confidence_level: not_stated
-        log_ion_current_times_temperature_as_printed: '2.56'
+        log_ion_current_sum_as_printed: '2.56'
         admission_status: typed_refusal
-        reason: No stored quantity token represents the printed log I+T form; it is not an absolute vapour pressure.
-        schema_gap: log10 ion current multiplied by temperature has no existing quantity token.
+        reason: No stored quantity token represents the printed log ΣI+WO2 form; no temperature multiplier is inferred.
+        schema_gap: The printed logarithm of summed WO2 ion current has no existing quantity token.
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -3628,10 +3637,10 @@ species:
         table_draft_index: 5
         table_row_number: 6
         table_column_number: 10
-      units: log I+T, as printed
+      units: log ΣI+WO2, as printed
       mineru_flags: []
       values:
-        quantity: log10_ion_current_times_temperature
+        quantity: log_ion_current_sum
         method_class: measured_direct
         T_K: '2360'
         value: '2.99'
@@ -3640,10 +3649,10 @@ species:
         sample_as_printed: mixture of Al2O3 and tungsten powder
         temperature_uncertainty_as_published: ± 10 K
         temperature_uncertainty_confidence_level: not_stated
-        log_ion_current_times_temperature_as_printed: '2.99'
+        log_ion_current_sum_as_printed: '2.99'
         admission_status: typed_refusal
-        reason: No stored quantity token represents the printed log I+T form; it is not an absolute vapour pressure.
-        schema_gap: log10 ion current multiplied by temperature has no existing quantity token.
+        reason: No stored quantity token represents the printed log ΣI+WO2 form; no temperature multiplier is inferred.
+        schema_gap: The printed logarithm of summed WO2 ion current has no existing quantity token.
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -3780,10 +3789,10 @@ species:
         table_draft_index: 5
         table_row_number: 7
         table_column_number: 10
-      units: log I+T, as printed
+      units: log ΣI+WO2, as printed
       mineru_flags: []
       values:
-        quantity: log10_ion_current_times_temperature
+        quantity: log_ion_current_sum
         method_class: measured_direct
         T_K: '2389'
         value: '3.20'
@@ -3792,10 +3801,10 @@ species:
         sample_as_printed: mixture of Al2O3 and tungsten powder
         temperature_uncertainty_as_published: ± 10 K
         temperature_uncertainty_confidence_level: not_stated
-        log_ion_current_times_temperature_as_printed: '3.20'
+        log_ion_current_sum_as_printed: '3.20'
         admission_status: typed_refusal
-        reason: No stored quantity token represents the printed log I+T form; it is not an absolute vapour pressure.
-        schema_gap: log10 ion current multiplied by temperature has no existing quantity token.
+        reason: No stored quantity token represents the printed log ΣI+WO2 form; no temperature multiplier is inferred.
+        schema_gap: The printed logarithm of summed WO2 ion current has no existing quantity token.
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -3932,10 +3941,10 @@ species:
         table_draft_index: 5
         table_row_number: 8
         table_column_number: 10
-      units: log I+T, as printed
+      units: log ΣI+WO2, as printed
       mineru_flags: []
       values:
-        quantity: log10_ion_current_times_temperature
+        quantity: log_ion_current_sum
         method_class: measured_direct
         T_K: '2441'
         value: '3.30'
@@ -3944,10 +3953,10 @@ species:
         sample_as_printed: mixture of Al2O3 and tungsten powder
         temperature_uncertainty_as_published: ± 10 K
         temperature_uncertainty_confidence_level: not_stated
-        log_ion_current_times_temperature_as_printed: '3.30'
+        log_ion_current_sum_as_printed: '3.30'
         admission_status: typed_refusal
-        reason: No stored quantity token represents the printed log I+T form; it is not an absolute vapour pressure.
-        schema_gap: log10 ion current multiplied by temperature has no existing quantity token.
+        reason: No stored quantity token represents the printed log ΣI+WO2 form; no temperature multiplier is inferred.
+        schema_gap: The printed logarithm of summed WO2 ion current has no existing quantity token.
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
@@ -4084,10 +4093,10 @@ species:
         table_draft_index: 5
         table_row_number: 9
         table_column_number: 10
-      units: log I+T, as printed
+      units: log ΣI+WO2, as printed
       mineru_flags: []
       values:
-        quantity: log10_ion_current_times_temperature
+        quantity: log_ion_current_sum
         method_class: measured_direct
         T_K: '2495'
         value: '3.50'
@@ -4096,10 +4105,10 @@ species:
         sample_as_printed: mixture of Al2O3 and tungsten powder
         temperature_uncertainty_as_published: ± 10 K
         temperature_uncertainty_confidence_level: not_stated
-        log_ion_current_times_temperature_as_printed: '3.50'
+        log_ion_current_sum_as_printed: '3.50'
         admission_status: typed_refusal
-        reason: No stored quantity token represents the printed log I+T form; it is not an absolute vapour pressure.
-        schema_gap: log10 ion current multiplied by temperature has no existing quantity token.
+        reason: No stored quantity token represents the printed log ΣI+WO2 form; no temperature multiplier is inferred.
+        schema_gap: The printed logarithm of summed WO2 ion current has no existing quantity token.
       phase: gas
       experiment: hasapis-1960-alumina-tungsten-effusion
       regime: knudsen_effusion
