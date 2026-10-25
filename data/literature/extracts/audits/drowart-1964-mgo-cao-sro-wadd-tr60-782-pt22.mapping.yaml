@@ -1,0 +1,850 @@
+source_id: drowart-1964-mgo-cao-sro-wadd-tr60-782-pt22
+source:
+  citation: 'University of Brussels manuscript released by its authors in March 1964 as a WADD Technical Report
+    under USAF contract AF61(052)-225, Project 7350. Proposed citation: Drowart, Exsteen and Verhaegen, “Dissociation
+    energies of MgO, CaO and SrO, and the atomization energy of Sr2O,” WADD-TR-60-782 Part XXII. The scan has no
+    title page; the names, series title and report number in the proposed citation are not printed on the filmed
+    pages.'
+  year: 1964
+  doi: null
+extraction:
+  method: MinerU table-cell draft plus independent Tesseract OCR, reconciled against rendered scan pages 12 and
+    15–20; prose apparatus and calibration statements checked on rendered scan pages 8 and 10.
+  date: '2026-10-25'
+  worker: w1025d-drow64
+  provenance_path: raw/drowart-1964-mgo-cao-sro-wadd-tr60-782-pt22/drowart-1964-mgo-cao-sro-wadd-tr60-782-pt22.pdf
+review_status: draft
+tables:
+- page: 12
+  table_index: 3
+  published_page: 6
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: as printed
+  evidence_class: measured_tabulated
+  phase: gas
+  value_pairs:
+  - species_column: 1
+    value_column: 2
+  - species_column: 1
+    value_column: 3
+  - species_column: 1
+    value_column: 4
+  - species_column: 1
+    value_column: 5
+- page: 15
+  table_index: 4
+  published_page: 9
+  type: rate_series
+  quantity: ion_current_ratio
+  unit: dimensionless
+  evidence_class: measured_direct
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-2a
+  rows:
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 2
+    species: Mg
+  - column: 3
+    species: O2
+  - column: 4
+    species: O
+  - column: 5
+    species: MgO
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: 2a
+  render_verified: []
+- page: 15
+  table_index: 5
+  published_page: 9
+  type: rate_series
+  quantity: ion_current_ratio
+  unit: dimensionless
+  evidence_class: measured_direct
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-2b
+  rows:
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 2
+    species: Mg
+  - column: 3
+    species: WO3
+  - column: 4
+    species: WO2
+  - column: 5
+    species: MgO
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: 2b
+  render_verified: []
+- page: 16
+  table_index: 6
+  published_page: 10
+  type: rate_series
+  quantity: ion_current_ratio
+  unit: dimensionless
+  evidence_class: measured_direct
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-3a
+  rows:
+  - 2
+  - 3
+  - 4
+  - 5
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 2
+    species: Ca
+  - column: 3
+    species: O2
+  - column: 4
+    species: O
+  - column: 5
+    species: CaO
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 16
+      published_page: 10
+      pdf_page_index: 15
+      table: 3a
+  render_verified: []
+- page: 16
+  table_index: 7
+  published_page: 10
+  type: rate_series
+  quantity: ion_current_ratio
+  unit: dimensionless
+  evidence_class: measured_direct
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-3b
+  rows:
+  - 2
+  - 3
+  - 4
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 2
+    species: Ca
+  - column: 3
+    species: MoO3
+  - column: 4
+    species: MoO2
+  - column: 5
+    species: CaO
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 16
+      published_page: 10
+      pdf_page_index: 15
+      table: 3b
+  render_verified: []
+- page: 16
+  table_index: 8
+  published_page: 10
+  type: rate_series
+  quantity: ion_current_ratio
+  unit: dimensionless
+  evidence_class: measured_direct
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-3c
+  rows:
+  - 2
+  - 3
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 2
+    species: Ca
+  - column: 3
+    species: WO3
+  - column: 4
+    species: WO2
+  - column: 5
+    species: CaO
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 16
+      published_page: 10
+      pdf_page_index: 15
+      table: 3c
+  render_verified: []
+- page: 17
+  table_index: 9
+  published_page: 11
+  type: rate_series
+  quantity: ion_current_ratio
+  unit: dimensionless
+  evidence_class: measured_direct
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-4a
+  rows:
+  - 2
+  - 3
+  - 4
+  - 5
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 2
+    species: Sr
+  - column: 3
+    species: O2
+  - column: 4
+    species: O
+  - column: 5
+    species: SrO
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 17
+      published_page: 11
+      pdf_page_index: 16
+      table: 4a
+  render_verified: []
+- page: 17
+  table_index: 10
+  published_page: 11
+  type: rate_series
+  quantity: ion_current_ratio
+  unit: dimensionless
+  evidence_class: measured_direct
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-4b
+  rows:
+  - 2
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 2
+    species: Sr
+  - column: 3
+    species: WO3
+  - column: 4
+    species: WO2
+  - column: 5
+    species: SrO
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 17
+      published_page: 11
+      pdf_page_index: 16
+      table: 4b
+  render_verified: []
+- page: 17
+  table_index: 11
+  published_page: 11
+  type: rate_series
+  quantity: ion_current_ratio
+  unit: dimensionless
+  evidence_class: measured_direct
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-4c
+  rows:
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 2
+    species: Sr
+  - column: 3
+    species: MoO3
+  - column: 4
+    species: MoO2
+  - column: 5
+    species: SrO
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 17
+      published_page: 11
+      pdf_page_index: 16
+      table: 4c
+  render_verified: []
+- page: 18
+  table_index: 12
+  published_page: 12
+  type: rate_series
+  quantity: ion_current_ratio
+  unit: dimensionless
+  evidence_class: measured_direct
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-5a
+  rows:
+  - 2
+  - 3
+  - 4
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 2
+    species: SrO
+  - column: 3
+    species: O
+  - column: 4
+    species: Sr2O
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 18
+      published_page: 12
+      pdf_page_index: 17
+      table: 5a
+  render_verified: []
+- page: 18
+  table_index: 13
+  published_page: 12
+  type: rate_series
+  quantity: ion_current_ratio
+  unit: dimensionless
+  evidence_class: measured_direct
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-5b
+  rows:
+  - 2
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 2
+    species: Sr
+  - column: 3
+    species: MoO3
+  - column: 4
+    species: O
+  - column: 5
+    species: Sr2O
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 18
+      published_page: 12
+      pdf_page_index: 17
+      table: 5b
+  render_verified: []
+- page: 18
+  table_index: 14
+  published_page: 12
+  type: rate_series
+  quantity: ion_current_ratio
+  unit: dimensionless
+  evidence_class: measured_direct
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-5c
+  rows:
+  - 2
+  - 3
+  - 4
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 2
+    species: Sr
+  - column: 3
+    species: O2
+  - column: 4
+    species: O
+  - column: 5
+    species: Sr2O
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 18
+      published_page: 12
+      pdf_page_index: 17
+      table: 5c
+  render_verified:
+  - row: 2
+    column: 2
+    text: '1.0'
+- page: 15
+  table_index: 4
+  published_page: 9
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: kcal/mole
+  evidence_class: quoted_attributed
+  attribution: "Authors' reported calculated output; numerical inputs for independent reproduction are not all printed."
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-2a
+  rows:
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 6
+    species: MgO
+    quantity: quantity_unknown
+    unit: kcal/mole
+    evidence_class: measured_reduced
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: 2a
+- page: 15
+  table_index: 5
+  published_page: 9
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: kcal/mole
+  evidence_class: quoted_attributed
+  attribution: "Authors' reported calculated output; numerical inputs for independent reproduction are not all printed."
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-2b
+  rows:
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 6
+    species: MgO
+    quantity: quantity_unknown
+    unit: kcal/mole
+    evidence_class: measured_reduced
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 15
+      published_page: 9
+      pdf_page_index: 14
+      table: 2b
+- page: 16
+  table_index: 6
+  published_page: 10
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: kcal/mole
+  evidence_class: quoted_attributed
+  attribution: "Authors' reported calculated output; numerical inputs for independent reproduction are not all printed."
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-3a
+  rows:
+  - 2
+  - 3
+  - 4
+  - 5
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 6
+    species: CaO
+    quantity: quantity_unknown
+    unit: kcal/mole
+    evidence_class: measured_reduced
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 16
+      published_page: 10
+      pdf_page_index: 15
+      table: 3a
+- page: 16
+  table_index: 7
+  published_page: 10
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: kcal/mole
+  evidence_class: quoted_attributed
+  attribution: "Authors' reported calculated output; numerical inputs for independent reproduction are not all printed."
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-3b
+  rows:
+  - 2
+  - 3
+  - 4
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 6
+    species: CaO
+    quantity: quantity_unknown
+    unit: kcal/mole
+    evidence_class: measured_reduced
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 16
+      published_page: 10
+      pdf_page_index: 15
+      table: 3b
+- page: 16
+  table_index: 8
+  published_page: 10
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: kcal/mole
+  evidence_class: quoted_attributed
+  attribution: "Authors' reported calculated output; numerical inputs for independent reproduction are not all printed."
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-3c
+  rows:
+  - 2
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 6
+    species: CaO
+    quantity: quantity_unknown
+    unit: kcal/mole
+    evidence_class: measured_reduced
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 16
+      published_page: 10
+      pdf_page_index: 15
+      table: 3c
+- page: 17
+  table_index: 9
+  published_page: 11
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: kcal/mole
+  evidence_class: quoted_attributed
+  attribution: "Authors' reported calculated output; numerical inputs for independent reproduction are not all printed."
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-4a
+  rows:
+  - 2
+  - 3
+  - 4
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 6
+    species: SrO
+    quantity: quantity_unknown
+    unit: kcal/mole
+    evidence_class: measured_reduced
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 17
+      published_page: 11
+      pdf_page_index: 16
+      table: 4a
+- page: 17
+  table_index: 10
+  published_page: 11
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: kcal/mole
+  evidence_class: quoted_attributed
+  attribution: "Authors' reported calculated output; numerical inputs for independent reproduction are not all printed."
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-4b
+  rows:
+  - 2
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 6
+    species: SrO
+    quantity: quantity_unknown
+    unit: kcal/mole
+    evidence_class: measured_reduced
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 17
+      published_page: 11
+      pdf_page_index: 16
+      table: 4b
+- page: 17
+  table_index: 11
+  published_page: 11
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: kcal/mole
+  evidence_class: quoted_attributed
+  attribution: "Authors' reported calculated output; numerical inputs for independent reproduction are not all printed."
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-4c
+  rows:
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 6
+    species: SrO
+    quantity: quantity_unknown
+    unit: kcal/mole
+    evidence_class: measured_reduced
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 17
+      published_page: 11
+      pdf_page_index: 16
+      table: 4c
+- page: 18
+  table_index: 12
+  published_page: 12
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: kcal/mole
+  evidence_class: quoted_attributed
+  attribution: "Authors' reported calculated output; numerical inputs for independent reproduction are not all printed."
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-5a
+  rows:
+  - 2
+  - 3
+  - 4
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 5
+    species: Sr2O
+    quantity: quantity_unknown
+    unit: kcal/mole
+    evidence_class: measured_reduced
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 18
+      published_page: 12
+      pdf_page_index: 17
+      table: 5a
+- page: 18
+  table_index: 13
+  published_page: 12
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: kcal/mole
+  evidence_class: quoted_attributed
+  attribution: "Authors' reported calculated output; numerical inputs for independent reproduction are not all printed."
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-5b
+  rows:
+  - 2
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 6
+    species: Sr2O
+    quantity: quantity_unknown
+    unit: kcal/mole
+    evidence_class: measured_reduced
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 18
+      published_page: 12
+      pdf_page_index: 17
+      table: 5b
+- page: 18
+  table_index: 14
+  published_page: 12
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: kcal/mole
+  evidence_class: quoted_attributed
+  attribution: "Authors' reported calculated output; numerical inputs for independent reproduction are not all printed."
+  phase: gas
+  regime: kems_effusion
+  experiment: drowart-1964-5c
+  rows:
+  - 2
+  - 3
+  - 4
+  temperature:
+    column: 1
+    unit: K
+  values:
+  - column: 6
+    species: Sr2O
+    quantity: quantity_unknown
+    unit: kcal/mole
+    evidence_class: measured_reduced
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 18
+      published_page: 12
+      pdf_page_index: 17
+      table: 5c
+- page: 20
+  table_index: 16
+  published_page: 14
+  type: gibbs_table
+  quantity: quantity_unknown
+  unit: kcal/mole
+  evidence_class: quoted_attributed
+  attribution: "Authors' reported calculated output; numerical inputs for independent reproduction are not all printed."
+  phase: gas
+  rows:
+  - 2
+  - 3
+  - 4
+  value_pairs:
+  - species_column: 1
+    value_column: 2
+    phase: gas

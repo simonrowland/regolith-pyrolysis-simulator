@@ -287,6 +287,17 @@ def _number_decimal(text: str) -> Decimal | None:
         return None
 
 
+def _relative_ion_intensity_decimal(text: str) -> Decimal | None:
+    """Read the numeric intensity before a printed ionizing-energy note."""
+    token = text.strip().replace("$", "")
+    prefix = re.match(
+        r"^[+\-−]?(?:\d+(?:\.\d*)?|\.\d+)"
+        r"(?:\s*\\times\s*10\s*\^\s*\{?[+\-−]?\d+\}?)?",
+        token,
+    )
+    return _number_decimal(prefix.group(0)) if prefix is not None else None
+
+
 def _number_value(text: str) -> float | None:
     value = _number_decimal(text)
     return float(value) if value is not None else None
@@ -756,6 +767,8 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                 "activity",
                 "gamma",
                 "T_m_K",
+                "ion_current_ratio",
+                "ion_intensity_ratio",
             )
             stored_points = values.get("points") or []
             if stored_points:
@@ -797,7 +810,7 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                 locator = point.get("locator") or observation.get("locator") or {}
                 observation_id = observation.get("observation_id", "")
                 cell_coordinates = re.search(
-                    r"_p\d+_t\d+_r(?P<row>\d+)_c(?P<column>\d+)$",
+                    r"_p(?P<page>\d+)_t(?P<table>\d+)_r(?P<row>\d+)_c(?P<column>\d+)$",
                     str(observation_id),
                 )
                 pdf_page = locator.get("pdf_page")
@@ -833,6 +846,15 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                             str(int(locator["table"]))
                             if locator.get("table") is not None
                             and str(locator["table"]).isdecimal()
+                            else None
+                        ),
+                        "draft_table_number": (
+                            str(int(cell_coordinates.group("table")))
+                            if cell_coordinates is not None
+                            and not (
+                                locator.get("table") is not None
+                                and str(locator["table"]).isdecimal()
+                            )
                             else None
                         ),
                         "phase": point.get(
@@ -887,6 +909,8 @@ def compare_extract_to_draft(
         for table in tables
     }
     scale_factors: dict[tuple[int, str, int], int] = {}
+    relative_intensity_columns: set[tuple[int, str, int]] = set()
+    render_verified_cells: dict[tuple[int, str, int, int], str] = {}
     if mapping is not None:
         mapping = _require_mapping(mapping, "mapping")
         _unknown_keys(mapping, _DOCUMENT_KEYS, "mapping")
@@ -897,10 +921,17 @@ def compare_extract_to_draft(
             if draft_table is None:
                 continue
             for measurement in _measurement_columns(mapped_table):
+                column = int(
+                    measurement["column"]
+                    if measurement["kind"] == "fixed"
+                    else measurement["value_column"]
+                )
+                quantity = str(measurement.get("quantity") or mapped_table["quantity"])
+                if quantity in {"ion_current_ratio", "ion_intensity_ratio"}:
+                    relative_intensity_columns.add((page, table_number, column))
                 raw_scale = measurement.get("scale_factor")
                 if raw_scale is None:
                     continue
-                column = int(measurement["column"])
                 header_cells = [
                     str(row[column - 1])
                     for row in draft_table.get("header_rows") or []
@@ -908,6 +939,15 @@ def compare_extract_to_draft(
                 ]
                 _, exponent = _scale_factor_spec(raw_scale, column, header_cells)
                 scale_factors[(page, table_number, column)] = exponent
+            for verified in mapped_table.get("render_verified") or []:
+                render_verified_cells[
+                    (
+                        page,
+                        table_number,
+                        int(verified["row"]),
+                        int(verified["column"]),
+                    )
+                ] = str(verified["text"])
 
     draft_by_page: dict[
         int, list[tuple[dict[str, Any], Decimal, int]]
@@ -932,7 +972,20 @@ def compare_extract_to_draft(
                     or int(cell["column"]) != int(cell["origin_column"])
                 ):
                     continue
-                number = _number_decimal(cell["value_text"])
+                table_number = str(int(table["table_key"].rsplit("-t", 1)[1]))
+                coordinates = (
+                    page,
+                    table_number,
+                    int(cell["row"]),
+                    int(cell["column"]),
+                )
+                verified_text = render_verified_cells.get(coordinates)
+                if verified_text is not None:
+                    number = _number_decimal(verified_text)
+                elif (page, table_number, int(cell["column"])) in relative_intensity_columns:
+                    number = _relative_ion_intensity_decimal(cell["text"])
+                else:
+                    number = _number_decimal(cell["value_text"])
                 if number is not None:
                     column = int(cell["column"])
                     candidate = {
@@ -957,13 +1010,19 @@ def compare_extract_to_draft(
     for point in _numeric_points(extract):
         page = point["pdf_page"]
         table_number = point["table_number"]
-        location = (page, table_number)
+        draft_table_number = point.get("draft_table_number")
+        lookup_table_number = (
+            draft_table_number
+            if table_number is None and draft_table_number is not None
+            else table_number
+        )
+        location = (page, lookup_table_number)
         if page is None:
             indexed_candidates = []
-        elif table_number is None:
+        elif lookup_table_number is None:
             indexed_candidates = draft_by_page.get(page, [])
         else:
-            indexed_candidates = draft_by_table.get((page, table_number), [])
+            indexed_candidates = draft_by_table.get((page, lookup_table_number), [])
         point_value = Decimal(str(point["value"]))
         has_location = any(
             point.get(key) is not None
@@ -1044,6 +1103,7 @@ _LETTER_FOR_DIGIT = re.compile(
     r"(?P<scale>[0-9ILlOoSs]+(?:\s*\^\s*\{?[+\-−]?[0-9ILlOoSs]+\}?)?)?",
     re.ASCII,
 )
+_LETTER_FOR_LEADING_DIGIT = re.compile(r"(?<![A-Za-z0-9])[+\-−]?[ILlOoSs]\.\d")
 _RUN_TOGETHER = re.compile(r"\d+\.\d+\.\d")
 _FUSED_SUPERSCRIPT_EXPONENT = re.compile(r"(?<![A-Za-z0-9])10[-−]\d+(?!\w)")
 _NUMBER_TOKEN = re.compile(
@@ -1339,7 +1399,7 @@ def _stacked_values(text: str) -> bool:
 
 
 def _has_letter_for_digit(text: str) -> bool:
-    return any(
+    return bool(_LETTER_FOR_LEADING_DIGIT.search(text)) or any(
         any(
             char in "ILlOoSs"
             for group in ("mantissa", "scale")
