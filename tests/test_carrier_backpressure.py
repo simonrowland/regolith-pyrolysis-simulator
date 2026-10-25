@@ -246,3 +246,16 @@ def test_legacy_notice_is_exported_and_cleared_without_mutating_retained_report(
     sim._make_snapshot()
     assert 'backpressure_notice' not in sim._last_vapour_batch_report['metadata']
     assert retained['metadata']['backpressure_notice'] == notice
+
+
+def test_achievable_mars_pressure_does_not_report_inverse_roundoff(monkeypatch):
+    model = OverheadGasModel({'enabled': False})
+    melt = MeltState(temperature_C=980.0, p_total_mbar=9.0)
+    flux = EvaporationFlux(species_kg_hr={'CO2': 1e-6})
+    flux.update_totals()
+    # Mars smoke's request and observed inversion overshoot (731 ulps Pa).
+    monkeypatch.setattr(model, '_vapor_pressure_mbar_from_flux',
+                        lambda *a, **kw: 900.0000000000831 / 100.0)
+    state = model.estimate_transport_state(flux, melt)
+    assert state['pipe_conductance_kg_hr'] >= flux.total_kg_hr
+    assert state['pressure_mbar'] * 100.0 == 900.0
