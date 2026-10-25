@@ -5178,6 +5178,13 @@ def test_cottrell_table_1_compositions_reach_redox_identity():
         )
     assert expected <= observed
 
+    aii_minus_15 = next(
+        row for row in bound if ":row=aii_-15:" in row.observation_id
+    )
+    aii_printed = aii_minus_15.point_conditions["printed_composition"].state.value
+    assert Decimal(aii_printed["SiO2"]) == Decimal("50.81")
+    assert Decimal(aii_printed["FeOT"]) == Decimal("9.53")
+
 
 def test_aithala_wds_compositions_join_vf_redox_rows():
     """Table S-2 WDS rows bind composition on each of the ten VF redox rows."""

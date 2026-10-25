@@ -170,6 +170,9 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
     assert basalt_fit["type"] == "recalculation_table"
     assert len(basalt_fit["derived_from"]) == 13
     assert set(basalt_fit["derived_from"]).issubset(result.observations)
+    assert len(basalt_fit["derivation"]["inputs"]) == 13
+    assert set(basalt_fit["derivation"]["inputs"]) == set(basalt_fit["derived_from"])
+    assert set(basalt_fit["derivation"]["inputs"]).issubset(result.observations)
     assert not set(basalt_fit["derived_from"]) & {
         oid for oid in ratios if any(tag in oid for tag in ("row=aii_-35", "row=lw_-30", "row=aii_-25"))
     }
