@@ -1,0 +1,104 @@
+# Printed Table 1 (six sub-tables) and Table 2 (two sub-tables) are hand
+# assembled from the table drafts because products cells combine a run's
+# phase names and several composition values. The current emitter cannot split
+# that cell into one run context plus multiple typed-refusal composition cells.
+# Table 3 and Tables 9–11 are retained as row contexts because their equations,
+# coefficient tuples, inequalities, and paired fugacity values lack matching
+# scalar point forms. Table 5 and Table 6 magnesium-free subtables are likewise
+# retained as contexts because their values are inequalities.
+source_id: williams-1971-fe-mgo-sio2-o2-reaction-constants
+source:
+  citation: >-
+    Williams, R.J. (1971), “Reaction constants in the system Fe-MgO-SiO2-O2
+    at 1 atm between 900 and 1300 C; experimental results”, American Journal
+    of Science 270(5), 334-360.
+extraction:
+  method: MinerU table draft emit, with hand assembly for merged and unsupported forms
+  date: '2026-10-25'
+  worker: w1025d-will71
+review_status: draft
+tables:
+  # Draft block p014-t11 is printed Table 4. The committed extract changes the
+  # emitted block locator to the printed table number, per the locator rule.
+  - page: 14
+    table_index: 11
+    published_page: 347
+    type: gibbs_table
+    quantity: log10_Kf
+    evidence_class: quoted_attributed
+    unit: log10 equilibrium constant
+    phase: cr
+    regime: quench_equilibration
+    attribution: Williams (1971), calculated from the experimental reaction data and cited activity-composition relationships.
+    temperature:
+      column: 2
+      unit: C
+    values:
+      - column: 3
+        species: MgSiO3
+  # Printed Tables 5–8 use ending run, log K columns. The stated T is printed
+  # once per row and applies to both ending runs on that row.
+  - page: 15
+    table_index: 12
+    published_page: 348
+    type: gibbs_table
+    quantity: log10_Kf
+    evidence_class: quoted_attributed
+    unit: log10 equilibrium constant
+    phase: cr
+    regime: quench_equilibration
+    attribution: Williams (1971), calculated from the experimental reaction data and cited activity-composition relationships.
+    temperature:
+      column: 1
+      unit: C
+    values:
+      - column: 5
+        species: FeO
+  - page: 15
+    table_index: 14
+    published_page: 348
+    type: gibbs_table
+    quantity: log10_Kf
+    evidence_class: quoted_attributed
+    unit: log10 equilibrium constant
+    phase: cr
+    regime: quench_equilibration
+    attribution: Williams (1971), calculated from the experimental reaction data and cited activity-composition relationships.
+    temperature:
+      column: 1
+      unit: C
+    values:
+      - column: 5
+        species: Fe2SiO4
+  - page: 16
+    table_index: 16
+    published_page: 349
+    type: gibbs_table
+    quantity: log10_Kf
+    evidence_class: quoted_attributed
+    unit: log10 equilibrium constant
+    phase: cr
+    regime: quench_equilibration
+    attribution: Williams (1971), calculated from the experimental reaction data and cited activity-composition relationships.
+    temperature:
+      column: 1
+      unit: C
+    values:
+      - column: 5
+        species: FeSiO3
+  - page: 16
+    table_index: 17
+    published_page: 349
+    type: gibbs_table
+    quantity: log10_Kf
+    evidence_class: quoted_attributed
+    unit: log10 equilibrium constant
+    phase: cr
+    regime: quench_equilibration
+    attribution: Williams (1971), calculated from the experimental reaction data and cited activity-composition relationships.
+    temperature:
+      column: 1
+      unit: C
+    values:
+      - column: 5
+        species: Fe2SiO4
