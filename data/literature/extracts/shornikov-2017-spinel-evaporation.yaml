@@ -850,12 +850,13 @@ species:
         - shornikov_2017_table2_mgo_partial_pressure
         - shornikov_2017_table2_mg_partial_pressure
       derivation:
-        relation: 'Atomic oxygen partial pressure calculated by Eq. (14).'
+        relation: 'Atomic oxygen partial pressure calculated by Eq. (14) using K10(T), not numerically printed here.'
         output_unit: atm
         inputs:
-          - 'Table 2 mgo pressure series at matching temperature.'
-          - 'Table 2 mg pressure series at matching temperature.'
-          - 'K10(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
+          - shornikov_2017_table2_mgo_partial_pressure
+          - shornikov_2017_table2_mg_partial_pressure
+        references:
+          - "Glushko handbook [10], K10(T)"
       values:
         quantity: partial_pressure
         method_class: model_derived
@@ -896,12 +897,13 @@ species:
         - shornikov_2017_table2_alo_partial_pressure
         - shornikov_2017_table2_al_partial_pressure
       derivation:
-        relation: 'Atomic oxygen partial pressure calculated by Eq. (15).'
+        relation: 'Atomic oxygen partial pressure calculated by Eq. (15) using K11(T), not numerically printed here.'
         output_unit: atm
         inputs:
-          - 'Table 2 alo pressure series at matching temperature.'
-          - 'Table 2 al pressure series at matching temperature.'
-          - 'K11(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
+          - shornikov_2017_table2_alo_partial_pressure
+          - shornikov_2017_table2_al_partial_pressure
+        references:
+          - "Glushko handbook [10], K11(T)"
       values:
         quantity: partial_pressure
         method_class: model_derived
@@ -942,12 +944,13 @@ species:
         - shornikov_2017_table2_al2o_partial_pressure
         - shornikov_2017_table2_al_partial_pressure
       derivation:
-        relation: 'Atomic oxygen partial pressure calculated by Eq. (16).'
+        relation: 'Atomic oxygen partial pressure calculated by Eq. (16) using K12(T), not numerically printed here.'
         output_unit: atm
         inputs:
-          - 'Table 2 al2o pressure series at matching temperature.'
-          - 'Table 2 al pressure series at matching temperature.'
-          - 'K12(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
+          - shornikov_2017_table2_al2o_partial_pressure
+          - shornikov_2017_table2_al_partial_pressure
+        references:
+          - "Glushko handbook [10], K12(T)"
       values:
         quantity: partial_pressure
         method_class: model_derived
@@ -985,11 +988,12 @@ species:
       derived_from:
         - shornikov_2017_table2_o2_partial_pressure
       derivation:
-        relation: 'Atomic oxygen partial pressure calculated by Eq. (17).'
+        relation: 'Atomic oxygen partial pressure calculated by Eq. (17) using K13(T), not numerically printed here.'
         output_unit: atm
         inputs:
-          - 'Table 2 o2 pressure series at matching temperature.'
-          - 'K13(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
+          - shornikov_2017_table2_o2_partial_pressure
+        references:
+          - "Glushko handbook [10], K13(T)"
       values:
         quantity: partial_pressure
         method_class: model_derived

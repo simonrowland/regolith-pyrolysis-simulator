@@ -955,6 +955,23 @@ def test_merged_shornikov_fragments_migrate_with_temperature_and_conditions(
     assert not result_2017.validation.hard_issues
     assert not result_2017.registry_issues
     assert len(records_2017) == 217
+    derived_2017 = [
+        record
+        for record in records_2017
+        if any(
+            f"shornikov_2017_table3_o_pressure_eq{equation}::" in record.observation_id
+            for equation in (14, 15, 16, 17)
+        )
+    ]
+    assert derived_2017
+    for record in derived_2017:
+        assert record.derived_from
+        assert all(parent in result_2017.observations for parent in record.derived_from)
+        assert record.derivation is not None
+        assert set(record.derivation.inputs) == set(record.derived_from)
+        assert record.derivation.references
+        assert "Glushko handbook [10]" in record.derivation.references[0]
+        assert "not numerically printed here" in record.derivation.relation
     for record in records_2017:
         assert record.identity.temperature_K.is_value
         condition = record.point_conditions["temperature_K"]
@@ -977,8 +994,7 @@ def test_merged_shornikov_fragments_migrate_with_temperature_and_conditions(
         assert composition.locator is not None
         assert record.point_conditions["fO2_Pa"].state.is_unknown
         assert record.point_conditions["fO2_Pa"].locator is not None
-        assert record.point_conditions["total_pressure_Pa"].state.is_unknown
-        assert record.point_conditions["total_pressure_Pa"].locator is not None
+        assert "total_pressure_Pa" not in record.point_conditions
         assert (
             record.point_conditions["temperature_K"].state.value
             == record.identity.temperature_K.value
