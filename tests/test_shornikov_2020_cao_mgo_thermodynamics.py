@@ -399,7 +399,10 @@ def test_isolated_migration_reaches_temperature_on_every_printed_row():
         assert row.uncertainty.kind is not UncertaintyKind.PRINTED
         assert row.value.kind is ValueKind.POINT
         assert row.identity.composition.is_unknown
-        assert row.identity.composition.reason == "no composition mapped from source"
+        assert row.identity.composition.reason == (
+            "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, "
+            "so the read mole percent is not stored as a mole fraction."
+        )
         assert row.point_conditions["composition"].state.is_unknown
         assert "mole percent" in row.point_conditions["composition"].state.reason
 
