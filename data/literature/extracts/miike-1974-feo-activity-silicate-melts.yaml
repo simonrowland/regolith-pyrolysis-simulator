@@ -1,0 +1,3326 @@
+schema_version: literature_extract.v1
+source_id: miike-1974-feo-activity-silicate-melts
+source:
+  citation: Miike, K., Morinaga, K., Suginohara, Y. & Yanagase, T. (1974). Activity of FeO in the silicate
+    melts. Journal of the Mining and Metallurgical Institute of Japan 90(1036), 411–416.
+  year: 1974
+extraction:
+  method: MinerU table draft; four table blocks map to printed Tables 1–3. All numeric body cells and
+    row/column assignments were checked against the rendered PDF page because the cells are absent from
+    pdftotext.
+  date: '2026-10-25'
+  worker: w1025a-mii74
+  notes: 'Tables 1–3 report 24 rows (Table 1: six, Table 2: ten, Table 3: eight) of liquid-slag compositions
+    in wt% and mol%, temperature, measured e.m.f., calculated P_O2, and calculated a_FeO (24 rows). The
+    paper prints no gamma_FeO values. The standard formation Gibbs energy is stated, but a pure FeO reference
+    phase is not. Total pressure is not printed. Figure-only activity curves, including Fig. 5, are candidates
+    for later figure reading and were not digitised.'
+review_status: draft
+species:
+  FeO:
+    observations:
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t01_r03_c12
+      type: activity_coefficient
+      locator: &id001
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '1'
+        row_label: '1'
+        column_header: $a_{\text{FeO}}$   $a_{\text{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.93'
+          T_C: '1350'
+          T_C_as_printed: 1,350 °C
+          composition_mass_percent: &id002
+            FeO: '80.33'
+            Fe2O3: '7.03'
+            SiO2: '12.64'
+          oxygen_partial_pressure:
+            value: '4.95e-11'
+            units: atm
+            as_published: 4.95 ×  10^{-11} atm
+            locator: &id097
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '1'
+              row_label: '1'
+              column_header: P_O2 (atm)
+          locator: *id001
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id002
+              locator: &id003
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '1'
+                row_label: '1'
+        composition_id: '1'
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '81.46'
+            Fe2O3: '3.21'
+            SiO2: '15.33'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id004
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id002
+          locator: *id003
+        sample_id:
+          state:
+            tag: value
+            value: '1'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '1'
+            row_label: '1'
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t01_r03_c12_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t01_r03_c12_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id004
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t01_r04_c12
+      type: activity_coefficient
+      locator: &id005
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '1'
+        row_label: '2'
+        column_header: $a_{\text{FeO}}$   $a_{\text{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.87'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id006
+            FeO: '77.88'
+            Fe2O3: '4.71'
+            SiO2: '17.41'
+          oxygen_partial_pressure:
+            value: '1.43e-11'
+            units: atm
+            as_published: 1.43 ×  10^{-11} atm
+            locator: &id098
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '1'
+              row_label: '2'
+              column_header: P_O2 (atm)
+          locator: *id005
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id006
+              locator: &id007
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '1'
+                row_label: '2'
+        composition_id: '2'
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '77.25'
+            Fe2O3: '2.10'
+            SiO2: '20.65'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id008
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id006
+          locator: *id007
+        sample_id:
+          state:
+            tag: value
+            value: '2'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '1'
+            row_label: '2'
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t01_r04_c12_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t01_r04_c12_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id008
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t01_r05_c12
+      type: activity_coefficient
+      locator: &id009
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '1'
+        row_label: '3'
+        column_header: $a_{\text{FeO}}$   $a_{\text{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.78'
+          T_C: '1295'
+          T_C_as_printed: 1,295 °C
+          composition_mass_percent: &id010
+            FeO: '74.14'
+            Fe2O3: '4.43'
+            SiO2: '21.43'
+          oxygen_partial_pressure:
+            value: '1.02e-11'
+            units: atm
+            as_published: 1.02 ×  10^{-11} atm
+            locator: &id099
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '1'
+              row_label: '3'
+              column_header: P_O2 (atm)
+          locator: *id009
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id010
+              locator: &id011
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '1'
+                row_label: '3'
+        composition_id: '3'
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '72.88'
+            Fe2O3: '1.93'
+            SiO2: '25.19'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id012
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id010
+          locator: *id011
+        sample_id:
+          state:
+            tag: value
+            value: '3'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '1'
+            row_label: '3'
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t01_r05_c12_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t01_r05_c12_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id012
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t01_r06_c12
+      type: activity_coefficient
+      locator: &id013
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '1'
+        row_label: '4'
+        column_header: $a_{\text{FeO}}$   $a_{\text{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.70'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id014
+            FeO: '70.03'
+            Fe2O3: '3.89'
+            SiO2: '26.08'
+          oxygen_partial_pressure:
+            value: '9.24e-12'
+            units: atm
+            as_published: 9.24 ×  10^{-12} atm
+            locator: &id100
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '1'
+              row_label: '4'
+              column_header: P_O2 (atm)
+          locator: *id013
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id014
+              locator: &id015
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '1'
+                row_label: '4'
+        composition_id: '4'
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '68.01'
+            Fe2O3: '1.70'
+            SiO2: '30.28'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id016
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id014
+          locator: *id015
+        sample_id:
+          state:
+            tag: value
+            value: '4'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '1'
+            row_label: '4'
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t01_r06_c12_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t01_r06_c12_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id016
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t01_r07_c12
+      type: activity_coefficient
+      locator: &id017
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '1'
+        row_label: '5'
+        column_header: $a_{\text{FeO}}$   $a_{\text{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.59'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id018
+            FeO: '66.69'
+            Fe2O3: '1.59'
+            SiO2: '31.72'
+          oxygen_partial_pressure:
+            value: '6.58e-12'
+            units: atm
+            as_published: 6.58 ×  10^{-12} atm
+            locator: &id101
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '1'
+              row_label: '5'
+              column_header: P_O2 (atm)
+          locator: *id017
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id018
+              locator: &id019
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '1'
+                row_label: '5'
+        composition_id: '5'
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '63.32'
+            Fe2O3: '0.68'
+            SiO2: '36.01'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id020
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id018
+          locator: *id019
+        sample_id:
+          state:
+            tag: value
+            value: '5'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '1'
+            row_label: '5'
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t01_r07_c12_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t01_r07_c12_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id020
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t01_r08_c12
+      type: activity_coefficient
+      locator: &id021
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '1'
+        row_label: '6'
+        column_header: $a_{\text{FeO}}$   $a_{\text{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.49'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id022
+            FeO: '61.76'
+            Fe2O3: '1.47'
+            SiO2: '36.77'
+          oxygen_partial_pressure:
+            value: '4.68e-12'
+            units: atm
+            as_published: 4.68 ×  10^{-12} atm
+            locator: &id102
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '1'
+              row_label: '6'
+              column_header: P_O2 (atm)
+          locator: *id021
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id022
+              locator: &id023
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '1'
+                row_label: '6'
+        composition_id: '6'
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '58.05'
+            Fe2O3: '0.62'
+            SiO2: '41.33'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id024
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id022
+          locator: *id023
+        sample_id:
+          state:
+            tag: value
+            value: '6'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '1'
+            row_label: '6'
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t01_r08_c12_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t01_r08_c12_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id024
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t02_r03_c13
+      type: activity_coefficient
+      locator: &id025
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '2'
+        row_label: Ca-1
+        column_header: $a_{FeO}$   $a_{FeO}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.85'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id026
+            FeO: '63.40'
+            Fe2O3: '3.07'
+            SiO2: '22.64'
+            CaO: '10.89'
+          oxygen_partial_pressure:
+            value: '1.38e-11'
+            units: atm
+            as_published: 1.38  ×  10^{-11} atm
+            locator: &id103
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '2'
+              row_label: Ca-1
+              column_header: P_O2 (atm)
+          locator: *id025
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id026
+              locator: &id027
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '2'
+                row_label: Ca-1
+        composition_id: Ca-1
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '59.92'
+            Fe2O3: '1.30'
+            SiO2: '25.56'
+            CaO: '13.18'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id028
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id026
+          locator: *id027
+        sample_id:
+          state:
+            tag: value
+            value: Ca-1
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '2'
+            row_label: Ca-1
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t02_r03_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t02_r03_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id028
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t02_r04_c13
+      type: activity_coefficient
+      locator: &id029
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '2'
+        row_label: Ca-2
+        column_header: $a_{FeO}$   $a_{FeO}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.72'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id030
+            FeO: '60.16'
+            Fe2O3: '2.48'
+            SiO2: '26.18'
+            CaO: '11.18'
+          oxygen_partial_pressure:
+            value: '9.86e-12'
+            units: atm
+            as_published: 9.86  ×  10^{-12} atm
+            locator: &id104
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '2'
+              row_label: Ca-2
+              column_header: P_O2 (atm)
+          locator: *id029
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id030
+              locator: &id031
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '2'
+                row_label: Ca-2
+        composition_id: Ca-2
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '56.69'
+            Fe2O3: '1.05'
+            SiO2: '29.50'
+            CaO: '13.50'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id032
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id030
+          locator: *id031
+        sample_id:
+          state:
+            tag: value
+            value: Ca-2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '2'
+            row_label: Ca-2
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t02_r04_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t02_r04_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id032
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t02_r05_c13
+      type: activity_coefficient
+      locator: &id033
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '2'
+        row_label: Ca-3
+        column_header: $a_{FeO}$   $a_{FeO}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.74'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id034
+            FeO: '58.76'
+            Fe2O3: '1.49'
+            SiO2: '28.64'
+            CaO: '11.10'
+          oxygen_partial_pressure:
+            value: '1.04e-11'
+            units: atm
+            as_published: 1.04  ×  10^{-11} atm
+            locator: &id105
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '2'
+              row_label: Ca-3
+              column_header: P_O2 (atm)
+          locator: *id033
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id034
+              locator: &id035
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '2'
+                row_label: Ca-3
+        composition_id: Ca-3
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '54.46'
+            Fe2O3: '0.62'
+            SiO2: '31.74'
+            CaO: '13.18'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id036
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id034
+          locator: *id035
+        sample_id:
+          state:
+            tag: value
+            value: Ca-3
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '2'
+            row_label: Ca-3
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t02_r05_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t02_r05_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id036
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t02_r06_c13
+      type: activity_coefficient
+      locator: &id037
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '2'
+        row_label: Ca-4
+        column_header: $a_{FeO}$   $a_{FeO}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.65'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id038
+            FeO: '55.13'
+            Fe2O3: '1.55'
+            SiO2: '31.20'
+            CaO: '12.12'
+          oxygen_partial_pressure:
+            value: '8.04e-12'
+            units: atm
+            as_published: 8.04  ×  10^{-12} atm
+            locator: &id106
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '2'
+              row_label: Ca-4
+              column_header: P_O2 (atm)
+          locator: *id037
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id038
+              locator: &id039
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '2'
+                row_label: Ca-4
+        composition_id: Ca-4
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '50.74'
+            Fe2O3: '0.64'
+            SiO2: '34.33'
+            CaO: '14.29'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id040
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id038
+          locator: *id039
+        sample_id:
+          state:
+            tag: value
+            value: Ca-4
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '2'
+            row_label: Ca-4
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t02_r06_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t02_r06_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id040
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t03_r02_c13
+      type: activity_coefficient
+      locator: &id041
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '2'
+        row_label: Ti-1
+        column_header: $a_{FeO}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.73'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id042
+            FeO: '67.83'
+            Fe2O3: '2.19'
+            SiO2: '18.70'
+            TiO2: '11.28'
+          oxygen_partial_pressure:
+            value: '1.01e-11'
+            units: atm
+            as_published: 1.01  ×  10^{-11} atm
+            locator: &id107
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '2'
+              row_label: Ti-1
+              column_header: P_O2 (atm)
+          locator: *id041
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id042
+              locator: &id043
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '2'
+                row_label: Ti-1
+        composition_id: Ti-1
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '66.95'
+            Fe2O3: '0.97'
+            SiO2: '22.07'
+            TiO2: '10.01'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id044
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id042
+          locator: *id043
+        sample_id:
+          state:
+            tag: value
+            value: Ti-1
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '2'
+            row_label: Ti-1
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t03_r02_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t03_r02_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id044
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t03_r03_c13
+      type: activity_coefficient
+      locator: &id045
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '2'
+        row_label: Ti-2
+        column_header: $a_{FeO}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.74'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id046
+            FeO: '67.64'
+            Fe2O3: '3.26'
+            SiO2: '20.56'
+            TiO2: '8.54'
+          oxygen_partial_pressure:
+            value: '1.04e-11'
+            units: atm
+            as_published: 1.04  ×  10^{-11} atm
+            locator: &id108
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '2'
+              row_label: Ti-2
+              column_header: P_O2 (atm)
+          locator: *id045
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id046
+              locator: &id047
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '2'
+                row_label: Ti-2
+        composition_id: Ti-2
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '66.72'
+            Fe2O3: '1.45'
+            SiO2: '24.25'
+            TiO2: '7.58'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id048
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id046
+          locator: *id047
+        sample_id:
+          state:
+            tag: value
+            value: Ti-2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '2'
+            row_label: Ti-2
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t03_r03_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t03_r03_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id048
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t03_r04_c13
+      type: activity_coefficient
+      locator: &id049
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '2'
+        row_label: Ti-3
+        column_header: $a_{FeO}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.60'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id050
+            FeO: '61.32'
+            Fe2O3: '2.89'
+            SiO2: '25.38'
+            TiO2: '10.41'
+          oxygen_partial_pressure:
+            value: '6.85e-12'
+            units: atm
+            as_published: 6.85  ×  10^{-12} atm
+            locator: &id109
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '2'
+              row_label: Ti-3
+              column_header: P_O2 (atm)
+          locator: *id049
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id050
+              locator: &id051
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '2'
+                row_label: Ti-3
+        composition_id: Ti-3
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '59.92'
+            Fe2O3: '1.27'
+            SiO2: '29.66'
+            TiO2: '9.15'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id052
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id050
+          locator: *id051
+        sample_id:
+          state:
+            tag: value
+            value: Ti-3
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '2'
+            row_label: Ti-3
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t03_r04_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t03_r04_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id052
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t03_r05_c13
+      type: activity_coefficient
+      locator: &id053
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '2'
+        row_label: Ti-4
+        column_header: $a_{FeO}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.63'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id054
+            FeO: '62.36'
+            Fe2O3: '1.90'
+            SiO2: '26.37'
+            TiO2: '9.37'
+          oxygen_partial_pressure:
+            value: '7.55e-12'
+            units: atm
+            as_published: 7.55  ×  10^{-12} atm
+            locator: &id110
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '2'
+              row_label: Ti-4
+              column_header: P_O2 (atm)
+          locator: *id053
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id054
+              locator: &id055
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '2'
+                row_label: Ti-4
+        composition_id: Ti-4
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '60.44'
+            Fe2O3: '0.83'
+            SiO2: '30.56'
+            TiO2: '8.17'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id056
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id054
+          locator: *id055
+        sample_id:
+          state:
+            tag: value
+            value: Ti-4
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '2'
+            row_label: Ti-4
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t03_r05_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t03_r05_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id056
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t03_r06_c13
+      type: activity_coefficient
+      locator: &id057
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '2'
+        row_label: Ti-5
+        column_header: $a_{FeO}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.51'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id058
+            FeO: '58.54'
+            Fe2O3: '1.79'
+            SiO2: '28.98'
+            TiO2: '10.69'
+          oxygen_partial_pressure:
+            value: '4.95e-12'
+            units: atm
+            as_published: 4.95  ×  10^{-12} atm
+            locator: &id111
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '2'
+              row_label: Ti-5
+              column_header: P_O2 (atm)
+          locator: *id057
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id058
+              locator: &id059
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '2'
+                row_label: Ti-5
+        composition_id: Ti-5
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '56.50'
+            Fe2O3: '0.78'
+            SiO2: '33.44'
+            TiO2: '9.28'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id060
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id058
+          locator: *id059
+        sample_id:
+          state:
+            tag: value
+            value: Ti-5
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '2'
+            row_label: Ti-5
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t03_r06_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t03_r06_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id060
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t03_r07_c13
+      type: activity_coefficient
+      locator: &id061
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '2'
+        row_label: Ti-6
+        column_header: $a_{FeO}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.52'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id062
+            FeO: '56.69'
+            Fe2O3: '2.09'
+            SiO2: '31.31'
+            TiO2: '9.91'
+          oxygen_partial_pressure:
+            value: '5.15e-12'
+            units: atm
+            as_published: 5.15  ×  10^{-12} atm
+            locator: &id112
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '2'
+              row_label: Ti-6
+              column_header: P_O2 (atm)
+          locator: *id061
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id062
+              locator: &id063
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '2'
+                row_label: Ti-6
+        composition_id: Ti-6
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '54.52'
+            Fe2O3: '0.91'
+            SiO2: '36.01'
+            TiO2: '8.57'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id064
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id062
+          locator: *id063
+        sample_id:
+          state:
+            tag: value
+            value: Ti-6
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '2'
+            row_label: Ti-6
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t03_r07_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t03_r07_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id064
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r03_c13
+      type: activity_coefficient
+      locator: &id065
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '3'
+        row_label: Al-1
+        column_header: $a_{\mathrm{FeO}}$   $a_{\mathrm{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.77'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id066
+            FeO: '67.36'
+            Fe2O3: '4.26'
+            SiO2: '18.52'
+            Al2O3: '9.86'
+          oxygen_partial_pressure:
+            value: '1.13e-11'
+            units: atm
+            as_published: 1.13 ×  10^{-11} atm
+            locator: &id113
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '3'
+              row_label: Al-1
+              column_header: P_O2 (atm)
+          locator: *id065
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id066
+              locator: &id067
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '3'
+                row_label: Al-1
+        composition_id: Al-1
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '68.48'
+            Fe2O3: '1.95'
+            SiO2: '22.51'
+            Al2O3: '7.06'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id068
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id066
+          locator: *id067
+        sample_id:
+          state:
+            tag: value
+            value: Al-1
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '3'
+            row_label: Al-1
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r03_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r03_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id068
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r04_c13
+      type: activity_coefficient
+      locator: &id069
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '3'
+        row_label: Al-2
+        column_header: $a_{\mathrm{FeO}}$   $a_{\mathrm{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.72'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id070
+            FeO: '63.49'
+            Fe2O3: '4.20'
+            SiO2: '22.68'
+            Al2O3: '9.63'
+          oxygen_partial_pressure:
+            value: '9.86e-12'
+            units: atm
+            as_published: 9.86 ×  10^{-12} atm
+            locator: &id114
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '3'
+              row_label: Al-2
+              column_header: P_O2 (atm)
+          locator: *id069
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id070
+              locator: &id071
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '3'
+                row_label: Al-2
+        composition_id: Al-2
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '63.95'
+            Fe2O3: '1.90'
+            SiO2: '27.31'
+            Al2O3: '6.83'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id072
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id070
+          locator: *id071
+        sample_id:
+          state:
+            tag: value
+            value: Al-2
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '3'
+            row_label: Al-2
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r04_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r04_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id072
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r05_c13
+      type: activity_coefficient
+      locator: &id073
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '3'
+        row_label: Al-3
+        column_header: $a_{\mathrm{FeO}}$   $a_{\mathrm{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.57'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id074
+            FeO: '61.73'
+            Fe2O3: '2.53'
+            SiO2: '26.17'
+            Al2O3: '9.57'
+          oxygen_partial_pressure:
+            value: '6.18e-12'
+            units: atm
+            as_published: 6.18 ×  10^{-12} atm
+            locator: &id115
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '3'
+              row_label: Al-3
+              column_header: P_O2 (atm)
+          locator: *id073
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id074
+              locator: &id075
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '3'
+                row_label: Al-3
+        composition_id: Al-3
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '61.18'
+            Fe2O3: '1.13'
+            SiO2: '31.01'
+            Al2O3: '6.69'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id076
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id074
+          locator: *id075
+        sample_id:
+          state:
+            tag: value
+            value: Al-3
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '3'
+            row_label: Al-3
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r05_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r05_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id076
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r06_c13
+      type: activity_coefficient
+      locator: &id077
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '3'
+        row_label: Al-4
+        column_header: $a_{\mathrm{FeO}}$   $a_{\mathrm{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.55'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id078
+            FeO: '62.37'
+            Fe2O3: '1.63'
+            SiO2: '26.52'
+            Al2O3: '9.48'
+          oxygen_partial_pressure:
+            value: '5.76e-12'
+            units: atm
+            as_published: 5.76 ×  10^{-12} atm
+            locator: &id116
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '3'
+              row_label: Al-4
+              column_header: P_O2 (atm)
+          locator: *id077
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id078
+              locator: &id079
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '3'
+                row_label: Al-4
+        composition_id: Al-4
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '61.45'
+            Fe2O3: '0.72'
+            SiO2: '31.24'
+            Al2O3: '6.58'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id080
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id078
+          locator: *id079
+        sample_id:
+          state:
+            tag: value
+            value: Al-4
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '3'
+            row_label: Al-4
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r06_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r06_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id080
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r07_c13
+      type: activity_coefficient
+      locator: &id081
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '3'
+        row_label: Al-5
+        column_header: $a_{\mathrm{FeO}}$   $a_{\mathrm{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.62'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id082
+            FeO: '61.28'
+            Fe2O3: '2.23'
+            SiO2: '26.55'
+            Al2O3: '9.94'
+          oxygen_partial_pressure:
+            value: '7.32e-12'
+            units: atm
+            as_published: 7.32 ×  10^{-12} atm
+            locator: &id117
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '3'
+              row_label: Al-5
+              column_header: P_O2 (atm)
+          locator: *id081
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id082
+              locator: &id083
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '3'
+                row_label: Al-5
+        composition_id: Al-5
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '60.66'
+            Fe2O3: '0.99'
+            SiO2: '31.42'
+            Al2O3: '6.93'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id084
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id082
+          locator: *id083
+        sample_id:
+          state:
+            tag: value
+            value: Al-5
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '3'
+            row_label: Al-5
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r07_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r07_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id084
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r08_c13
+      type: activity_coefficient
+      locator: &id085
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '3'
+        row_label: Al-6
+        column_header: $a_{\mathrm{FeO}}$   $a_{\mathrm{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.63'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id086
+            FeO: '60.45'
+            Fe2O3: '2.63'
+            SiO2: '27.40'
+            Al2O3: '9.52'
+          oxygen_partial_pressure:
+            value: '7.55e-12'
+            units: atm
+            as_published: 7.55 ×  10^{-12} atm
+            locator: &id118
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '3'
+              row_label: Al-6
+              column_header: P_O2 (atm)
+          locator: *id085
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id086
+              locator: &id087
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '3'
+                row_label: Al-6
+        composition_id: Al-6
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '59.79'
+            Fe2O3: '1.17'
+            SiO2: '32.40'
+            Al2O3: '6.64'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id088
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id086
+          locator: *id087
+        sample_id:
+          state:
+            tag: value
+            value: Al-6
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '3'
+            row_label: Al-6
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r08_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r08_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id088
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r09_c13
+      type: activity_coefficient
+      locator: &id089
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '3'
+        row_label: Al-7
+        column_header: $a_{\mathrm{FeO}}$   $a_{\mathrm{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.51'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id090
+            FeO: '58.66'
+            Fe2O3: '1.94'
+            SiO2: '29.22'
+            Al2O3: '10.18'
+          oxygen_partial_pressure:
+            value: '4.95e-12'
+            units: atm
+            as_published: 4.95 ×  10^{-12} atm
+            locator: &id119
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '3'
+              row_label: Al-7
+              column_header: P_O2 (atm)
+          locator: *id089
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id090
+              locator: &id091
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '3'
+                row_label: Al-7
+        composition_id: Al-7
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '57.71'
+            Fe2O3: '0.86'
+            SiO2: '34.38'
+            Al2O3: '7.05'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id092
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id090
+          locator: *id091
+        sample_id:
+          state:
+            tag: value
+            value: Al-7
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '3'
+            row_label: Al-7
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r09_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r09_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id092
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r10_c13
+      type: activity_coefficient
+      locator: &id093
+        page: 3
+        pdf_page_index: 2
+        published_page: 413
+        table: '3'
+        row_label: Al-8
+        column_header: $a_{\mathrm{FeO}}$   $a_{\mathrm{FeO}}$
+      units: dimensionless
+      mineru_flags: []
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        points:
+        - activity: '0.52'
+          T_C: '1300'
+          T_C_as_printed: 1,300 °C
+          composition_mass_percent: &id094
+            FeO: '56.78'
+            Fe2O3: '1.44'
+            SiO2: '31.63'
+            Al2O3: '10.15'
+          oxygen_partial_pressure:
+            value: '5.15e-12'
+            units: atm
+            as_published: 5.15 ×  10^{-12} atm
+            locator: &id120
+              page: 3
+              pdf_page_index: 2
+              published_page: 413
+              table: '3'
+              row_label: Al-8
+              column_header: P_O2 (atm)
+          locator: *id093
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed wt%
+                  amount_basis: mass_percent
+                  units: '%'
+                  components: *id094
+              locator: &id095
+                page: 3
+                pdf_page_index: 2
+                published_page: 413
+                table: '3'
+                row_label: Al-8
+        composition_id: Al-8
+        composition_wt_pct_units: '%'
+        composition_mol_pct_as_printed:
+          units: '%'
+          components:
+            FeO: '55.45'
+            Fe2O3: '0.63'
+            SiO2: '36.94'
+            Al2O3: '6.98'
+        method_as_printed: FeO activity calculated from the measured cell e.m.f. and the derived oxygen
+          partial pressure using Eqs. (1) and (2).
+        reference_state_as_printed: The paper gives the standard formation Gibbs energy of FeO in Eq.
+          (1); a pure FeO reference phase is not stated.
+        reference_state_locator: &id096
+          page: 2
+          pdf_page_index: 1
+          published_page: 412
+          equation: '1'
+          section: '2.1'
+      phase: l
+      regime: emf_cell
+      point_conditions:
+        gas_mix:
+          state:
+            tag: value
+            value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; the numerical ratio is not printed
+              in the activity tables.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 416
+            section: English abstract
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed wt%
+              amount_basis: mass_percent
+              units: '%'
+              components: *id094
+          locator: *id095
+        sample_id:
+          state:
+            tag: value
+            value: Al-8
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 413
+            table: '3'
+            row_label: Al-8
+      standard_state: The paper gives the standard formation Gibbs energy of FeO in Eq. (1); a pure FeO
+        reference phase is not stated.
+      equipment:
+        crucible_material:
+          value: γ-Fe crucible made of SS-41 steel
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 412
+            section: '2.2'
+      derived_from:
+      - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r10_c13_printed_inputs
+      derivation:
+        relation: a_FeO calculated from temperature and P_O2 using Eq. (1); P_O2 is determined from the
+          measured e.m.f. using Eq. (2).
+        inputs:
+        - miike-1974-feo-activity-silicate-melts::context::miike_1974_feo_activity_silicate_melts_p003_t04_r10_c13_printed_inputs
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Eqs. (1) and (2) calculate P_O2 from e.m.f. and a_FeO from P_O2 and temperature.
+          locator: *id096
+    context:
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t01_r03_c12_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id001
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '775'
+        emf_as_printed: 775 mV
+        oxygen_partial_pressure:
+          value: '4.95e-11'
+          units: atm
+          as_published: 4.95 ×  10^{-11} atm
+          locator: *id097
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t01_r04_c12_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id005
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '793'
+        emf_as_printed: 793 mV
+        oxygen_partial_pressure:
+          value: '1.43e-11'
+          units: atm
+          as_published: 1.43 ×  10^{-11} atm
+          locator: *id098
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t01_r05_c12_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id009
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '802'
+        emf_as_printed: 802 mV
+        oxygen_partial_pressure:
+          value: '1.02e-11'
+          units: atm
+          as_published: 1.02 ×  10^{-11} atm
+          locator: *id099
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t01_r06_c12_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id013
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '808'
+        emf_as_printed: 808 mV
+        oxygen_partial_pressure:
+          value: '9.24e-12'
+          units: atm
+          as_published: 9.24 ×  10^{-12} atm
+          locator: *id100
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t01_r07_c12_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id017
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '820'
+        emf_as_printed: 820 mV
+        oxygen_partial_pressure:
+          value: '6.58e-12'
+          units: atm
+          as_published: 6.58 ×  10^{-12} atm
+          locator: *id101
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t01_r08_c12_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id021
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '831'
+        emf_as_printed: 831 mV
+        oxygen_partial_pressure:
+          value: '4.68e-12'
+          units: atm
+          as_published: 4.68 ×  10^{-12} atm
+          locator: *id102
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t02_r03_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id025
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '795'
+        emf_as_printed: 795 mV
+        oxygen_partial_pressure:
+          value: '1.38e-11'
+          units: atm
+          as_published: 1.38  ×  10^{-11} atm
+          locator: *id103
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t02_r04_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id029
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '806'
+        emf_as_printed: 806 mV
+        oxygen_partial_pressure:
+          value: '9.86e-12'
+          units: atm
+          as_published: 9.86  ×  10^{-12} atm
+          locator: *id104
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t02_r05_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id033
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '804'
+        emf_as_printed: 804 mV
+        oxygen_partial_pressure:
+          value: '1.04e-11'
+          units: atm
+          as_published: 1.04  ×  10^{-11} atm
+          locator: *id105
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t02_r06_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id037
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '812'
+        emf_as_printed: 812 mV
+        oxygen_partial_pressure:
+          value: '8.04e-12'
+          units: atm
+          as_published: 8.04  ×  10^{-12} atm
+          locator: *id106
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t03_r02_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id041
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '805'
+        emf_as_printed: 805 mV
+        oxygen_partial_pressure:
+          value: '1.01e-11'
+          units: atm
+          as_published: 1.01  ×  10^{-11} atm
+          locator: *id107
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t03_r03_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id045
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '804'
+        emf_as_printed: 804 mV
+        oxygen_partial_pressure:
+          value: '1.04e-11'
+          units: atm
+          as_published: 1.04  ×  10^{-11} atm
+          locator: *id108
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t03_r04_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id049
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '818'
+        emf_as_printed: 818 mV
+        oxygen_partial_pressure:
+          value: '6.85e-12'
+          units: atm
+          as_published: 6.85  ×  10^{-12} atm
+          locator: *id109
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t03_r05_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id053
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '815'
+        emf_as_printed: 815 mV
+        oxygen_partial_pressure:
+          value: '7.55e-12'
+          units: atm
+          as_published: 7.55  ×  10^{-12} atm
+          locator: *id110
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t03_r06_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id057
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '829'
+        emf_as_printed: 829 mV
+        oxygen_partial_pressure:
+          value: '4.95e-12'
+          units: atm
+          as_published: 4.95  ×  10^{-12} atm
+          locator: *id111
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t03_r07_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id061
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '828'
+        emf_as_printed: 828 mV
+        oxygen_partial_pressure:
+          value: '5.15e-12'
+          units: atm
+          as_published: 5.15  ×  10^{-12} atm
+          locator: *id112
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r03_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id065
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '801'
+        emf_as_printed: 801 mV
+        oxygen_partial_pressure:
+          value: '1.13e-11'
+          units: atm
+          as_published: 1.13 ×  10^{-11} atm
+          locator: *id113
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r04_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id069
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '806'
+        emf_as_printed: 806 mV
+        oxygen_partial_pressure:
+          value: '9.86e-12'
+          units: atm
+          as_published: 9.86 ×  10^{-12} atm
+          locator: *id114
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r05_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id073
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '822'
+        emf_as_printed: 822 mV
+        oxygen_partial_pressure:
+          value: '6.18e-12'
+          units: atm
+          as_published: 6.18 ×  10^{-12} atm
+          locator: *id115
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r06_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id077
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '824'
+        emf_as_printed: 824 mV
+        oxygen_partial_pressure:
+          value: '5.76e-12'
+          units: atm
+          as_published: 5.76 ×  10^{-12} atm
+          locator: *id116
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r07_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id081
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '816'
+        emf_as_printed: 816 mV
+        oxygen_partial_pressure:
+          value: '7.32e-12'
+          units: atm
+          as_published: 7.32 ×  10^{-12} atm
+          locator: *id117
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r08_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id085
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '815'
+        emf_as_printed: 815 mV
+        oxygen_partial_pressure:
+          value: '7.55e-12'
+          units: atm
+          as_published: 7.55 ×  10^{-12} atm
+          locator: *id118
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r09_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id089
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '829'
+        emf_as_printed: 829 mV
+        oxygen_partial_pressure:
+          value: '4.95e-12'
+          units: atm
+          as_published: 4.95 ×  10^{-12} atm
+          locator: *id119
+    - observation_id: miike_1974_feo_activity_silicate_melts_p003_t04_r10_c13_printed_inputs
+      type: activity_calculation_inputs
+      locator: *id093
+      units: mV and atm as printed
+      values:
+        quantity: activity_calculation_inputs
+        emf_mV: '828'
+        emf_as_printed: 828 mV
+        oxygen_partial_pressure:
+          value: '5.15e-12'
+          units: atm
+          as_published: 5.15 ×  10^{-12} atm
+          locator: *id120
+fidelity_samples:
+- path: species.FeO.observations[miike_1974_feo_activity_silicate_melts_p003_t01_r03_c12].values.points[0].activity
+  value: '0.93'
+  note: Rendered table activity value, PDF page 3 (published page 413).
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 413
+    table: '1'
+    row_label: '1'
+- path: species.FeO.observations[miike_1974_feo_activity_silicate_melts_p003_t02_r06_c13].values.points[0].activity
+  value: '0.65'
+  note: Rendered table activity value, PDF page 3 (published page 413).
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 413
+    table: '2'
+    row_label: Ca-4
+- path: species.FeO.observations[miike_1974_feo_activity_silicate_melts_p003_t04_r10_c13].values.points[0].activity
+  value: '0.52'
+  note: Rendered table activity value, PDF page 3 (published page 413).
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 413
+    table: '3'
+    row_label: Al-8

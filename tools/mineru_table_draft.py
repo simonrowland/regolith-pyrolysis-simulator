@@ -797,7 +797,7 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                 locator = point.get("locator") or observation.get("locator") or {}
                 observation_id = observation.get("observation_id", "")
                 cell_coordinates = re.search(
-                    r"_p\d+_t\d+_r(?P<row>\d+)_c(?P<column>\d+)$",
+                    r"_p\d+_t(?P<table>\d+)_r(?P<row>\d+)_c(?P<column>\d+)$",
                     str(observation_id),
                 )
                 pdf_page = locator.get("pdf_page")
@@ -840,6 +840,11 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                         ),
                         "table_row_number": table_row_number,
                         "table_column_number": table_column_number,
+                        "draft_table_number": (
+                            int(cell_coordinates.group("table"))
+                            if cell_coordinates
+                            else None
+                        ),
                         "table_phase_column": point.get(
                             "table_phase_column",
                             locator.get(
@@ -859,6 +864,8 @@ def _phase_matches_column(phase: Any, column_header: str) -> bool:
     token = str(phase).strip().casefold()
     if token == "cr":
         token = "solid"
+    elif token == "l":
+        token = "liquid"
     if token not in {"gas", "liquid", "solid"}:
         return False
     # A column with no phase qualifier cannot contradict the row phase.
@@ -957,6 +964,9 @@ def compare_extract_to_draft(
     for point in _numeric_points(extract):
         page = point["pdf_page"]
         table_number = point["table_number"]
+        draft_table_number = point.get("draft_table_number")
+        if draft_table_number is not None:
+            table_number = str(draft_table_number)
         location = (page, table_number)
         if page is None:
             indexed_candidates = []

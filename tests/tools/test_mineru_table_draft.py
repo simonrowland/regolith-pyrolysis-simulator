@@ -852,6 +852,47 @@ def test_compare_phase_is_bound_to_the_candidate_column(tmp_path: Path) -> None:
     assert result["matched_cell"] is None
 
 
+def test_compare_uses_emitted_table_block_and_short_liquid_phase(tmp_path: Path) -> None:
+    tables = []
+    for table_number, value in ((2, "0.85"), (3, "0.73")):
+        csv_path = tmp_path / f"p003-t{table_number:02d}.csv"
+        with csv_path.open("w", encoding="utf-8", newline="") as stream:
+            writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+            writer.writeheader()
+            writer.writerow({
+                "row": 3, "column": 13, "row_type": "body",
+                "text": value, "value_text": value, "mark": "",
+                "numeric_column": 1, "origin_row": 3,
+                "origin_column": 13, "rowspan": 1, "colspan": 1,
+                "flags": "[]",
+            })
+        tables.append({
+            "table_key": f"p003-t{table_number:02d}",
+            "pdf_page": 3,
+            "csv": csv_path.name,
+            "columns": [{"column": 13, "header": "$a_{FeO}$"}],
+        })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": tables}), encoding="utf-8")
+    extract = {"species": {"FeO": {"observations": [{
+        "observation_id": "miike_1974_p003_t03_r03_c13",
+        "type": "activity_coefficient",
+        "phase": "l",
+        "locator": {
+            "page": 3, "pdf_page_index": 2, "table": "2",
+            "row_label": "Ti-1",
+        },
+        "units": "dimensionless",
+        "values": {"quantity": "activity", "activity": "0.73"},
+    }]}}}
+
+    result = draft.compare_extract_to_draft(extract, index_path)[0]
+
+    assert result["status"] == "matched"
+    assert result["matched_cell"]["table_key"] == "p003-t03"
+    assert result["matched_cell"]["value"] == 0.73
+
+
 def test_compare_accepts_a_neutral_equation_column_for_a_typed_phase(
     tmp_path: Path,
 ) -> None:

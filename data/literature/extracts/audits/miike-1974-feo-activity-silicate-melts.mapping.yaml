@@ -1,0 +1,114 @@
+source_id: miike-1974-feo-activity-silicate-melts
+source:
+  citation: 'Miike, K., Morinaga, K., Suginohara, Y. & Yanagase, T. (1974). Activity of FeO in the silicate melts. Journal of the Mining and Metallurgical Institute of Japan 90(1036), 411–416.'
+  year: 1974
+extraction:
+  method: MinerU table draft, reconciled to the page render because the table cells are absent from pdftotext.
+  date: '2026-10-25'
+  worker: w1025a-mii74
+review_status: draft
+tables:
+  - page: 3
+    table_index: 1
+    published_page: 413
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: l
+    regime: emf_cell
+    rows: all
+    temperature:
+      column: 9
+      unit: C
+    values:
+      - column: 12
+        species: FeO
+    conditions:
+      - key: gas_mix
+        state:
+          tag: value
+          value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; numerical ratio not printed in the activity tables.
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 416
+          section: 'English abstract'
+  - page: 3
+    table_index: 2
+    published_page: 413
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: l
+    regime: emf_cell
+    rows: all
+    temperature:
+      column: 10
+      unit: C
+    values:
+      - column: 13
+        species: FeO
+    conditions:
+      - key: gas_mix
+        state:
+          tag: value
+          value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; numerical ratio not printed in the activity tables.
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 416
+          section: 'English abstract'
+  - page: 3
+    table_index: 3
+    published_page: 413
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: l
+    regime: emf_cell
+    rows: all
+    temperature:
+      column: 10
+      unit: C
+    values:
+      - column: 13
+        species: FeO
+    conditions:
+      - key: gas_mix
+        state:
+          tag: value
+          value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; numerical ratio not printed in the activity tables.
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 416
+          section: 'English abstract'
+  - page: 3
+    table_index: 4
+    published_page: 413
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: l
+    regime: emf_cell
+    rows: all
+    temperature:
+      column: 10
+      unit: C
+    values:
+      - column: 13
+        species: FeO
+    conditions:
+      - key: gas_mix
+        state:
+          tag: value
+          value: CO-CO2 gas mixture with fixed P_CO/P_CO2 ratio; numerical ratio not printed in the activity tables.
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 416
+          section: 'English abstract'
