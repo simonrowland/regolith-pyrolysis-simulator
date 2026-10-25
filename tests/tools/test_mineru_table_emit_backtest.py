@@ -913,14 +913,14 @@ def test_van_limpt_numeric_header_values_compare_to_their_cells(
 def test_backtest_rejects_extra_cells_and_same_key_column_swaps(
     tmp_path: Path,
 ) -> None:
-    mapping_path = FIXTURES / "stolyarova-1995-cao-alumina-kems.mapping.yaml"
+    mapping_path = FIXTURES / "stolyarova-1996-cao-alumina-silica-kems.mapping.yaml"
     mapping = yaml.safe_load(mapping_path.read_text(encoding="utf-8"))
     corpus_root, raw_root = _corpus_roots()
     source_id = mapping["source_id"]
     source = _source_dir(corpus_root, raw_root, source_id)
     draft_dir = _convert_source(source, source_id, tmp_path, raw_root)
     document = draft.emit_extract(
-        draft_dir, mapping_path, tmp_path / "stolyarova-1995.yaml"
+        draft_dir, mapping_path, tmp_path / f"{source_id}.yaml"
     )
     extract = yaml.safe_load(
         (EXTRACTS / f"{source_id}.yaml").read_text(encoding="utf-8")
@@ -943,22 +943,40 @@ def test_backtest_rejects_extra_cells_and_same_key_column_swaps(
 
     swapped_document = copy.deepcopy(document)
     by_column_and_row: dict[tuple[int, int], dict] = {}
+    table = next(table for table in mapping["tables"] if table["table_index"] == 2)
+    duplicate_columns = [
+        int(measurement["column"])
+        for measurement in table["values"]
+        if measurement["species"] == "O"
+        and (measurement.get("quantity") or table["quantity"]) == "partial_pressure"
+        and (measurement.get("evidence_class") or table.get("evidence_class"))
+        == "model_derived"
+    ]
+    first_column, second_column = duplicate_columns[:2]
     for observation in swapped_document["species"]["O"]["observations"]:
         match = re.search(
-            r"_p\d+_t\d+_r(?P<row>\d+)_c(?P<column>\d+)$",
+            r"_p(?P<page>\d+)_t(?P<table>\d+)_r(?P<row>\d+)_c(?P<column>\d+)$",
             observation["observation_id"],
         )
-        if not match or observation["values"]["quantity"] != "partial_pressure":
+        if (
+            not match
+            or int(match["page"]) != int(table["page"])
+            or int(match["table"]) != int(table["table_index"])
+            or observation["values"]["quantity"] != "partial_pressure"
+        ):
             continue
         key = (int(match.group("column")), int(match.group("row")))
         by_column_and_row[key] = observation
     row = next(
         row
         for row in sorted({row for _, row in by_column_and_row})
-        if (5, row) in by_column_and_row and (6, row) in by_column_and_row
+        if (first_column, row) in by_column_and_row
+        and (second_column, row) in by_column_and_row
+        and _decimal(_emitted_scalar(by_column_and_row[(first_column, row)]))
+        != _decimal(_emitted_scalar(by_column_and_row[(second_column, row)]))
     )
-    first = by_column_and_row[(5, row)]["values"]
-    second = by_column_and_row[(6, row)]["values"]
+    first = by_column_and_row[(first_column, row)]["values"]
+    second = by_column_and_row[(second_column, row)]["values"]
     first["pressure_atm"], second["pressure_atm"] = (
         second["pressure_atm"],
         first["pressure_atm"],
