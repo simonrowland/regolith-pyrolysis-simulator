@@ -1533,7 +1533,7 @@ def test_gas_ratio_validation_rejects_invalid_basis_or_species(
     assert any("invalid gas ratio" in error for error in errors), errors
 
 
-def test_docs_private_reference_in_nested_prose_is_refused_but_path_is_allowed():
+def test_docs_private_reference_in_nested_prose_and_provenance_path_is_refused():
     doc = _minimal_extract()
     doc["species"]["Fe"]["observations"][0]["locator"]["note"] = (
         "See docs-private/research/hidden.md"
@@ -1549,13 +1549,12 @@ def test_docs_private_reference_in_nested_prose_is_refused_but_path_is_allowed()
         and "[docs-private-prose]" in error
         for error in errors
     )
-    assert not any("extraction.provenance_path" in error for error in errors)
-
-    clean = _minimal_extract()
-    clean["extraction"]["provenance_path"] = "docs-private/research/source.md"
-    assert vle.validate_extract_document(
-        clean, expected_source_id="fixture-source"
-    ) == []
+    assert any(
+        "fixture-source.yaml:extraction.provenance_path" in error
+        and "repository-portable" in error
+        and "docs-private path refused for provenance_path" in error
+        for error in errors
+    )
 
 
 def test_clean_extract_citation_renders_without_private_path_in_index():
