@@ -42,15 +42,14 @@ def _sim(setpoints=None):
     ("stage3_product_purity",), ("stage3_instantaneous_purity",),
     ("stage3_product_purity", "stage3_instantaneous_purity"),
 ])
-def test_partial_constructor_names_missing_collection_purity(missing):
-    from simulator.recipe_errors import MalformedRecipeError
-    setpoints = load_config_bundle().setpoints
+def test_partial_constructor_inherits_owned_collection_purity(missing):
+    defaults = load_config_bundle().setpoints
+    setpoints = copy.deepcopy(defaults)
     for field in missing:
         del setpoints["condensation_train"][field]
-    with pytest.raises(MalformedRecipeError) as caught:
-        _sim(setpoints)
-    assert str(caught.value) == "missing required purity fields: " + ", ".join(
-        f"condensation_train.{field}" for field in sorted(missing))
+    sim = _sim(setpoints)
+    for field in missing:
+        assert sim.train.collection_route[field] == defaults['condensation_train'][field]
 
 
 def test_divert_excludes_silica_from_stages_budget_walls_supply_and_sampling(monkeypatch):
@@ -694,6 +693,8 @@ def test_purity_config_recipe_and_runtime_reject_invalid(field, value, tmp_path)
         parse_campaign_override_value(field, value)
     cfg = load_config_bundle().setpoints
     cfg["condensation_train"][field] = value
+    with pytest.raises(ValueError, match=field):
+        _sim(cfg)
     file = tmp_path / "setpoints.yaml"
     file.write_text(yaml.safe_dump(cfg))
     with pytest.raises(ValueError, match=f"{field}|rejects NaN"):

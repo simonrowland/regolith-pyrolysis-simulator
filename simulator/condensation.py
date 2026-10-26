@@ -2685,7 +2685,10 @@ class CondensationModel:
         cfg = self.stage3_bypass
         try:
             liner = cfg['liner_material']
-            material = self.materials['liner_materials'][liner]
+            # Partial material overrides inherit the shipped liner declarations;
+            # species sticking overrides still resolve through _wall_alpha_record.
+            material = self.materials.get(
+                'liner_materials', MATERIALS_DATA['liner_materials'])[liner]
             if liner == 'fused_silica_baffles' or not material:
                 raise ValueError('bypass must have a non-silica liner')
             length = _deposition_finite_scalar('bypass.length_m', cfg['length_m'])

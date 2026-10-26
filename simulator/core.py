@@ -4099,7 +4099,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _overhead_holdup_mol(self) -> Dict[str, float]:
         return {
             species: float(mol)
-            for species, mol in self.atom_ledger.physical_mol_by_account(
+            for species, mol in self.atom_ledger.mol_by_account(
                 'process.overhead_gas').items()
             if float(mol) > 0.0
         }
@@ -15374,7 +15374,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(type(exc), 'terminal_refusal', False)
             )
             if terminal_refusal:
-                wall_refusals = self.condensation_model.last_sticking_alpha_provenance_notice.get(
+                wall_refusals = getattr(
+                    self._condensation_model, 'last_sticking_alpha_provenance_notice', {},
+                ).get(
                     'wall_saturation_pressure_refusals_by_species'
                 )
                 _materialize_refusal_snapshot_history(terminal_refusal_state)
@@ -15385,7 +15387,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 # Roll back quantities, but retain the reason the wall channel refused.
                 if wall_refusals:
-                    self.condensation_model.last_sticking_alpha_provenance_notice[
+                    self._condensation_model.last_sticking_alpha_provenance_notice[
                         'wall_saturation_pressure_refusals_by_species'
                     ] = wall_refusals
             elif committed_transition_count:

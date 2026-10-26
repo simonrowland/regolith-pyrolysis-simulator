@@ -13,7 +13,6 @@ import pytest
 
 from engines.builtin.foulant_disposition import chi_decomp, load_foulant_registry
 from simulator.accounting import resolve_species_formula
-from simulator.config import load_config_bundle
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 
@@ -26,10 +25,7 @@ def _sim(feedstocks):
     backend.initialize({})
     return PyrolysisSimulator(
         backend,
-        {
-            "campaigns": {},
-            "condensation_train": load_config_bundle().setpoints["condensation_train"],
-        },
+        {"campaigns": {}},
         feedstocks,
         {"metals": {}, "oxide_vapors": {}},
     )

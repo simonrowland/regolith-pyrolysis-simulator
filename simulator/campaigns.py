@@ -1711,13 +1711,15 @@ class CampaignManager:
                 command = stage.get('stage3_route', command)
         ovr = self._campaign_overrides(campaign)
         command = ovr.get('stage3_route', command)
-        train_config = self.setpoints.get('condensation_train')
-        missing = [f'condensation_train.{field}'
-                   for field in sorted(STAGE3_PURITY_FIELDS)
-                   if not isinstance(train_config, Mapping) or field not in train_config]
-        if missing:
-            raise MalformedRecipeError(
-                f"missing required purity fields: {', '.join(missing)}")
+        train_config = self.setpoints.get('condensation_train', {})
+        if not isinstance(train_config, Mapping):
+            raise MalformedRecipeError('condensation_train must be a mapping')
+        if any(field not in train_config for field in STAGE3_PURITY_FIELDS):
+            from simulator.config import DEFAULT_DATA_DIR, _load_setpoints_file
+            train_config = {
+                **_load_setpoints_file(DEFAULT_DATA_DIR / 'setpoints.yaml')['condensation_train'],
+                **train_config,
+            }
         purity_defaults = {field: cfg.get(field,
             train_config[field]) for field in STAGE3_PURITY_FIELDS}
         # Literal reads keep both consumers visible to the override-field guard.
