@@ -10931,6 +10931,53 @@ def test_thermochemical_calorie_to_kilojoule_conversion_is_independently_pinned(
     assert named.unit_trail == "thermochemical_cal_to_kJ_exact"
 
 
+def test_calorie_conventions_remain_distinct_and_unknown_variants_refuse() -> None:
+    from simulator.battery.migrate import (
+        CALORIE_15_C_J,
+        INTERNATIONAL_TABLE_CALORIE_J,
+        THERMOCHEMICAL_CALORIE_J,
+    )
+
+    assert THERMOCHEMICAL_CALORIE_J == Decimal("4.184")
+    assert CALORIE_15_C_J == Decimal("4.1855")
+    assert INTERNATIONAL_TABLE_CALORIE_J == Decimal("4.1868")
+
+    cal15_energy = _convert_compilation_amount(
+        Decimal("2"), Quantity.H_MINUS_H298, "cal.15 mole−1"
+    )
+    assert cal15_energy == (Decimal("0.0083710"), "calorie_15C_to_kJ_exact")
+    cal15_cp = _convert_compilation_amount(
+        Decimal("2"), Quantity.CP, "cal.15 mole−1 °C−1"
+    )
+    assert cal15_cp == (Decimal("8.3710"), "calorie_15C_to_J_exact")
+    cal15_cp_kelvin = _convert_compilation_amount(
+        Decimal("2"), Quantity.CP, "cal.15 mole−1 K−1"
+    )
+    assert cal15_cp_kelvin == cal15_cp
+
+    assert _convert_compilation_amount(
+        Decimal("1"), Quantity.CP, "cal/mol/K"
+    ) == (Decimal("4.184"), "thermochemical_calorie_to_J_exact")
+    assert _convert_compilation_amount(
+        Decimal("1"), Quantity.H_MINUS_H298, "cal_IT/mol"
+    ) == (Decimal("0.0041868"), "international_table_calorie_to_kJ_exact")
+    assert _convert_compilation_amount(
+        Decimal("1"), Quantity.H_MINUS_H298, "cal.16 mole−1"
+    ) is None
+    unknown = select_declared_source(
+        Quantity.H_MINUS_H298,
+        None,
+        {
+            "enthalpy_increment": "1",
+            "units": {"enthalpy_increment": "cal.16 mole−1"},
+        },
+    )
+    assert unknown.value.kind is ValueKind.UNAVAILABLE
+    assert unknown.value.unavailable_reason == (
+        "unsupported printed unit for enthalpy_increment"
+    )
+
+
 def test_g1_delta_fh_migrate_refuses_blank_units_and_admits_declared_point(
     tmp_path: Path,
 ) -> None:
