@@ -18,6 +18,18 @@ class Kress91InvalidControls(ValueError):
     """Invalid finite-control input for the Kress91 Fe-redox relation."""
 
 
+def legacy_iw_log10_fO2_bar(
+    temperature_K: float,
+    *,
+    vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
+) -> float:
+    """Return the legacy IW log-fugacity line, flooring nonpositive T."""
+    temperature = float(temperature_K)
+    if temperature <= 0.0:
+        return math.log10(vacuum_floor_bar)
+    return -27215.0 / temperature + 6.57
+
+
 def intrinsic_melt_fO2(
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,
@@ -27,12 +39,18 @@ def intrinsic_melt_fO2(
     """Return the legacy intrinsic-fO2 diagnostic for an oxide composition."""
     temperature = float(temperature_K)
     if temperature <= 0.0:
-        return math.log10(vacuum_floor_bar)
+        return legacy_iw_log10_fO2_bar(
+            temperature,
+            vacuum_floor_bar=vacuum_floor_bar,
+        )
     feo, fe2o3 = iron_oxide_values(composition_wt_pct)
     alkali = max(0.0, float(composition_wt_pct.get("Na2O", 0.0))) + max(
         0.0, float(composition_wt_pct.get("K2O", 0.0))
     )
-    log_iw = -27215.0 / temperature + 6.57
+    log_iw = legacy_iw_log10_fO2_bar(
+        temperature,
+        vacuum_floor_bar=vacuum_floor_bar,
+    )
     redox_offset = 0.0
     if feo > 0.0 and fe2o3 > 0.0:
         redox_offset += 0.25 * math.log10(max(fe2o3 / feo, 1.0e-12))
