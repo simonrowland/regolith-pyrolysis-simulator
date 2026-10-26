@@ -1,4 +1,4 @@
-"""Hot-hour production receipts after the C7 R4 gas constant and pipe inverse moves."""
+"""Hot-hour receipts for retained oxygen and deferred pressure trials."""
 import hashlib
 import json
 
@@ -98,10 +98,10 @@ def test_accepted_hot_hour_hex():
         # and zero-rate records, rather than storing another 930 kB fixture.
         assert {key: hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
                 for key, value in receipt.items()} == {
-            'flux': '0bf5b2dd1d755f025cb8a00f5957bcc025a7bc48d066501c71855fdc4953b4d7',
-            'oxygen': '6a072751e243dd81c78ff63a9f13c52270636a7c7929699a35c9f93e55e834d6',
-            'ledger': '5437fea6ca3e99175a4a1fe0784e6144f7d9bae2c533b83985eeb2b927541ec3',
-            'condensation': 'b8c9bc4eeaac682ec64582dd50235abb6978d7e9c7a861366301d6714b2e795c',
+            'flux': '59993b971e8efdd95bbe456934584e8f63a2bbc0055ab2e9485f188a8b1fd359',
+            'oxygen': 'c499e99c3c55d8f5b80b81ef43a3d4c66a406a30f6af88ed5da581531a9ac621',
+            'ledger': '2f921a5f0d0de652266991e06452f535ee310dee71c9aad6bd50700a37cec38f',
+            'condensation': '0602c6d1846437b3270aade5b45864e98cc68816e561db65edf54ad5804b789d',
         }
     finally:
         close_test_owned_magemin_backend(sim)
