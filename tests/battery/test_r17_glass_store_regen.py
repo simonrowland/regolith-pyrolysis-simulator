@@ -138,11 +138,11 @@ def test_committed_store_mg013_and_w003_quote_printed_glass_markers() -> None:
 def test_committed_store_has_no_stale_migrate_input_commits() -> None:
     """Reject unacknowledged post-regen migrate-input commits."""
     freshness = _load_freshness()
-    neutral = freshness.STORE_NEUTRAL_INPUT_COMMITS
-    require_store_neutral_ack_history(REPO_ROOT, freshness, *sorted(neutral))
+    require_store_neutral_ack_history(REPO_ROOT, freshness)
+    acknowledged = freshness._store_neutral_ack_commits()
     if _git("rev-parse", "--is-shallow-repository").strip() == "true":
         pytest.skip("git_history_unavailable: freshness requires a full checkout")
-    for revision in neutral:
+    for revision in acknowledged:
         if subprocess.run(
             ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
             cwd=REPO_ROOT,

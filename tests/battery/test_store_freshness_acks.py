@@ -173,21 +173,24 @@ def test_multiline_ack_body_fails(
         freshness.stale_input_commits("HEAD", "store")
 
 
-def test_ack_cannot_duplicate_frozenset_entry(
+def test_ack_for_same_commit_cannot_be_recorded_twice(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     freshness = _load_freshness()
     ack_dir = tmp_path / "scripts" / "store_neutral_acks"
     ack_dir.mkdir(parents=True)
-    (ack_dir / "037f97f.txt").write_text("Reason.\n", encoding="utf-8")
+    commit = "abcdef1" + "0" * 33
+    (ack_dir / "abcdef1.txt").write_text("Reason.\n", encoding="utf-8")
+    (ack_dir / f"{commit}.txt").write_text("Same reason.\n", encoding="utf-8")
     monkeypatch.setattr(freshness, "ROOT", tmp_path)
-    duplicate = "037f97ff6" + "a" * 31
     monkeypatch.setattr(
-        freshness, "_git", _fake_git(_fake_log("a" * 40), {"037f97f": duplicate})
+        freshness,
+        "_git",
+        _fake_git(_fake_log("a" * 40), {"abcdef1": commit, commit: commit}),
     )
 
     with pytest.raises(ValueError, match="duplicate store-neutral acknowledgement"):
-        freshness.stale_input_commits("HEAD", "store")
+        freshness._store_neutral_ack_commits()
 
 
 def test_ack_for_one_commit_does_not_exempt_another(
@@ -212,12 +215,15 @@ def test_ack_for_one_commit_does_not_exempt_another(
     assert set(stale) == {f"{stale_commit[:9]} input change 1"}
 
 
-def test_existing_store_neutral_frozenset_still_exempts_commit(
+def test_unacknowledged_legacy_commit_is_reported_as_stale(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """Mutation: restoring the removed static allowlist hides this stale input."""
     freshness = _load_freshness()
     commit = "037f97ff6" + "a" * 31
     monkeypatch.setattr(freshness, "ROOT", tmp_path)
     monkeypatch.setattr(freshness, "_git", lambda *args: _fake_log(commit))
 
-    assert freshness.stale_input_commits("HEAD", "store") == {}
+    assert freshness.stale_input_commits("HEAD", "store") == {
+        f"{commit[:9]} input change 0": [_STALE_INPUT]
+    }
