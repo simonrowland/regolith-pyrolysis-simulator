@@ -138,6 +138,20 @@ def _mass_loss_point(document: dict, material: str, sample: str) -> dict:
     )
 
 
+def _point_run_id(point: dict) -> str:
+    condition = point["point_conditions"]["run_id"]
+    assert condition["state"]["tag"] == "value"
+    assert condition["locator"] is not None
+    return str(condition["state"]["value"])
+
+
+def _migrated_run_id(row) -> str:
+    condition = (row.point_conditions or {}).get("run_id")
+    assert condition is not None and condition.state.is_value
+    assert condition.locator is not None
+    return str(condition.state.value)
+
+
 def _assert_starting_composition_link(point: dict, material: str) -> None:
     composition = point["point_conditions"]["composition"]
     assert composition["state"]["tag"] == "value"
@@ -430,6 +444,7 @@ def test_mass_loss_points_link_pdf_starting_compositions_and_run_conditions() ->
         point = _mass_loss_point(document, material, sample)
         conditions = point["point_conditions"]
         _assert_starting_composition_link(point, material)
+        assert _point_run_id(point) == sample
         assert conditions["composition"]["locator"] == start_locators[material]
         assert str(point["T_C"]) == expected["temperature_C"]
         assert str(point["duration_s"]) == expected["duration_s"]
@@ -445,6 +460,33 @@ def test_mass_loss_points_link_pdf_starting_compositions_and_run_conditions() ->
         assert conditions["temperature_K"]["locator"]["row"] == expected["row"]
         assert conditions["total_pressure_Pa"]["state"]["tag"] == "unknown"
         assert conditions["partial_pressure_Pa"]["state"]["tag"] == "unknown"
+
+    # These six run-condition rows are printed on physical PDF page 3, Table 1.
+    for sample in ("3-12", "4-1", "4-2", "4-4", "4-5", "4-6"):
+        point = _mass_loss_point(document, "basalt", sample)
+        assert _point_run_id(point) == sample
+        expected_row = sample.replace("-", "–")
+        for key in (
+            "temperature_K",
+            "duration_s",
+            "fO2_control",
+            "atmosphere",
+            "gas_flow_rate_cm3_min",
+        ):
+            locator = point["point_conditions"][key]["locator"]
+            assert (
+                locator["page"],
+                locator["pdf_page_index"],
+                locator["published_page"],
+            ) == (3, 2, 52)
+            assert locator["table"] == "1"
+            assert locator["row"] == expected_row
+
+    mutated_run = copy.deepcopy(document)
+    mutated_point = _mass_loss_point(mutated_run, "basalt", "1-1")
+    mutated_point["point_conditions"]["run_id"]["state"]["value"] = "1-2"
+    with pytest.raises(AssertionError):
+        assert _point_run_id(mutated_point) == "1-1"
 
     all_mass_loss_points = [
         point
@@ -463,6 +505,7 @@ def test_mass_loss_points_link_pdf_starting_compositions_and_run_conditions() ->
     )
     unlinked_point = _mass_loss_point(document, "basalt", "2-6")
     unlinked_run = unlinked_point["point_conditions"]
+    assert _point_run_id(unlinked_point) == "2-6"
     assert unlinked_point["material"] == "Basalt"
     assert "T_C" not in unlinked_point
     assert "duration_s" not in unlinked_point
@@ -553,6 +596,7 @@ def test_derived_supplementary_mass_loss_rows_migrate_and_pin_values() -> None:
         material = point["material"].lower()
         conditions = row.point_conditions
         assert conditions is not None
+        assert _migrated_run_id(row) == sample
         composition = conditions["composition"]
         assert composition.state.is_value and composition.locator is not None
         assert composition.state.value.as_map() == wt_pct_to_mole_fraction(
@@ -640,6 +684,25 @@ def test_isolated_migration_preserves_species_and_run_conditions() -> None:
     assert sum(
         row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION for row in rows
     ) == 49
+    mass_loss_rows = [
+        row
+        for row in rows
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+    ]
+    endpoint_counts = Counter(_migrated_run_id(row) for row in mass_loss_rows)
+    assert len(mass_loss_rows) == 49
+    assert set(endpoint_counts.values()) == {1}
+    residue_rows = [row for row in rows if "_residue_" in row.observation_id]
+    assert len(residue_rows) == 2160
+    # score._battery_hero_mass_loss_fraction will join on printed identity
+    # before duration; assert that dependency's data contract here.
+    for row in residue_rows:
+        sample_match = re.search(r":row=(.*?):h=", row.observation_id)
+        assert sample_match is not None
+        run_id = _migrated_run_id(row)
+        assert run_id == sample_match.group(1).replace("–", "-")
+        assert endpoint_counts[run_id] == 1
 
     actual_species_rows = Counter()
     without_sample = []
