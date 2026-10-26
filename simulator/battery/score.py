@@ -7369,6 +7369,35 @@ def _equilibrate_phase_assemblage(
             close_battery_engine_handle(handle)
 
 
+_ENGINE_WORKER_LIFECYCLE_FAILURES = (
+    "EngineWorkerDied",
+    "EngineWorkerUnavailable",
+    "EngineWorkerPoolLifecycleError",
+)
+
+
+def _engine_worker_lifecycle_failure(result: object) -> str | None:
+    """Return a typed worker lifecycle failure preserved by the backend."""
+
+    diagnostics = getattr(result, "diagnostics", None)
+    failure = (
+        diagnostics.get("backend_failure_exception")
+        if isinstance(diagnostics, Mapping)
+        else None
+    )
+    if failure not in _ENGINE_WORKER_LIFECYCLE_FAILURES:
+        engine_reason = str(getattr(result, "engine_reason", None) or "")
+        failure = next(
+            (
+                name
+                for name in _ENGINE_WORKER_LIFECYCLE_FAILURES
+                if f"{name}:" in engine_reason
+            ),
+            None,
+        )
+    return failure if failure in _ENGINE_WORKER_LIFECYCLE_FAILURES else None
+
+
 def _phase_role_value(identity: Identity, name: str) -> PhaseRole | None:
     state = getattr(identity, name, None)
     if state is None or not isinstance(state, State) or not state.is_value:
@@ -7645,6 +7674,18 @@ def _predict_phase_row(
                 "detail": f"{type(exc).__name__}: {exc}",
             },
             execution=ExecutionState.NOT_PROBED,
+        )
+
+    worker_failure = _engine_worker_lifecycle_failure(result)
+    if worker_failure is not None:
+        return refused(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            {
+                "reason": f"engine_transport_error:{engine.value}",
+                "engine": engine.value,
+                "backend_failure_exception": worker_failure,
+            },
+            execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
         )
 
     formula = identity.species.formula
@@ -9120,9 +9161,13 @@ def _predict_with_engine(
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
             cell_status = str(getattr(cell, "engine_status", "") or "")
+            worker_failure = _engine_worker_lifecycle_failure(cell)
             if typed in {"out_of_domain", "out_of_basis"} or cell_status == "out_of_domain":
                 refusal_reason = RefusalReason.METRIC_DOMAIN
                 typed_reason = "out_of_domain"
+            elif worker_failure is not None:
+                refusal_reason = RefusalReason.ATTEMPTED_UNAVAILABLE
+                typed_reason = f"engine_transport_error:{engine.value}"
             else:
                 refusal_reason = RefusalReason.ATTEMPTED_UNAVAILABLE
                 if typed == REFUSAL_TIMEOUT:
@@ -9151,6 +9196,11 @@ def _predict_with_engine(
                     "cell_refusal_reason": typed,
                     "engine_status": cell_status,
                     "engine_reason": engine_side_reason,
+                    **(
+                        {"backend_failure_exception": worker_failure}
+                        if worker_failure is not None
+                        else {}
+                    ),
                 },
                 identity=identity,
                 requested_composition=requested,

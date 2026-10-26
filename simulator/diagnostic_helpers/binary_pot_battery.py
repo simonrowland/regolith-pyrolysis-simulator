@@ -3502,32 +3502,37 @@ def run_isolated_cell_worker(
         cell_material=po2_raw.get("cell_material"),
     )
     engine_name = str(payload["engine"])
+    owns_handle = handle is None or handle.name != engine_name
     if handle is None or handle.name != engine_name:
         handle = open_battery_engine(engine_name)
-    if handle.name == "alphamelts" and handle.backend is not None:
-        # A fresh per-cell backend used to start with an empty warning set.
-        # Keep that output behavior while the native transport is reused.
-        warning_seen = getattr(
-            handle.backend, "_pseudo_vapor_pressure_warning_seen", None
+    try:
+        if handle.name == "alphamelts" and handle.backend is not None:
+            # A fresh per-cell backend used to start with an empty warning set.
+            # Keep that output behavior while the native transport is reused.
+            warning_seen = getattr(
+                handle.backend, "_pseudo_vapor_pressure_warning_seen", None
+            )
+            if isinstance(warning_seen, set):
+                warning_seen.clear()
+        cell = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=float(payload["temperature_K"]),
+            po2=po2,
+            timeout_s=finite_float(payload.get("timeout_s")),
+            physical_pressure_bar=(
+                None
+                if payload.get("physical_pressure_bar") is None
+                else float(payload["physical_pressure_bar"])
+            ),
+            qualification=bool(payload.get("qualification")),
+            isolated=False,
+            arm=str(payload.get("arm") or ARM_HEADLINE),
         )
-        if isinstance(warning_seen, set):
-            warning_seen.clear()
-    cell = equilibrate_cell(
-        handle,
-        pot,
-        temperature_K=float(payload["temperature_K"]),
-        po2=po2,
-        timeout_s=finite_float(payload.get("timeout_s")),
-        physical_pressure_bar=(
-            None
-            if payload.get("physical_pressure_bar") is None
-            else float(payload["physical_pressure_bar"])
-        ),
-        qualification=bool(payload.get("qualification")),
-        isolated=False,
-        arm=str(payload.get("arm") or ARM_HEADLINE),
-    )
-    return cell.as_payload()
+        return cell.as_payload()
+    finally:
+        if owns_handle:
+            close_battery_engine_handle(handle)
 
 
 def _crash_cell_from_returncode(
