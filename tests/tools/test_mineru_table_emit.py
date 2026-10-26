@@ -150,6 +150,35 @@ def test_printed_scale_factor_scales_exactly_and_keeps_both_spellings(
     assert row["locator"]["column_header"] == header
 
 
+def test_printed_scale_factor_refuses_cell_with_unrepresented_uncertainty(
+    tmp_path: Path,
+) -> None:
+    header = "p Mg x 10^5, atm"
+    draft_dir = _convert_html(
+        tmp_path,
+        f"<table><tr><th>T, K</th><th>{header}</th></tr>"
+        "<tr><td>1851</td><td>12.34±0.50</td></tr></table>",
+    )
+    table = _pressure_table(
+        values=[
+            {
+                "column": 2,
+                "species": "Mg",
+                "scale_factor": {
+                    "header": header,
+                    "exponent": 5,
+                    "direction": "quantity_times_factor_equals_cell",
+                },
+            }
+        ]
+    )
+
+    with pytest.raises(
+        ValueError, match="scale_factor for row 2 column 2 needs a numeric cell"
+    ):
+        _emit(tmp_path, draft_dir, _base_mapping(table))
+
+
 def test_printed_scale_factor_refuses_missing_direction_bad_power_and_mismatch(
     tmp_path: Path,
 ) -> None:

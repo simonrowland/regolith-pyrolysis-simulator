@@ -264,11 +264,30 @@ def _is_number(text: str) -> bool:
     return bool(_NUMBER.fullmatch(token) or _LATEX_SCIENTIFIC.fullmatch(token))
 
 
-def _number_decimal(text: str) -> Decimal | None:
+def _normalized_number_text(text: str) -> str:
     token = text.strip().strip("$").strip()
     token = re.sub(r"\\mathrm\s*\{([^{}]*)\}", r"\1", token)
-    token = token.replace(r"\,", "").replace("−", "-").replace("–", "-").replace("—", "-")
-    token = re.split(r"\s*(?:±|\+/-)\s*", token, maxsplit=1)[0].strip()
+    return token.replace(r"\,", "").replace("−", "-").replace("–", "-").replace("—", "-")
+
+
+def _has_printed_numeric_uncertainty(text: str) -> bool:
+    token = _normalized_number_text(text)
+    parts = re.split(r"\s*(?:±|\+/-)\s*", token, maxsplit=1)
+    return len(parts) == 2 and all(_is_number(part.strip()) for part in parts)
+
+
+def _is_numeric_cell(text: str) -> bool:
+    return _number_decimal(text) is not None or _has_printed_numeric_uncertainty(text)
+
+
+def _comparison_number_decimal(text: str) -> Decimal | None:
+    token = _normalized_number_text(text)
+    central_value = re.split(r"\s*(?:±|\+/-)\s*", token, maxsplit=1)[0]
+    return _number_decimal(central_value)
+
+
+def _number_decimal(text: str) -> Decimal | None:
+    token = _normalized_number_text(text)
     scientific = re.fullmatch(
         r"([+\-]?\d+(?:\.\d+)?|[+\-]?\.\d+)\s*\\times\s*10\s*\^\s*\{?([+\-]?\d+)\}?",
         token,
@@ -399,7 +418,7 @@ def _header_row_count(grid: list[list[Cell]]) -> int:
         first_row = grid[0]
         first_row_text = " ".join(cell.text for cell in first_row)
         if axis_with_unit.search(first_row_text) and not any(
-            _number_value(_split_mark(cell.text, cell.superscript_text)[0]) is not None
+            _is_numeric_cell(_split_mark(cell.text, cell.superscript_text)[0])
             for cell in first_row
         ):
             count = 1
@@ -411,7 +430,7 @@ def _header_row_count(grid: list[list[Cell]]) -> int:
             row = [cell for cell in grid[count] if cell.origin_row == count]
             populated = [cell for cell in row if cell.text.strip()]
             numeric_count = sum(
-                _number_value(_split_mark(cell.text, cell.superscript_text)[0]) is not None
+                _is_numeric_cell(_split_mark(cell.text, cell.superscript_text)[0])
                 for cell in populated
             )
             trailing_unit = bool(
@@ -422,8 +441,7 @@ def _header_row_count(grid: list[list[Cell]]) -> int:
                 axis_with_unit.search(previous)
                 and numeric_count >= 2
                 and all(
-                    _number_value(_split_mark(cell.text, cell.superscript_text)[0])
-                    is not None
+                    _is_numeric_cell(_split_mark(cell.text, cell.superscript_text)[0])
                     or (trailing_unit and index == len(populated) - 1)
                     for index, cell in enumerate(populated)
                 )
@@ -435,16 +453,16 @@ def _header_row_count(grid: list[list[Cell]]) -> int:
 
     numeric_rows = [
         [
-            _number_value(_split_mark(cell.text, cell.superscript_text)[0])
+            _is_numeric_cell(_split_mark(cell.text, cell.superscript_text)[0])
             for cell in row
         ]
         for row in grid
     ]
     for row_index, row_values in enumerate(numeric_rows):
-        if sum(value is not None for value in row_values) >= 2:
+        if sum(row_values) >= 2:
             return row_index
     for row_index, row_values in enumerate(numeric_rows):
-        if any(value is not None for value in row_values):
+        if any(row_values):
             return row_index
     return len(grid)
 
@@ -459,7 +477,7 @@ def _numeric_columns(grid: list[list[Cell]], header_count: int) -> set[int]:
             if cell.text.strip():
                 populated[column_index] += 1
             value_text, _ = _split_mark(cell.text, cell.superscript_text)
-            if _number_value(value_text) is not None:
+            if _is_numeric_cell(value_text):
                 numeric[column_index] += 1
     return {
         column
@@ -504,6 +522,7 @@ def _add_cell_flags(
                 and column_index in numeric_columns
                 and cell.text.strip()
                 and cell.numeric_value is None
+                and not _has_printed_numeric_uncertainty(cell.value_text)
             ):
                 flags.append("non_numeric_in_numeric_column")
             if (
@@ -792,7 +811,7 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                 value = point[value_field]
                 if isinstance(value, bool) or value is None:
                     continue
-                number = _number_decimal(str(value))
+                number = _comparison_number_decimal(str(value))
                 if number is None:
                     continue
                 locator = point.get("locator") or observation.get("locator") or {}
@@ -933,7 +952,7 @@ def compare_extract_to_draft(
                     or int(cell["column"]) != int(cell["origin_column"])
                 ):
                     continue
-                number = _number_decimal(cell["value_text"])
+                number = _comparison_number_decimal(cell["value_text"])
                 if number is not None:
                     column = int(cell["column"])
                     candidate = {
@@ -1397,7 +1416,7 @@ def _render_traps(cell: Mapping[str, Any], page_text: str | None) -> list[str]:
         found.append("dropped_plusminus")
     if (
         cell.get("row_type") == "header"
-        and _number_decimal(value_text or text) is not None
+        and _is_numeric_cell(value_text or text)
     ):
         found.append("numeric_header_row")
     return [name for name in _TRAP_ORDER if name in found]
@@ -1705,8 +1724,7 @@ def _emit_table(
             if cell["row_type"] == "header"
             and int(cell["column"]) in measurement_columns
             and _is_origin(cell)
-            and _number_decimal(str(cell.get("value_text") or cell["text"]))
-            is not None
+            and _is_numeric_cell(str(cell.get("value_text") or cell["text"]))
         }
     )
     if numeric_header_rows:
@@ -1776,8 +1794,7 @@ def _emit_table(
             if (
                 row in numeric_header_rows
                 and cell["row_type"] == "header"
-                and _number_decimal(str(cell.get("value_text") or cell["text"]))
-                is None
+                and not _is_numeric_cell(str(cell.get("value_text") or cell["text"]))
             ):
                 raise ValueError(
                     f"numeric header row {row} has nonnumeric mapped value "
