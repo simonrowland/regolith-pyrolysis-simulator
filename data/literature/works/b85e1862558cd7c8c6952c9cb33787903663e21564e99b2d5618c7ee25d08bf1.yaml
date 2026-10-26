@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
     files:
+    - asset_id: pdf:kems-212-schneider-1980-nbsir-80-2059
+      role: pdf
+      path: raw/kems-212-schneider-1980-nbsir-80-2059/kems-212-schneider-1980-nbsir-80-2059.pdf
+      sha256:
+        tag: value
+        value: 08ef68ee74434a719eb7dad6bb8636ef97c7cecb1ac48919f6a8506e6ce683bb
+    - asset_id: pdftotext:kems-212-schneider-1980-nbsir-80-2059
+      role: pdftotext
+      path: text/kems-212-schneider-1980-nbsir-80-2059
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-212-schneider-1980-nbsir-80-2059
+      role: table_csv
+      path: tables/kems-212-schneider-1980-nbsir-80-2059
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-212-schneider-1980-nbsir-80-2059
       role: pdftotext
       path: unknown

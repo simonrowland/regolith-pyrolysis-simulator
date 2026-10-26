@@ -7,7 +7,7 @@ experiments: 5612
 queue size: 110337
 identical-payload dedupe aliases: 342
 metadata files: 48
-index sources: 439
+index sources: 443
 hard issues: 3567
 
 ## Spec vs measured

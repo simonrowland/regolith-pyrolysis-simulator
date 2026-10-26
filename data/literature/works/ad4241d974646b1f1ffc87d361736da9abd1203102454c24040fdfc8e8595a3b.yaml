@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
     files:
+    - asset_id: pdf:farber-1972-al2o3-suboxides
+      role: pdf
+      path: raw/farber-1972-al2o3-suboxides/farber-1972-al2o3-suboxides.pdf
+      sha256:
+        tag: value
+        value: 0ad9538a63da033dfcf98938fd1c3463978755f4928b9d83b3669bbf327bd140
+    - asset_id: pdftotext:farber-1972-al2o3-suboxides
+      role: pdftotext
+      path: text/farber-1972-al2o3-suboxides
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:farber-1972-al2o3-suboxides
       role: pdftotext
       path: unknown

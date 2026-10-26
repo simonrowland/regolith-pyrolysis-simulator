@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
     files:
+    - asset_id: pdf:ferguson-nuth-2012-sio-vapor-pressure-mixture
+      role: pdf
+      path: raw/ferguson-nuth-2012-sio-vapor-pressure-mixture/ferguson-nuth-2012-sio-vapor-pressure-mixture.pdf
+      sha256:
+        tag: value
+        value: eb91695c8283e2c96aade0f727511d7be2edc94f1f0a1832bf8ee8593174b7ba
+    - asset_id: pdftotext:ferguson-nuth-2012-sio-vapor-pressure-mixture
+      role: pdftotext
+      path: text/ferguson-nuth-2012-sio-vapor-pressure-mixture
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:ferguson-nuth-2012-sio-vapor-pressure-mixture
       role: pdftotext
       path: unknown

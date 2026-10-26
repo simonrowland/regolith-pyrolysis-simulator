@@ -8,9 +8,21 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
     files:
+    - asset_id: pdf:drowart-1960-al2o3-kems
+      role: pdf
+      path: raw/drowart-1960-al2o3-kems/drowart-1960-al2o3-kems.pdf
+      sha256:
+        tag: value
+        value: 71aaca0cf3157501a62f683415561abd39a1ab1abbafeb195acc595c4a4b88ff
+    - asset_id: pdftotext:drowart-1960-al2o3-kems
+      role: pdftotext
+      path: text/drowart-1960-al2o3-kems
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:drowart-1960-al2o3-kems
       role: pdftotext
       path: unknown
