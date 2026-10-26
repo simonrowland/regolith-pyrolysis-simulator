@@ -8243,7 +8243,7 @@ def test_candidate_census_splits_admitted_from_pending() -> None:
 def test_predict_success_path_does_not_hardcode_lineage_complete_false() -> None:
     from simulator.battery import score as score_mod
 
-    tree = ast.parse(inspect.getsource(score_mod.predict_with_engine))
+    tree = ast.parse(inspect.getsource(score_mod._predict_with_engine))
     produced_with_value = 0
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
