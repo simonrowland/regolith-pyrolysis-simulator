@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
+
+STAGE3_ROUTES = ('divert', 'through')
+STAGE3_BYPASS_SEGMENT_NAME = 'stage_2_to_stage_4_bypass'
+
 
 STAGE_KEY_BY_NUMBER: dict[int, str] = {
     1: 'stage_1_fe_condenser',
@@ -118,6 +124,18 @@ def designated_stage_number(species: str) -> int | None:
     return stage_number_for_destination(DESIGNATED_STAGE.get(species))
 
 
+def active_collector_stage_number(species: str, stage_numbers: Iterable[int]) -> int | None:
+    """First eligible physical collector at/after the designated stage.
+
+    Bypassing silica sends SiO toward Stage 4 under the existing allocation
+    law; its bypass wall therefore remains upstream of the active collector.
+    """
+    designated = designated_stage_number(species)
+    if designated is None:
+        return None
+    return min((number for number in stage_numbers if number >= designated), default=None)
+
+
 def accepted_species_for_stage_number(stage_number: int) -> frozenset[str]:
     """Species that may land in a stage without counting as impurity."""
 
@@ -166,3 +184,15 @@ def is_designated_for_stage(species: str, stage_number: int) -> bool:
     """True when species belongs to the stage's accepted-species set."""
 
     return species in accepted_species_for_stage_number(stage_number)
+
+
+STAGE3_PURITY_FIELDS = ("stage3_product_purity", "stage3_instantaneous_purity")
+
+
+def validate_stage3_purity(value, field):
+    """Mass fraction of SiO2 in SiO2 plus alkali-oxide contamination."""
+    from simulator.scalar_boundary import require_finite_float
+    purity = require_finite_float(value, field)
+    if not 0.0 < purity <= 1.0:
+        raise ValueError(f'{field} must be in (0, 1]')
+    return purity

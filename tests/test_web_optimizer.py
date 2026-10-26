@@ -2320,6 +2320,97 @@ def test_recipe_collision_reservation_is_atomic(tmp_path, monkeypatch) -> None:
     assert destination.read_text(encoding="utf-8") == "complete: true\n"
 
 
+def test_recipe_runtime_override_numeric_boundary_pin():
+    from web.routes import _recipe_inputs_from_controls
+    assert _recipe_inputs_from_controls({"runtime_campaign_overrides": {
+        "C4": {"hold_temp_C": "1600.125", "pO2_mbar": 0,
+               "max_hours": None, "ramp_rate": "",
+               "stage3_product_purity": "0.999", "stage3_instantaneous_purity": 0.99},
+    }}) == {"runtime_campaign_overrides": {
+        "C4": {"hold_temp_C": 1600.125, "pO2_mbar": 0.0,
+               "stage3_product_purity": 0.999, "stage3_instantaneous_purity": 0.99},
+    }}
+
+
+@pytest.mark.parametrize("value", [True, "bad", "nan", "inf", -1])
+@pytest.mark.parametrize("field", ["pO2_mbar", "hold_temp_C", "ramp_rate"])
+def test_recipe_runtime_override_numeric_error_pin(value, field):
+    from web.routes import _recipe_inputs_from_controls
+    from werkzeug.exceptions import BadRequest
+    with pytest.raises(BadRequest) as caught:
+        _recipe_inputs_from_controls({"runtime_campaign_overrides": {
+            "C4": {field: value},
+        }})
+    assert caught.value.description == (
+        f"controls.runtime_campaign_overrides.C4.{field} "
+        "must be a finite non-negative number"
+    )
+
+
+@pytest.mark.parametrize("field", ["stage3_product_purity", "stage3_instantaneous_purity"])
+@pytest.mark.parametrize(
+    ("value", "message"),
+    [
+        (0, "must be in (0, 1]"),
+        (1.0000001, "must be in (0, 1]"),
+        (1.5, "must be in (0, 1]"),
+        (True, "must be numeric"),
+        (float("nan"), "must be finite"),
+        ("not-a-number", "must be numeric"),
+    ],
+)
+def test_recipe_runtime_override_purity_refusal_is_qualified(field, value, message):
+    from web.routes import _recipe_inputs_from_controls
+    from werkzeug.exceptions import BadRequest
+
+    with pytest.raises(BadRequest) as caught:
+        _recipe_inputs_from_controls({"runtime_campaign_overrides": {
+            "C4": {field: value},
+        }})
+    assert caught.value.description == (
+        f"controls.runtime_campaign_overrides.C4.{field} {message}"
+    )
+
+
+@pytest.mark.parametrize("field", ["stage3_product_purity", "stage3_instantaneous_purity"])
+@pytest.mark.parametrize("value", [0.0001, 1.0])
+def test_recipe_runtime_override_purity_accepts_open_lower_and_closed_upper_end(field, value):
+    from web.routes import _recipe_inputs_from_controls
+
+    assert _recipe_inputs_from_controls({"runtime_campaign_overrides": {
+        "C4": {field: value},
+    }}) == {"runtime_campaign_overrides": {"C4": {field: value}}}
+
+
+@pytest.mark.parametrize("route", ["divert", "through", "garbage"])
+def test_recipe_capture_stage3_route(client, tmp_path, monkeypatch, route):
+    from web import events as web_events
+    monkeypatch.setattr(web_events, "recipe_save_context", lambda _sid: {})
+    client.application.config["RECIPE_LIBRARY_DIR"] = tmp_path / "recipes"
+    response = client.post("/recipes/save", json={
+        "title": "Route Recipe", "sid": "sid-1",
+        "setpoints_patch": {"furnace_max_T_C": 1800.0},
+        "controls": {
+            "feedstock": "lunar_mare_low_ti", "mass_kg": 1,
+            "backend": "internal-analytical", "track": "pyrolysis",
+            "runtime_campaign_overrides": {"C2A_staged": {"stage3_route": route}},
+        },
+    })
+    if route == "garbage":
+        assert response.status_code == 400
+        assert response.get_json()["error"] == (
+            "controls.runtime_campaign_overrides.C2A_staged.stage3_route "
+            "must be divert or through"
+        )
+        return
+    assert response.status_code == 200, response.get_json()
+    loaded = client.post("/recipes/load", json={"name": "route-recipe"})
+    assert loaded.status_code == 200, loaded.get_json()
+    assert loaded.get_json()["controls"]["runtime_campaign_overrides"] == {
+        "C2A_staged": {"stage3_route": route},
+    }
+
+
 def test_recipe_save_load_start_behavior_identity_uses_browser_controls(
     client,
     tmp_path,

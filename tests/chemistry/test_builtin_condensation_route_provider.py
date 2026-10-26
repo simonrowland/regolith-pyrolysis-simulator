@@ -326,6 +326,68 @@ def test_provider_declares_condensation_accounts():
     assert "process.cleaned_melt" not in profile.declared_accounts
 
 
+@pytest.mark.parametrize('species,oxide', [('Na', 'Na2O'), ('K', 'K2O')])
+@pytest.mark.parametrize('oxygen_available', [0.5, 0.0])
+def test_stage3_alkali_oxide_commit_uses_headspace_oxygen_only(
+    species, oxide, oxygen_available, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from dataclasses import replace
+
+    sim = _build_sim('lunar_mare_low_ti', vapor_pressure_data, feedstocks_data, setpoints_data)
+    mw = resolve_species_formula(species, sim.species_formula_registry).molar_mass_kg_per_mol()
+    request = _route_validation_request(sim, species=species, controls={
+        'condensed_kg': 2.0 * mw,
+        'stage3_reactive_alkali': {
+            'uptake_mol': 2.0, 'oxide_species': oxide,
+            'oxide_product_mol': 1.0, 'oxygen_debit_mol': 0.5,
+            'silica_partner': 'structural substrate/deposit; no SiO2 ledger debit',
+        },
+    })
+    request = replace(request, account_view=ProviderAccountView(
+        accounts={'process.overhead_gas': {species: 2.0, 'O2': oxygen_available}},
+        species_formula_registry=sim.species_formula_registry))
+    result = BuiltinCondensationRouteProvider().dispatch(request)
+    if oxygen_available == 0.0:
+        assert result.status == 'refused'
+        assert result.transition is None
+        return
+    proposal = result.transition
+    assert proposal.debits == {'process.overhead_gas': {species: 2.0, 'O2': 0.5}}
+    assert proposal.credits == {'process.condensation_train': {oxide: 1.0}}
+    assert all(abs(value) < 1e-12 for value in proposal.atom_balance_proof.values())
+    assert result.diagnostic['stage3_reactive_alkali']['silica_partner'].startswith('structural')
+
+
+@pytest.mark.parametrize('total_mol,reactive_mol,noop', [(1.0, 4e-14, False), (1e-10, 9e-11, True)])
+def test_subfloor_reactive_oxidant_preserves_ordinary_condensation(
+    total_mol, reactive_mol, noop, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from dataclasses import replace
+
+    sim = _build_sim('lunar_mare_low_ti', vapor_pressure_data, feedstocks_data, setpoints_data)
+    mw = resolve_species_formula('Na', sim.species_formula_registry).molar_mass_kg_per_mol()
+    request = _route_validation_request(sim, species='Na', controls={
+        'condensed_kg': total_mol * mw,
+        'stage3_reactive_alkali': {
+            'uptake_mol': reactive_mol, 'oxide_species': 'Na2O',
+            'oxide_product_mol': reactive_mol / 2, 'oxygen_debit_mol': reactive_mol / 4,
+        },
+    })
+    request = replace(request, account_view=ProviderAccountView(
+        accounts={'process.overhead_gas': {'Na': total_mol, 'O2': reactive_mol / 4}},
+        species_formula_registry=sim.species_formula_registry))
+    result = BuiltinCondensationRouteProvider().dispatch(request)
+    if noop:
+        assert result.transition is None
+        assert result.diagnostic['credited_condensed_kg'] == 0.0
+        return
+    assert result.transition.credits['process.condensation_train']['Na'] == pytest.approx(1.0)
+    assert 'Na2O' not in result.transition.credits['process.condensation_train']
+    assert 'O2' not in result.transition.debits['process.overhead_gas']
+    assert result.diagnostic['stage3_reactive_alkali']['committed_vapor_kg'] == 0.0
+    assert all(abs(value) < 1e-12 for value in result.transition.atom_balance_proof.values())
+
+
 def test_provider_refuses_primary_condensate_routed_back_to_overhead(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):

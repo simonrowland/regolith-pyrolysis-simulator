@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from simulator.condensation_routing import STAGE3_ROUTES, STAGE3_PURITY_FIELDS
+
 import copy
 from dataclasses import dataclass, field, replace
 from functools import lru_cache
@@ -243,6 +245,7 @@ C2A_STAGED_STAGE_GAS_FIELDS: tuple[str, ...] = (
     "pO2_mbar",
     "p_total_mbar",
     "gas_cover_mode",
+    "stage3_route",
 )
 C2A_STAGED_STAGE_METADATA_FIELDS: frozenset[str] = frozenset(
     ("target_species", "endpoint", "verification")
@@ -445,6 +448,11 @@ def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
     prefix = f"campaigns.C2A_staged.stages.{stage_name}"
     return (
         _knob(
+            f"{prefix}.stage3_route", "categorical",
+            choices=STAGE3_ROUTES,
+            bounds_source="physical Stage-3 diverter command",
+        ),
+        _knob(
             f"{prefix}.pO2_mbar",
             low=0.0,
             high=15.0,
@@ -568,6 +576,18 @@ class RecipeSchema:
     )
 
     ALLOWLIST: tuple[KnobSpec, ...] = (
+        *(_knob(f"condensation_train.{field}", low=0.0, high=1.0,
+                bounds_source="owner d-279 purity mass fraction; (0, 1]",
+                search_enabled=False) for field in STAGE3_PURITY_FIELDS),
+        *(_knob(
+            f"campaigns.{phase}.stage3_route", "categorical",
+            choices=STAGE3_ROUTES,
+            search_enabled=False,
+            bounds_source="physical Stage-3 diverter command",
+        ) for phase in (
+            "C0", "C0b_p_cleanup", "C2A_continuous", "C2A_staged",
+            "C2B", "C3", "C3.Na_phase", "C3.K_phase", "C4", "C5", "C6",
+        )),
         _knob(
             "furnace_max_T_C",
             low=FURNACE_MAX_T_BOUNDS_C[0],
@@ -2775,6 +2795,13 @@ def _default_setpoint_value(path: KeyPath) -> Any:
 
 
 def _validate_value(spec: KnobSpec, value: Any, schema: RecipeSchema) -> None:
+    if spec.path[-1] in STAGE3_PURITY_FIELDS:
+        from simulator.condensation_routing import validate_stage3_purity
+        try:
+            validate_stage3_purity(value, spec.path[-1])
+        except ValueError as exc:
+            raise RecipeValidationError(str(exc)) from exc
+
     if spec.kind == "categorical":
         if not isinstance(value, str):
             raise RecipeValidationError(

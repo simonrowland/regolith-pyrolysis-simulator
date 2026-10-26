@@ -33,10 +33,12 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     # C3 leaves C0.temp_range_C and the C2A early-ramp path in the full
     # allowlist but disables both for search; this changes conditional subspace
     # dimensions and derived digests.
+    # d-268 chunk 3 adds explicit route commands; four existing staged intervals
+    # expose the diverter to search. Receiver accounting remains a later chunk.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "d9712e60baa51f93b8ad62fb4317697ab9fdda5d24f38bdea14f47d06661e811"
+        "d35c97cc003f47f4aa7e2d7f1fcfd7eb860330d3003b03c7ba8309285718c6c0"
     )
-    assert digest == "afa70b858622d530fd2050d744827dbfd1ff58484edaf01f98a6b2438c558eb7"
+    assert digest == "c48fcc639c138598b568b51b86d21bf4d409ff5341d6acaf0a594470375b59e3"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
@@ -51,4 +53,4 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
         for path in paths
         for prefix in forbidden_future_prefixes
     )
-    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [59, 65]
+    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [63, 69]
