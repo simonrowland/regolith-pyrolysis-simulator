@@ -94,14 +94,9 @@ class EvidenceRow:
     scoring for the production melt carrier.
 
     ``alpha`` is the numeric pin this table uses for band-coverage checks.
-    When the named ``(source_id, observation_id)`` carries a scalar, or a
-    well-defined range mid, that is the usual source. It is not always a
-    same-observation extract pin: the SiO Fedkin Langmuir placeholder
-    ``fedkin_2006_sio_hashimoto_langmuir_table3`` stores 0.17 here while
-    its named extract row has ``values.alpha is None`` (the 0.17 scalar
-    lives on the same-source ``complete_b1`` observation and the declared
-    mirror). Fence rows may omit it. Band coverage for comparable
-    non-fence rows with a numeric alpha is enforced by
+    It comes from the named observation or a declared measurement mirror.
+    Fence rows may omit it. Band coverage for comparable non-fence rows with
+    a numeric alpha is enforced by
     :func:`assert_evidence_rows_present`.
     """
 
@@ -177,20 +172,6 @@ _SIO_EVIDENCE: tuple[EvidenceRow, ...] = (
         alpha=math.sqrt(0.003 * 0.036),
     ),
     EvidenceRow(
-        source_id="kems-005-fedkin-2006",
-        observation_id="fedkin_2006_sio_hashimoto_langmuir_table3",
-        species="SiO",
-        system_class="silicate_melt",
-        transformation_class="network_former_dissociation",
-        alpha_note="Hashimoto Langmuir series 0.12-0.21",
-        comparable=True,
-        role="grounding",
-        # 0.17 is Fedkin Table 3 SiO at 2073 K (per-T 0.12/0.17/0.20/0.21
-        # at 1973–2273 K). Named observation values.alpha is None (OCR
-        # placeholder); the per-temperature series carries this value.
-        alpha=0.17,
-    ),
-    EvidenceRow(
         source_id="kems-037-richter-2002",
         observation_id="richter_2002_sio_cai_langmuir_gamma",
         species="SiO",
@@ -225,28 +206,6 @@ _REDOX_EVIDENCE: tuple[EvidenceRow, ...] = (
         comparable=True,
         role="grounding",
         alpha=0.01978,
-    ),
-    EvidenceRow(
-        source_id="kems-005-fedkin-2006",
-        observation_id="fedkin_2006_fe_hashimoto_langmuir_table3",
-        species="Fe",
-        system_class="silicate_melt",
-        transformation_class="redox_reduction_required",
-        alpha_note="0.24 Langmuir free-evap",
-        comparable=True,
-        role="grounding",
-        alpha=0.24,
-    ),
-    EvidenceRow(
-        source_id="kems-005-fedkin-2006",
-        observation_id="fedkin_2006_mg_hashimoto_langmuir_table3",
-        species="Mg",
-        system_class="silicate_melt",
-        transformation_class="redox_reduction_required",
-        alpha_note="0.24",
-        comparable=True,
-        role="grounding",
-        alpha=0.24,
     ),
     EvidenceRow(
         source_id="kems-037-richter-2002",
@@ -382,48 +341,18 @@ _MARKED_IDEAL_FENCES: tuple[EvidenceRow, ...] = (
 
 
 # ---------------------------------------------------------------------------
-# Class centrals derived from comparable rows (P0 b-153)
+# Fixed diagnostic class priors. Evidence rows below define current comparables;
+# context-only fit outputs do not enter evidence or residual-band coverage.
 # ---------------------------------------------------------------------------
 #
-# silicate_melt_cation_redox — recompute from comparable grounding alphas.
-# Pilot/kems mirrors of the same measurement are collapsed to one pole:
-#
-#   Costa Fe olivine KEMS (1753.84 K figure point):                 0.01978
-#   Fedkin Fe Hashimoto Langmuir (fedkin_2006_fe… / table3_fe…):  0.24
-#   Fedkin Mg Hashimoto (kems 0.24 + table3 0.27) → √(0.24·0.27): 0.254558
-#   Richter Mg CAI γ (richter_2002_mg…):                          0.04
-#
-# gmean = exp(mean(ln α_i))
-#       = exp( (ln 0.01978 + ln 0.24 + ln √(0.24·0.27) + ln 0.04) / 4 )
-#       = 0.083382…  → class central 0.083 (3 s.f.)
-#
-# Cross-check: Fe-pole-only gmean √(0.01978·0.24) = 0.0689, which alone already
-# refutes the prior 0.10 central. Full-class gmean is used (not Fe-only).
-#
-# Band: every grounded α ∈ {0.01978, 0.24, 0.27, 0.04} must lie in
-#   [α_c · 10^{-σ}, α_c · 10^{+σ}].
-#   max_i |log10(α_i / 0.083)| = |log10(0.01978/0.083)| ≈ 0.623 → residual 0.63 dex.
-#   Programme 0.5-dex pin is a floor, not a ceiling. Fe poles 0.01978 and 0.24
-#   differ by log10(0.24/0.01978) = 1.084 dex, but those two rows also differ in
-#   condensed phase (solid_solution_olivine / kems_effusion vs silicate_melt /
-#   langmuir_free_evaporation), material, and T window (Costa ~1700–1800 K
-#   vs Fedkin 1973–2273 K). This comment block does not isolate Motzfeldt
-#   geometry as the cause of that spread: Costa's extract records a
-#   Whitman–Motzfeld multi-cell path with missing numeric orifices; Fedkin
-#   is free-evaporation (not Knudsen). Residual 0.63 dex is coverage of the
-#   stored poles, not a Motzfeldt-corrected split. A unique-cause
-#   decomposition of the Fe spread is unestablished here.
-#
-# Unit check: α dimensionless; gmean and 10^{±σ} dimensionless. ✔
-# Limiting cases: σ→0 collapses to a point estimate (false precision here);
-# σ ≥ half-span of log poles is the minimum honest band.
+# The prior values are retained as diagnostics; the extracted Table 3 fit
+# outputs are context, not observations that establish or cover these priors.
 
 _REDOX_CENTRAL_ALPHA: Final[float] = 0.083
 _REDOX_RESIDUAL_DEX: Final[float] = 0.63
 
-# SiO-class: keep rail prior_scalar 0.04 as central; residual widens so every
-# stored comparable numeric pin (Costa log-mid ~0.0104, Fedkin 0.17) is covered.
-# max |log10(α/0.04)| over {0.010392, 0.17} ≈ 0.628 → 0.63 dex.
+# SiO-class: keep rail prior_scalar 0.04 as central. The diagnostic residual
+# remains a conservative prior; current comparable evidence is the Costa band.
 _SIO_RESIDUAL_DEX: Final[float] = 0.63
 
 # Na/K: 0.30 is a programme central, not a log-middle of the stored poles.
@@ -451,8 +380,8 @@ EVAPORATION_CLASSES: Final[dict[str, EvaporationClass]] = {
         species=("SiO", "Si", "Si2", "Si3", "SiO2_gas"),
         evidence=_SIO_EVIDENCE,
         notes=(
-            "Central matches rail prior_scalar on SiO. Residual 0.63 dex covers "
-            "Costa log-mid (~0.010) through Fedkin Langmuir mid (0.17). Wetzel "
+            "Central matches rail prior_scalar on SiO. Fedkin Table 3 fit "
+            "outputs remain extract context, not comparable evidence. Wetzel "
             "growth form is a fence (solid_film_growth)."
         ),
     ),

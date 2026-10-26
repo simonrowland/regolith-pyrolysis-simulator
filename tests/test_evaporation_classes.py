@@ -275,26 +275,7 @@ def test_consolidated_duplicate_evidence_alpha_values_stay_pinned():
         *evaporation_classes._MODIFIER_EVIDENCE,
         *evaporation_classes._MARKED_IDEAL_FENCES,
     )
-    owner_extract = yaml.safe_load(
-        (Path(__file__).parents[1] / "data/literature/extracts/kems-005-fedkin-2006.yaml")
-        .read_text(encoding="utf-8")
-    )
-    mg_table3 = next(
-        row
-        for row in owner_extract["species"]["Fe"]["context"]
-        if row["observation_id"] == "fedkin_2006_table3_hashimoto_fit_outputs"
-    )
-    mg_owner = next(
-        row
-        for row in mg_table3["values"]
-        if row["source_observation_id"] == "fedkin_2006_mg_hashimoto_langmuir_table3"
-    )
-    # Table 3, published p. 212: first Mg cell is the printed 1973 K value.
-    assert mg_owner["temperature_values"][0]["alpha"] == 0.24
     targets = {
-        ("kems-005-fedkin-2006", "fedkin_2006_sio_hashimoto_langmuir_table3"): 0.17,
-        ("kems-005-fedkin-2006", "fedkin_2006_fe_hashimoto_langmuir_table3"): 0.24,
-        ("kems-005-fedkin-2006", "fedkin_2006_mg_hashimoto_langmuir_table3"): 0.24,
         ("kems-005-fedkin-2006", "fedkin_2006_na_yu_langmuir"): 0.26,
         ("kems-005-fedkin-2006", "fedkin_2006_k_yu_langmuir"): 0.13,
         ("kems-012-sossi-2019", "sossi_2019_na_alpha_e_authors_adopted_unity"): 1.0,
@@ -303,3 +284,28 @@ def test_consolidated_duplicate_evidence_alpha_values_stay_pinned():
     actual = {(row.source_id, row.observation_id): row.alpha for row in rows
               if (row.source_id, row.observation_id) in targets}
     assert actual == targets
+
+
+def test_fedkin_table3_fit_outputs_are_not_class_grounding():
+    owner_extract = yaml.safe_load(
+        (Path(__file__).parents[1] / "data/literature/extracts/kems-005-fedkin-2006.yaml")
+        .read_text(encoding="utf-8")
+    )
+    table3 = next(
+        row
+        for row in owner_extract["species"]["Fe"]["context"]
+        if row["observation_id"] == "fedkin_2006_table3_hashimoto_fit_outputs"
+    )
+    table3_observation_ids = {
+        value["source_observation_id"] for value in table3["values"]
+    }
+    class_grounding_ids = {
+        row.observation_id
+        for cls in EVAPORATION_CLASSES.values()
+        for row in cls.evidence
+        if row.source_id == "kems-005-fedkin-2006"
+        and row.comparable
+        and row.role == "grounding"
+    }
+
+    assert table3_observation_ids.isdisjoint(class_grounding_ids)
