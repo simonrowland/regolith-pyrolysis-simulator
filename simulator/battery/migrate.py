@@ -4378,12 +4378,24 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
     return None, None
 
 
+def _has_printed_initial_series_start(role: str | None, values: object) -> bool:
+    """The declared initial charge supplies points in its printed series."""
+
+    return (
+        role == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        and isinstance(values, Mapping)
+        and isinstance(values.get("series"), list)
+        and bool(values["series"])
+    )
+
+
 def _initial_charge_only_missing_composition(
     identity: Identity,
     point_conditions: Mapping[str, Located[Any]] | None,
     notices: Sequence[Notice],
     *,
     role: str | None,
+    printed_series_start: bool,
     quantity: Quantity | None,
     quantity_as_printed: object,
     locator: Locator | None,
@@ -4391,6 +4403,7 @@ def _initial_charge_only_missing_composition(
 ) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
     if (
         role != INITIAL_CHARGE_ONLY_PROXY_FLAG
+        or printed_series_start
         or quantity in {
             Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
             Quantity.RESIDUE_COMPONENT_COMPOSITION,
@@ -18100,6 +18113,9 @@ class Migrator:
                 point_conditions,
                 observation_notices,
                 role=composition_role,
+                printed_series_start=_has_printed_initial_series_start(
+                    composition_role, values
+                ),
                 quantity=q_token,
                 quantity_as_printed=values.get("quantity"),
                 locator=locator,
@@ -19761,6 +19777,9 @@ class Migrator:
                 point_conditions,
                 child_notices,
                 role=point_composition_role,
+                printed_series_start=_has_printed_initial_series_start(
+                    point_composition_role, parent_values
+                ),
                 quantity=q_token_point,
                 quantity_as_printed=(
                     raw_item.get("quantity")
