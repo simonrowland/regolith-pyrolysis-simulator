@@ -8361,6 +8361,119 @@ def test_complete_ancestry_outputs_are_pinned() -> None:
     assert _compile_redox(calibration)[0].source_relation is SourceRelation.TRAINING
 
 
+def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes() -> None:
+    """A scoring snapshot reuses a shared parent without changing decisions."""
+
+    from simulator.battery.records import Derivation
+    from simulator.battery.validate import (
+        _resolve_coefficient_sources,
+        bound_work_inputs,
+    )
+
+    work = F.work("lineage-cache-work")
+    experiment = F.tabulation_experiment(
+        experiment_id="lineage-cache-exp", work_id=work.work_id
+    )
+    rows = [
+        F.observation(
+            "lineage-cache-0",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="janaf-4th",
+        )
+    ]
+    for index in range(1, 4):
+        parent = rows[-1]
+        rows.append(
+            F.observation(
+                f"lineage-cache-{index}",
+                experiment.experiment_id,
+                F.o2_identity(),
+                Decimal("0"),
+                evidence=EvidenceClass.MEASURED_REDUCED,
+                source_id="janaf-4th",
+                derived_from=(parent.observation_id,),
+                derivation=Derivation(
+                    relation="reduced from the preceding printed row",
+                    inputs=(parent.observation_id,),
+                    parameters=(),
+                    output_unit="kJ/mol",
+                ),
+            )
+        )
+
+    class CountingObservations(dict):
+        def __init__(self, values):
+            super().__init__(values)
+            self.lineage_lookups = 0
+
+        def get(self, key, default=None):
+            self.lineage_lookups += 1
+            return super().get(key, default)
+
+    observations = CountingObservations(
+        {row.observation_id: row for row in rows}
+    )
+    works = {work.work_id: work}
+    experiments = {experiment.experiment_id: experiment}
+    baseline = _resolve_coefficient_sources(
+        (work.work_id,), observations, works, experiments
+    )
+    assert baseline.complete and baseline.ids is not None
+    for _ in range(3):
+        assert (
+            _resolve_coefficient_sources(
+                (work.work_id,), observations, works, experiments
+            )
+            == baseline
+        )
+    uncached_lookups = observations.lineage_lookups
+
+    observations.lineage_lookups = 0
+    context = replace(_context(work, experiment, *rows), observations=observations)
+    reference = rows[-1]
+    prediction = _predict(
+        Decimal("0"), reference.identity, coefficient_sources=(work.work_id,)
+    )
+    residual_without_cache, candidate_without_cache = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+        comparison_ids={reference.observation_id},
+    )
+    residual_line_without_cache = dumps_residual_line(
+        residual_without_cache, candidate_without_cache
+    )
+
+    observations.lineage_lookups = 0
+    with bound_work_inputs(works, observations, experiments):
+        cached_results = [
+            _resolve_coefficient_sources(
+                (work.work_id,), observations, works, experiments
+            )
+            for _ in range(4)
+        ]
+        cached_lookups = observations.lineage_lookups
+        residual_with_cache, candidate_with_cache = compile_residual(
+            reference,
+            Engine.INTERNAL_ANALYTICAL,
+            context=context,
+            prediction=prediction,
+            comparison_ids={reference.observation_id},
+        )
+
+    assert cached_results == [baseline] * 4
+    assert uncached_lookups == 40
+    assert cached_lookups == 10
+    assert cached_lookups < uncached_lookups
+    assert dumps_residual_line(
+        residual_with_cache, candidate_with_cache
+    ) == residual_line_without_cache
+
+
 def _alias_fixture(prefix: str):
     work = replace(
         F.work(f"{prefix}-work"),
