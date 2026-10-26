@@ -194,10 +194,16 @@ def test_projection_is_read_only_and_commits_the_same_signed_amounts():
         assert not hasattr(trial, 'cost_ledger')
         assert not hasattr(trial, '_chem_kernel')
         sim._reaction_pO2_bar = solved.reaction_pO2_bar
+        # Match core.step's accepted context, retaining subfloor eligible
+        # channels and the same finite settlement/route plan as the projection.
+        sim._frozen_evaporation_carriers = trial.frozen_carriers
         sim._get_equilibrium()
         start = len(sim.atom_ledger.transitions)
         stored = sim.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
-        sim._apply_evaporation_carrier_batch(flux)
+        sim._apply_evaporation_carrier_batch(flux,
+            oxygen_uptake_capacity_mol=trial.oxygen_uptake_capacity_mol,
+            oxygen_release_capacity_mol=trial.oxygen_release_capacity_mol,
+            prepared_route=trial.route_plan)
         actual = sim._evaporation_signed_amounts(start, stored)
         sim._verify_evaporation_projection(predicted, actual)
         # Net source equals actual gas accumulation; finite stored oxygen and
@@ -354,7 +360,7 @@ def test_fixed_admission_preserves_subfloor_carrier_and_oxygen_legs():
 
 
 @pytest.mark.parametrize('disabled_p4', (False, True))
-def test_cold_admission_jump_accepts_zero_and_flags_positive_side_limit(disabled_p4, monkeypatch):
+def test_cold_inverse_sources_are_eligible_without_seed_flow(disabled_p4, monkeypatch):
     sim = simulation('lunar_mare_low_ti', 'C0')
     try:
         # Hour three of the existing C0 ramp formerly jumped across the P4
@@ -368,18 +374,15 @@ def test_cold_admission_jump_accepts_zero_and_flags_positive_side_limit(disabled
         sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
         solved = sim._solve_evaporative_oxygen_boundary()
         projected = solved.payload[2]
-        assert projected.frozen_carriers == frozenset()
-        assert solved.reaction_pO2_bar == 0.0
-        assert not any(solved.balance_terms)
-        admitted = {item['species'] for item in projected.carrier_admission_flips
-                    if item['direction'] == 'admitted'}
-        assert ('P4' in admitted) is not disabled_p4
-        assert ('P2' in admitted) is disabled_p4
-        # Si3's seed pressure is positive but its HK rate underflows. Its
-        # stronger inverse power still dominates Si2 in the exact limit.
-        assert 'Si3' in admitted and 'Si2' not in admitted
-        assert any('carrier admission flips at the solved surface oxygen; frozen-set solution used'
-                   in notice for notice in projected.carrier_admission_notices)
+        # Inventory and executable inverse-source contracts survive the zero
+        # seed flux. Their finite positive-side depletion closes above zero.
+        assert {'P4O6', 'SiO', 'Si2', 'Si3'} <= projected.frozen_carriers
+        assert solved.reaction_pO2_bar > 0.0
+        assert solved.source_terms_mol_m2_s['P4O6'] > 0.0
+        gross = math.fsum(abs(value) for value in solved.balance_terms)
+        assert abs(solved.residual) / gross < math.sqrt(math.ulp(1.0))
+        if disabled_p4:
+            assert solved.payload[0].species_kg_hr.get('P4', 0.0) == 0.0
     finally:
         close_test_owned_magemin_backend(sim)
 
