@@ -159,7 +159,7 @@ def test_run_scoring_arm_reopens_dead_backend_after_worker_death(
             assert self.live
             return EquilibriumResult(
                 liquid_fraction=1.0,
-                melt_activities={"SiO2": 0.5},
+                activity_coefficients={"SiO2": 0.5},
             )
 
         def close(self) -> None:
@@ -212,7 +212,7 @@ def test_run_scoring_arm_reopens_dead_backend_after_worker_death(
         why="test dead worker recovery",
     )
 
-    report = run_scoring_arm(
+    report = scoring.run_scoring_arm(
         engine_names=("fake",), pots=(pot,), extract_paths=()
     )
 
