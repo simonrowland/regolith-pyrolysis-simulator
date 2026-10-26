@@ -55,6 +55,7 @@ from simulator.state import (
 )
 from simulator.vapour_rail.batch import (
     _carrier_numerical_floor,
+    _oxygen_coproduct_enters_gas,
     FLUX_ACTIVATION_EPOCH_PRE_RG,
     FluxActivationContext,
 )
@@ -3758,8 +3759,7 @@ class EvaporationMixin:
             )
             if (
                 o2_kg_hr < 0.0
-                or vapor_oxygen_atoms > 0.0
-                or oxygen_destination == 'process.overhead_gas'
+                or _oxygen_coproduct_enters_gas(oxygen_destination, vapor_oxygen_atoms)
             ):
                 source_mol_hr['O2'] = (
                     source_mol_hr.get('O2', 0.0)

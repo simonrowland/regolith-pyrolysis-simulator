@@ -44,7 +44,7 @@ from __future__ import annotations
 
 import math
 import warnings as runtime_warnings
-from simulator.vapour_rail.batch import _carrier_pressure_floor
+from simulator.vapour_rail.batch import _carrier_pressure_floor, _oxygen_coproduct_enters_gas
 
 from collections.abc import Mapping
 from dataclasses import replace
@@ -2671,6 +2671,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         # re-enters this module during package init -- see
         # engines/builtin/__init__.py for the cycle description.
         from simulator.state import GAS_CONSTANT
+        from simulator.accounting.formulas import parse_formula
         from simulator.vapour_rail.channels import (
             REACTION_PLANE_MELT_INTERFACE,
             channel_linear_mass_action_factor,
@@ -3895,7 +3896,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 evaluator_pO2_bar = transport_pO2_bar
                 if (compiled_evaluator.oxygen_fugacity_channel == "intrinsic_melt"
-                        and compiled_evaluator.pO2_exponent < 0.0):
+                        and compiled_evaluator.pO2_exponent < 0.0
+                        and not _oxygen_coproduct_enters_gas(
+                            str(data.get('oxygen_destination') or ''),
+                            float(parse_formula(compiled_species.formula).elements.get('O', 0.0)))):
+                    # The channel declaration alone is insufficient: PO/PO2
+                    # carry a gas coproduct despite the legacy intrinsic label.
+                    # Only retained coproduct has dn_gas=0 and is independent
+                    # of the film's surface oxygen coordinate.
                     evaluator_pO2_bar = melt_dissociation_pO2_bar
                 evaluation = compiled_evaluator.evaluate(
                     T_K,
