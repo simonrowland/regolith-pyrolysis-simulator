@@ -126,7 +126,8 @@ def _materialize_refusal_snapshot_history(
     snapshot owner's copied mutable tail, then release the rollback memo.
     """
     for owner, field in ((state.get('record'), 'snapshots'),
-                         (state.get('_condensation_model'), 'operating_history')):
+                         (state.get('_condensation_model'), 'operating_history'),
+                         (state.get('_condensation_model'), 'cold_spot_history')):
         history = getattr(owner, field, None)
         if isinstance(history, _RefusalSnapshotHistoryPrefix):
             setattr(owner, field, history.materialize() if copy_committed_rows else list(history))
@@ -14180,23 +14181,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 record_snapshots,
                 memo,
             )
-        operating_history = getattr(
-            getattr(self, '_condensation_model', None), 'operating_history', None,
-        )
-        if defer_committed_history and isinstance(operating_history, list):
-            from simulator.trace import _freeze_value
+        for field, mutable_tail in (('operating_history', 1), ('cold_spot_history', 0)):
+            history = getattr(getattr(self, '_condensation_model', None), field, None)
+            if defer_committed_history and isinstance(history, list):
+                from simulator.trace import _freeze_value
 
-            # Only the tail may change. Freeze each newly committed row once,
-            # detaching nested aliases; stop at the already frozen prefix. Thus
-            # ordinary hourly append costs O(1) rows, and prefix writes refuse
-            # instead of contaminating a later terminal-refusal rollback.
-            for index in range(len(operating_history) - 2, -1, -1):
-                if isinstance(operating_history[index], MappingProxyType):
-                    break
-                operating_history[index] = _freeze_value(operating_history[index])
-            memo[id(operating_history)] = _RefusalSnapshotHistoryPrefix(
-                operating_history, memo, mutable_tail=1,
-            )
+                # Operating conditions can edit their last row; cold-spot
+                # diagnostics only append. Freeze each new committed row once,
+                # then reuse the existing deferred prefix for both histories.
+                # This removes O(hours) recursive work from each pressure trial
+                # while rollback still detaches the full history on refusal.
+                for index in range(len(history) - mutable_tail - 1, -1, -1):
+                    if isinstance(history[index], MappingProxyType):
+                        break
+                    history[index] = _freeze_value(history[index])
+                memo[id(history)] = _RefusalSnapshotHistoryPrefix(
+                    history, memo, mutable_tail=mutable_tail,
+                )
         state_source = {
             name: value
             for name, value in self.__dict__.items()
@@ -14316,6 +14317,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(
                 terminal_refusal_state.get('_condensation_model'),
                 'operating_history', None,
+            ),
+            getattr(
+                terminal_refusal_state.get('_condensation_model'),
+                'cold_spot_history', None,
             ),
         )
         try:
