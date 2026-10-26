@@ -4,9 +4,11 @@ from copy import deepcopy
 from dataclasses import replace
 import builtins
 import errno
+import multiprocessing.process
 import subprocess
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import pytest
 
@@ -55,6 +57,8 @@ def _sim(provider, vapor_pressure_data, feedstocks_data, setpoints_data):
 
 
 def _injected_launch_exception(name):
+    if name == 'OSError':
+        return OSError(errno.EMFILE, 'injected launch failure')
     if name == 'TimeoutExpired':
         return subprocess.TimeoutExpired('/fake/MAGEMin', 1.0)
     if name == 'CalledProcessError':
@@ -115,6 +119,94 @@ def _warm_magemin_launch_failure_pool(backend, exception_name):
         )
 
     return EngineWorkerPool(worker_factory, size=1)
+
+
+def _warm_magemin_respawn_pool(backend):
+    def worker_factory(index):
+        return WarmEngineWorker(
+            name=f'MAGEMin respawn failure slot {index}',
+            bootstrap=_bootstrap_magemin_subprocess_worker,
+            handler=_handle_magemin_subprocess_request,
+            bootstrap_args=(
+                str(backend._binary_path), backend._database, backend._config,
+            ),
+            startup_timeout_s=30.0,
+            call_timeout_s=30.0,
+        )
+
+    return EngineWorkerPool(worker_factory, size=1)
+
+
+@pytest.mark.parametrize('exception_name', [
+    'OSError', 'BlockingIOError', 'MemoryError', 'SubprocessError',
+])
+def test_magemin_warm_worker_respawn_environment_errors_are_typed_refusals(
+    exception_name, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+    backend = MAGEMinBackend()
+    assert backend.initialize({'warm_worker': False})
+    backend._subprocess_pool = _warm_magemin_respawn_pool(backend)
+    backend._subprocess_pool.workers[0].close()
+    provider._backend = backend
+    provider._backend_initialised = True
+    attempts = []
+
+    def fail_start(_process):
+        attempts.append(True)
+        raise _injected_launch_exception(exception_name)
+
+    before = sim.atom_ledger.mol_by_account()
+    try:
+        with patch.object(multiprocessing.process.BaseProcess, 'start', fail_start):
+            with pytest.raises(EvaporationFluxRefusal) as error:
+                sim._melt_redox_liquidus_gate_curve()
+
+        diagnostic = error.value.diagnostic['provider_diagnostic'][
+            'backend_diagnostics'
+        ]['projected_liquidus_diagnostics']
+        assert diagnostic['backend_failure_exception'] == exception_name
+        assert diagnostic['backend_failure_disposition'] == 'environment'
+        assert error.value.diagnostic['reason'] == 'liquid_fraction_provider_failed'
+        assert attempts
+        assert sim.atom_ledger.mol_by_account() == before
+    finally:
+        try:
+            backend.close()
+        except EngineWorkerTimeout:
+            # The injected Process.start failure leaves the pool's normal
+            # shutdown path to report its own hard timeout; the test records
+            # the gate outcome above, as the review probe does.
+            pass
+
+
+def test_magemin_warm_worker_respawn_programming_error_propagates(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+    backend = MAGEMinBackend()
+    assert backend.initialize({'warm_worker': False})
+    backend._subprocess_pool = _warm_magemin_respawn_pool(backend)
+    backend._subprocess_pool.workers[0].close()
+    provider._backend = backend
+    provider._backend_initialised = True
+
+    def fail_start(_process):
+        raise TypeError('injected programming error')
+
+    try:
+        with patch.object(multiprocessing.process.BaseProcess, 'start', fail_start):
+            with pytest.raises(TypeError, match='injected programming error'):
+                sim._melt_redox_liquidus_gate_curve()
+    finally:
+        try:
+            backend.close()
+        except EngineWorkerTimeout:
+            pass
 
 
 @pytest.mark.parametrize('value', ['auto', 'alphamelts', '', None, True, 1])
