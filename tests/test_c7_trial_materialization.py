@@ -11,6 +11,107 @@ from tests.magemin_test_support import close_test_owned_magemin_backend
 pytestmark = [pytest.mark.serial, pytest.mark.xdist_group('serial')]
 
 
+@pytest.mark.parametrize('frontier', ('snapshot', 'ledger', 'history', 'notice', 'observer'))
+def test_pressure_evaluation_has_no_write_frontier(monkeypatch, frontier):
+    from simulator.accounting.ledger import AtomLedger
+    from simulator.condensation import CondensationModel
+    from simulator.core import PyrolysisSimulator
+    from simulator.chemistry import langmuir_knudsen
+
+    sim = simulation()
+    targets = {
+        'snapshot': (PyrolysisSimulator, '_snapshot_terminal_refusal_hour_state'),
+        'ledger': (AtomLedger, 'apply'),
+        'history': (CondensationModel, 'configure_operating_conditions'),
+        'notice': (PyrolysisSimulator, '_record_degraded_path_engagement'),
+        'observer': (PyrolysisSimulator, '_commit_proposal'),
+    }
+    solve = langmuir_knudsen._solve_surface_oxygen_balance
+
+    def checked_solve(evaluate, **kwargs):
+        def checked(excess, **options):
+            with monkeypatch.context() as guard:
+                owner, name = targets[frontier]
+                guard.setattr(owner, name, lambda *a, **k: pytest.fail(
+                    f'pressure evaluation crossed {frontier} write frontier'))
+                return evaluate(excess, **options)
+        return solve(checked, **kwargs)
+
+    monkeypatch.setattr(langmuir_knudsen, '_solve_surface_oxygen_balance', checked_solve)
+    try:
+        sim.melt.temperature_C = 1600.0
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+        sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        sim._solve_evaporative_oxygen_boundary()
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
+def test_pressure_evaluation_order_and_failure_leave_no_state(monkeypatch):
+    from copy import deepcopy
+    from simulator.chemistry import langmuir_knudsen
+
+    sim = simulation()
+    solve = langmuir_knudsen._solve_surface_oxygen_balance
+
+    def receipt():
+        return deepcopy((sim.atom_ledger.mol_by_account(), sim.atom_ledger.transitions,
+                         sim.cost_ledger.__dict__, sim.melt, sim.train,
+                         sim.condensation_model.operating_history,
+                         sim.condensation_model.cold_spot_history,
+                         getattr(sim, '_degraded_path_engagement', {})))
+
+    def checked_solve(evaluate, **kwargs):
+        before = receipt()
+        first = evaluate(1e-7)
+        evaluate(1e-5)
+        with pytest.raises((ValueError, RuntimeError)):
+            evaluate(float('nan'))
+        repeated = evaluate(1e-7)
+        assert first.balance_terms == repeated.balance_terms
+        assert first.payload[1] == repeated.payload[1]
+        assert receipt() == before
+        return solve(evaluate, **kwargs)
+
+    monkeypatch.setattr(langmuir_knudsen, '_solve_surface_oxygen_balance', checked_solve)
+    try:
+        sim.melt.temperature_C = 1600.0
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+        sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        sim._solve_evaporative_oxygen_boundary()
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
+def test_nonzero_cro2_condensation_returns_gas_oxygen():
+    from simulator.state import EvaporationFlux
+
+    sim = simulation('s_type_asteroid_silicate')
+    try:
+        sim.melt.temperature_C = 1600.0
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+        sim.atom_ledger.load_external_mol('process.overhead_gas', {'O2': 1.0},
+            material_origin='feedstock', source='CrO2 condensation pin')
+        sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        sim._reaction_pO2_bar = 0.013
+        sim._frozen_evaporation_carriers = frozenset({'CrO2'})
+        flux = EvaporationFlux(species_kg_hr={'CrO2': 0.001})
+        flux.update_totals()
+        start = len(sim.atom_ledger.transitions)
+        sim._apply_evaporation_carrier_batch(flux)
+        returns = [sim._transition_species_mol(transition, side='credits',
+                    account='process.overhead_gas', species='O2')
+                   for transition in sim.atom_ledger.transitions[start:]
+                   if not transition.name.startswith('evaporate_')]
+        assert returns and sum(returns) > 0.0
+        assert [value.hex() for value in returns] == ['0x1.860dbad355075p-9']
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
 def test_trial_ledger_still_refuses_unbalanced_transitions():
     from simulator.accounting.exceptions import UnbalancedTransitionError
     from simulator.accounting.ledger import snapshot_atom_ledger

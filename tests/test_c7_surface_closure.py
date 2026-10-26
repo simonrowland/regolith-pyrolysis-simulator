@@ -712,6 +712,29 @@ def test_rh03_saturated_buffer_release_respects_film_capacity(monkeypatch, capac
         close_test_owned_magemin_backend(sim)
 
 
+@pytest.mark.parametrize('capacity', (0.001, 0.0027318327123612676))
+def test_saturated_release_has_a_zero_residual_plateau(monkeypatch, capacity):
+    sim = simulation()
+    try:
+        sim.atom_ledger.load_external_mol('reservoir.fo2_buffer', {'O2': 0.057022307388092434},
+            material_origin='feedstock', source='saturated-release plateau pin')
+        sim._fe_redox_internal_o2_capacity_mol_this_hr = 1.0
+        sim._fe_redox_respeciation_diagnostics_this_hr = [{}]
+        monkeypatch.setattr(sim, '_melt_redox_fO2_upper_bound_log', lambda: -1000.0)
+        monkeypatch.setattr(sim, '_apply_fe_redox_respeciation', lambda **kw: {})
+        before = sim.atom_ledger.mol_by_account('process.overhead_gas').get('O2', 0.0)
+        sim._settle_evaporative_redox_after_batch(oxygen_release_capacity_mol=capacity)
+        released = sim.atom_ledger.mol_by_account('process.overhead_gas').get('O2', 0.0) - before
+        # On a unit area-second the film flux equals the supplied mol budget.
+        # Both distinct positive budgets lie on the existing zero-residual
+        # plateau: this pins the selection without claiming a unique root.
+        assert released.hex() == capacity.hex()
+        assert capacity - released == 0.0
+        assert sim._oxygen_release_transport_limited
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
 def test_legacy_retained_source_uses_published_intrinsic_buffer():
     sim = simulation()
     try:
