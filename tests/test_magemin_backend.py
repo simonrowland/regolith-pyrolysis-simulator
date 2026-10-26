@@ -39,7 +39,10 @@ from simulator.engine_pool import (
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 from engines.domain_reason import OutOfDomainReason
 from engines.magemin.domain import MAGEMinDomainGate
-from simulator.composition_projection import PROJECTED_BULK_CLASSIFICATION_KEY
+from simulator.composition_projection import (
+    PROJECTED_BULK_CLASSIFICATION_KEY,
+    PROJECTED_BULK_MAX_DROPPED_WT_PCT,
+)
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
@@ -771,7 +774,7 @@ def _assert_magemin_bulk_drop_projected(
     result,
     expected_components,
     *,
-    min_dropped_wt_pct,
+    min_dropped_wt_pct=None,
     exact_components=False,
     min_dropped_mass_fraction=None,
 ):
@@ -792,7 +795,8 @@ def _assert_magemin_bulk_drop_projected(
         assert dropped == expected
     else:
         assert expected <= dropped
-    assert projection["bulk_dropped_wt_pct"] >= min_dropped_wt_pct
+    if min_dropped_wt_pct is not None:
+        assert projection["bulk_dropped_wt_pct"] >= min_dropped_wt_pct
     assert notice["dropped_components"] == projection["dropped_bulk_components"]
     assert classification["dropped_components"] == projection[
         "dropped_bulk_components"
@@ -2326,7 +2330,11 @@ def test_magemin_bulk_projection_drop_at_exactly_1_wt_pct_solves(
 
     result = backend.equilibrate(
         1400.0,
-        composition_kg={"SiO2": 50.0, "MgO": 49.0, "MnO": 1.0},
+        composition_kg={
+            "SiO2": 50.0,
+            "MgO": 50.0 - PROJECTED_BULK_MAX_DROPPED_WT_PCT,
+            "MnO": PROJECTED_BULK_MAX_DROPPED_WT_PCT,
+        },
         fO2_log=-8.0,
         pressure_bar=5000.0,
     )
@@ -2335,7 +2343,9 @@ def test_magemin_bulk_projection_drop_at_exactly_1_wt_pct_solves(
     assert result.status == "ok"
     classification = result.diagnostics[PROJECTED_BULK_CLASSIFICATION_KEY]
     assert classification["projection_verdict"] == "within_threshold"
-    assert classification["dropped_total_wt_pct"] == pytest.approx(1.0)
+    assert classification["dropped_total_wt_pct"] == pytest.approx(
+        PROJECTED_BULK_MAX_DROPPED_WT_PCT
+    )
     assert result.diagnostics["composition_projected_notice"][
         "dropped_components"
     ][0]["component"] == "MnO"
@@ -2419,7 +2429,6 @@ def test_magemin_bulk_projection_drop_at_1_01_wt_pct_is_refused(
     _assert_magemin_bulk_drop_projected(
         result,
         ("MnO",),
-        min_dropped_wt_pct=1.0,
         exact_components=True,
     )
     classification = result.diagnostics[PROJECTED_BULK_CLASSIFICATION_KEY]

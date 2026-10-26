@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 from simulator.composition_projection import (
+    PROJECTED_BULK_MAX_DROPPED_WT_PCT,
     ProjectedBulkClassification,
     classify_projected_bulk,
     format_projected_component_mol,
@@ -15,24 +16,28 @@ from simulator.composition_projection import (
 
 def test_one_wt_percent_boundary_is_within_threshold():
     classification = classify_projected_bulk(
-        {"NaCl": 1.0},
+        {"NaCl": PROJECTED_BULK_MAX_DROPPED_WT_PCT},
         source_sum_wt_pct=100.0,
     )
 
     assert classification.verdict == "within_threshold"
     assert classification.within_threshold is True
-    assert classification.dropped_total_wt_pct == pytest.approx(1.0)
+    assert classification.dropped_total_wt_pct == pytest.approx(
+        PROJECTED_BULK_MAX_DROPPED_WT_PCT
+    )
 
 
 def test_more_than_one_wt_percent_is_over_threshold():
     classification = classify_projected_bulk(
-        {"NaCl": 1.0 + 1e-9},
+        {"NaCl": PROJECTED_BULK_MAX_DROPPED_WT_PCT + 1e-9},
         source_sum_wt_pct=100.0,
     )
 
     assert classification.verdict == "over_threshold"
     assert classification.within_threshold is False
-    assert classification.dropped_total_wt_pct > 1.0
+    assert classification.dropped_total_wt_pct > (
+        PROJECTED_BULK_MAX_DROPPED_WT_PCT
+    )
 
 
 def test_projection_normalizes_against_non_100_source_sum_and_sorts_components():
@@ -113,7 +118,10 @@ def test_zero_component_is_absent_and_does_not_refuse():
 
 @pytest.mark.parametrize(
     "component_value",
-    [np.float32(1.0), np.int64(1)],
+    [
+        np.float32(PROJECTED_BULK_MAX_DROPPED_WT_PCT),
+        np.int64(PROJECTED_BULK_MAX_DROPPED_WT_PCT),
+    ],
 )
 def test_numpy_real_values_are_accepted(component_value):
     classification = classify_projected_bulk(
@@ -122,7 +130,9 @@ def test_numpy_real_values_are_accepted(component_value):
     )
 
     assert classification.verdict == "within_threshold"
-    assert classification.dropped_total_wt_pct == pytest.approx(1.0)
+    assert classification.dropped_total_wt_pct == pytest.approx(
+        PROJECTED_BULK_MAX_DROPPED_WT_PCT
+    )
 
 
 def test_normalization_overflow_refuses_and_diagnostics_stay_strict_json():

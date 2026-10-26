@@ -2297,7 +2297,9 @@ def test_projected_bulk_within_one_percent_has_notice_and_classifier_record() ->
 
     assert policy["status"] == "projected"
     assert classifier["projection_verdict"] == "within_threshold"
-    assert 0.0 < classifier["dropped_total_wt_pct"] <= 1.0
+    assert 0.0 < classifier["dropped_total_wt_pct"] <= classifier[
+        "threshold_wt_pct"
+    ]
     assert policy["notice"]["code"] == "openimcc_projected_bulk"
 
 
