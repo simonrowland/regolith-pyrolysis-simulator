@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.enums import (
@@ -25,7 +26,7 @@ from simulator.battery.migrate import (
     select_declared_source,
     to_plain,
 )
-from simulator.battery.records import Reaction, State
+from simulator.battery.records import Reaction, State, Value
 from simulator.battery.score import ScoreContext, compile_residual
 from simulator.battery.validate import validate_observation
 
@@ -113,6 +114,99 @@ def test_reaction_bound_comparator_sets_direction_and_inclusivity() -> None:
     assert selection.value.bound_operator == ">="
     assert selection.value.bound_direction is BoundDirection.LOWER
     assert selection.value.bound_inclusivity is BoundInclusivity.INCLUDED
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {
+            "value": "2.302585092994046",
+            "log_base_as_published": "e",
+            "units_as_published": "ln K",
+        },
+        {"value": "10", "units_as_published": "K"},
+        {
+            "log10_K_reaction": 1,
+            "log_base_as_published": "unknown",
+            "units_as_published": "log10 K",
+        },
+        {
+            "log10_K_reaction": 1,
+            "log_base_as_published": "e",
+            "units_as_published": "log10 K",
+        },
+    ],
+    ids=("natural-log", "plain-K", "unknown-base", "conflicting-base"),
+)
+def test_reaction_constant_rejects_unestablished_log10_encoding(
+    payload: dict[str, object],
+) -> None:
+    selection = select_declared_source(
+        Quantity.LOG10_K_REACTION, "dimensionless", payload
+    )
+
+    assert selection.value.kind is ValueKind.UNAVAILABLE
+    assert selection.reason is not None
+    assert "reaction equilibrium constant" in selection.reason
+
+
+def test_generic_reaction_constant_value_requires_printed_log10_units() -> None:
+    selection = select_declared_source(
+        Quantity.LOG10_K_REACTION,
+        "dimensionless",
+        {"value": 1, "units_as_published": "log10 K"},
+    )
+
+    assert selection.value.kind is ValueKind.POINT
+    assert selection.value.point == 1
+
+
+def test_experimental_pressure_does_not_fill_gas_standard_pressure(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_fixture(tmp_path)
+    observation = result.observations[
+        "t1522-reaction-fixture::gas-reaction-experimental-pressure"
+    ]
+
+    assert observation.identity.standard_pressure_Pa is not None
+    assert observation.identity.standard_pressure_Pa.is_unknown
+    assert (
+        observation.point_conditions["total_pressure_Pa"].state.value == 1000
+    )
+    issues = validate_observation(
+        observation,
+        result.experiments,
+        result.observations,
+        result.works,
+    )
+    assert any(
+        issue.reason is RefusalReason.IDENTITY_INCOMPLETE
+        and issue.path.endswith("standard_pressure_Pa")
+        for issue in issues
+    )
+
+
+def test_bound_rejects_conflicting_comparator_and_direction_in_codec(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(ValueError, match="conflicts with direction or inclusivity"):
+        Value(
+            ValueKind.BOUND,
+            bound_operator="<",
+            bound_value=2,
+            bound_direction=BoundDirection.LOWER,
+            bound_inclusivity=BoundInclusivity.INCLUDED,
+        )
+
+    plain = to_plain(_migrate_fixture(tmp_path).observations[
+        "t1522-reaction-fixture::compound-minimum"
+    ])
+    plain["value"]["bound_operator"] = "<"
+    plain["value"]["bound_direction"] = BoundDirection.LOWER.value
+    plain["value"]["bound_inclusivity"] = BoundInclusivity.INCLUDED.value
+    with pytest.raises(ValueError, match="conflicts with direction or inclusivity"):
+        observation_from_plain(plain)
 
 
 def test_reaction_identity_includes_term_standard_state_and_is_not_log10_kf(

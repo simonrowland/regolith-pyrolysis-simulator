@@ -570,6 +570,23 @@ _NUMERIC_VALUE_KINDS = frozenset(
     }
 )
 
+_BOUND_OPERATOR_SEMANTICS = {
+    ">": (BoundDirection.LOWER, BoundInclusivity.EXCLUDED),
+    ">=": (BoundDirection.LOWER, BoundInclusivity.INCLUDED),
+    "≥": (BoundDirection.LOWER, BoundInclusivity.INCLUDED),
+    "<": (BoundDirection.UPPER, BoundInclusivity.EXCLUDED),
+    "<=": (BoundDirection.UPPER, BoundInclusivity.INCLUDED),
+    "≤": (BoundDirection.UPPER, BoundInclusivity.INCLUDED),
+}
+
+
+def _bound_operator_semantics(
+    operator: str | None,
+) -> tuple[BoundDirection, BoundInclusivity] | None:
+    """Typed meaning of comparator bounds, shared by record and source readers."""
+
+    return _BOUND_OPERATOR_SEMANTICS.get(operator) if operator is not None else None
+
 
 def _require_finite(name: str, value: Decimal) -> None:
     if not value.is_finite():
@@ -643,6 +660,19 @@ class Value:
                 if self.bound_direction is None:
                     raise ValueError(
                         "Value.bound inclusivity requires direction"
+                    )
+            operator_semantics = _bound_operator_semantics(self.bound_operator)
+            if self.bound_direction is not None and self.bound_operator is not None:
+                if operator_semantics is None:
+                    raise ValueError(
+                        "Value.bound operator is unsupported with direction metadata"
+                    )
+                if operator_semantics != (
+                    self.bound_direction,
+                    self.bound_inclusivity,
+                ):
+                    raise ValueError(
+                        "Value.bound operator conflicts with direction or inclusivity"
                     )
             if self.bound_value is None:
                 raise ValueError("Value.bound requires value")

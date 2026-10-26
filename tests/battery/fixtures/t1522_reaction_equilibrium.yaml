@@ -136,3 +136,43 @@ species:
                     convention: raoultian_pure_endmember
                     endmember: {formula: FeSiO3, phase: l}
                     component_basis: FeSiO3
+  H2:
+    observations:
+      - observation_id: gas-reaction-experimental-pressure
+        type: reaction_equilibrium_constant
+        locator:
+          page: 3
+          table: III
+        T_K: 1500
+        units: dimensionless
+        point_conditions:
+          total_pressure_Pa:
+            state:
+              tag: value
+              value: 1000
+            locator:
+              table: III
+        values:
+          quantity: reaction_equilibrium_constant
+          log10_K_reaction: 3.0
+          P_bar: 0.01
+          units_as_published: log10 K
+          reaction_as_printed: H2(g) = 2H(g)
+          reaction:
+            terms:
+              - species: {formula: H2, phase: g}
+                coefficient: -1
+                standard_state:
+                  tag: value
+                  value:
+                    convention: raoultian_pure_endmember
+                    endmember: {formula: H2, phase: g}
+                    component_basis: H2
+              - species: {formula: H, phase: g}
+                coefficient: 2
+                standard_state:
+                  tag: value
+                  value:
+                    convention: raoultian_pure_endmember
+                    endmember: {formula: H, phase: g}
+                    component_basis: H

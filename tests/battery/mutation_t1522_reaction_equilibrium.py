@@ -1,4 +1,4 @@
-"""Run reversible mutation checks for the reaction-K identity and score guards."""
+"""Run reversible mutations for the reaction-K identity, ingestion, and score guards."""
 
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ def _expect_mutation_failure(
             check=False,
         )
         output = result.stdout + result.stderr
-        if result.returncode == 0 or "FAILED " not in output:
+        if result.returncode == 0 or f"FAILED {test}" not in output:
             raise RuntimeError(
                 f"{label} mutation did not fail its matching test:\n{output}"
             )
@@ -70,6 +70,52 @@ def main() -> None:
             "test_reaction_equilibrium_scoring_refuses_without_dropping_source_value"
         ),
         label="reaction-K scoring refusal",
+    )
+    _expect_mutation_failure(
+        path=ROOT / "simulator/battery/migrate.py",
+        before="if encoding_reason is not None:",
+        after="if False and encoding_reason is not None:",
+        test=(
+            f"{test}::"
+            "test_reaction_constant_rejects_unestablished_log10_encoding"
+        ),
+        label="reaction-K log-base refusal",
+    )
+    _expect_mutation_failure(
+        path=ROOT / "simulator/battery/migrate.py",
+        before=(
+            "standard_pressure_values = values\n"
+            "        if q_token is Quantity.LOG10_K_REACTION:\n"
+            "            standard_pressure_values = {\n"
+            "                key: values[key]\n"
+            "                for key in (\"reference_pressure_Pa\", \"standard_pressure_Pa\")\n"
+            "                if key in values\n"
+            "            }"
+        ),
+        after=(
+            "standard_pressure_values = values\n"
+            "        if False and q_token is Quantity.LOG10_K_REACTION:\n"
+            "            standard_pressure_values = {\n"
+            "                key: values[key]\n"
+            "                for key in (\"reference_pressure_Pa\", \"standard_pressure_Pa\")\n"
+            "                if key in values\n"
+            "            }"
+        ),
+        test=(
+            f"{test}::"
+            "test_experimental_pressure_does_not_fill_gas_standard_pressure"
+        ),
+        label="reaction-K standard pressure source",
+    )
+    _expect_mutation_failure(
+        path=ROOT / "simulator/battery/records.py",
+        before="if operator_semantics != (",
+        after="if False and operator_semantics != (",
+        test=(
+            f"{test}::"
+            "test_bound_rejects_conflicting_comparator_and_direction_in_codec"
+        ),
+        label="bound comparator consistency",
     )
 
 

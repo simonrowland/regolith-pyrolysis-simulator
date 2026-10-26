@@ -162,6 +162,7 @@ from simulator.battery.records import (
     Uncertainty,
     Value,
     Work,
+    _bound_operator_semantics,
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
     as_decimal,
@@ -9713,6 +9714,70 @@ def _selection_from_named_field(
         for key in QUANTITY_SOURCE_FIELDS[q_token]:
             if key not in payload:
                 continue
+            base_raw = payload.get("log_base_as_published")
+            base_token = (
+                ""
+                if base_raw in (None, "")
+                else str(base_raw).strip().casefold()
+            )
+            base_is_log10 = base_token in {
+                "10",
+                "10.0",
+                "base10",
+                "base 10",
+                "base-10",
+                "common",
+                "common log",
+                "common logarithm",
+                "log10",
+            }
+            encoding_reason = None
+            if base_token and not base_is_log10:
+                encoding_reason = (
+                    "printed reaction equilibrium constant has unsupported "
+                    f"log base {base_raw!r}"
+                )
+            printed_units = _printed_unit_for_field(payload, key) or units
+            unit_token = (
+                ""
+                if printed_units in (None, "")
+                else str(printed_units).strip().casefold()
+            )
+            compact_units = re.sub(r"[\s_]", "", unit_token).replace("₁₀", "10")
+            units_are_log10 = compact_units in {
+                "log10k",
+                "log10(k)",
+                "log10keq",
+                "log10(keq)",
+                "commonlogk",
+                "commonlogarithmk",
+                "commonlogarithmofk",
+            }
+            dimensionless_units = unit_token in {
+                "1",
+                "dimensionless",
+                "unitless",
+                "",
+            }
+            if unit_token and not units_are_log10 and not dimensionless_units:
+                encoding_reason = (
+                    f"printed reaction equilibrium constant units {printed_units!r} "
+                    "do not establish log10 K"
+                )
+            establishes_log10 = (
+                key == "log10_K_reaction" or base_is_log10 or units_are_log10
+            )
+            if not establishes_log10:
+                encoding_reason = (
+                    "printed reaction equilibrium constant does not establish base-10 log K"
+                )
+            if encoding_reason is not None:
+                return _unavailable_selection(
+                    encoding_reason,
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                )
             amount = _numeric_field(payload, key)
             if amount is None:
                 return _unavailable_selection(
@@ -9727,14 +9792,7 @@ def _selection_from_named_field(
                 if operator_raw not in (None, "")
                 else None
             )
-            operator_metadata = {
-                ">": (BoundDirection.LOWER, BoundInclusivity.EXCLUDED),
-                ">=": (BoundDirection.LOWER, BoundInclusivity.INCLUDED),
-                "≥": (BoundDirection.LOWER, BoundInclusivity.INCLUDED),
-                "<": (BoundDirection.UPPER, BoundInclusivity.EXCLUDED),
-                "<=": (BoundDirection.UPPER, BoundInclusivity.INCLUDED),
-                "≤": (BoundDirection.UPPER, BoundInclusivity.INCLUDED),
-            }.get(operator)
+            operator_metadata = _bound_operator_semantics(operator)
             qualifier_direction = None
             qualifier = payload.get("qualifier_as_published")
             if isinstance(qualifier, str):
@@ -9778,15 +9836,9 @@ def _selection_from_named_field(
                 if (
                     qualifier_direction is not None
                     and qualifier_direction is not direction
-                ) or (
-                    operator_metadata is not None
-                    and (
-                        operator_metadata[0] is not direction
-                        or operator_metadata[1] is not inclusivity
-                    )
                 ):
                     return _unavailable_selection(
-                        "log10 reaction equilibrium bound direction conflicts with its printed qualifier or comparator",
+                        "log10 reaction equilibrium bound direction conflicts with its printed qualifier",
                         condition_ranges=condition_ranges,
                         unused_ancillary=_unused_ancillary(payload, key),
                         field_name=key,
@@ -9799,7 +9851,15 @@ def _selection_from_named_field(
                 }
                 if operator is not None:
                     bound_payload["bound_operator"] = operator
-                value = _value_from_plain(bound_payload)
+                try:
+                    value = _value_from_plain(bound_payload)
+                except (TypeError, ValueError) as exc:
+                    return _unavailable_selection(
+                        f"log10 reaction equilibrium bound is inconsistent: {exc}",
+                        condition_ranges=condition_ranges,
+                        unused_ancillary=_unused_ancillary(payload, key),
+                        field_name=key,
+                    )
             else:
                 return _point_selection(
                     amount, key, "identity:log10", payload, condition_ranges
@@ -15308,7 +15368,16 @@ class Migrator:
                 observation_id=obs_id,
             )
 
-        p_sel = select_declared_source(AXIS_STANDARD_PRESSURE_PA, None, values)
+        standard_pressure_values = values
+        if q_token is Quantity.LOG10_K_REACTION:
+            standard_pressure_values = {
+                key: values[key]
+                for key in ("reference_pressure_Pa", "standard_pressure_Pa")
+                if key in values
+            }
+        p_sel = select_declared_source(
+            AXIS_STANDARD_PRESSURE_PA, None, standard_pressure_values
+        )
         p_std = p_sel.amount if p_sel.available else None
         if p_std is not None:
             measured.gibbs_reference_pressures += 1
