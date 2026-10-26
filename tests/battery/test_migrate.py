@@ -7377,6 +7377,8 @@ def test_j01_declared_quantity_refuses_regolith_specific_rate_without_mass() -> 
 
 
 def test_density_source_converts_g_per_cm3_and_refuses_unknown_unit() -> None:
+    from simulator.battery.migrate import conversion_derivation
+
     selection = select_declared_source(
         Quantity.DENSITY,
         "g/cm3 as printed",
@@ -7385,6 +7387,9 @@ def test_density_source_converts_g_per_cm3_and_refuses_unknown_unit() -> None:
     assert selection.value.kind is ValueKind.POINT
     assert selection.amount == as_decimal("3030")
     assert selection.unit_trail == "g_per_cm3_to_kg_per_m3"
+    conversion = conversion_derivation(selection.unit_trail, "3.03", None)
+    assert conversion is not None
+    assert conversion.output_unit == "kg_per_m3"
 
     refused = select_declared_source(
         Quantity.DENSITY,
@@ -7398,6 +7403,7 @@ def test_density_source_converts_g_per_cm3_and_refuses_unknown_unit() -> None:
 
 def test_evolved_gas_yield_units_convert_to_mol_per_initial_kg() -> None:
     from simulator.accounting.formulas import parse_formula
+    from simulator.battery.migrate import conversion_derivation
 
     water = select_declared_source(
         Quantity.EVOLVED_GAS_YIELD,
@@ -7409,6 +7415,9 @@ def test_evolved_gas_yield_units_convert_to_mol_per_initial_kg() -> None:
     )
     assert water.value.kind is ValueKind.POINT
     assert water.amount == as_decimal("0.023") / water_molar_mass
+    water_derivation = conversion_derivation(water.unit_trail, "2.3", None)
+    assert water_derivation is not None
+    assert water_derivation.output_unit == "mol_species_per_initial_kg"
 
     carbon_dioxide = select_declared_source(
         Quantity.EVOLVED_GAS_YIELD,
