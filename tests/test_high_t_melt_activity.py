@@ -1090,13 +1090,11 @@ def test_refused_calls_use_nearest_same_composition_temperature_neighbor(
             neighbor_results[anchor_T] = evaluate_cleaned_melt(
                 refused_62["composition"], anchor_T,
             )
-        anchored_activity, anchored_fraction = single_cation_activity_and_fraction(
-            oxide,
+        # evaluate_cleaned_melt already returns single-cation activities.
+        # Compare directly so multi-cation oxides are not converted twice.
+        assert activity.activity == pytest.approx(
             neighbor_results[anchor_T].single_cation_activities[oxide],
-            refused_62["composition"],
-        )
-        assert activity.effective_gamma == pytest.approx(
-            anchored_activity / anchored_fraction, rel=1e-12,
+            rel=1e-12,
         )
     assert all(abs(error) < 0.01 for error in errors.values()), errors
     assert "K2O" not in authority["held_effective_gamma_by_parent"]
@@ -1133,34 +1131,56 @@ def test_refused_calls_use_nearest_same_composition_temperature_neighbor(
     ).activity
 
 
-@pytest.mark.parametrize(("anchor_gap_K", "accepted"), [(75.0, True), (76.0, False)])
-def test_temperature_neighbor_gap_uses_schedule_cap_and_warns_when_far(
-    monkeypatch, anchor_gap_K, accepted,
+def _temperature_neighbor_test_result() -> OpenImccBridgeResult:
+    parents = openimcc_bridge_module.OPENIMCC_PARENT_OXIDES
+    activities = {parent: 1.0 for parent in parents}
+    activities["SiO2"] = 0.36
+    return OpenImccBridgeResult(
+        parent_oxide_activities=activities,
+        parent_oxides=parents,
+        flags=(),
+        notices=(),
+        acid_sink_ratio=None,
+        pack_model_id="temperature-neighbor-test",
+        pack_version="test",
+        pack_digest="test",
+        openimcc_version="test",
+        envelope_status="in_domain",
+        extrapolated=False,
+        labels=SimpleNamespace(),
+        coverage={},
+    )
+
+
+@pytest.mark.parametrize(
+    ("available_offset_K", "selected_offset_K"),
+    [(50.0, 50.0), (75.0, 75.0), (76.0, None)],
+    ids=("50-k-not-far", "75-k-far-anchor", "76-k-outside-schedule"),
+)
+def test_temperature_neighbor_probe_selection_and_notice_follow_schedule(
+    monkeypatch, available_offset_K, selected_offset_K,
 ) -> None:
     target_T = CAP_PLUS_T_K
-    anchor_T = target_T + anchor_gap_K
+    only_success_temperature_K = target_T + available_offset_K
+    solver_temperatures_K = []
+    successful_temperatures_K = []
 
-    def refuse_target(**_kwargs):
-        raise ImccNonconvergenceError("forced target refusal", {})
+    def solve_only_available_temperature(**kwargs):
+        temperature_K = float(kwargs["temperature_K"])
+        solver_temperatures_K.append(temperature_K)
+        if math.isclose(
+            temperature_K, only_success_temperature_K, abs_tol=1e-9,
+        ):
+            successful_temperatures_K.append(temperature_K)
+            return _temperature_neighbor_test_result()
+        raise ImccNonconvergenceError(
+            "forced temperature-specific solve refusal", {},
+        )
 
+    # Keep the production schedule, probe selector and cleaned-melt policy;
+    # fake only the low-level OpenIMCC solve outcome at each requested T.
     monkeypatch.setattr(
-        openimcc_bridge_module, "evaluate_cleaned_melt", refuse_target,
-    )
-    monkeypatch.setattr(
-        vapor_pressure_module,
-        "_same_composition_temperature_bridge",
-        lambda *_args, **_kwargs: {
-            "call_count": 1,
-            "attempted_temperatures_K": [anchor_T],
-            "cap_K": 75.0,
-            "nearest_neighbors": {
-                "SiO2": {
-                    "gamma": 2.5,
-                    "anchor_temperature_K": anchor_T,
-                    "anchor_gap_K": anchor_gap_K,
-                },
-            },
-        },
+        openimcc_bridge_module, "evaluate", solve_only_available_temperature,
     )
     authority = vapor_pressure_module._build_high_t_melt_activity_authority(
         composition_mol=BASE_MELT_MOL,
@@ -1171,25 +1191,58 @@ def test_temperature_neighbor_gap_uses_schedule_cap_and_warns_when_far(
     )
     assert vapor_pressure_module._TEMPERATURE_BRIDGE_CAP_K == 75.0
     assert vapor_pressure_module._TEMPERATURE_BRIDGE_FAR_ANCHOR_WARNING_GAP_K == 50.0
-    if not accepted:
+    assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
+
+    attempted_temperatures_K = authority["temperature_bridge"][
+        "attempted_temperatures_K"
+    ]
+    assert authority["temperature_bridge"]["call_count"] == 6
+    assert len(attempted_temperatures_K) == 6
+    assert solver_temperatures_K == [target_T, *attempted_temperatures_K]
+    assert all(
+        min(
+            abs(abs(probe_T - target_T) - schedule_offset_K)
+            for schedule_offset_K in (25.0, 50.0, 75.0)
+        ) < 1e-9
+        for probe_T in attempted_temperatures_K
+    )
+    assert {
+        round(probe_T - target_T, 6)
+        for probe_T in attempted_temperatures_K
+    } == {-75.0, -50.0, -25.0, 25.0, 50.0, 75.0}
+
+    if selected_offset_K is None:
+        assert successful_temperatures_K == []
+        assert only_success_temperature_K not in solver_temperatures_K
+        assert authority["provider"] == "constant_gamma"
+        assert authority["fallback"] is True
+        assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
         assert authority["held_effective_gamma_by_parent"] == {}
+        assert not any(
+            notice.get("method") == "nearest_converged_temperature_neighbor"
+            for notice in authority["notices"]
+        )
         return
 
+    assert successful_temperatures_K == [only_success_temperature_K]
     held = authority["held_effective_gamma_by_parent"]["SiO2"]
     assert held["method"] == "nearest_converged_temperature_neighbor"
-    assert held["anchor_temperature_K"] == anchor_T
-    assert held["anchor_gap_K"] == anchor_gap_K
-    assert held["gamma_applied"] == 2.5
-    assert "schedule-derived 50.0 K notice threshold" in held["message"]
-    sentence = _high_t_melt_activity_fallback_sentence({
-        "reason": "imcc_nonconvergence",
-        "notices": [held],
-        "affected_tick_count": 1,
-        "affected_parent_count": 1,
-        "first_hour": 1,
-        "last_hour": 1,
-    })
-    assert "schedule-derived 50.0 K notice threshold" in sentence
+    assert held["anchor_temperature_K"] == target_T + selected_offset_K
+    assert held["anchor_gap_K"] == selected_offset_K
+    assert held["gamma_applied"] == pytest.approx(0.36)
+    if selected_offset_K == 50.0:
+        assert "schedule-derived" not in held["message"]
+    else:
+        assert "schedule-derived 50.0 K notice threshold" in held["message"]
+        sentence = _high_t_melt_activity_fallback_sentence({
+            "reason": "imcc_nonconvergence",
+            "notices": [held],
+            "affected_tick_count": 1,
+            "affected_parent_count": 1,
+            "first_hour": 1,
+            "last_hour": 1,
+        })
+        assert "schedule-derived 50.0 K notice threshold" in sentence
 
 
 @pytest.mark.parametrize("call_index", [62, 65])
