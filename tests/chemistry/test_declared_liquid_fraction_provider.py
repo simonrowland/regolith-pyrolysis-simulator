@@ -2,7 +2,9 @@
 
 from copy import deepcopy
 from dataclasses import replace
+import builtins
 import errno
+import subprocess
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -12,10 +14,19 @@ from engines.magemin import MAGEMinShadowProvider
 from simulator.chemistry.kernel import normalize_chemistry_kernel_config
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.fe_redox import KRESS91_LIQUID_CALIBRATION_MIN_T_C
-from simulator.engine_pool import EngineWorkerTimeout
+from simulator.engine_pool import (
+    EngineWorkerPool,
+    EngineWorkerTimeout,
+    WarmEngineWorker,
+)
 from simulator.melt_backend.liquidus import LiquidusSampleError
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.magemin import MAGEMinBackend
+import simulator.melt_backend.magemin as magemin_module
+from simulator.melt_backend.magemin import (
+    _bootstrap_magemin_subprocess_worker,
+    _handle_magemin_subprocess_request,
+)
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.reduced_real_determinism import (
     GateCurveProviderOutcome,
@@ -41,6 +52,69 @@ def _sim(provider, vapor_pressure_data, feedstocks_data, setpoints_data):
     return _build_sim(
         'lunar_mare_low_ti', vapor_pressure_data, feedstocks_data, setpoints,
     )
+
+
+def _injected_launch_exception(name):
+    if name == 'TimeoutExpired':
+        return subprocess.TimeoutExpired('/fake/MAGEMin', 1.0)
+    if name == 'CalledProcessError':
+        return subprocess.CalledProcessError(2, ['/fake/MAGEMin'])
+    if name in {'BlockingIOError', 'ConnectionResetError', 'InterruptedError'}:
+        number = {
+            'BlockingIOError': errno.EAGAIN,
+            'ConnectionResetError': errno.ECONNRESET,
+            'InterruptedError': errno.EINTR,
+        }[name]
+        return getattr(builtins, name)(number, 'injected launch failure')
+    if name == 'MemoryError':
+        return getattr(builtins, name)('injected launch failure')
+    if name == 'TypeError':
+        return TypeError('injected programming error')
+    if name == 'SubprocessError':
+        return subprocess.SubprocessError('injected launch failure')
+    raise AssertionError(f'unhandled injected exception {name}')
+
+
+def _bootstrap_magemin_launch_failure_worker(
+    binary_path, database, config, exception_name,
+):
+    backend, ready = _bootstrap_magemin_subprocess_worker(
+        binary_path, database, config,
+    )
+    return (backend, exception_name), ready
+
+
+def _handle_magemin_launch_failure_request(resource, request, errlog):
+    backend, exception_name = resource
+    original_run = magemin_module.subprocess.run
+
+    def fail_launch(*_args, **_kwargs):
+        raise _injected_launch_exception(exception_name)
+
+    magemin_module.subprocess.run = fail_launch
+    try:
+        return _handle_magemin_subprocess_request(backend, request, errlog)
+    finally:
+        magemin_module.subprocess.run = original_run
+
+
+def _warm_magemin_launch_failure_pool(backend, exception_name):
+    def worker_factory(index):
+        return WarmEngineWorker(
+            name=f'MAGEMin injected launch failure slot {index}',
+            bootstrap=_bootstrap_magemin_launch_failure_worker,
+            handler=_handle_magemin_launch_failure_request,
+            bootstrap_args=(
+                str(backend._binary_path),
+                backend._database,
+                backend._config,
+                exception_name,
+            ),
+            startup_timeout_s=30.0,
+            call_timeout_s=30.0,
+        )
+
+    return EngineWorkerPool(worker_factory, size=1)
 
 
 @pytest.mark.parametrize('value', ['auto', 'alphamelts', '', None, True, 1])
@@ -263,9 +337,104 @@ def test_actual_magemin_launch_oserror_is_typed_environment_refusal(
             'projected_liquidus_diagnostics'
         ]
         assert projected['backend_failure_exception'] == error_type.__name__
-        assert projected['backend_failure_disposition'] == 'environment_os_error'
+        assert projected['backend_failure_disposition'] == 'environment'
         assert calls
         assert sim.atom_ledger.mol_by_account() == before
+    finally:
+        backend.close()
+
+
+@pytest.mark.parametrize('mode', ['cold', 'bridge_retry', 'warm_pool'])
+@pytest.mark.parametrize('exception_name', [
+    'BlockingIOError', 'ConnectionResetError', 'InterruptedError',
+    'MemoryError', 'SubprocessError', 'TimeoutExpired', 'CalledProcessError',
+])
+def test_magemin_launch_environment_errors_refuse_in_every_execution_mode(
+    monkeypatch, mode, exception_name,
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+    backend = MAGEMinBackend()
+    assert backend.initialize({'warm_worker': False})
+    if mode == 'warm_pool':
+        backend._subprocess_pool = _warm_magemin_launch_failure_pool(
+            backend, exception_name,
+        )
+    elif mode == 'bridge_retry':
+        backend._bridge = 'pymagemin'
+
+        def fail_bridge(**_kwargs):
+            raise RuntimeError('injected optional bridge failure')
+
+        backend._magemin_module = SimpleNamespace(minimize=fail_bridge)
+
+        def fail_launch(*_args, **_kwargs):
+            raise _injected_launch_exception(exception_name)
+
+        monkeypatch.setattr(magemin_module.subprocess, 'run', fail_launch)
+    else:
+        def fail_launch(*_args, **_kwargs):
+            raise _injected_launch_exception(exception_name)
+
+        monkeypatch.setattr(magemin_module.subprocess, 'run', fail_launch)
+    provider._backend = backend
+    provider._backend_initialised = True
+    before = sim.atom_ledger.mol_by_account()
+    try:
+        with pytest.raises(EvaporationFluxRefusal) as error:
+            sim._melt_redox_liquidus_gate_curve()
+
+        assert error.value.diagnostic['reason'] == 'liquid_fraction_provider_failed'
+        assert error.value.diagnostic['outcome'] is GateCurveProviderOutcome.FAILED
+        projected = error.value.diagnostic['provider_diagnostic'][
+            'backend_diagnostics'
+        ]['projected_liquidus_diagnostics']
+        assert projected['backend_failure_exception'] == exception_name
+        assert projected['backend_failure_disposition'] == 'environment'
+        if mode == 'warm_pool':
+            assert backend._subprocess_pool is not None
+        assert sim.atom_ledger.mol_by_account() == before
+    finally:
+        backend.close()
+
+
+@pytest.mark.parametrize('mode', ['cold', 'bridge_retry', 'warm_pool'])
+def test_magemin_launch_programming_errors_still_propagate(
+    monkeypatch, mode, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+    backend = MAGEMinBackend()
+    assert backend.initialize({'warm_worker': False})
+    if mode == 'warm_pool':
+        backend._subprocess_pool = _warm_magemin_launch_failure_pool(
+            backend, 'TypeError',
+        )
+    elif mode == 'bridge_retry':
+        backend._bridge = 'pymagemin'
+
+        def fail_bridge(**_kwargs):
+            raise RuntimeError('injected optional bridge failure')
+
+        backend._magemin_module = SimpleNamespace(minimize=fail_bridge)
+
+        def fail_launch(*_args, **_kwargs):
+            raise TypeError('injected programming error')
+
+        monkeypatch.setattr(magemin_module.subprocess, 'run', fail_launch)
+    else:
+        def fail_launch(*_args, **_kwargs):
+            raise TypeError('injected programming error')
+
+        monkeypatch.setattr(magemin_module.subprocess, 'run', fail_launch)
+    provider._backend = backend
+    provider._backend_initialised = True
+    try:
+        with pytest.raises(TypeError, match='injected programming error'):
+            sim._melt_redox_liquidus_gate_curve()
     finally:
         backend.close()
 
