@@ -386,6 +386,44 @@ def test_c5_branch_one_rump_expectation_honors_c5_targets():
     assert diagnostic["missing_expected_rump_elements"] == []
 
 
+def test_c5_ellingham_diagnostic_notes_unresolved_cleaned_melt_formula(
+    monkeypatch,
+):
+    from simulator import extraction as extraction_module
+
+    class FixedQueries:
+        def __init__(self, _sim):
+            pass
+
+        def species_kg_by_accounts(self, _accounts):
+            return {"FeO": 1.0, "Unobtainium": 0.5}
+
+    monkeypatch.setattr(extraction_module, "AccountingQueries", FixedQueries)
+    sim = SimpleNamespace(
+        melt=SimpleNamespace(temperature_C=1600.0),
+        species_formula_registry=None,
+        _mre_voltage_sequence=(),
+    )
+
+    diagnostic = (
+        extraction_module.ExtractionMixin._build_c5_ellingham_ladder_diagnostic(
+            sim,
+            step_info={"species": []},
+            declared_rung_V=2.0,
+            pO2_bar=0.1,
+        )
+    )
+
+    notices = diagnostic["formula_mass_notices"]
+    assert len(notices) == 1
+    assert notices[0]["type"] == "typed_notice"
+    assert notices[0]["kind"] == (
+        "c5_ellingham_cleaned_melt_formula_mass_unavailable"
+    )
+    assert notices[0]["refusal_category"] == "missing_input"
+    assert notices[0]["species"] == "Unobtainium"
+
+
 def test_mre_reduction_records_atom_ledger_transition():
     """After the ELECTROLYSIS_STEP kernel flip, ``_step_mre``'s ledger
     behaviour comes from a :class:`BuiltinElectrolysisStepProvider`

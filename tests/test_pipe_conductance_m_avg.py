@@ -202,6 +202,18 @@ def test_unresolved_overhead_carrier_refuses_without_renormalizing_others():
     assert refusal.value.diagnostic["unresolved_species"] == ["Unobtainium"]
 
 
+def test_overhead_partial_pressures_preserve_zero_flow_species_key():
+    iron_mass = resolve_species_formula("Fe").molar_mass_g_per_mol()
+    flux = EvaporationFlux(
+        species_kg_hr={"Fe": iron_mass / 1000.0, "O2": 0.0},
+        total_kg_hr=iron_mass / 1000.0,
+    )
+
+    partial_pressures = OverheadGasModel.species_partial_pressures(flux, 100.0)
+
+    assert partial_pressures == pytest.approx({"Fe": 100.0, "O2": 0.0})
+
+
 def test_pure_kr_returns_kr_molar_mass_without_fallback():
     M_avg = _mean_molar_mass_kg_mol({"Kr": 1.0})
 
