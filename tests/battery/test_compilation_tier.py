@@ -4592,6 +4592,45 @@ def test_stated_pressure_is_not_replaced_with_one_bar() -> None:
     assert attempt.notices == ()
 
 
+def test_cp_and_s_pressure_notices_omit_the_enthalpy_bound() -> None:
+    """The V·dP figure is an enthalpy. Cp and S keep the 1 bar call only."""
+
+    class _Props:
+        formula = "MgO"
+        Cp_J_K_mol = 40.0
+        H_J_mol = 1000.0
+        S_J_K_mol = 26.0
+        volume_m3_mol = 1.0e-5
+        absences = ()
+        warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, pressure_bar):
+        assert temperature_K == 1000.0
+        assert pressure_bar == 1.0
+        return _Props()
+
+    for quantity, printed in ((Quantity.CP, Decimal("40.0")), (Quantity.S, Decimal("26.0"))):
+        identity = replace(
+            _pure_phase_identity(quantity),
+            standard_pressure_Pa=State.unknown("source does not state pressure"),
+        )
+        attempt = predict_thermo_attempt(
+            Engine.THERMOENGINE,
+            F.observation(f"mgo-{quantity.value}-pressure", "exp-1", identity, printed),
+            pure_phase=pure_phase,
+        )
+        assert attempt.refusal_reason is None
+        assert attempt.value == printed
+        notice = next(
+            item for item in attempt.notices if "standard-pressure-assumed" in item.reason
+        )
+        assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        assert "pressure_bar=1" in notice.reason
+        assert "bound_J_mol_per_bar" not in notice.reason
+        assert "term=omitted" in notice.reason
+        assert notice.original is None
+
+
 def test_gas_unknown_pressure_still_refuses() -> None:
     identity = F.oxide_identity(
         "MgO",

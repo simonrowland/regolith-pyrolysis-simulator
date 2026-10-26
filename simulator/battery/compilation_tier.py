@@ -1144,16 +1144,17 @@ def _standard_pressure_bar(identity: Identity) -> tuple[float | None, str | None
 
 
 def _pressure_effect_bound_J(*sources: object) -> tuple[Decimal, str]:
-    """J/mol per bar for assuming 1 bar, and which volume supplied it.
+    """J/mol per bar for an enthalpy at an assumed 1 bar.
 
-    Premise. A condensed pure-standard row with no stated pressure is
-    still H, Cp, or S of that phase. (dH/dP)_T = V(1 - alpha*T), with
-    alpha = (1/V)(dV/dT)_P. One bar is 1e5 Pa.
+    Premise. (dH/dP)_T = V(1 - alpha*T), with alpha = (1/V)(dV/dT)_P.
+    One bar is 1e5 Pa. (dS/dP)_T = -alpha*V and
+    (dCp/dP)_T = -T d²V/dT². These property objects carry neither alpha
+    nor d²V/dT², so the caller attaches this bound to enthalpy only.
 
-    Algebra. The scored value is the engine value at 1 bar. The notice
-    bound is |V| x 1e5 Pa when this engine exposes molar volume, which
-    is V*dP and omits (1 - alpha*T) because these property objects do
-    not carry alpha. Otherwise the bound is the stated 4 J/mol per bar.
+    Algebra. The scored enthalpy is the engine value at 1 bar. The
+    notice bound is |V| x 1e5 Pa when this engine exposes molar volume,
+    which is V*dP and omits (1 - alpha*T) because alpha is absent.
+    Otherwise the bound is the stated 4 J/mol per bar.
 
     Units. m3/mol x Pa = J/mol. The scored enthalpy stays kJ/mol; this
     bound is not added to it.
@@ -1658,21 +1659,33 @@ def _pure_phase_attempt(
     if anchor_notice is not None:
         notices = notices + (anchor_notice,)
     if assumed_pressure:
-        bound_J, bound_term = _pressure_effect_bound_J(props, second, t_ref_props)
         call_evidence += ":P_bar=1:assumed"
+        if quantity is Quantity.H_MINUS_H298:
+            bound_J, bound_term = _pressure_effect_bound_J(props, second, t_ref_props)
+            pressure_reason = (
+                "standard-pressure-assumed: declared=unknown; "
+                f"pressure_bar=1; bound_J_mol_per_bar={format(bound_J, 'f')}; "
+                f"authority={Authority.BRIDGE.value}; term={bound_term}"
+            )
+            pressure_original = bound_J
+        else:
+            # Enthalpy bound only. Cp and S need alpha or d²V/dT², which
+            # these property objects do not carry. The value stays the
+            # 1 bar engine value.
+            pressure_reason = (
+                "standard-pressure-assumed: declared=unknown; "
+                f"pressure_bar=1; authority={Authority.BRIDGE.value}; term=omitted"
+            )
+            pressure_original = None
         notices = notices + (
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                 affected_quantities=(quantity,),
-                reason=(
-                    "standard-pressure-assumed: declared=unknown; "
-                    f"pressure_bar=1; bound_J_mol_per_bar={format(bound_J, 'f')}; "
-                    f"authority={Authority.BRIDGE.value}; term={bound_term}"
-                ),
+                reason=pressure_reason,
                 origin=origin,
                 band="1 bar",
                 authority=Authority.BRIDGE,
-                original=bound_J,
+                original=pressure_original,
             ),
         )
     return ThermoAttempt(
