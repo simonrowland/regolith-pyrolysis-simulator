@@ -50,6 +50,7 @@ import copy
 import gc
 from collections import deque
 from dataclasses import dataclass
+from itertools import islice
 import logging
 import math
 from pathlib import Path
@@ -71,37 +72,52 @@ class _RefusalSnapshotHistoryPrefix:
     Condensation operating history additionally permits edits to its last row,
     which is copied eagerly while the older, recursively frozen prefix is shared.
     A terminal refusal materializes the prefix before the rollback consumer is
-    called, so restored state still owns an ordinary list with identical
-    ordered content.
+    called, so restored state still owns an ordinary list or insertion-ordered
+    dictionary with identical content.
     """
 
     __slots__ = ('_source', '_length', '_memo', '_tail')
 
     def __init__(
-        self, source: list[Any], memo: Dict[int, Any], *, mutable_tail: int = 0,
+        self, source: list[Any] | Dict[Any, Any], memo: Dict[int, Any], *, mutable_tail: int = 0,
     ) -> None:
         self._source = source
         self._length = max(0, len(source) - mutable_tail)
         self._memo = memo
-        self._tail: list[Any] = []
+        self._tail: list[Any] | Dict[Any, Any] = {} if isinstance(source, dict) else []
         memo[id(source)] = self
         if mutable_tail:
-            self._tail = _deepcopy_refusal_state(source[self._length:], memo)
+            if isinstance(source, dict):
+                keys = tuple(islice(reversed(source), mutable_tail))
+                tail = {key: source[key] for key in reversed(keys)}
+            else:
+                tail = source[self._length:]
+            self._tail = _deepcopy_refusal_state(tail, memo)
 
     def __len__(self) -> int:
         return self._length + len(self._tail)
 
     def __iter__(self):
-        for index in range(self._length):
-            yield self._source[index]
+        if isinstance(self._source, dict):
+            yield from islice(self._source, self._length)
+        else:
+            for index in range(self._length):
+                yield self._source[index]
         yield from self._tail
 
-    def materialize(self) -> list[Any]:
+    def materialize(self) -> list[Any] | Dict[Any, Any]:
         # Terminal refusal is the cold path: pay the legacy copy cost here so
         # restored history remains detached from HourSnapshot objects already
         # returned to callers.  Reuse the live-frontier memo to retain any
         # cross-object aliases the eager whole-state deepcopy preserved.
-        materialized: list[Any] = []
+        if isinstance(self._source, dict):
+            materialized = {}
+            self._memo[id(self._source)] = materialized
+            prefix = dict(islice(self._source.items(), self._length))
+            materialized.update(_deepcopy_refusal_state(prefix, self._memo))
+            materialized.update(self._tail)
+            return materialized
+        materialized = []
         self._memo[id(self._source)] = materialized
         materialized.extend(
             _deepcopy_refusal_state(self._source[:self._length], self._memo)
@@ -117,7 +133,18 @@ class _RefusalSnapshotHistoryPrefix:
         memo.clear()
 
 
-def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
+# These owners append whole rows; their last row can still be aliased by
+# live diagnostics. Retain its ordinary dict/list shape and copy that tail,
+# deferring the committed archive exactly like BatchRecord.snapshots.
+_REFUSAL_APPEND_ONLY_HISTORIES = (
+    ('_backend_status_history', 0),
+    ('_sulfur_saturation_steps', 1),
+    ('_target_inventory_by_hour', 1),
+    ('_yield_disposition_ledger_snapshots', 1),
+)
+
+
+def _materialize_refusal_snapshot_history(state: Dict[str, Any]) -> None:
     """Detach committed history rows when an hour must be rolled back."""
     for owner, field in ((state.get('record'), 'snapshots'),
                          (state.get('_condensation_model'), 'operating_history'),
@@ -125,6 +152,10 @@ def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
         history = getattr(owner, field, None)
         if isinstance(history, _RefusalSnapshotHistoryPrefix):
             setattr(owner, field, history.materialize())
+    for field, _ in _REFUSAL_APPEND_ONLY_HISTORIES:
+        history = state.get(field)
+        if isinstance(history, _RefusalSnapshotHistoryPrefix):
+            state[field] = history.materialize()
 
 
 _REFUSAL_MISSING = object()
@@ -13757,6 +13788,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 memo[id(history)] = _RefusalSnapshotHistoryPrefix(
                     history, memo, mutable_tail=mutable_tail,
                 )
+        for field, mutable_tail in _REFUSAL_APPEND_ONLY_HISTORIES:
+            history = getattr(self, field, None)
+            if defer_committed_history and isinstance(history, (list, dict)):
+                memo[id(history)] = _RefusalSnapshotHistoryPrefix(
+                    history, memo, mutable_tail=mutable_tail,
+                )
         state_source = {
             name: value
             for name, value in self.__dict__.items()
@@ -13878,6 +13915,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 terminal_refusal_state.get('_condensation_model'),
                 'cold_spot_history', None,
             ),
+            *(terminal_refusal_state.get(field)
+              for field, _ in _REFUSAL_APPEND_ONLY_HISTORIES),
         )
         try:
             return self._step_one_hour()
