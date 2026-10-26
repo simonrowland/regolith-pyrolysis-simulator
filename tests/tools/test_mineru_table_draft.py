@@ -89,12 +89,12 @@ def test_printed_caption_label_wins_over_table_block_ordinal(tmp_path: Path) -> 
         [
             {
                 "type": "text",
-                "page_idx": 0,
+                "page_idx": 1,
                 "text": "TABLE 3. Printed caption appears before block five.",
             },
             {
                 "type": "table",
-                "page_idx": 0,
+                "page_idx": 1,
                 "published_page": 410,
                 "table_body": "<table><tr><td>1.0</td></tr></table>",
             },
@@ -110,9 +110,9 @@ def test_printed_caption_label_wins_over_table_block_ordinal(tmp_path: Path) -> 
     tables = yaml.safe_load(index_path.read_text(encoding="utf-8"))["tables"]
     fifth_table = tables[4]
 
-    assert fifth_table["table_key"] == "p001-t05"
+    assert fifth_table["table_key"] == "p002-t05"
     assert fifth_table["locator"] == {
-        "page": 1,
+        "page": 2,
         "table": "3",
         "published_page": 410,
     }
@@ -775,6 +775,108 @@ def test_compare_prefers_draft_table_id_when_printed_label_is_unknown(
     assert results[1]["status"] == "presence-only"
     assert results[1]["matched_cell"]["table_key"] == "p001-t02"
     assert results[1]["draft_candidate_count"] == 1
+
+
+def test_compare_rejects_draft_id_when_printed_label_disagrees(
+    tmp_path: Path,
+) -> None:
+    source_root = tmp_path / "raw" / "label-conflict" / "ocr-mineru" / "p001-p008"
+    source_root.mkdir(parents=True)
+    (source_root / "content_list.json").write_text(
+        json.dumps(
+            [
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_caption": ["Table 3. First table."],
+                    "table_body": "<table><tr><td>1.5</td></tr></table>",
+                },
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_caption": ["Table 4. Second table."],
+                    "table_body": "<table><tr><td>9.0</td></tr></table>",
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+    index_path = draft.convert_source(
+        "label-conflict", tmp_path / "draft", corpus_root=tmp_path / "raw"
+    )
+    extract = {
+        "species": {
+            "Fe": {
+                "observations": [
+                    {
+                        "observation_id": "sample_p001_t01_r02_c01",
+                        "locator": {"page": 1, "table": "4"},
+                        "values": {"points": [{"value": 1.5}]},
+                    }
+                ]
+            }
+        }
+    }
+
+    results = draft.compare_extract_to_draft(extract, index_path)
+
+    assert len(results) == 1
+    assert results[0]["status"] == "locator-error"
+    assert results[0]["matched_cell"] is None
+    assert "selects printed table '3'" in results[0]["locator_issue"]
+    assert "locator declares '4'" in results[0]["locator_issue"]
+
+
+def test_caption_between_tables_does_not_label_both(tmp_path: Path) -> None:
+    source_root = tmp_path / "raw" / "ambiguous-caption" / "ocr-mineru" / "p001-p008"
+    source_root.mkdir(parents=True)
+    (source_root / "content_list.json").write_text(
+        json.dumps(
+            [
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_body": "<table><tr><td>1.5</td></tr></table>",
+                },
+                {
+                    "type": "text",
+                    "page_idx": 0,
+                    "text": "Table 4. Caption between two tables.",
+                },
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_body": "<table><tr><td>9.0</td></tr></table>",
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+    index_path = draft.convert_source(
+        "ambiguous-caption", tmp_path / "draft", corpus_root=tmp_path / "raw"
+    )
+    tables = yaml.safe_load(index_path.read_text(encoding="utf-8"))["tables"]
+    extract = {
+        "species": {
+            "Fe": {
+                "observations": [
+                    {
+                        "observation_id": "plain-observation-id",
+                        "locator": {"page": 1, "table": "4"},
+                        "values": {"points": [{"value": 1.5}]},
+                    }
+                ]
+            }
+        }
+    }
+
+    result = draft.compare_extract_to_draft(extract, index_path)
+
+    assert [table["locator"]["table"] for table in tables] == ["unknown", "unknown"]
+    assert all("TODO" in table["locator_todo"] for table in tables)
+    assert len(result) == 1
+    assert result[0]["status"] == "no-match"
+    assert result[0]["matched_cell"] is None
 
 
 def test_compare_flags_page_pair_outside_mapping_page_offset(tmp_path: Path) -> None:

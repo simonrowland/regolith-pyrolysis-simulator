@@ -503,6 +503,58 @@ def _caption_evidence(
     return captions_by_page
 
 
+def _table_caption_contexts(content: list[Any]) -> dict[int, Any]:
+    """Assign each standalone caption to one adjacent table on its PDF page."""
+    caption_blocks: list[tuple[int, int, Any, bool, bool]] = []
+    page_directions: dict[int, set[str]] = defaultdict(set)
+    for item_index, item in enumerate(content):
+        if (
+            not isinstance(item, Mapping)
+            or item.get("type") != "text"
+            or item.get("page_idx") is None
+            or _printed_table_label(None, item.get("text")) is None
+        ):
+            continue
+        page_idx = int(item["page_idx"])
+        previous = content[item_index - 1] if item_index > 0 else None
+        following = content[item_index + 1] if item_index + 1 < len(content) else None
+        before = (
+            isinstance(previous, Mapping)
+            and previous.get("type") == "table"
+            and previous.get("page_idx") == page_idx
+        )
+        after = (
+            isinstance(following, Mapping)
+            and following.get("type") == "table"
+            and following.get("page_idx") == page_idx
+        )
+        caption_blocks.append((item_index, page_idx, item.get("text"), before, after))
+        if before and not after:
+            page_directions[page_idx].add("below")
+        elif after and not before:
+            page_directions[page_idx].add("above")
+
+    table_contexts: dict[int, list[Any]] = defaultdict(list)
+    for item_index, page_idx, text, before, after in caption_blocks:
+        if before and after:
+            directions = page_directions[page_idx]
+            if len(directions) != 1:
+                continue
+            table_index = item_index + 1 if "above" in directions else item_index - 1
+        elif before:
+            table_index = item_index - 1
+        elif after:
+            table_index = item_index + 1
+        else:
+            continue
+        table_contexts[table_index].append(text)
+    return {
+        table_index: contexts[0]
+        for table_index, contexts in table_contexts.items()
+        if len(contexts) == 1
+    }
+
+
 def _published_page(item: Mapping[str, Any]) -> int | str | None:
     value = item.get("published_page")
     if value is None or isinstance(value, bool):
@@ -667,22 +719,10 @@ def convert_source(
             raise ValueError(f"expected a list of content blocks in {content_file}")
         for page, labels in _caption_evidence(content, chunk_start_page).items():
             caption_evidence[page].update(labels)
+        caption_contexts = _table_caption_contexts(content)
         for item_index, item in enumerate(content):
             if not isinstance(item, Mapping) or item.get("type") != "table":
                 continue
-            caption_context = None
-            for neighbor_index in (item_index - 1, item_index + 1):
-                if neighbor_index < 0 or neighbor_index >= len(content):
-                    continue
-                neighbor = content[neighbor_index]
-                if (
-                    isinstance(neighbor, Mapping)
-                    and neighbor.get("type") == "text"
-                    and neighbor.get("page_idx") == item.get("page_idx")
-                    and _printed_table_label(None, neighbor.get("text")) is not None
-                ):
-                    caption_context = neighbor.get("text")
-                    break
             block_ordinal = len(tables) + 1
             tables.append(
                 _render_table(
@@ -691,7 +731,7 @@ def convert_source(
                     source_file=content_file,
                     chunk_start_page=chunk_start_page,
                     table_dir=table_dir,
-                    caption_context=caption_context,
+                    caption_context=caption_contexts.get(item_index),
                 )
             )
 
@@ -939,12 +979,16 @@ def compare_extract_to_draft(
     draft_by_table: dict[tuple[int, str], list[tuple[dict[str, Any], Decimal]]] = defaultdict(list)
     draft_by_key: dict[str, list[tuple[dict[str, Any], Decimal]]] = defaultdict(list)
     draft_table_keys: set[str] = set()
+    draft_labels_by_key: dict[str, str | None] = {}
     for table in index.get("tables") or []:
         page = int(table["pdf_page"])
         table_key = str(table["table_key"])
         draft_table_keys.add(table_key)
         locator = table.get("locator") or {}
         table_label = _normalize_table_label(locator.get("table"))
+        draft_labels_by_key[table_key] = (
+            None if table_label == "UNKNOWN" else table_label
+        )
         column_headers = {
             int(column["column"]): str(column.get("header") or "")
             for column in table.get("columns") or []
@@ -987,15 +1031,32 @@ def compare_extract_to_draft(
         equation_locator = point.pop("equation_locator")
         keyed_candidates = draft_by_key.get(draft_table_key, [])
         use_draft_table_key = draft_table_key in draft_table_keys
-        location = (page, draft_table_key if use_draft_table_key else table_number)
+        locator_issue = ""
         if equation_locator or page is None:
             indexed_candidates = []
         elif use_draft_table_key:
-            indexed_candidates = keyed_candidates
+            draft_table_label = draft_labels_by_key.get(draft_table_key)
+            if table_number is None:
+                indexed_candidates = keyed_candidates
+            elif draft_table_label == table_number:
+                indexed_candidates = keyed_candidates
+            elif draft_table_label is not None:
+                locator_issue = (
+                    f"draft observation ID selects printed table "
+                    f"{draft_table_label!r}, but locator declares {table_number!r}"
+                )
+                indexed_candidates = []
+            else:
+                indexed_candidates = draft_by_table.get((page, table_number), [])
+                use_draft_table_key = False
         elif table_number is None:
             indexed_candidates = draft_by_page.get(page, [])
         else:
             indexed_candidates = draft_by_table.get((page, table_number), [])
+        location = (
+            page,
+            draft_table_key if use_draft_table_key else table_number,
+        )
         point_value = Decimal(str(point["value"]))
         has_location = any(
             point.get(key) is not None
@@ -1017,7 +1078,9 @@ def compare_extract_to_draft(
             and _phase_matches_column(point.get("phase"), candidate["column_header"])
         ]
         matched_index, matched = matching_candidates[0] if matching_candidates else (None, None)
-        if matched is not None:
+        if locator_issue:
+            status = "locator-error"
+        elif matched is not None:
             consumed[location].add(matched_index)
             status = "matched" if has_location else "presence-only"
         elif equation_locator:
@@ -1032,6 +1095,7 @@ def compare_extract_to_draft(
                 "status": status,
                 "matched_cell": matched,
                 "draft_candidate_count": len(indexed_candidates),
+                "locator_issue": locator_issue,
             }
         )
     for issue in _locator_issues(extract, index):
