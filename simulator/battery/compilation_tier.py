@@ -1560,6 +1560,7 @@ def _pure_phase_attempt(
             origin=origin,
             extra={"engine": engine.value, "returned": str(returned)},
         )
+    h_call_failure = None
     t_ref_props = None
     if t_ref_K is not None and t_ref_K != _ENGINE_ENTHALPY_ANCHOR_K:
         t_ref_float = float(t_ref_K)
@@ -1576,8 +1577,11 @@ def _pure_phase_attempt(
                 ValueError,
                 OSError,
                 RuntimeError,
-            ):
+            ) as exc:
+                # A missing H at T_ref is still the Cp·ΔT fallback. The
+                # notice has to say the H call failed, not only term=engine-Cp.
                 fetched = None
+                h_call_failure = f"{type(exc).__name__}: {exc}"
             fetched_formula = getattr(fetched, "formula", None) if fetched is not None else None
             if fetched_formula and parse_species_formula(str(fetched_formula)) != parse_species_formula(
                 identity.species.formula
@@ -1609,18 +1613,24 @@ def _pure_phase_attempt(
             t_ref_K,
         )
         if correction is None:
+            extra = {
+                "engine": engine.value,
+                "actual_anchor": declared_anchor,
+                "T_ref_K": format(t_ref_K.normalize(), "f"),
+            }
+            if h_call_failure is not None:
+                extra["H_call_at_T_ref"] = "failed"
+                extra["H_call_detail"] = h_call_failure
             return _refuse(
                 RefusalReason.UNSUPPORTED,
                 "pure-phase-enthalpy-anchor-no-H-or-Cp",
                 quantity=quantity,
                 origin=origin,
-                extra={
-                    "engine": engine.value,
-                    "actual_anchor": declared_anchor,
-                    "T_ref_K": format(t_ref_K.normalize(), "f"),
-                },
+                extra=extra,
             )
         correction_J, term = correction
+        if h_call_failure is not None and term == "engine-Cp":
+            term = f"{term} after a failed H call ({h_call_failure})"
         value += correction_J / Decimal(1000)
         call_evidence += f":T_ref={format(t_ref_K.normalize(), 'f')}"
         anchor_notice = Notice(

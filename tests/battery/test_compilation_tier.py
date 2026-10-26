@@ -4799,6 +4799,85 @@ def test_liquid_glass_and_formation_unknown_pressure_stay_unknown() -> None:
     assert "standard_pressure_Pa" in formed.fields
 
 
+def test_failed_enthalpy_call_at_t_ref_is_named_on_the_cp_fallback() -> None:
+    """A raised H call at T_ref stays on the Cp·ΔT value and says so.
+
+    A successful call that simply has no H is the same number and does not
+    use that sentence. No Cp and a raised call still refuse, with the
+    failure on the refusal detail.
+    """
+
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(298 K)"),
+    )
+    observation = F.observation("mgo-tref-fail", "exp-1", identity, Decimal("4"))
+
+    class _Props:
+        def __init__(self, enthalpy, heat_capacity) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = heat_capacity
+            self.S_J_K_mol = 26.0
+            self.absences = ()
+            self.warnings = ()
+
+    def at_temperature(temperature_K: float, *, fail: bool, with_cp: bool):
+        if abs(temperature_K - 298.0) < 1e-9:
+            if fail:
+                raise RuntimeError("t-ref down")
+            return _Props(None, None)
+        if abs(temperature_K - 298.15) < 1e-9:
+            return _Props(1000.0, 40.0 if with_cp else None)
+        return _Props(5000.0, None)
+
+    quiet = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        observation,
+        pure_phase=lambda engine, symbol, temperature_K, pressure_bar: at_temperature(
+            temperature_K, fail=False, with_cp=True
+        ),
+    )
+    failed = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        observation,
+        pure_phase=lambda engine, symbol, temperature_K, pressure_bar: at_temperature(
+            temperature_K, fail=True, with_cp=True
+        ),
+    )
+    assert quiet.refusal_reason is None
+    assert failed.refusal_reason is None
+    assert failed.value == quiet.value
+    assert quiet.notices[0].original == failed.notices[0].original
+    assert "term=engine-Cp" in quiet.notices[0].reason
+    assert "after a failed H call" not in quiet.notices[0].reason
+    assert "term=engine-Cp after a failed H call" in failed.notices[0].reason
+    assert "RuntimeError: t-ref down" in failed.notices[0].reason
+
+    refused = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        observation,
+        pure_phase=lambda engine, symbol, temperature_K, pressure_bar: at_temperature(
+            temperature_K, fail=True, with_cp=False
+        ),
+    )
+    assert refused.value is None
+    assert refused.notices == ()
+    assert refused.refusal_reason is RefusalReason.UNSUPPORTED
+    assert refused.refusal_detail["reason"] == "pure-phase-enthalpy-anchor-no-H-or-Cp"
+    assert refused.refusal_detail["H_call_at_T_ref"] == "failed"
+    assert refused.refusal_detail["H_call_detail"] == "RuntimeError: t-ref down"
+
+
 def test_enthalpy_anchor_without_h_or_cp_refuses_typed() -> None:
     identity = F.oxide_identity(
         "MgO",
