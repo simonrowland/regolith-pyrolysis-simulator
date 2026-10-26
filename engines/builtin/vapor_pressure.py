@@ -333,6 +333,22 @@ def _attach_pO2_floor_inversion_notices(
     return notices
 
 
+def _vapor_pressure_temperature_extrapolation_notice(
+    *,
+    temperature_K: float,
+    valid_range_K: tuple[float, float],
+    reason: str,
+) -> dict[str, Any]:
+    band = (float(valid_range_K[0]), float(valid_range_K[1]))
+    return {
+        "temperature_K": float(temperature_K),
+        "valid_range_K": band,
+        "authority_level": "extrapolated",
+        "certified_band": {"temperature_K": band},
+        "reason": reason,
+    }
+
+
 class VaporPressureComputationError(RuntimeError):
     """Raised when vapor-pressure math cannot produce an authoritative value."""
 
@@ -3330,10 +3346,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         valid_low = float(valid_range[0])
                         valid_high = float(valid_range[1])
                         if T_K < valid_low or T_K > valid_high:
-                            metal_extrapolations[species] = {
-                                "temperature_K": T_K,
-                                "valid_range_K": (valid_low, valid_high),
-                            }
+                            metal_extrapolations[species] = (
+                                _vapor_pressure_temperature_extrapolation_notice(
+                                    temperature_K=T_K,
+                                    valid_range_K=(valid_low, valid_high),
+                                    reason=(
+                                        compiled_reference_evaluator.out_of_range_status
+                                        if compiled_reference_evaluator is not None
+                                        else "extrapolated_beyond_valid_range_K"
+                                    ),
+                                )
+                            )
                             warnings.append(
                                 f"{species} metal Antoine fit extrapolated beyond "
                                 f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
@@ -3516,11 +3539,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if valid_liq is not None:
                     vlo, vhi = valid_liq
                     if T_K < vlo or T_K > vhi:
-                        metal_extrapolations[species] = {
-                            "temperature_K": T_K,
-                            "valid_range_K": (vlo, vhi),
-                            "rail": "liquid_oxide_standard_reaction",
-                        }
+                        metal_extrapolations[species] = (
+                            _vapor_pressure_temperature_extrapolation_notice(
+                                temperature_K=T_K,
+                                valid_range_K=(vlo, vhi),
+                                reason="extrapolated_beyond_valid_range_K",
+                            )
+                        )
+                        metal_extrapolations[species]["rail"] = (
+                            "liquid_oxide_standard_reaction"
+                        )
                         warnings.append(
                             f"{species} liquid-oxide standard reaction "
                             f"extrapolated beyond valid_range_K "
@@ -3671,15 +3699,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     if valid_gas is not None:
                         vlo, vhi = valid_gas
                         if T_K < vlo or T_K > vhi:
-                            metal_extrapolations[species] = {
-                                "temperature_K": T_K,
-                                "valid_range_K": (vlo, vhi),
-                                "rail": "gas_rail_standard_reaction",
-                            }
+                            metal_extrapolations[species] = (
+                                _vapor_pressure_temperature_extrapolation_notice(
+                                    temperature_K=T_K,
+                                    valid_range_K=(vlo, vhi),
+                                    reason="extrapolated_beyond_valid_range_K",
+                                )
+                            )
                             warnings.append(
                                 f"{species} gas-rail liquid-oxide standard reaction "
                                 f"extrapolated beyond valid_range_K "
                                 f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
+                            )
+                            metal_extrapolations[species]["rail"] = (
+                                "gas_rail_standard_reaction"
                             )
                     log_P_gas = _antoine_log10_pressure(A_g, B_g, C_g, T_K)
                     P_reference_Pa = _pow10_pressure_or_raise(
@@ -4051,6 +4084,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "raw_metal_activity_root": metal_activity_root,
                     "source_label": source_label,
                 }
+                if species in metal_extrapolations:
+                    provenance["extrapolation_notice"] = dict(
+                        metal_extrapolations[species]
+                    )
                 if P_reference_Pa is not None:
                     provenance["P_reference_Antoine_Pa"] = P_reference_Pa
                 if reconstructed_vapor_limit is not None:
@@ -4233,12 +4270,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         # t-838 pilot: the domain miss demotes evidence, not
                         # the numeric source reaction. Other rails retain their
                         # existing admission policy until separately reviewed.
-                        oxide_vapor_extrapolations[name] = {
-                            "temperature_K": T_K,
-                            "valid_range_K": (valid_low, valid_high),
-                            "authority_level": "extrapolated",
-                            "reason": "oxide_vapor_pressure_out_of_validated_range",
-                        }
+                        oxide_vapor_extrapolations[name] = (
+                            _vapor_pressure_temperature_extrapolation_notice(
+                                temperature_K=T_K,
+                                valid_range_K=(valid_low, valid_high),
+                                reason=(
+                                    "oxide_vapor_pressure_out_of_validated_range"
+                                ),
+                            )
+                        )
                     else:
                         extrapolation_allowed_range = _range_tuple(
                             data.get("extrapolation_allowed_range_K")
@@ -4259,14 +4299,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                                 "extrapolation_allowed_range_K="
                                 f"[{allowed_low:g}, {allowed_high:g}]"
                             )
-                        oxide_vapor_extrapolations[name] = {
-                            "temperature_K": T_K,
-                            "valid_range_K": (valid_low, valid_high),
-                            "extrapolation_allowed_range_K": (
-                                allowed_low,
-                                allowed_high,
-                            ),
-                        }
+                        oxide_vapor_extrapolations[name] = (
+                            _vapor_pressure_temperature_extrapolation_notice(
+                                temperature_K=T_K,
+                                valid_range_K=(valid_low, valid_high),
+                                reason=(
+                                    "oxide_vapor_pressure_out_of_validated_range"
+                                ),
+                            )
+                        )
+                        oxide_vapor_extrapolations[name][
+                            "extrapolation_allowed_range_K"
+                        ] = (allowed_low, allowed_high)
                     warnings.append(
                         f"{name} oxide-vapor Antoine fit extrapolated beyond "
                         f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
@@ -4321,12 +4365,22 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 pO2_exponent = compiled_evaluator.pO2_exponent
                 pO2_scaled = bool(pO2_exponent)
                 if evaluation.out_of_range:
-                    oxide_vapor_extrapolations[name] = {
-                        "temperature_K": T_K,
-                        "valid_range_K": compiled_evaluator.valid_temperature_K,
-                        "status": evaluation.status,
-                        "acquisition_flag": evaluation.acquisition_flag,
-                    }
+                    oxide_vapor_extrapolations[name] = (
+                        _vapor_pressure_temperature_extrapolation_notice(
+                            temperature_K=T_K,
+                            valid_range_K=compiled_evaluator.valid_temperature_K,
+                            reason=(
+                                evaluation.status
+                                or compiled_evaluator.out_of_range_status
+                            ),
+                        )
+                    )
+                    oxide_vapor_extrapolations[name]["status"] = (
+                        evaluation.status
+                    )
+                    oxide_vapor_extrapolations[name]["acquisition_flag"] = (
+                        evaluation.acquisition_flag
+                    )
                     warnings.append(str(evaluation.status))
                     # Premise: the compiled evaluator's consequence-aware
                     # continuation is its best available point estimate; refusing
@@ -4335,9 +4389,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     # Algebra: P_eq = 10**log10(P_cont),
                     # with activity and fO2 powers already applied exactly once
                     # by evaluate(). Units: P_eq remains Pa. Sanity: only the two
-                    # fields above change at the boundary (typed warning +
-                    # acquisition flag); the pressure remains continuous for every
-                    # status-bearing compiled carrier.
+                    # status and acquisition metadata change at the boundary;
+                    # the pressure remains continuous for every status-bearing
+                    # compiled carrier.
             else:
                 assert coefficients is not None
                 # Premise: above-band SiO retains its source reaction fit.
@@ -4481,9 +4535,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
-                if name == "SiO" and oxide_extrapolated:
+                oxide_notice = oxide_vapor_extrapolations.get(name)
+                if (
+                    oxide_notice is not None
+                    and oxide_notice.get("authority_level") == "extrapolated"
+                ):
                     vapor_pressure_provenance[name]["extrapolation_notice"] = dict(
-                        oxide_vapor_extrapolations[name]
+                        oxide_notice
                     )
                 oxygen_notice = (
                     evaluation.extrapolation_notice

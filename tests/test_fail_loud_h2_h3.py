@@ -261,13 +261,43 @@ def test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite() -> None:
     assert result.diagnostic["pO2_bar"] == pytest.approx(1.0e-9)
     assert all(math.isfinite(value) for value in pressures.values())
 
-    with pytest.raises(VaporPressureComputationError, match="out_of_validated_range"):
-        provider.dispatch(
-            _vapor_request(
-                temperature_c=3000.0,
-                pO2_bar=1.0e-9,
-            )
+    # Mutation pinned: remove the compiled extrapolation reason, authority,
+    # or certified band while leaving the predicted pressure finite.
+    extreme = provider.dispatch(
+        _vapor_request(
+            temperature_c=3000.0,
+            pO2_bar=1.0e-9,
         )
+    )
+    extreme_pressures = dict(extreme.diagnostic["vapor_pressures_Pa"])
+    notices = extreme.diagnostic["extrapolated_beyond_valid_range_K"]
+    expected_species = {"Si", "SiO", "Si2", "Si3", "SiO2_gas"}
+
+    assert extreme.status == "ok"
+    assert all(math.isfinite(value) for value in extreme_pressures.values())
+    assert set(notices) == expected_species
+    for species in expected_species:
+        notice = notices[species]
+        assert notice["reason"]
+        assert notice["authority_level"] == "extrapolated"
+        assert notice["certified_band"]["temperature_K"] == notice[
+            "valid_range_K"
+        ]
+        assert extreme.diagnostic["vapor_pressure_numerator_provenance"][species][
+            "extrapolation_notice"
+        ] == notice
+    assert notices["Si"]["reason"] == (
+        provider._vapour_rail_catalog.evaluator_for_hot_train(
+            "Si",
+            process_phase=None,
+        ).out_of_range_status
+    )
+    assert notices["SiO"]["reason"] == (
+        "oxide_vapor_pressure_out_of_validated_range"
+    )
+    for species in expected_species - {"Si", "SiO"}:
+        if "status" in notices[species]:
+            assert notices[species]["reason"] == notices[species]["status"]
 
 
 def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:

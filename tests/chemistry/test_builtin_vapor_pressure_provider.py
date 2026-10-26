@@ -2754,6 +2754,9 @@ def test_sio_oxide_vapor_extrapolation_predicts_with_certified_band(
         "temperature_K": temperature_K,
         "valid_range_K": (1400.0, 2273.15),
         "authority_level": "extrapolated",
+        "certified_band": {
+            "temperature_K": (1400.0, 2273.15),
+        },
         "reason": "oxide_vapor_pressure_out_of_validated_range",
     }
     assert diagnostic["vapor_pressure_numerator_provenance"]["SiO"][
@@ -2815,6 +2818,7 @@ def test_sio_extrapolation_notice_reaches_public_numeric_answer(vapor_pressure_d
         "temperature_K": 2473.15,
         "valid_range_K": [1400.0, 2273.15],
         "authority_level": "extrapolated",
+        "certified_band": {"temperature_K": [1400.0, 2273.15]},
         "reason": "oxide_vapor_pressure_out_of_validated_range",
     }
 
