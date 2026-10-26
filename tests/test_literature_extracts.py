@@ -5331,3 +5331,24 @@ def test_offer10_extract_locators_use_physical_pdf_pages() -> None:
         "pdf_page_index": 11,
         "figure": "6",
     }
+
+
+def test_khedim_2008_thesis_locators_use_printed_annex_3_heading() -> None:
+    source = EXTRACTS / "khedim-2008-chromia-solubility-thesis.yaml"
+    extract = yaml.safe_load(source.read_text())
+    observations = {
+        row["observation_id"]: row
+        for collection in ("observations", "context")
+        for row in extract["species"]["Cr"].get(collection, [])
+    }
+    expected = {
+        "khedim_2008_chromia_solubility_thesis_p169_t20_r04_c03": (169, 168),
+        "khedim_2008_chromia_solubility_thesis_p170_t21_r03_c03": (170, 169),
+        "khedim_2008_chromia_solubility_thesis_p170_t22_r03_c03": (170, 169),
+        "khedim_2008_chromia_solubility_thesis_p170_t23_r03_c03": (170, 169),
+    }
+    for observation_id, (page, pdf_page_index) in expected.items():
+        locator = observations[observation_id]["locator"]
+        assert locator["page"] == page
+        assert locator["pdf_page_index"] == pdf_page_index
+        assert locator["table"] == "Annexe 3"

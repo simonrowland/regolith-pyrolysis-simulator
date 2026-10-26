@@ -243,7 +243,7 @@ def _assert_render_grid_matches(document: dict, grid: list[dict] | None = None) 
             locator = observation["locator"]
         assert locator["page"] == row["page"]
         assert locator["pdf_page_index"] == row["pdf_page_index"]
-        assert locator["table"] == row["table"]
+        assert locator["table"] == "Annexe 3"
         assert locator["row"] == row["buffer"]
         assert values["T_C"] == row["T_C"]
         assert values["composition_as_published"] == row["composition_as_published"]
