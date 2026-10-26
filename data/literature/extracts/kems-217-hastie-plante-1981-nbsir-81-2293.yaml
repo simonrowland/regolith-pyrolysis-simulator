@@ -1,0 +1,235 @@
+schema_version: literature_extract.v1
+source_id: kems-217-hastie-plante-1981-nbsir-81-2293
+source:
+  citation: >-
+    Hastie, J. W. and Plante, E. R. (1981), "Mass Spectrometric Studies of MHD
+    Slag Thermochemistry", NBSIR 81-2293, National Bureau of Standards, June
+    1981 (interim report).
+  doi: 10.6028/NBS.IR.81-2293
+  url: https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nbsir81-2293.pdf
+  year: 1981
+extraction:
+  method: >-
+    Machine-text-first audit. The 17 printed Table 1 fit rows were checked
+    against PDF pages 19-21 and matched row-for-row to Table 2 already stored
+    in kems-020-hastie-1981-nbsir, so no duplicate fit observations were emitted.
+    Figure-only data were not digitised.
+  date: '2026-10-26'
+  worker: w1026b-hast81b
+  provenance_path: raw/kems-217-hastie-plante-1981-nbsir-81-2293/kems-217-hastie-plante-1981-nbsir-81-2293.pdf
+review_status: draft
+species: {}
+benches:
+  - id: kms
+    identity:
+      basis: described_in_this_work
+    apparatus_family:
+      state:
+        tag: value
+        value: Knudsen Effusion Mass Spectrometric method
+      locator:
+        page: 7
+        section: '1'
+    method:
+      state:
+        tag: value
+        value: Knudsen Effusion Mass Spectrometry
+      locator:
+        page: 7
+        section: '1'
+    other_facts:
+      - name: upper_pressure_limit
+        unit: atm
+        value:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1e-4'
+          locator:
+            page: 7
+            section: '1'
+            note: Method upper limit; not an experimental total pressure.
+      - name: upper_gas_residence_time
+        unit: s
+        value:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.04'
+              approximate: true
+          locator:
+            page: 7
+            section: '1'
+            note: Method upper limit; not a per-run residence time.
+  - id: tms
+    identity:
+      basis: described_in_this_work
+    apparatus_family:
+      state:
+        tag: value
+        value: Transpiration Mass Spectrometric method
+      locator:
+        page: 7
+        section: '1'
+    method:
+      state:
+        tag: value
+        value: Transpiration Mass Spectrometry
+      locator:
+        page: 7
+        section: '1'
+    other_facts:
+      - name: upper_pressure_limit
+        unit: atm
+        value:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1'
+          locator:
+            page: 7
+            section: '1'
+            note: Method upper limit; not an experimental total pressure.
+      - name: upper_gas_residence_time
+        unit: s
+        value:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '20'
+              approximate: true
+          locator:
+            page: 7
+            section: '1'
+            note: Method upper limit; not a per-run residence time.
+experiments:
+  - experiment_id: tms-salt-slag-exchange
+    bench_id: tms
+    method: transpiration
+    locator:
+      page: 15
+      published_page: 11
+      section: '5.1'
+      figure: '7'
+      note: TMS salt-slag exchange; its activity data are already in kems-020.
+    sample:
+      form:
+        state:
+          tag: value
+          value: NaCl + K1 slag
+        locator:
+          page: 15
+          published_page: 11
+          section: '5.1'
+      printed_composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: wt_percent
+            components:
+              - [K2O, '19.4']
+        locator:
+          page: 15
+          published_page: 11
+          section: '5.1'
+          note: Partial printed analysis; no other components are specified.
+    apparatus:
+      calibration:
+        pressure_factor_method:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            section: '1'
+            note: The methods are referred to earlier works; no calibration procedure is given here.
+        activity_check:
+          state:
+            tag: value
+            value: >-
+              The authors report that the near-unit NaCl activity confirms the
+              factors used to convert mass-spectral ion intensities to partial
+              pressures and indicates thermodynamic equilibrium.
+          locator:
+            page: 16
+            published_page: 12
+            section: '5.1'
+            figure: '7'
+source_metadata:
+  table1_overlap:
+    locator:
+      page: 19
+      table: '1'
+      note: Table continues on PDF pages 20-21.
+    printed_row_count: 17
+    render_audit:
+      method: pdftoppm page renders
+      pages:
+        - 19
+        - 20
+        - 21
+      result: All Table 1 cells were checked against their printed row and column.
+    duplicate_rows:
+      source_id: kems-020-hastie-1981-nbsir
+      table: '2'
+      row_count: 17
+      matching_fields:
+        - A and B coefficients
+        - temperature range
+        - additional C, D, and E coefficients
+        - composition values and ranges
+      comparison: >-
+        All 17 rows match their kems-020 Table 2 counterpart by the numeric
+        fit fingerprint and composition. C/D/E values are retained in the
+        prior extract's additional_coefficients_as_printed field. Composition
+        is retained across its system, phase, comment, and composition fields.
+        Formatting and footnote markers differ in a few text cells; numeric
+        values and row assignments agree.
+      row_numbers:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+        - 9
+        - 10
+        - 11
+        - 12
+        - 13
+        - 14
+        - 15
+        - 16
+        - 17
+  mineru_inventory:
+    - pdf_page: 35
+      table_index: 1
+      content: NBS bibliographic datasheet
+      scientific_measurements: false
+    - content: Invented chart tables inside details blocks
+      count: 7
+      scientific_measurements: false
+  figure_read_candidates:
+    - figure: '1'
+      content: Non-equilibrium K2O-Al2O3-SiO2 vaporization.
+    - figure: '2'
+      content: K pressures over synthetic Western and Eastern channel slags.
+    - figure: '3'
+      content: K and O2 partial pressures over synthetic Eastern channel slag.
+    - figure: '4'
+      content: K2O dissociation-pressure comparison for synthetic and simplified Western slags.
+    - figure: '5'
+      content: K2O activity coefficient versus temperature and composition for K1 slag.
+    - figure: '6'
+      content: Plasma-slag K2O dissociation-pressure comparison.
+    - figure: '7'
+      content: TMS NaCl and KCl activities during salt-slag exchange.
+    - figure: '8'
+      content: KCl activity for the NaCl(s)-K2 slag system.
