@@ -61,6 +61,71 @@ def test_mysen_kushiro_1988_tables_and_migrated_percent_pins() -> None:
     assert len(t3["values"]["weight_percent_rows"]) == 5
     assert len(t3["values"]["atomic_proportion_rows"]) == 4
     assert len(t4["values"]["rows"]) == 4
+
+    table2_points = [
+        point
+        for observation in (
+            t2,
+            species["MgO"]["observations"][0],
+            species["Mg2SiO4"]["observations"][0],
+        )
+        for point in observation["values"]["points"]
+    ]
+    no_h_rows = [
+        point for point in table2_points
+        if point.get("point_conditions", {}).get("pressure_medium_as_printed", {}).get("state", {}).get("value")
+        == "No H"
+    ]
+    argon_rows = [
+        point for point in table2_points
+        if point.get("point_conditions", {}).get("pressure_medium_as_printed", {}).get("state", {}).get("value")
+        == "Ar used as pressure medium"
+    ]
+    assert sorted(
+        (point["point_conditions"]["pressure_medium_as_printed"]["locator"]["row"], point["T_C"])
+        for point in no_h_rows
+    ) == [(24, "1400"), (25, "1500"), (26, "1500"), (27, "1550"), (28, "1600"), (61, "1600")]
+    assert all(point["P_H2_as_printed"] == "1.0 × 10^-9 ** (No H) bar" for point in no_h_rows)
+    assert all(
+        point["point_conditions"]["hydrogen_pressure_bar"]["state"]["tag"] == "unknown"
+        and point["point_conditions"]["hydrogen_pressure_bar"]["state"]["reason"] == "not_applicable"
+        and point["point_conditions"]["total_pressure_Pa"]["state"]["tag"] == "unknown"
+        for point in no_h_rows
+    )
+    assert sorted(
+        (point["point_conditions"]["pressure_medium_as_printed"]["locator"]["row"], point["T_C"])
+        for point in argon_rows
+    ) == [(11, "1618"), (13, "1640"), (16, "1661"), (62, "1540"), (63, "1600"), (64, "1650")]
+    assert all(
+        "*" in point["P_H2_as_printed"] and "**" not in point["P_H2_as_printed"]
+        and point["point_conditions"]["total_pressure_Pa"]["state"]["tag"] == "unknown"
+        for point in argon_rows
+    )
+
+    # PDF p. 6 render: single-star runs are sealed Pt; double-star runs use H2 in Mo Knudsen cells.
+    table4_rows = t4["values"]["rows"]
+    assert [
+        (row["run_no_as_printed"], row["pressure_interpretation_as_printed"], row["pressure_bar_as_printed"])
+        for row in table4_rows
+    ] == [
+        ("2882*", "Sealed Pt containers", "1.0 × 10^-8"),
+        ("2883*", "Sealed Pt containers", "1.0 × 10^-8"),
+        ("2892**", "Mo Knudsen cells with H2 as pressure medium", "9.0 × 10^-8"),
+        ("2894**", "Mo Knudsen cells with H2 as pressure medium", "9.0 × 10^-8"),
+    ]
+    assert all(row["total_pressure_Pa"]["state"]["tag"] == "unknown" for row in table4_rows)
+    assert [row["hydrogen_pressure_bar"]["state"]["tag"] for row in table4_rows] == [
+        "unknown", "unknown", "value", "value"
+    ]
+    assert [row["hydrogen_pressure_bar"]["state"].get("value") for row in table4_rows] == [
+        None, None, "9.0 × 10^-8 bar", "9.0 × 10^-8 bar"
+    ]
+    assert [row["locator"]["page"] for row in table4_rows] == [6, 6, 6, 6]
+    assert [row["locator"]["table"] for row in table4_rows] == ["4", "4", "4", "4"]
+    assert [row["locator"]["row"] for row in table4_rows] == [2, 3, 4, 5]
+    assert [row["hydrogen_pressure_bar"]["locator"]["row"] for row in table4_rows] == [2, 3, 4, 5]
+    assert "no H2 pressure is stated" in table4_rows[0]["hydrogen_pressure_bar"]["locator"]["note"]
+    assert "H2 pressure printed" in table4_rows[2]["hydrogen_pressure_bar"]["locator"]["note"]
     assert len(t6_context["values"]["analytical_totals"]) == 3
     assert len(t6_context["values"]["atomic_proportions"]) == 3
     assert t5_640["delta_Hv_as_printed"] == "640 ± 36"
