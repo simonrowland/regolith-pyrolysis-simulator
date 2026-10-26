@@ -54,6 +54,10 @@ def _make_guard_suite(pytester, *, source: str, roster: tuple[tuple[str, str], .
         pytest.param(("tests/", "tests/sub/"), id="tests-plus-subdirectory"),
         pytest.param((".",), id="repository-root"),
         pytest.param((), id="configured-testpaths"),
+        pytest.param(
+            ("tests/", "tests/test_synthetic.py::test_unrostered_heavy_node"),
+            id="tests-plus-node-id",
+        ),
     ],
 )
 def test_suite_shape_collection_audit_catches_deselected_phantom_and_unrostered_heavy(
@@ -99,6 +103,10 @@ def test_suite_shape_collection_audit_catches_deselected_phantom_and_unrostered_
             ("-k", "real_node", "tests/test_synthetic.py"),
             id="focused-file-and-k",
         ),
+        pytest.param(
+            ("tests/test_synthetic.py::test_real_node",),
+            id="focused-node-id",
+        ),
         pytest.param(("tests/sub/",), id="focused-subdirectory"),
     ],
 )
@@ -112,6 +120,22 @@ def test_suite_shape_collection_audit_skips_phantoms_for_focused_run(
     )
 
     result = pytester.runpytest_subprocess("--collect-only", *run_args)
+
+    assert result.ret == pytest.ExitCode.OK
+    assert "phantom row" not in result.stderr.str()
+
+
+def test_suite_shape_collection_audit_skips_phantoms_for_dot_from_subdirectory(
+    pytester, monkeypatch,
+) -> None:
+    _make_guard_suite(
+        pytester,
+        roster=(("tests/test_synthetic.py", "test_phantom_node"),),
+        source="def test_real_node():\n    pass\n",
+    )
+    monkeypatch.chdir(pytester.path / "tests" / "sub")
+
+    result = pytester.runpytest_subprocess("--collect-only", ".")
 
     assert result.ret == pytest.ExitCode.OK
     assert "phantom row" not in result.stderr.str()

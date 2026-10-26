@@ -232,14 +232,19 @@ def _is_whole_suite_request(config) -> bool:
         return False
     root = Path(config.rootpath).resolve()
     tests_root = (root / "tests").resolve()
-    args = list(config.args) or list(config.getini("testpaths"))
-    if not args or any("::" in str(argument) for argument in args):
+    args = list(config.args)
+    if config.args_source is config.ArgsSource.TESTPATHS:
+        args = list(config.getini("testpaths"))
+        base = root
+    else:
+        base = Path(config.invocation_params.dir).resolve()
+    if not args:
         return False
     requested = []
     for argument in args:
-        path = Path(str(argument))
+        path = Path(str(argument).split("::", 1)[0])
         if not path.is_absolute():
-            path = root / path
+            path = base / path
         requested.append(path.resolve())
     return root in requested or tests_root in requested
 
