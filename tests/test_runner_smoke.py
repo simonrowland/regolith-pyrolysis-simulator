@@ -96,8 +96,9 @@ MASS_BALANCE_MAX_PCT = 5e-12
 SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
         # d-252 / physics seq 923: computed C0 exit advances the 24 h run.
-        "flux_maps_sha256": "6f6b8e6f2137ffb369ec3079cd7305324325713cad87be2e6d609fe9911b6267",
-        "ledger_sha256": "fabe87d7c89cd5622ab3b77734e2ef1f307f3b7af48e5175723c14d93a4dea3e",
+        # b-952: formula-owner carrier molar masses move these at floating-point round-off.
+        "flux_maps_sha256": "b9248ee9ccfe246e512e64da0ca223d2d18a09e78a11eda09ab541ae5a92106b",
+        "ledger_sha256": "fe84c891cfb2ae72754802bfe64a04e28e30f2544e538c2186a86c585b94d4e7",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
