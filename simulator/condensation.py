@@ -1520,208 +1520,43 @@ class CondensationRouteResult:
         return (sio_condensed_kg * sio_to_sio2) / feedstock_kg
 
 
-class CondensationModel:
-    """
-    Routes evaporated species through the condensation train.
-
-    For each species in the evaporation flux, calculates the
-    fraction that condenses in each stage based on the stage
-    temperature relative to the species' condensation temperature.
-    """
-
-    def __init__(
+class _CondensationRoutePhysics:
+    def _build_default_pipe_segments(
         self,
-        train: CondensationTrain,
-        vapor_pressure_data: MutableMapping[str, Any] | None = None,
-        wall_surface_area_m2: float | None = None,
-        wall_temperature_C: float = DEFAULT_PIPE_TEMPERATURE_C,
-        materials: Mapping[str, Any] | None = None,
-        species_formula_registry: Mapping[str, Any] | None = None,
-    ):
-        self.train = train
-        # Owner-boundary projection: schema-v2 → legacy view once so the
-        # per-species hot path never re-digests/recompiles the full catalog
-        # (content-digest identity is correct but ~3 ms/hit on production
-        # payloads; 72 species × 2 loops reintroduced the ~151 ms class).
-        if vapor_pressure_data is None:
-            self.vapor_pressure_data = None
-        else:
-            raw = copy.deepcopy(vapor_pressure_data)
-            owned_catalog_payload = getattr(raw, "catalog_payload", None)
-            if (
-                isinstance(raw, Mapping)
-                and raw.get("schema_version") == 2
-                and "families" in raw
-            ):
-                compatibility_view = VaporPressureCompatibilityView(
-                    vapor_pressure_legacy_view(raw), raw
-                )
-                # The route cache relies on payload identity after this point.
-                # Freeze the owned copy at construction so a cached compiled
-                # catalog cannot outlive a silent in-place payload mutation.
-                compatibility_view.catalog_payload = _freeze_catalog_value(
-                    compatibility_view.catalog_payload
-                )
-                self.vapor_pressure_data = compatibility_view
-            elif (
-                isinstance(owned_catalog_payload, Mapping)
-                and owned_catalog_payload.get("schema_version") == 2
-                and "families" in owned_catalog_payload
-            ):
-                # Session callers may already provide the legacy facade; its
-                # authoritative schema-v2 payload still needs the same owner
-                # boundary freeze before route-local identity caching.
-                raw.catalog_payload = _freeze_catalog_value(
-                    owned_catalog_payload
-                )
-                self.vapor_pressure_data = raw
-            else:
-                self.vapor_pressure_data = raw
-        self.materials = copy.deepcopy(
-            materials if materials is not None else MATERIALS_DATA
+        wall_temperature_C: float,
+    ) -> list[PipeSegment]:
+        stages = sorted(self.train.stages, key=lambda stage: stage.stage_number)
+        if len(stages) < 2:
+            return []
+        diameter_m = require_lab_pipe_diameter(
+            self.pipe_diameter_m, 'pipe_diameter_m')
+        total_length_m = (
+            max(0.0, float(self.wall_surface_area_m2))
+            / (math.pi * diameter_m)
         )
-        self.species_formula_registry = species_formula_registry or {}
+        length_m = total_length_m / float(len(stages) - 1)
+        segments: list[PipeSegment] = []
+        for upstream, downstream in zip(stages, stages[1:]):
+            downstream_material = _stage_material_config(downstream, self.materials)
+            segments.append(PipeSegment(
+                name=(
+                    f'stage_{upstream.stage_number}'
+                    f'_to_stage_{downstream.stage_number}'
+                ),
+                upstream_stage=f'stage_{upstream.stage_number}',
+                downstream_stage=f'stage_{downstream.stage_number}',
+                wall_temperature_C=float(wall_temperature_C),
+                length_m=length_m,
+                inner_diameter_m=diameter_m,
+                declared_area_m2=self._stage_area_m2_for_stage_number(
+                    downstream.stage_number),
+                liner_material=str(
+                    downstream_material.get('liner_material') or ''
+                ),
+            ))
+        return segments
 
-        for label, value in (
-            ('wall_surface_area_m2', wall_surface_area_m2),
-            ('wall_temperature_C', wall_temperature_C),
-        ):
-            if value is not None and not is_declared_real_scalar(
-                value,
-                allow_numeric_str=True,
-            ):
-                raise ValueError(f'{label} must be numeric')
-
-        # 0.5.4.1 review-cluster-C (P2 #1, evening-4commits review):
-        # per-instance per-species condensation temperatures so each
-        # CondensationModel can carry its own setpoints overrides
-        # without cross-contaminating the module-level
-        # ``CONDENSATION_TEMPS_C`` dict. Multi-tenant servers
-        # (``web/events.py`` per-SID, ``runner.py`` per-run
-        # setpoints_path) need this isolation. Initialised from the
-        # module-level fallback; ``apply_setpoints_overrides`` later
-        # merges YAML values into this instance dict only — the
-        # module dict is no longer the canonical production-path
-        # source-of-truth (it remains the fallback for callers
-        # that don't pass an instance).
-        self.condensation_temperatures_C: dict[str, float] = dict(
-            CONDENSATION_TEMPS_C
-        )
-        self.wall_surface_area_m2 = (
-            float(wall_surface_area_m2)
-            if wall_surface_area_m2 is not None
-            else _default_pipe_surface_area_m2()
-        )
-        self.wall_temperature_C = float(wall_temperature_C)
-        self.overhead_pressure_mbar = 0.0
-        self.species_partial_pressures_mbar: dict[str, float] = {}
-        self._species_partial_pressures_configured = False
-        self.wall_species_partial_pressures_pa: dict[str, float] = {}
-        self.wall_species_partial_pressures_pa_by_segment: dict[
-            str, dict[str, float]
-        ] = {}
-        self.pipe_diameter_m = DEFAULT_PIPE_DIAMETER_M
-        self.stage_area_m2_by_stage: dict[str, float] = {}
-        self.stage_area_geometry_provenance_notice: dict[str, Any] = {}
-        self.gas_temperature_C = float(wall_temperature_C)
-        self.carrier_gas = DEFAULT_CARRIER_GAS
-        # Induction-stirring intensity — recipe-controlled per
-        # ``setpoints.yaml § induction_stirring``. Constructor default
-        # is ``1.0`` (no-stir laminar baseline, ``Sh = 3.66``), NOT the
-        # ``MeltState.stir_factor = 6.0`` default. The two are
-        # intentionally different: ``MeltState`` is the operator-facing
-        # field carrying the C2A recipe value, ``CondensationModel`` is
-        # a transport object whose flux helpers reduce to honest
-        # no-stir physics until ``configure_operating_conditions(
-        # stir_factor=...)`` pushes the recipe value through. Direct-
-        # construction callers (typically unit tests) MUST call
-        # ``configure_operating_conditions`` before ``route()`` for the
-        # series-resistance branch to engage; otherwise ``regime_factor
-        # = 1.0`` (free-molecular default) collapses the form back to
-        # pure HKL. gstack /review subagent flagged this Phase B P3 as
-        # a footgun for future direct-construction tests; documenting
-        # rather than coupling here avoids importing state.py for what
-        # is properly an operator-boundary concern.
-        self.stir_factor = 1.0
-        # 0.5.3 Phase B (2-axis stirring): the radial axis is the
-        # canonical Sh driver. Constructor default ``None`` is the
-        # explicit "not configured" sentinel — the deposition helper
-        # (``_stirring_enhanced_sherwood``) falls back to the legacy
-        # ``stir_factor`` when ``radial_stir_factor is None``, which
-        # preserves pre-Phase-B Sh-enhancement semantics for legacy
-        # callers that only pass ``stir_factor`` to
-        # ``configure_operating_conditions``.
-        #
-        # Phase B chunk-review P1 (codex 2026-05-28): the previous
-        # default of ``1.0`` made the radial axis ALWAYS take precedence
-        # in the deposition call (per helper precedence: explicit
-        # radial wins over stir_factor) so a legacy
-        # ``configure_operating_conditions(stir_factor=6)`` call left
-        # Sh stuck at the laminar 3.66 baseline — silently broke the
-        # documented 0.5.2 backward-compat. The ``None`` sentinel lets
-        # the helper's fallback fire.
-        self.radial_stir_factor: float | None = None
-        self.knudsen_number = math.inf
-        self.regime_factor = 1.0
-        self.knudsen_regime = KnudsenRegime.FREE_MOLECULAR
-        self._knudsen_policy_configured = False
-        self.lab_geometry: LabGeometry | None = None
-        self.pipe_segments = self._build_default_pipe_segments(
-            float(wall_temperature_C))
-        self.cold_spot_margin_C = COLD_SPOT_MARGIN_C
-        self.upstream_hot_wall_min_C = DEFAULT_UPSTREAM_HOT_WALL_MIN_C
-        self.last_cold_spot_diagnostic: dict[str, Any] = {
-            'has_cold_spot': False,
-            'warnings': [],
-            'findings': [],
-            'has_upstream_hot_wall_violation': False,
-            'upstream_hot_wall_warnings': [],
-            'upstream_hot_wall_findings': [],
-            'upstream_hot_wall_min_C': DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
-        }
-        self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
-        self.last_sticking_alpha_provenance_notice: dict[str, Any] = {}
-        self.wall_temperature_input_refusals: dict[str, str] = {}
-        self.last_transport_parameter_notice: dict[str, Any] = {}
-        self.last_capture_budget_regularizer_notice: dict[str, Any] = {}
-        # VR-11 / B2: consumer-facing condensation refusal channel.
-        self.last_condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
-        self.last_condensation_authority_by_species: dict[str, dict[str, Any]] = {}
-        self.last_wall_deposition_rate_shadow_candidate: dict[
-            str, dict[str, Any]
-        ] = {}
-        self.last_wall_capture_fixed_point_iterations = 0
-        self.wall_alkali_binding_diagnostic_state_by_account: dict[
-            str, dict[str, Any]
-        ] = {}
-        self.cold_spot_history: list[dict[str, Any]] = []
-        self.operating_history: list[dict[str, Any]] = []
-
-        # Default residence time per stage (seconds)
-        # In a real design, this comes from equipment sizing
-        self.residence_time_s = {
-            0: 0.5,    # Hot duct — fast transit
-            1: 5.0,    # Fe condenser — baffles slow the flow
-            2: 240.0,  # Cr oxide harvester — dedicated hot cartridge
-            3: 4.0,    # SiO zone — removable baffles
-            4: 3.0,    # Cyclone — vortex residence
-            5: 2.0,    # Dust filter
-            6: 0.2,    # Turbine — very fast
-            7: 0.0,    # Accumulator — no condensation
-        }
-
-    @property
-    def wall_deposit_accounts(self) -> tuple[str, ...]:
-        return tuple(segment.wall_deposit_account for segment in self.pipe_segments)
-
-    def reset_run_sticking_authority(self) -> None:
-        """Reset route-accumulated sticking authority at a run boundary."""
-
-        self.last_sticking_alpha_provenance_notice = {}
-        self.last_condensation_refusals_by_species = {}
-        self.last_condensation_authority_by_species = {}
-
-    def configure_operating_conditions(
+    def _configure_route_conditions(
         self,
         *,
         wall_temperature_C: float | None = None,
@@ -1737,7 +1572,7 @@ class CondensationModel:
         carrier_gas: str | None = None,
         campaign_name: str | None = None,
         campaign_hour: float | None = None,
-    ) -> None:
+    ) -> tuple[float | None, bool, float | None, bool]:
         """Update tick-local wall and Knudsen conditions for cached models.
 
         ``stir_factor`` (when provided): legacy 0.5.2 single-axis input.
@@ -1981,239 +1816,8 @@ class CondensationModel:
         self.last_knudsen_regime_diagnostic = copy.deepcopy(
             self._current_knudsen_diagnostic()
         )
-        # gstack reviewer Phase B P2: previously this snapshot was gated
-        # ONLY on ``overhead_pressure_mbar is not None``, so a caller that
-        # tweaked wall temperatures or stir_factor without supplying a
-        # pressure (e.g. ``runner._apply_sio_wall_sweep_controls``) left
-        # zero audit trail. Broadened to fire when any operating-condition
-        # input changed this call. Mass-balance closure stays honest by
-        # the same path.
-        _snapshot_inputs_changed = any(
-            x is not None
-            for x in (
-                overhead_pressure_mbar,
-                species_partial_pressures_mbar,
-                stir_factor,
-                radial_stir_factor,
-                wall_temperature_C,
-                pipe_diameter_m,
-                gas_temperature_C,
-                stage_area_m2_by_stage,
-                stage_area_geometry_provenance_notice,
-                pipe_segment_temperatures_C,
-                carrier_gas,
-            )
-        )
-        if _snapshot_inputs_changed:
-            snapshot: dict[str, Any] = {
-                "campaign": str(campaign_name or ""),
-                "campaign_hour": (
-                    0.0 if campaign_hour is None
-                    else float(campaign_hour)
-                ),
-                "wall_temperature_C": float(self.wall_temperature_C),
-                "pipe_segment_temperatures_C": {
-                    segment.name: float(segment.wall_temperature_C)
-                    for segment in self.pipe_segments
-                },
-                "stage_area_m2_by_stage": dict(self.stage_area_m2_by_stage),
-                "stage_area_geometry_provenance_notice": dict(
-                    self.stage_area_geometry_provenance_notice),
-                "overhead_pressure_mbar": float(self.overhead_pressure_mbar),
-                "species_partial_pressures_mbar": dict(
-                    self.species_partial_pressures_mbar
-                ),
-                "stir_factor": float(self.stir_factor),
-                "stir_factor_clamped": bool(_stir_factor_clamped),
-                # 0.5.3 Phase B: radial axis carried in the snapshot
-                # alongside the legacy ``stir_factor`` field so a
-                # downstream auditor can read both axes' applied values.
-                # ``radial_stir_factor_requested`` is added below ONLY
-                # when the caller explicitly supplied it, mirroring the
-                # ``stir_factor_requested`` convention. The applied
-                # ``radial_stir_factor`` is ``None`` (not 0.0) when the
-                # caller never configured radial — distinguishes "no-
-                # configure, falls back to legacy stir_factor for Sh"
-                # from "explicit radial=0 halt signal" in the audit
-                # trail. Phase B chunk-review P1 fix (codex 2026-05-28).
-                "radial_stir_factor": (
-                    float(self.radial_stir_factor)
-                    if self.radial_stir_factor is not None
-                    else None
-                ),
-                "radial_stir_factor_clamped": bool(
-                    _radial_stir_factor_clamped),
-                "knudsen_number": float(self.knudsen_number),
-                "knudsen_regime": self.knudsen_regime.value,
-                "regime_factor": float(self.regime_factor),
-                "carrier_gas": self.carrier_gas,
-                "knudsen_warnings": tuple(
-                    self.last_knudsen_regime_diagnostic.get(
-                        "warnings", ())),
-                "knudsen_regime_diagnostic": copy.deepcopy(
-                    self.last_knudsen_regime_diagnostic),
-            }
-            # Record the as-requested stir_factor only when it was passed
-            # this call; otherwise the field is intentionally omitted so
-            # downstream auditors can distinguish "no override this tick"
-            # from "override that survived the clamp" from "override that
-            # got clamped down".
-            if _stir_factor_requested is not None:
-                snapshot["stir_factor_requested"] = (
-                    float(_stir_factor_requested)
-                    if math.isfinite(_stir_factor_requested)
-                    else None
-                )
-            # 0.5.3 Phase B: mirror the requested-record convention on
-            # the radial axis. Omission semantics: no record → operator
-            # did not touch the radial axis this tick (which is the
-            # majority case for pre-Phase-B campaign overrides that
-            # only carry the legacy scalar ``stir_factor``).
-            if _radial_stir_factor_requested is not None:
-                snapshot["radial_stir_factor_requested"] = (
-                    float(_radial_stir_factor_requested)
-                    if math.isfinite(_radial_stir_factor_requested)
-                    else None
-                )
-            self.operating_history.append(snapshot)
-
-    def apply_setpoints_overrides(
-        self, setpoints: Mapping[str, Any] | None,
-    ) -> None:
-        """0.5.4.1 review-cluster-C (P2 #1): instance-isolated
-        version of the module-level ``apply_setpoints_condensation_
-        temperature_overrides``. Reads per-species condensation
-        temperatures from
-        ``setpoints['condensation_train']['condensation_temperatures_C']``
-        and merges into ``self.condensation_temperatures_C`` —
-        WITHOUT touching the process-global
-        ``CONDENSATION_TEMPS_C`` fallback dict.
-
-        This is the canonical production seam: each
-        ``CondensationModel`` instance carries its own setpoints
-        overrides, so multi-tenant servers (``web/events.py`` per-
-        SID, ``runner.py`` per-run setpoints_path) can build sims
-        with different setpoints in the same Python interpreter
-        without cross-contamination.
-
-        Same parse contract as the legacy module-level helper:
-        non-finite / non-coercible entries skipped; idempotent;
-        partial overrides keep other species at the fallback.
-        """
-        if not setpoints:
-            return
-        self.upstream_hot_wall_min_C = _stage0_hot_wall_min_C_from_setpoints(
-            setpoints,
-            default_C=self.upstream_hot_wall_min_C,
-        )
-        block = (
-            (setpoints.get('condensation_train', {}) or {})
-            .get('condensation_temperatures_C', {}) or {}
-        )
-        if not isinstance(block, Mapping):
-            return
-        # b-195. This loop used to accept ANY key in the YAML and silently
-        # `continue` past any value it could not parse. Two holes in six lines.
-        #
-        # The unknown-key hole: an operator typo like 'Sio' or a species the
-        # rail does not model became a live entry that nothing ever reported.
-        # The consumer is cold_spot_diagnostic (called below), the mandate
-        # section 4 hot-wall check deciding whether a species condenses BEFORE
-        # reaching its designated stage - so a bogus entry can fabricate or
-        # suppress a cold-spot warning, which is the coating failure mode.
-        #
-        # The silent-skip hole: a malformed temperature vanished instead of
-        # refusing, leaving the operator believing a setpoint was applied when
-        # it was not. Both are fail-closed CATEGORY 1 - missing or unusable
-        # input refuses; it does not get quietly dropped.
-        #
-        # NOTE the correction to b-195 as filed: this does NOT reach
-        # condensation ADMISSION. _condensation_admission_refusal gates on
-        # _assert_condensation_applicable and _species_has_compiled_or_legacy_
-        # pressure, i.e. the vapour-pressure catalogue, which setpoints cannot
-        # write. The blast radius is the coating diagnostic, not the b-189 seam.
-        #
-        # MEASURED GOLDEN-NEUTRAL: data/setpoints.yaml ships 11 entries under
-        # condensation_train.condensation_temperatures_C and all 11 are known
-        # species with parseable values, so nothing in the shipped config
-        # trips either branch.
-        known_species = set(self.condensation_temperatures_C)
-        for species, value in block.items():
-            name = str(species)
-            if name not in known_species:
-                raise ValueError(
-                    f"setpoints condensation_temperatures_C names {name!r}, "
-                    "which the condensation train does not model. Known "
-                    f"species: {sorted(known_species)}. Refusing rather than "
-                    "accepting the key, because an unmodelled entry silently "
-                    "feeds the cold-spot diagnostic and nothing reports it."
-                )
-            try:
-                T_C = float(value)
-            except (TypeError, ValueError):
-                raise ValueError(
-                    f"setpoints condensation temperature for {name!r} is not "
-                    f"numeric ({value!r}); refusing rather than skipping, so a "
-                    "mistyped setpoint cannot look like an applied one."
-                ) from None
-            if not math.isfinite(T_C):
-                raise ValueError(
-                    f"setpoints condensation temperature for {name!r} is not "
-                    f"finite ({value!r}); refusing rather than skipping."
-                )
-            self.condensation_temperatures_C[name] = T_C
-
-    def _build_default_pipe_segments(
-        self,
-        wall_temperature_C: float,
-    ) -> list[PipeSegment]:
-        stages = sorted(self.train.stages, key=lambda stage: stage.stage_number)
-        if len(stages) < 2:
-            return []
-        diameter_m = require_lab_pipe_diameter(
-            self.pipe_diameter_m, 'pipe_diameter_m')
-        total_length_m = (
-            max(0.0, float(self.wall_surface_area_m2))
-            / (math.pi * diameter_m)
-        )
-        length_m = total_length_m / float(len(stages) - 1)
-        segments: list[PipeSegment] = []
-        for upstream, downstream in zip(stages, stages[1:]):
-            downstream_material = _stage_material_config(downstream, self.materials)
-            segments.append(PipeSegment(
-                name=(
-                    f'stage_{upstream.stage_number}'
-                    f'_to_stage_{downstream.stage_number}'
-                ),
-                upstream_stage=f'stage_{upstream.stage_number}',
-                downstream_stage=f'stage_{downstream.stage_number}',
-                wall_temperature_C=float(wall_temperature_C),
-                length_m=length_m,
-                inner_diameter_m=diameter_m,
-                declared_area_m2=self._stage_area_m2_for_stage_number(
-                    downstream.stage_number),
-                liner_material=str(
-                    downstream_material.get('liner_material') or ''
-                ),
-            ))
-        return segments
-
-    def _stage_area_m2_for_stage_number(self, stage_number: int) -> float | None:
-        key = STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number))
-        raw = None if key is None else self.stage_area_m2_by_stage.get(key)
-        if raw is None:
-            raw = self.stage_area_m2_by_stage.get(f'stage_{stage_number}')
-        if raw is None:
-            raw = self.stage_area_m2_by_stage.get(str(stage_number))
-        if raw is None:
-            return None
-        try:
-            area_m2 = float(raw)
-        except (TypeError, ValueError):
-            return None
-        if not math.isfinite(area_m2) or area_m2 < 0.0:
-            return None
-        return area_m2
+        return (_stir_factor_requested, _stir_factor_clamped,
+                _radial_stir_factor_requested, _radial_stir_factor_clamped)
 
     def _apply_stage_area_m2_to_pipe_segments(self) -> None:
         if not self.pipe_segments:
@@ -2254,6 +1858,7 @@ class CondensationModel:
             ))
         self.pipe_segments = updated
 
+
     def _apply_pipe_segment_temperatures(
         self,
         temperatures_C: Mapping[str, float],
@@ -2291,78 +1896,7 @@ class CondensationModel:
             ))
         self.pipe_segments = updated
 
-    def update_pipe_segment_temperatures(
-        self,
-        temperatures_C: Mapping[str, float],
-    ) -> None:
-        self._apply_pipe_segment_temperatures(temperatures_C)
-        if not self.pipe_segments:
-            return
-        self.wall_temperature_C = None if self.wall_temperature_input_refusals else min(
-            segment.wall_temperature_C for segment in self.pipe_segments
-        )
-        if self.operating_history:
-            self.operating_history[-1]["wall_temperature_C"] = self.wall_temperature_C
-            if self.wall_temperature_input_refusals:
-                self.operating_history[-1]["wall_temperature_input_refusals"] = dict(
-                    self.wall_temperature_input_refusals
-                )
-            else:
-                self.operating_history[-1].pop("wall_temperature_input_refusals", None)
-            self.operating_history[-1]["pipe_segment_temperatures_C"] = {
-                segment.name: float(segment.wall_temperature_C)
-                for segment in self.pipe_segments
-                if segment.name not in self.wall_temperature_input_refusals
-            }
-
-    def configure_lab_geometry(
-        self,
-        lab_geometry: LabGeometry | Mapping[str, Any],
-    ) -> LabGeometry:
-        geometry = (
-            lab_geometry
-            if isinstance(lab_geometry, LabGeometry)
-            else parse_lab_geometry(lab_geometry)
-        )
-        if geometry is None:
-            raise ValueError("lab_geometry is required")
-        self.pipe_segments = geometry.to_pipe_segments(
-            default_diameter_m=require_lab_pipe_diameter(
-                self.pipe_diameter_m, 'pipe_diameter_m'),
-        )
-        self.wall_surface_area_m2 = geometry.total_surface_area_m2
-        if self.pipe_segments:
-            self.pipe_diameter_m = min(
-                segment.inner_diameter_m for segment in self.pipe_segments
-            )
-            self.wall_temperature_C = min(
-                segment.wall_temperature_C for segment in self.pipe_segments
-            )
-            self.gas_temperature_C = self.wall_temperature_C
-        self.lab_geometry = geometry
-        return geometry
-
-    def route(self, evap_flux: EvaporationFlux, melt: MeltState):
-        """Route one flux batch with mutation-checked catalog reuse."""
-        data = self.vapor_pressure_data
-        if not isinstance(data, VaporPressureCompatibilityView):
-            return self._route(evap_flux, melt)
-        if getattr(self, '_pressure_trial', False):
-            if not hasattr(data, '_route_catalog'):
-                data._route_catalog = None
-            return self._route(evap_flux, melt)
-        missing = object()
-        previous = getattr(data, '_route_catalog', missing)
-        data._route_catalog = None
-        try:
-            return self._route(evap_flux, melt)
-        finally:
-            if previous is missing:
-                del data._route_catalog
-            else:
-                data._route_catalog = previous
-
-    def _route(self, evap_flux: EvaporationFlux, melt: MeltState):
+    def _route_amounts(self, evap_flux: EvaporationFlux, melt: MeltState, *, materialize_authority=True):
         """
         Route all evaporated species through the train.
 
@@ -2413,7 +1947,7 @@ class CondensationModel:
         raw_carrier_authority = getattr(
             evap_flux, 'carrier_authority_by_species', {}
         )
-        trial = getattr(self, '_pressure_trial', False)
+        trial = not materialize_authority
         carrier_authority_by_species = {
             str(species): (dict(record) if trial else copy.deepcopy(dict(record)))
             for species, record in (
@@ -2504,27 +2038,9 @@ class CondensationModel:
             if self._species_partial_pressures_configured
             else {}
         )
-        knudsen_diagnostic = self._enforce_knudsen_regime()
-        cold_spot_warnings = ()
-        if not trial:
-            diagnostic = cold_spot_diagnostic(
-                [segment for segment in self.pipe_segments
-                 if segment.name not in self.wall_temperature_input_refusals],
-                evap_flux.species_kg_hr,
-                margin_C=self.cold_spot_margin_C,
-                upstream_hot_wall_min_C=self.upstream_hot_wall_min_C,
-                temps=self.condensation_temperatures_C,
-                vapor_pressure_data=self.vapor_pressure_data,
-                species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
-            )
-            self.last_cold_spot_diagnostic = copy.deepcopy(diagnostic)
-            self.cold_spot_history.append(copy.deepcopy(diagnostic))
-            cold_spot_warnings = tuple(diagnostic.get('warnings', ()))
-            if self.operating_history:
-                self.operating_history[-1]['cold_spot_warning_count'] = len(
-                    cold_spot_warnings)
-                self.operating_history[-1]['cold_spot_warnings'] = cold_spot_warnings
-
+        knudsen_diagnostic = self._current_knudsen_diagnostic()
+        if knudsen_diagnostic.get('status') == 'refused':
+            raise KnudsenRegimeRefusal(knudsen_diagnostic)
         stage_route_by_species: dict[str, dict[str, Any]] = {}
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             if (
@@ -2901,8 +2417,1063 @@ class CondensationModel:
             ),
             condensation_authority_by_species=condensation_authority_by_species,
         )
+        return (antoine_extrapolation_warnings, antoine_extrapolations, carrier_authority_by_species, condensation_authority_by_species, condensation_refusals_by_species, efficiency_outcomes_by_species, knudsen_diagnostic, route_result, transport_parameter_notice_by_species, used_capture_budget_regularizer, wall_deposit_by_species, wall_saturation_pressure_refusals_by_species, wall_sticking_alpha_by_species, wall_sticking_alpha_provenance_by_species, condensed_by_stage_species, carrier_authority_status_by_species, cleanup_offgas_authorization, remaining_by_species, retained_in_source_by_species)
+
+    def _stage_area_m2_for_stage_number(self, stage_number: int) -> float | None:
+        return _stage_area_m2_for_stage_number(stage_number, self.stage_area_m2_by_stage)
+
+
+    def _current_knudsen_diagnostic(self) -> dict[str, Any]:
+        diagnostic = knudsen_regime_diagnostic(
+            overhead_pressure_mbar=self.overhead_pressure_mbar,
+            gas_temperature_C=self.gas_temperature_C,
+            pipe_diameter_m=self.pipe_diameter_m,
+            pipe_segments=self.pipe_segments,
+            regime_factor=self.regime_factor,
+            carrier_gas=self.carrier_gas,
+        )
+        diagnostic['stage_area_m2_by_stage'] = dict(self.stage_area_m2_by_stage)
+        diagnostic['stage_area_geometry_provenance_notice'] = dict(
+            self.stage_area_geometry_provenance_notice)
+        if self._knudsen_policy_configured:
+            diagnostic['viscous_flow_required'] = False
+            return diagnostic
+        unconfigured = dict(diagnostic)
+        unconfigured['status'] = 'refused'
+        unconfigured['reason'] = 'knudsen_policy_unconfigured'
+        unconfigured['reason_refused'] = 'knudsen_policy_unconfigured'
+        unconfigured['message'] = (
+            'Knudsen pressure policy is unconfigured; condensation routing '
+            'refused.'
+        )
+        return unconfigured
+
+
+    def _wall_deposit_candidate_kg(
+        self,
+        *,
+        species: str,
+        rate_kg_hr: float,
+        T_cond_C: float,
+        melt_temperature_C: float,
+        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+        antoine_extrapolation_warnings: list[str] | None = None,
+    ) -> float | Mapping[str, Any]:
+        if (
+            antoine_extrapolations is not None
+            or antoine_extrapolation_warnings is not None
+        ):
+            _record_wall_surface_antoine_telemetry(
+                species,
+                self.wall_temperature_C,
+                vapor_pressure_data=self.vapor_pressure_data,
+                antoine_extrapolations=antoine_extrapolations,
+                antoine_extrapolation_warnings=(
+                    antoine_extrapolation_warnings),
+            )
+        token = _with_antoine_telemetry_context(
+            antoine_extrapolations,
+            antoine_extrapolation_warnings,
+        )
+        try:
+            return query_wall_deposit_candidate_kg(
+                self,
+                species=species,
+                rate_kg_hr=rate_kg_hr,
+                T_cond_C=T_cond_C,
+                melt_temperature_C=melt_temperature_C,
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            )
+        finally:
+            _reset_antoine_telemetry_context(token)
+
+
+    def _wall_deposit_candidates_by_segment_kg(
+        self,
+        *,
+        species: str,
+        rate_kg_hr: float,
+        T_cond_C: float,
+        melt_temperature_C: float,
+        supply_by_segment_kg: Mapping[str, float],
+        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+        antoine_extrapolation_warnings: list[str] | None = None,
+    ) -> Dict[str, float]:
+        if (
+            antoine_extrapolations is not None
+            or antoine_extrapolation_warnings is not None
+        ):
+            for segment in self._mixed_temperature_wall_candidate_segments(
+                species,
+            ):
+                if segment.name in self.wall_temperature_input_refusals:
+                    continue
+                _record_wall_surface_antoine_telemetry(
+                    species,
+                    segment.wall_temperature_C,
+                    vapor_pressure_data=self.vapor_pressure_data,
+                    antoine_extrapolations=antoine_extrapolations,
+                    antoine_extrapolation_warnings=(
+                        antoine_extrapolation_warnings),
+                )
+        token = _with_antoine_telemetry_context(
+            antoine_extrapolations,
+            antoine_extrapolation_warnings,
+        )
+        try:
+            return query_wall_deposit_candidates_by_segment_kg(
+                self,
+                species=species,
+                rate_kg_hr=rate_kg_hr,
+                T_cond_C=T_cond_C,
+                melt_temperature_C=melt_temperature_C,
+                supply_by_segment_kg=supply_by_segment_kg,
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            )
+        finally:
+            _reset_antoine_telemetry_context(token)
+
+
+    def _resolve_wall_deposit_candidates_by_species_segment_kg(
+        self,
+        *,
+        evap_flux: EvaporationFlux,
+        melt: MeltState,
+        stage_route_by_species: Mapping[str, Mapping[str, Any]],
+        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+        antoine_extrapolation_warnings: list[str] | None = None,
+    ) -> Dict[str, Dict[str, float]]:
+        self.last_wall_capture_fixed_point_iterations = 0
+        if not self.pipe_segments or not stage_route_by_species:
+            self.wall_species_partial_pressures_pa_by_segment = {}
+            return {}
+
+        inlet_rates = {
+            str(species): max(0.0, float(rate_kg_hr))
+            for species, rate_kg_hr in evap_flux.species_kg_hr.items()
+        }
+        segment_names = [segment.name for segment in self.pipe_segments]
+        total_pressure_pa = self.overhead_pressure_mbar * 100.0
+
+        def segment_rates_from_capture(
+            stage_capture_by_species: Mapping[str, Mapping[int, float]],
+            wall_capture_by_species: Mapping[str, Mapping[str, float]],
+        ) -> dict[str, dict[str, float]]:
+            by_segment: dict[str, dict[str, float]] = {}
+            prior_segments: list[str] = []
+            for segment in self.pipe_segments:
+                upstream_number = _segment_stage_number(segment.upstream_stage)
+                rates: dict[str, float] = {}
+                for species, inlet_rate in inlet_rates.items():
+                    stage_removed = (
+                        sum(
+                            float(value)
+                            for stage_number, value
+                            in stage_capture_by_species.get(species, {}).items()
+                            if (
+                                upstream_number is not None
+                                and int(stage_number) <= upstream_number
+                            )
+                        )
+                    )
+                    wall_removed = sum(
+                        float(
+                            wall_capture_by_species.get(species, {}).get(
+                                prior_segment,
+                                0.0,
+                            )
+                        )
+                        for prior_segment in prior_segments
+                    )
+                    remaining = inlet_rate - stage_removed - wall_removed
+                    tolerance = 1.0e-12 * max(1.0, inlet_rate)
+                    if remaining < -tolerance:
+                        raise ValueError(
+                            'resolved wall routing removes more '
+                            f'{species} than enters the train'
+                        )
+                    rates[species] = max(0.0, remaining)
+                by_segment[segment.name] = rates
+                prior_segments.append(segment.name)
+            return by_segment
+
+        def wall_candidates(
+            species_rates_by_segment: Mapping[str, Mapping[str, float]],
+            *,
+            record_telemetry: bool,
+        ) -> dict[str, dict[str, float]]:
+            candidates: dict[str, dict[str, float]] = {}
+            for species, stage_route in stage_route_by_species.items():
+                rate_kg_hr = inlet_rates.get(species, 0.0)
+                if rate_kg_hr <= 0.0:
+                    continue
+                species_candidates = self._wall_deposit_candidates_by_segment_kg(
+                    species=species,
+                    rate_kg_hr=rate_kg_hr,
+                    T_cond_C=float(stage_route['T_cond_C']),
+                    melt_temperature_C=float(
+                        getattr(melt, 'temperature_C', stage_route['T_cond_C'])
+                    ),
+                    supply_by_segment_kg={
+                        segment_name: float(
+                            species_rates_by_segment.get(
+                                segment_name,
+                                {},
+                            ).get(species, 0.0)
+                        )
+                        for segment_name in segment_names
+                    },
+                    antoine_extrapolations=(
+                        antoine_extrapolations if record_telemetry else None
+                    ),
+                    antoine_extrapolation_warnings=(
+                        antoine_extrapolation_warnings
+                        if record_telemetry else None
+                    ),
+                )
+                candidates[species] = species_candidates
+            return candidates
+
+        def resolved_capture(
+            candidates_by_species: Mapping[str, Mapping[str, float]],
+        ) -> tuple[
+            dict[str, dict[int, float]],
+            dict[str, dict[str, float]],
+        ]:
+            stage_capture: dict[str, dict[int, float]] = {}
+            wall_capture: dict[str, dict[str, float]] = {}
+            for species, stage_route in stage_route_by_species.items():
+                stages, walls = _regularized_capture_allocations(
+                    float(stage_route['capture_budget_kg']),
+                    stage_route['hkl_condensed_by_stage'],
+                    candidates_by_species.get(species, {}),
+                )
+                stage_capture[species] = {
+                    int(stage_number): float(value)
+                    for stage_number, value in stages.items()
+                }
+                wall_capture[species] = {
+                    str(segment_name): float(value)
+                    for segment_name, value in walls.items()
+                }
+            return stage_capture, wall_capture
+
+        def capture_delta(
+            previous_stage: Mapping[str, Mapping[int, float]],
+            previous_wall: Mapping[str, Mapping[str, float]],
+            current_stage: Mapping[str, Mapping[int, float]],
+            current_wall: Mapping[str, Mapping[str, float]],
+        ) -> float:
+            delta = 0.0
+            for species, inlet_rate in inlet_rates.items():
+                scale = max(1.0e-30, inlet_rate)
+                for stage_number in (
+                    set(previous_stage.get(species, {}))
+                    | set(current_stage.get(species, {}))
+                ):
+                    delta = max(
+                        delta,
+                        abs(
+                            float(
+                                previous_stage.get(species, {}).get(
+                                    stage_number,
+                                    0.0,
+                                )
+                            )
+                            - float(
+                                current_stage.get(species, {}).get(
+                                    stage_number,
+                                    0.0,
+                                )
+                            )
+                        )
+                        / scale,
+                    )
+                for segment_name in (
+                    set(previous_wall.get(species, {}))
+                    | set(current_wall.get(species, {}))
+                ):
+                    delta = max(
+                        delta,
+                        abs(
+                            float(
+                                previous_wall.get(species, {}).get(
+                                    segment_name,
+                                    0.0,
+                                )
+                            )
+                            - float(
+                                current_wall.get(species, {}).get(
+                                    segment_name,
+                                    0.0,
+                                )
+                            )
+                        )
+                        / scale,
+                    )
+            return delta
+
+        def relax_capture(
+            previous: Mapping[str, Mapping[Any, float]],
+            current: Mapping[str, Mapping[Any, float]],
+            factor: float,
+        ) -> dict[str, dict[Any, float]]:
+            relaxed: dict[str, dict[Any, float]] = {}
+            for species in sorted(set(previous) | set(current)):
+                values: dict[Any, float] = {}
+                for location in (
+                    sorted(
+                        set(previous.get(species, {}))
+                        | set(current.get(species, {}))
+                    )
+                ):
+                    old_value = float(
+                        previous.get(species, {}).get(location, 0.0)
+                    )
+                    new_value = float(
+                        current.get(species, {}).get(location, 0.0)
+                    )
+                    value = old_value + factor * (new_value - old_value)
+                    if value > 0.0:
+                        values[location] = value
+                relaxed[species] = values
+            return relaxed
+
+        stage_capture: dict[str, dict[int, float]] = {}
+        wall_capture: dict[str, dict[str, float]] = {}
+        converged = False
+        previous_delta: float | None = None
+        relaxation = 1.0
+        for iteration in range(1024):
+            species_rates_by_segment = segment_rates_from_capture(
+                stage_capture,
+                wall_capture,
+            )
+            self.wall_species_partial_pressures_pa_by_segment = (
+                _segment_species_partial_pressures_pa(
+                    self.wall_species_partial_pressures_pa,
+                    total_pressure_pa,
+                    inlet_rates,
+                    species_rates_by_segment,
+                )
+            )
+            self.last_wall_deposition_rate_shadow_candidate = {}
+            candidates_by_species = wall_candidates(
+                species_rates_by_segment,
+                record_telemetry=False,
+            )
+            next_stage_capture, next_wall_capture = resolved_capture(
+                candidates_by_species
+            )
+            delta = capture_delta(
+                stage_capture,
+                wall_capture,
+                next_stage_capture,
+                next_wall_capture,
+            )
+            if delta <= 1.0e-7:
+                stage_capture = next_stage_capture
+                wall_capture = next_wall_capture
+                self.last_wall_capture_fixed_point_iterations = iteration + 1
+                converged = True
+                break
+            if (
+                previous_delta is not None
+                and delta >= 0.95 * previous_delta
+            ):
+                relaxation = 0.8
+            stage_capture = relax_capture(
+                stage_capture,
+                next_stage_capture,
+                relaxation,
+            )
+            wall_capture = relax_capture(
+                wall_capture,
+                next_wall_capture,
+                relaxation,
+            )
+            previous_delta = delta
+        if not converged:
+            self.last_wall_capture_fixed_point_iterations = 1024
+            raise RuntimeError(
+                'wall/stage capture fixed-point did not converge in 1024 '
+                f'iterations (relative delta={delta:.12g})'
+            )
+        if (
+            antoine_extrapolations is not None
+            or antoine_extrapolation_warnings is not None
+        ):
+            for species in stage_route_by_species:
+                for segment in self._mixed_temperature_wall_candidate_segments(
+                    species
+                ):
+                    if segment.name in self.wall_temperature_input_refusals:
+                        continue
+                    _record_wall_surface_antoine_telemetry(
+                        species,
+                        segment.wall_temperature_C,
+                        vapor_pressure_data=self.vapor_pressure_data,
+                        antoine_extrapolations=antoine_extrapolations,
+                        antoine_extrapolation_warnings=(
+                            antoine_extrapolation_warnings
+                        ),
+                    )
+        return candidates_by_species
+
+
+    def _mixed_temperature_wall_candidate_segments(
+        self,
+        species: str,
+    ) -> list[PipeSegment]:
+        if self.lab_geometry is not None:
+            return list(self.pipe_segments)
+        target_stage_number = designated_stage_number(species)
+        if target_stage_number is None:
+            return []
+        segments: list[PipeSegment] = []
+        for segment in self.pipe_segments:
+            downstream_number = _segment_stage_number(segment.downstream_stage)
+            if downstream_number is None:
+                continue
+            if downstream_number <= target_stage_number:
+                segments.append(segment)
+        return segments
+
+
+    def _wall_deposit_candidate_for_surface_kg(
+        self,
+        *,
+        species: str,
+        rate_kg_hr: float,
+        T_cond_C: float,
+        melt_temperature_C: float,
+        wall_temperature_C: float,
+        surface_area_m2: float,
+        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+        antoine_extrapolation_warnings: list[str] | None = None,
+    ) -> float | Mapping[str, Any]:
+        if (
+            antoine_extrapolations is not None
+            or antoine_extrapolation_warnings is not None
+        ):
+            _record_wall_surface_antoine_telemetry(
+                species,
+                wall_temperature_C,
+                vapor_pressure_data=self.vapor_pressure_data,
+                antoine_extrapolations=antoine_extrapolations,
+                antoine_extrapolation_warnings=(
+                    antoine_extrapolation_warnings),
+            )
+        token = _with_antoine_telemetry_context(
+            antoine_extrapolations,
+            antoine_extrapolation_warnings,
+        )
+        try:
+            return query_wall_deposit_candidate_for_surface_kg(
+                self,
+                species=species,
+                rate_kg_hr=rate_kg_hr,
+                T_cond_C=T_cond_C,
+                melt_temperature_C=melt_temperature_C,
+                wall_temperature_C=wall_temperature_C,
+                surface_area_m2=surface_area_m2,
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            )
+        finally:
+            _reset_antoine_telemetry_context(token)
+
+
+    def _segment_supply_by_name(
+        self,
+        rate_kg_hr: float,
+        remaining_after_stage: Mapping[int, float],
+    ) -> Dict[str, float]:
+        supply: Dict[str, float] = {}
+        for segment in self.pipe_segments:
+            upstream_number = _segment_stage_number(segment.upstream_stage)
+            if upstream_number is None:
+                supply[segment.name] = max(0.0, float(rate_kg_hr))
+            else:
+                prior_numbers = [
+                    stage_number
+                    for stage_number in remaining_after_stage
+                    if stage_number <= upstream_number
+                ]
+                default_supply = (
+                    remaining_after_stage[max(prior_numbers)]
+                    if prior_numbers else rate_kg_hr
+                )
+                supply[segment.name] = max(
+                    0.0,
+                    min(
+                        float(rate_kg_hr),
+                        float(remaining_after_stage.get(
+                            upstream_number, default_supply)),
+                    ),
+                )
+        return supply
+
+
+    def _condensation_efficiency(
+        self,
+        *,
+        stage: CondensationStage,
+        species: str,
+        T_cond_C: float,
+        residence_s: float,
+        available_kg: float,
+        alpha_s_value: float,
+        alpha_record: MutableMapping[str, Any] | None = None,
+        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+        antoine_extrapolation_warnings: list[str] | None = None,
+        efficiency_outcomes: list[dict[str, Any]] | None = None,
+    ) -> float:
+        return _condensation_efficiency(
+            stage=stage,
+            species=species,
+            T_cond_C=T_cond_C,
+            residence_s=residence_s,
+            available_kg=available_kg,
+            alpha_s_value=alpha_s_value,
+            alpha_record=alpha_record,
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            efficiency_outcomes=efficiency_outcomes,
+            _species_partial_pressures_configured=self._species_partial_pressures_configured,
+            carrier_gas=self.carrier_gas,
+            condensation_temperatures_C=self.condensation_temperatures_C,
+            gas_temperature_C=self.gas_temperature_C,
+            overhead_pressure_mbar=self.overhead_pressure_mbar,
+            pipe_diameter_m=self.pipe_diameter_m,
+            radial_stir_factor=self.radial_stir_factor,
+            regime_factor=self.regime_factor,
+            stage_area_m2_by_stage=self.stage_area_m2_by_stage,
+            stir_factor=self.stir_factor,
+            vapor_pressure_data=self.vapor_pressure_data,
+            wall_species_partial_pressures_pa=self.wall_species_partial_pressures_pa,
+        )
+
+
+class CondensationModel(_CondensationRoutePhysics):
+    """
+    Routes evaporated species through the condensation train.
+
+    For each species in the evaporation flux, calculates the
+    fraction that condenses in each stage based on the stage
+    temperature relative to the species' condensation temperature.
+    """
+
+    def __init__(
+        self,
+        train: CondensationTrain,
+        vapor_pressure_data: MutableMapping[str, Any] | None = None,
+        wall_surface_area_m2: float | None = None,
+        wall_temperature_C: float = DEFAULT_PIPE_TEMPERATURE_C,
+        materials: Mapping[str, Any] | None = None,
+        species_formula_registry: Mapping[str, Any] | None = None,
+    ):
+        self.train = train
+        # Owner-boundary projection: schema-v2 → legacy view once so the
+        # per-species hot path never re-digests/recompiles the full catalog
+        # (content-digest identity is correct but ~3 ms/hit on production
+        # payloads; 72 species × 2 loops reintroduced the ~151 ms class).
+        if vapor_pressure_data is None:
+            self.vapor_pressure_data = None
+        else:
+            raw = copy.deepcopy(vapor_pressure_data)
+            owned_catalog_payload = getattr(raw, "catalog_payload", None)
+            if (
+                isinstance(raw, Mapping)
+                and raw.get("schema_version") == 2
+                and "families" in raw
+            ):
+                compatibility_view = VaporPressureCompatibilityView(
+                    vapor_pressure_legacy_view(raw), raw
+                )
+                # The route cache relies on payload identity after this point.
+                # Freeze the owned copy at construction so a cached compiled
+                # catalog cannot outlive a silent in-place payload mutation.
+                compatibility_view.catalog_payload = _freeze_catalog_value(
+                    compatibility_view.catalog_payload
+                )
+                self.vapor_pressure_data = compatibility_view
+            elif (
+                isinstance(owned_catalog_payload, Mapping)
+                and owned_catalog_payload.get("schema_version") == 2
+                and "families" in owned_catalog_payload
+            ):
+                # Session callers may already provide the legacy facade; its
+                # authoritative schema-v2 payload still needs the same owner
+                # boundary freeze before route-local identity caching.
+                raw.catalog_payload = _freeze_catalog_value(
+                    owned_catalog_payload
+                )
+                self.vapor_pressure_data = raw
+            else:
+                self.vapor_pressure_data = raw
+        self.materials = copy.deepcopy(
+            materials if materials is not None else MATERIALS_DATA
+        )
+        self.species_formula_registry = species_formula_registry or {}
+
+        for label, value in (
+            ('wall_surface_area_m2', wall_surface_area_m2),
+            ('wall_temperature_C', wall_temperature_C),
+        ):
+            if value is not None and not is_declared_real_scalar(
+                value,
+                allow_numeric_str=True,
+            ):
+                raise ValueError(f'{label} must be numeric')
+
+        # 0.5.4.1 review-cluster-C (P2 #1, evening-4commits review):
+        # per-instance per-species condensation temperatures so each
+        # CondensationModel can carry its own setpoints overrides
+        # without cross-contaminating the module-level
+        # ``CONDENSATION_TEMPS_C`` dict. Multi-tenant servers
+        # (``web/events.py`` per-SID, ``runner.py`` per-run
+        # setpoints_path) need this isolation. Initialised from the
+        # module-level fallback; ``apply_setpoints_overrides`` later
+        # merges YAML values into this instance dict only — the
+        # module dict is no longer the canonical production-path
+        # source-of-truth (it remains the fallback for callers
+        # that don't pass an instance).
+        self.condensation_temperatures_C: dict[str, float] = dict(
+            CONDENSATION_TEMPS_C
+        )
+        self.wall_surface_area_m2 = (
+            float(wall_surface_area_m2)
+            if wall_surface_area_m2 is not None
+            else _default_pipe_surface_area_m2()
+        )
+        self.wall_temperature_C = float(wall_temperature_C)
+        self.overhead_pressure_mbar = 0.0
+        self.species_partial_pressures_mbar: dict[str, float] = {}
+        self._species_partial_pressures_configured = False
+        self.wall_species_partial_pressures_pa: dict[str, float] = {}
+        self.wall_species_partial_pressures_pa_by_segment: dict[
+            str, dict[str, float]
+        ] = {}
+        self.pipe_diameter_m = DEFAULT_PIPE_DIAMETER_M
+        self.stage_area_m2_by_stage: dict[str, float] = {}
+        self.stage_area_geometry_provenance_notice: dict[str, Any] = {}
+        self.gas_temperature_C = float(wall_temperature_C)
+        self.carrier_gas = DEFAULT_CARRIER_GAS
+        # Induction-stirring intensity — recipe-controlled per
+        # ``setpoints.yaml § induction_stirring``. Constructor default
+        # is ``1.0`` (no-stir laminar baseline, ``Sh = 3.66``), NOT the
+        # ``MeltState.stir_factor = 6.0`` default. The two are
+        # intentionally different: ``MeltState`` is the operator-facing
+        # field carrying the C2A recipe value, ``CondensationModel`` is
+        # a transport object whose flux helpers reduce to honest
+        # no-stir physics until ``configure_operating_conditions(
+        # stir_factor=...)`` pushes the recipe value through. Direct-
+        # construction callers (typically unit tests) MUST call
+        # ``configure_operating_conditions`` before ``route()`` for the
+        # series-resistance branch to engage; otherwise ``regime_factor
+        # = 1.0`` (free-molecular default) collapses the form back to
+        # pure HKL. gstack /review subagent flagged this Phase B P3 as
+        # a footgun for future direct-construction tests; documenting
+        # rather than coupling here avoids importing state.py for what
+        # is properly an operator-boundary concern.
+        self.stir_factor = 1.0
+        # 0.5.3 Phase B (2-axis stirring): the radial axis is the
+        # canonical Sh driver. Constructor default ``None`` is the
+        # explicit "not configured" sentinel — the deposition helper
+        # (``_stirring_enhanced_sherwood``) falls back to the legacy
+        # ``stir_factor`` when ``radial_stir_factor is None``, which
+        # preserves pre-Phase-B Sh-enhancement semantics for legacy
+        # callers that only pass ``stir_factor`` to
+        # ``configure_operating_conditions``.
+        #
+        # Phase B chunk-review P1 (codex 2026-05-28): the previous
+        # default of ``1.0`` made the radial axis ALWAYS take precedence
+        # in the deposition call (per helper precedence: explicit
+        # radial wins over stir_factor) so a legacy
+        # ``configure_operating_conditions(stir_factor=6)`` call left
+        # Sh stuck at the laminar 3.66 baseline — silently broke the
+        # documented 0.5.2 backward-compat. The ``None`` sentinel lets
+        # the helper's fallback fire.
+        self.radial_stir_factor: float | None = None
+        self.knudsen_number = math.inf
+        self.regime_factor = 1.0
+        self.knudsen_regime = KnudsenRegime.FREE_MOLECULAR
+        self._knudsen_policy_configured = False
+        self.lab_geometry: LabGeometry | None = None
+        self.pipe_segments = self._build_default_pipe_segments(
+            float(wall_temperature_C))
+        self.cold_spot_margin_C = COLD_SPOT_MARGIN_C
+        self.upstream_hot_wall_min_C = DEFAULT_UPSTREAM_HOT_WALL_MIN_C
+        self.last_cold_spot_diagnostic: dict[str, Any] = {
+            'has_cold_spot': False,
+            'warnings': [],
+            'findings': [],
+            'has_upstream_hot_wall_violation': False,
+            'upstream_hot_wall_warnings': [],
+            'upstream_hot_wall_findings': [],
+            'upstream_hot_wall_min_C': DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
+        }
+        self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
+        self.last_sticking_alpha_provenance_notice: dict[str, Any] = {}
+        self.wall_temperature_input_refusals: dict[str, str] = {}
+        self.last_transport_parameter_notice: dict[str, Any] = {}
+        self.last_capture_budget_regularizer_notice: dict[str, Any] = {}
+        # VR-11 / B2: consumer-facing condensation refusal channel.
+        self.last_condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
+        self.last_condensation_authority_by_species: dict[str, dict[str, Any]] = {}
+        self.last_wall_deposition_rate_shadow_candidate: dict[
+            str, dict[str, Any]
+        ] = {}
+        self.last_wall_capture_fixed_point_iterations = 0
+        self.wall_alkali_binding_diagnostic_state_by_account: dict[
+            str, dict[str, Any]
+        ] = {}
+        self.cold_spot_history: list[dict[str, Any]] = []
+        self.operating_history: list[dict[str, Any]] = []
+
+        # Default residence time per stage (seconds)
+        # In a real design, this comes from equipment sizing
+        self.residence_time_s = {
+            0: 0.5,    # Hot duct — fast transit
+            1: 5.0,    # Fe condenser — baffles slow the flow
+            2: 240.0,  # Cr oxide harvester — dedicated hot cartridge
+            3: 4.0,    # SiO zone — removable baffles
+            4: 3.0,    # Cyclone — vortex residence
+            5: 2.0,    # Dust filter
+            6: 0.2,    # Turbine — very fast
+            7: 0.0,    # Accumulator — no condensation
+        }
+
+    @property
+    def wall_deposit_accounts(self) -> tuple[str, ...]:
+        return tuple(segment.wall_deposit_account for segment in self.pipe_segments)
+
+    def reset_run_sticking_authority(self) -> None:
+        """Reset route-accumulated sticking authority at a run boundary."""
+
+        self.last_sticking_alpha_provenance_notice = {}
+        self.last_condensation_refusals_by_species = {}
+        self.last_condensation_authority_by_species = {}
+
+    def configure_operating_conditions(
+        self,
+        *,
+        wall_temperature_C: float | None = None,
+        overhead_pressure_mbar: float | None = None,
+        species_partial_pressures_mbar: Mapping[str, float] | None = None,
+        pipe_diameter_m: float | None = None,
+        gas_temperature_C: float | None = None,
+        stage_area_m2_by_stage: Mapping[str, float] | None = None,
+        stage_area_geometry_provenance_notice: Mapping[str, Any] | None = None,
+        pipe_segment_temperatures_C: Mapping[str, float] | None = None,
+        stir_factor: float | None = None,
+        radial_stir_factor: float | None = None,
+        carrier_gas: str | None = None,
+        campaign_name: str | None = None,
+        campaign_hour: float | None = None,
+    ) -> None:
+        (_stir_factor_requested, _stir_factor_clamped,
+         _radial_stir_factor_requested, _radial_stir_factor_clamped) = self._configure_route_conditions(
+            wall_temperature_C=wall_temperature_C,
+            overhead_pressure_mbar=overhead_pressure_mbar,
+            species_partial_pressures_mbar=species_partial_pressures_mbar,
+            pipe_diameter_m=pipe_diameter_m,
+            gas_temperature_C=gas_temperature_C,
+            stage_area_m2_by_stage=stage_area_m2_by_stage,
+            stage_area_geometry_provenance_notice=stage_area_geometry_provenance_notice,
+            pipe_segment_temperatures_C=pipe_segment_temperatures_C,
+            stir_factor=stir_factor,
+            radial_stir_factor=radial_stir_factor,
+            carrier_gas=carrier_gas,
+            campaign_name=campaign_name,
+            campaign_hour=campaign_hour,
+        )
+        # gstack reviewer Phase B P2: previously this snapshot was gated
+        # ONLY on ``overhead_pressure_mbar is not None``, so a caller that
+        # tweaked wall temperatures or stir_factor without supplying a
+        # pressure (e.g. ``runner._apply_sio_wall_sweep_controls``) left
+        # zero audit trail. Broadened to fire when any operating-condition
+        # input changed this call. Mass-balance closure stays honest by
+        # the same path.
+        _snapshot_inputs_changed = any(
+            x is not None
+            for x in (
+                overhead_pressure_mbar,
+                species_partial_pressures_mbar,
+                stir_factor,
+                radial_stir_factor,
+                wall_temperature_C,
+                pipe_diameter_m,
+                gas_temperature_C,
+                stage_area_m2_by_stage,
+                stage_area_geometry_provenance_notice,
+                pipe_segment_temperatures_C,
+                carrier_gas,
+            )
+        )
+        if _snapshot_inputs_changed:
+            snapshot: dict[str, Any] = {
+                "campaign": str(campaign_name or ""),
+                "campaign_hour": (
+                    0.0 if campaign_hour is None
+                    else float(campaign_hour)
+                ),
+                "wall_temperature_C": float(self.wall_temperature_C),
+                "pipe_segment_temperatures_C": {
+                    segment.name: float(segment.wall_temperature_C)
+                    for segment in self.pipe_segments
+                },
+                "stage_area_m2_by_stage": dict(self.stage_area_m2_by_stage),
+                "stage_area_geometry_provenance_notice": dict(
+                    self.stage_area_geometry_provenance_notice),
+                "overhead_pressure_mbar": float(self.overhead_pressure_mbar),
+                "species_partial_pressures_mbar": dict(
+                    self.species_partial_pressures_mbar
+                ),
+                "stir_factor": float(self.stir_factor),
+                "stir_factor_clamped": bool(_stir_factor_clamped),
+                # 0.5.3 Phase B: radial axis carried in the snapshot
+                # alongside the legacy ``stir_factor`` field so a
+                # downstream auditor can read both axes' applied values.
+                # ``radial_stir_factor_requested`` is added below ONLY
+                # when the caller explicitly supplied it, mirroring the
+                # ``stir_factor_requested`` convention. The applied
+                # ``radial_stir_factor`` is ``None`` (not 0.0) when the
+                # caller never configured radial — distinguishes "no-
+                # configure, falls back to legacy stir_factor for Sh"
+                # from "explicit radial=0 halt signal" in the audit
+                # trail. Phase B chunk-review P1 fix (codex 2026-05-28).
+                "radial_stir_factor": (
+                    float(self.radial_stir_factor)
+                    if self.radial_stir_factor is not None
+                    else None
+                ),
+                "radial_stir_factor_clamped": bool(
+                    _radial_stir_factor_clamped),
+                "knudsen_number": float(self.knudsen_number),
+                "knudsen_regime": self.knudsen_regime.value,
+                "regime_factor": float(self.regime_factor),
+                "carrier_gas": self.carrier_gas,
+                "knudsen_warnings": tuple(
+                    self.last_knudsen_regime_diagnostic.get(
+                        "warnings", ())),
+                "knudsen_regime_diagnostic": copy.deepcopy(
+                    self.last_knudsen_regime_diagnostic),
+            }
+            # Record the as-requested stir_factor only when it was passed
+            # this call; otherwise the field is intentionally omitted so
+            # downstream auditors can distinguish "no override this tick"
+            # from "override that survived the clamp" from "override that
+            # got clamped down".
+            if _stir_factor_requested is not None:
+                snapshot["stir_factor_requested"] = (
+                    float(_stir_factor_requested)
+                    if math.isfinite(_stir_factor_requested)
+                    else None
+                )
+            # 0.5.3 Phase B: mirror the requested-record convention on
+            # the radial axis. Omission semantics: no record → operator
+            # did not touch the radial axis this tick (which is the
+            # majority case for pre-Phase-B campaign overrides that
+            # only carry the legacy scalar ``stir_factor``).
+            if _radial_stir_factor_requested is not None:
+                snapshot["radial_stir_factor_requested"] = (
+                    float(_radial_stir_factor_requested)
+                    if math.isfinite(_radial_stir_factor_requested)
+                    else None
+                )
+            self.operating_history.append(snapshot)
+
+    def apply_setpoints_overrides(
+        self, setpoints: Mapping[str, Any] | None,
+    ) -> None:
+        """0.5.4.1 review-cluster-C (P2 #1): instance-isolated
+        version of the module-level ``apply_setpoints_condensation_
+        temperature_overrides``. Reads per-species condensation
+        temperatures from
+        ``setpoints['condensation_train']['condensation_temperatures_C']``
+        and merges into ``self.condensation_temperatures_C`` —
+        WITHOUT touching the process-global
+        ``CONDENSATION_TEMPS_C`` fallback dict.
+
+        This is the canonical production seam: each
+        ``CondensationModel`` instance carries its own setpoints
+        overrides, so multi-tenant servers (``web/events.py`` per-
+        SID, ``runner.py`` per-run setpoints_path) can build sims
+        with different setpoints in the same Python interpreter
+        without cross-contamination.
+
+        Same parse contract as the legacy module-level helper:
+        non-finite / non-coercible entries skipped; idempotent;
+        partial overrides keep other species at the fallback.
+        """
+        if not setpoints:
+            return
+        self.upstream_hot_wall_min_C = _stage0_hot_wall_min_C_from_setpoints(
+            setpoints,
+            default_C=self.upstream_hot_wall_min_C,
+        )
+        block = (
+            (setpoints.get('condensation_train', {}) or {})
+            .get('condensation_temperatures_C', {}) or {}
+        )
+        if not isinstance(block, Mapping):
+            return
+        # b-195. This loop used to accept ANY key in the YAML and silently
+        # `continue` past any value it could not parse. Two holes in six lines.
+        #
+        # The unknown-key hole: an operator typo like 'Sio' or a species the
+        # rail does not model became a live entry that nothing ever reported.
+        # The consumer is cold_spot_diagnostic (called below), the mandate
+        # section 4 hot-wall check deciding whether a species condenses BEFORE
+        # reaching its designated stage - so a bogus entry can fabricate or
+        # suppress a cold-spot warning, which is the coating failure mode.
+        #
+        # The silent-skip hole: a malformed temperature vanished instead of
+        # refusing, leaving the operator believing a setpoint was applied when
+        # it was not. Both are fail-closed CATEGORY 1 - missing or unusable
+        # input refuses; it does not get quietly dropped.
+        #
+        # NOTE the correction to b-195 as filed: this does NOT reach
+        # condensation ADMISSION. _condensation_admission_refusal gates on
+        # _assert_condensation_applicable and _species_has_compiled_or_legacy_
+        # pressure, i.e. the vapour-pressure catalogue, which setpoints cannot
+        # write. The blast radius is the coating diagnostic, not the b-189 seam.
+        #
+        # MEASURED GOLDEN-NEUTRAL: data/setpoints.yaml ships 11 entries under
+        # condensation_train.condensation_temperatures_C and all 11 are known
+        # species with parseable values, so nothing in the shipped config
+        # trips either branch.
+        known_species = set(self.condensation_temperatures_C)
+        for species, value in block.items():
+            name = str(species)
+            if name not in known_species:
+                raise ValueError(
+                    f"setpoints condensation_temperatures_C names {name!r}, "
+                    "which the condensation train does not model. Known "
+                    f"species: {sorted(known_species)}. Refusing rather than "
+                    "accepting the key, because an unmodelled entry silently "
+                    "feeds the cold-spot diagnostic and nothing reports it."
+                )
+            try:
+                T_C = float(value)
+            except (TypeError, ValueError):
+                raise ValueError(
+                    f"setpoints condensation temperature for {name!r} is not "
+                    f"numeric ({value!r}); refusing rather than skipping, so a "
+                    "mistyped setpoint cannot look like an applied one."
+                ) from None
+            if not math.isfinite(T_C):
+                raise ValueError(
+                    f"setpoints condensation temperature for {name!r} is not "
+                    f"finite ({value!r}); refusing rather than skipping."
+                )
+            self.condensation_temperatures_C[name] = T_C
+
+
+    def update_pipe_segment_temperatures(
+        self,
+        temperatures_C: Mapping[str, float],
+    ) -> None:
+        self._apply_pipe_segment_temperatures(temperatures_C)
+        if not self.pipe_segments:
+            return
+        self.wall_temperature_C = None if self.wall_temperature_input_refusals else min(
+            segment.wall_temperature_C for segment in self.pipe_segments
+        )
+        if self.operating_history:
+            self.operating_history[-1]["wall_temperature_C"] = self.wall_temperature_C
+            if self.wall_temperature_input_refusals:
+                self.operating_history[-1]["wall_temperature_input_refusals"] = dict(
+                    self.wall_temperature_input_refusals
+                )
+            else:
+                self.operating_history[-1].pop("wall_temperature_input_refusals", None)
+            self.operating_history[-1]["pipe_segment_temperatures_C"] = {
+                segment.name: float(segment.wall_temperature_C)
+                for segment in self.pipe_segments
+                if segment.name not in self.wall_temperature_input_refusals
+            }
+
+    def configure_lab_geometry(
+        self,
+        lab_geometry: LabGeometry | Mapping[str, Any],
+    ) -> LabGeometry:
+        geometry = (
+            lab_geometry
+            if isinstance(lab_geometry, LabGeometry)
+            else parse_lab_geometry(lab_geometry)
+        )
+        if geometry is None:
+            raise ValueError("lab_geometry is required")
+        self.pipe_segments = geometry.to_pipe_segments(
+            default_diameter_m=require_lab_pipe_diameter(
+                self.pipe_diameter_m, 'pipe_diameter_m'),
+        )
+        self.wall_surface_area_m2 = geometry.total_surface_area_m2
+        if self.pipe_segments:
+            self.pipe_diameter_m = min(
+                segment.inner_diameter_m for segment in self.pipe_segments
+            )
+            self.wall_temperature_C = min(
+                segment.wall_temperature_C for segment in self.pipe_segments
+            )
+            self.gas_temperature_C = self.wall_temperature_C
+        self.lab_geometry = geometry
+        return geometry
+
+    def route(self, evap_flux: EvaporationFlux, melt: MeltState):
+        """Route one flux batch with mutation-checked catalog reuse."""
+        data = self.vapor_pressure_data
+        if not isinstance(data, VaporPressureCompatibilityView):
+            return self._route(evap_flux, melt)
+        if getattr(self, '_pressure_trial', False):
+            if not hasattr(data, '_route_catalog'):
+                data._route_catalog = None
+            return self._route(evap_flux, melt)
+        missing = object()
+        previous = getattr(data, '_route_catalog', missing)
+        data._route_catalog = None
+        try:
+            return self._route(evap_flux, melt)
+        finally:
+            if previous is missing:
+                del data._route_catalog
+            else:
+                data._route_catalog = previous
+
+    def _route(self, evap_flux: EvaporationFlux, melt: MeltState):
+        trial = getattr(self, '_pressure_trial', False)
+        (antoine_extrapolation_warnings, antoine_extrapolations, carrier_authority_by_species, condensation_authority_by_species, condensation_refusals_by_species, efficiency_outcomes_by_species, knudsen_diagnostic, route_result, transport_parameter_notice_by_species, used_capture_budget_regularizer, wall_deposit_by_species, wall_saturation_pressure_refusals_by_species, wall_sticking_alpha_by_species, wall_sticking_alpha_provenance_by_species, condensed_by_stage_species, carrier_authority_status_by_species, cleanup_offgas_authorization, remaining_by_species, retained_in_source_by_species) = self._route_amounts(
+            evap_flux, melt, materialize_authority=not trial)
         if trial:
             return route_result
+        self._enforce_knudsen_regime()
+        from simulator.vapour_rail.instrumentation import (
+            VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE, VAPOUR_CARRIER_AUTHORITY_MISSING,
+            VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO, VAPOUR_CARRIER_AUTHORITY_REFUSED,
+            VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING, merge_vapour_carrier_lineage,
+            vapour_carrier_authority_severity, vapour_carrier_authority_status,
+        )
+        cold_spot_warnings = ()
+        diagnostic = cold_spot_diagnostic(
+            [segment for segment in self.pipe_segments
+             if segment.name not in self.wall_temperature_input_refusals],
+            evap_flux.species_kg_hr,
+            margin_C=self.cold_spot_margin_C,
+            upstream_hot_wall_min_C=self.upstream_hot_wall_min_C,
+            temps=self.condensation_temperatures_C,
+            vapor_pressure_data=self.vapor_pressure_data,
+            species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
+        )
+        self.last_cold_spot_diagnostic = copy.deepcopy(diagnostic)
+        self.cold_spot_history.append(copy.deepcopy(diagnostic))
+        cold_spot_warnings = tuple(diagnostic.get('warnings', ()))
+        if self.operating_history:
+            self.operating_history[-1]['cold_spot_warning_count'] = len(
+                cold_spot_warnings)
+            self.operating_history[-1]['cold_spot_warnings'] = cold_spot_warnings
+
 
         from simulator.diagnostics import (
             _status_bearing_alpha_record,
@@ -3309,30 +3880,6 @@ class CondensationModel:
             ),
         )
 
-    def _current_knudsen_diagnostic(self) -> dict[str, Any]:
-        diagnostic = knudsen_regime_diagnostic(
-            overhead_pressure_mbar=self.overhead_pressure_mbar,
-            gas_temperature_C=self.gas_temperature_C,
-            pipe_diameter_m=self.pipe_diameter_m,
-            pipe_segments=self.pipe_segments,
-            regime_factor=self.regime_factor,
-            carrier_gas=self.carrier_gas,
-        )
-        diagnostic['stage_area_m2_by_stage'] = dict(self.stage_area_m2_by_stage)
-        diagnostic['stage_area_geometry_provenance_notice'] = dict(
-            self.stage_area_geometry_provenance_notice)
-        if self._knudsen_policy_configured:
-            diagnostic['viscous_flow_required'] = False
-            return diagnostic
-        unconfigured = dict(diagnostic)
-        unconfigured['status'] = 'refused'
-        unconfigured['reason'] = 'knudsen_policy_unconfigured'
-        unconfigured['reason_refused'] = 'knudsen_policy_unconfigured'
-        unconfigured['message'] = (
-            'Knudsen pressure policy is unconfigured; condensation routing '
-            'refused.'
-        )
-        return unconfigured
 
     def _enforce_knudsen_regime(self) -> dict[str, Any]:
         diagnostic = self._current_knudsen_diagnostic()
@@ -3346,819 +3893,6 @@ class CondensationModel:
                 copy.deepcopy(diagnostic)
             )
         return copy.deepcopy(diagnostic)
-
-    def _wall_deposit_candidate_kg(
-        self,
-        *,
-        species: str,
-        rate_kg_hr: float,
-        T_cond_C: float,
-        melt_temperature_C: float,
-        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
-        antoine_extrapolation_warnings: list[str] | None = None,
-    ) -> float | Mapping[str, Any]:
-        if (
-            antoine_extrapolations is not None
-            or antoine_extrapolation_warnings is not None
-        ):
-            _record_wall_surface_antoine_telemetry(
-                species,
-                self.wall_temperature_C,
-                vapor_pressure_data=self.vapor_pressure_data,
-                antoine_extrapolations=antoine_extrapolations,
-                antoine_extrapolation_warnings=(
-                    antoine_extrapolation_warnings),
-            )
-        token = _with_antoine_telemetry_context(
-            antoine_extrapolations,
-            antoine_extrapolation_warnings,
-        )
-        try:
-            return query_wall_deposit_candidate_kg(
-                self,
-                species=species,
-                rate_kg_hr=rate_kg_hr,
-                T_cond_C=T_cond_C,
-                melt_temperature_C=melt_temperature_C,
-                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-            )
-        finally:
-            _reset_antoine_telemetry_context(token)
-
-    def _wall_deposit_candidates_by_segment_kg(
-        self,
-        *,
-        species: str,
-        rate_kg_hr: float,
-        T_cond_C: float,
-        melt_temperature_C: float,
-        supply_by_segment_kg: Mapping[str, float],
-        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
-        antoine_extrapolation_warnings: list[str] | None = None,
-    ) -> Dict[str, float]:
-        if (
-            antoine_extrapolations is not None
-            or antoine_extrapolation_warnings is not None
-        ):
-            for segment in self._mixed_temperature_wall_candidate_segments(
-                species,
-            ):
-                if segment.name in self.wall_temperature_input_refusals:
-                    continue
-                _record_wall_surface_antoine_telemetry(
-                    species,
-                    segment.wall_temperature_C,
-                    vapor_pressure_data=self.vapor_pressure_data,
-                    antoine_extrapolations=antoine_extrapolations,
-                    antoine_extrapolation_warnings=(
-                        antoine_extrapolation_warnings),
-                )
-        token = _with_antoine_telemetry_context(
-            antoine_extrapolations,
-            antoine_extrapolation_warnings,
-        )
-        try:
-            return query_wall_deposit_candidates_by_segment_kg(
-                self,
-                species=species,
-                rate_kg_hr=rate_kg_hr,
-                T_cond_C=T_cond_C,
-                melt_temperature_C=melt_temperature_C,
-                supply_by_segment_kg=supply_by_segment_kg,
-                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-            )
-        finally:
-            _reset_antoine_telemetry_context(token)
-
-    def _resolve_wall_deposit_candidates_by_species_segment_kg(
-        self,
-        *,
-        evap_flux: EvaporationFlux,
-        melt: MeltState,
-        stage_route_by_species: Mapping[str, Mapping[str, Any]],
-        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
-        antoine_extrapolation_warnings: list[str] | None = None,
-    ) -> Dict[str, Dict[str, float]]:
-        self.last_wall_capture_fixed_point_iterations = 0
-        if not self.pipe_segments or not stage_route_by_species:
-            self.wall_species_partial_pressures_pa_by_segment = {}
-            return {}
-
-        inlet_rates = {
-            str(species): max(0.0, float(rate_kg_hr))
-            for species, rate_kg_hr in evap_flux.species_kg_hr.items()
-        }
-        segment_names = [segment.name for segment in self.pipe_segments]
-        total_pressure_pa = self.overhead_pressure_mbar * 100.0
-
-        def segment_rates_from_capture(
-            stage_capture_by_species: Mapping[str, Mapping[int, float]],
-            wall_capture_by_species: Mapping[str, Mapping[str, float]],
-        ) -> dict[str, dict[str, float]]:
-            by_segment: dict[str, dict[str, float]] = {}
-            prior_segments: list[str] = []
-            for segment in self.pipe_segments:
-                upstream_number = _segment_stage_number(segment.upstream_stage)
-                rates: dict[str, float] = {}
-                for species, inlet_rate in inlet_rates.items():
-                    stage_removed = (
-                        sum(
-                            float(value)
-                            for stage_number, value
-                            in stage_capture_by_species.get(species, {}).items()
-                            if (
-                                upstream_number is not None
-                                and int(stage_number) <= upstream_number
-                            )
-                        )
-                    )
-                    wall_removed = sum(
-                        float(
-                            wall_capture_by_species.get(species, {}).get(
-                                prior_segment,
-                                0.0,
-                            )
-                        )
-                        for prior_segment in prior_segments
-                    )
-                    remaining = inlet_rate - stage_removed - wall_removed
-                    tolerance = 1.0e-12 * max(1.0, inlet_rate)
-                    if remaining < -tolerance:
-                        raise ValueError(
-                            'resolved wall routing removes more '
-                            f'{species} than enters the train'
-                        )
-                    rates[species] = max(0.0, remaining)
-                by_segment[segment.name] = rates
-                prior_segments.append(segment.name)
-            return by_segment
-
-        def wall_candidates(
-            species_rates_by_segment: Mapping[str, Mapping[str, float]],
-            *,
-            record_telemetry: bool,
-        ) -> dict[str, dict[str, float]]:
-            candidates: dict[str, dict[str, float]] = {}
-            for species, stage_route in stage_route_by_species.items():
-                rate_kg_hr = inlet_rates.get(species, 0.0)
-                if rate_kg_hr <= 0.0:
-                    continue
-                species_candidates = self._wall_deposit_candidates_by_segment_kg(
-                    species=species,
-                    rate_kg_hr=rate_kg_hr,
-                    T_cond_C=float(stage_route['T_cond_C']),
-                    melt_temperature_C=float(
-                        getattr(melt, 'temperature_C', stage_route['T_cond_C'])
-                    ),
-                    supply_by_segment_kg={
-                        segment_name: float(
-                            species_rates_by_segment.get(
-                                segment_name,
-                                {},
-                            ).get(species, 0.0)
-                        )
-                        for segment_name in segment_names
-                    },
-                    antoine_extrapolations=(
-                        antoine_extrapolations if record_telemetry else None
-                    ),
-                    antoine_extrapolation_warnings=(
-                        antoine_extrapolation_warnings
-                        if record_telemetry else None
-                    ),
-                )
-                candidates[species] = species_candidates
-            return candidates
-
-        def resolved_capture(
-            candidates_by_species: Mapping[str, Mapping[str, float]],
-        ) -> tuple[
-            dict[str, dict[int, float]],
-            dict[str, dict[str, float]],
-        ]:
-            stage_capture: dict[str, dict[int, float]] = {}
-            wall_capture: dict[str, dict[str, float]] = {}
-            for species, stage_route in stage_route_by_species.items():
-                stages, walls = _regularized_capture_allocations(
-                    float(stage_route['capture_budget_kg']),
-                    stage_route['hkl_condensed_by_stage'],
-                    candidates_by_species.get(species, {}),
-                )
-                stage_capture[species] = {
-                    int(stage_number): float(value)
-                    for stage_number, value in stages.items()
-                }
-                wall_capture[species] = {
-                    str(segment_name): float(value)
-                    for segment_name, value in walls.items()
-                }
-            return stage_capture, wall_capture
-
-        def capture_delta(
-            previous_stage: Mapping[str, Mapping[int, float]],
-            previous_wall: Mapping[str, Mapping[str, float]],
-            current_stage: Mapping[str, Mapping[int, float]],
-            current_wall: Mapping[str, Mapping[str, float]],
-        ) -> float:
-            delta = 0.0
-            for species, inlet_rate in inlet_rates.items():
-                scale = max(1.0e-30, inlet_rate)
-                for stage_number in (
-                    set(previous_stage.get(species, {}))
-                    | set(current_stage.get(species, {}))
-                ):
-                    delta = max(
-                        delta,
-                        abs(
-                            float(
-                                previous_stage.get(species, {}).get(
-                                    stage_number,
-                                    0.0,
-                                )
-                            )
-                            - float(
-                                current_stage.get(species, {}).get(
-                                    stage_number,
-                                    0.0,
-                                )
-                            )
-                        )
-                        / scale,
-                    )
-                for segment_name in (
-                    set(previous_wall.get(species, {}))
-                    | set(current_wall.get(species, {}))
-                ):
-                    delta = max(
-                        delta,
-                        abs(
-                            float(
-                                previous_wall.get(species, {}).get(
-                                    segment_name,
-                                    0.0,
-                                )
-                            )
-                            - float(
-                                current_wall.get(species, {}).get(
-                                    segment_name,
-                                    0.0,
-                                )
-                            )
-                        )
-                        / scale,
-                    )
-            return delta
-
-        def relax_capture(
-            previous: Mapping[str, Mapping[Any, float]],
-            current: Mapping[str, Mapping[Any, float]],
-            factor: float,
-        ) -> dict[str, dict[Any, float]]:
-            relaxed: dict[str, dict[Any, float]] = {}
-            for species in sorted(set(previous) | set(current)):
-                values: dict[Any, float] = {}
-                for location in (
-                    sorted(
-                        set(previous.get(species, {}))
-                        | set(current.get(species, {}))
-                    )
-                ):
-                    old_value = float(
-                        previous.get(species, {}).get(location, 0.0)
-                    )
-                    new_value = float(
-                        current.get(species, {}).get(location, 0.0)
-                    )
-                    value = old_value + factor * (new_value - old_value)
-                    if value > 0.0:
-                        values[location] = value
-                relaxed[species] = values
-            return relaxed
-
-        stage_capture: dict[str, dict[int, float]] = {}
-        wall_capture: dict[str, dict[str, float]] = {}
-        converged = False
-        previous_delta: float | None = None
-        relaxation = 1.0
-        for iteration in range(1024):
-            species_rates_by_segment = segment_rates_from_capture(
-                stage_capture,
-                wall_capture,
-            )
-            self.wall_species_partial_pressures_pa_by_segment = (
-                _segment_species_partial_pressures_pa(
-                    self.wall_species_partial_pressures_pa,
-                    total_pressure_pa,
-                    inlet_rates,
-                    species_rates_by_segment,
-                )
-            )
-            self.last_wall_deposition_rate_shadow_candidate = {}
-            candidates_by_species = wall_candidates(
-                species_rates_by_segment,
-                record_telemetry=False,
-            )
-            next_stage_capture, next_wall_capture = resolved_capture(
-                candidates_by_species
-            )
-            delta = capture_delta(
-                stage_capture,
-                wall_capture,
-                next_stage_capture,
-                next_wall_capture,
-            )
-            if delta <= 1.0e-7:
-                stage_capture = next_stage_capture
-                wall_capture = next_wall_capture
-                self.last_wall_capture_fixed_point_iterations = iteration + 1
-                converged = True
-                break
-            if (
-                previous_delta is not None
-                and delta >= 0.95 * previous_delta
-            ):
-                relaxation = 0.8
-            stage_capture = relax_capture(
-                stage_capture,
-                next_stage_capture,
-                relaxation,
-            )
-            wall_capture = relax_capture(
-                wall_capture,
-                next_wall_capture,
-                relaxation,
-            )
-            previous_delta = delta
-        if not converged:
-            self.last_wall_capture_fixed_point_iterations = 1024
-            raise RuntimeError(
-                'wall/stage capture fixed-point did not converge in 1024 '
-                f'iterations (relative delta={delta:.12g})'
-            )
-        if (
-            antoine_extrapolations is not None
-            or antoine_extrapolation_warnings is not None
-        ):
-            for species in stage_route_by_species:
-                for segment in self._mixed_temperature_wall_candidate_segments(
-                    species
-                ):
-                    if segment.name in self.wall_temperature_input_refusals:
-                        continue
-                    _record_wall_surface_antoine_telemetry(
-                        species,
-                        segment.wall_temperature_C,
-                        vapor_pressure_data=self.vapor_pressure_data,
-                        antoine_extrapolations=antoine_extrapolations,
-                        antoine_extrapolation_warnings=(
-                            antoine_extrapolation_warnings
-                        ),
-                    )
-        return candidates_by_species
-
-    def _mixed_temperature_wall_candidate_segments(
-        self,
-        species: str,
-    ) -> list[PipeSegment]:
-        if self.lab_geometry is not None:
-            return list(self.pipe_segments)
-        target_stage_number = designated_stage_number(species)
-        if target_stage_number is None:
-            return []
-        segments: list[PipeSegment] = []
-        for segment in self.pipe_segments:
-            downstream_number = _segment_stage_number(segment.downstream_stage)
-            if downstream_number is None:
-                continue
-            if downstream_number <= target_stage_number:
-                segments.append(segment)
-        return segments
-
-    def _wall_deposit_candidate_for_surface_kg(
-        self,
-        *,
-        species: str,
-        rate_kg_hr: float,
-        T_cond_C: float,
-        melt_temperature_C: float,
-        wall_temperature_C: float,
-        surface_area_m2: float,
-        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
-        antoine_extrapolation_warnings: list[str] | None = None,
-    ) -> float | Mapping[str, Any]:
-        if (
-            antoine_extrapolations is not None
-            or antoine_extrapolation_warnings is not None
-        ):
-            _record_wall_surface_antoine_telemetry(
-                species,
-                wall_temperature_C,
-                vapor_pressure_data=self.vapor_pressure_data,
-                antoine_extrapolations=antoine_extrapolations,
-                antoine_extrapolation_warnings=(
-                    antoine_extrapolation_warnings),
-            )
-        token = _with_antoine_telemetry_context(
-            antoine_extrapolations,
-            antoine_extrapolation_warnings,
-        )
-        try:
-            return query_wall_deposit_candidate_for_surface_kg(
-                self,
-                species=species,
-                rate_kg_hr=rate_kg_hr,
-                T_cond_C=T_cond_C,
-                melt_temperature_C=melt_temperature_C,
-                wall_temperature_C=wall_temperature_C,
-                surface_area_m2=surface_area_m2,
-                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-            )
-        finally:
-            _reset_antoine_telemetry_context(token)
-
-    def _segment_supply_by_name(
-        self,
-        rate_kg_hr: float,
-        remaining_after_stage: Mapping[int, float],
-    ) -> Dict[str, float]:
-        supply: Dict[str, float] = {}
-        for segment in self.pipe_segments:
-            upstream_number = _segment_stage_number(segment.upstream_stage)
-            if upstream_number is None:
-                supply[segment.name] = max(0.0, float(rate_kg_hr))
-            else:
-                prior_numbers = [
-                    stage_number
-                    for stage_number in remaining_after_stage
-                    if stage_number <= upstream_number
-                ]
-                default_supply = (
-                    remaining_after_stage[max(prior_numbers)]
-                    if prior_numbers else rate_kg_hr
-                )
-                supply[segment.name] = max(
-                    0.0,
-                    min(
-                        float(rate_kg_hr),
-                        float(remaining_after_stage.get(
-                            upstream_number, default_supply)),
-                    ),
-                )
-        return supply
-
-    def _condensation_efficiency(
-        self,
-        *,
-        stage: CondensationStage,
-        species: str,
-        T_cond_C: float,
-        residence_s: float,
-        available_kg: float,
-        alpha_s_value: float,
-        alpha_record: MutableMapping[str, Any] | None = None,
-        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
-        antoine_extrapolation_warnings: list[str] | None = None,
-        efficiency_outcomes: list[dict[str, Any]] | None = None,
-    ) -> float:
-        """
-        Condensation efficiency for one species in one stage.
-
-        Wall deposition uses ``_series_resistance_deposition_flux_mol_m2_s``:
-        HKL surface uptake in series with gas-side mass transfer, with
-        ``f = Kn/(Kn+0.01)`` removing boundary-layer resistance as flow
-        becomes free molecular.
-
-        Reactive wall products use the product-P_sat floor in the shared
-        driving-pressure helper instead of the vapor species' Antoine P_sat.
-
-        Chunk A keeps the existing stage residence-time surrogate for
-        geometry and integrates the H-K-L driving force across the actual
-        stage T-band. Chunk C replaces the constant regime factor with
-        pressure/Knudsen coupling.
-
-        VR-11 / B3: the finite early-zero exits (non-positive residence
-        or alpha, nonpositive local pressure,
-        nonpositive reference flux) mint typed pass-through outcomes
-        into ``efficiency_outcomes`` (when provided) rather than
-        returning a silent 0.0 with no consumer channel. Non-finite
-        ``residence_s`` or ``alpha_s_value`` raise; a later
-        available_kg / molar-mass non-finite or non-positive check
-        returns 0.0 without minting. Numeric eta for finite valid
-        inputs is unchanged. Unavailable SiO wall saturation uses the declared
-        reactive-product route and measured flowing pressure, with an
-        extrapolated outcome; missing or invalid inputs remain terminal.
-        """
-        def _mint_zero(reason: str, **detail: Any) -> float:
-            if efficiency_outcomes is not None:
-                record: dict[str, Any] = {
-                    'status': 'pass_through',
-                    'reason': reason,
-                    'output_status': 'status_bearing',
-                    'species': species,
-                    'stage_number': int(getattr(stage, 'stage_number', -1)),
-                    'T_cond_C': float(T_cond_C),
-                    'eta': 0.0,
-                }
-                record.update(detail)
-                efficiency_outcomes.append(record)
-            return 0.0
-
-        if not math.isfinite(float(residence_s)):
-            raise ValueError('residence_s must be finite')
-        if not math.isfinite(float(alpha_s_value)):
-            raise ValueError('alpha_s_value must be finite')
-
-        if residence_s <= 0.0 or alpha_s_value <= 0.0:
-            return _mint_zero(
-                'zero_residence_or_alpha',
-                residence_s=float(residence_s),
-                alpha_s_value=float(alpha_s_value),
-            )
-
-        # Resolve Antoine (or catalog) Psat at T_cond; uncovered segments and
-        # range errors are typed refusals (b-127), never a fabricated 100 Pa.
-        psat_notices = antoine_extrapolations if antoine_extrapolations is not None else {}
-        P_local_pa, psat_refused = _try_antoine_psat_pa(
-            species,
-            T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
-            vapor_pressure_data=self.vapor_pressure_data,
-            antoine_extrapolations=psat_notices,
-            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-        )
-        domain_outcome = None
-        if psat_refused or P_local_pa is None:
-            notice = psat_notices.get(
-                f'{species}#wall:{T_cond_C + CELSIUS_TO_KELVIN_OFFSET}', {}
-            )
-            if notice.get('refusal_type') == 'CatalogCompileError':
-                raise DepositionInputRefusal(
-                    'vapor_pressure_data', species, str(notice.get('reason')),
-                )
-            if _valid_temperature_range_K(notice.get('valid_range_K')) is None:
-                raise DepositionInputRefusal(
-                    'valid_range_K', notice.get('valid_range_K'),
-                    'declared source band required for extrapolated routing',
-                )
-            declared_temperature = _deposition_finite_scalar(
-                'condensation_temperatures_C', _species_condensation_temperature_C(
-                    species, temps=self.condensation_temperatures_C,
-                    vapor_pressure_data=self.vapor_pressure_data,
-                ),
-            )
-            if declared_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
-                raise DepositionInputRefusal(
-                    'condensation_temperatures_C', declared_temperature,
-                    'declared routing temperature must be above absolute zero',
-                )
-            P_local_pa = _deposition_finite_scalar(
-                'flowing_pressure_pa', self.wall_species_partial_pressures_pa.get(species)
-                if self._species_partial_pressures_configured else None,
-            )
-            if P_local_pa < 0.0:
-                raise DepositionInputRefusal(
-                    'flowing_pressure_pa', P_local_pa, 'pressure must be nonnegative',
-                )
-            if P_local_pa == 0.0:
-                return _mint_zero('nonpositive_flowing_pressure', flowing_pressure_pa=0.0)
-            # The existing Si/SiO2 reactive-product limit supplies P_sat ~= 0
-            # below the declared routing temperature. Flow supplies pressure;
-            # the 1 mbar routing reference never substitutes for measured flow.
-            domain_outcome = {
-                **notice,
-                'status': 'extrapolated',
-                'authority_level': 'extrapolated',
-                'reason': 'antoine_psat_unavailable_at_T',
-                'original_reason': notice.get('reason', 'uncovered_antoine_segment'),
-                'valid_range_K': notice.get('valid_range_K'),
-                'output_status': 'status_bearing',
-                'species': species,
-                'stage_number': int(stage.stage_number),
-                'T_cond_C': float(T_cond_C),
-                'flowing_pressure_pa': P_local_pa,
-                'routing_reference_temperature_C': declared_temperature,
-                'routing_reference_source': 'condensation_train.condensation_temperatures_C',
-                'saturation_pressure_policy': 'reactive_product_backstop',
-                'eta': 0.0,
-            }
-            if efficiency_outcomes is not None:
-                efficiency_outcomes.append(domain_outcome)
-            if species != 'SiO':
-                domain_outcome['saturation_pressure_policy'] = 'declared_pressure_isolated_stage_efficiency'
-                available_kg = _deposition_finite_scalar('available_kg', available_kg)
-                if available_kg < 0.0:
-                    raise DepositionInputRefusal('available_kg', available_kg, 'mass must be nonnegative')
-                if available_kg == 0.0:
-                    return _mint_zero('no_available_mass')
-                # The default hot duct, dust filter and turbine declare no
-                # condenser surface. Explicit area overrides still need validation.
-                if (
-                    stage.stage_number in (0, 5, 6)
-                    and not stage.target_species
-                    and f'stage_{stage.stage_number}' not in self.stage_area_m2_by_stage
-                    and str(stage.stage_number) not in self.stage_area_m2_by_stage
-                ):
-                    return _mint_zero(
-                        'no_capture_surface_in_train_topology',
-                        applicability_evidence={
-                            'stage_number': stage.stage_number,
-                            'target_species': [],
-                            'configured_capture_surface': False,
-                        },
-                    )
-                stage_area_m2 = _deposition_finite_scalar(
-                    'stage_area_m2',
-                    self._stage_area_m2_for_stage_number(stage.stage_number),
-                )
-                if stage_area_m2 == 0.0:
-                    return _mint_zero('no_configured_capture_area')
-                domain_outcome['eta'] = _pressure_isolated_stage_efficiency(
-                    stage, T_cond_C, residence_s, alpha_s_value,
-                )
-                domain_outcome['capture_budget_regularizer_notice'] = dict(CAPTURE_BUDGET_REGULARIZER_NOTICE)
-                return domain_outcome['eta']
-        if P_local_pa <= 0.0:
-            return _mint_zero(
-                'nonpositive_local_pressure',
-                P_local_pa=float(P_local_pa),
-            )
-
-        T_ref_K = max(T_cond_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
-        reference_flux = _hkl_impingement_flux_mol_m2_s(
-            species,
-            P_local_pa,
-            T_ref_K,
-            vapor_pressure_data=self.vapor_pressure_data,
-        )
-        if reference_flux <= 0.0:
-            return _mint_zero(
-                'nonpositive_reference_flux',
-                P_local_pa=float(P_local_pa),
-                reference_flux=float(reference_flux),
-            )
-
-        lo_C, hi_C = _stage_temp_band_C(stage)
-        if hi_C < lo_C:
-            lo_C, hi_C = hi_C, lo_C
-
-        band_flux_mol_m2_s = 0.0
-        width_C = hi_C - lo_C
-        spec = (
-            alpha_record.get('alpha_s_coefficient_spec')
-            if isinstance(alpha_record, Mapping)
-            else None
-        )
-        sample_extrapolated = False
-        for sample in range(HKL_BAND_SAMPLES):
-            if width_C <= 0.0:
-                T_surface_C = lo_C
-            else:
-                T_surface_C = (
-                    lo_C + width_C * (sample + 0.5) / HKL_BAND_SAMPLES
-                )
-            T_surface_K = max(T_surface_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
-            sample_alpha_s = alpha_s_value
-            if isinstance(spec, Mapping):
-                alpha_context: dict[str, Any] = {'coefficient_spec': spec}
-                sample_alpha_s = _condensation_alpha_s(
-                    species,
-                    T_surface_K,
-                    alpha_context,
-                )
-                sample_eval = alpha_context.get('alpha_s_evaluation', {})
-                sample_extrapolated = sample_extrapolated or bool(
-                    sample_eval.get('alpha_s_extrapolated')
-                )
-            # 0.5.2 Phase B (series-resistance + stir-Sherwood): same
-            # series-resistance form as the wall-deposit candidate path so
-            # the stage-condensation band integration honors the canonical
-            # mass-transfer composition (Bird/Stewart/Lightfoot) rather
-            # than the v1 additive blend. T_surface_K (stage T-band
-            # sample) drives P_sat; T_gas_K (bulk gas) drives the
-            # ideal-gas denominator. overhead_pressure_pa feeds the
-            # Chapman-Enskog D_AB(T, P) per Phase A1. The explicit
-            # radial_stir_factor sets the heuristic Sherwood proxy;
-            # a legacy scalar is radial-equivalent only when the
-            # explicit radial input is absent. No induction power or
-            # field is modeled.
-            T_gas_K = max(
-                float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
-                1.0,
-            )
-            overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
-            rate_diagnostic: dict[str, Any] = {}
-            flux = _series_resistance_deposition_flux_mol_m2_s(
-                species, P_local_pa, T_surface_K, sample_alpha_s,
-                pipe_diameter_m=self.pipe_diameter_m,
-                # 0.5.3 Phase B: pass both axes (see twin call above
-                # in ``_wall_deposit_candidate_for_surface_kg`` for the
-                # precedence rationale; the helper reads radial as the
-                # Sh driver, legacy stir_factor as audit-history).
-                stir_factor=self.stir_factor,
-                radial_stir_factor=self.radial_stir_factor,
-                regime_factor=self.regime_factor,
-                T_gas_K=T_gas_K,
-                overhead_pressure_pa=overhead_pressure_pa,
-                carrier_gas=self.carrier_gas,
-                vapor_pressure_data=self.vapor_pressure_data,
-                # Standard-reaction SiO rows intentionally have no pure-SiO
-                # wall P_sat.  At and below the declared condensation
-                # temperature, baffles materialize the disproportionation
-                # product instead of silently disabling capture when the melt
-                # reaction term is rejected as a wall pressure.  The
-                # temperature gate preserves colder downstream carryover
-                # without admitting hotter upstream stages.
-                reactive_product_backstop=(
-                    _reactive_product_backstop_authorized(species)
-                    and T_surface_C <= T_cond_C
-                ),
-                # Stable product class (CrO2 today) materializes the declared
-                # irreversible oxide route instead of reversible pure-species Psat.
-                stable_condensation_product_backstop=(
-                    _stable_condensation_product_backstop_authorized(species)
-                ),
-                antoine_extrapolations=antoine_extrapolations,
-                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-                diagnostic_out=rate_diagnostic,
-            )
-            if (
-                bool(rate_diagnostic.get('wall_saturation_pressure_refused'))
-                and flux > 0.0
-            ):
-                raise RuntimeError(
-                    "wall saturation-pressure refusal produced positive flux"
-                )
-            band_flux_mol_m2_s += flux
-        band_flux_mol_m2_s /= HKL_BAND_SAMPLES
-        if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
-            alpha_record['alpha_s_sample_temperature_range_K'] = [
-                max(lo_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
-                max(hi_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
-            ]
-            alpha_record['alpha_s_sample_extrapolated'] = sample_extrapolated
-
-        stage_area_m2 = self._stage_area_m2_for_stage_number(stage.stage_number)
-        if stage_area_m2 is not None:
-            molar_mass_kg_mol = (
-                _molecular_mass_kg_per_molecule(
-                    species,
-                    vapor_pressure_data=self.vapor_pressure_data,
-                )
-                * AVOGADRO_MOL
-            )
-            if (
-                not math.isfinite(available_kg)
-                or available_kg <= 0.0
-                or molar_mass_kg_mol <= 0.0
-            ):
-                return 0.0
-            available_mol = available_kg / molar_mass_kg_mol
-            # HKL/transport flux is mol m^-2 s^-1. Integrating over physical
-            # baffle area and residence time gives capturable mol:
-            # (mol m^-2 s^-1)(m^2)(s) = mol. Dividing by available vapor mol
-            # makes eta dimensionless and lets configured Stage-3 area affect
-            # capture without inventing an area-normalized rate constant.
-            capturable_mol = (
-                max(0.0, band_flux_mol_m2_s)
-                * stage_area_m2
-                * residence_s
-            )
-            eta = capturable_mol / available_mol
-        else:
-            # Premise: ``band_flux_fraction = flux / reference_flux`` is
-            # dimensionless. Algebra requires capturable mol =
-            # flux(mol m^-2 s^-1) * area(m^2) * residence(s), then
-            # eta = capturable_mol / available_mol. Unit check: without a
-            # configured area there is no m^2 term, so treating the ratio as
-            # s^-1 invents a rate constant. Sanity: leave vapor un-baffled
-            # rather than create synthetic capture.
-            eta = 0.0
-        if not math.isfinite(eta):
-            raise ValueError(
-                f'condensation efficiency for {species} in stage '
-                f'{int(getattr(stage, "stage_number", -1))} is not finite'
-            )
-        # Supply-limited capture: band flux * area * time can exceed available
-        # vapour. Cap eta at 1 and surface a typed notice (Ferry V / V1-S13 P3).
-        eta_uncapped = float(eta)
-        eta = max(0.0, min(1.0, eta))
-        supply_limited = eta_uncapped > 1.0
-        if domain_outcome is not None:
-            domain_outcome['eta'] = eta
-            if supply_limited:
-                domain_outcome['capture_supply_limited'] = True
-                domain_outcome['eta_uncapped'] = eta_uncapped
-        if supply_limited and efficiency_outcomes is not None:
-            efficiency_outcomes.append(
-                {
-                    'status': 'capture_supply_limited',
-                    'reason': 'capture_supply_limited',
-                    'species': species,
-                    'stage_number': int(getattr(stage, 'stage_number', -1)),
-                    'eta': eta,
-                    'eta_uncapped': eta_uncapped,
-                }
-            )
-        return eta
 
 
 def _authoritative_vapour_catalog_payload(
@@ -7367,3 +7101,387 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
             stage_report['activity'] = activity
         report[stage_key] = stage_report
     return report
+
+
+def _stage_area_m2_for_stage_number(stage_number: int, stage_area_m2_by_stage) -> float | None:
+    key = STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number))
+    raw = None if key is None else stage_area_m2_by_stage.get(key)
+    if raw is None:
+        raw = stage_area_m2_by_stage.get(f'stage_{stage_number}')
+    if raw is None:
+        raw = stage_area_m2_by_stage.get(str(stage_number))
+    if raw is None:
+        return None
+    try:
+        area_m2 = float(raw)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(area_m2) or area_m2 < 0.0:
+        return None
+    return area_m2
+
+
+def _condensation_efficiency(
+    *,
+    _species_partial_pressures_configured,
+    carrier_gas,
+    condensation_temperatures_C,
+    gas_temperature_C,
+    overhead_pressure_mbar,
+    pipe_diameter_m,
+    radial_stir_factor,
+    regime_factor,
+    stage_area_m2_by_stage,
+    stir_factor,
+    vapor_pressure_data,
+    wall_species_partial_pressures_pa,
+    stage: CondensationStage,
+    species: str,
+    T_cond_C: float,
+    residence_s: float,
+    available_kg: float,
+    alpha_s_value: float,
+    alpha_record: MutableMapping[str, Any] | None = None,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+    antoine_extrapolation_warnings: list[str] | None = None,
+    efficiency_outcomes: list[dict[str, Any]] | None = None,
+) -> float:
+    """
+    Condensation efficiency for one species in one stage.
+
+    Wall deposition uses ``_series_resistance_deposition_flux_mol_m2_s``:
+    HKL surface uptake in series with gas-side mass transfer, with
+    ``f = Kn/(Kn+0.01)`` removing boundary-layer resistance as flow
+    becomes free molecular.
+
+    Reactive wall products use the product-P_sat floor in the shared
+    driving-pressure helper instead of the vapor species' Antoine P_sat.
+
+    Chunk A keeps the existing stage residence-time surrogate for
+    geometry and integrates the H-K-L driving force across the actual
+    stage T-band. Chunk C replaces the constant regime factor with
+    pressure/Knudsen coupling.
+
+    VR-11 / B3: the finite early-zero exits (non-positive residence
+    or alpha, nonpositive local pressure,
+    nonpositive reference flux) mint typed pass-through outcomes
+    into ``efficiency_outcomes`` (when provided) rather than
+    returning a silent 0.0 with no consumer channel. Non-finite
+    ``residence_s`` or ``alpha_s_value`` raise; a later
+    available_kg / molar-mass non-finite or non-positive check
+    returns 0.0 without minting. Numeric eta for finite valid
+    inputs is unchanged. Unavailable SiO wall saturation uses the declared
+    reactive-product route and measured flowing pressure, with an
+    extrapolated outcome; missing or invalid inputs remain terminal.
+    """
+    def _mint_zero(reason: str, **detail: Any) -> float:
+        if efficiency_outcomes is not None:
+            record: dict[str, Any] = {
+                'status': 'pass_through',
+                'reason': reason,
+                'output_status': 'status_bearing',
+                'species': species,
+                'stage_number': int(getattr(stage, 'stage_number', -1)),
+                'T_cond_C': float(T_cond_C),
+                'eta': 0.0,
+            }
+            record.update(detail)
+            efficiency_outcomes.append(record)
+        return 0.0
+
+    if not math.isfinite(float(residence_s)):
+        raise ValueError('residence_s must be finite')
+    if not math.isfinite(float(alpha_s_value)):
+        raise ValueError('alpha_s_value must be finite')
+
+    if residence_s <= 0.0 or alpha_s_value <= 0.0:
+        return _mint_zero(
+            'zero_residence_or_alpha',
+            residence_s=float(residence_s),
+            alpha_s_value=float(alpha_s_value),
+        )
+
+    # Resolve Antoine (or catalog) Psat at T_cond; uncovered segments and
+    # range errors are typed refusals (b-127), never a fabricated 100 Pa.
+    psat_notices = antoine_extrapolations if antoine_extrapolations is not None else {}
+    P_local_pa, psat_refused = _try_antoine_psat_pa(
+        species,
+        T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
+        vapor_pressure_data=vapor_pressure_data,
+        antoine_extrapolations=psat_notices,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+    )
+    domain_outcome = None
+    if psat_refused or P_local_pa is None:
+        notice = psat_notices.get(
+            f'{species}#wall:{T_cond_C + CELSIUS_TO_KELVIN_OFFSET}', {}
+        )
+        if notice.get('refusal_type') == 'CatalogCompileError':
+            raise DepositionInputRefusal(
+                'vapor_pressure_data', species, str(notice.get('reason')),
+            )
+        if _valid_temperature_range_K(notice.get('valid_range_K')) is None:
+            raise DepositionInputRefusal(
+                'valid_range_K', notice.get('valid_range_K'),
+                'declared source band required for extrapolated routing',
+            )
+        declared_temperature = _deposition_finite_scalar(
+            'condensation_temperatures_C', _species_condensation_temperature_C(
+                species, temps=condensation_temperatures_C,
+                vapor_pressure_data=vapor_pressure_data,
+            ),
+        )
+        if declared_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
+            raise DepositionInputRefusal(
+                'condensation_temperatures_C', declared_temperature,
+                'declared routing temperature must be above absolute zero',
+            )
+        P_local_pa = _deposition_finite_scalar(
+            'flowing_pressure_pa', wall_species_partial_pressures_pa.get(species)
+            if _species_partial_pressures_configured else None,
+        )
+        if P_local_pa < 0.0:
+            raise DepositionInputRefusal(
+                'flowing_pressure_pa', P_local_pa, 'pressure must be nonnegative',
+            )
+        if P_local_pa == 0.0:
+            return _mint_zero('nonpositive_flowing_pressure', flowing_pressure_pa=0.0)
+        # The existing Si/SiO2 reactive-product limit supplies P_sat ~= 0
+        # below the declared routing temperature. Flow supplies pressure;
+        # the 1 mbar routing reference never substitutes for measured flow.
+        domain_outcome = {
+            **notice,
+            'status': 'extrapolated',
+            'authority_level': 'extrapolated',
+            'reason': 'antoine_psat_unavailable_at_T',
+            'original_reason': notice.get('reason', 'uncovered_antoine_segment'),
+            'valid_range_K': notice.get('valid_range_K'),
+            'output_status': 'status_bearing',
+            'species': species,
+            'stage_number': int(stage.stage_number),
+            'T_cond_C': float(T_cond_C),
+            'flowing_pressure_pa': P_local_pa,
+            'routing_reference_temperature_C': declared_temperature,
+            'routing_reference_source': 'condensation_train.condensation_temperatures_C',
+            'saturation_pressure_policy': 'reactive_product_backstop',
+            'eta': 0.0,
+        }
+        if efficiency_outcomes is not None:
+            efficiency_outcomes.append(domain_outcome)
+        if species != 'SiO':
+            domain_outcome['saturation_pressure_policy'] = 'declared_pressure_isolated_stage_efficiency'
+            available_kg = _deposition_finite_scalar('available_kg', available_kg)
+            if available_kg < 0.0:
+                raise DepositionInputRefusal('available_kg', available_kg, 'mass must be nonnegative')
+            if available_kg == 0.0:
+                return _mint_zero('no_available_mass')
+            # The default hot duct, dust filter and turbine declare no
+            # condenser surface. Explicit area overrides still need validation.
+            if (
+                stage.stage_number in (0, 5, 6)
+                and not stage.target_species
+                and f'stage_{stage.stage_number}' not in stage_area_m2_by_stage
+                and str(stage.stage_number) not in stage_area_m2_by_stage
+            ):
+                return _mint_zero(
+                    'no_capture_surface_in_train_topology',
+                    applicability_evidence={
+                        'stage_number': stage.stage_number,
+                        'target_species': [],
+                        'configured_capture_surface': False,
+                    },
+                )
+            stage_area_m2 = _deposition_finite_scalar(
+                'stage_area_m2',
+                _stage_area_m2_for_stage_number(stage.stage_number, stage_area_m2_by_stage),
+            )
+            if stage_area_m2 == 0.0:
+                return _mint_zero('no_configured_capture_area')
+            domain_outcome['eta'] = _pressure_isolated_stage_efficiency(
+                stage, T_cond_C, residence_s, alpha_s_value,
+            )
+            domain_outcome['capture_budget_regularizer_notice'] = dict(CAPTURE_BUDGET_REGULARIZER_NOTICE)
+            return domain_outcome['eta']
+    if P_local_pa <= 0.0:
+        return _mint_zero(
+            'nonpositive_local_pressure',
+            P_local_pa=float(P_local_pa),
+        )
+
+    T_ref_K = max(T_cond_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
+    reference_flux = _hkl_impingement_flux_mol_m2_s(
+        species,
+        P_local_pa,
+        T_ref_K,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    if reference_flux <= 0.0:
+        return _mint_zero(
+            'nonpositive_reference_flux',
+            P_local_pa=float(P_local_pa),
+            reference_flux=float(reference_flux),
+        )
+
+    lo_C, hi_C = _stage_temp_band_C(stage)
+    if hi_C < lo_C:
+        lo_C, hi_C = hi_C, lo_C
+
+    band_flux_mol_m2_s = 0.0
+    width_C = hi_C - lo_C
+    spec = (
+        alpha_record.get('alpha_s_coefficient_spec')
+        if isinstance(alpha_record, Mapping)
+        else None
+    )
+    sample_extrapolated = False
+    for sample in range(HKL_BAND_SAMPLES):
+        if width_C <= 0.0:
+            T_surface_C = lo_C
+        else:
+            T_surface_C = (
+                lo_C + width_C * (sample + 0.5) / HKL_BAND_SAMPLES
+            )
+        T_surface_K = max(T_surface_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
+        sample_alpha_s = alpha_s_value
+        if isinstance(spec, Mapping):
+            alpha_context: dict[str, Any] = {'coefficient_spec': spec}
+            sample_alpha_s = _condensation_alpha_s(
+                species,
+                T_surface_K,
+                alpha_context,
+            )
+            sample_eval = alpha_context.get('alpha_s_evaluation', {})
+            sample_extrapolated = sample_extrapolated or bool(
+                sample_eval.get('alpha_s_extrapolated')
+            )
+        # 0.5.2 Phase B (series-resistance + stir-Sherwood): same
+        # series-resistance form as the wall-deposit candidate path so
+        # the stage-condensation band integration honors the canonical
+        # mass-transfer composition (Bird/Stewart/Lightfoot) rather
+        # than the v1 additive blend. T_surface_K (stage T-band
+        # sample) drives P_sat; T_gas_K (bulk gas) drives the
+        # ideal-gas denominator. overhead_pressure_pa feeds the
+        # Chapman-Enskog D_AB(T, P) per Phase A1. The explicit
+        # radial_stir_factor sets the heuristic Sherwood proxy;
+        # a legacy scalar is radial-equivalent only when the
+        # explicit radial input is absent. No induction power or
+        # field is modeled.
+        T_gas_K = max(
+            float(gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+            1.0,
+        )
+        overhead_pressure_pa = float(overhead_pressure_mbar) * 100.0
+        rate_diagnostic: dict[str, Any] = {}
+        flux = _series_resistance_deposition_flux_mol_m2_s(
+            species, P_local_pa, T_surface_K, sample_alpha_s,
+            pipe_diameter_m=pipe_diameter_m,
+            # 0.5.3 Phase B: pass both axes (see twin call above
+            # in ``_wall_deposit_candidate_for_surface_kg`` for the
+            # precedence rationale; the helper reads radial as the
+            # Sh driver, legacy stir_factor as audit-history).
+            stir_factor=stir_factor,
+            radial_stir_factor=radial_stir_factor,
+            regime_factor=regime_factor,
+            T_gas_K=T_gas_K,
+            overhead_pressure_pa=overhead_pressure_pa,
+            carrier_gas=carrier_gas,
+            vapor_pressure_data=vapor_pressure_data,
+            # Standard-reaction SiO rows intentionally have no pure-SiO
+            # wall P_sat.  At and below the declared condensation
+            # temperature, baffles materialize the disproportionation
+            # product instead of silently disabling capture when the melt
+            # reaction term is rejected as a wall pressure.  The
+            # temperature gate preserves colder downstream carryover
+            # without admitting hotter upstream stages.
+            reactive_product_backstop=(
+                _reactive_product_backstop_authorized(species)
+                and T_surface_C <= T_cond_C
+            ),
+            # Stable product class (CrO2 today) materializes the declared
+            # irreversible oxide route instead of reversible pure-species Psat.
+            stable_condensation_product_backstop=(
+                _stable_condensation_product_backstop_authorized(species)
+            ),
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            diagnostic_out=rate_diagnostic,
+        )
+        if (
+            bool(rate_diagnostic.get('wall_saturation_pressure_refused'))
+            and flux > 0.0
+        ):
+            raise RuntimeError(
+                "wall saturation-pressure refusal produced positive flux"
+            )
+        band_flux_mol_m2_s += flux
+    band_flux_mol_m2_s /= HKL_BAND_SAMPLES
+    if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
+        alpha_record['alpha_s_sample_temperature_range_K'] = [
+            max(lo_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
+            max(hi_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
+        ]
+        alpha_record['alpha_s_sample_extrapolated'] = sample_extrapolated
+
+    stage_area_m2 = _stage_area_m2_for_stage_number(stage.stage_number, stage_area_m2_by_stage)
+    if stage_area_m2 is not None:
+        molar_mass_kg_mol = (
+            _molecular_mass_kg_per_molecule(
+                species,
+                vapor_pressure_data=vapor_pressure_data,
+            )
+            * AVOGADRO_MOL
+        )
+        if (
+            not math.isfinite(available_kg)
+            or available_kg <= 0.0
+            or molar_mass_kg_mol <= 0.0
+        ):
+            return 0.0
+        available_mol = available_kg / molar_mass_kg_mol
+        # HKL/transport flux is mol m^-2 s^-1. Integrating over physical
+        # baffle area and residence time gives capturable mol:
+        # (mol m^-2 s^-1)(m^2)(s) = mol. Dividing by available vapor mol
+        # makes eta dimensionless and lets configured Stage-3 area affect
+        # capture without inventing an area-normalized rate constant.
+        capturable_mol = (
+            max(0.0, band_flux_mol_m2_s)
+            * stage_area_m2
+            * residence_s
+        )
+        eta = capturable_mol / available_mol
+    else:
+        # Premise: ``band_flux_fraction = flux / reference_flux`` is
+        # dimensionless. Algebra requires capturable mol =
+        # flux(mol m^-2 s^-1) * area(m^2) * residence(s), then
+        # eta = capturable_mol / available_mol. Unit check: without a
+        # configured area there is no m^2 term, so treating the ratio as
+        # s^-1 invents a rate constant. Sanity: leave vapor un-baffled
+        # rather than create synthetic capture.
+        eta = 0.0
+    if not math.isfinite(eta):
+        raise ValueError(
+            f'condensation efficiency for {species} in stage '
+            f'{int(getattr(stage, "stage_number", -1))} is not finite'
+        )
+    # Supply-limited capture: band flux * area * time can exceed available
+    # vapour. Cap eta at 1 and surface a typed notice (Ferry V / V1-S13 P3).
+    eta_uncapped = float(eta)
+    eta = max(0.0, min(1.0, eta))
+    supply_limited = eta_uncapped > 1.0
+    if domain_outcome is not None:
+        domain_outcome['eta'] = eta
+        if supply_limited:
+            domain_outcome['capture_supply_limited'] = True
+            domain_outcome['eta_uncapped'] = eta_uncapped
+    if supply_limited and efficiency_outcomes is not None:
+        efficiency_outcomes.append(
+            {
+                'status': 'capture_supply_limited',
+                'reason': 'capture_supply_limited',
+                'species': species,
+                'stage_number': int(getattr(stage, 'stage_number', -1)),
+                'eta': eta,
+                'eta_uncapped': eta_uncapped,
+            }
+        )
+    return eta

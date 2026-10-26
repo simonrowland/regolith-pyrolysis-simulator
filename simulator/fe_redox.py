@@ -1380,3 +1380,259 @@ def _kress91_fe3_fe2_ratio(fe2o3_over_feo_molar: float) -> float:
     # One Fe2O3 formula unit contains two Fe3+ cations; FeO contains one
     # Fe2+ cation, so Fe3+/Fe2+ = 2*n(Fe2O3)/n(FeO) = 2*ratio.
     return 2.0 * float(fe2o3_over_feo_molar)
+
+
+def _fe3_over_sigma_fe_at_fO2(
+    comp: Mapping[str, float],
+    *,
+    fO2_log: float,
+    T_K: float,
+    pressure_bar: float,
+) -> float:
+    mol_fractions = melt_mol_fractions_for_kress91(comp)
+    if not mol_fractions:
+        return 0.0
+    return float(kress91_split(
+        fO2_log=fO2_log,
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )['fe3'])
+
+
+def _melt_redox_capacity_mol_per_ln_fO2(
+    *,
+    total_fe_mol: float,
+    comp: Mapping[str, float],
+    pressure_bar: float,
+    fO2_log: float,
+    T_K: float,
+) -> float:
+    if total_fe_mol <= 0.0:
+        return 0.0
+    eps_log10 = 0.001
+    eps_ln = math.log(10.0) * eps_log10
+    x_plus = _fe3_over_sigma_fe_at_fO2(
+        comp,
+        fO2_log=fO2_log + eps_log10,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    x_minus = _fe3_over_sigma_fe_at_fO2(
+        comp,
+        fO2_log=fO2_log - eps_log10,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    derivative = max(0.0, (x_plus - x_minus) / (2.0 * eps_ln))
+    return (total_fe_mol / 4.0) * derivative
+
+
+
+def _transition_account_o2_equiv_mol(
+    transition,
+    *,
+    species_formula_registry,
+    side: str,
+    account: str,
+    species_filter: set[str] | None = None,
+) -> float:
+    from simulator.accounting.formulas import resolve_species_formula
+
+    if side not in {'debits', 'credits'}:
+        raise ValueError(f"transition side must be 'debits' or 'credits', got {side!r}")
+    lots = transition.debits if side == 'debits' else transition.credits
+    o2_equiv_mol = 0.0
+    for lot in lots:
+        if lot.account != account:
+            continue
+        for species, kg in lot.species_kg.items():
+            species_name = str(species)
+            if species_filter is not None and species_name not in species_filter:
+                continue
+            formula = resolve_species_formula(
+                species_name,
+                species_formula_registry,
+            )
+            oxygen_atoms = float(formula.elements.get('O', 0.0) or 0.0)
+            if oxygen_atoms <= 0.0:
+                continue
+            species_mol = float(kg) / formula.molar_mass_kg_per_mol()
+            o2_equiv_mol += 0.5 * oxygen_atoms * species_mol
+    return o2_equiv_mol
+
+
+def _transition_species_mol(
+    transition,
+    *,
+    species_formula_registry,
+    side: str,
+    account: str | None,
+    species: str,
+) -> float:
+    from simulator.accounting.formulas import resolve_species_formula
+
+    if side not in {'debits', 'credits'}:
+        raise ValueError(f"transition side must be 'debits' or 'credits', got {side!r}")
+    lots = transition.debits if side == 'debits' else transition.credits
+    formula = resolve_species_formula(species, species_formula_registry)
+    mol = 0.0
+    for lot in lots:
+        if account is not None and lot.account != account:
+            continue
+        kg = float(lot.species_kg.get(species, 0.0) or 0.0)
+        if kg <= 0.0:
+            continue
+        mol += kg / formula.molar_mass_kg_per_mol()
+    return mol
+
+
+def _evaporative_redox_source_terms_from_transition(
+    transition,
+    species_formula_registry,
+    noop_mol: float,
+) -> dict[str, float]:
+    from simulator.accounting.formulas import resolve_species_formula
+
+    prefix = 'evaporate_'
+    if not transition.name.startswith(prefix):
+        return {}
+    vapor_species = transition.name[len(prefix):]
+    vapor_formula = resolve_species_formula(
+        vapor_species,
+        species_formula_registry,
+    )
+    vapor_oxygen_atoms = float(vapor_formula.elements.get('O', 0.0) or 0.0)
+    overhead_o2_credit_mol = _transition_species_mol(
+        transition,
+        species_formula_registry=species_formula_registry,
+        side='credits',
+        account='process.overhead_gas',
+        species='O2',
+    )
+    overhead_o2_debit_mol = _transition_species_mol(
+        transition,
+        species_formula_registry=species_formula_registry,
+        side='debits',
+        account='process.overhead_gas',
+        species='O2',
+    )
+    net_overhead_o2_mol = overhead_o2_credit_mol - overhead_o2_debit_mol
+    # Actual ledger destination outranks carrier class. Premise: when a
+    # channel credits/debits O2 in process.overhead_gas, that physical O2
+    # transfer is the redox source even if the vapor itself is elemental
+    # (Ti is explicitly co-routed with TiO/TiO2). Algebra uses
+    # source=-net_overhead_O2 so release is reducing (negative) and uptake
+    # is oxidising (positive). Units remain mol O2 equivalent. Sanity:
+    # legacy Na/K buffer-routed channels have net=0 and retain the metal-loss
+    # branch; TiO2(g) has net=0 and no spurious source.
+    if abs(net_overhead_o2_mol) > noop_mol:
+        return {'redox_source:evaporative_oxygen_loss': -net_overhead_o2_mol}
+    if vapor_oxygen_atoms > 0.0:
+        return {}
+
+    # Elemental vapor classes (Na/K/Fe/Mg/Ca in current data) are
+    # ledger-balanced as parent oxide -> metal vapor + O2.  The metal
+    # loss leaves the debited oxide oxygen behind in the melt redox
+    # couple, so the fO2 source is positive and derives from the actual
+    # cleaned-melt debit.  If a future provider debits a reduced metal
+    # species directly, this term naturally falls to zero.
+    cleaned_melt_debit_o2_equiv_mol = _transition_account_o2_equiv_mol(
+        transition,
+        species_formula_registry=species_formula_registry,
+        side='debits',
+        account='process.cleaned_melt',
+    )
+    cleaned_melt_credit_o2_equiv_mol = _transition_account_o2_equiv_mol(
+        transition,
+        species_formula_registry=species_formula_registry,
+        side='credits',
+        account='process.cleaned_melt',
+    )
+    metal_loss_o2_equiv_mol = (
+        cleaned_melt_debit_o2_equiv_mol
+        - cleaned_melt_credit_o2_equiv_mol
+    )
+    if abs(metal_loss_o2_equiv_mol) <= noop_mol:
+        return {}
+    return {'redox_source:evaporative_metal_loss': metal_loss_o2_equiv_mol}
+
+
+
+def _redox_source_increment(base_fO2_log, net_o2_equiv_mol, C_m, upper_bound):
+    x_m = base_fO2_log * math.log(10.0)
+    delta_to_bound = (upper_bound - base_fO2_log) * math.log(10.0)
+    # Compare in mol BEFORE division: even a finite oxygen source
+    # divided by a collapsing C_m can overflow. The finite Kress
+    # ledger split below owns the actual uptake, not this tangent.
+    if net_o2_equiv_mol >= C_m * delta_to_bound:
+        applied_delta_ln = delta_to_bound
+        candidate_fO2_log = upper_bound
+    else:
+        applied_delta_ln = net_o2_equiv_mol / C_m
+        candidate_fO2_log = (
+            x_m + applied_delta_ln
+        ) / math.log(10.0)
+    return applied_delta_ln, candidate_fO2_log
+
+
+def _evaporative_redox_is_saturated(internal_o2_capacity_mol, intrinsic_fO2_log,
+        melt_redox_capacity_mol_per_ln_fO2, upper_bound_log, noop_mol):
+    return (internal_o2_capacity_mol > noop_mol) and (
+        intrinsic_fO2_log >= upper_bound_log
+        or melt_redox_capacity_mol_per_ln_fO2 <= noop_mol)
+
+
+def _film_bounded_buffer_release(excess_o2_mol, oxygen_release_capacity_mol):
+    limited = (oxygen_release_capacity_mol is not None
+               and excess_o2_mol > oxygen_release_capacity_mol)
+    return (oxygen_release_capacity_mol if limited else excess_o2_mol), limited
+
+
+_FE_REDOX_OXYGEN_SOURCE_OVERHEAD = "overhead_gas"
+_FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER = "fo2_buffer"
+_FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS = (
+    "evaporative_metal_loss_internal"
+)
+
+
+def _remaining_fe_redox_internal_o2_capacity_mol(capacity_mol, consumed_mol, buffer_o2_mol):
+    capacity_mol = max(0.0, float(capacity_mol or 0.0) - float(consumed_mol or 0.0))
+    return min(capacity_mol, max(0.0, float(buffer_o2_mol)))
+
+
+def _fe_redox_settlement_inputs(oxygen_source, *, exchange_o2_mol, replenished_mol,
+        internal_o2_capacity_mol, remaining_internal_o2_capacity, buffer_o2_mol, noop_mol):
+    oxygen_source = str(oxygen_source or _FE_REDOX_OXYGEN_SOURCE_OVERHEAD)
+    if (
+        oxygen_source == _FE_REDOX_OXYGEN_SOURCE_OVERHEAD
+        and abs(exchange_o2_mol)
+        > noop_mol
+    ):
+        # Passive exchange already moved the physical O2 between overhead
+        # and this buffer. The finite Fe split must settle that same move,
+        # not draw/release gas again. Select by the signed exchange, not a
+        # positive balance: release may have depleted the buffer to zero.
+        # Reducing credit is bounded by this hour's actual exchange;
+        # unmatched finite reduction products go to ordinary overhead.
+        oxygen_source = _FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER
+    passive_settlement = (
+        oxygen_source == _FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER
+        and internal_o2_capacity_mol is None
+    )
+    # A released passive parcel can be replenished only once per hour.
+    # Explicit injections retain their existing independent funding.
+
+    exchange_release_mol = max(
+        0.0, exchange_o2_mol - replenished_mol
+    ) if passive_settlement else 0.0
+    buffer_capacity_mol = 0.0
+    if internal_o2_capacity_mol is not None:
+        buffer_capacity_mol = max(0.0, float(internal_o2_capacity_mol))
+    elif oxygen_source == _FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS:
+        buffer_capacity_mol = (
+            remaining_internal_o2_capacity()
+        )
+    elif oxygen_source == _FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER:
+        buffer_capacity_mol = max(0.0, float(buffer_o2_mol))
+    return oxygen_source, passive_settlement, exchange_release_mol, buffer_capacity_mol

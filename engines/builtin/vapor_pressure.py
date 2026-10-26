@@ -2667,6 +2667,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
+        pseudo_fallbacks = []
+        result = self._evaluate_pressure(request, pseudo_fallbacks=pseudo_fallbacks)
+        for species, data in pseudo_fallbacks:
+            warn_pseudo_vapor_pressure_fallback(
+                species, data, self._pseudo_vapor_pressure_warning_seen, stacklevel=2)
+        return result
+
+    def _evaluate_pressure(self, request: IntentRequest, *, pseudo_fallbacks) -> IntentResult:
         # Lazy import: simulator.state pulls in simulator/__init__ which
         # re-enters this module during package init -- see
         # engines/builtin/__init__.py for the cycle description.
@@ -3707,12 +3715,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "equivalent_parent_oxide_activity"
                     ] = a_oxide
                 if coefficient_block == COEFF_BLOCK_ANTOINE:
-                    warn_pseudo_vapor_pressure_fallback(
-                        species,
-                        sp_data,
-                        self._pseudo_vapor_pressure_warning_seen,
-                        stacklevel=2,
-                    )
+                    pseudo_fallbacks.append((species, sp_data))
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
         from simulator.vapour_rail.catalog import CatalogCompileError
@@ -4106,12 +4109,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[name][
                         "equivalent_parent_oxide_activity"
                     ] = a_ox
-                warn_pseudo_vapor_pressure_fallback(
-                    name,
-                    data,
-                    self._pseudo_vapor_pressure_warning_seen,
-                    stacklevel=2,
-                )
+                pseudo_fallbacks.append((name, data))
 
         # YAML authority/bracket labels (pressure-neutral; Bug B pattern).
         species_authority: dict[str, dict[str, Any]] = {}

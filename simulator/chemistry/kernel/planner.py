@@ -769,23 +769,8 @@ class ChemistryKernel:
             # had a chance to produce in the first place.
             result = provider.dispatch(request)
 
-        if result.intent != intent:
-            raise KernelError(
-                f"provider {profile.provider_id!r} returned intent "
-                f"{result.intent.value!r} for request {intent.value!r}"
-            )
-
-        if result.transition is not None:
-            if str(result.status) != "ok":
-                raise KernelError(
-                    f"provider {profile.provider_id!r} returned a transition "
-                    f"with non-committable status {result.status!r}"
-                )
-            validate_intent_authority(intent, profile)
-            validate_proposal_accounts(result.transition, declared_accounts)
-            validate_atom_balance(result.transition, self._species_formula_registry)
-        if result.control_audit is not None:
-            validate_control_audit(result.control_audit, request)
+        _validate_provider_result(provider, request, result, declared_accounts,
+                                  self._species_formula_registry)
         if result.transition is not None:
             stamped_transition = self._stamp_proposal_origin(
                 result.transition, provider, intent
@@ -956,3 +941,25 @@ class ChemistryKernel:
             return self._ledger.apply(transition)
         except AccountingError as exc:
             raise ProposalRejected(str(exc)) from exc
+
+
+def _validate_provider_result(provider, request, result, declared_accounts, species_formula_registry):
+    intent = request.intent
+    profile = provider.capability_profile()
+    if result.intent != intent:
+        raise KernelError(
+            f"provider {profile.provider_id!r} returned intent "
+            f"{result.intent.value!r} for request {intent.value!r}"
+        )
+
+    if result.transition is not None:
+        if str(result.status) != "ok":
+            raise KernelError(
+                f"provider {profile.provider_id!r} returned a transition "
+                f"with non-committable status {result.status!r}"
+            )
+        validate_intent_authority(intent, profile)
+        validate_proposal_accounts(result.transition, declared_accounts)
+        validate_atom_balance(result.transition, species_formula_registry)
+    if result.control_audit is not None:
+        validate_control_audit(result.control_audit, request)

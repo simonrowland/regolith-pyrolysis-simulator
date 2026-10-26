@@ -1030,146 +1030,15 @@ class OverheadGasModel:
         p_downstream_bar: Optional[float] = None,
         effective_transport_capacity: Optional[EffectiveTransportCapacity] = None,
     ) -> dict[str, float]:
-        """Estimate pipe pressure/capacity with the shared regime-spanning model."""
-
-        conductance_temperature_C = _required_finite_float(
-            melt.temperature_C,
-            'melt.temperature_C',
-        )  # °C — gas temperature used for pipe conductance
-        if conductance_temperature_C + CELSIUS_TO_KELVIN_OFFSET <= 0.0:
-            raise OverheadConfigurationError(
-                'melt.temperature_C must be above absolute zero'
-            )
-        total_evap_kg_hr = _required_finite_nonnegative_float(
-            evap_flux.total_kg_hr,
-            'evap_flux.total_kg_hr',
-        )  # kg/hr — total evaporation mass flow
-        allowed_pressure_mbar = _required_finite_nonnegative_float(
-            melt.p_total_mbar,
-            'melt.p_total_mbar',
-        )  # mbar — operating ceiling, or zero for hard-vacuum operation
-        pipe_temperature_C = self.resolve_pipe_temperature_C(melt)  # °C — active pipe/liner wall temperature
-        # Pa = mbar*100. A numerical pressure floor would evaluate rarefied
-        # capacity at the wrong physical input (and invent flow at P1=P2=0).
-        allowed_pressure_Pa = allowed_pressure_mbar * 100.0
-        controlled_flow = effective_transport_capacity is not None
-        downstream_pressure_Pa = (
-            _required_finite_nonnegative_float(
-                effective_transport_capacity.downstream_pressure_bar,
-                'effective_transport_capacity.downstream_pressure_bar',
-            ) * 1.0e5
-            if controlled_flow
-            else self._resolve_downstream_pressure(melt, p_downstream_bar) * 1.0e5
-        )  # Pa — derived or explicit downstream/reference pressure; bar -> Pa
-        # Preserve the existing gas-temperature basis: pipe conductance has
-        # historically used melt/gas temperature. The liner trajectory controls
-        # wall deposition and Kn diagnostics without changing evaporation totals.
-        # 0.5.4 W7 (CW5): pass the live evap-flux mixture so the
-        # ideal-gas density in ``_pipe_conductance`` uses the actual
-        # mole-weighted M_avg (~0.023-0.046 kg/mol across a recipe)
-        # rather than the legacy 0.040 hardcoded magic number.
-        # ``evap_flux.species_kg_hr`` is the steady-state pipe
-        # composition; the time unit cancels in the mole-fraction
-        # weighting.
-        if controlled_flow:
-            pipe_conductance_kg_hr = _required_finite_nonnegative_float(
-                effective_transport_capacity.effective_capacity_kg_hr,
-                'effective_transport_capacity.effective_capacity_kg_hr',
-            )
-            conductance = pipe_conductance_kg_hr / 3600.0
-            vapor_pressure_mbar = allowed_pressure_Pa / 100.0
-        else:
-            conductance = self._pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream/downstream pressures
-                allowed_pressure_Pa,
-                conductance_temperature_C,
-                p_downstream_Pa=downstream_pressure_Pa,
-                species_kg_for_M_avg=evap_flux.species_kg_hr,  # kg/hr by species — composition basis for M_avg
-            )
-            pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — capacity at allowed pressure; kg/s -> kg/hr
-        if not controlled_flow and (
-            conductance > 0.0
-            or allowed_pressure_Pa == 0.0
-        ):
-            # Zero is the hard-vacuum campaign setting, not a zero upstream
-            # ceiling. The evolved gas develops the pressure solving F(P1,P2)
-            # = source. F is kg/s and the inverse returns mbar. In the
-            # molecular limit P1=P2+source/K, with K independent of pressure;
-            # as source -> 0, P1 -> P2. No arbitrary pressure floor is needed.
-            vapor_pressure_mbar = self._vapor_pressure_mbar_from_flux(  # mbar — steady-state throughput pressure, inverted pipe balance
-                total_evap_kg_hr / 3600.0,  # kg/s — evaporation mass flow
-                conductance_temperature_C,
-                p_downstream_bar=downstream_pressure_Pa / 1.0e5,
-                species_kg_for_M_avg=evap_flux.species_kg_hr,
-            )
-            if allowed_pressure_Pa == 0.0:
-                allowed_pressure_Pa = vapor_pressure_mbar * 100.0
-                if total_evap_kg_hr > 0.0 and allowed_pressure_Pa <= downstream_pressure_Pa:
-                    raise OverheadConfigurationError(
-                        'hard-vacuum source requires a valid pipe with positive forward capacity'
-                    )
-                conductance = self._pipe_conductance(
-                    allowed_pressure_Pa, conductance_temperature_C,
-                    p_downstream_Pa=downstream_pressure_Pa,
-                    species_kg_for_M_avg=evap_flux.species_kg_hr,
-                )
-                pipe_conductance_kg_hr = conductance * 3600.0
-        elif not controlled_flow:
-            # Premise: zero forward conductance is a closed-line condition,
-            # not zero vapor pressure; evolved gas fills the upstream volume
-            # until the allowed headspace pressure is reached and backpressure
-            # suppresses the next tick's net HKL source.  Algebra is the closed
-            # boundary P_vapor=P_up.  Unit check: Pa/100=mbar.  Limits: any
-            # positive conductance uses the shared inversion above; at
-            # P_down->P_up this full-upstream state makes the following live
-            # flux (and therefore saturation) recover instead of relatching.
-            vapor_pressure_mbar = allowed_pressure_Pa / 100.0
-        pressure_mbar = max(vapor_pressure_mbar, allowed_pressure_mbar)  # mbar — reported total overhead pressure
-        if controlled_flow:
-            pipe_capacity_used_pct = (
-                effective_transport_capacity.saturation * 100.0
-            )
-        elif allowed_pressure_mbar == 0.0:
-            # No positive upstream pressure ceiling is prescribed in hard
-            # vacuum. The solved source pressure supplies HK backpressure;
-            # load/F at that pressure is identically one, not a spare-capacity
-            # constraint on heating. Report no ceiling saturation (also the
-            # zero-source 0/0 limit), rather than fabricate a ramp throttle.
-            pipe_capacity_used_pct = 0.0
-        elif total_evap_kg_hr <= 0.0:
-            pipe_capacity_used_pct = 0.0
-        elif pipe_conductance_kg_hr > 0.0:
-            pipe_capacity_used_pct = (
-                total_evap_kg_hr / pipe_conductance_kg_hr * 100.0
-            )  # percent — load / capacity at allowed upstream pressure
-        else:
-            pipe_capacity_used_pct = math.inf
-        # Capacity uses the declared ceiling or resolved hard-vacuum source
-        # pressure and the downstream pressure. The historical p_mean_Pa key is an alias
-        # for the upstream pressure, not their arithmetic mean. Units: kg/s;
-        # conductance_kg_s_per_bar remains the same historical kg/s alias.
-        return {
-            'pipe_temperature_C': pipe_temperature_C,  # °C — active pipe/liner wall temperature
-            'conductance_temperature_C': conductance_temperature_C,  # °C — gas temperature used for conductance
-            'p_mean_Pa': allowed_pressure_Pa,  # Pa — compatibility field; resolved upstream pressure
-            'initial_throat_area_m2': self.initial_throat_area_m2,  # m² — user-configured throat cross-section
-            'throat_diameter_m': self.pipe_diameter_m,  # m — circular-equivalent throat diameter
-            'stage_area_m2_by_stage': self.stage_area_m2_by_stage(),  # m² by stage — throat area × ratio
-            'stage_area_geometry_provenance_notice': (
-                self.stage_area_geometry_provenance_notice()
-            ),
-            'conductance_kg_s': conductance,  # kg/s — PIPE-1 flow at resolved upstream/downstream pressures, not their arithmetic mean
-            'conductance_kg_s_per_bar': conductance,  # kg/s — deprecated compatibility alias; not per-bar
-            'pipe_conductance_kg_hr': pipe_conductance_kg_hr,  # kg/hr — pipe mass-flow capacity
-            'pipe_capacity_used_pct': pipe_capacity_used_pct,  # percent — capacity used
-            'vapor_pressure_mbar': vapor_pressure_mbar,  # mbar — steady-state vapor partial pressure
-            'pressure_mbar': pressure_mbar,  # mbar — reported total overhead pressure
-            'p_downstream_bar': downstream_pressure_Pa / 1.0e5,
-            'transport_binding_cause': (
-                effective_transport_capacity.binding_cause
-                if controlled_flow
-                else 'pipe'
-            ),
-        }
+        return _estimate_transport_state(evap_flux, melt,
+            resolve_pipe_temperature_C=self.resolve_pipe_temperature_C,
+            resolve_downstream_pressure=self._resolve_downstream_pressure,
+            pipe_conductance=self._pipe_conductance,
+            vapor_pressure_mbar_from_flux=self._vapor_pressure_mbar_from_flux,
+            initial_throat_area_m2=self.initial_throat_area_m2, pipe_diameter_m=self.pipe_diameter_m,
+            stage_areas=self.stage_area_m2_by_stage,
+            geometry_notice=self.stage_area_geometry_provenance_notice,
+            p_downstream_bar=p_downstream_bar, effective_transport_capacity=effective_transport_capacity)
 
     def controlled_o2_transport_capacity(
         self,
@@ -1180,65 +1049,17 @@ class OverheadGasModel:
         retained_holdup_kg: float = 0.0,
         dt_hr: float = 1.0,
     ) -> Optional[EffectiveTransportCapacity]:
-        """Return the one-tick flow boundary for controlled-pO2 operation."""
-
-        if self._downstream_pressure_override is not None:
-            return None
-        if getattr(melt.atmosphere, 'name', '') not in {
-            'CONTROLLED_O2',
-            'CONTROLLED_O2_FLOW',
-            'O2_BACKPRESSURE',
-        }:
-            return None
-        allowed_pressure_Pa = float(melt.p_total_mbar) * 100.0
-        self.last_pipe_conductance_authority_notice = None
-        pipe_capacity_kg_hr = (
-            max(0.0, float(self._conductance_override)) * 3600.0
-            if self._conductance_override is not None
-            else self._pipe_conductance(
-                allowed_pressure_Pa,
-                float(melt.temperature_C),
-                p_downstream_Pa=0.0,
-                species_kg_for_M_avg=evap_flux.species_kg_hr,
-            ) * 3600.0
-        )
-        from simulator.thermal_train import FiniteCapacity, NoColdTrain
-
-        equipment_capacity = (
-            cold_train_capacity.value_kg_hr
-            if isinstance(cold_train_capacity, FiniteCapacity)
-            else None
-        )
-        equipment_capacity_required = not (
-            isinstance(cold_train_capacity, NoColdTrain)
-            and cold_train_capacity.reason == "runtime_enforcement_disabled"
-        )
-        gas_temperature_K = float(melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
-        gas_molar_mass_kg_mol = _mean_molar_mass_kg_mol(
-            evap_flux.species_kg_hr,
-            species_formula_registry=self.species_formula_registry,
-        )
-        capacity = controlled_flow_capacity(
-            pipe_capacity_kg_hr=pipe_capacity_kg_hr,
-            equipment_capacity_kg_hr=equipment_capacity,
-            evolved_flux_kg_hr=evap_flux.total_kg_hr,
-            retained_holdup_kg=retained_holdup_kg,
-            dt_hr=dt_hr,
-            equipment_capacity_required=equipment_capacity_required,
-            upstream_pressure_bar=allowed_pressure_Pa / PA_PER_BAR,
-            pipe_diameter_m=self.pipe_diameter_m,
-            pipe_length_m=self.pipe_length_m,
-            gas_temperature_K=gas_temperature_K,
-            gas_molar_mass_kg_mol=gas_molar_mass_kg_mol,
-        )
-        if self._conductance_override is not None:
-            # A configured rate still uses mean-mixture bulk-fraction removal.
-            # Classify its capacity boundary even though no pipe law was run.
-            self.last_pipe_conductance_authority_notice = pipe_conductance_authority_notice(
-                self.pipe_diameter_m, gas_molar_mass_kg_mol,
-                self._gas_dynamic_viscosity_Pa_s(gas_temperature_K), gas_temperature_K,
-                capacity.upstream_pressure_bar * PA_PER_BAR, 0.0,
-            )
+        def conductance(*args, **kwargs):
+            value = self._pipe_conductance(*args, **kwargs)
+            return value, self.last_pipe_conductance_authority_notice
+        capacity, notice = _controlled_o2_transport_capacity(evap_flux, melt,
+            downstream_pressure_override=self._downstream_pressure_override,
+            conductance_override=self._conductance_override,
+            pipe_diameter_m=self.pipe_diameter_m, pipe_length_m=self.pipe_length_m,
+            species_formula_registry=self.species_formula_registry, pipe_conductance=conductance,
+            cold_train_capacity=cold_train_capacity, retained_holdup_kg=retained_holdup_kg, dt_hr=dt_hr)
+        if capacity is not None:
+            self.last_pipe_conductance_authority_notice = notice
         return capacity
 
     def _resolve_liner_temperature_value(
@@ -1563,21 +1384,10 @@ class OverheadGasModel:
         species_formula_registry: Optional[Mapping[str, Any]] = None,
         *, oxygen_mol_hr: float = 0.0,
     ) -> dict[str, float]:
-        """Use the achieved CSTR source mixture, or flag the legacy bound."""
-        self.last_backpressure_notice = None
-        if melt.sweep_mol_per_s is None:
-            if melt.p_total_mbar > 0.0:
-                self.last_backpressure_notice = (
-                    'underspecified carrier boundary: vapour-only back-pressure UPPER BOUND'
-                )
-            return self.species_partial_pressures(
-                evap_flux, transport['vapor_pressure_mbar'], species_formula_registry)
-        carrier = next(iter(self._background_partial_pressures_mbar(melt)), 'N2')
-        return self.species_partial_pressures(
-            evap_flux, transport['pressure_mbar'], species_formula_registry,
-            carrier=carrier, sweep_mol_per_s=melt.sweep_mol_per_s,
-            oxygen_mol_hr=oxygen_mol_hr,
-        )
+        partials, self.last_backpressure_notice = _backpressure_partials(
+            evap_flux, melt, transport, species_formula_registry,
+            background_partials=lambda: self._background_partial_pressures_mbar(melt), oxygen_mol_hr=oxygen_mol_hr)
+        return partials
 
     @staticmethod
     def species_partial_pressures(
@@ -1834,97 +1644,13 @@ class OverheadGasModel:
         p_downstream_Pa: float = 0.0,  # Pa — downstream/reference pressure
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
     ) -> float:
-        """
-        Regime-spanning mass-flow capacity of the collection pipe.
-
-        Knudsen interpolation joins compressible Poiseuille to molecular
-        transport with finite-length Clausing transmission.
-
-        Args:
-            p_upstream_Pa: Allowed upstream pressure in the pipe (Pa)
-            T_C:       Pipe temperature (°C)
-            species_kg_for_M_avg: optional mapping of species → mass
-                for deriving the live mole-weighted M_avg. Pass the
-                evap-flux species mass-rate to track real-recipe
-                composition. ``None`` / empty falls back to
-                ``DEFAULT_PIPE_M_AVG_KG_MOL`` (~0.040 kg/mol) which
-                matches the historical hardcoded value.
-
-        Returns:
-            Conductance in kg/s (mass-flow capacity)
-
-        0.5.4 W7 (CW5 historical-audit closure): the mass-conductance
-        density used to derive a hardcoded ``M_avg = 0.040 kg/mol``
-        "mix of SiO, Fe, Na vapors ~40 g/mol" magic number. Real
-        recipes span ~0.023 (alkali sweep, Na ~23 g/mol) to ~0.046
-        (Fe vapor, ~56 g/mol mixed with O2 ~32) — a factor-of-2 in
-        conductance that pre-W7 was hidden behind the placeholder.
-        The mole-weighted average is computed from the passed
-        species mixture; legacy callers without the kwarg get the
-        documented fallback.
-        """
-        self.last_pipe_conductance_authority_notice = None
-        d = self.pipe_diameter_m  # m — pipe inner diameter
-        L = self.pipe_length_m  # m — pipe length
-
-        # Direct-helper invalid-input contract: T_K, L, d, and both pressures
-        # must be finite, with T_K/L/d positive. A NaN evades ordinary <=
-        # comparisons, while infinite pressure makes the pressure-square law
-        # report infinite capacity; either result is a meaningless scientific
-        # verdict. Fail closed to 0.0 here (the public transport estimator
-        # raises OverheadConfigurationError earlier). Negative pressure remains
-        # the existing zero-pressure clamp; this preserves valid arithmetic.
-        try:
-            T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET  # K — pipe gas temperature; °C -> K
-            L = float(L)  # m — validated pipe length
-            d = float(d)  # m — validated pipe inner diameter
-            p_upstream_Pa = float(p_upstream_Pa)  # Pa — candidate upstream pressure
-            p_downstream_Pa = float(p_downstream_Pa)  # Pa — candidate downstream pressure
-        except (TypeError, ValueError):
-            return 0.0
-        if (
-            not all(math.isfinite(value) for value in (
-                T_K, L, d, p_upstream_Pa, p_downstream_Pa,
-            ))
-            or T_K <= 0.0
-            or L <= 0.0
-            or d <= 0.0
-        ):
-            return 0.0
-        p_upstream_Pa = max(0.0, p_upstream_Pa)  # Pa — clamped upstream pressure
-        p_downstream_Pa = max(0.0, p_downstream_Pa)  # Pa — clamped downstream pressure
-
-        # Provisional N₂-like correlation: η=1.8e-5*(T/300 K)^0.7 Pa·s.
-        # The temperature ratio and exponent are dimensionless. It recovers
-        # 1.8e-5 Pa·s at 300 K and gives 6.243e-5 Pa·s at 1773.15 K
-        # (1500 °C); the positive exponent makes viscosity increase with T.
-        eta = self._gas_dynamic_viscosity_Pa_s(T_K)  # Pa·s — dynamic viscosity
-
-        # BH-163 provenance: this closes the finite-headspace pipe-conductance
-        # defect. The old path used a legacy constant M_avg = 0.040 kg/mol,
-        # mis-weighting light species (pure Na off by ~1.74x); this now uses
-        # the real evaporating species mix.
-        M_avg = _mean_molar_mass_kg_mol(  # kg/mol — mole-weighted gas molar mass
-            species_kg_for_M_avg,
-            fallback_engagement_recorder=(
-                self._record_pipe_m_avg_fallback_engagement
-            ),
+        value, self.last_pipe_conductance_authority_notice = _pipe_conductance(
+            p_upstream_Pa, T_C, p_downstream_Pa=p_downstream_Pa, species_kg_for_M_avg=species_kg_for_M_avg,
+            pipe_diameter_m=self.pipe_diameter_m, pipe_length_m=self.pipe_length_m,
             species_formula_registry=self.species_formula_registry,
-        )
-        # The transport owner derives both limits, the finite-length Clausing
-        # term and the published Knudsen bridge; both pressures are absolute Pa.
-        self.last_pipe_conductance_authority_notice = pipe_conductance_authority_notice(
-            d, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa,
-        )
-        return pipe_mass_flow_kg_s(
-            d,
-            L,
-            M_avg,
-            eta,
-            T_K,
-            p_upstream_Pa,
-            p_downstream_Pa,
-        )
+            fallback_engagement_recorder=self._record_pipe_m_avg_fallback_engagement,
+            previous_notice=getattr(self, 'last_pipe_conductance_authority_notice', None))
+        return value
 
     @staticmethod
     def _gas_dynamic_viscosity_Pa_s(T_K: float) -> float:
@@ -1938,59 +1664,13 @@ class OverheadGasModel:
         p_downstream_bar: float = 0.0,  # bar — downstream/reference pressure
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
     ) -> float:
-        """Invert the shared regime-spanning pipe law."""
-
-        try:
-            F_kg_s = float(total_evap_kg_s)  # kg/s — candidate vapor mass throughput
-            T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET  # K — pipe gas temperature
-            d = float(self.pipe_diameter_m)  # m — throat-equivalent diameter
-            L = float(self.pipe_length_m)  # m — throat/pipe length
-            p_downstream_bar = float(p_downstream_bar)  # bar — candidate downstream pressure
-        except (TypeError, ValueError):
-            return 0.0
-        if (
-            not all(math.isfinite(value) for value in (
-                F_kg_s, T_K, d, L, p_downstream_bar,
-            ))
-            or F_kg_s < 0.0
-        ):
-            return 0.0
-        if F_kg_s == 0.0:
-            # Open-pipe zero-source limit: F(P1,P2)=0 equilibrates P1=P2.
-            # bar*1000=mbar. Vacuum still returns zero; a finite sink must
-            # not be replaced by a fictitious zero upstream pressure.
-            return max(0.0, p_downstream_bar) * 1000.0
-        F_kg_s = max(0.0, F_kg_s)  # kg/s — nonnegative vapor mass throughput
-        M_avg = _mean_molar_mass_kg_mol(  # kg/mol — mole-weighted gas molar mass
-            species_kg_for_M_avg,
-            fallback_engagement_recorder=(
-                self._record_pipe_m_avg_fallback_engagement
-            ),
+        value, self.last_pipe_conductance_authority_notice = _vapor_pressure_mbar_from_flux(
+            total_evap_kg_s, T_C, p_downstream_bar=p_downstream_bar, species_kg_for_M_avg=species_kg_for_M_avg,
+            pipe_diameter_m=self.pipe_diameter_m, pipe_length_m=self.pipe_length_m,
             species_formula_registry=self.species_formula_registry,
-        )
-        if (
-            not math.isfinite(M_avg)
-            or T_K <= 0.0
-            or d <= 0.0
-            or L <= 0.0
-            or M_avg <= 0.0
-        ):
-            return 0.0
-        eta = self._gas_dynamic_viscosity_Pa_s(T_K)  # Pa·s — dynamic viscosity
-        p_downstream_Pa = max(0.0, p_downstream_bar) * 1.0e5  # Pa — bar -> Pa
-        pressure_Pa = pipe_pressure_pa_for_mass_flow(
-            d, L, M_avg, eta, T_K, F_kg_s, p_downstream_Pa,
-        )
-        # Capacity at the design ceiling and pressure inferred from the live
-        # source may be in different regimes. Preserve either interpolation
-        # notice for the snapshot; estimate_transport_state starts a fresh
-        # capacity calculation each tick, so this does not latch across ticks.
-        self.last_pipe_conductance_authority_notice = (
-            pipe_conductance_authority_notice(
-                d, M_avg, eta, T_K, pressure_Pa, p_downstream_Pa,
-            ) or getattr(self, 'last_pipe_conductance_authority_notice', None)
-        )
-        return pressure_Pa / 100.0  # mbar — Pa -> mbar
+            fallback_engagement_recorder=self._record_pipe_m_avg_fallback_engagement,
+            previous_notice=getattr(self, 'last_pipe_conductance_authority_notice', None))
+        return value
 
     def sweep_boundary(self, species_mol, *, volume_m3, temperature_K):
         pressure_bar = sum(self._compute_partial_pressures(species_mol, volume_m3, temperature_K).values())
@@ -2001,3 +1681,411 @@ class OverheadGasModel:
             )
             self._sweep_boundary_input = boundary
         return self._sweep_boundary_result
+
+
+def _pipe_conductance(
+    p_upstream_Pa: float,  # Pa — allowed upstream pipe pressure
+    T_C: float,  # °C — pipe gas temperature
+    *,
+    pipe_diameter_m, pipe_length_m, species_formula_registry,
+    fallback_engagement_recorder, previous_notice=None,
+    p_downstream_Pa: float = 0.0,  # Pa — downstream/reference pressure
+    species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
+) -> float:
+    """
+    Regime-spanning mass-flow capacity of the collection pipe.
+
+    Knudsen interpolation joins compressible Poiseuille to molecular
+    transport with finite-length Clausing transmission.
+
+    Args:
+        p_upstream_Pa: Allowed upstream pressure in the pipe (Pa)
+        T_C:       Pipe temperature (°C)
+        species_kg_for_M_avg: optional mapping of species → mass
+            for deriving the live mole-weighted M_avg. Pass the
+            evap-flux species mass-rate to track real-recipe
+            composition. ``None`` / empty falls back to
+            ``DEFAULT_PIPE_M_AVG_KG_MOL`` (~0.040 kg/mol) which
+            matches the historical hardcoded value.
+
+    Returns:
+        Conductance in kg/s (mass-flow capacity)
+
+    0.5.4 W7 (CW5 historical-audit closure): the mass-conductance
+    density used to derive a hardcoded ``M_avg = 0.040 kg/mol``
+    "mix of SiO, Fe, Na vapors ~40 g/mol" magic number. Real
+    recipes span ~0.023 (alkali sweep, Na ~23 g/mol) to ~0.046
+    (Fe vapor, ~56 g/mol mixed with O2 ~32) — a factor-of-2 in
+    conductance that pre-W7 was hidden behind the placeholder.
+    The mole-weighted average is computed from the passed
+    species mixture; legacy callers without the kwarg get the
+    documented fallback.
+    """
+    notice = None
+    d = pipe_diameter_m  # m — pipe inner diameter
+    L = pipe_length_m  # m — pipe length
+
+    # Direct-helper invalid-input contract: T_K, L, d, and both pressures
+    # must be finite, with T_K/L/d positive. A NaN evades ordinary <=
+    # comparisons, while infinite pressure makes the pressure-square law
+    # report infinite capacity; either result is a meaningless scientific
+    # verdict. Fail closed to 0.0 here (the public transport estimator
+    # raises OverheadConfigurationError earlier). Negative pressure remains
+    # the existing zero-pressure clamp; this preserves valid arithmetic.
+    try:
+        T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET  # K — pipe gas temperature; °C -> K
+        L = float(L)  # m — validated pipe length
+        d = float(d)  # m — validated pipe inner diameter
+        p_upstream_Pa = float(p_upstream_Pa)  # Pa — candidate upstream pressure
+        p_downstream_Pa = float(p_downstream_Pa)  # Pa — candidate downstream pressure
+    except (TypeError, ValueError):
+        return 0.0, None
+    if (
+        not all(math.isfinite(value) for value in (
+            T_K, L, d, p_upstream_Pa, p_downstream_Pa,
+        ))
+        or T_K <= 0.0
+        or L <= 0.0
+        or d <= 0.0
+    ):
+        return 0.0, None
+    p_upstream_Pa = max(0.0, p_upstream_Pa)  # Pa — clamped upstream pressure
+    p_downstream_Pa = max(0.0, p_downstream_Pa)  # Pa — clamped downstream pressure
+
+    # Provisional N₂-like correlation: η=1.8e-5*(T/300 K)^0.7 Pa·s.
+    # The temperature ratio and exponent are dimensionless. It recovers
+    # 1.8e-5 Pa·s at 300 K and gives 6.243e-5 Pa·s at 1773.15 K
+    # (1500 °C); the positive exponent makes viscosity increase with T.
+    eta = gas_dynamic_viscosity_Pa_s(T_K)  # Pa·s — dynamic viscosity
+
+    # BH-163 provenance: this closes the finite-headspace pipe-conductance
+    # defect. The old path used a legacy constant M_avg = 0.040 kg/mol,
+    # mis-weighting light species (pure Na off by ~1.74x); this now uses
+    # the real evaporating species mix.
+    M_avg = _mean_molar_mass_kg_mol(  # kg/mol — mole-weighted gas molar mass
+        species_kg_for_M_avg,
+        fallback_engagement_recorder=(
+            fallback_engagement_recorder
+        ),
+        species_formula_registry=species_formula_registry,
+    )
+    # The transport owner derives both limits, the finite-length Clausing
+    # term and the published Knudsen bridge; both pressures are absolute Pa.
+    notice = pipe_conductance_authority_notice(
+        d, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa,
+    )
+    value = pipe_mass_flow_kg_s(
+        d,
+        L,
+        M_avg,
+        eta,
+        T_K,
+        p_upstream_Pa,
+        p_downstream_Pa,
+    )
+    return value, notice
+
+
+def _vapor_pressure_mbar_from_flux(
+    total_evap_kg_s: float,  # kg/s — evaporation mass flow
+    T_C: float,  # °C — pipe gas temperature
+    *,
+    pipe_diameter_m, pipe_length_m, species_formula_registry,
+    fallback_engagement_recorder, previous_notice=None,
+    p_downstream_bar: float = 0.0,  # bar — downstream/reference pressure
+    species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
+) -> float:
+    """Invert the shared regime-spanning pipe law."""
+
+    try:
+        F_kg_s = float(total_evap_kg_s)  # kg/s — candidate vapor mass throughput
+        T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET  # K — pipe gas temperature
+        d = float(pipe_diameter_m)  # m — throat-equivalent diameter
+        L = float(pipe_length_m)  # m — throat/pipe length
+        p_downstream_bar = float(p_downstream_bar)  # bar — candidate downstream pressure
+    except (TypeError, ValueError):
+        return 0.0, previous_notice
+    if (
+        not all(math.isfinite(value) for value in (
+            F_kg_s, T_K, d, L, p_downstream_bar,
+        ))
+        or F_kg_s < 0.0
+    ):
+        return 0.0, previous_notice
+    if F_kg_s == 0.0:
+        # Open-pipe zero-source limit: F(P1,P2)=0 equilibrates P1=P2.
+        # bar*1000=mbar. Vacuum still returns zero; a finite sink must
+        # not be replaced by a fictitious zero upstream pressure.
+        return max(0.0, p_downstream_bar) * 1000.0, previous_notice
+    F_kg_s = max(0.0, F_kg_s)  # kg/s — nonnegative vapor mass throughput
+    M_avg = _mean_molar_mass_kg_mol(  # kg/mol — mole-weighted gas molar mass
+        species_kg_for_M_avg,
+        fallback_engagement_recorder=(
+            fallback_engagement_recorder
+        ),
+        species_formula_registry=species_formula_registry,
+    )
+    if (
+        not math.isfinite(M_avg)
+        or T_K <= 0.0
+        or d <= 0.0
+        or L <= 0.0
+        or M_avg <= 0.0
+    ):
+        return 0.0, previous_notice
+    eta = gas_dynamic_viscosity_Pa_s(T_K)  # Pa·s — dynamic viscosity
+    p_downstream_Pa = max(0.0, p_downstream_bar) * 1.0e5  # Pa — bar -> Pa
+    pressure_Pa = pipe_pressure_pa_for_mass_flow(
+        d, L, M_avg, eta, T_K, F_kg_s, p_downstream_Pa,
+    )
+    # Capacity at the design ceiling and pressure inferred from the live
+    # source may be in different regimes. Preserve either interpolation
+    # notice for the snapshot; estimate_transport_state starts a fresh
+    # capacity calculation each tick, so this does not latch across ticks.
+    notice = (
+        pipe_conductance_authority_notice(
+            d, M_avg, eta, T_K, pressure_Pa, p_downstream_Pa,
+        ) or previous_notice
+    )
+    return pressure_Pa / 100.0, notice  # mbar — Pa -> mbar
+
+
+def _estimate_transport_state(
+    evap_flux: EvaporationFlux,
+    melt: MeltState,
+    resolve_pipe_temperature_C, resolve_downstream_pressure, pipe_conductance,
+    vapor_pressure_mbar_from_flux, initial_throat_area_m2, pipe_diameter_m,
+    stage_areas, geometry_notice,
+    p_downstream_bar: Optional[float] = None,
+    effective_transport_capacity: Optional[EffectiveTransportCapacity] = None,
+) -> dict[str, float]:
+    """Estimate pipe pressure/capacity with the shared regime-spanning model."""
+
+    conductance_temperature_C = _required_finite_float(
+        melt.temperature_C,
+        'melt.temperature_C',
+    )  # °C — gas temperature used for pipe conductance
+    if conductance_temperature_C + CELSIUS_TO_KELVIN_OFFSET <= 0.0:
+        raise OverheadConfigurationError(
+            'melt.temperature_C must be above absolute zero'
+        )
+    total_evap_kg_hr = _required_finite_nonnegative_float(
+        evap_flux.total_kg_hr,
+        'evap_flux.total_kg_hr',
+    )  # kg/hr — total evaporation mass flow
+    allowed_pressure_mbar = _required_finite_nonnegative_float(
+        melt.p_total_mbar,
+        'melt.p_total_mbar',
+    )  # mbar — operating ceiling, or zero for hard-vacuum operation
+    pipe_temperature_C = resolve_pipe_temperature_C(melt)  # °C — active pipe/liner wall temperature
+    # Pa = mbar*100. A numerical pressure floor would evaluate rarefied
+    # capacity at the wrong physical input (and invent flow at P1=P2=0).
+    allowed_pressure_Pa = allowed_pressure_mbar * 100.0
+    controlled_flow = effective_transport_capacity is not None
+    downstream_pressure_Pa = (
+        _required_finite_nonnegative_float(
+            effective_transport_capacity.downstream_pressure_bar,
+            'effective_transport_capacity.downstream_pressure_bar',
+        ) * 1.0e5
+        if controlled_flow
+        else resolve_downstream_pressure(melt, p_downstream_bar) * 1.0e5
+    )  # Pa — derived or explicit downstream/reference pressure; bar -> Pa
+    # Preserve the existing gas-temperature basis: pipe conductance has
+    # historically used melt/gas temperature. The liner trajectory controls
+    # wall deposition and Kn diagnostics without changing evaporation totals.
+    # 0.5.4 W7 (CW5): pass the live evap-flux mixture so the
+    # ideal-gas density in ``_pipe_conductance`` uses the actual
+    # mole-weighted M_avg (~0.023-0.046 kg/mol across a recipe)
+    # rather than the legacy 0.040 hardcoded magic number.
+    # ``evap_flux.species_kg_hr`` is the steady-state pipe
+    # composition; the time unit cancels in the mole-fraction
+    # weighting.
+    if controlled_flow:
+        pipe_conductance_kg_hr = _required_finite_nonnegative_float(
+            effective_transport_capacity.effective_capacity_kg_hr,
+            'effective_transport_capacity.effective_capacity_kg_hr',
+        )
+        conductance = pipe_conductance_kg_hr / 3600.0
+        vapor_pressure_mbar = allowed_pressure_Pa / 100.0
+    else:
+        conductance = pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream/downstream pressures
+            allowed_pressure_Pa,
+            conductance_temperature_C,
+            p_downstream_Pa=downstream_pressure_Pa,
+            species_kg_for_M_avg=evap_flux.species_kg_hr,  # kg/hr by species — composition basis for M_avg
+        )
+        pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — capacity at allowed pressure; kg/s -> kg/hr
+    if not controlled_flow and (
+        conductance > 0.0
+        or allowed_pressure_Pa == 0.0
+    ):
+        # Zero is the hard-vacuum campaign setting, not a zero upstream
+        # ceiling. The evolved gas develops the pressure solving F(P1,P2)
+        # = source. F is kg/s and the inverse returns mbar. In the
+        # molecular limit P1=P2+source/K, with K independent of pressure;
+        # as source -> 0, P1 -> P2. No arbitrary pressure floor is needed.
+        vapor_pressure_mbar = vapor_pressure_mbar_from_flux(  # mbar — steady-state throughput pressure, inverted pipe balance
+            total_evap_kg_hr / 3600.0,  # kg/s — evaporation mass flow
+            conductance_temperature_C,
+            p_downstream_bar=downstream_pressure_Pa / 1.0e5,
+            species_kg_for_M_avg=evap_flux.species_kg_hr,
+        )
+        if allowed_pressure_Pa == 0.0:
+            allowed_pressure_Pa = vapor_pressure_mbar * 100.0
+            if total_evap_kg_hr > 0.0 and allowed_pressure_Pa <= downstream_pressure_Pa:
+                raise OverheadConfigurationError(
+                    'hard-vacuum source requires a valid pipe with positive forward capacity'
+                )
+            conductance = pipe_conductance(
+                allowed_pressure_Pa, conductance_temperature_C,
+                p_downstream_Pa=downstream_pressure_Pa,
+                species_kg_for_M_avg=evap_flux.species_kg_hr,
+            )
+            pipe_conductance_kg_hr = conductance * 3600.0
+    elif not controlled_flow:
+        # Premise: zero forward conductance is a closed-line condition,
+        # not zero vapor pressure; evolved gas fills the upstream volume
+        # until the allowed headspace pressure is reached and backpressure
+        # suppresses the next tick's net HKL source.  Algebra is the closed
+        # boundary P_vapor=P_up.  Unit check: Pa/100=mbar.  Limits: any
+        # positive conductance uses the shared inversion above; at
+        # P_down->P_up this full-upstream state makes the following live
+        # flux (and therefore saturation) recover instead of relatching.
+        vapor_pressure_mbar = allowed_pressure_Pa / 100.0
+    pressure_mbar = max(vapor_pressure_mbar, allowed_pressure_mbar)  # mbar — reported total overhead pressure
+    if controlled_flow:
+        pipe_capacity_used_pct = (
+            effective_transport_capacity.saturation * 100.0
+        )
+    elif allowed_pressure_mbar == 0.0:
+        # No positive upstream pressure ceiling is prescribed in hard
+        # vacuum. The solved source pressure supplies HK backpressure;
+        # load/F at that pressure is identically one, not a spare-capacity
+        # constraint on heating. Report no ceiling saturation (also the
+        # zero-source 0/0 limit), rather than fabricate a ramp throttle.
+        pipe_capacity_used_pct = 0.0
+    elif total_evap_kg_hr <= 0.0:
+        pipe_capacity_used_pct = 0.0
+    elif pipe_conductance_kg_hr > 0.0:
+        pipe_capacity_used_pct = (
+            total_evap_kg_hr / pipe_conductance_kg_hr * 100.0
+        )  # percent — load / capacity at allowed upstream pressure
+    else:
+        pipe_capacity_used_pct = math.inf
+    # Capacity uses the declared ceiling or resolved hard-vacuum source
+    # pressure and the downstream pressure. The historical p_mean_Pa key is an alias
+    # for the upstream pressure, not their arithmetic mean. Units: kg/s;
+    # conductance_kg_s_per_bar remains the same historical kg/s alias.
+    return {
+        'pipe_temperature_C': pipe_temperature_C,  # °C — active pipe/liner wall temperature
+        'conductance_temperature_C': conductance_temperature_C,  # °C — gas temperature used for conductance
+        'p_mean_Pa': allowed_pressure_Pa,  # Pa — compatibility field; resolved upstream pressure
+        'initial_throat_area_m2': initial_throat_area_m2,  # m² — user-configured throat cross-section
+        'throat_diameter_m': pipe_diameter_m,  # m — circular-equivalent throat diameter
+        'stage_area_m2_by_stage': stage_areas(),  # m² by stage — throat area × ratio
+        'stage_area_geometry_provenance_notice': (
+            geometry_notice()
+        ),
+        'conductance_kg_s': conductance,  # kg/s — PIPE-1 flow at resolved upstream/downstream pressures, not their arithmetic mean
+        'conductance_kg_s_per_bar': conductance,  # kg/s — deprecated compatibility alias; not per-bar
+        'pipe_conductance_kg_hr': pipe_conductance_kg_hr,  # kg/hr — pipe mass-flow capacity
+        'pipe_capacity_used_pct': pipe_capacity_used_pct,  # percent — capacity used
+        'vapor_pressure_mbar': vapor_pressure_mbar,  # mbar — steady-state vapor partial pressure
+        'pressure_mbar': pressure_mbar,  # mbar — reported total overhead pressure
+        'p_downstream_bar': downstream_pressure_Pa / 1.0e5,
+        'transport_binding_cause': (
+            effective_transport_capacity.binding_cause
+            if controlled_flow
+            else 'pipe'
+        ),
+    }
+
+
+def _controlled_o2_transport_capacity(
+    evap_flux: EvaporationFlux,
+    melt: MeltState,
+    *,
+    downstream_pressure_override, conductance_override, pipe_diameter_m, pipe_length_m,
+    species_formula_registry, pipe_conductance,
+    cold_train_capacity,
+    retained_holdup_kg: float = 0.0,
+    dt_hr: float = 1.0,
+) -> Optional[EffectiveTransportCapacity]:
+    """Return the one-tick flow boundary for controlled-pO2 operation."""
+
+    if downstream_pressure_override is not None:
+        return None, None
+    if getattr(melt.atmosphere, 'name', '') not in {
+        'CONTROLLED_O2',
+        'CONTROLLED_O2_FLOW',
+        'O2_BACKPRESSURE',
+    }:
+        return None, None
+    allowed_pressure_Pa = float(melt.p_total_mbar) * 100.0
+    notice = None
+    if conductance_override is not None:
+        pipe_capacity_kg_hr = max(0.0, float(conductance_override)) * 3600.0
+    else:
+        flow, notice = pipe_conductance(allowed_pressure_Pa, float(melt.temperature_C),
+            p_downstream_Pa=0.0, species_kg_for_M_avg=evap_flux.species_kg_hr)
+        pipe_capacity_kg_hr = flow * 3600.0
+    from simulator.thermal_train import FiniteCapacity, NoColdTrain
+
+    equipment_capacity = (
+        cold_train_capacity.value_kg_hr
+        if isinstance(cold_train_capacity, FiniteCapacity)
+        else None
+    )
+    equipment_capacity_required = not (
+        isinstance(cold_train_capacity, NoColdTrain)
+        and cold_train_capacity.reason == "runtime_enforcement_disabled"
+    )
+    gas_temperature_K = float(melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+    gas_molar_mass_kg_mol = _mean_molar_mass_kg_mol(
+        evap_flux.species_kg_hr,
+        species_formula_registry=species_formula_registry,
+    )
+    capacity = controlled_flow_capacity(
+        pipe_capacity_kg_hr=pipe_capacity_kg_hr,
+        equipment_capacity_kg_hr=equipment_capacity,
+        evolved_flux_kg_hr=evap_flux.total_kg_hr,
+        retained_holdup_kg=retained_holdup_kg,
+        dt_hr=dt_hr,
+        equipment_capacity_required=equipment_capacity_required,
+        upstream_pressure_bar=allowed_pressure_Pa / PA_PER_BAR,
+        pipe_diameter_m=pipe_diameter_m,
+        pipe_length_m=pipe_length_m,
+        gas_temperature_K=gas_temperature_K,
+        gas_molar_mass_kg_mol=gas_molar_mass_kg_mol,
+    )
+    if conductance_override is not None:
+        # A configured rate still uses mean-mixture bulk-fraction removal.
+        # Classify its capacity boundary even though no pipe law was run.
+        notice = pipe_conductance_authority_notice(
+            pipe_diameter_m, gas_molar_mass_kg_mol,
+            gas_dynamic_viscosity_Pa_s(gas_temperature_K), gas_temperature_K,
+            capacity.upstream_pressure_bar * PA_PER_BAR, 0.0,
+        )
+    return capacity, notice
+
+
+def _backpressure_partials(
+    evap_flux: EvaporationFlux, melt: MeltState, transport: Mapping,
+    species_formula_registry: Optional[Mapping[str, Any]] = None,
+    *, background_partials, oxygen_mol_hr: float = 0.0,
+) -> dict[str, float]:
+    """Use the achieved CSTR source mixture, or flag the legacy bound."""
+    notice = None
+    if melt.sweep_mol_per_s is None:
+        if melt.p_total_mbar > 0.0:
+            notice = (
+                'underspecified carrier boundary: vapour-only back-pressure UPPER BOUND'
+            )
+        return OverheadGasModel.species_partial_pressures(
+            evap_flux, transport['vapor_pressure_mbar'], species_formula_registry), notice
+    carrier = next(iter(background_partials()), 'N2')
+    return OverheadGasModel.species_partial_pressures(
+        evap_flux, transport['pressure_mbar'], species_formula_registry,
+        carrier=carrier, sweep_mol_per_s=melt.sweep_mol_per_s,
+        oxygen_mol_hr=oxygen_mol_hr,
+    ), notice

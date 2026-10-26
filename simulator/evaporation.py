@@ -23,6 +23,7 @@ from simulator.chemistry.kernel import (
     ProviderUnavailableError,
 )
 from simulator.fe_redox import (
+    _transition_species_mol,
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     RedoxState,
@@ -658,6 +659,992 @@ def _load_evaporation_alpha_envelope_by_species(
     return envelope_by_species
 
 
+
+def _analytic_evaporation_depletion_rates(
+    raw_rates_kg_hr: Mapping[str, float],
+    *,
+    vapor_pressures,
+    frozen_carriers,
+    species_formula_registry,
+    dt_hr: float,
+    phase_scalar: float,
+    cleaned_melt_kg: Mapping[str, float],
+    available_o2_kg: float,
+    zero_oxygen_exponents: Mapping[str, float] | None = None,
+) -> dict[str, float]:
+    """Pure frozen-inventory transform from raw HK rates to actual rates."""
+    if dt_hr <= 0.0 or (not raw_rates_kg_hr and not zero_oxygen_exponents):
+        return {
+            str(species): max(0.0, float(rate))
+            for species, rate in raw_rates_kg_hr.items()
+        }
+
+    if zero_oxygen_exponents is not None and phase_scalar <= 0.0:
+        return {}
+    frozen = frozen_carriers
+    total_floor = _carrier_numerical_floor(None, frozen, 1e-12)
+    metals_data = vapor_pressures.get('metals', {}) or {}
+    oxide_vapors_data = vapor_pressures.get('oxide_vapors', {}) or {}
+    parent_groups: dict[str, list[dict]] = defaultdict(list)
+
+    species_ids = raw_rates_kg_hr.keys() | (zero_oxygen_exponents or {}).keys()
+    for species in sorted(species_ids):
+        raw_rate_kg_hr = (
+            float(raw_rates_kg_hr.get(species, 0.0))
+            * phase_scalar
+        )
+        if zero_oxygen_exponents is not None:
+            if species not in zero_oxygen_exponents:
+                continue
+        elif raw_rate_kg_hr <= _carrier_numerical_floor(species, frozen, 1e-12):
+            continue
+        sp_data = metals_data.get(species, {})
+        if not sp_data:
+            sp_data = oxide_vapors_data.get(species, {})
+        stoich = _evaporation_stoich(species, sp_data, species_formula_registry)
+        parent_oxide = stoich['parent_oxide']
+        oxide_per_product_kg = float(stoich['oxide_per_product_kg'])
+        parent_draw_kg_hr = raw_rate_kg_hr * oxide_per_product_kg
+        if zero_oxygen_exponents is None and parent_draw_kg_hr <= _carrier_numerical_floor(
+            species,
+            frozen, 1e-12):
+            continue
+        parent_groups[parent_oxide].append({
+            'species': species,
+            'sp_data': sp_data,
+            'stoich': stoich,
+            'raw_rate_kg_hr': raw_rate_kg_hr,
+            'parent_draw_kg_hr': parent_draw_kg_hr,
+        })
+
+    effective_rates: dict[str, float] = {}
+    max_fraction = math.nextafter(1.0, 0.0)
+    for parent_oxide in sorted(parent_groups):
+        entries = parent_groups[parent_oxide]
+        if zero_oxygen_exponents is not None:
+            # Existing depletion's positive-side endpoint: r_i=c_i*x^e_i,
+            # D=sum(s_i*r_i), product_i=A*(1-exp(-D*dt/A))*s_i*r_i/D/s_i.
+            # As x->0+, only the most negative exponent survives and
+            # depletion tends to max_fraction. Equal leading exponents
+            # retain their evaluated HK-rate shares at the same seed x.
+            # Units: A[kg parent]/s_i[kg parent/kg product]/dt[h]=kg/h.
+            # Unique P4 dominates weaker P2/PO2 sharing P2O5; no epsilon
+            # oxygen, infinite rate, or IEEE pressure cap is evaluated.
+            leading = min(zero_oxygen_exponents[entry['species']] for entry in entries)
+            entries = [entry for entry in entries
+                       if zero_oxygen_exponents[entry['species']] == leading]
+            if len(entries) == 1:
+                # A unique leading coefficient cancels from d_i/D.
+                # Normalize its weight to one, even when positive seed
+                # pressure converted to an underflowed HK rate (cold Si3).
+                # This is a dimensionless share weight, not a rate floor.
+                entries[0]['parent_draw_kg_hr'] = 1.0
+        available_parent_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
+        total_parent_draw_kg_hr = sum(
+            entry['parent_draw_kg_hr'] for entry in entries)
+        if available_parent_kg <= 1e-12 or total_parent_draw_kg_hr <= (
+                total_floor if zero_oxygen_exponents is None else 0.0):
+            continue
+        k_hr = total_parent_draw_kg_hr / available_parent_kg
+        depletion_fraction = (max_fraction if zero_oxygen_exponents is not None
+                              else -math.expm1(-k_hr * dt_hr))
+        depletion_fraction = max(
+            0.0, min(max_fraction, depletion_fraction))
+        parent_draw_kg = available_parent_kg * depletion_fraction
+        for entry in entries:
+            share = entry['parent_draw_kg_hr'] / total_parent_draw_kg_hr
+            product_kg = (
+                parent_draw_kg
+                * share
+                / float(entry['stoich']['oxide_per_product_kg'])
+            )
+            if product_kg > _carrier_numerical_floor(entry['species'], frozen, 1e-12):
+                effective_rates[entry['species']] = product_kg / dt_hr
+
+    o2_draws: list[tuple[str, float]] = []
+    for parent_oxide in sorted(parent_groups):
+        for entry in parent_groups[parent_oxide]:
+            species = entry['species']
+            rate_kg_hr = float(effective_rates.get(species, 0.0))
+            O2_per_product_kg = float(
+                entry['stoich'].get('O2_per_product_kg', 0.0))
+            if rate_kg_hr > _carrier_numerical_floor(species, frozen, 1e-12) and O2_per_product_kg < -1e-12:
+                o2_draws.append(
+                    (species, rate_kg_hr * abs(O2_per_product_kg)))
+    total_o2_draw_kg_hr = sum(draw for _species, draw in o2_draws)
+    if total_o2_draw_kg_hr <= total_floor:
+        return effective_rates
+
+    if available_o2_kg <= 1e-12:
+        for species, _draw in o2_draws:
+            effective_rates.pop(species, None)
+        return effective_rates
+
+    max_fraction = math.nextafter(1.0, 0.0)
+    k_hr = total_o2_draw_kg_hr / float(available_o2_kg)
+    depletion_fraction = -math.expm1(-k_hr * dt_hr)
+    depletion_fraction = max(0.0, min(max_fraction, depletion_fraction))
+    allowed_o2_draw_kg = float(available_o2_kg) * depletion_fraction
+    by_species_draw = dict(o2_draws)
+    for species, required_o2_kg_hr in o2_draws:
+        if required_o2_kg_hr <= _carrier_numerical_floor(species, frozen, 1e-12):
+            continue
+        allowed_draw_kg = (
+            allowed_o2_draw_kg
+            * required_o2_kg_hr
+            / total_o2_draw_kg_hr
+        )
+        current_rate = float(effective_rates.get(species, 0.0))
+        allowed_rate = current_rate * (
+            allowed_draw_kg / by_species_draw[species])
+        if allowed_rate <= _carrier_numerical_floor(species, frozen, 1e-12):
+            effective_rates.pop(species, None)
+        else:
+            effective_rates[species] = min(current_rate, allowed_rate)
+    return effective_rates
+
+
+def _evaporation_stoich(species: str, sp_data: dict, species_formula_registry):
+    parent_oxide = sp_data.get('parent_oxide', '')
+    if not parent_oxide:
+        raise AccountingError(
+            f"vapor species {species!r} requires parent_oxide "
+            "metadata before ledger routing"
+        )
+
+    has_oxide = sp_data.get('stoich_oxide_per_vapor') is not None
+    has_o2 = sp_data.get('stoich_O2_per_vapor') is not None
+    if has_oxide or has_o2:
+        missing = []
+        if not has_oxide:
+            missing.append('stoich_oxide_per_vapor')
+        if not has_o2:
+            missing.append('stoich_O2_per_vapor')
+        if missing:
+            raise AccountingError(
+                f"vapor species {species!r} from {parent_oxide!r} "
+                f"missing explicit stoich metadata: {', '.join(missing)}"
+            )
+        oxide_per_product = float(sp_data['stoich_oxide_per_vapor'])
+        O2_per_product = float(sp_data['stoich_O2_per_vapor'])
+        if oxide_per_product <= 0.0:
+            raise AccountingError(
+                f"vapor species {species!r} from {parent_oxide!r} "
+                "requires positive stoich_oxide_per_vapor"
+            )
+        if not math.isclose(
+            oxide_per_product,
+            1.0 + O2_per_product,
+            rel_tol=1e-6,
+            abs_tol=1e-9,
+        ):
+            raise AccountingError(
+                f"vapor species {species!r} from {parent_oxide!r} "
+                "stoich metadata must conserve mass: "
+                "stoich_oxide_per_vapor must equal "
+                "1 + stoich_O2_per_vapor"
+            )
+        _validate_evaporation_stoich_atoms(
+            parent_oxide,
+            species,
+            oxide_per_product,
+            O2_per_product, species_formula_registry,
+        )
+        return {
+            'parent_oxide': parent_oxide,
+            'oxide_per_product_kg': oxide_per_product,
+            'O2_per_product_kg': O2_per_product,
+            'oxygen_destination': sp_data.get('oxygen_destination'),
+        }
+
+    implied = OXIDE_TO_METAL.get(parent_oxide, ('', 0, 0))[0]
+    if species != implied:
+        raise AccountingError(
+            f"vapor species {species!r} from {parent_oxide!r} requires "
+            "explicit stoich_oxide_per_vapor and stoich_O2_per_vapor; "
+            f"STOICH_RATIOS fallback only applies to elemental "
+            f"{implied!r}"
+        )
+    fallback = STOICH_RATIOS.get(parent_oxide)
+    if not fallback or fallback[0] <= 0:
+        raise AccountingError(
+            f"vapor species {species!r} from {parent_oxide!r} has no "
+            "valid elemental stoich fallback"
+        )
+    kg_product_per_kg_oxide, kg_O2_per_kg_oxide = fallback
+    oxide_per_product = 1.0 / kg_product_per_kg_oxide
+    O2_per_product = kg_O2_per_kg_oxide / kg_product_per_kg_oxide
+    if not math.isclose(
+        oxide_per_product,
+        1.0 + O2_per_product,
+        rel_tol=1e-6,
+        abs_tol=1e-9,
+    ):
+        raise AccountingError(
+            f"STOICH_RATIOS[{parent_oxide!r}] does not conserve mass"
+        )
+    _validate_evaporation_stoich_atoms(
+        parent_oxide,
+        species,
+        oxide_per_product,
+        O2_per_product, species_formula_registry,
+    )
+    return {
+        'parent_oxide': parent_oxide,
+        'oxide_per_product_kg': oxide_per_product,
+        'O2_per_product_kg': O2_per_product,
+        'oxygen_destination': sp_data.get('oxygen_destination'),
+    }
+
+
+def _validate_evaporation_stoich_atoms(
+    parent_oxide: str,
+    product_species: str,
+    oxide_per_product_kg: float,
+    O2_per_product_kg: float,
+    species_formula_registry,
+) -> None:
+    debit_atoms = _atom_moles_for_kg(
+        parent_oxide, oxide_per_product_kg, species_formula_registry)
+    credit_atoms = defaultdict(float)
+    product_atoms = _atom_moles_for_kg(product_species, 1.0, species_formula_registry)
+    for element, moles in product_atoms.items():
+        credit_atoms[element] += moles
+    if O2_per_product_kg >= 0.0:
+        oxygen_atoms = _atom_moles_for_kg('O2', O2_per_product_kg, species_formula_registry)
+        for element, moles in oxygen_atoms.items():
+            credit_atoms[element] += moles
+    else:
+        oxygen_atoms = _atom_moles_for_kg('O2', abs(O2_per_product_kg), species_formula_registry)
+        for element, moles in oxygen_atoms.items():
+            debit_atoms[element] = debit_atoms.get(element, 0.0) + moles
+
+    for element in set(debit_atoms) | set(credit_atoms):
+        debit = debit_atoms.get(element, 0.0)
+        credit = credit_atoms.get(element, 0.0)
+        if not math.isclose(debit, credit, rel_tol=1e-6, abs_tol=1e-9):
+            raise AccountingError(
+                f"vapor species {product_species!r} from "
+                f"{parent_oxide!r} stoich metadata does not conserve "
+                f"{element} atoms"
+            )
+
+
+def _atom_moles_for_kg(species: str, kg: float, species_formula_registry) -> dict:
+    if kg <= 0.0:
+        return {}
+    formula = resolve_species_formula(
+        species, species_formula_registry)
+    species_moles = float(kg) / formula.molar_mass_kg_per_mol()
+    return formula.atom_moles(species_moles)
+
+
+
+def _evaporation_signed_amounts(transitions, buffer_before, buffer_after, species_formula_registry):
+    """Current interval's signed reaction progress and finite O2 storage.
+
+    Redox-state labels have different sign conventions for metal and SiO
+    loss. Physical O2 credits minus debits own this receipt instead.
+    Native Fe formation precedes this interval and is counted only there.
+    """
+    operands = defaultdict(list)
+    oxygen_accounts = ('process.overhead_gas', 'reservoir.fo2_buffer')
+    for transition in transitions:
+        gas_species = {species for lot in (*transition.credits, *transition.debits)
+                       if lot.account == 'process.overhead_gas' for species in lot.species_kg}
+        for species in gas_species:
+            for side, sign in (('credits', 1.0), ('debits', -1.0)):
+                operands[f'gas:{species}'].append(sign * _transition_species_mol(
+                    transition, species_formula_registry=species_formula_registry, side=side, account='process.overhead_gas', species=species))
+        carrier = transition.name.removeprefix('evaporate_') if transition.name.startswith('evaporate_') else None
+        if carrier is not None:
+            label = f'source:{carrier}'
+            operands[f'carrier:{carrier}'].append(_transition_species_mol(
+                transition, species_formula_registry=species_formula_registry, side='credits', account='process.overhead_gas', species=carrier))
+        elif transition.name.startswith('fe_redox_respeciation'):
+            label = 'ferric_oxygen'
+        else:
+            label = 'other_oxygen'
+        for account in oxygen_accounts:
+            for side, sign in (('credits', 1.0), ('debits', -1.0)):
+                operands[label].append(sign * _transition_species_mol(
+                    transition, species_formula_registry=species_formula_registry, side=side, account=account, species='O2'))
+    operands['storage'] = [buffer_after, -buffer_before]
+    for label in ('ferric_oxygen', 'other_oxygen'):
+        operands.setdefault(label, [])
+    amounts = {label: math.fsum(values) for label, values in operands.items()}
+    # Each converted operand is rounded once, then fsum and the final
+    # subtraction round once. Sum their ULPs, including the result; this
+    # bound scales with gross traffic even when the signed sum cancels.
+    # Units: every ULP here is mol; exact zero has only subnormal error.
+    roundoff = {label: math.fsum(math.ulp(value) for value in (*values, amounts[label]))
+                for label, values in operands.items()}
+    return amounts, roundoff
+
+
+
+def _resolve_evaporation_vapour_batch(
+    equilibrium: Any,
+    *,
+    builder,
+    vapor_pressure_diagnostic,
+    total_pressure_Pa,
+    campaign_name,
+    melt_activity_shadow_enabled,
+    melt_activity_engine_inputs,
+    temperature_K: float,
+    effective_pressure_source: EffectivePressureSource,
+) -> Any:
+    """Exact-key VapourBatch for VR-11 flux consumer + instrumentation.
+
+    A complete batch owns channel refusal, eligibility, and the active set.
+    Only the typed source's species IDs enter activation; its values remain
+    outside catalog/request state. Resolve failures fail closed.
+    """
+
+    resolve_error = {}
+    if not callable(builder):
+        resolve_error = {
+            'status': 'unavailable',
+            'reason': 'vapour_batch_builder_missing',
+            'detail': 'build_vapour_batch is not available on simulator',
+        }
+        return None, resolve_error
+    transport_pO2_bar = vapor_pressure_diagnostic.get('pO2_bar')
+    if transport_pO2_bar is None:
+        transport_pO2_bar = getattr(equilibrium, 'pO2_bar', None)
+    source_reaction_fO2_bar = vapor_pressure_diagnostic.get(
+        'source_reaction_fO2_bar'
+    )
+    if source_reaction_fO2_bar is not None:
+        try:
+            source_reaction_fO2_bar = float(source_reaction_fO2_bar)
+        except (TypeError, ValueError):
+            source_reaction_fO2_bar = None
+        if source_reaction_fO2_bar is not None and (
+            not math.isfinite(source_reaction_fO2_bar)
+            or source_reaction_fO2_bar <= 0.0
+        ):
+            source_reaction_fO2_bar = None
+    try:
+        reported_activities = EvaporationMixin._vapor_pressure_activity_operands(
+            equilibrium, vapor_pressure_diagnostic,
+        )
+        kernel_activities = vapor_pressure_diagnostic.get('activities')
+        kernel_activity_source = (
+            isinstance(kernel_activities, Mapping)
+            and bool(reported_activities)
+        )
+        if kernel_activity_source:
+            activity_metadata = vapor_pressure_diagnostic
+            activity_evidence_owner = (
+                '_last_vapor_pressure_diagnostic.activities'
+            )
+        else:
+            activity_metadata = dict(
+                getattr(equilibrium, 'diagnostics', {}) or {}
+            )
+            activity_evidence_owner = (
+                'EquilibriumResult.activity_coefficients'
+            )
+        activity_provider_id = activity_metadata.get('activities_provider')
+        activity_provenance_raw = (
+            activity_metadata.get('vapor_pressure_numerator_provenance')
+            or activity_metadata.get('activity_provenance')
+            or {}
+        )
+        if not isinstance(activity_provenance_raw, Mapping):
+            activity_provenance_raw = {}
+        activity_provenance = {
+            str(species_id): dict(provenance)
+            for species_id, provenance in dict(activity_provenance_raw).items()
+            if isinstance(provenance, Mapping)
+            and species_id in reported_activities
+        }
+        feo_activity = activity_metadata.get('a_FeO_calphad')
+        if 'Fe' in reported_activities and isinstance(feo_activity, Mapping):
+            feo_sources = feo_activity.get('sources')
+            if isinstance(feo_sources, Mapping) and feo_sources:
+                activity_provenance.setdefault('Fe', {})[
+                    'activity_evidence_ref'
+                ] = '; '.join(str(value) for value in feo_sources.values())
+        standard_state_raw = activity_metadata.get(
+            'activities_standard_state'
+        )
+        activity_standard_state = None
+        if isinstance(standard_state_raw, Mapping):
+            activity_standard_state = StandardStateIdentity(
+                convention=str(standard_state_raw.get('convention') or ''),
+                phase=str(standard_state_raw.get('phase') or ''),
+                reference_pressure_bar=float(
+                    standard_state_raw.get('reference_pressure_bar')
+                ),
+                reference_temperature_K=(
+                    float(standard_state_raw['reference_temperature_K'])
+                    if standard_state_raw.get('reference_temperature_K')
+                    is not None
+                    else None
+                ),
+                component_basis=str(
+                    standard_state_raw.get('component_basis') or ''
+                ),
+            )
+        # Compose: INCOMING structured citation/evidence_ref first
+        # (external DOI provenance for activity-corrected channels); HEAD
+        # provider-token fallback for channels without melt-oxide citation;
+        # HEAD b-133 P-carrier authority annotations when present.
+        activity_evidence_refs: dict[str, str] = {}
+        for species_id in reported_activities:
+            if not activity_provider_id or activity_standard_state is None:
+                continue
+            provenance = dict(activity_provenance.get(str(species_id)) or {})
+            citation = (
+                provenance.get('melt_oxide_gamma_citation')
+                or provenance.get('activity_evidence_ref')
+            )
+            if citation:
+                activity_evidence_refs[str(species_id)] = str(citation)
+                continue
+            evidence = (
+                f'{activity_provider_id}:'
+                f'{activity_evidence_owner}[{species_id}]'
+            )
+            if species_id in {
+                'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10'
+            }:
+                authority_status = provenance.get(
+                    'melt_oxide_activity_authority_status'
+                )
+                gamma_range = provenance.get(
+                    'melt_oxide_gamma_valid_range_K'
+                )
+                activity_basis = (
+                    'parent_oxide'
+                    if provenance.get('equivalent_parent_oxide_activity')
+                    == reported_activities.get(species_id)
+                    else 'reported_component'
+                )
+                if authority_status:
+                    evidence += f';authority_status={authority_status}'
+                if gamma_range:
+                    evidence += (
+                        f';gamma_valid_range_K={tuple(gamma_range)}'
+                    )
+                evidence += f';activity_basis={activity_basis}'
+            activity_evidence_refs[str(species_id)] = evidence
+        activity_standard_states = {
+            str(species_id): activity_standard_state
+            for species_id in reported_activities
+            if activity_provider_id and activity_standard_state is not None
+        }
+        # Keep the global request phase on the legacy hot-train contract.
+        # Stage-0 phosphorus is a narrow marker consumed only by stage0-only
+        # rules sourced from P2O5; flipping the whole phase to stage0 changes
+        # unrelated Na/Fe/channel eligibility.
+        request_stage = (
+            'c0b_p_cleanup'
+            if campaign_name == 'C0B'
+            else (
+                'stage0_p_carriers'
+                if campaign_name == 'C0'
+                else 'evaporation'
+            )
+        )
+        effective_pressure_species_ids = effective_pressure_source.species_ids
+        if campaign_name == 'C0B':
+            effective_pressure_species_ids = frozenset(
+                species_id
+                for species_id in effective_pressure_species_ids
+                if species_id in {'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10'}
+            )
+        batch = builder(
+            temperature_K=float(temperature_K),
+            process_phase='hot_train',
+            stage=request_stage,
+            total_pressure_Pa=total_pressure_Pa,
+            fO2_bar=(
+                float(transport_pO2_bar)
+                if transport_pO2_bar is not None
+                else None
+            ),
+            source_reaction_fO2_bar=source_reaction_fO2_bar,
+            source_reaction_fO2_log10=(
+                float(vapor_pressure_diagnostic["source_reaction_fO2_log10"])
+                if vapor_pressure_diagnostic.get("source_reaction_fO2_log10")
+                is not None
+                else None
+            ),
+            source_reaction_activity_pressure_bar=(
+                float(
+                    vapor_pressure_diagnostic[
+                        "source_reaction_activity_pressure_bar"
+                    ]
+                )
+                if vapor_pressure_diagnostic.get(
+                    "source_reaction_activity_pressure_bar"
+                )
+                is not None
+                else None
+            ),
+            source_reaction_redox_model_id=(
+                str(vapor_pressure_diagnostic["source_reaction_redox_model_id"])
+                if vapor_pressure_diagnostic.get(
+                    "source_reaction_redox_model_id"
+                )
+                else None
+            ),
+            source_reaction_composition_wt_pct=(
+                dict(
+                    vapor_pressure_diagnostic.get(
+                        "source_reaction_composition_wt_pct"
+                    )
+                    or {}
+                )
+            ),
+            source_reaction_activities=reported_activities,
+            source_reaction_activity_provider=(
+                str(activity_provider_id) if activity_provider_id else None
+            ),
+            source_reaction_activity_evidence_refs=activity_evidence_refs,
+            source_reaction_activity_standard_states=(
+                activity_standard_states
+            ),
+            source_reaction_activity_provenance=activity_provenance,
+            melt_activity_shadow_enabled=melt_activity_shadow_enabled,
+            melt_activity_engine_inputs=melt_activity_engine_inputs,
+            flux_activation_context=FluxActivationContext(
+                epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
+                effective_pressure_species_ids=effective_pressure_species_ids,
+            ),
+        )
+    except Exception as exc:  # noqa: BLE001 — typed failure, not live fallback
+        resolve_error = {
+            'status': 'unavailable',
+            'reason': 'vapour_batch_resolve_failed',
+            'detail': str(exc),
+        }
+        return None, resolve_error
+    if batch is None and not resolve_error:
+        resolve_error = {
+            'status': 'unavailable',
+            'reason': 'vapour_batch_unavailable',
+            'detail': 'build_vapour_batch returned None without a typed error',
+        }
+    return batch, resolve_error
+
+
+
+def _build_evaporation_aux_maps(
+    vapor_pressures: dict, *, vapor_pressure_data, species_formula_registry,
+    cleaned_melt_kg, spent_reductant_residue_kg, composition_kg,
+) -> tuple[dict, dict, dict]:
+    """Precompute per-species auxiliary inputs for EVAPORATION_FLUX.
+
+    Returns ``(molar_masses_kg_mol, stoich_by_species,
+    available_oxide_kg)``.
+
+    These three maps are everything the kernel provider needs that
+    cannot be derived from the request DTOs alone: the
+    ``vapor_pressures.yaml`` payload plus the simulator's stoichiometric
+    validation.
+
+    Side effects: This method invokes :meth:`_evaporation_stoich` for each
+    species and raises ``AccountingError`` on missing or inconsistent
+    metadata. ``_evaporation_flux_control_inputs`` maps that internal
+    validation error to the module's typed terminal physics refusal before
+    it can escape the evaporation boundary.
+    """
+
+    molar_masses_kg_mol: dict[str, float] = {}
+    stoich_by_species: dict[str, dict] = {}
+    available_oxide_kg: dict[str, float] = {}
+
+    metals_data = vapor_pressure_data.get('metals', {}) or {}
+    oxide_vapors_data = vapor_pressure_data.get('oxide_vapors', {}) or {}
+
+    projection_parity_tolerance_pct = 5.0e-12
+
+    for species in vapor_pressures:
+        sp_data = metals_data.get(species, {})
+        if not sp_data:
+            sp_data = oxide_vapors_data.get(species, {})
+
+        M_g_mol = sp_data.get('molar_mass_g_mol')
+        if M_g_mol is None:
+            M_g_mol = MOLAR_MASS.get(species)
+        if M_g_mol is None:
+            raise AccountingError(
+                f"vapor species {species!r} requires "
+                "molar_mass_g_mol metadata before evaporation flux "
+                "can be emitted"
+            )
+        molar_masses_kg_mol[species] = M_g_mol / 1000.0
+
+        parent_oxide = sp_data.get('parent_oxide', '')
+        if not parent_oxide:
+            raise AccountingError(
+                f"vapor species {species!r} requires parent_oxide "
+                "metadata before evaporation flux can be emitted"
+        )
+        stoich = _evaporation_stoich(species, sp_data, species_formula_registry)
+        stoich_by_species[species] = dict(stoich)
+        # Mirrors core.py::_project_cleaned_melt_from_atom_ledger:
+        # cleaned_melt + spent_reductant_residue define the projection.
+        ledger_oxide_kg = (
+            float(cleaned_melt_kg.get(parent_oxide, 0.0))
+            + float(spent_reductant_residue_kg.get(parent_oxide, 0.0))
+        )
+        projection_oxide_kg = float(composition_kg.get(
+            parent_oxide, 0.0))
+        scale_kg = max(abs(ledger_oxide_kg), abs(projection_oxide_kg), 1.0)
+        divergence_pct = (
+            abs(ledger_oxide_kg - projection_oxide_kg) / scale_kg * 100.0
+        )
+        if divergence_pct > projection_parity_tolerance_pct:
+            raise AccountingError(
+                "cleaned_melt projection stale for parent oxide "
+                f"{parent_oxide!r}: atom_ledger={ledger_oxide_kg:.17g} kg "
+                f"melt_projection={projection_oxide_kg:.17g} kg "
+                f"divergence_pct={divergence_pct:.17g}"
+            )
+        available_oxide_kg[species] = ledger_oxide_kg
+
+    return molar_masses_kg_mol, stoich_by_species, available_oxide_kg
+
+
+
+def _project_evaporation_flux(kernel_result, flux, diagnostic, *,
+        freeze_gate_fraction, native_fe_capacity_mol, molar_masses_kg_mol, frozen_carriers):
+    alpha_authority_statuses = dict(diagnostic.get('alpha_authority_status_by_species', {}) or {})
+    # Promote EVERY non-OK EVAPORATION_FLUX result to a typed refusal.
+    # Previously only missing_alpha / missing_transport_parameters raised;
+    # other refusals (e.g. uncertified_melt_resistance_model,
+    # viscous_p_bulk_transport_out_of_domain) fell through to empty
+    # flux_kg_hr={} — silent zero evaporation, not a load-bearing refuse.
+    if str(kernel_result.status) != 'ok':
+        reason = str(diagnostic.get('reason') or '').strip()
+        # A primary refusal wins; secondary records remain diagnostic context.
+        if 'missing_alpha' in diagnostic and not reason:
+            missing = ', '.join(sorted(diagnostic['missing_alpha']))
+            reason = (
+                "missing evaporation_alpha for sampled species: "
+                f"{missing}; set chemistry_kernel.allow_unmeasured_alpha_fallback "
+                "for alpha=1.0 prototype fallback"
+            )
+        elif 'missing_transport_parameters' in diagnostic and not reason:
+            missing = ', '.join(
+                sorted(diagnostic['missing_transport_parameters'])
+            )
+            reason = (
+                'missing Chapman-Enskog transport parameters for sampled '
+                f'species: {missing}'
+            )
+        if not reason:
+            reason = (
+                f"evaporation_flux_{kernel_result.status}"
+                if kernel_result.status
+                else "evaporation_flux_refused"
+            )
+        raise EvaporationFluxRefusal(reason, diagnostic)
+    flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
+    liquid_fraction_factor = 1.0 if freeze_gate_fraction is None else freeze_gate_fraction
+    if flux_kg_hr and freeze_gate_fraction is not None:
+        if melt_regime(liquid_fraction=liquid_fraction_factor) == MeltRegime.FROZEN:
+            flux.update_totals()
+            return flux
+    for species, rate_kg_hr in flux_kg_hr.items():
+        gated_rate_kg_hr = float(rate_kg_hr) * liquid_fraction_factor
+        if species == 'Fe':
+            residual_capacity_mol = native_fe_capacity_mol
+            if residual_capacity_mol is not None:
+                fe_molar_mass = float(molar_masses_kg_mol.get('Fe', 0.0) or 0.0)
+                residual_capacity_kg_hr = max(
+                    0.0,
+                    float(residual_capacity_mol),
+                ) * fe_molar_mass
+                # Explicit scheduling policy, not an activity calculation:
+                # native-pool Fe claims the shared transport capacity first,
+                # then melt-derived Fe is capped at the residual molar
+                # capacity times M_Fe [kg/mol], yielding kg/h. No pool or
+                # melt activity is an operand here. Limiting cases: zero
+                # residual gives zero melt-derived Fe; residual >= raw
+                # rate/M_Fe leaves the raw melt-derived rate unchanged.
+                original_gated_rate = gated_rate_kg_hr
+                gated_rate_kg_hr = min(gated_rate_kg_hr, residual_capacity_kg_hr)
+                diagnostic['native_fe_capacity_allocation'] = {
+                    'rule': 'pool_first_residual',
+                    'native_pool_activity_argument': (
+                        'not modeled; allocation is an explicit pool-first '
+                        'scheduling policy'
+                    ),
+                    'melt_fe_raw_kg_hr': float(original_gated_rate),
+                    'melt_fe_residual_capacity_kg_hr': float(
+                        residual_capacity_kg_hr
+                    ),
+                    'melt_fe_applied_kg_hr': float(gated_rate_kg_hr),
+                }
+        if gated_rate_kg_hr > _carrier_numerical_floor(
+            species,
+            frozen_carriers, 1e-12):
+            flux.species_kg_hr[species] = gated_rate_kg_hr
+            alpha_authority_status = alpha_authority_statuses.get(species)
+            if alpha_authority_status is not None:
+                flux.alpha_authority_status_by_species[species] = str(
+                    alpha_authority_status
+                )
+
+    flux.update_totals()
+    return flux
+
+
+
+def _project_evaporation_overhead_source_mol_hr(
+    rates_kg_hr: Mapping[str, float],
+    stoich_by_species: Mapping[str, Mapping[str, Any]],
+    *, vapor_pressure_data, species_formula_registry,
+) -> dict[str, float]:
+    source_mol_hr: dict[str, float] = {}
+    o2_molar_mass = resolve_species_formula(
+        'O2', species_formula_registry
+    ).molar_mass_kg_per_mol()
+    for species, raw_rate in rates_kg_hr.items():
+        rate_kg_hr = max(0.0, float(raw_rate))
+        if rate_kg_hr <= 0.0:
+            continue
+        formula = resolve_species_formula(
+            species, species_formula_registry
+        )
+        source_mol_hr[species] = (
+            source_mol_hr.get(species, 0.0)
+            + rate_kg_hr / formula.molar_mass_kg_per_mol()
+        )
+        stoich = dict(stoich_by_species.get(species) or {})
+        if not stoich:
+            sp_data = dict(
+                (vapor_pressure_data.get('metals', {}) or {}).get(
+                    species, {}
+                )
+                or (vapor_pressure_data.get('oxide_vapors', {}) or {}).get(
+                    species, {}
+                )
+            )
+            if sp_data:
+                stoich = dict(_evaporation_stoich(species, sp_data, species_formula_registry))
+        o2_kg_hr = rate_kg_hr * float(
+            stoich.get('O2_per_product_kg') or 0.0
+        )
+        oxygen_destination = str(
+            stoich.get('oxygen_destination') or ''
+        )
+        vapor_oxygen_atoms = float(
+            formula.elements.get('O', 0.0) or 0.0
+        )
+        if (
+            o2_kg_hr < 0.0
+            or _oxygen_coproduct_enters_gas(oxygen_destination, vapor_oxygen_atoms)
+        ):
+            source_mol_hr['O2'] = (
+                source_mol_hr.get('O2', 0.0)
+                + o2_kg_hr / o2_molar_mass
+            )
+    return source_mol_hr
+
+
+def _bound_evaporation_oxygen_uptake(evap_flux, capacity_mol, *, vapor_pressure_data, species_formula_registry,
+        vapour_rail_catalog, process_phase):
+    """Re-settle consuming mass-action responses against film delivery."""
+    if capacity_mol is None:
+        return evap_flux
+    draws = {}
+    fixed_draws = []
+    credits = []
+    for species, rate in evap_flux.species_kg_hr.items():
+        # Reuse the source owner per carrier; never recover a small credit
+        # by subtracting gross consuming traffic from its net.
+        # C7 freezes a one-hour tick: (mol/hr) * 1 hr is the interval mol
+        # compared with capacity_mol; no rate/amount conversion is implicit
+        # for a different timestep.
+        oxygen = _project_evaporation_overhead_source_mol_hr({species: rate}, {},
+            vapor_pressure_data=vapor_pressure_data, species_formula_registry=species_formula_registry).get('O2', 0.0)
+        if oxygen >= 0.0:
+            credits.append(oxygen)
+            continue
+        evaluator = vapour_rail_catalog.evaluator_for_hot_train(
+            species, process_phase=process_phase)
+        if evaluator is not None and evaluator.pO2_exponent > 0.0:
+            draws[species] = -oxygen
+        else:
+            # A finite stoichiometric forcing is not a bounded response.
+            fixed_draws.append(-oxygen)
+    demand = math.fsum(draws.values())
+    # Net debit = responsive draw + fixed draw - gas credit (mol).
+    # Thus responsive draw <= film supply + credit - fixed draw.
+    # At zero supply a credit may still fund uptake; producer-only
+    # batches and an already feasible debit leave this clip idle.
+    available = max(0.0, math.fsum((capacity_mol, *credits, *(-v for v in fixed_draws))))
+    if demand > available:
+        evap_flux = copy.deepcopy(evap_flux)
+        for species in draws:
+            evap_flux.species_kg_hr[species] *= available / demand
+        evap_flux.update_totals()
+    return evap_flux
+
+
+
+def _evaporation_transition_controls(species, rate_kg_hr, remaining_kg_hr, sp_data, *,
+        cleaned_melt_kg, frozen_carriers, species_formula_registry):
+    stoich = _evaporation_stoich(species, sp_data, species_formula_registry)
+    if stoich is None:
+        return None
+
+    parent_oxide = stoich['parent_oxide']
+    rate_kg_per_tick = rate_kg_hr * 1.0  # 1-hour tick (see core.py)
+    oxide_removed = rate_kg_per_tick * stoich['oxide_per_product_kg']
+    product_kg = rate_kg_per_tick
+
+    if oxide_removed <= _carrier_numerical_floor(
+        species,
+        frozen_carriers, 1e-12):
+        return None
+
+    available_kg = cleaned_melt_kg.get(parent_oxide, 0.0)
+    if available_kg <= _carrier_numerical_floor(
+        species,
+        frozen_carriers, 1e-12):
+        return None
+
+    # Mirror the legacy validation: the AccountingError surface is
+    # owned by the caller, not the provider. The provider receives
+    # already-validated inputs (this matches the EVAPORATION_FLUX
+    # flip pattern in _calculate_evaporation).
+    if remaining_kg_hr < -1e-12 or remaining_kg_hr > rate_kg_hr + 1e-12:
+        raise AccountingError(
+            f"condensation route for {species!r} returned "
+            "unphysical remaining vapor mass"
+        )
+    remaining_kg = max(0.0, remaining_kg_hr) * 1.0
+    if remaining_kg > product_kg + 1e-12:
+        raise AccountingError(
+            f"condensation route for {species!r} exceeds credited vapor"
+        )
+
+    frozen_controls = tuple(sorted(frozen_carriers)) if frozen_carriers is not None else None
+    return {
+        'species': species,
+        'stoich': dict(stoich),
+        'sp_data': dict(sp_data or {}),
+        'rate_kg_hr': float(rate_kg_hr),
+        'remaining_kg_hr': float(remaining_kg_hr),
+        'dt_hr': 1.0,
+        '_frozen_carriers': frozen_controls,
+        'available_kg': float(available_kg),
+    }
+
+
+
+def _evaporation_route_refusal(route_result, species):
+    authority = dict(
+        getattr(route_result, 'condensation_authority_by_species', {}).get(
+            species,
+            {},
+        )
+        or {}
+    )
+    retained_source_kg = float(
+        getattr(route_result, 'retained_in_source_by_species', {}).get(
+            species,
+            0.0,
+        )
+        or 0.0
+    )
+    if (
+        str(authority.get('status', '')) in {'refused', 'proven_zero'}
+        or retained_source_kg > 1e-15
+    ):
+        # The rail did not authorize an evaporation debit. Keep the
+        # candidate mass in its source account; returning no transition
+        # also keeps it out of terminal offgas after the end-of-hour bleed.
+        return {
+            'credited_condensed_kg': 0.0,
+            'remaining_kg': 0.0,
+            'retained_in_source_kg': retained_source_kg,
+            'evaporation_transition': None,
+            'authority_status': authority.get('status'),
+        }
+
+    return None
+
+
+
+def _condensation_route_controls(species, condensed_kg, sp_data, route_result, route_inputs):
+    wall_deposit_fraction = float(
+        route_result.wall_deposit_fraction_by_species.get(species, 0.0)
+    )
+    wall_deposit_account_fractions = dict(
+        route_result
+        .wall_deposit_account_fractions_by_species
+        .get(species, {})
+    )
+    if wall_deposit_fraction <= 1.0e-12 or not wall_deposit_account_fractions:
+        wall_deposit_fraction = 0.0
+        wall_deposit_account_fractions = {}
+
+    return {
+                    'species': species,
+                    'condensed_kg': float(condensed_kg),
+                    'sp_data': dict(sp_data or {}),
+                    'wall_deposit_fraction': wall_deposit_fraction,
+                    'wall_deposit_account_fractions': wall_deposit_account_fractions,
+                    'wall_temperature_K': (
+                        float(route_inputs.wall_temperature_C) + 273.15
+                        if route_inputs.wall_temperature_C is not None else None
+                    ),
+                    'wall_deposit_account_temperatures_K': {
+                        segment.wall_deposit_account: (
+                            float(segment.wall_temperature_C) + 273.15
+                        )
+                        for segment in route_inputs.pipe_segments
+                        if segment.name not in route_inputs.wall_temperature_input_refusals
+                    },
+                    'wall_alkali_binding_diagnostic_state_by_account': dict(
+                        getattr(
+                            route_inputs,
+                            'wall_alkali_binding_diagnostic_state_by_account',
+                            {},
+                        )
+                    ),
+                    'dt_hr': 1.0,
+                }
+
+
+
+def _pipe_transport_inlet_flux(
+    evap_flux: EvaporationFlux, *, p_total_mbar, vapor_pressure_data, species_formula_registry,
+    additional_source_mol_hr: Mapping[str, float] | None = None,
+) -> EvaporationFlux:
+    """Full upstream source gas, including any separately committed stream."""
+    if float(p_total_mbar) != 0.0 and additional_source_mol_hr is None:
+        return evap_flux
+    # Reuse the canonical stoichiometric source projection: free O2 from
+    # oxide dissociation occupies the pipe alongside the product vapour.
+    # Counting only the product underestimates both total pressure and M.
+    # kg/hr = (mol/hr)*(kg/mol); this creates no inventory or ledger move.
+    source = _project_evaporation_overhead_source_mol_hr(
+        evap_flux.species_kg_hr, {}, vapor_pressure_data=vapor_pressure_data,
+        species_formula_registry=species_formula_registry,
+    )
+    for species, mol_hr in (additional_source_mol_hr or {}).items():
+        source[species] = source.get(species, 0.0) + mol_hr
+    inlet = EvaporationFlux(species_kg_hr={
+        species: mol_hr * resolve_species_formula(
+            species, species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, mol_hr in source.items() if mol_hr > 0.0
+    })
+    inlet.update_totals()
+    return inlet
+
+
 class EvaporationMixin:
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
@@ -1210,9 +2197,6 @@ class EvaporationMixin:
                         **notice, 'temperature_K': continuum_notice['gas_temperature_K'],
                     },
                 )
-        alpha_authority_statuses = dict(
-            diagnostic.get('alpha_authority_status_by_species', {}) or {}
-        )
         unmeasured_alpha_species = tuple(
             diagnostic.get('unmeasured_alpha_fallback_species', ()) or ()
         )
@@ -1233,100 +2217,17 @@ class EvaporationMixin:
                 'unmeasured_alpha_evaporation_fallback',
                 count=len(unmeasured_alpha_species),
             )
-        # Promote EVERY non-OK EVAPORATION_FLUX result to a typed refusal.
-        # Previously only missing_alpha / missing_transport_parameters raised;
-        # other refusals (e.g. uncertified_melt_resistance_model,
-        # viscous_p_bulk_transport_out_of_domain) fell through to empty
-        # flux_kg_hr={} — silent zero evaporation, not a load-bearing refuse.
-        if str(kernel_result.status) != 'ok':
-            reason = str(diagnostic.get('reason') or '').strip()
-            # A primary refusal wins; secondary records remain diagnostic context.
-            if 'missing_alpha' in diagnostic and not reason:
-                missing = ', '.join(sorted(diagnostic['missing_alpha']))
-                reason = (
-                    "missing evaporation_alpha for sampled species: "
-                    f"{missing}; set chemistry_kernel.allow_unmeasured_alpha_fallback "
-                    "for alpha=1.0 prototype fallback"
-                )
-            elif 'missing_transport_parameters' in diagnostic and not reason:
-                missing = ', '.join(
-                    sorted(diagnostic['missing_transport_parameters'])
-                )
-                reason = (
-                    'missing Chapman-Enskog transport parameters for sampled '
-                    f'species: {missing}'
-                )
-            if not reason:
-                reason = (
-                    f"evaporation_flux_{kernel_result.status}"
-                    if kernel_result.status
-                    else "evaporation_flux_refused"
-                )
-            raise EvaporationFluxRefusal(reason, diagnostic)
-        flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
-        liquid_fraction_factor = 1.0
-        if flux_kg_hr and self._freeze_gate_enabled():
-            if gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:
-                liquid_fraction_factor = (
-                    self._freeze_gate_liquid_fraction_factor()
-                )
-            else:
-                liquid_fraction_factor = self._freeze_gate_liquid_fraction_factor(
-                    gate_authority=gate_authority,
-                )
-            if (
-                melt_regime(liquid_fraction=liquid_fraction_factor)
-                == MeltRegime.FROZEN
-            ):
-                flux.update_totals()
-                return flux
-        for species, rate_kg_hr in flux_kg_hr.items():
-            gated_rate_kg_hr = float(rate_kg_hr) * liquid_fraction_factor
-            if species == 'Fe':
-                residual_capacity_mol = getattr(
-                    self,
-                    '_native_fe_vapor_residual_capacity_mol_this_hr',
-                    None,
-                )
-                if residual_capacity_mol is not None:
-                    fe_molar_mass = float(molar_masses_kg_mol.get('Fe', 0.0) or 0.0)
-                    residual_capacity_kg_hr = max(
-                        0.0,
-                        float(residual_capacity_mol),
-                    ) * fe_molar_mass
-                    # Explicit scheduling policy, not an activity calculation:
-                    # native-pool Fe claims the shared transport capacity first,
-                    # then melt-derived Fe is capped at the residual molar
-                    # capacity times M_Fe [kg/mol], yielding kg/h. No pool or
-                    # melt activity is an operand here. Limiting cases: zero
-                    # residual gives zero melt-derived Fe; residual >= raw
-                    # rate/M_Fe leaves the raw melt-derived rate unchanged.
-                    original_gated_rate = gated_rate_kg_hr
-                    gated_rate_kg_hr = min(gated_rate_kg_hr, residual_capacity_kg_hr)
-                    diagnostic['native_fe_capacity_allocation'] = {
-                        'rule': 'pool_first_residual',
-                        'native_pool_activity_argument': (
-                            'not modeled; allocation is an explicit pool-first '
-                            'scheduling policy'
-                        ),
-                        'melt_fe_raw_kg_hr': float(original_gated_rate),
-                        'melt_fe_residual_capacity_kg_hr': float(
-                            residual_capacity_kg_hr
-                        ),
-                        'melt_fe_applied_kg_hr': float(gated_rate_kg_hr),
-                    }
-            if gated_rate_kg_hr > _carrier_numerical_floor(
-                species,
-                getattr(self, '_frozen_evaporation_carriers', None), 1e-12):
-                flux.species_kg_hr[species] = gated_rate_kg_hr
-                alpha_authority_status = alpha_authority_statuses.get(species)
-                if alpha_authority_status is not None:
-                    flux.alpha_authority_status_by_species[species] = str(
-                        alpha_authority_status
-                    )
-
-        flux.update_totals()
-        return flux
+        freeze_gate_fraction = None
+        if (str(kernel_result.status) == 'ok'
+                and diagnostic.get('evaporation_flux_kg_hr') and self._freeze_gate_enabled()):
+            freeze_gate_fraction = (self._freeze_gate_liquid_fraction_factor()
+                if gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY
+                else self._freeze_gate_liquid_fraction_factor(gate_authority=gate_authority))
+        return _project_evaporation_flux(kernel_result, flux, diagnostic,
+            freeze_gate_fraction=freeze_gate_fraction,
+            native_fe_capacity_mol=getattr(self, '_native_fe_vapor_residual_capacity_mol_this_hr', None),
+            molar_masses_kg_mol=molar_masses_kg_mol,
+            frozen_carriers=getattr(self, '_frozen_evaporation_carriers', None))
 
     def _build_partial_melt_offgassing_diagnostic(
         self,
@@ -3217,82 +4118,12 @@ class EvaporationMixin:
     def _build_evaporation_aux_maps(
         self, vapor_pressures: dict,
     ) -> tuple[dict, dict, dict]:
-        """Precompute per-species auxiliary inputs for EVAPORATION_FLUX.
-
-        Returns ``(molar_masses_kg_mol, stoich_by_species,
-        available_oxide_kg)``.
-
-        These three maps are everything the kernel provider needs that
-        cannot be derived from the request DTOs alone: the
-        ``vapor_pressures.yaml`` payload plus the simulator's stoichiometric
-        validation.
-
-        Side effects: This method invokes :meth:`_evaporation_stoich` for each
-        species and raises ``AccountingError`` on missing or inconsistent
-        metadata. ``_evaporation_flux_control_inputs`` maps that internal
-        validation error to the module's typed terminal physics refusal before
-        it can escape the evaporation boundary.
-        """
-
-        molar_masses_kg_mol: dict[str, float] = {}
-        stoich_by_species: dict[str, dict] = {}
-        available_oxide_kg: dict[str, float] = {}
-
-        metals_data = self.vapor_pressures.get('metals', {}) or {}
-        oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
-
-        cleaned_melt_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt')
-        spent_reductant_residue_kg = self.atom_ledger.kg_by_account(
-            SPENT_REDUCTANT_RESIDUE_ACCOUNT)
-        projection_parity_tolerance_pct = 5.0e-12
-
-        for species in vapor_pressures:
-            sp_data = metals_data.get(species, {})
-            if not sp_data:
-                sp_data = oxide_vapors_data.get(species, {})
-
-            M_g_mol = sp_data.get('molar_mass_g_mol')
-            if M_g_mol is None:
-                M_g_mol = MOLAR_MASS.get(species)
-            if M_g_mol is None:
-                raise AccountingError(
-                    f"vapor species {species!r} requires "
-                    "molar_mass_g_mol metadata before evaporation flux "
-                    "can be emitted"
-                )
-            molar_masses_kg_mol[species] = M_g_mol / 1000.0
-
-            parent_oxide = sp_data.get('parent_oxide', '')
-            if not parent_oxide:
-                raise AccountingError(
-                    f"vapor species {species!r} requires parent_oxide "
-                    "metadata before evaporation flux can be emitted"
-            )
-            stoich = self._evaporation_stoich(species, sp_data)
-            stoich_by_species[species] = dict(stoich)
-            # Mirrors core.py::_project_cleaned_melt_from_atom_ledger:
-            # cleaned_melt + spent_reductant_residue define the projection.
-            ledger_oxide_kg = (
-                float(cleaned_melt_kg.get(parent_oxide, 0.0))
-                + float(spent_reductant_residue_kg.get(parent_oxide, 0.0))
-            )
-            projection_oxide_kg = float(self.melt.composition_kg.get(
-                parent_oxide, 0.0))
-            scale_kg = max(abs(ledger_oxide_kg), abs(projection_oxide_kg), 1.0)
-            divergence_pct = (
-                abs(ledger_oxide_kg - projection_oxide_kg) / scale_kg * 100.0
-            )
-            if divergence_pct > projection_parity_tolerance_pct:
-                raise AccountingError(
-                    "cleaned_melt projection stale for parent oxide "
-                    f"{parent_oxide!r}: atom_ledger={ledger_oxide_kg:.17g} kg "
-                    f"melt_projection={projection_oxide_kg:.17g} kg "
-                    f"divergence_pct={divergence_pct:.17g}"
-                )
-            available_oxide_kg[species] = ledger_oxide_kg
-
-        return molar_masses_kg_mol, stoich_by_species, available_oxide_kg
+        return _build_evaporation_aux_maps(vapor_pressures,
+            vapor_pressure_data=self.vapor_pressures,
+            species_formula_registry=self.species_formula_registry,
+            cleaned_melt_kg=self.atom_ledger.kg_by_account('process.cleaned_melt'),
+            spent_reductant_residue_kg=self.atom_ledger.kg_by_account(SPENT_REDUCTANT_RESIDUE_ACCOUNT),
+            composition_kg=self.melt.composition_kg)
 
     def _evaporation_overhead_total_pressure_Pa(
         self,
@@ -3324,258 +4155,20 @@ class EvaporationMixin:
         temperature_K: float,
         effective_pressure_source: EffectivePressureSource,
     ) -> Any:
-        """Exact-key VapourBatch for VR-11 flux consumer + instrumentation.
-
-        A complete batch owns channel refusal, eligibility, and the active set.
-        Only the typed source's species IDs enter activation; its values remain
-        outside catalog/request state. Resolve failures fail closed.
-        """
-
         self._last_vapour_batch_resolve_error = {}
-        builder = getattr(self, 'build_vapour_batch', None)
-        if not callable(builder):
-            self._last_vapour_batch_resolve_error = {
-                'status': 'unavailable',
-                'reason': 'vapour_batch_builder_missing',
-                'detail': 'build_vapour_batch is not available on simulator',
-            }
-            return None
-        vapor_pressure_diagnostic = dict(
-            getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
-        )
-        transport_pO2_bar = vapor_pressure_diagnostic.get('pO2_bar')
-        if transport_pO2_bar is None:
-            transport_pO2_bar = getattr(equilibrium, 'pO2_bar', None)
-        source_reaction_fO2_bar = vapor_pressure_diagnostic.get(
-            'source_reaction_fO2_bar'
-        )
-        if source_reaction_fO2_bar is not None:
-            try:
-                source_reaction_fO2_bar = float(source_reaction_fO2_bar)
-            except (TypeError, ValueError):
-                source_reaction_fO2_bar = None
-            if source_reaction_fO2_bar is not None and (
-                not math.isfinite(source_reaction_fO2_bar)
-                or source_reaction_fO2_bar <= 0.0
-            ):
-                source_reaction_fO2_bar = None
-        total_pressure_Pa = None
         try:
-            total_pressure_Pa = float(
-                getattr(self.melt, 'p_total_mbar', 0.0) or 0.0
-            ) * 100.0
+            total_pressure_Pa = float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) * 100.0
         except (TypeError, ValueError):
             total_pressure_Pa = None
-        try:
-            reported_activities = EvaporationMixin._vapor_pressure_activity_operands(
-                equilibrium, vapor_pressure_diagnostic,
-            )
-            kernel_activities = vapor_pressure_diagnostic.get('activities')
-            kernel_activity_source = (
-                isinstance(kernel_activities, Mapping)
-                and bool(reported_activities)
-            )
-            if kernel_activity_source:
-                activity_metadata = vapor_pressure_diagnostic
-                activity_evidence_owner = (
-                    '_last_vapor_pressure_diagnostic.activities'
-                )
-            else:
-                activity_metadata = dict(
-                    getattr(equilibrium, 'diagnostics', {}) or {}
-                )
-                activity_evidence_owner = (
-                    'EquilibriumResult.activity_coefficients'
-                )
-            activity_provider_id = activity_metadata.get('activities_provider')
-            activity_provenance_raw = (
-                activity_metadata.get('vapor_pressure_numerator_provenance')
-                or activity_metadata.get('activity_provenance')
-                or {}
-            )
-            if not isinstance(activity_provenance_raw, Mapping):
-                activity_provenance_raw = {}
-            activity_provenance = {
-                str(species_id): dict(provenance)
-                for species_id, provenance in dict(activity_provenance_raw).items()
-                if isinstance(provenance, Mapping)
-                and species_id in reported_activities
-            }
-            feo_activity = activity_metadata.get('a_FeO_calphad')
-            if 'Fe' in reported_activities and isinstance(feo_activity, Mapping):
-                feo_sources = feo_activity.get('sources')
-                if isinstance(feo_sources, Mapping) and feo_sources:
-                    activity_provenance.setdefault('Fe', {})[
-                        'activity_evidence_ref'
-                    ] = '; '.join(str(value) for value in feo_sources.values())
-            standard_state_raw = activity_metadata.get(
-                'activities_standard_state'
-            )
-            activity_standard_state = None
-            if isinstance(standard_state_raw, Mapping):
-                activity_standard_state = StandardStateIdentity(
-                    convention=str(standard_state_raw.get('convention') or ''),
-                    phase=str(standard_state_raw.get('phase') or ''),
-                    reference_pressure_bar=float(
-                        standard_state_raw.get('reference_pressure_bar')
-                    ),
-                    reference_temperature_K=(
-                        float(standard_state_raw['reference_temperature_K'])
-                        if standard_state_raw.get('reference_temperature_K')
-                        is not None
-                        else None
-                    ),
-                    component_basis=str(
-                        standard_state_raw.get('component_basis') or ''
-                    ),
-                )
-            # Compose: INCOMING structured citation/evidence_ref first
-            # (external DOI provenance for activity-corrected channels); HEAD
-            # provider-token fallback for channels without melt-oxide citation;
-            # HEAD b-133 P-carrier authority annotations when present.
-            activity_evidence_refs: dict[str, str] = {}
-            for species_id in reported_activities:
-                if not activity_provider_id or activity_standard_state is None:
-                    continue
-                provenance = dict(activity_provenance.get(str(species_id)) or {})
-                citation = (
-                    provenance.get('melt_oxide_gamma_citation')
-                    or provenance.get('activity_evidence_ref')
-                )
-                if citation:
-                    activity_evidence_refs[str(species_id)] = str(citation)
-                    continue
-                evidence = (
-                    f'{activity_provider_id}:'
-                    f'{activity_evidence_owner}[{species_id}]'
-                )
-                if species_id in {
-                    'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10'
-                }:
-                    authority_status = provenance.get(
-                        'melt_oxide_activity_authority_status'
-                    )
-                    gamma_range = provenance.get(
-                        'melt_oxide_gamma_valid_range_K'
-                    )
-                    activity_basis = (
-                        'parent_oxide'
-                        if provenance.get('equivalent_parent_oxide_activity')
-                        == reported_activities.get(species_id)
-                        else 'reported_component'
-                    )
-                    if authority_status:
-                        evidence += f';authority_status={authority_status}'
-                    if gamma_range:
-                        evidence += (
-                            f';gamma_valid_range_K={tuple(gamma_range)}'
-                        )
-                    evidence += f';activity_basis={activity_basis}'
-                activity_evidence_refs[str(species_id)] = evidence
-            activity_standard_states = {
-                str(species_id): activity_standard_state
-                for species_id in reported_activities
-                if activity_provider_id and activity_standard_state is not None
-            }
-            campaign = getattr(self.melt, 'campaign', None)
-            campaign_name = str(getattr(campaign, 'name', '') or '')
-            # Keep the global request phase on the legacy hot-train contract.
-            # Stage-0 phosphorus is a narrow marker consumed only by stage0-only
-            # rules sourced from P2O5; flipping the whole phase to stage0 changes
-            # unrelated Na/Fe/channel eligibility.
-            request_stage = (
-                'c0b_p_cleanup'
-                if campaign_name == 'C0B'
-                else (
-                    'stage0_p_carriers'
-                    if campaign_name == 'C0'
-                    else 'evaporation'
-                )
-            )
-            effective_pressure_species_ids = effective_pressure_source.species_ids
-            if campaign_name == 'C0B':
-                effective_pressure_species_ids = frozenset(
-                    species_id
-                    for species_id in effective_pressure_species_ids
-                    if species_id in {'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10'}
-                )
-            batch = builder(
-                temperature_K=float(temperature_K),
-                process_phase='hot_train',
-                stage=request_stage,
-                total_pressure_Pa=total_pressure_Pa,
-                fO2_bar=(
-                    float(transport_pO2_bar)
-                    if transport_pO2_bar is not None
-                    else None
-                ),
-                source_reaction_fO2_bar=source_reaction_fO2_bar,
-                source_reaction_fO2_log10=(
-                    float(vapor_pressure_diagnostic["source_reaction_fO2_log10"])
-                    if vapor_pressure_diagnostic.get("source_reaction_fO2_log10")
-                    is not None
-                    else None
-                ),
-                source_reaction_activity_pressure_bar=(
-                    float(
-                        vapor_pressure_diagnostic[
-                            "source_reaction_activity_pressure_bar"
-                        ]
-                    )
-                    if vapor_pressure_diagnostic.get(
-                        "source_reaction_activity_pressure_bar"
-                    )
-                    is not None
-                    else None
-                ),
-                source_reaction_redox_model_id=(
-                    str(vapor_pressure_diagnostic["source_reaction_redox_model_id"])
-                    if vapor_pressure_diagnostic.get(
-                        "source_reaction_redox_model_id"
-                    )
-                    else None
-                ),
-                source_reaction_composition_wt_pct=(
-                    dict(
-                        vapor_pressure_diagnostic.get(
-                            "source_reaction_composition_wt_pct"
-                        )
-                        or {}
-                    )
-                ),
-                source_reaction_activities=reported_activities,
-                source_reaction_activity_provider=(
-                    str(activity_provider_id) if activity_provider_id else None
-                ),
-                source_reaction_activity_evidence_refs=activity_evidence_refs,
-                source_reaction_activity_standard_states=(
-                    activity_standard_states
-                ),
-                source_reaction_activity_provenance=activity_provenance,
-                melt_activity_shadow_enabled=getattr(
-                    self, "_melt_activity_shadow_enabled", False
-                ),
-                melt_activity_engine_inputs=getattr(
-                    self, "_melt_activity_engine_inputs", {}
-                ),
-                flux_activation_context=FluxActivationContext(
-                    epoch=FLUX_ACTIVATION_EPOCH_PRE_RG,
-                    effective_pressure_species_ids=effective_pressure_species_ids,
-                ),
-            )
-        except Exception as exc:  # noqa: BLE001 — typed failure, not live fallback
-            self._last_vapour_batch_resolve_error = {
-                'status': 'unavailable',
-                'reason': 'vapour_batch_resolve_failed',
-                'detail': str(exc),
-            }
-            return None
-        if batch is None and not getattr(self, '_last_vapour_batch_resolve_error', None):
-            self._last_vapour_batch_resolve_error = {
-                'status': 'unavailable',
-                'reason': 'vapour_batch_unavailable',
-                'detail': 'build_vapour_batch returned None without a typed error',
-            }
+        batch, error = _resolve_evaporation_vapour_batch(equilibrium,
+            temperature_K=temperature_K, effective_pressure_source=effective_pressure_source,
+            builder=getattr(self, 'build_vapour_batch', None),
+            vapor_pressure_diagnostic=dict(getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}),
+            total_pressure_Pa=total_pressure_Pa,
+            campaign_name=str(getattr(getattr(self.melt, 'campaign', None), 'name', '') or ''),
+            melt_activity_shadow_enabled=getattr(self, '_melt_activity_shadow_enabled', False),
+            melt_activity_engine_inputs=getattr(self, '_melt_activity_engine_inputs', {}))
+        self._last_vapour_batch_resolve_error = self._last_vapour_batch_resolve_error or error
         return batch
 
     def _evaporation_flux_control_inputs(
@@ -3721,51 +4314,8 @@ class EvaporationMixin:
         rates_kg_hr: Mapping[str, float],
         stoich_by_species: Mapping[str, Mapping[str, Any]],
     ) -> dict[str, float]:
-        source_mol_hr: dict[str, float] = {}
-        o2_molar_mass = resolve_species_formula(
-            'O2', self.species_formula_registry
-        ).molar_mass_kg_per_mol()
-        for species, raw_rate in rates_kg_hr.items():
-            rate_kg_hr = max(0.0, float(raw_rate))
-            if rate_kg_hr <= 0.0:
-                continue
-            formula = resolve_species_formula(
-                species, self.species_formula_registry
-            )
-            source_mol_hr[species] = (
-                source_mol_hr.get(species, 0.0)
-                + rate_kg_hr / formula.molar_mass_kg_per_mol()
-            )
-            stoich = dict(stoich_by_species.get(species) or {})
-            if not stoich:
-                sp_data = dict(
-                    (self.vapor_pressures.get('metals', {}) or {}).get(
-                        species, {}
-                    )
-                    or (self.vapor_pressures.get('oxide_vapors', {}) or {}).get(
-                        species, {}
-                    )
-                )
-                if sp_data:
-                    stoich = dict(self._evaporation_stoich(species, sp_data))
-            o2_kg_hr = rate_kg_hr * float(
-                stoich.get('O2_per_product_kg') or 0.0
-            )
-            oxygen_destination = str(
-                stoich.get('oxygen_destination') or ''
-            )
-            vapor_oxygen_atoms = float(
-                formula.elements.get('O', 0.0) or 0.0
-            )
-            if (
-                o2_kg_hr < 0.0
-                or _oxygen_coproduct_enters_gas(oxygen_destination, vapor_oxygen_atoms)
-            ):
-                source_mol_hr['O2'] = (
-                    source_mol_hr.get('O2', 0.0)
-                    + o2_kg_hr / o2_molar_mass
-                )
-        return source_mol_hr
+        return _project_evaporation_overhead_source_mol_hr(rates_kg_hr, stoich_by_species,
+            vapor_pressure_data=self.vapor_pressures, species_formula_registry=self.species_formula_registry)
 
     def _apply_analytic_evaporation_depletion(
         self, evap_flux: EvaporationFlux, dt_hr: float = 1.0,
@@ -3819,173 +4369,18 @@ class EvaporationMixin:
         available_o2_kg: float,
         zero_oxygen_exponents: Mapping[str, float] | None = None,
     ) -> dict[str, float]:
-        """Pure frozen-inventory transform from raw HK rates to actual rates."""
-        if dt_hr <= 0.0 or (not raw_rates_kg_hr and not zero_oxygen_exponents):
-            return {
-                str(species): max(0.0, float(rate))
-                for species, rate in raw_rates_kg_hr.items()
-            }
-
-        if zero_oxygen_exponents is not None and phase_scalar <= 0.0:
-            return {}
-        frozen = getattr(self, '_frozen_evaporation_carriers', None)
-        total_floor = _carrier_numerical_floor(None, frozen, 1e-12)
-        metals_data = self.vapor_pressures.get('metals', {}) or {}
-        oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
-        parent_groups: dict[str, list[dict]] = defaultdict(list)
-
-        species_ids = raw_rates_kg_hr.keys() | (zero_oxygen_exponents or {}).keys()
-        for species in sorted(species_ids):
-            raw_rate_kg_hr = (
-                float(raw_rates_kg_hr.get(species, 0.0))
-                * phase_scalar
-            )
-            if zero_oxygen_exponents is not None:
-                if species not in zero_oxygen_exponents:
-                    continue
-            elif raw_rate_kg_hr <= _carrier_numerical_floor(species, frozen, 1e-12):
-                continue
-            sp_data = metals_data.get(species, {})
-            if not sp_data:
-                sp_data = oxide_vapors_data.get(species, {})
-            stoich = self._evaporation_stoich(species, sp_data)
-            parent_oxide = stoich['parent_oxide']
-            oxide_per_product_kg = float(stoich['oxide_per_product_kg'])
-            parent_draw_kg_hr = raw_rate_kg_hr * oxide_per_product_kg
-            if zero_oxygen_exponents is None and parent_draw_kg_hr <= _carrier_numerical_floor(
-                species,
-                frozen, 1e-12):
-                continue
-            parent_groups[parent_oxide].append({
-                'species': species,
-                'sp_data': sp_data,
-                'stoich': stoich,
-                'raw_rate_kg_hr': raw_rate_kg_hr,
-                'parent_draw_kg_hr': parent_draw_kg_hr,
-            })
-
-        effective_rates: dict[str, float] = {}
-        max_fraction = math.nextafter(1.0, 0.0)
-        for parent_oxide in sorted(parent_groups):
-            entries = parent_groups[parent_oxide]
-            if zero_oxygen_exponents is not None:
-                # Existing depletion's positive-side endpoint: r_i=c_i*x^e_i,
-                # D=sum(s_i*r_i), product_i=A*(1-exp(-D*dt/A))*s_i*r_i/D/s_i.
-                # As x->0+, only the most negative exponent survives and
-                # depletion tends to max_fraction. Equal leading exponents
-                # retain their evaluated HK-rate shares at the same seed x.
-                # Units: A[kg parent]/s_i[kg parent/kg product]/dt[h]=kg/h.
-                # Unique P4 dominates weaker P2/PO2 sharing P2O5; no epsilon
-                # oxygen, infinite rate, or IEEE pressure cap is evaluated.
-                leading = min(zero_oxygen_exponents[entry['species']] for entry in entries)
-                entries = [entry for entry in entries
-                           if zero_oxygen_exponents[entry['species']] == leading]
-                if len(entries) == 1:
-                    # A unique leading coefficient cancels from d_i/D.
-                    # Normalize its weight to one, even when positive seed
-                    # pressure converted to an underflowed HK rate (cold Si3).
-                    # This is a dimensionless share weight, not a rate floor.
-                    entries[0]['parent_draw_kg_hr'] = 1.0
-            available_parent_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
-            total_parent_draw_kg_hr = sum(
-                entry['parent_draw_kg_hr'] for entry in entries)
-            if available_parent_kg <= 1e-12 or total_parent_draw_kg_hr <= (
-                    total_floor if zero_oxygen_exponents is None else 0.0):
-                continue
-            k_hr = total_parent_draw_kg_hr / available_parent_kg
-            depletion_fraction = (max_fraction if zero_oxygen_exponents is not None
-                                  else -math.expm1(-k_hr * dt_hr))
-            depletion_fraction = max(
-                0.0, min(max_fraction, depletion_fraction))
-            parent_draw_kg = available_parent_kg * depletion_fraction
-            for entry in entries:
-                share = entry['parent_draw_kg_hr'] / total_parent_draw_kg_hr
-                product_kg = (
-                    parent_draw_kg
-                    * share
-                    / float(entry['stoich']['oxide_per_product_kg'])
-                )
-                if product_kg > _carrier_numerical_floor(entry['species'], frozen, 1e-12):
-                    effective_rates[entry['species']] = product_kg / dt_hr
-
-        o2_draws: list[tuple[str, float]] = []
-        for parent_oxide in sorted(parent_groups):
-            for entry in parent_groups[parent_oxide]:
-                species = entry['species']
-                rate_kg_hr = float(effective_rates.get(species, 0.0))
-                O2_per_product_kg = float(
-                    entry['stoich'].get('O2_per_product_kg', 0.0))
-                if rate_kg_hr > _carrier_numerical_floor(species, frozen, 1e-12) and O2_per_product_kg < -1e-12:
-                    o2_draws.append(
-                        (species, rate_kg_hr * abs(O2_per_product_kg)))
-        total_o2_draw_kg_hr = sum(draw for _species, draw in o2_draws)
-        if total_o2_draw_kg_hr <= total_floor:
-            return effective_rates
-
-        if available_o2_kg <= 1e-12:
-            for species, _draw in o2_draws:
-                effective_rates.pop(species, None)
-            return effective_rates
-
-        max_fraction = math.nextafter(1.0, 0.0)
-        k_hr = total_o2_draw_kg_hr / float(available_o2_kg)
-        depletion_fraction = -math.expm1(-k_hr * dt_hr)
-        depletion_fraction = max(0.0, min(max_fraction, depletion_fraction))
-        allowed_o2_draw_kg = float(available_o2_kg) * depletion_fraction
-        by_species_draw = dict(o2_draws)
-        for species, required_o2_kg_hr in o2_draws:
-            if required_o2_kg_hr <= _carrier_numerical_floor(species, frozen, 1e-12):
-                continue
-            allowed_draw_kg = (
-                allowed_o2_draw_kg
-                * required_o2_kg_hr
-                / total_o2_draw_kg_hr
-            )
-            current_rate = float(effective_rates.get(species, 0.0))
-            allowed_rate = current_rate * (
-                allowed_draw_kg / by_species_draw[species])
-            if allowed_rate <= _carrier_numerical_floor(species, frozen, 1e-12):
-                effective_rates.pop(species, None)
-            else:
-                effective_rates[species] = min(current_rate, allowed_rate)
-        return effective_rates
+        return _analytic_evaporation_depletion_rates(raw_rates_kg_hr,
+            vapor_pressures=self.vapor_pressures,
+            frozen_carriers=getattr(self, '_frozen_evaporation_carriers', None),
+            species_formula_registry=self.species_formula_registry,
+            dt_hr=dt_hr, phase_scalar=phase_scalar, cleaned_melt_kg=cleaned_melt_kg,
+            available_o2_kg=available_o2_kg, zero_oxygen_exponents=zero_oxygen_exponents)
 
     def _bound_evaporation_oxygen_uptake(self, evap_flux, capacity_mol):
-        """Re-settle consuming mass-action responses against film delivery."""
-        if capacity_mol is None:
-            return evap_flux
-        draws = {}
-        fixed_draws = []
-        credits = []
-        for species, rate in evap_flux.species_kg_hr.items():
-            # Reuse the source owner per carrier; never recover a small credit
-            # by subtracting gross consuming traffic from its net.
-            # C7 freezes a one-hour tick: (mol/hr) * 1 hr is the interval mol
-            # compared with capacity_mol; no rate/amount conversion is implicit
-            # for a different timestep.
-            oxygen = self._project_evaporation_overhead_source_mol_hr({species: rate}, {}).get('O2', 0.0)
-            if oxygen >= 0.0:
-                credits.append(oxygen)
-                continue
-            evaluator = self.vapour_rail_catalog.evaluator_for_hot_train(
-                species, process_phase=('stage0' if self.melt.campaign.name in {'C0', 'C0B'} else 'hot_train'))
-            if evaluator is not None and evaluator.pO2_exponent > 0.0:
-                draws[species] = -oxygen
-            else:
-                # A finite stoichiometric forcing is not a bounded response.
-                fixed_draws.append(-oxygen)
-        demand = math.fsum(draws.values())
-        # Net debit = responsive draw + fixed draw - gas credit (mol).
-        # Thus responsive draw <= film supply + credit - fixed draw.
-        # At zero supply a credit may still fund uptake; producer-only
-        # batches and an already feasible debit leave this clip idle.
-        available = max(0.0, math.fsum((capacity_mol, *credits, *(-v for v in fixed_draws))))
-        if demand > available:
-            evap_flux = copy.deepcopy(evap_flux)
-            for species in draws:
-                evap_flux.species_kg_hr[species] *= available / demand
-            evap_flux.update_totals()
-        return evap_flux
+        return _bound_evaporation_oxygen_uptake(evap_flux, capacity_mol,
+            vapor_pressure_data=self.vapor_pressures, species_formula_registry=self.species_formula_registry,
+            vapour_rail_catalog=self.vapour_rail_catalog,
+            process_phase=('stage0' if self.melt.campaign.name in {'C0', 'C0B'} else 'hot_train'))
 
     def _apply_evaporation_carrier_batch(self, evap_flux, *, oxygen_uptake_capacity_mol=None,
                                        oxygen_release_capacity_mol=None):
@@ -4051,45 +4446,9 @@ class EvaporationMixin:
         return trial
 
     def _evaporation_signed_amounts(self, transition_start, buffer_before):
-        """Current interval's signed reaction progress and finite O2 storage.
-
-        Redox-state labels have different sign conventions for metal and SiO
-        loss. Physical O2 credits minus debits own this receipt instead.
-        Native Fe formation precedes this interval and is counted only there.
-        """
-        operands = defaultdict(list)
-        oxygen_accounts = ('process.overhead_gas', 'reservoir.fo2_buffer')
-        for transition in self.atom_ledger.transitions[transition_start:]:
-            gas_species = {species for lot in (*transition.credits, *transition.debits)
-                           if lot.account == 'process.overhead_gas' for species in lot.species_kg}
-            for species in gas_species:
-                for side, sign in (('credits', 1.0), ('debits', -1.0)):
-                    operands[f'gas:{species}'].append(sign * self._transition_species_mol(
-                        transition, side=side, account='process.overhead_gas', species=species))
-            carrier = transition.name.removeprefix('evaporate_') if transition.name.startswith('evaporate_') else None
-            if carrier is not None:
-                label = f'source:{carrier}'
-                operands[f'carrier:{carrier}'].append(self._transition_species_mol(
-                    transition, side='credits', account='process.overhead_gas', species=carrier))
-            elif transition.name.startswith('fe_redox_respeciation'):
-                label = 'ferric_oxygen'
-            else:
-                label = 'other_oxygen'
-            for account in oxygen_accounts:
-                for side, sign in (('credits', 1.0), ('debits', -1.0)):
-                    operands[label].append(sign * self._transition_species_mol(
-                        transition, side=side, account=account, species='O2'))
-        operands['storage'] = [self.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0), -buffer_before]
-        for label in ('ferric_oxygen', 'other_oxygen'):
-            operands.setdefault(label, [])
-        amounts = {label: math.fsum(values) for label, values in operands.items()}
-        # Each converted operand is rounded once, then fsum and the final
-        # subtraction round once. Sum their ULPs, including the result; this
-        # bound scales with gross traffic even when the signed sum cancels.
-        # Units: every ULP here is mol; exact zero has only subnormal error.
-        roundoff = {label: math.fsum(math.ulp(value) for value in (*values, amounts[label]))
-                    for label, values in operands.items()}
-        return amounts, roundoff
+        return _evaporation_signed_amounts(self.atom_ledger.transitions[transition_start:],
+            buffer_before, self.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0),
+            self.species_formula_registry)
 
     def _verify_evaporation_projection(self, predicted, actual):
         expected, expected_roundoff = predicted
@@ -4593,34 +4952,9 @@ class EvaporationMixin:
         *,
         apply_evaporative_redox_source_terms: bool = True,
     ) -> dict[str, Any]:
-        authority = dict(
-            getattr(route_result, 'condensation_authority_by_species', {}).get(
-                species,
-                {},
-            )
-            or {}
-        )
-        retained_source_kg = float(
-            getattr(route_result, 'retained_in_source_by_species', {}).get(
-                species,
-                0.0,
-            )
-            or 0.0
-        )
-        if (
-            str(authority.get('status', '')) in {'refused', 'proven_zero'}
-            or retained_source_kg > 1e-15
-        ):
-            # The rail did not authorize an evaporation debit. Keep the
-            # candidate mass in its source account; returning no transition
-            # also keeps it out of terminal offgas after the end-of-hour bleed.
-            return {
-                'credited_condensed_kg': 0.0,
-                'remaining_kg': 0.0,
-                'retained_in_source_kg': retained_source_kg,
-                'evaporation_transition': None,
-                'authority_status': authority.get('status'),
-            }
+        refusal = _evaporation_route_refusal(route_result, species)
+        if refusal is not None:
+            return refusal
 
         metals_data = self.vapor_pressures.get('metals', {})
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {})
@@ -4628,25 +4962,7 @@ class EvaporationMixin:
         if not sp_data:
             sp_data = oxide_vapors_data.get(species, {})
 
-        stoich = self._evaporation_stoich(species, sp_data)
-        if stoich is None:
-            return {}
-        available_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt').get(stoich['parent_oxide'], 0.0)
-        if available_kg <= _carrier_numerical_floor(
-            species,
-            getattr(self, '_frozen_evaporation_carriers', None), 1e-12):
-            return {}
-        remaining_kg_hr = route_result.remaining_by_species.get(
-            species, 0.0)
-        if (
-            remaining_kg_hr < -1e-12
-            or remaining_kg_hr > rate_kg_hr + 1e-12
-        ):
-            raise AccountingError(
-                f"condensation route for {species!r} returned "
-                "unphysical remaining vapor mass"
-            )
+        remaining_kg_hr = route_result.remaining_by_species.get(species, 0.0)
 
         _credited_from_evaporation, evaporation_transition = (
             self._credit_evaporation_transition(
@@ -4838,18 +5154,6 @@ class EvaporationMixin:
         actually deposited onto ``process.condensation_train``, used by
         the caller to drive ``_project_condensed_stage_collection``.
         """
-        wall_deposit_fraction = float(
-            route_result.wall_deposit_fraction_by_species.get(species, 0.0)
-        )
-        wall_deposit_account_fractions = dict(
-            route_result
-            .wall_deposit_account_fractions_by_species
-            .get(species, {})
-        )
-        if wall_deposit_fraction <= 1.0e-12 or not wall_deposit_account_fractions:
-            wall_deposit_fraction = 0.0
-            wall_deposit_account_fractions = {}
-
         kernel_result = self._dispatch_and_commit(
             ChemistryIntent.CONDENSATION_ROUTE,
             transition_meta={
@@ -4858,32 +5162,8 @@ class EvaporationMixin:
                     .get(species, {})
                 ),
             },
-            control_inputs={
-                'species': species,
-                'condensed_kg': float(condensed_kg),
-                'sp_data': dict(sp_data or {}),
-                'wall_deposit_fraction': wall_deposit_fraction,
-                'wall_deposit_account_fractions': wall_deposit_account_fractions,
-                'wall_temperature_K': (
-                    float(self.condensation_model.wall_temperature_C) + 273.15
-                    if self.condensation_model.wall_temperature_C is not None else None
-                ),
-                'wall_deposit_account_temperatures_K': {
-                    segment.wall_deposit_account: (
-                        float(segment.wall_temperature_C) + 273.15
-                    )
-                    for segment in self.condensation_model.pipe_segments
-                    if segment.name not in self.condensation_model.wall_temperature_input_refusals
-                },
-                'wall_alkali_binding_diagnostic_state_by_account': dict(
-                    getattr(
-                        self.condensation_model,
-                        'wall_alkali_binding_diagnostic_state_by_account',
-                        {},
-                    )
-                ),
-                'dt_hr': 1.0,
-            },
+            control_inputs=_condensation_route_controls(
+                species, condensed_kg, sp_data, route_result, self.condensation_model),
         )
         if kernel_result.transition is None:
             return 0.0
@@ -5062,75 +5342,20 @@ class EvaporationMixin:
             caller to drive stage-collection bookkeeping.
         """
 
-        stoich = self._evaporation_stoich(species, sp_data)
-        if stoich is None:
+        control_inputs = _evaporation_transition_controls(species, rate_kg_hr, remaining_kg_hr,
+            sp_data, cleaned_melt_kg=self.atom_ledger.kg_by_account('process.cleaned_melt'),
+            frozen_carriers=getattr(self, '_frozen_evaporation_carriers', None),
+            species_formula_registry=self.species_formula_registry)
+        if control_inputs is None:
             return (0.0, None) if return_transition else 0.0
-
-        parent_oxide = stoich['parent_oxide']
-        rate_kg_per_tick = rate_kg_hr * 1.0  # 1-hour tick (see core.py)
-        oxide_removed = rate_kg_per_tick * stoich['oxide_per_product_kg']
-        product_kg = rate_kg_per_tick
-
-        if oxide_removed <= _carrier_numerical_floor(
-            species,
-            getattr(self, '_frozen_evaporation_carriers', None), 1e-12):
-            return (0.0, None) if return_transition else 0.0
-
-        available_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt').get(parent_oxide, 0.0)
-        if available_kg <= _carrier_numerical_floor(
-            species,
-            getattr(self, '_frozen_evaporation_carriers', None), 1e-12):
-            return (0.0, None) if return_transition else 0.0
-
-        # Mirror the legacy validation: the AccountingError surface is
-        # owned by the caller, not the provider. The provider receives
-        # already-validated inputs (this matches the EVAPORATION_FLUX
-        # flip pattern in _calculate_evaporation).
-        if remaining_kg_hr < -1e-12 or remaining_kg_hr > rate_kg_hr + 1e-12:
-            raise AccountingError(
-                f"condensation route for {species!r} returned "
-                "unphysical remaining vapor mass"
-            )
-        remaining_kg = max(0.0, remaining_kg_hr) * 1.0
-        if remaining_kg > product_kg + 1e-12:
-            raise AccountingError(
-                f"condensation route for {species!r} exceeds credited vapor"
-            )
-
-        # F-B1: split dispatch / commit so post-commit redox scalar
-        # bookkeeping can derive strictly from the applied LedgerTransition.
-        frozen = getattr(self, '_frozen_evaporation_carriers', None)
-        frozen_controls = tuple(sorted(frozen)) if frozen is not None else None
         kernel_result = self._dispatch_only(
-            ChemistryIntent.EVAPORATION_TRANSITION,
-            control_inputs={
-                'species': species,
-                'stoich': dict(stoich),
-                'sp_data': dict(sp_data or {}),
-                'rate_kg_hr': float(rate_kg_hr),
-                'remaining_kg_hr': float(remaining_kg_hr),
-                'dt_hr': 1.0,
-                '_frozen_carriers': frozen_controls,
-                'available_kg': float(available_kg),
-            },
-        )
+            ChemistryIntent.EVAPORATION_TRANSITION, control_inputs=control_inputs)
         proposal = kernel_result.transition
         if proposal is None:
             self._chem_no_op_dispatch_count += 1
             return (0.0, None) if return_transition else 0.0
 
         diagnostic = dict(kernel_result.diagnostic or {})
-        control_inputs = {
-            'species': species,
-            'stoich': dict(stoich),
-            'sp_data': dict(sp_data or {}),
-            'rate_kg_hr': float(rate_kg_hr),
-            'remaining_kg_hr': float(remaining_kg_hr),
-            'dt_hr': 1.0,
-            '_frozen_carriers': frozen_controls,
-            'available_kg': float(available_kg),
-        }
         transition = self._commit_proposal(
             ChemistryIntent.EVAPORATION_TRANSITION,
             proposal,
@@ -5244,96 +5469,7 @@ class EvaporationMixin:
         return converted
 
     def _evaporation_stoich(self, species: str, sp_data: dict):
-        parent_oxide = sp_data.get('parent_oxide', '')
-        if not parent_oxide:
-            raise AccountingError(
-                f"vapor species {species!r} requires parent_oxide "
-                "metadata before ledger routing"
-            )
-
-        has_oxide = sp_data.get('stoich_oxide_per_vapor') is not None
-        has_o2 = sp_data.get('stoich_O2_per_vapor') is not None
-        if has_oxide or has_o2:
-            missing = []
-            if not has_oxide:
-                missing.append('stoich_oxide_per_vapor')
-            if not has_o2:
-                missing.append('stoich_O2_per_vapor')
-            if missing:
-                raise AccountingError(
-                    f"vapor species {species!r} from {parent_oxide!r} "
-                    f"missing explicit stoich metadata: {', '.join(missing)}"
-                )
-            oxide_per_product = float(sp_data['stoich_oxide_per_vapor'])
-            O2_per_product = float(sp_data['stoich_O2_per_vapor'])
-            if oxide_per_product <= 0.0:
-                raise AccountingError(
-                    f"vapor species {species!r} from {parent_oxide!r} "
-                    "requires positive stoich_oxide_per_vapor"
-                )
-            if not math.isclose(
-                oxide_per_product,
-                1.0 + O2_per_product,
-                rel_tol=1e-6,
-                abs_tol=1e-9,
-            ):
-                raise AccountingError(
-                    f"vapor species {species!r} from {parent_oxide!r} "
-                    "stoich metadata must conserve mass: "
-                    "stoich_oxide_per_vapor must equal "
-                    "1 + stoich_O2_per_vapor"
-                )
-            self._validate_evaporation_stoich_atoms(
-                parent_oxide,
-                species,
-                oxide_per_product,
-                O2_per_product,
-            )
-            return {
-                'parent_oxide': parent_oxide,
-                'oxide_per_product_kg': oxide_per_product,
-                'O2_per_product_kg': O2_per_product,
-                'oxygen_destination': sp_data.get('oxygen_destination'),
-            }
-
-        implied = OXIDE_TO_METAL.get(parent_oxide, ('', 0, 0))[0]
-        if species != implied:
-            raise AccountingError(
-                f"vapor species {species!r} from {parent_oxide!r} requires "
-                "explicit stoich_oxide_per_vapor and stoich_O2_per_vapor; "
-                f"STOICH_RATIOS fallback only applies to elemental "
-                f"{implied!r}"
-            )
-        fallback = STOICH_RATIOS.get(parent_oxide)
-        if not fallback or fallback[0] <= 0:
-            raise AccountingError(
-                f"vapor species {species!r} from {parent_oxide!r} has no "
-                "valid elemental stoich fallback"
-            )
-        kg_product_per_kg_oxide, kg_O2_per_kg_oxide = fallback
-        oxide_per_product = 1.0 / kg_product_per_kg_oxide
-        O2_per_product = kg_O2_per_kg_oxide / kg_product_per_kg_oxide
-        if not math.isclose(
-            oxide_per_product,
-            1.0 + O2_per_product,
-            rel_tol=1e-6,
-            abs_tol=1e-9,
-        ):
-            raise AccountingError(
-                f"STOICH_RATIOS[{parent_oxide!r}] does not conserve mass"
-            )
-        self._validate_evaporation_stoich_atoms(
-            parent_oxide,
-            species,
-            oxide_per_product,
-            O2_per_product,
-        )
-        return {
-            'parent_oxide': parent_oxide,
-            'oxide_per_product_kg': oxide_per_product,
-            'O2_per_product_kg': O2_per_product,
-            'oxygen_destination': sp_data.get('oxygen_destination'),
-        }
+        return _evaporation_stoich(species, sp_data, self.species_formula_registry)
 
     def _validate_evaporation_stoich_atoms(
         self,
@@ -5342,38 +5478,11 @@ class EvaporationMixin:
         oxide_per_product_kg: float,
         O2_per_product_kg: float,
     ) -> None:
-        debit_atoms = self._atom_moles_for_kg(
-            parent_oxide, oxide_per_product_kg)
-        credit_atoms = defaultdict(float)
-        product_atoms = self._atom_moles_for_kg(product_species, 1.0)
-        for element, moles in product_atoms.items():
-            credit_atoms[element] += moles
-        if O2_per_product_kg >= 0.0:
-            oxygen_atoms = self._atom_moles_for_kg('O2', O2_per_product_kg)
-            for element, moles in oxygen_atoms.items():
-                credit_atoms[element] += moles
-        else:
-            oxygen_atoms = self._atom_moles_for_kg('O2', abs(O2_per_product_kg))
-            for element, moles in oxygen_atoms.items():
-                debit_atoms[element] = debit_atoms.get(element, 0.0) + moles
-
-        for element in set(debit_atoms) | set(credit_atoms):
-            debit = debit_atoms.get(element, 0.0)
-            credit = credit_atoms.get(element, 0.0)
-            if not math.isclose(debit, credit, rel_tol=1e-6, abs_tol=1e-9):
-                raise AccountingError(
-                    f"vapor species {product_species!r} from "
-                    f"{parent_oxide!r} stoich metadata does not conserve "
-                    f"{element} atoms"
-                )
+        return _validate_evaporation_stoich_atoms(parent_oxide, product_species,
+            oxide_per_product_kg, O2_per_product_kg, self.species_formula_registry)
 
     def _atom_moles_for_kg(self, species: str, kg: float) -> dict:
-        if kg <= 0.0:
-            return {}
-        formula = resolve_species_formula(
-            species, self.species_formula_registry)
-        species_moles = float(kg) / formula.molar_mass_kg_per_mol()
-        return formula.atom_moles(species_moles)
+        return _atom_moles_for_kg(species, kg, self.species_formula_registry)
 
     def _project_condensed_stage_collection(
         self, route_result, species: str, credited_condensed_kg: float,

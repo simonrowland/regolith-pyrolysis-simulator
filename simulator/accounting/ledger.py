@@ -1286,37 +1286,11 @@ class AtomLedger:
         *,
         dust_clamped_kg: dict[str, float] | None = None,
     ) -> dict[str, float]:
-        """Project one account for reports, products, and terminal summaries.
-
-        Negative dust within projection tolerance is omitted from the outward
-        map (display clamp). When ``dust_clamped_kg`` is provided, forgiven
-        dust is recorded there so auditors can see it (Ferry V / V1-S13 P3).
-        Canonical signed mol/kg balances remain untouched.
-        """
         name = str(account)
-        species_kg = self.kg_by_account(name)
-        if self.account_policy(name).allow_negative:
-            return species_kg
-        projected: dict[str, float] = {}
-        for species, kg in species_kg.items():
-            value = float(kg)
-            tolerance_kg = self._projection_tolerance_kg(name, species)
-            if value < -tolerance_kg:
-                # This is not display dust: a normal account below policy
-                # tolerance is corrupt state and must refuse, not be clamped.
-                raise AccountingError(
-                    "negative outward mass from normal account: "
-                    f"account={name!r} species={species!r} kg={value:.12g}"
-                )
-            if value < 0.0:
-                # Display-only clamp. Canonical signed mol/kg remains untouched,
-                # preserving exact ledger closure for audit and validation.
-                if dust_clamped_kg is not None:
-                    dust_clamped_kg[str(species)] = float(value)
-                continue
-            if value != 0.0:
-                projected[species] = value
-        return projected
+        return _project_account_kg(name, self.kg_by_account(name),
+            self.account_policy(name).allow_negative,
+            lambda species: self._projection_tolerance_kg(name, species),
+            dust_clamped_kg=dust_clamped_kg)
 
     def project_account_mol(self, account: str) -> dict[str, float]:
         """Project one account to outward-policy mol without changing closure."""
@@ -1332,20 +1306,9 @@ class AtomLedger:
         species: str,
         movement_scale_kg: Mapping[str, Mapping[str, float]] | None = None,
     ) -> float:
-        scales = (
-            self._movement_scale_kg
-            if movement_scale_kg is None
-            else movement_scale_kg
-        )
-        scale_kg = abs(float(scales.get(account, {}).get(species, 0.0)))
-        # Subtraction/conversion roundoff scales with the largest movement for
-        # this account/species, so the relative term preserves ~1e-12 kg dust
-        # at a 1 kg scale without granting that absolute band to tiny accounts.
-        # The 1e-15 kg floor covers near-zero representation noise only.
-        return max(
-            self.balance_absolute_floor_kg,
-            self.balance_relative_tolerance * scale_kg,
-        )
+        return _projection_tolerance_kg(account, self.balance_absolute_floor_kg,
+            self.balance_relative_tolerance, species,
+            self._movement_scale_kg if movement_scale_kg is None else movement_scale_kg)
 
     @staticmethod
     def _record_movement_scale(
@@ -2416,3 +2379,59 @@ def _atom_tolerance_for_element(
 
 def _origin_atom_tolerance(amount: float) -> float:
     return max(1.0e-18, abs(float(amount)) * 5.0e-14)
+
+
+def _project_account_kg(
+    account: str,
+    species_kg, allow_negative, tolerance_for_species,
+    *,
+    dust_clamped_kg: dict[str, float] | None = None,
+) -> dict[str, float]:
+    """Project one account for reports, products, and terminal summaries.
+
+    Negative dust within projection tolerance is omitted from the outward
+    map (display clamp). When ``dust_clamped_kg`` is provided, forgiven
+    dust is recorded there so auditors can see it (Ferry V / V1-S13 P3).
+    Canonical signed mol/kg balances remain untouched.
+    """
+    name = str(account)
+    if allow_negative:
+        return species_kg
+    projected: dict[str, float] = {}
+    for species, kg in species_kg.items():
+        value = float(kg)
+        tolerance_kg = tolerance_for_species(species)
+        if value < -tolerance_kg:
+            # This is not display dust: a normal account below policy
+            # tolerance is corrupt state and must refuse, not be clamped.
+            raise AccountingError(
+                "negative outward mass from normal account: "
+                f"account={name!r} species={species!r} kg={value:.12g}"
+            )
+        if value < 0.0:
+            # Display-only clamp. Canonical signed mol/kg remains untouched,
+            # preserving exact ledger closure for audit and validation.
+            if dust_clamped_kg is not None:
+                dust_clamped_kg[str(species)] = float(value)
+            continue
+        if value != 0.0:
+            projected[species] = value
+    return projected
+
+
+def _projection_tolerance_kg(
+    account: str,
+    balance_absolute_floor_kg, balance_relative_tolerance,
+    species: str,
+    movement_scale_kg: Mapping[str, Mapping[str, float]] | None = None,
+) -> float:
+    scales = movement_scale_kg
+    scale_kg = abs(float(scales.get(account, {}).get(species, 0.0)))
+    # Subtraction/conversion roundoff scales with the largest movement for
+    # this account/species, so the relative term preserves ~1e-12 kg dust
+    # at a 1 kg scale without granting that absolute band to tiny accounts.
+    # The 1e-15 kg floor covers near-zero representation noise only.
+    return max(
+        balance_absolute_floor_kg,
+        balance_relative_tolerance * scale_kg,
+    )
