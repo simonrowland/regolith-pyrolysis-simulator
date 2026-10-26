@@ -49,7 +49,251 @@ def wall_deposit_candidate_kg(
     melt_temperature_C: float,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float | dict[str, Any]:
-    return wall_deposit_candidate_for_surface_kg(
+    notice_proposals = []
+    result = _evaluate_wall_deposit_candidate_kg(
+        model=model,
+        species=species,
+        rate_kg_hr=rate_kg_hr,
+        T_cond_C=T_cond_C,
+        melt_temperature_C=melt_temperature_C,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+        notice_proposals=notice_proposals,
+    )
+    for kind, species, segment, record in notice_proposals:
+        _record_wall_pressure_notice(model, kind, species, segment, record)
+    return result
+
+
+def wall_deposit_candidates_by_segment_kg(
+    model: Any,
+    *,
+    species: str,
+    rate_kg_hr: float,
+    T_cond_C: float,
+    melt_temperature_C: float,
+    supply_by_segment_kg: Mapping[str, float],
+    antoine_extrapolation_warnings: list[str] | None = None,
+) -> dict[str, float]:
+    notice_proposals = []
+    result = _evaluate_wall_deposit_candidates_by_segment_kg(
+        model=model,
+        species=species,
+        rate_kg_hr=rate_kg_hr,
+        T_cond_C=T_cond_C,
+        melt_temperature_C=melt_temperature_C,
+        supply_by_segment_kg=supply_by_segment_kg,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+        notice_proposals=notice_proposals,
+    )
+    for kind, species, segment, record in notice_proposals:
+        _record_wall_pressure_notice(model, kind, species, segment, record)
+    return result
+
+
+def wall_deposit_candidate_for_surface_kg(
+    model: Any,
+    *,
+    species: str,
+    rate_kg_hr: float,
+    T_cond_C: float,
+    melt_temperature_C: float,
+    wall_temperature_C: float,
+    surface_area_m2: float,
+    pipe_diameter_m: float | None = None,
+    regime_factor: float | None = None,
+    segment: Any | None = None,
+    antoine_extrapolation_warnings: list[str] | None = None,
+) -> float | dict[str, Any]:
+    notice_proposals = []
+    result = _evaluate_wall_deposit_candidate_for_surface_kg(
+        model=model,
+        species=species,
+        rate_kg_hr=rate_kg_hr,
+        T_cond_C=T_cond_C,
+        melt_temperature_C=melt_temperature_C,
+        wall_temperature_C=wall_temperature_C,
+        surface_area_m2=surface_area_m2,
+        pipe_diameter_m=pipe_diameter_m,
+        regime_factor=regime_factor,
+        segment=segment,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+        notice_proposals=notice_proposals,
+    )
+    for kind, species, segment, record in notice_proposals:
+        _record_wall_pressure_notice(model, kind, species, segment, record)
+    return result
+
+
+def _wall_rate_parameter_status(alpha_record: Mapping[str, Any]) -> str:
+    """Map generic source provenance onto the coating interface vocabulary."""
+
+    raw = str(
+        alpha_record.get("qualification_status")
+        or alpha_record.get("status")
+        or ""
+    ).strip().lower()
+    allowed = {
+        "measured_same_surface",
+        "measured_proxy_surface",
+        "bounded_prior",
+        "uncalibrated",
+    }
+    if raw in allowed:
+        return raw
+    source_class = str(alpha_record.get("source_class") or "").lower()
+    if "uncert" in raw or not alpha_record.get("source"):
+        return "uncalibrated"
+    if "proxy" in raw or "proxy" in source_class:
+        return "measured_proxy_surface"
+    return "bounded_prior"
+
+
+def _wall_deposition_flux_budget_kg_hr(
+    *,
+    species: str,
+    flux_mol_m2_s: float,
+    surface_area_m2: float,
+    formula_registry: Mapping[str, Any] | None = None,
+) -> float:
+    values = {
+        "flux_mol_m2_s": flux_mol_m2_s,
+        "surface_area_m2": surface_area_m2,
+    }
+    for name, value in values.items():
+        if not math.isfinite(float(value)) or float(value) < 0.0:
+            raise AccountingError(f"wall capture {name} must be finite and non-negative")
+
+    # Premise: the transport solver returns deposited molar flux at the wall.
+    # Algebra: m_dot = J*A*M. Unit check:
+    # (mol/m2/s)*(m2)*(kg/mol)*(3600 s/h) = kg/h.
+    # Sanity: the budget is zero at zero flux/area and linear before supply cap.
+    molar_mass_kg_mol = resolve_species_formula(
+        species,
+        formula_registry,
+    ).molar_mass_kg_per_mol()
+    return (
+        flux_mol_m2_s
+        * surface_area_m2
+        * molar_mass_kg_mol
+        * SECONDS_PER_HOUR
+    )
+
+
+def _segment_wall_regime_factor(model: Any, segment: Any) -> float:
+    """Knudsen regime factor for one wall segment.
+
+    Fail closed: unusable Knudsen inputs refuse the segment candidate.
+    A default of 1.0 would invent continuum deposition under viscous
+    overhead and is not a measured regime factor.
+    """
+
+    from simulator.condensation import (
+        KnudsenRegimeRefusal,
+        _knudsen_input_refusal,
+        _knudsen_number,
+        _knudsen_regime_factor,
+    )
+
+    try:
+        pressure_pa = float(model.overhead_pressure_mbar) * 100.0
+        gas_temperature_K = max(
+            float(model.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+            1.0,
+        )
+        diameter_m = float(getattr(segment, "inner_diameter_m", model.pipe_diameter_m))
+        carrier_gas = str(getattr(model, "carrier_gas", "N2") or "N2")
+        kn = _knudsen_number(
+            pressure_pa,
+            gas_temperature_K,
+            diameter_m,
+            carrier_gas=carrier_gas,
+        )
+        return _knudsen_regime_factor(kn)
+    except KnudsenRegimeRefusal:
+        raise
+    except Exception as exc:
+        raise _knudsen_input_refusal(
+            reason="wall_segment_knudsen_inputs_unusable",
+            field="overhead_pressure_mbar",
+            value=getattr(model, "overhead_pressure_mbar", None),
+            detail=f"{type(exc).__name__}: {exc}",
+        ) from exc
+
+
+def _wall_geometry_conductance_weight(segment: Any) -> float:
+    """Named assumption: free-molecular view-factor/LOS area proxy.
+
+    TODO(P0a): replace this proxy with the pinned aperture/tube conductance
+    ladder once carrier/regime plumbing is available for lab surfaces.
+    """
+
+    try:
+        raw_area = segment.surface_area_m2
+    except AttributeError as exc:
+        raise AccountingError(
+            "wall geometry surface_area_m2 is missing; "
+            "missing area is not proof of zero deposition weight"
+        ) from exc
+    except ValueError as exc:
+        raise AccountingError(
+            f"wall geometry surface_area_m2 is invalid: {exc}; "
+            "invalid area is not proof of zero deposition weight"
+        ) from exc
+    try:
+        area_m2 = float(raw_area)
+    except (TypeError, ValueError) as exc:
+        raise AccountingError(
+            f"wall geometry surface_area_m2 is not numeric: {raw_area!r}; "
+            "unknown area is not proof of zero deposition weight"
+        ) from exc
+    if not math.isfinite(area_m2) or area_m2 <= 0.0:
+        raise AccountingError(
+            f"wall geometry surface_area_m2 is not a positive finite area: "
+            f"{raw_area!r}; invalid area is not proof of zero deposition weight"
+        )
+    view_factor = getattr(segment, "view_factor_from_melt", None)
+    line_of_sight = getattr(segment, "line_of_sight_to_melt", None)
+    if view_factor is None and line_of_sight is None:
+        return area_m2
+    if line_of_sight is False:
+        return 0.0
+    if view_factor is None:
+        view_factor_value = 1.0
+    else:
+        try:
+            view_factor_value = float(view_factor)
+        except (TypeError, ValueError) as exc:
+            raise AccountingError(
+                f"wall geometry view_factor_from_melt is not numeric: "
+                f"{view_factor!r}; unknown view factor is not proof of zero "
+                f"deposition weight"
+            ) from exc
+        if not math.isfinite(view_factor_value):
+            raise AccountingError(
+                f"wall geometry view_factor_from_melt is non-finite: "
+                f"{view_factor!r}; unknown view factor is not proof of zero "
+                f"deposition weight"
+            )
+        if not 0.0 <= view_factor_value <= 1.0:
+            raise AccountingError(
+                f"wall geometry view_factor_from_melt is outside [0, 1]: "
+                f"{view_factor!r}; invalid view factor is not proof of zero "
+                f"deposition weight"
+            )
+    return area_m2 * view_factor_value
+
+
+def _evaluate_wall_deposit_candidate_kg(
+    model: Any,
+    *,
+    notice_proposals,
+    species: str,
+    rate_kg_hr: float,
+    T_cond_C: float,
+    melt_temperature_C: float,
+    antoine_extrapolation_warnings: list[str] | None = None,
+) -> float | dict[str, Any]:
+    return _evaluate_wall_deposit_candidate_for_surface_kg(
         model,
         species=species,
         rate_kg_hr=rate_kg_hr,
@@ -57,13 +301,13 @@ def wall_deposit_candidate_kg(
         melt_temperature_C=melt_temperature_C,
         wall_temperature_C=model.wall_temperature_C,
         surface_area_m2=model.wall_surface_area_m2,
-        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-    )
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings, notice_proposals=notice_proposals)
 
 
-def wall_deposit_candidates_by_segment_kg(
+def _evaluate_wall_deposit_candidates_by_segment_kg(
     model: Any,
     *,
+    notice_proposals,
     species: str,
     rate_kg_hr: float,
     T_cond_C: float,
@@ -93,7 +337,7 @@ def wall_deposit_candidates_by_segment_kg(
             rate_kg_hr,
         )
         try:
-            candidate = wall_deposit_candidate_for_surface_kg(
+            candidate = _evaluate_wall_deposit_candidate_for_surface_kg(
                 model,
                 species=species,
                 rate_kg_hr=supply_kg,
@@ -106,8 +350,7 @@ def wall_deposit_candidates_by_segment_kg(
                 ),
                 regime_factor=_segment_wall_regime_factor(model, segment),
                 segment=segment,
-                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-            )
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings, notice_proposals=notice_proposals)
         except KnudsenRegimeRefusal as exc:
             record = {
                 "status": "refused",
@@ -117,13 +360,7 @@ def wall_deposit_candidates_by_segment_kg(
                 "authority_level": "unavailable",
                 "diagnostic": getattr(exc, "diagnostic", None),
             }
-            _record_wall_pressure_notice(
-                model,
-                "wall_knudsen_regime_refusals_by_species",
-                species,
-                segment.name,
-                record,
-            )
+            notice_proposals.append(("wall_knudsen_regime_refusals_by_species", species, segment.name, record))
             continue
         except WallSaturationPressureRefusal as exc:
             record = {
@@ -135,8 +372,7 @@ def wall_deposit_candidates_by_segment_kg(
                 ),
                 "wall_saturation_pressure_pa": None,
             }
-            _record_wall_pressure_notice(model, "wall_saturation_pressure_refusals_by_species",
-                                         species, segment.name, record)
+            notice_proposals.append(("wall_saturation_pressure_refusals_by_species", species, segment.name, record))
             continue
         if isinstance(candidate, Mapping) and candidate.get("status") == "unavailable":
             # No wall quantity: leave this supply on the existing gas-train route.
@@ -181,9 +417,10 @@ def wall_deposit_candidates_by_segment_kg(
     return candidates
 
 
-def wall_deposit_candidate_for_surface_kg(
+def _evaluate_wall_deposit_candidate_for_surface_kg(
     model: Any,
     *,
+    notice_proposals,
     species: str,
     rate_kg_hr: float,
     T_cond_C: float,
@@ -223,10 +460,7 @@ def wall_deposit_candidate_for_surface_kg(
             "output_status": "status_bearing", "authority_level": "unavailable",
             "wall_temperature_K": None, "wall_saturation_pressure_pa": None,
         }
-        _record_wall_pressure_notice(
-            model, "wall_saturation_pressure_refusals_by_species",
-            species, str(segment.name), record,
-        )
+        notice_proposals.append(("wall_saturation_pressure_refusals_by_species", species, str(segment.name), record))
         raise refusal
 
     rate_kg_hr = _deposition_finite_scalar("rate_kg_hr", rate_kg_hr)
@@ -387,15 +621,14 @@ def wall_deposit_candidate_for_surface_kg(
         )
     if rate_diagnostic.get("wall_saturation_pressure_refused"):
         refusal_reason = rate_diagnostic["wall_saturation_pressure_refusal_reason"]
-        _record_wall_pressure_notice(model, "wall_saturation_pressure_refusals_by_species",
-            species, str(getattr(segment, "name", "default_pipe")), {
+        notice_proposals.append(("wall_saturation_pressure_refusals_by_species", species, str(getattr(segment, "name", "default_pipe")), {
             "status": "refused",
             "reason": refusal_reason,
             "output_status": "status_bearing",
             "wall_temperature_K": T_wall_K,
             "wall_saturation_pressure_pa": None,
             **rate_diagnostic.get("wall_saturation_pressure_notice", {}),
-        })
+        }))
         source_data = _species_vapor_data(species, vapor_pressure_data=vapor_pressure_data)
         source_only_wall_channel = (
             source_data.get("fit_target") == "standard_reaction_term"
@@ -440,8 +673,7 @@ def wall_deposit_candidate_for_surface_kg(
         }
     pressure_notice = rate_diagnostic.get("wall_saturation_pressure_notice")
     if pressure_notice is not None:
-        _record_wall_pressure_notice(model, "wall_saturation_pressure_extrapolations_by_species",
-            species, str(getattr(segment, "name", "default_pipe")), pressure_notice)
+        notice_proposals.append(("wall_saturation_pressure_extrapolations_by_species", species, str(getattr(segment, "name", "default_pipe")), pressure_notice))
     rate_diagnostic["species_partial_pressure_pa"] = P_local_pa
     rate_diagnostic["total_pressure_pa"] = overhead_pressure_pa
     wall_saturation_pressure_pa = rate_diagnostic.get(
@@ -521,162 +753,3 @@ def wall_deposit_candidate_for_surface_kg(
             "authoritative_for_lifespan": False,
         }
     return min(rate_kg_hr, budget_kg_hr)
-
-
-def _wall_rate_parameter_status(alpha_record: Mapping[str, Any]) -> str:
-    """Map generic source provenance onto the coating interface vocabulary."""
-
-    raw = str(
-        alpha_record.get("qualification_status")
-        or alpha_record.get("status")
-        or ""
-    ).strip().lower()
-    allowed = {
-        "measured_same_surface",
-        "measured_proxy_surface",
-        "bounded_prior",
-        "uncalibrated",
-    }
-    if raw in allowed:
-        return raw
-    source_class = str(alpha_record.get("source_class") or "").lower()
-    if "uncert" in raw or not alpha_record.get("source"):
-        return "uncalibrated"
-    if "proxy" in raw or "proxy" in source_class:
-        return "measured_proxy_surface"
-    return "bounded_prior"
-
-
-def _wall_deposition_flux_budget_kg_hr(
-    *,
-    species: str,
-    flux_mol_m2_s: float,
-    surface_area_m2: float,
-    formula_registry: Mapping[str, Any] | None = None,
-) -> float:
-    values = {
-        "flux_mol_m2_s": flux_mol_m2_s,
-        "surface_area_m2": surface_area_m2,
-    }
-    for name, value in values.items():
-        if not math.isfinite(float(value)) or float(value) < 0.0:
-            raise AccountingError(f"wall capture {name} must be finite and non-negative")
-
-    # Premise: the transport solver returns deposited molar flux at the wall.
-    # Algebra: m_dot = J*A*M. Unit check:
-    # (mol/m2/s)*(m2)*(kg/mol)*(3600 s/h) = kg/h.
-    # Sanity: the budget is zero at zero flux/area and linear before supply cap.
-    molar_mass_kg_mol = resolve_species_formula(
-        species,
-        formula_registry,
-    ).molar_mass_kg_per_mol()
-    return (
-        flux_mol_m2_s
-        * surface_area_m2
-        * molar_mass_kg_mol
-        * SECONDS_PER_HOUR
-    )
-
-
-def _segment_wall_regime_factor(model: Any, segment: Any) -> float:
-    """Knudsen regime factor for one wall segment.
-
-    Fail closed: unusable Knudsen inputs refuse the segment candidate.
-    A default of 1.0 would invent continuum deposition under viscous
-    overhead and is not a measured regime factor.
-    """
-
-    from simulator.condensation import (
-        KnudsenRegimeRefusal,
-        _knudsen_input_refusal,
-        _knudsen_number,
-        _knudsen_regime_factor,
-    )
-
-    try:
-        pressure_pa = float(model.overhead_pressure_mbar) * 100.0
-        gas_temperature_K = max(
-            float(model.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
-            1.0,
-        )
-        diameter_m = float(getattr(segment, "inner_diameter_m", model.pipe_diameter_m))
-        carrier_gas = str(getattr(model, "carrier_gas", "N2") or "N2")
-        kn = _knudsen_number(
-            pressure_pa,
-            gas_temperature_K,
-            diameter_m,
-            carrier_gas=carrier_gas,
-        )
-        return _knudsen_regime_factor(kn)
-    except KnudsenRegimeRefusal:
-        raise
-    except Exception as exc:
-        raise _knudsen_input_refusal(
-            reason="wall_segment_knudsen_inputs_unusable",
-            field="overhead_pressure_mbar",
-            value=getattr(model, "overhead_pressure_mbar", None),
-            detail=f"{type(exc).__name__}: {exc}",
-        ) from exc
-
-
-def _wall_geometry_conductance_weight(segment: Any) -> float:
-    """Named assumption: free-molecular view-factor/LOS area proxy.
-
-    TODO(P0a): replace this proxy with the pinned aperture/tube conductance
-    ladder once carrier/regime plumbing is available for lab surfaces.
-    """
-
-    try:
-        raw_area = segment.surface_area_m2
-    except AttributeError as exc:
-        raise AccountingError(
-            "wall geometry surface_area_m2 is missing; "
-            "missing area is not proof of zero deposition weight"
-        ) from exc
-    except ValueError as exc:
-        raise AccountingError(
-            f"wall geometry surface_area_m2 is invalid: {exc}; "
-            "invalid area is not proof of zero deposition weight"
-        ) from exc
-    try:
-        area_m2 = float(raw_area)
-    except (TypeError, ValueError) as exc:
-        raise AccountingError(
-            f"wall geometry surface_area_m2 is not numeric: {raw_area!r}; "
-            "unknown area is not proof of zero deposition weight"
-        ) from exc
-    if not math.isfinite(area_m2) or area_m2 <= 0.0:
-        raise AccountingError(
-            f"wall geometry surface_area_m2 is not a positive finite area: "
-            f"{raw_area!r}; invalid area is not proof of zero deposition weight"
-        )
-    view_factor = getattr(segment, "view_factor_from_melt", None)
-    line_of_sight = getattr(segment, "line_of_sight_to_melt", None)
-    if view_factor is None and line_of_sight is None:
-        return area_m2
-    if line_of_sight is False:
-        return 0.0
-    if view_factor is None:
-        view_factor_value = 1.0
-    else:
-        try:
-            view_factor_value = float(view_factor)
-        except (TypeError, ValueError) as exc:
-            raise AccountingError(
-                f"wall geometry view_factor_from_melt is not numeric: "
-                f"{view_factor!r}; unknown view factor is not proof of zero "
-                f"deposition weight"
-            ) from exc
-        if not math.isfinite(view_factor_value):
-            raise AccountingError(
-                f"wall geometry view_factor_from_melt is non-finite: "
-                f"{view_factor!r}; unknown view factor is not proof of zero "
-                f"deposition weight"
-            )
-        if not 0.0 <= view_factor_value <= 1.0:
-            raise AccountingError(
-                f"wall geometry view_factor_from_melt is outside [0, 1]: "
-                f"{view_factor!r}; invalid view factor is not proof of zero "
-                f"deposition weight"
-            )
-    return area_m2 * view_factor_value

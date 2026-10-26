@@ -431,11 +431,13 @@ from simulator.environment import (
     feedstock_surface_pressure_mbar as _feedstock_surface_pressure_mbar,
 )
 from simulator.fe_redox import (
+    _OXYGEN_RESERVOIR_NOOP_MOL as OXYGEN_RESERVOIR_NOOP_MOL,
     _remaining_fe_redox_internal_o2_capacity_mol,
+    _cleaned_melt_fe_atom_mol, _fe_redox_respeciation_controls,
     _fe_redox_settlement_inputs,
     _evaporative_redox_is_saturated,
     _film_bounded_buffer_release,
-    _redox_source_increment,
+    _redox_source_response,
     _transition_account_o2_equiv_mol,
     _transition_species_mol,
     _evaporative_redox_source_terms_from_transition,
@@ -510,7 +512,9 @@ from simulator.state import (
     STOICH_RATIOS,
 )
 from simulator.vapour_rail.batch import FluxActivationContext
-from simulator.equilibrium import EquilibriumMixin
+from simulator.equilibrium import (
+    _project_vapor_pressure_result, _kernel_vapor_pressure_source, _vapor_pressure_values_agree, EquilibriumMixin,
+)
 from simulator.evaporation import (
     _pipe_transport_inlet_flux,
     EvaporationFluxRefusal,
@@ -874,7 +878,6 @@ CHAR_SPECIES = 'C'
 CHAR_LANCE_BASIS_CO2 = 'C_plus_O2_to_CO2'
 CHAR_LANCE_BASIS_CO = 'C_plus_half_O2_to_CO'
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
-OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
 # Coarse absolute ferric-fraction tripwire until SSO-R ch2 re-speciation
 # samples implied and ledger speciation at the same boundary.
 # TODO(SSO-R ch2 re-speciation): replace with the final respeciation gate.
@@ -1432,7 +1435,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._condensation_model.configure_lab_geometry(
                     self.lab_geometry
                 )
-        self._condensation_model._pressure_trial = getattr(self, '_pressure_trial', False)
         return self._condensation_model
 
     @property
@@ -4222,8 +4224,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         head_o2_mol: Optional[float] = None,
     ) -> float:
-        if getattr(self, '_pressure_trial', False):
-            return self._pressure_trial_bulk_pO2_bar
         if self.melt.sweep_mol_per_s is not None:
             return self._sweep_boundary_pO2_bar()
         if str(getattr(self.melt.atmosphere, 'name', '') or '') in {
@@ -4411,15 +4411,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return boundary
 
     def _cleaned_melt_fe_atom_mol(self) -> float:
-        total_fe_mol = 0.0
-        for species, mol in self.atom_ledger.mol_by_account(
-            'process.cleaned_melt'
-        ).items():
-            if float(mol) <= 0.0:
-                continue
-            formula = resolve_species_formula(species, self.species_formula_registry)
-            total_fe_mol += float(mol) * float(formula.elements.get('Fe', 0.0))
-        return max(0.0, total_fe_mol)
+        return _cleaned_melt_fe_atom_mol(self.atom_ledger.mol_by_account('process.cleaned_melt'),
+            self.species_formula_registry)
 
     def _fe3_over_sigma_fe_at_fO2(
         self,
@@ -4852,8 +4845,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         redox_state: RedoxState | None = None,
     ) -> _MeltRedoxGateAuthority:
-        if getattr(self, '_pressure_trial', False):
-            return self._pressure_trial_gate_authority
         redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         if gate_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
             pinned_hour = getattr(
@@ -5701,58 +5692,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             head_o2_mol,
             self._effective_headspace_floor_o2_mol(),
         )
-        applied_delta_ln = 0.0
-        skip_reason = ''
+        applied_delta_ln, candidate_fO2_log, skip_reason = _redox_source_response(
+            base_fO2_log, net_o2_equiv_mol, C_m, self._melt_redox_fO2_upper_bound_log(),
+            OXYGEN_RESERVOIR_NOOP_MOL)
         refusal_context: Dict[str, Any] = {}
-        if C_m <= OXYGEN_RESERVOIR_NOOP_MOL:
-            # No resolvable differential uptake: Δln(fO2) = n_O2eq/C_m
-            # (mol / (mol per ln) is dimensionless) cannot be integrated at
-            # C_m -> 0. This does NOT discard the oxygen: evaporation's caller
-            # attempts the finite Fe split, then routes the unabsorbed ledger
-            # buffer to gas even when this numerical integration is refused.
-            # Limit: at zero Fe uptake, all source O2 goes to the overhead.
-            skip_reason = 'no_melt_redox_capacity'
-        elif abs(net_o2_equiv_mol) < OXYGEN_RESERVOIR_NOOP_MOL:
-            skip_reason = 'below_threshold'
-        else:
-            applied_delta_ln, candidate_fO2_log = _redox_source_increment(
-                base_fO2_log, net_o2_equiv_mol, C_m, self._melt_redox_fO2_upper_bound_log())
-            if (
-                not math.isfinite(applied_delta_ln)
-                or not math.isfinite(candidate_fO2_log)
-            ):
-                skip_reason = 'redox_capacity_saturation_refusal'
-                refusal_context = self._oxygen_reservoir_guard_context(
-                    context='redox_source_terms_saturation_refusal',
-                    source_terms_mol_o2_equiv=terms,
-                    net_o2_equiv_mol=net_o2_equiv_mol,
-                    melt_redox_capacity_mol_per_ln_fO2=C_m,
-                    delta_ln_fO2=applied_delta_ln,
-                    candidate_fO2_log=candidate_fO2_log,
-                )
-                applied_delta_ln = 0.0
-            else:
-                # The derivative is a local tangent, not an unlimited oxygen
-                # capacity. Stop its prediction at the gas pressure ceiling;
-                # evaporative oxygen left after the finite Fe split is moved
-                # by OXYGEN_RESERVOIR_EXCHANGE, never discarded by this clamp.
-                candidate_fO2_log = min(
-                    candidate_fO2_log, self._melt_redox_fO2_upper_bound_log(),
-                )
-                applied_delta_ln = (
-                    candidate_fO2_log - base_fO2_log
-                ) * math.log(10.0)
-                reservoir.melt_intrinsic_fO2_log = (
-                    self._finite_oxygen_reservoir_fO2_log(
-                        candidate_fO2_log,
-                        context='redox_source_terms',
-                        source_terms_mol_o2_equiv=terms,
-                        net_o2_equiv_mol=net_o2_equiv_mol,
-                        melt_redox_capacity_mol_per_ln_fO2=C_m,
-                        delta_ln_fO2=applied_delta_ln,
-                        candidate_fO2_log=candidate_fO2_log,
-                    )
-                )
+        if skip_reason == 'redox_capacity_saturation_refusal':
+            refusal_context = self._oxygen_reservoir_guard_context(
+                context='redox_source_terms_saturation_refusal',
+                source_terms_mol_o2_equiv=terms,
+                net_o2_equiv_mol=net_o2_equiv_mol,
+                melt_redox_capacity_mol_per_ln_fO2=C_m,
+                delta_ln_fO2=applied_delta_ln,
+                candidate_fO2_log=candidate_fO2_log,
+            )
+            applied_delta_ln = 0.0
+        elif not skip_reason:
+            reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
+                candidate_fO2_log, context='redox_source_terms',
+                source_terms_mol_o2_equiv=terms, net_o2_equiv_mol=net_o2_equiv_mol,
+                melt_redox_capacity_mol_per_ln_fO2=C_m,
+                delta_ln_fO2=applied_delta_ln, candidate_fO2_log=candidate_fO2_log)
         if terms:
             if skip_reason:
                 self._accumulate_redox_source_terms_for_hour(
@@ -6497,20 +6456,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 candidate_fO2_log=float(fO2_log_override),
             )
         fO2_log = min(fO2_log, self._melt_redox_fO2_upper_bound_log())
-        control_inputs = {
-            'source': 'scalar Kress91 fO2 ledger re-speciation',
-            'o2_account': (
-                FO2_BUFFER_ACCOUNT
-                if oxygen_source in {
-                    FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
-                    FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER,
-                }
-                else 'process.overhead_gas'
-            ),
-            'oxygen_source': oxygen_source,
-            'internal_o2_capacity_mol': buffer_capacity_mol,
-            'exchange_o2_mol': exchange_release_mol,
-        }
+        control_inputs = _fe_redox_respeciation_controls(oxygen_source, buffer_capacity_mol, exchange_release_mol)
         result = self._dispatch_only(
             ChemistryIntent.FE_REDOX_RESPECIATION,
             control_inputs=control_inputs,
@@ -10269,197 +10215,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             **dispatch_kwargs,
         )
         self._last_high_t_melt_activity_temperature_K = T_C + 273.15
-        diagnostic = dict(kernel_result.diagnostic or {})
-        diagnostic['intrinsic_fO2_publication'] = intrinsic_publication
-
-        def append_kernel_warnings(
-            messages: tuple[str, ...] | str,
-        ) -> None:
-            if not messages:
-                return
-            additions = (
-                (messages,)
-                if isinstance(messages, str)
-                else tuple(messages)
-            )
-            existing = diagnostic.get('kernel_vapor_pressure_warnings')
-            if not isinstance(existing, list):
-                existing = [existing] if existing is not None else []
-            existing.extend(additions)
-            diagnostic['kernel_vapor_pressure_warnings'] = existing
-
-        append_kernel_warnings(getattr(kernel_result, 'warnings', ()) or ())
-        if intrinsic_publication['notice']:
-            append_kernel_warnings(intrinsic_publication['notice'])
-            result.warnings.append(intrinsic_publication['notice'])
-        if getattr(self, '_reaction_pO2_bar', None) is None and not self._evaporation_campaign_active():
-            notice = 'no gas-side closure; published intrinsic melt oxygen potential used'
-            append_kernel_warnings(notice)
-            result.warnings.append(notice)
-        self._last_high_t_melt_activity = dict(
-            diagnostic.get("high_t_melt_activity") or {}
-        )
-        diagnostic['backend_vapor_pressures_source'] = dict(backend_sources)
-        diagnostic['backend_vapor_pressures_Pa'] = dict(backend_vp)
-        diagnostic.update(regime_diagnostic)
-        kernel_vp = diagnostic.get('vapor_pressures_Pa') or {}
-        if kernel_vp:
-            kernel_source = self._kernel_vapor_pressure_source(diagnostic)
-            kernel_sources = diagnostic.get('vapor_pressures_source')
-            if not isinstance(kernel_sources, Mapping):
-                kernel_sources = {}
-            merged_vp = dict(kernel_vp)
-            merged_sources = {
-                str(species): str(
-                    kernel_sources.get(species)
-                    or kernel_sources.get(str(species))
-                    or kernel_source
-                )
-                for species in merged_vp
-            }
-            thermoengine_confirmed = []
-            for species, kernel_value in kernel_vp.items():
-                if backend_sources.get(species) != 'thermoengine':
-                    continue
-                if species not in backend_vp:
-                    continue
-                backend_value = backend_vp[species]
-                if not self._vapor_pressure_values_agree(
-                    backend_value, kernel_value
-                ):
-                    continue
-                merged_sources[str(species)] = 'thermoengine'
-                thermoengine_confirmed.append(str(species))
-            result.vapor_pressures_Pa = merged_vp
-            result.vapor_pressures_source = merged_sources
-            diagnostic['vapor_pressures_source'] = dict(merged_sources)
-            diagnostic['thermoengine_vapor_pressures_confirmed'] = tuple(
-                sorted(thermoengine_confirmed)
-            )
-        else:
-            # Autoreview r8 P1 (2026-05-27, post-0.5.0): the prior code
-            # silently kept the pre-kernel backend vapor-pressure
-            # surface whenever the kernel returned no pressures --
-            # treating ``status='unavailable'`` (the authoritative
-            # VapoRock import succeeded but the adapter call yielded no
-            # result) identically to ``status='ok'`` with no
-            # evaporation expected. Under ``allow_fallback_vapor=False``
-            # that is a silent downgrade: the run continues on
-            # internal-analytical/AlphaMELTS pressures with no operator-visible
-            # signal. Now we distinguish:
-            #
-            #   - status='ok' / empty kernel_vp: legit (e.g. melt
-            #     below evaporation threshold or oxide-only system);
-            #     kernel-computed zero is authoritative.
-            #   - status='unavailable' / 'failed' AND
-            #     allow_fallback_vapor=False: raise loud so the
-            #     operator sees the missing authoritative dispatch
-            #     instead of inheriting silently.
-            #   - status='unavailable' AND allow_fallback_vapor=True:
-            #     keep backend with an explicit warning entry on the
-            #     diagnostic (this is the documented fallback path).
-            # Codex challenge pre-0.5.1 P1 (2026-05-27): malformed
-            # status (None / "") must not authorise backend fallback.
-            # The prior ``getattr(..., 'status', 'ok') or 'ok'`` form
-            # treated missing OR empty status as success -- so any
-            # provider that returned ``status=None`` (broken adapter)
-            # or ``status=""`` (uninitialised) would silently appear
-            # ``ok`` to the gate. Materialise the raw status first so
-            # we can distinguish "missing/empty" from "ok".
-            raw_status = getattr(kernel_result, 'status', None)
-            if raw_status is None or str(raw_status).strip() == '':
-                kernel_status = 'unknown'
-            else:
-                kernel_status = str(raw_status).strip().lower()
-            # Autoreview pre-0.5.1 P1 (2026-05-27): the prior version only
-            # caught {'unavailable', 'failed'}, but the VapoRock provider
-            # also emits 'not_converged' and 'out_of_domain' (per
-            # engines/vaporock/provider.py:211 the canonical kernel
-            # status vocabulary is ``ok | not_converged | out_of_domain
-            # | unavailable``). When kernel_vp is empty AND status is
-            # ANY non-'ok' value, the run is silently downgrading to the
-            # backend surface -- exactly what the r8 fix was meant to
-            # prevent. Invert the check: anything non-'ok' (including
-            # the new 'unknown' bucket for malformed status) with no
-            # kernel pressures is a failure mode under
-            # allow_fallback_vapor=False.
-            if kernel_status == 'ok':
-                result.vapor_pressures_Pa = {}
-                result.vapor_pressures_source = {}
-                diagnostic['vapor_pressures_Pa'] = {}
-                diagnostic['vapor_pressures_source'] = {}
-                diagnostic[
-                    'vapor_pressure_zero_reason'
-                ] = 'kernel_ok_empty'
-                # b-149 instance 2: kernel status=ok with empty pressures is
-                # accepted as an authoritative zero. Instrument (do not refuse)
-                # so the silent-zero class is visible on the diagnostic surface.
-                from simulator.silent_zero import (
-                    CATEGORY_PROVEN_ZERO,
-                    ZeroBecause,
-                    merge_notes_into_mapping,
-                    note_dict,
-                    record_on_host,
-                )
-
-                _sz_note = note_dict(
-                    ZeroBecause.KERNEL_OK_EMPTY,
-                    site='core.kernel_ok_empty',
-                    field='vapor_pressures_Pa',
-                    detail=(
-                        'kernel_status=ok with empty pressures accepted as '
-                        'authoritative zero (kernel_ok_empty); indistinguishable '
-                        'from a computed empty without this typed note'
-                    ),
-                    doctrine_category=CATEGORY_PROVEN_ZERO,
-                )
-                merge_notes_into_mapping(diagnostic, [_sz_note])
-                record_on_host(
-                    self,
-                    ZeroBecause.KERNEL_OK_EMPTY,
-                    site='core.kernel_ok_empty',
-                    field='vapor_pressures_Pa',
-                    detail=_sz_note['detail'],
-                    doctrine_category=CATEGORY_PROVEN_ZERO,
-                )
-            else:
-                if not self._allow_fallback_vapor:
-                    # Codex challenge pre-0.5.1 P2 (2026-05-27): keep the
-                    # exception message bounded so operator logs stay
-                    # readable. Surface the status + the diagnostic keys
-                    # only; full diagnostic dict is on
-                    # ``self._last_vapor_pressure_diagnostic`` for the
-                    # caller that wants the full dump.
-                    diagnostic_keys = sorted(diagnostic.keys())
-                    raise RuntimeError(
-                        f"Authoritative VAPOR_PRESSURE dispatch returned "
-                        f"status={kernel_status!r} with no pressures and "
-                        f"allow_fallback_vapor=False; refusing to silently "
-                        f"continue on backend vapor pressures. Diagnostic "
-                        f"keys: {diagnostic_keys!r}"
-                    )
-                append_kernel_warnings(
-                    f"VAPOR_PRESSURE returned status={kernel_status!r}; "
-                    f"falling back to backend vapor pressures under "
-                    f"allow_fallback_vapor=True."
-                )
-                if backend_sources:
-                    result.vapor_pressures_source = dict(backend_sources)
-                diagnostic['vapor_pressures_source'] = dict(
-                    getattr(result, 'vapor_pressures_source', {}) or {}
-                )
-        high_t_activity = diagnostic.get('high_t_melt_activity') or {}
-        parent_activities = high_t_activity.get('selected_parent_activities')
-        kernel_activities = parent_activities or diagnostic.get('activities') or {}
-        if kernel_activities:
-            result.activity_coefficients = dict(kernel_activities)
-            if parent_activities:
-                result.diagnostics = {
-                    **(getattr(result, 'diagnostics', {}) or {}),
-                    'activities_provider': high_t_activity['selected_parent_activities_provider'],
-                    'activity_provenance': high_t_activity['selected_parent_activity_provenance'],
-                    'activities_standard_state': high_t_activity['selected_parent_activities_standard_state'],
-                }
+        diagnostic, host_notes = _project_vapor_pressure_result(result, kernel_result,
+            intrinsic_publication=intrinsic_publication, backend_sources=backend_sources,
+            backend_vp=backend_vp, regime_diagnostic=regime_diagnostic,
+            non_evaporating_without_closure=(getattr(self, '_reaction_pO2_bar', None) is None
+                                           and not self._evaporation_campaign_active()),
+            allow_fallback_vapor=self._allow_fallback_vapor)
+        if host_notes:
+            from simulator.silent_zero import record_on_host
+            for reason, note in host_notes:
+                record_on_host(self, reason, **note)
+        self._last_high_t_melt_activity = dict(diagnostic.get('high_t_melt_activity') or {})
         self._last_vapor_pressures_source = dict(
             getattr(result, 'vapor_pressures_source', {}) or {}
         )
@@ -10478,29 +10244,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     @staticmethod
     def _kernel_vapor_pressure_source(diagnostic: Mapping[str, Any]) -> str:
-        provider = diagnostic.get('kernel_fallback_used')
-        if provider == 'builtin-vapor-pressure':
-            return 'builtin_fallback'
-        sources = diagnostic.get('vapor_pressures_source')
-        if isinstance(sources, Mapping):
-            labels = {str(source) for source in sources.values() if source}
-            if len(labels) == 1:
-                return next(iter(labels))
-        if 'vaporock_full_speciation_Pa' in diagnostic:
-            return 'vaporock'
-        return 'kernel_diagnostic'
+        return _kernel_vapor_pressure_source(diagnostic)
 
     @staticmethod
     def _vapor_pressure_values_agree(left: Any, right: Any) -> bool:
-        try:
-            lhs = float(left)
-            rhs = float(right)
-        except (TypeError, ValueError):
-            return False
-        if not (math.isfinite(lhs) and math.isfinite(rhs)):
-            return False
-        tolerance = max(1e-9, 1e-9 * max(abs(lhs), abs(rhs)))
-        return abs(lhs - rhs) <= tolerance
+        return _vapor_pressure_values_agree(left, right)
 
     def _backend_accepts_kwarg(self, name: str) -> bool:
         try:
@@ -13969,7 +13717,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         *,
         defer_committed_history: bool = False,
-        state_receiver: Any = None,
     ) -> tuple[Dict[str, Any], Any, Optional[Dict[str, Any]]]:
         preserved_names = {
             'backend',
@@ -13986,26 +13733,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # hourly mutation that refusal rollback needs to restore.
             'vapour_rail_catalog',
         }
-        memo = {id(self): self if state_receiver is None else state_receiver}
-        if state_receiver is not None:
-            # Pressure trials read these run inputs without editing them. The
-            # tables share source/provenance objects: preserving just one root
-            # lets another table copy the same graph on every residual call.
-            # Share all three roots and their aliases. Whole-hour rollback
-            # retains its original detached mutable-input contract.
-            for name in ('feedstocks', 'vapor_pressure_catalog_data', 'vapor_pressures'):
-                if name in self.__dict__:
-                    preserved_names.add(name)
-                    memo[id(self.__dict__[name])] = self.__dict__[name]
-            # Condensation freezes this owned payload at construction. Its
-            # compiled admission catalog is immutable too; detached trials
-            # share both, keeping the compatibility-view cache slot private.
-            data = getattr(getattr(self, '_condensation_model', None),
-                           'vapor_pressure_data', None)
-            for value in (getattr(data, 'catalog_payload', None),
-                          getattr(data, '_route_catalog', None)):
-                if value is not None:
-                    memo[id(value)] = value
+        memo = {id(self): self}
         record = getattr(self, 'record', None)
         record_snapshots = getattr(record, 'snapshots', None)
         if (
@@ -14029,7 +13757,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # Operating conditions can edit their last row; cold-spot
                 # diagnostics only append. Freeze each new committed row once,
                 # then reuse the existing deferred prefix for both histories.
-                # This removes O(hours) recursive work from each pressure trial
+                # This removes O(hours) recursive work from each hourly checkpoint
                 # while rollback still detaches the full history on refusal.
                 for index in range(len(history) - mutable_tail - 1, -1, -1):
                     if isinstance(history[index], MappingProxyType):
@@ -14071,8 +13799,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # A refused hour leaves no registry trace; restore every mutable
             # provider table before rebuilding the chemistry kernel.
             state['_terminal_refusal_chem_registry_tables'] = registry_tables
-        ledger = (snapshot_atom_ledger(self.atom_ledger, _pressure_trial=True)
-                  if state_receiver is not None else snapshot_atom_ledger(self.atom_ledger))
+        ledger = snapshot_atom_ledger(self.atom_ledger)
         cost_state = None
         if hasattr(self, 'cost_ledger'):
             cost_state = {
@@ -14085,8 +13812,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 for name, value in self.cost_ledger.__dict__.items()
             }
-        if defer_committed_history and state_receiver is not None:
-            _materialize_refusal_snapshot_history(state, copy_committed_rows=False)
         return state, ledger, cost_state
 
     def _restore_terminal_refusal_hour_state(
@@ -14399,7 +14124,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         equilibrium = None
         if boundary is not None:
             self._reaction_pO2_bar = boundary.reaction_pO2_bar
-            self._frozen_evaporation_carriers = boundary.payload[2]._frozen_evaporation_carriers
+            self._frozen_evaporation_carriers = boundary.payload[2].frozen_carriers
             projected_equilibrium = boundary.payload[3]
             if (not any(boundary.balance_terms)
                     and self._evaporation_carrier_zero_reason(projected_equilibrium)
@@ -14419,13 +14144,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # Re-enter the real flux controls at the accepted coordinate for
             # live diagnostics. A changed source is a refusal, never a re-solve.
             live_flux = self._apply_analytic_evaporation_depletion(self._calculate_evaporation(equilibrium))
-            uptake_capacity = getattr(projected, '_evaporation_oxygen_uptake_capacity_mol', None)
+            uptake_capacity = projected.oxygen_uptake_capacity_mol
             live_flux = self._bound_evaporation_oxygen_uptake(live_flux, uptake_capacity)
             planned_rates = dict(evap_flux.species_kg_hr)
             achieved_rates = dict(live_flux.species_kg_hr)
             self._verify_evaporation_projection(
                 (planned_rates, {key: math.ulp(value) for key, value in planned_rates.items()}),
                 (achieved_rates, {key: math.ulp(value) for key, value in achieved_rates.items()}))
+            evap_flux = live_flux
             terms = boundary.balance_terms
             gross = math.fsum(abs(value) for value in terms)
             self._last_surface_oxygen_diagnostic = {
@@ -14440,24 +14166,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'oxygen_flux_mol_m2_s': boundary.oxygen_flux_mol_m2_s,
                 'oxygen_uptake_transport_limited': boundary.oxygen_uptake_transport_limited,
                 **({'oxygen_release_transport_limited': True}
-                   if projected._oxygen_release_transport_limited else {}),
+                   if projected.oxygen_release_transport_limited else {}),
                 'relative_residual': abs(boundary.residual) / gross if gross else 0.0,
                 'oxygen_series': oxygen_series,
                 'frozen_carriers': sorted(self._frozen_evaporation_carriers),
-                'carrier_admission_flips': projected._carrier_admission_flips,
-                'notices': projected._carrier_admission_notices,
+                'carrier_admission_flips': projected.carrier_admission_flips,
+                'notices': projected.carrier_admission_notices,
                 'oxygen_alpha_source': 'declared alpha_O2=1 sensitivity; unmeasured',
                 'melt_resistance_status': 'R_melt=0 upper bound; missing species/state inputs',
                 'coupling': 'C7 frozen step-start carrier admission and pre-batch bulk/removal; C8 transient unresolved',
             }
-            equilibrium.warnings.extend(projected._carrier_admission_notices)
+            equilibrium.warnings.extend(projected.carrier_admission_notices)
             from simulator.thermal_train import FiniteCapacity
             capacity, cold_train = self._cold_train_capacity_policy()
             if self._overhead_headspace_enabled() and isinstance(capacity, FiniteCapacity):
                 from simulator.capacity_coupling import CapacityCouplingRefusalError, CapacityShadowRefusal
                 assert cold_train is not None
                 capacity_result = self._compute_capacity_coupling_shadow(equilibrium,
-                    fixed_evaporation_flux_kg_hr=projected._ledger_committed_evap_flux_this_tick.species_kg_hr,
+                    fixed_evaporation_flux_kg_hr=projected.committed_flux.species_kg_hr,
                     fixed_overhead_source_mol_hr={key.removeprefix('gas:'): value
                         for key, value in predicted_amounts[0].items() if key.startswith('gas:')})
                 if isinstance(capacity_result, CapacityShadowRefusal):
@@ -14485,7 +14211,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         buffer_before = self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(OXYGEN_SPECIES, 0.0)
         evap_flux, overhead_flux = self._apply_evaporation_carrier_batch(evap_flux,
             oxygen_uptake_capacity_mol=(uptake_capacity if boundary is not None else None),
-            oxygen_release_capacity_mol=(projected._evaporation_oxygen_release_capacity_mol
+            oxygen_release_capacity_mol=(projected.oxygen_release_capacity_mol
                                          if boundary is not None else None))
         if boundary is not None:
             self._verify_evaporation_projection(predicted_amounts,

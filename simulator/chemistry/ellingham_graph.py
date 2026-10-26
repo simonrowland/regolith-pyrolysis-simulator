@@ -64,11 +64,19 @@ def _physical_pO2_bar(pO2_bar: float) -> float:
 
 
 
+def _physical_pO2_scalar(pO2_bar: float) -> float:
+    from simulator.vapour_rail.channels import _validated_physical_pO2_bar
+    try:
+        return _validated_physical_pO2_bar(pO2_bar)
+    except ValueError as exc:
+        raise EllinghamPressureRefusal(str(exc)) from exc
+
+
 def _sio_oxygen_pressure_factor(pO2_bar: float, reference_bar: float) -> float:
     """SiO2(l) -> SiO(g) + 1/2 O2: continue the declared reaction reference."""
     from simulator.vapour_rail.channels import _log_oxygen_ratio
 
-    oxygen = _physical_pO2_bar(pO2_bar)
+    oxygen = _physical_pO2_scalar(pO2_bar)
     # K = (P_SiO/P0)*(pO2/P0)**(1/2)/a_SiO2. At fixed T/activity,
     # P/P_ref = sqrt(p_ref/pO2); bar/bar is dimensionless. This applies on
     # both sides of p_ref and tends continuously to 1 there. Keep the direct

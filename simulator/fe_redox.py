@@ -14,6 +14,9 @@ from simulator.feedstock_composition import (
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
+_OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
+
+
 class Kress91InvalidControls(ValueError):
     """Invalid finite-control input for the Kress91 Fe-redox relation."""
 
@@ -1576,6 +1579,20 @@ def _redox_source_increment(base_fO2_log, net_o2_equiv_mol, C_m, upper_bound):
     return applied_delta_ln, candidate_fO2_log
 
 
+def _redox_source_response(base_fO2_log, net_o2_equiv_mol, C_m, upper_bound, noop_mol):
+    if C_m <= noop_mol:
+        return 0.0, base_fO2_log, 'no_melt_redox_capacity'
+    if abs(net_o2_equiv_mol) < noop_mol:
+        return 0.0, base_fO2_log, 'below_threshold'
+    delta_ln, candidate = _redox_source_increment(base_fO2_log, net_o2_equiv_mol, C_m, upper_bound)
+    if not math.isfinite(delta_ln) or not math.isfinite(candidate):
+        return delta_ln, candidate, 'redox_capacity_saturation_refusal'
+    # This tangent predicts potential only. The finite Fe split below owns
+    # uptake atoms; oxygen beyond its capacity remains in the physical buffer.
+    candidate = min(candidate, upper_bound)
+    return (candidate - base_fO2_log) * math.log(10.0), candidate, ''
+
+
 def _evaporative_redox_is_saturated(internal_o2_capacity_mol, intrinsic_fO2_log,
         melt_redox_capacity_mol_per_ln_fO2, upper_bound_log, noop_mol):
     return (internal_o2_capacity_mol > noop_mol) and (
@@ -1599,6 +1616,33 @@ _FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS = (
 def _remaining_fe_redox_internal_o2_capacity_mol(capacity_mol, consumed_mol, buffer_o2_mol):
     capacity_mol = max(0.0, float(capacity_mol or 0.0) - float(consumed_mol or 0.0))
     return min(capacity_mol, max(0.0, float(buffer_o2_mol)))
+
+
+def _cleaned_melt_fe_atom_mol(species_mol, species_formula_registry):
+    from simulator.accounting.formulas import resolve_species_formula
+    total_fe_mol = 0.0
+    for species, mol in species_mol.items():
+        if float(mol) <= 0.0:
+            continue
+        formula = resolve_species_formula(species, species_formula_registry)
+        total_fe_mol += float(mol) * float(formula.elements.get('Fe', 0.0))
+    return max(0.0, total_fe_mol)
+
+
+def _remaining_buffer_release_capacity(capacity_mol, signed_gas_o2_mol):
+    return None if capacity_mol is None else max(0.0, capacity_mol - signed_gas_o2_mol)
+
+
+def _fe_redox_respeciation_controls(oxygen_source, buffer_capacity_mol, exchange_release_mol):
+    return {
+        'source': 'scalar Kress91 fO2 ledger re-speciation',
+        'o2_account': ('reservoir.fo2_buffer' if oxygen_source in {
+            _FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
+            _FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER} else 'process.overhead_gas'),
+        'oxygen_source': oxygen_source,
+        'internal_o2_capacity_mol': buffer_capacity_mol,
+        'exchange_o2_mol': exchange_release_mol,
+    }
 
 
 def _fe_redox_settlement_inputs(oxygen_source, *, exchange_o2_mol, replenished_mol,

@@ -976,23 +976,33 @@ class OverheadGasModel:
         self._pipe_temperature_C = self.resolve_pipe_temperature_C()  # °C — resolved active pipe/liner wall temperature
 
     def resolve_pipe_temperature_C(self, melt: Optional[MeltState] = None) -> float:
+        self._pipe_temperature_C = self._pipe_temperature_value(melt)
+        return self._pipe_temperature_C
+
+    def _pipe_temperature_value(self, melt: Optional[MeltState] = None) -> float:
         """Resolve scalar or scheduled liner temperature for the current tick."""
 
         value = self._resolve_liner_temperature_value(  # °C — resolved liner wall temperature
             self._liner_temperature_config,
             melt,
         )
-        self._pipe_temperature_C = max(0.0, float(value))  # °C — clamped pipe/liner wall temperature
-        return self._pipe_temperature_C
+        pipe_temperature_C = max(0.0, float(value))  # °C — clamped pipe/liner wall temperature
+        return pipe_temperature_C
 
     def resolve_pipe_segment_temperatures_C(
+        self, segment_names: list[str] | tuple[str, ...],
+        melt: Optional[MeltState] = None,
+    ) -> dict[str, float]:
+        base_C = self.resolve_pipe_temperature_C(melt)
+        return self._pipe_segment_temperature_values(segment_names, melt, base_C=base_C)
+
+    def _pipe_segment_temperature_values(
         self,
         segment_names: list[str] | tuple[str, ...],
-        melt: Optional[MeltState] = None,
+        melt: Optional[MeltState] = None, *, base_C,
     ) -> dict[str, float]:
         """Resolve per-segment wall temperatures for the active recipe."""
 
-        base_C = self.resolve_pipe_temperature_C(melt)  # °C — scalar fallback pipe/liner wall temperature
         config = self._pipe_segment_temperature_config  # °C or mapping — segment temperature config
         if config in (None, ''):
             return {str(name): base_C for name in segment_names}

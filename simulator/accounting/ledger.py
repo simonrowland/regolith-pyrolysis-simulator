@@ -720,10 +720,6 @@ class AtomLedger:
         return transition
 
     def _record_gross_lot(self, direction: str, lot: MaterialLot) -> None:
-        # Pressure residuals use conserved balances and signed transitions,
-        # never the reporting journal. Acceptance records the ordinary events.
-        if getattr(self, '_pressure_trial', False):
-            return
         flows = self._gross_account_flows[direction]
         account = str(lot.account)
         event_species = lot.species_moles_for(self.registry)
@@ -1316,13 +1312,7 @@ class AtomLedger:
         account: str,
         species_kg: Mapping[str, float],
     ) -> None:
-        account_scale = movement_scale_kg.setdefault(str(account), {})
-        for species, kg in species_kg.items():
-            value = abs(float(kg))
-            account_scale[str(species)] = max(
-                value,
-                account_scale.get(str(species), 0.0),
-            )
+        return _record_movement_scale(movement_scale_kg, account, species_kg)
 
     def _record_lot_movement_scale(
         self,
@@ -1727,20 +1717,10 @@ class AtomLedger:
             )
 
 
-def snapshot_atom_ledger(ledger: Any, *, _pressure_trial: bool = False) -> Any:
-    """Detach ledger state; read-only trials share committed journal rows."""
-
+def snapshot_atom_ledger(ledger: Any) -> Any:
+    """Detach ledger state for whole-hour refusal rollback."""
     snapshot = shallow_copy(ledger)
-    memo = {}
-    if _pressure_trial:
-        # Committed journal rows are read-only during pressure evaluation;
-        # _record_gross_lot withholds new rows, while all balance, origin and
-        # conservation checks still run. Ordinary rollback detaches every row.
-        events = ledger._gross_account_flow_events
-        memo[id(events)] = list(events)
-    snapshot.__dict__ = _clone_owned_ledger_state(ledger.__dict__, memo)
-    if _pressure_trial:
-        snapshot._pressure_trial = True
+    snapshot.__dict__ = _clone_owned_ledger_state(ledger.__dict__, {})
     return snapshot
 
 
@@ -2435,3 +2415,17 @@ def _projection_tolerance_kg(
         balance_absolute_floor_kg,
         balance_relative_tolerance * scale_kg,
     )
+
+
+def _record_movement_scale(
+    movement_scale_kg: dict[str, dict[str, float]],
+    account: str,
+    species_kg: Mapping[str, float],
+) -> None:
+    account_scale = movement_scale_kg.setdefault(str(account), {})
+    for species, kg in species_kg.items():
+        value = abs(float(kg))
+        account_scale[str(species)] = max(
+            value,
+            account_scale.get(str(species), 0.0),
+        )

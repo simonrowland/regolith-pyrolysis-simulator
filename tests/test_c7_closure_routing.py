@@ -254,12 +254,11 @@ def test_fixed_state_source_pressure_exponents_at_solved_oxygen():
         sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
         boundary = sim._solve_evaporative_oxygen_boundary()
         cases = []
+        from dataclasses import replace
+        from simulator.evaporation import _frozen_pressure
+        hour = replace(sim._prepare_evaporation_hour(), frozen_carriers=boundary.payload[2].frozen_carriers)
         for oxygen in (1e-9, boundary.reaction_pO2_bar):
-            trial = sim._detached_evaporation_projection()
-            trial._reaction_pO2_bar = oxygen
-            trial._frozen_evaporation_carriers = boundary.payload[2]._frozen_evaporation_carriers
-            result = trial._get_equilibrium()
-            diagnostic = trial._last_vapor_pressure_diagnostic
+            result, diagnostic = _frozen_pressure(hour, oxygen)
             assert diagnostic['source_reaction_fO2_bar'] == 10.0 ** sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
             cases.append((result.vapor_pressures_Pa, diagnostic['activities']))
         assert cases[0][1] == cases[1][1]

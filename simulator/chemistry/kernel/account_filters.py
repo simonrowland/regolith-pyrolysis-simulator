@@ -55,6 +55,13 @@ def build_provider_account_view(
             account).
     """
 
+    declared_accounts = _declared_provider_accounts(declared_accounts)
+    return _provider_account_view_from_mol(ledger.mol_by_account(), declared_accounts,
+        species_formula_registry, project_account_mol=getattr(ledger, 'project_account_mol', None),
+        account_mol_overrides=account_mol_overrides)
+
+
+def _declared_provider_accounts(declared_accounts):
     if not isinstance(declared_accounts, frozenset):
         declared_accounts = frozenset(declared_accounts or ())
     if not declared_accounts:
@@ -62,12 +69,16 @@ def build_provider_account_view(
             "provider declared no accounts; cannot build a non-empty ProviderAccountView"
         )
 
-    snapshot = ledger.mol_by_account()
+    return declared_accounts
+
+
+def _provider_account_view_from_mol(snapshot, declared_accounts, species_formula_registry,
+        *, project_account_mol=None, account_mol_overrides=None):
+    declared_accounts = _declared_provider_accounts(declared_accounts)
     if not isinstance(snapshot, Mapping):  # defensive: ledger contract says dict
         raise AccountFilterViolation(
             "ledger.mol_by_account() did not return a mapping; cannot filter"
         )
-    project_account_mol = getattr(ledger, "project_account_mol", None)
 
     overrides: dict[str, dict[str, float]] = {}
     if account_mol_overrides is not None:

@@ -831,7 +831,7 @@ class ReactionThermoInputs:
 # ---------------------------------------------------------------------------
 
 
-def validate_physical_pO2_bar(pO2_bar: float) -> float:
+def _validated_physical_pO2_bar(pO2_bar: float) -> float:
     """Admit the actual finite-positive oxygen scalar for O2 evaluation."""
 
     if not is_declared_real_scalar(pO2_bar, allow_numeric_str=True):
@@ -839,6 +839,12 @@ def validate_physical_pO2_bar(pO2_bar: float) -> float:
     oxygen = float(pO2_bar)
     if not math.isfinite(oxygen) or oxygen <= 0.0:
         raise ValueError(f"pO2_bar must be finite and positive; got {pO2_bar!r}")
+    return oxygen
+
+
+def validate_physical_pO2_bar(pO2_bar: float) -> float:
+    """Admit supplied oxygen and publish its extrapolation notice."""
+    oxygen = _validated_physical_pO2_bar(pO2_bar)
     notice = _pO2_evaluation_notice(oxygen)
     if notice is not None:
         import warnings
@@ -884,7 +890,7 @@ def _log_oxygen_ratio(
     )
 
 
-def o2_potential_from_pO2_bar(
+def _o2_potential_from_pO2_bar(
     *,
     pO2_bar: float,
     temperature_K: float,
@@ -940,7 +946,7 @@ def o2_potential_from_pO2_bar(
         owner_id="legacy_pO2_adapter",
         source_kind=SOURCE_KIND_LEGACY_SCALAR_ADAPTER,
     )
-    oxygen = validate_physical_pO2_bar(pO2_bar)
+    oxygen = _validated_physical_pO2_bar(pO2_bar)
     # 1-bar ideal-gas standard state: (μ-μ0)/(R T) = ln(f / 1 bar).
     reduced = math.log(oxygen / 1.0)
     delta_mu = GAS_CONSTANT * temperature_K * reduced
@@ -973,6 +979,29 @@ def o2_potential_from_pO2_bar(
         legacy_pO2_reference_bar=p_ref,
         _owner_grant=grant,
     )
+
+
+def o2_potential_from_pO2_bar(
+    *,
+    pO2_bar: float,
+    temperature_K: float,
+    reaction_plane: str,
+    pO2_reference_bar: float = 1.0,
+    state_fingerprint: str | None = None,
+    authority: bool = False,
+) -> GasChannelPotential:
+    potential = _o2_potential_from_pO2_bar(
+        pO2_bar=pO2_bar,
+        temperature_K=temperature_K,
+        reaction_plane=reaction_plane,
+        pO2_reference_bar=pO2_reference_bar,
+        state_fingerprint=state_fingerprint,
+        authority=authority,
+    )
+    # The numerical constructor returns the same receipt; publication belongs
+    # to the ordinary caller, after an accepted pressure evaluation.
+    validate_physical_pO2_bar(potential.legacy_pO2_bar)
+    return potential
 
 
 def channel_log10_contribution(

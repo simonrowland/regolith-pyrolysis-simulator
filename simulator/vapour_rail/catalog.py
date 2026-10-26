@@ -47,9 +47,9 @@ from simulator.vapour_rail.channels import (
     ReactionThermoInputs,
     _log_oxygen_ratio,
     channel_log10_contribution,
-    validate_physical_pO2_bar,
+    _validated_physical_pO2_bar,
     compile_o2_channel_term,
-    o2_potential_from_pO2_bar,
+    _o2_potential_from_pO2_bar as o2_potential_from_pO2_bar,
 )
 from engines.antoine import _antoine_log10_pressure
 from simulator.vapour_rail.nasa_cea import (
@@ -4195,7 +4195,7 @@ def _evaluation_pO2_bar_used(
         return None
     if not math.isfinite(raw) or raw <= 0.0:
         return None
-    return validate_physical_pO2_bar(raw)
+    return _validated_physical_pO2_bar(raw)
 
 
 def _pO2_floor_inversion_notice(

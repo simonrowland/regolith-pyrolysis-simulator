@@ -278,8 +278,6 @@ class EquilibriumMixin:
     def _headspace_transport_pO2_bar(self) -> float:
         """O2 transport reservoir pO2 consumed by SiO/vapor transport."""
 
-        if getattr(self, '_pressure_trial', False):
-            return self._pressure_trial_bulk_pO2_bar
         if self.melt.sweep_mol_per_s is not None:
             return self._sweep_boundary_pO2_bar()
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
@@ -1525,3 +1523,216 @@ class EquilibriumMixin:
             status='ok',
             diagnostics=_eq_diagnostics,
         )
+
+
+def _kernel_vapor_pressure_source(diagnostic: Mapping[str, Any]) -> str:
+    provider = diagnostic.get('kernel_fallback_used')
+    if provider == 'builtin-vapor-pressure':
+        return 'builtin_fallback'
+    sources = diagnostic.get('vapor_pressures_source')
+    if isinstance(sources, Mapping):
+        labels = {str(source) for source in sources.values() if source}
+        if len(labels) == 1:
+            return next(iter(labels))
+    if 'vaporock_full_speciation_Pa' in diagnostic:
+        return 'vaporock'
+    return 'kernel_diagnostic'
+
+
+def _vapor_pressure_values_agree(left: Any, right: Any) -> bool:
+    try:
+        lhs = float(left)
+        rhs = float(right)
+    except (TypeError, ValueError):
+        return False
+    if not (math.isfinite(lhs) and math.isfinite(rhs)):
+        return False
+    tolerance = max(1e-9, 1e-9 * max(abs(lhs), abs(rhs)))
+    return abs(lhs - rhs) <= tolerance
+
+
+def _project_vapor_pressure_result(result, kernel_result, *, intrinsic_publication,
+        backend_sources, backend_vp, regime_diagnostic, non_evaporating_without_closure,
+        allow_fallback_vapor):
+    host_notes = []
+    diagnostic = dict(kernel_result.diagnostic or {})
+    diagnostic['intrinsic_fO2_publication'] = intrinsic_publication
+
+    def append_kernel_warnings(
+        messages: tuple[str, ...] | str,
+    ) -> None:
+        if not messages:
+            return
+        additions = (
+            (messages,)
+            if isinstance(messages, str)
+            else tuple(messages)
+        )
+        existing = diagnostic.get('kernel_vapor_pressure_warnings')
+        if not isinstance(existing, list):
+            existing = [existing] if existing is not None else []
+        existing.extend(additions)
+        diagnostic['kernel_vapor_pressure_warnings'] = existing
+
+    append_kernel_warnings(getattr(kernel_result, 'warnings', ()) or ())
+    if intrinsic_publication['notice']:
+        append_kernel_warnings(intrinsic_publication['notice'])
+        result.warnings.append(intrinsic_publication['notice'])
+    if non_evaporating_without_closure:
+        notice = 'no gas-side closure; published intrinsic melt oxygen potential used'
+        append_kernel_warnings(notice)
+        result.warnings.append(notice)
+    diagnostic['backend_vapor_pressures_source'] = dict(backend_sources)
+    diagnostic['backend_vapor_pressures_Pa'] = dict(backend_vp)
+    diagnostic.update(regime_diagnostic)
+    kernel_vp = diagnostic.get('vapor_pressures_Pa') or {}
+    if kernel_vp:
+        kernel_source = _kernel_vapor_pressure_source(diagnostic)
+        kernel_sources = diagnostic.get('vapor_pressures_source')
+        if not isinstance(kernel_sources, Mapping):
+            kernel_sources = {}
+        merged_vp = dict(kernel_vp)
+        merged_sources = {
+            str(species): str(
+                kernel_sources.get(species)
+                or kernel_sources.get(str(species))
+                or kernel_source
+            )
+            for species in merged_vp
+        }
+        thermoengine_confirmed = []
+        for species, kernel_value in kernel_vp.items():
+            if backend_sources.get(species) != 'thermoengine':
+                continue
+            if species not in backend_vp:
+                continue
+            backend_value = backend_vp[species]
+            if not _vapor_pressure_values_agree(
+                backend_value, kernel_value
+            ):
+                continue
+            merged_sources[str(species)] = 'thermoengine'
+            thermoengine_confirmed.append(str(species))
+        result.vapor_pressures_Pa = merged_vp
+        result.vapor_pressures_source = merged_sources
+        diagnostic['vapor_pressures_source'] = dict(merged_sources)
+        diagnostic['thermoengine_vapor_pressures_confirmed'] = tuple(
+            sorted(thermoengine_confirmed)
+        )
+    else:
+        # Autoreview r8 P1 (2026-05-27, post-0.5.0): the prior code
+        # silently kept the pre-kernel backend vapor-pressure
+        # surface whenever the kernel returned no pressures --
+        # treating ``status='unavailable'`` (the authoritative
+        # VapoRock import succeeded but the adapter call yielded no
+        # result) identically to ``status='ok'`` with no
+        # evaporation expected. Under ``allow_fallback_vapor=False``
+        # that is a silent downgrade: the run continues on
+        # internal-analytical/AlphaMELTS pressures with no operator-visible
+        # signal. Now we distinguish:
+        #
+        #   - status='ok' / empty kernel_vp: legit (e.g. melt
+        #     below evaporation threshold or oxide-only system);
+        #     kernel-computed zero is authoritative.
+        #   - status='unavailable' / 'failed' AND
+        #     allow_fallback_vapor=False: raise loud so the
+        #     operator sees the missing authoritative dispatch
+        #     instead of inheriting silently.
+        #   - status='unavailable' AND allow_fallback_vapor=True:
+        #     keep backend with an explicit warning entry on the
+        #     diagnostic (this is the documented fallback path).
+        # Codex challenge pre-0.5.1 P1 (2026-05-27): malformed
+        # status (None / "") must not authorise backend fallback.
+        # The prior ``getattr(..., 'status', 'ok') or 'ok'`` form
+        # treated missing OR empty status as success -- so any
+        # provider that returned ``status=None`` (broken adapter)
+        # or ``status=""`` (uninitialised) would silently appear
+        # ``ok`` to the gate. Materialise the raw status first so
+        # we can distinguish "missing/empty" from "ok".
+        raw_status = getattr(kernel_result, 'status', None)
+        if raw_status is None or str(raw_status).strip() == '':
+            kernel_status = 'unknown'
+        else:
+            kernel_status = str(raw_status).strip().lower()
+        # Autoreview pre-0.5.1 P1 (2026-05-27): the prior version only
+        # caught {'unavailable', 'failed'}, but the VapoRock provider
+        # also emits 'not_converged' and 'out_of_domain' (per
+        # engines/vaporock/provider.py:211 the canonical kernel
+        # status vocabulary is ``ok | not_converged | out_of_domain
+        # | unavailable``). When kernel_vp is empty AND status is
+        # ANY non-'ok' value, the run is silently downgrading to the
+        # backend surface -- exactly what the r8 fix was meant to
+        # prevent. Invert the check: anything non-'ok' (including
+        # the new 'unknown' bucket for malformed status) with no
+        # kernel pressures is a failure mode under
+        # allow_fallback_vapor=False.
+        if kernel_status == 'ok':
+            result.vapor_pressures_Pa = {}
+            result.vapor_pressures_source = {}
+            diagnostic['vapor_pressures_Pa'] = {}
+            diagnostic['vapor_pressures_source'] = {}
+            diagnostic[
+                'vapor_pressure_zero_reason'
+            ] = 'kernel_ok_empty'
+            # b-149 instance 2: kernel status=ok with empty pressures is
+            # accepted as an authoritative zero. Instrument (do not refuse)
+            # so the silent-zero class is visible on the diagnostic surface.
+            from simulator.silent_zero import (
+                CATEGORY_PROVEN_ZERO,
+                ZeroBecause,
+                merge_notes_into_mapping,
+                note_dict,
+            )
+
+            _sz_note = note_dict(
+                ZeroBecause.KERNEL_OK_EMPTY,
+                site='core.kernel_ok_empty',
+                field='vapor_pressures_Pa',
+                detail=(
+                    'kernel_status=ok with empty pressures accepted as '
+                    'authoritative zero (kernel_ok_empty); indistinguishable '
+                    'from a computed empty without this typed note'
+                ),
+                doctrine_category=CATEGORY_PROVEN_ZERO,
+            )
+            merge_notes_into_mapping(diagnostic, [_sz_note])
+            host_notes.append((ZeroBecause.KERNEL_OK_EMPTY, {'site': 'core.kernel_ok_empty', 'field': 'vapor_pressures_Pa', 'detail': _sz_note['detail'], 'doctrine_category': CATEGORY_PROVEN_ZERO}))
+        else:
+            if not allow_fallback_vapor:
+                # Codex challenge pre-0.5.1 P2 (2026-05-27): keep the
+                # exception message bounded so operator logs stay
+                # readable. Surface the status + the diagnostic keys
+                # only; full diagnostic dict is on
+                # ``self._last_vapor_pressure_diagnostic`` for the
+                # caller that wants the full dump.
+                diagnostic_keys = sorted(diagnostic.keys())
+                raise RuntimeError(
+                    f"Authoritative VAPOR_PRESSURE dispatch returned "
+                    f"status={kernel_status!r} with no pressures and "
+                    f"allow_fallback_vapor=False; refusing to silently "
+                    f"continue on backend vapor pressures. Diagnostic "
+                    f"keys: {diagnostic_keys!r}"
+                )
+            append_kernel_warnings(
+                f"VAPOR_PRESSURE returned status={kernel_status!r}; "
+                f"falling back to backend vapor pressures under "
+                f"allow_fallback_vapor=True."
+            )
+            if backend_sources:
+                result.vapor_pressures_source = dict(backend_sources)
+            diagnostic['vapor_pressures_source'] = dict(
+                getattr(result, 'vapor_pressures_source', {}) or {}
+            )
+    high_t_activity = diagnostic.get('high_t_melt_activity') or {}
+    parent_activities = high_t_activity.get('selected_parent_activities')
+    kernel_activities = parent_activities or diagnostic.get('activities') or {}
+    if kernel_activities:
+        result.activity_coefficients = dict(kernel_activities)
+        if parent_activities:
+            result.diagnostics = {
+                **(getattr(result, 'diagnostics', {}) or {}),
+                'activities_provider': high_t_activity['selected_parent_activities_provider'],
+                'activity_provenance': high_t_activity['selected_parent_activity_provenance'],
+                'activities_standard_state': high_t_activity['selected_parent_activities_standard_state'],
+            }
+    return diagnostic, host_notes

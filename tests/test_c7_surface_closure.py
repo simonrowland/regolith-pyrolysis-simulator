@@ -8,7 +8,8 @@ from simulator.chemistry.langmuir_knudsen import (
     OxygenClosureNonconvergence, _SurfaceOxygenEvaluation,
     _solve_surface_oxygen_balance,
 )
-from simulator.evaporation import EvaporationFluxRefusal
+from simulator.evaporation import (EvaporationFluxRefusal, _frozen_source,
+    _project_frozen_carrier_batch)
 from simulator.transport_regime import series_evaporation_flux
 from tests.test_c7_closure_routing import simulation
 from tests.magemin_test_support import close_test_owned_magemin_backend
@@ -188,9 +189,10 @@ def test_projection_is_read_only_and_commits_the_same_signed_amounts():
         assert (sim.atom_ledger.mol_by_account(), len(sim.atom_ledger.transitions),
                 sim.melt.oxygen_reservoir, sim.train) == before
         flux, predicted, trial, _, _ = solved.payload
-        assert trial.atom_ledger is not sim.atom_ledger
-        assert trial.cost_ledger is not sim.cost_ledger
-        assert trial._chem_kernel is not sim._chem_kernel
+        assert trial.proposals
+        assert not hasattr(trial, 'atom_ledger')
+        assert not hasattr(trial, 'cost_ledger')
+        assert not hasattr(trial, '_chem_kernel')
         sim._reaction_pO2_bar = solved.reaction_pO2_bar
         sim._get_equilibrium()
         start = len(sim.atom_ledger.transitions)
@@ -213,7 +215,7 @@ def test_projection_is_read_only_and_commits_the_same_signed_amounts():
         close_test_owned_magemin_backend(sim)
 
 
-def test_pressure_projections_share_committed_history_and_copy_mutable_frontier():
+def test_frozen_hour_omits_committed_history_and_preserves_live_frontier():
     class CommittedSnapshot:
         def __deepcopy__(self, _memo):
             raise AssertionError('pressure trials must not recursively copy committed history')
@@ -224,18 +226,14 @@ def test_pressure_projections_share_committed_history_and_copy_mutable_frontier(
         sim.record.snapshots.append(committed)
         sim.condensation_model.operating_history.append({'nested': {'wall_temperature_C': 25.0}})
         before = sim.atom_ledger.mol_by_account()
-        trial = sim._detached_evaporation_projection()
-        nested = trial._detached_evaporation_projection()
-        for projection in (trial, nested):
-            assert projection.record.snapshots[0] is committed
-            assert projection.record.snapshots is not sim.record.snapshots
-            assert projection.atom_ledger.mol_by_account() == before
-            assert projection.atom_ledger is not sim.atom_ledger
-        trial.record.snapshots.append(committed)
-        trial.condensation_model.operating_history[-1]['nested']['wall_temperature_C'] = 99.0
-        assert len(sim.record.snapshots) == len(nested.record.snapshots) == 1
+        hour = sim._prepare_evaporation_hour()
+        flux, *_ = _frozen_source(hour, 1e-7)
+        _project_frozen_carrier_batch(hour, flux)
+        assert hour.accounts_mol == before
+        assert not hasattr(hour, 'record')
+        assert 'operating_history' not in hour.condensation_inputs
+        assert len(sim.record.snapshots) == 1
         assert sim.condensation_model.operating_history[-1]['nested']['wall_temperature_C'] == 25.0
-        assert nested.condensation_model.operating_history[-1]['nested']['wall_temperature_C'] == 25.0
     finally:
         close_test_owned_magemin_backend(sim)
 
@@ -250,11 +248,9 @@ def test_pressure_projection_shares_read_only_inputs_but_rollback_detaches_them(
     try:
         for name in names:
             setattr(sim, name, ReadOnlyInputs(getattr(sim, name)))
-        trial = sim._detached_evaporation_projection()
-        for name in names:
-            assert getattr(trial, name) is getattr(sim, name)
-        assert trial.melt is not sim.melt
-        assert trial.atom_ledger is not sim.atom_ledger
+        hour = sim._prepare_evaporation_hour()
+        assert hour.vapor_pressure_data is sim.vapor_pressures
+        assert hour.accounts_mol == sim.atom_ledger.mol_by_account()
         # Whole-hour rollback keeps its original mutable-input contract.
         for name in names:
             setattr(sim, name, {'sample': {'value': 1000.0}})
@@ -474,16 +470,9 @@ def test_mixed_asteroid_zero_keeps_neutral_pressure(monkeypatch):
         assert legacy.vapor_pressures_Pa == result.vapor_pressures_Pa
         flux = sim._calculate_evaporation(result)
         assert flux.species_kg_hr['SiO2_gas'] > 0.0
-        projections = []
-        project = sim._detached_evaporation_projection
-        def count_projection():
-            projections.append(1)
-            return project()
-        monkeypatch.setattr(sim, '_detached_evaporation_projection', count_projection)
+        monkeypatch.setattr(sim, '_snapshot_terminal_refusal_hour_state',
+                            lambda **kw: pytest.fail('zero endpoint took a snapshot'))
         solved = sim._solve_evaporative_oxygen_boundary(result)
-        # The proven zero needs its ledger projection and admission audit,
-        # not a decade search that repeatedly snapshots the same zero source.
-        assert len(projections) <= 2
         assert solved.reaction_pO2_bar == solved.residual == 0.0
         proposed, amounts, trial, _, _ = solved.payload
         assert proposed.species_kg_hr.get('CrO2', 0.0) == 0.0
@@ -491,7 +480,7 @@ def test_mixed_asteroid_zero_keeps_neutral_pressure(monkeypatch):
         assert proposed.species_kg_hr['SiO2_gas'] > 0.0
         assert amounts[0]['carrier:SiO2_gas'] > 0.0
         assert any('oxygen-consuming carriers stop at zero oxygen' in notice
-                   for notice in trial._carrier_admission_notices)
+                   for notice in trial.carrier_admission_notices)
     finally:
         close_test_owned_magemin_backend(sim)
 
@@ -522,18 +511,14 @@ def test_transport_bounded_batch_retains_internal_buffer_coproduct():
             'Na': 0.001, 'CrO2': 5.808349183114205e-10,
             'CrO3': 3.3342076872338656e-10})
         flux.update_totals()
-        full = sim._detached_evaporation_projection()
-        limited = sim._detached_evaporation_projection()
-        full._apply_evaporation_carrier_batch(deepcopy(flux))
-        start = len(limited.atom_ledger.transitions)
-        before = limited.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
+        hour = sim._prepare_evaporation_hour()
+        full, _ = _project_frozen_carrier_batch(hour, flux)
         # Lunar inward film supply at the recorded area and one-hour dt.
         supply = 4.993391080925191e-25 * 0.41006003303200633 * 3600.0
-        limited._apply_evaporation_carrier_batch(deepcopy(flux), oxygen_uptake_capacity_mol=supply)
-        amounts, _ = limited._evaporation_signed_amounts(start, before)
+        (amounts, _), limited = _project_frozen_carrier_batch(hour, flux, oxygen_uptake_capacity_mol=supply)
         assert amounts['gas:O2'] == pytest.approx(-supply, rel=1e-12, abs=0.0)
-        assert limited.atom_ledger.mol_by_account('reservoir.fo2_buffer') == full.atom_ledger.mol_by_account('reservoir.fo2_buffer')
-        assert limited._oxygen_uptake_transport_limited
+        assert amounts['storage'] == full[0]['storage']
+        assert limited.oxygen_uptake_transport_limited
     finally:
         close_test_owned_magemin_backend(sim)
 
@@ -558,10 +543,8 @@ def test_lunar_shaped_debit_resettles_at_inward_endpoint():
             'Na': 0.001, 'CrO2': 5.808349183114205e-10,
             'CrO3': 3.3342076872338656e-10})
         flux.update_totals()
-        full = sim._detached_evaporation_projection()
-        start = len(full.atom_ledger.transitions)
-        full._apply_evaporation_carrier_batch(deepcopy(flux))
-        amounts, _ = full._evaporation_signed_amounts(start, 0.0)
+        hour = sim._prepare_evaporation_hour()
+        (amounts, _), _ = _project_frozen_carrier_batch(hour, flux)
         # Scale actual balanced carrier legs to the captured lunar debit and
         # buffer coproduct, rather than copying a residual or stoichiometry law.
         for species in ('CrO2', 'CrO3'):
@@ -571,18 +554,15 @@ def test_lunar_shaped_debit_resettles_at_inward_endpoint():
 
         def point(delta, *, bounded=False):
             j = oxygen_transport(bulk, delta, film=True, temperature_K=1418.15, area_m2=0.41006003303200633).flux_kg_s_m2 / 0.031998
-            trial = sim._detached_evaporation_projection()
-            start = len(trial.atom_ledger.transitions)
-            trial._apply_evaporation_carrier_batch(deepcopy(flux),
+            (amounts, _), trial = _project_frozen_carrier_batch(hour, flux,
                 oxygen_uptake_capacity_mol=(max(0.0, -j) * area_dt if bounded else None))
-            amounts, _ = trial._evaporation_signed_amounts(start, 0.0)
             return _SurfaceOxygenEvaluation(
                 bulk + delta, bulk, j, 0.0,
                 {k: v / area_dt for k, v in amounts.items() if k.startswith('source:')},
                 2.0 * amounts['ferric_oxygen'] / area_dt,
                 amounts['other_oxygen'] / area_dt, amounts['storage'] / area_dt,
                 amounts['gas:O2'] / area_dt,
-                oxygen_uptake_transport_limited=trial._oxygen_uptake_transport_limited)
+                oxygen_uptake_transport_limited=trial.oxygen_uptake_transport_limited)
 
         solved = _solve_surface_oxygen_balance(point, bulk_pO2_bar=bulk,
             settle_inward_endpoint=lambda delta: point(delta, bounded=True))

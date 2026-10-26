@@ -145,9 +145,6 @@ from simulator.config import load_config_bundle
 from simulator.coating_rate import continuous_wall_deposition_flux
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
-from simulator.core import (
-    CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
-)
 from simulator.lab_geometry import (
     LabGeometry,
     LabGeometryError,
@@ -162,6 +159,7 @@ from simulator.condensation_routing import (
     is_designated_for_stage,
 )
 from simulator.state import (
+    CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
     CampaignPhase,
     MAX_STIR_FACTOR,
     MOLAR_MASS,
@@ -1521,6 +1519,27 @@ class CondensationRouteResult:
 
 
 class _CondensationRoutePhysics:
+    def _update_route_surface_temperatures(
+        self,
+        temperatures_C: Mapping[str, float],
+    ) -> bool:
+        self._apply_pipe_segment_temperatures(temperatures_C)
+        if not self.pipe_segments:
+            return False
+        self.wall_temperature_C = None if self.wall_temperature_input_refusals else min(
+            segment.wall_temperature_C for segment in self.pipe_segments
+        )
+        return True
+
+    def _query_wall_deposit_candidate(self, **kwargs):
+        return query_wall_deposit_candidate_kg(self, **kwargs)
+
+    def _query_wall_deposit_segments(self, **kwargs):
+        return query_wall_deposit_candidates_by_segment_kg(self, **kwargs)
+
+    def _query_wall_deposit_surface(self, **kwargs):
+        return query_wall_deposit_candidate_for_surface_kg(self, **kwargs)
+
     def _build_default_pipe_segments(
         self,
         wall_temperature_C: float,
@@ -2476,8 +2495,7 @@ class _CondensationRoutePhysics:
             antoine_extrapolation_warnings,
         )
         try:
-            return query_wall_deposit_candidate_kg(
-                self,
+            return self._query_wall_deposit_candidate(
                 species=species,
                 rate_kg_hr=rate_kg_hr,
                 T_cond_C=T_cond_C,
@@ -2521,8 +2539,7 @@ class _CondensationRoutePhysics:
             antoine_extrapolation_warnings,
         )
         try:
-            return query_wall_deposit_candidates_by_segment_kg(
-                self,
+            return self._query_wall_deposit_segments(
                 species=species,
                 rate_kg_hr=rate_kg_hr,
                 T_cond_C=T_cond_C,
@@ -2869,8 +2886,7 @@ class _CondensationRoutePhysics:
             antoine_extrapolation_warnings,
         )
         try:
-            return query_wall_deposit_candidate_for_surface_kg(
-                self,
+            return self._query_wall_deposit_surface(
                 species=species,
                 rate_kg_hr=rate_kg_hr,
                 T_cond_C=T_cond_C,
@@ -2952,6 +2968,104 @@ class _CondensationRoutePhysics:
             vapor_pressure_data=self.vapor_pressure_data,
             wall_species_partial_pressures_pa=self.wall_species_partial_pressures_pa,
         )
+
+
+@dataclass(frozen=True)
+class _CondensationStageInputs:
+    stage_number: int
+    label: str
+    temp_range_C: tuple[float, float]
+    target_species: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class _CondensationGeometryInputs:
+    stages: tuple[_CondensationStageInputs, ...]
+
+
+@dataclass
+class _CondensationRouteWork(_CondensationRoutePhysics):
+    """Local route arithmetic; no ledger, product collections, or histories."""
+
+    train: _CondensationGeometryInputs
+    vapor_pressure_data: Any
+    materials: Mapping[str, Any]
+    species_formula_registry: Mapping[str, Any]
+    condensation_temperatures_C: Mapping[str, float]
+    wall_surface_area_m2: float
+    wall_temperature_C: float | None
+    overhead_pressure_mbar: float
+    species_partial_pressures_mbar: Mapping[str, float]
+    _species_partial_pressures_configured: bool
+    pipe_diameter_m: float
+    stage_area_m2_by_stage: Mapping[str, float]
+    stage_area_geometry_provenance_notice: Mapping[str, Any]
+    gas_temperature_C: float
+    carrier_gas: str
+    stir_factor: float
+    radial_stir_factor: float | None
+    regime_factor: float
+    _knudsen_policy_configured: bool
+    lab_geometry: bool | None
+    pipe_segments: tuple[PipeSegment, ...]
+    wall_temperature_input_refusals: Mapping[str, str]
+    residence_time_s: Mapping[int, float]
+    wall_alkali_binding_diagnostic_state_by_account: Mapping[str, Any]
+    knudsen_number: float = field(init=False, default=math.inf)
+    knudsen_regime: Any = field(init=False, default=KnudsenRegime.FREE_MOLECULAR)
+    last_knudsen_regime_diagnostic: dict = field(init=False, default_factory=dict)
+    last_wall_capture_fixed_point_iterations: int = field(init=False, default=0)
+    last_wall_deposition_rate_shadow_candidate: dict = field(init=False, default_factory=dict)
+    wall_species_partial_pressures_pa: dict = field(init=False, default_factory=dict)
+    wall_species_partial_pressures_pa_by_segment: dict = field(init=False, default_factory=dict)
+    notice_proposals: list = field(init=False, default_factory=list)
+
+    def _query_wall_deposit_candidate(self, **kwargs):
+        from simulator.wall_deposition import _evaluate_wall_deposit_candidate_kg
+        return _evaluate_wall_deposit_candidate_kg(self, notice_proposals=self.notice_proposals, **kwargs)
+
+    def _query_wall_deposit_segments(self, **kwargs):
+        from simulator.wall_deposition import _evaluate_wall_deposit_candidates_by_segment_kg
+        return _evaluate_wall_deposit_candidates_by_segment_kg(self, notice_proposals=self.notice_proposals, **kwargs)
+
+    def _query_wall_deposit_surface(self, **kwargs):
+        from simulator.wall_deposition import _evaluate_wall_deposit_candidate_for_surface_kg
+        return _evaluate_wall_deposit_candidate_for_surface_kg(self, notice_proposals=self.notice_proposals, **kwargs)
+
+
+def _condensation_route_inputs(model):
+    from dataclasses import fields
+
+    inputs = _FrozenCatalogDict()
+    for item in fields(_CondensationRouteWork):
+        if not item.init:
+            continue
+        value = getattr(model, item.name)
+        if item.name == 'train':
+            value = _CondensationGeometryInputs(tuple(
+                _CondensationStageInputs(stage.stage_number, stage.label,
+                    tuple(stage.temp_range_C), tuple(stage.target_species))
+                for stage in value.stages))
+        elif item.name == 'lab_geometry':
+            value = True if value is not None else None
+        elif item.name == 'pipe_segments':
+            value = tuple(value)
+        elif item.name == 'vapor_pressure_data':
+            if isinstance(value, VaporPressureCompatibilityView):
+                # Reuse the owner's frozen payload and existing route binding.
+                # The public facade constructor deep-copies caller-owned data;
+                # this hour projection already owns immutable numerical inputs.
+                route_data = _freeze_catalog_value(dict(value))
+                route_data.catalog_payload = value.catalog_payload
+                value = route_data
+                value._route_catalog = None
+                _condensation_catalog(value, value.catalog_payload)
+            else:
+                value = _freeze_catalog_value(value)
+        elif item.name != 'vapor_pressure_data':
+            value = _freeze_catalog_value(value)
+        dict.__setitem__(inputs, item.name, value)
+    return inputs
 
 
 class CondensationModel(_CondensationRoutePhysics):
@@ -3372,15 +3486,10 @@ class CondensationModel(_CondensationRoutePhysics):
 
 
     def update_pipe_segment_temperatures(
-        self,
-        temperatures_C: Mapping[str, float],
+        self, temperatures_C: Mapping[str, float],
     ) -> None:
-        self._apply_pipe_segment_temperatures(temperatures_C)
-        if not self.pipe_segments:
+        if not self._update_route_surface_temperatures(temperatures_C):
             return
-        self.wall_temperature_C = None if self.wall_temperature_input_refusals else min(
-            segment.wall_temperature_C for segment in self.pipe_segments
-        )
         if self.operating_history:
             self.operating_history[-1]["wall_temperature_C"] = self.wall_temperature_C
             if self.wall_temperature_input_refusals:
@@ -3427,10 +3536,6 @@ class CondensationModel(_CondensationRoutePhysics):
         data = self.vapor_pressure_data
         if not isinstance(data, VaporPressureCompatibilityView):
             return self._route(evap_flux, melt)
-        if getattr(self, '_pressure_trial', False):
-            if not hasattr(data, '_route_catalog'):
-                data._route_catalog = None
-            return self._route(evap_flux, melt)
         missing = object()
         previous = getattr(data, '_route_catalog', missing)
         data._route_catalog = None
@@ -3443,11 +3548,8 @@ class CondensationModel(_CondensationRoutePhysics):
                 data._route_catalog = previous
 
     def _route(self, evap_flux: EvaporationFlux, melt: MeltState):
-        trial = getattr(self, '_pressure_trial', False)
         (antoine_extrapolation_warnings, antoine_extrapolations, carrier_authority_by_species, condensation_authority_by_species, condensation_refusals_by_species, efficiency_outcomes_by_species, knudsen_diagnostic, route_result, transport_parameter_notice_by_species, used_capture_budget_regularizer, wall_deposit_by_species, wall_saturation_pressure_refusals_by_species, wall_sticking_alpha_by_species, wall_sticking_alpha_provenance_by_species, condensed_by_stage_species, carrier_authority_status_by_species, cleanup_offgas_authorization, remaining_by_species, retained_in_source_by_species) = self._route_amounts(
-            evap_flux, melt, materialize_authority=not trial)
-        if trial:
-            return route_result
+            evap_flux, melt, materialize_authority=True)
         self._enforce_knudsen_regime()
         from simulator.vapour_rail.instrumentation import (
             VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE, VAPOUR_CARRIER_AUTHORITY_MISSING,

@@ -10,6 +10,7 @@ from simulator.alpha_kinetics import (
 
 import copy
 import math
+from dataclasses import dataclass, fields, replace
 from collections import defaultdict
 from collections.abc import Mapping
 from numbers import Real
@@ -23,7 +24,8 @@ from simulator.chemistry.kernel import (
     ProviderUnavailableError,
 )
 from simulator.fe_redox import (
-    _transition_species_mol,
+    _transition_species_mol, _remaining_buffer_release_capacity,
+    _fe_redox_respeciation_controls, _cleaned_melt_fe_atom_mol,
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     RedoxState,
@@ -1645,6 +1647,629 @@ def _pipe_transport_inlet_flux(
     return inlet
 
 
+
+def _depleted_evaporation_flux(evap_flux, effective_rates, frozen_carriers):
+    smoothed = EvaporationFlux(
+        species_kg_hr=effective_rates,
+        alpha_authority_status_by_species={
+            species: status
+            for species, status in (
+                evap_flux.alpha_authority_status_by_species.items()
+            )
+            if float(effective_rates.get(species, 0.0)) > _carrier_numerical_floor(
+                species,
+                frozen_carriers, 1.0e-12)
+        },
+        # Canonical serialized answers are treated as immutable evidence;
+        # depletion changes rates only and can safely share the records.
+        carrier_authority_by_species=(
+            evap_flux.carrier_authority_by_species
+        ),
+    )
+    smoothed.update_totals()
+    return smoothed
+
+
+
+def _require_evaporation_melt_resistance_policy(series_config):
+    if bool(series_config.get('melt_resistance_enabled', False)):
+        diagnostic = {
+            'evaporation_flux_kg_hr': {},
+            'reason': 'uncertified_melt_resistance_model',
+            'detail': (
+                'requires species- and state-specific D_i, k_L,i, '
+                'and dp_eq/dC_i'
+            ),
+        }
+        raise EvaporationFluxRefusal(
+            'uncertified_melt_resistance_model',
+            diagnostic,
+        )
+
+
+
+def _frozen_evaporation_zero_reason(frozen, oxygen, evaluator_for, gas_source_for):
+    if frozen == frozenset():
+        return 'frozen_carrier_set_empty'
+    if oxygen == 0.0 and frozen:
+        evaluators = [evaluator_for(species) for species in frozen]
+        if all(evaluator is not None and (
+                evaluator.pO2_exponent >= 0.0 or (
+                    evaluator.oxygen_fugacity_channel == 'intrinsic_melt'
+                    and gas_source_for(species) == 0.0))
+               for species, evaluator in zip(frozen, evaluators)):
+            return 'frozen_consuming_carriers_at_zero_oxygen'
+    return None
+
+
+@dataclass(frozen=True)
+class _EvaporationHourMelt:
+    temperature_C: float
+    p_total_mbar: float
+    atmosphere: Any
+    campaign: Any
+    campaign_hour: float
+    hour: int
+    sweep_mol_per_s: float | None
+
+
+@dataclass(frozen=True)
+class _FrozenEvaporationHour:
+    melt: _EvaporationHourMelt
+    accounts_mol: Mapping[str, Mapping[str, float]]
+    species_formula_registry: Mapping[str, Any]
+    ledger_controls: Mapping[str, Any]
+    vapor_pressure_data: Mapping[str, Any]
+    catalog: Any
+    provider_requests: Mapping[Any, Any]
+    providers: Mapping[Any, Any]
+    equilibrium_inputs: Mapping[str, Any]
+    intrinsic_publication: Mapping[str, Any]
+    flux_controls: Mapping[str, Any]
+    phase: Mapping[str, Any]
+    redox: Mapping[str, Any]
+    bulk_pO2_bar: float
+    bulk_partials_Pa: Mapping[str, float]
+    area_dt_m2_s: float
+    transport: Mapping[str, Any]
+    condensation_inputs: Mapping[str, Any]
+    frozen_carriers: frozenset[str] | None = None
+    seed_raw_rates: Mapping[str, float] | None = None
+    seed_alpha_authority: Mapping[str, str] | None = None
+    seed_carrier_authority: Mapping[str, Any] | None = None
+    seed_computed_channels: frozenset[str] = frozenset()
+
+
+@dataclass(frozen=True)
+class _EvaporationTrialProposal:
+    frozen_carriers: frozenset[str]
+    proposals: tuple
+    committed_flux: EvaporationFlux
+    oxygen_uptake_capacity_mol: float | None
+    oxygen_release_capacity_mol: float | None
+    oxygen_uptake_transport_limited: bool
+    oxygen_release_transport_limited: bool
+    carrier_admission_flips: tuple = ()
+    carrier_admission_notices: tuple[str, ...] = ()
+
+
+def _hour_account_kg(hour, accounts, account):
+    from simulator.accounting.ledger import _species_mol_to_kg
+    return _species_mol_to_kg(accounts.get(account, {}), hour.species_formula_registry,
+                              tolerance_kg=0.0)
+
+
+def _hour_outward_account_mol(hour, accounts, scales, account):
+    from simulator.accounting.ledger import (
+        _project_account_kg, _projection_tolerance_kg, _species_kg_to_mol,
+    )
+    controls = hour.ledger_controls
+    projected = _project_account_kg(account, _hour_account_kg(hour, accounts, account),
+        account in controls['allow_negative_accounts'],
+        lambda species: _projection_tolerance_kg(account,
+            controls['balance_absolute_floor_kg'], controls['balance_relative_tolerance'],
+            species, scales))
+    return _species_kg_to_mol(projected, hour.species_formula_registry, tolerance_kg=0.0)
+
+
+def _frozen_provider_result(hour, intent, accounts, scales, control_inputs, *, fO2_log=None):
+    from simulator.chemistry.kernel.account_filters import _provider_account_view_from_mol
+    from simulator.chemistry.kernel.planner import _validate_provider_result
+    from simulator.fe_redox import _reanchor_redox_state
+
+    provider, profile = hour.providers[intent]
+    request = hour.provider_requests[intent]
+    controls = dict(control_inputs)
+    fO2_log, redox_state = normalize_redox_state(fO2_log, None)
+    quantization = hour.ledger_controls['quantization']
+    overrides = None
+    if quantization is not None:
+        from simulator.reduced_real_determinism import (
+            _quantize, canonicalized_composition_mol_by_account,
+        )
+        if fO2_log is not None:
+            fO2_log = _quantize(fO2_log, quantization.log_fo2_quantum,
+                               quantization.log_fo2_decimals)
+            redox_state = _reanchor_redox_state(redox_state, fO2_log)
+            fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
+            if 'melt_fO2_log' in controls:
+                controls['melt_fO2_log'] = float(fO2_log)
+        overrides = canonicalized_composition_mol_by_account(
+            {account: _hour_outward_account_mol(hour, accounts, scales, account)
+             for account in accounts}, sig_figs=quantization.composition_sig_figs)
+    view = _provider_account_view_from_mol(accounts, profile.declared_accounts,
+        hour.species_formula_registry,
+        project_account_mol=lambda account: _hour_outward_account_mol(hour, accounts, scales, account),
+        account_mol_overrides=overrides)
+    request = replace(request, account_view=view, control_inputs=controls,
+        fO2_log=fO2_log if profile.consumes_fO2 else None,
+        redox_state=redox_state if profile.consumes_fO2 else None)
+    if intent == ChemistryIntent.VAPOR_PRESSURE and hasattr(provider, '_evaluate_pressure'):
+        result = provider._evaluate_pressure(request, pseudo_fallbacks=[])
+    else:
+        result = provider.dispatch(request)
+    _validate_provider_result(provider, request, result, profile.declared_accounts,
+                              hour.species_formula_registry)
+    return result
+
+
+def _project_frozen_proposal(hour, accounts, scales, proposals, transitions, intent, result):
+    from simulator.accounting.ledger import _apply_lot, _record_movement_scale
+    from simulator.chemistry.kernel.validation import _proposal_to_ledger_transition
+
+    if result.transition is None:
+        return None
+    proposal = result.transition
+    transition = _proposal_to_ledger_transition(proposal, hour.species_formula_registry)
+    for lots, sign in ((transition.debits, -1.0), (transition.credits, 1.0)):
+        for lot in lots:
+            _apply_lot(accounts, lot, sign=sign,
+                tolerance_kg=hour.ledger_controls['balance_tolerance_kg'],
+                registry=hour.species_formula_registry)
+            _record_movement_scale(scales, lot.account, lot.species_kg)
+    proposals.append((intent, proposal))
+    transitions.append(transition)
+    return transition
+
+
+def _frozen_equilibrium_result(hour):
+    from simulator.melt_backend.base import EquilibriumResult
+
+    values = dict(hour.equilibrium_inputs)
+    values['warnings'] = list(values.get('warnings', ()))
+    return EquilibriumResult(**values)
+
+
+def _hour_zero_reason(hour, oxygen):
+    phase = 'stage0' if hour.melt.campaign.name in {'C0', 'C0B'} else 'hot_train'
+    reason = _frozen_evaporation_zero_reason(hour.frozen_carriers, oxygen,
+        lambda species: hour.catalog.evaluator_for_hot_train(species, process_phase=phase),
+        lambda species: _project_evaporation_overhead_source_mol_hr({species: 1.0}, {},
+            vapor_pressure_data=hour.vapor_pressure_data,
+            species_formula_registry=hour.species_formula_registry).get('O2', 0.0))
+    return reason or hour.phase['physical_zero_reason']
+
+
+def _frozen_pressure(hour, oxygen):
+    from simulator.equilibrium import _project_vapor_pressure_result
+
+    result = _frozen_equilibrium_result(hour)
+    if hour.melt.temperature_C + 273.15 < 400.0:
+        return result, {'vapor_pressure_zero_reason': 'internal_analytical_below_400K'}
+    reason = 'no_liquid_phase' if result.liquid_fraction == 0.0 else (
+        _hour_zero_reason(hour, oxygen) if oxygen == 0.0 else None)
+    if reason and reason != 'frozen_consuming_carriers_at_zero_oxygen':
+        result.vapor_pressures_Pa = {}
+        result.vapor_pressures_source = {}
+        return result, {'status': 'ok', 'vapor_pressures_Pa': {},
+                        'vapor_pressure_zero_reason': reason}
+    controls = dict(hour.provider_requests[ChemistryIntent.VAPOR_PRESSURE].control_inputs)
+    controls.update(pO2_bar=oxygen, pO2_admission='surface_closure',
+        _frozen_carriers=(tuple(sorted(hour.frozen_carriers))
+                          if hour.frozen_carriers is not None else None))
+    kernel_result = _frozen_provider_result(hour, ChemistryIntent.VAPOR_PRESSURE,
+        hour.accounts_mol, hour.ledger_controls['movement_scale_kg'], controls,
+        fO2_log=hour.intrinsic_publication['published_intrinsic_fO2_log'])
+    diagnostic, _ = _project_vapor_pressure_result(result, kernel_result,
+        intrinsic_publication=hour.intrinsic_publication,
+        backend_sources=dict(result.vapor_pressures_source),
+        backend_vp=dict(result.vapor_pressures_Pa), regime_diagnostic={},
+        non_evaporating_without_closure=False,
+        allow_fallback_vapor=hour.phase['allow_fallback_vapor'])
+    return result, diagnostic
+
+
+def _evaporation_channels_non_debiting(states):
+    return bool(states) and all(state in {'zero_by_physics', 'upper_bound', 'dormant_by_epoch'}
+                                for state in states.values())
+
+
+def _frozen_flux_from_pressure(hour, oxygen, equilibrium, pressure_diagnostic):
+    _require_evaporation_melt_resistance_policy(hour.flux_controls['evaporation_series_resistance'])
+    zero_reason = (_hour_zero_reason(hour, oxygen)
+                   if oxygen == 0.0 or hour.frozen_carriers == frozenset() else None)
+    flux = EvaporationFlux()
+    if ((zero_reason and zero_reason != 'frozen_consuming_carriers_at_zero_oxygen')
+            or equilibrium.liquid_fraction == 0.0):
+        return flux, {}, flux
+
+    def build_batch(**state):
+        activation = state.pop('flux_activation_context')
+        state['imcc_activity_shadow_enabled'] = False
+        return hour.catalog.resolve_batch(hour.accounts_mol, state,
+                                         flux_activation_context=activation)
+
+    effective = _pre_rg_effective_pressure_source(hour.vapor_pressure_data, equilibrium)
+    batch, error = _resolve_evaporation_vapour_batch(equilibrium,
+        temperature_K=hour.melt.temperature_C + 273.15,
+        effective_pressure_source=effective, builder=build_batch,
+        vapor_pressure_diagnostic=pressure_diagnostic,
+        total_pressure_Pa=hour.melt.p_total_mbar * 100.0,
+        campaign_name=hour.melt.campaign.name, melt_activity_shadow_enabled=False,
+        melt_activity_engine_inputs={})
+    vapor_pressures, overlay, _, _, _, _ = _evaporation_flux_pressure_overlay(
+        hour.vapor_pressure_data, equilibrium, pressure_diagnostic, batch, error, effective)
+    report = serialize_vapour_batch(batch)
+    if isinstance(report, Mapping):
+        flux.carrier_authority_by_species = {
+            str(species): dict(record)
+            for species, record in (report.get('channels_by_species', {}) or {}).items()
+            if isinstance(record, Mapping)}
+    if error:
+        raise EvaporationFluxRefusal(str(error.get('reason') or 'vapour_batch_resolution_error'), error)
+    if batch is not None and not batch.requested_species_ids:
+        return flux, {}, flux
+    if not vapor_pressures:
+        states = overlay.get('batch_channel_states', {}) or {}
+        if (hour.melt.temperature_C + 273.15 < 400.0
+                or (effective.physical_zero_reason is not None and overlay.get('batch_pa_by_species'))
+                or _evaporation_channels_non_debiting(states)):
+            return flux, {}, flux
+        raise EvaporationFluxRefusal('vapour_batch_no_debiting_pressure_outcome', {
+            'reason': 'vapour_batch_no_debiting_pressure_outcome',
+            'evaporation_flux_kg_hr': {}, 'vapour_batch_flux_overlay': overlay,
+            'vapour_batch': report})
+    if hour.melt.temperature_C + 273.15 < 400.0:
+        return flux, {}, flux
+    partials = dict(hour.bulk_partials_Pa)
+    for species in vapor_pressures:
+        partials.setdefault(species, 0.0)
+    molar_masses, stoich, available = _build_evaporation_aux_maps(vapor_pressures,
+        vapor_pressure_data=hour.vapor_pressure_data,
+        species_formula_registry=hour.species_formula_registry,
+        cleaned_melt_kg=_hour_account_kg(hour, hour.accounts_mol, 'process.cleaned_melt'),
+        spent_reductant_residue_kg=_hour_account_kg(hour, hour.accounts_mol, SPENT_REDUCTANT_RESIDUE_ACCOUNT),
+        composition_kg=hour.phase['composition_kg'])
+    controls = dict(hour.flux_controls)
+    controls.update({
+        CONTROL_FLUX_PRESSURES_KEY: vapor_pressures,
+        'vapor_pressures_Pa': dict(equilibrium.vapor_pressures_Pa),
+        'vapor_pressures_source': dict(equilibrium.vapor_pressures_source),
+        'vapor_pressure_numerator_provenance': dict(
+            pressure_diagnostic.get('vapor_pressure_numerator_provenance') or {}),
+        'vapor_pressure_activities': EvaporationMixin._vapor_pressure_activity_operands(
+            equilibrium, pressure_diagnostic),
+        '_frozen_carriers': (tuple(sorted(hour.frozen_carriers))
+                             if hour.frozen_carriers is not None else None),
+        'pO2_bar': pressure_diagnostic.get('pO2_bar'),
+        'overhead_partials_Pa': partials, 'molar_mass_kg_mol': molar_masses,
+        'stoich_by_species': stoich, 'available_oxide_kg': available,
+        CONTROL_BATCH_REPORT_KEY: report, 'vapour_batch_flux_overlay': overlay,
+    })
+    if 'shadow_equal' in overlay:
+        controls[CONTROL_SHADOW_EQUAL_KEY] = bool(overlay['shadow_equal'])
+    if 'shadow_outcome' in overlay:
+        controls['vapour_batch_flux_shadow_outcome'] = overlay['shadow_outcome']
+    kernel_result = _frozen_provider_result(hour, ChemistryIntent.EVAPORATION_FLUX,
+        hour.accounts_mol, hour.ledger_controls['movement_scale_kg'], controls)
+    diagnostic = dict(kernel_result.diagnostic or {})
+    raw = _project_evaporation_flux(kernel_result, flux, diagnostic,
+        freeze_gate_fraction=hour.phase['freeze_gate_fraction'],
+        native_fe_capacity_mol=hour.phase['native_fe_capacity_mol'],
+        molar_masses_kg_mol=molar_masses, frozen_carriers=hour.frozen_carriers)
+    if not raw.species_kg_hr:
+        return raw, diagnostic, raw
+    rates = _analytic_evaporation_depletion_rates(raw.species_kg_hr,
+        vapor_pressures=hour.vapor_pressure_data, frozen_carriers=hour.frozen_carriers,
+        species_formula_registry=hour.species_formula_registry, dt_hr=1.0, phase_scalar=1.0,
+        cleaned_melt_kg=_hour_account_kg(hour, hour.accounts_mol, 'process.cleaned_melt'),
+        available_o2_kg=_hour_account_kg(hour, hour.accounts_mol, 'process.overhead_gas').get('O2', 0.0))
+    return _depleted_evaporation_flux(raw, rates, hour.frozen_carriers), diagnostic, raw
+
+
+def _frozen_source(hour, oxygen):
+    equilibrium, diagnostic = _frozen_pressure(hour, oxygen)
+    flux, flux_diagnostic, raw = _frozen_flux_from_pressure(hour, oxygen, equilibrium, diagnostic)
+    return flux, equilibrium, diagnostic, flux_diagnostic, raw
+
+
+def _frozen_condensation_route(hour, flux):
+    from simulator.condensation import _CondensationRouteWork
+    from simulator.overhead import (
+        _pipe_conductance, _vapor_pressure_mbar_from_flux,
+        _estimate_transport_state, _controlled_o2_transport_capacity, _backpressure_partials,
+    )
+    inputs = hour.transport
+    geometry = dict(pipe_diameter_m=inputs['pipe_diameter_m'],
+        pipe_length_m=inputs['pipe_length_m'],
+        species_formula_registry=hour.species_formula_registry,
+        fallback_engagement_recorder=None)
+    def conductance(*args, **kwargs):
+        return _pipe_conductance(*args, **geometry, **kwargs)
+    def inverse(*args, **kwargs):
+        return _vapor_pressure_mbar_from_flux(*args, **geometry, **kwargs)[0]
+    capacity, _ = _controlled_o2_transport_capacity(flux, hour.melt,
+        downstream_pressure_override=inputs['downstream_pressure_override'],
+        conductance_override=inputs['conductance_override'],
+        pipe_diameter_m=inputs['pipe_diameter_m'], pipe_length_m=inputs['pipe_length_m'],
+        species_formula_registry=hour.species_formula_registry, pipe_conductance=conductance,
+        cold_train_capacity=inputs['cold_train_capacity'], retained_holdup_kg=inputs['retained_holdup_kg'])
+    inlet = _pipe_transport_inlet_flux(flux, p_total_mbar=hour.melt.p_total_mbar,
+        vapor_pressure_data=hour.vapor_pressure_data, species_formula_registry=hour.species_formula_registry)
+    transport = _estimate_transport_state(inlet, hour.melt,
+        resolve_pipe_temperature_C=lambda melt: inputs['pipe_temperature_C'],
+        resolve_downstream_pressure=lambda melt, override: inputs['downstream_pressure_bar'],
+        pipe_conductance=lambda *args, **kwargs: conductance(*args, **kwargs)[0],
+        vapor_pressure_mbar_from_flux=inverse,
+        initial_throat_area_m2=inputs['initial_throat_area_m2'], pipe_diameter_m=inputs['pipe_diameter_m'],
+        stage_areas=lambda: dict(inputs['stage_areas']), geometry_notice=lambda: dict(inputs['geometry_notice']),
+        effective_transport_capacity=capacity)
+    oxygen_mol_hr = (_project_evaporation_overhead_source_mol_hr(flux.species_kg_hr, {},
+        vapor_pressure_data=hour.vapor_pressure_data, species_formula_registry=hour.species_formula_registry)
+        .get('O2', 0.0) if hour.melt.sweep_mol_per_s is not None else 0.0)
+    partials, _ = _backpressure_partials(inlet, hour.melt, transport,
+        hour.species_formula_registry, background_partials=lambda: dict(inputs['background_partials']),
+        oxygen_mol_hr=oxygen_mol_hr)
+    work = _CondensationRouteWork(**hour.condensation_inputs)
+    work._configure_route_conditions(wall_temperature_C=transport['pipe_temperature_C'],
+        overhead_pressure_mbar=transport['pressure_mbar'], species_partial_pressures_mbar=partials,
+        pipe_diameter_m=inputs['pipe_diameter_m'], gas_temperature_C=transport['conductance_temperature_C'],
+        stage_area_m2_by_stage=transport['stage_area_m2_by_stage'],
+        stage_area_geometry_provenance_notice=transport.get('stage_area_geometry_provenance_notice', {}),
+        pipe_segment_temperatures_C=inputs['pipe_segment_temperatures_C'],
+        stir_factor=inputs['stir_factor'], radial_stir_factor=inputs['radial_stir_factor'],
+        carrier_gas=inputs['carrier_gas'], campaign_name=hour.melt.campaign.name,
+        campaign_hour=hour.melt.campaign_hour)
+    if inputs['lab_surface_temperatures_C'] is not None:
+        work.wall_temperature_input_refusals = dict(inputs['lab_surface_refusals'])
+        work._update_route_surface_temperatures(inputs['lab_surface_temperatures_C'])
+    return work._route_amounts(flux, hour.melt, materialize_authority=False)[7], work
+
+
+
+def _organic_tar_wall_route(overhead_kg, route_inputs, melt_temperature_C, species_formula_registry):
+    from simulator.chemistry.organics_pyrolysis import tar_fate
+
+    tar_kg = float(overhead_kg.get('organic_tar', 0.0) or 0.0)
+    if tar_kg <= 1e-12:
+        return
+    if route_inputs.wall_temperature_C is None:
+        from simulator.condensation import DepositionInputRefusal
+
+        raise DepositionInputRefusal(
+            "T_wall_K", None,
+            str(route_inputs.wall_temperature_input_refusals),
+        )
+    wall_T = float(route_inputs.wall_temperature_C)
+    melt_T = float(melt_temperature_C or wall_T)
+    formula = resolve_species_formula(
+        'organic_tar', species_formula_registry
+    )
+    tar_mol = tar_kg / formula.molar_mass_kg_per_mol()
+    atoms = formula.atom_moles(tar_mol)
+    fate = tar_fate(atoms, melt_T, wall_T)
+    if fate.coat_frac <= 1e-12:
+        return
+
+    class _TarRoute:
+        wall_deposit_fraction_by_species = {'organic_tar': 1.0}
+        wall_deposit_account_fractions_by_species = {
+            'organic_tar': {'process.wall_deposit': 1.0}
+        }
+
+    coat_kg = tar_kg * fate.coat_frac
+    return coat_kg, _TarRoute()
+
+def _project_frozen_carrier_batch(hour, flux, *, oxygen_uptake_capacity_mol=None,
+                                 oxygen_release_capacity_mol=None):
+    from simulator.fe_redox import (
+        _evaporative_redox_source_terms_from_transition, _melt_redox_capacity_mol_per_ln_fO2,
+        _redox_source_response, _evaporative_redox_is_saturated, _film_bounded_buffer_release,
+        _remaining_fe_redox_internal_o2_capacity_mol, _fe_redox_settlement_inputs,
+        _FE_REDOX_OXYGEN_SOURCE_OVERHEAD, _FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
+        )
+    accounts = {account: dict(amounts) for account, amounts in hour.accounts_mol.items()}
+    scales = {account: dict(amounts) for account, amounts in hour.ledger_controls['movement_scale_kg'].items()}
+    proposals, transitions = [], []
+    buffer_before = accounts.get('reservoir.fo2_buffer', {}).get('O2', 0.0)
+    redox = dict(hour.redox)
+    noop = redox['noop_mol']
+    original_rates = dict(flux.species_kg_hr)
+    flux = _bound_evaporation_oxygen_uptake(flux, oxygen_uptake_capacity_mol,
+        vapor_pressure_data=hour.vapor_pressure_data, species_formula_registry=hour.species_formula_registry,
+        vapour_rail_catalog=hour.catalog,
+        process_phase=('stage0' if hour.melt.campaign.name in {'C0', 'C0B'} else 'hot_train'))
+    uptake_limited = original_rates != flux.species_kg_hr
+    def dispatch(intent, controls, *, fO2_log=None):
+        result = _frozen_provider_result(hour, intent, accounts, scales, controls, fO2_log=fO2_log)
+        transition = _project_frozen_proposal(hour, accounts, scales, proposals, transitions, intent, result)
+        return result, transition
+    committed = {}
+    if flux.total_kg_hr > 0 or bool(flux.carrier_authority_by_species):
+        route, work = _frozen_condensation_route(hour, flux)
+        for species in (route.wall_route_species_order or flux.species_kg_hr.keys()):
+            if species not in flux.species_kg_hr or _evaporation_route_refusal(route, species) is not None:
+                continue
+            rate = flux.species_kg_hr[species]
+            data = (hour.vapor_pressure_data.get('metals', {}).get(species)
+                    or hour.vapor_pressure_data.get('oxide_vapors', {}).get(species, {}))
+            controls = _evaporation_transition_controls(species, rate, rate, data,
+                cleaned_melt_kg=_hour_account_kg(hour, accounts, 'process.cleaned_melt'),
+                frozen_carriers=hour.frozen_carriers, species_formula_registry=hour.species_formula_registry)
+            if controls is None:
+                continue
+            _, transition = dispatch(ChemistryIntent.EVAPORATION_TRANSITION, controls)
+            if transition is None:
+                continue
+            committed[species] = rate
+            terms = _evaporative_redox_source_terms_from_transition(transition,
+                hour.species_formula_registry, noop)
+            if terms:
+                redox['internal_capacity_mol'] += max(0.0, float(terms.get('redox_source:evaporative_metal_loss', 0.0) or 0.0))
+                total_fe = _cleaned_melt_fe_atom_mol(accounts.get('process.cleaned_melt', {}),
+                    hour.species_formula_registry)
+                # The live mirror is projected after the entire carrier batch:
+                # tangent composition is step-start; its Fe amount is current mol.
+                capacity = _melt_redox_capacity_mol_per_ln_fO2(total_fe_mol=max(0.0, total_fe),
+                    comp=redox['composition_wt_pct'], fO2_log=redox['fO2_log'],
+                    T_K=hour.melt.temperature_C + 273.15, pressure_bar=redox['pressure_bar']) * redox['liquid_fraction']
+                redox['capacity_mol_per_ln'] = capacity
+                _, candidate, skip_reason = _redox_source_response(redox['fO2_log'], sum(terms.values()),
+                    capacity, redox['upper_bound_log'], noop)
+                if not skip_reason:
+                    redox['fO2_log'] = candidate
+            condensed = max(0.0, rate - route.remaining_by_species.get(species, 0.0))
+            result, _ = dispatch(ChemistryIntent.CONDENSATION_ROUTE,
+                _condensation_route_controls(species, condensed, data, route, work))
+            updated = (result.diagnostic or {}).get('wall_alkali_binding_diagnostic_state_by_account')
+            if isinstance(updated, Mapping):
+                work.wall_alkali_binding_diagnostic_state_by_account = {
+                    str(account): dict(state) for account, state in updated.items() if isinstance(state, Mapping)}
+        tar = _organic_tar_wall_route(_hour_account_kg(hour, accounts, 'process.overhead_gas'),
+            work, hour.melt.temperature_C, hour.species_formula_registry)
+        if tar is not None:
+            coat_kg, tar_route = tar
+            dispatch(ChemistryIntent.CONDENSATION_ROUTE,
+                _condensation_route_controls('organic_tar', coat_kg, {}, tar_route, work))
+    else:
+        committed = dict(flux.species_kg_hr)
+    committed_flux = _depleted_evaporation_flux(flux, committed, hour.frozen_carriers)
+    release_capacity = oxygen_release_capacity_mol
+    if release_capacity is not None:
+        carrier_amounts, _ = _evaporation_signed_amounts(transitions, buffer_before,
+            accounts.get('reservoir.fo2_buffer', {}).get('O2', 0.0), hour.species_formula_registry)
+        release_capacity = _remaining_buffer_release_capacity(release_capacity, carrier_amounts.get('gas:O2', 0.0))
+    saturated = _evaporative_redox_is_saturated(redox['internal_capacity_mol'], redox['fO2_log'],
+        redox['capacity_mol_per_ln'], redox['upper_bound_log'], noop)
+    buffer = lambda: accounts.get('reservoir.fo2_buffer', {}).get('O2', 0.0)
+    remaining = lambda: _remaining_fe_redox_internal_o2_capacity_mol(redox['internal_capacity_mol'],
+        redox['internal_consumed_mol'], buffer())
+    source = (_FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
+              if saturated or remaining() > noop else _FE_REDOX_OXYGEN_SOURCE_OVERHEAD)
+    source, _, exchange, buffer_capacity = _fe_redox_settlement_inputs(source,
+        exchange_o2_mol=redox['exchange_o2_mol'], replenished_mol=redox['replenished_mol'],
+        internal_o2_capacity_mol=None, remaining_internal_o2_capacity=remaining,
+        buffer_o2_mol=buffer(), noop_mol=noop)
+    if redox['is_liquid']:
+        dispatch(ChemistryIntent.FE_REDOX_RESPECIATION,
+            _fe_redox_respeciation_controls(source, buffer_capacity, exchange),
+            fO2_log=min(redox['upper_bound_log'] if saturated else redox['fO2_log'], redox['upper_bound_log']))
+    release_limited = False
+    if saturated:
+        release, release_limited = _film_bounded_buffer_release(max(0.0, float(buffer())), release_capacity)
+        if release > noop:
+            dispatch(ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE, {'dn_to_headspace_mol': release})
+    receipt = _evaporation_signed_amounts(transitions, buffer_before, buffer(), hour.species_formula_registry)
+    proposal = _EvaporationTrialProposal(hour.frozen_carriers or frozenset(), tuple(proposals), committed_flux,
+        oxygen_uptake_capacity_mol, oxygen_release_capacity_mol, uptake_limited, release_limited)
+    return receipt, proposal
+
+
+
+def _evaluate_evaporation_hour(excess, hour, *, bound_uptake=False):
+    """Pure signed-pressure trial over one immutable hour projection."""
+    from simulator.chemistry.langmuir_knudsen import _SurfaceOxygenEvaluation
+    from simulator.transport_regime import series_evaporation_flux
+
+    bulk, controls, area_dt = hour.bulk_pO2_bar, hour.flux_controls, hour.area_dt_m2_s
+    mass = resolve_species_formula('O2', hour.species_formula_registry).molar_mass_kg_per_mol()
+    config = controls['evaporation_series_resistance']
+    oxygen = bulk + excess
+    flux, result, _, _, _ = _frozen_source(hour, oxygen)
+    series = series_evaporation_flux(
+        'O2', oxygen * 100000.0, bulk * 100000.0,
+        hour.melt.temperature_C + 273.15, mass, 1.0,
+        overhead_pressure_pa=controls['overhead_pressure_pa'],
+        carrier_gas=controls['carrier_gas'], T_gas_K=controls['gas_temperature_K'],
+        gas_resistance_enabled=bool(config.get('gas_resistance_enabled', True)),
+        melt_surface_area_m2=controls['melt_surface_area_m2'],
+        surface_flow=controls['surface_flow'], signed=True,
+        pressure_excess_pa=excess * 100000.0,
+        stir_diagnostic=dict(axial_stir_applied=0.0, radial_stir_applied=0.0,
+            axial_stir_clamped=False, radial_stir_clamped=False,
+            frozen_skull_stir_clamped=False, frozen_skull_stir_ceiling='not applicable to oxygen'),
+    )
+    oxygen_flux = series.flux_kg_s_m2 / mass
+    # Every interval transition is partitioned into source/ferric/other:
+    # S_source+S_ferric+S_other = dn_overhead+dn_buffer (mol O2).
+    # Thus R*A*dt = j*A*dt - sum(S) + dn_buffer
+    #             = j*A*dt - dn_overhead. Internal coproduct cancels.
+    # Bound only gas-funded uptake: D <= max(0,-j)*A*dt (mol).
+    # As p_bulk -> 0 the inward supply tends to zero; an already
+    # feasible debit leaves the clip idle. Outward credit is unbounded
+    # by this uptake capacity and still requires its outward film root.
+    capacity = max(0.0, -oxygen_flux) * area_dt if bound_uptake else None
+    unbounded_rates = dict(flux.species_kg_hr)
+    flux = _bound_evaporation_oxygen_uptake(flux, capacity,
+        vapor_pressure_data=hour.vapor_pressure_data,
+        species_formula_registry=hour.species_formula_registry, vapour_rail_catalog=hour.catalog,
+        process_phase=('stage0' if hour.melt.campaign.name in {'C0', 'C0B'} else 'hot_train'))
+    carrier_limited = flux.species_kg_hr != unbounded_rates
+    proposed_flux = flux
+    receipt, proposal = _project_frozen_carrier_batch(hour, flux,
+        oxygen_uptake_capacity_mol=capacity,
+        oxygen_release_capacity_mol=max(0.0, oxygen_flux) * area_dt)
+    proposal = replace(proposal, oxygen_uptake_transport_limited=(
+        proposal.oxygen_uptake_transport_limited or carrier_limited))
+    amounts, _ = receipt
+    # p_face = p_bulk + j*M*R_film, with the same owner's effective
+    # film resistance (including its Stefan correction). Units:
+    # (mol/m²/s)(kg/mol)(Pa*m²*s/kg)=Pa. R_film=0 gives EXACT bulk,
+    # avoiding cancellation of x and its equal HK jump at vacuum.
+    gas_face = (bulk * 100000.0 + series.flux_kg_s_m2 * series.r_gas) / 100000.0
+    return _SurfaceOxygenEvaluation(
+        # Atomic O is dormant_pending_r2_epoch in the runtime catalog;
+        # its unacquired diagnostic pressure cannot mint an escape flux.
+        oxygen, gas_face, oxygen_flux, 0.0,
+        {key.removeprefix('source:'): value / area_dt for key, value in amounts.items()
+         if key.startswith('source:')},
+        2.0 * amounts['ferric_oxygen'] / area_dt,
+        amounts['other_oxygen'] / area_dt, amounts['storage'] / area_dt,
+        amounts.get('gas:O2', 0.0) / area_dt,
+        (proposed_flux, receipt, proposal, result, series.as_diagnostic()),
+        bulk_pO2_bar=bulk,
+        oxygen_uptake_transport_limited=(bound_uptake and proposal.oxygen_uptake_transport_limited),
+    )
+
+
+
+def _evaporation_flux_pressure_overlay(vapor_pressure_data, equilibrium, vapor_pressure_diagnostic,
+        vapour_batch, resolve_error, effective_pressure_source):
+    live_vapor_pressures = _evaporation_legacy_shadow_pressure_map(
+        vapor_pressure_data, vapor_pressure_diagnostic)
+    vapor_pressures, flux_overlay_report = flux_pressures_from_batch(
+        vapour_batch,
+        effective_pressure_source=effective_pressure_source,
+        resolution_error=resolve_error or None,
+    )
+    flux_overlay_report.update(
+        compare_live_shadow_to_batch_flux(
+            batch=vapour_batch,
+            live_pressures_Pa=live_vapor_pressures,
+            batch_flux_pressures_Pa=vapor_pressures,
+            resolution_error=resolve_error or None,
+        )
+    )
+    return (
+        vapor_pressures,
+        flux_overlay_report,
+        vapour_batch,
+        resolve_error,
+        vapor_pressure_diagnostic,
+        effective_pressure_source,
+    )
+
+
 class EvaporationMixin:
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
@@ -1689,10 +2314,6 @@ class EvaporationMixin:
             self.vapor_pressures,
             equilibrium,
         )
-        live_vapor_pressures = _evaporation_legacy_shadow_pressure_map(
-            self.vapor_pressures,
-            vapor_pressure_diagnostic,
-        )
         vapour_batch = self._resolve_evaporation_vapour_batch(
             equilibrium,
             temperature_K=temperature_K,
@@ -1701,27 +2322,8 @@ class EvaporationMixin:
         resolve_error = dict(
             getattr(self, '_last_vapour_batch_resolve_error', {}) or {}
         )
-        vapor_pressures, flux_overlay_report = flux_pressures_from_batch(
-            vapour_batch,
-            effective_pressure_source=effective_pressure_source,
-            resolution_error=resolve_error or None,
-        )
-        flux_overlay_report.update(
-            compare_live_shadow_to_batch_flux(
-                batch=vapour_batch,
-                live_pressures_Pa=live_vapor_pressures,
-                batch_flux_pressures_Pa=vapor_pressures,
-                resolution_error=resolve_error or None,
-            )
-        )
-        return (
-            vapor_pressures,
-            flux_overlay_report,
-            vapour_batch,
-            resolve_error,
-            vapor_pressure_diagnostic,
-            effective_pressure_source,
-        )
+        return _evaporation_flux_pressure_overlay(self.vapor_pressures, equilibrium,
+            vapor_pressure_diagnostic, vapour_batch, resolve_error, effective_pressure_source)
 
     def _calculate_evaporation(
         self,
@@ -1785,20 +2387,11 @@ class EvaporationMixin:
         series_config = dict(
             kernel_config.get('evaporation_series_resistance', {}) or {}
         )
-        if bool(series_config.get('melt_resistance_enabled', False)):
-            diagnostic = {
-                'evaporation_flux_kg_hr': {},
-                'reason': 'uncertified_melt_resistance_model',
-                'detail': (
-                    'requires species- and state-specific D_i, k_L,i, '
-                    'and dp_eq/dC_i'
-                ),
-            }
-            self._last_evaporation_flux_diagnostic = diagnostic
-            raise EvaporationFluxRefusal(
-                'uncertified_melt_resistance_model',
-                diagnostic,
-            )
+        try:
+            _require_evaporation_melt_resistance_policy(series_config)
+        except EvaporationFluxRefusal as exc:
+            self._last_evaporation_flux_diagnostic = exc.diagnostic
+            raise
 
         # Precedence: no liquid = nothing to evaporate = physical zero,
         # regardless of resolver / vapor-pressure-map state.  Must run
@@ -2016,19 +2609,7 @@ class EvaporationMixin:
             # When every channel is a typed non-debit outcome (genuine bound,
             # zero, dormant) and none is refused / eligible / missing-seam,
             # empty flux is authorized, not an empty-provider false zero.
-            _typed_non_debit = frozenset(
-                {
-                    'zero_by_physics',
-                    'upper_bound',
-                    'dormant_by_epoch',
-                }
-            )
-            if (
-                channel_states
-                and all(
-                    state in _typed_non_debit for state in channel_states.values()
-                )
-            ):
+            if _evaporation_channels_non_debiting(channel_states):
                 self._last_evaporation_flux_diagnostic = {
                     **regime_diagnostic,
                     'reason': 'vapour_batch_all_channels_non_debiting',
@@ -4339,25 +4920,8 @@ class EvaporationMixin:
                 )
             ),
         )
-        smoothed = EvaporationFlux(
-            species_kg_hr=effective_rates,
-            alpha_authority_status_by_species={
-                species: status
-                for species, status in (
-                    evap_flux.alpha_authority_status_by_species.items()
-                )
-                if float(effective_rates.get(species, 0.0)) > _carrier_numerical_floor(
-                    species,
-                    getattr(self, '_frozen_evaporation_carriers', None), 1.0e-12)
-            },
-            # Canonical serialized answers are treated as immutable evidence;
-            # depletion changes rates only and can safely share the records.
-            carrier_authority_by_species=(
-                evap_flux.carrier_authority_by_species
-            ),
-        )
-        smoothed.update_totals()
-        return smoothed
+        return _depleted_evaporation_flux(evap_flux, effective_rates,
+            getattr(self, '_frozen_evaporation_carriers', None))
 
     def _analytic_evaporation_depletion_rates(
         self,
@@ -4407,43 +4971,9 @@ class EvaporationMixin:
             amounts, _ = self._evaporation_signed_amounts(transition_start, buffer_before)
             # The film carries the NET gas credit; carrier gas legs have
             # already claimed (or supplied) part of this interval's capacity.
-            release_capacity = max(0.0, release_capacity - amounts.get('gas:O2', 0.0))
+            release_capacity = _remaining_buffer_release_capacity(release_capacity, amounts.get('gas:O2', 0.0))
         self._settle_evaporative_redox_after_batch(oxygen_release_capacity_mol=release_capacity)
         return evap_flux, overhead_flux
-
-    def _detached_evaporation_projection(self):
-        """Read-only live-state projection using the existing snapshot owner."""
-        from simulator.chemistry.kernel import ChemistryKernel
-
-        # Measure once on the parent, at the step-start intrinsic fO2.
-        # Composition/redox settlement in detached trials cannot invalidate
-        # this C7 frozen-hour measurement and launch another native scan.
-        authority = self._resolved_melt_redox_gate_authority()
-        bulk = self._vapor_pressure_transport_pO2_bar()
-        trial = copy.copy(self)
-        state, ledger, cost_state = self._snapshot_terminal_refusal_hour_state(
-            defer_committed_history=True, state_receiver=trial)
-        trial.__dict__ = dict(self.__dict__)
-        trial.__dict__.update({key: value for key, value in state.items()
-                               if key != '_terminal_refusal_chem_registry_tables'})
-        trial.atom_ledger = ledger
-        trial._pressure_trial = True
-        trial._pressure_trial_gate_authority = authority
-        trial._pressure_trial_bulk_pO2_bar = bulk
-        if trial._condensation_model is not None:
-            trial._condensation_model._pressure_trial = True
-        trial.cost_ledger = copy.copy(self.cost_ledger)
-        trial.cost_ledger.__dict__ = dict(cost_state)
-        trial._chem_registry = copy.copy(self._chem_registry)
-        for name, table in state['_terminal_refusal_chem_registry_tables'].items():
-            setattr(trial._chem_registry, name, table)
-        kernel = self._require_chem_kernel()
-        trial._chem_kernel = ChemistryKernel(
-            ledger, trial._chem_registry, self.species_formula_registry,
-            allow_fallback_intents=kernel.allow_fallback_intents,
-            oxygen_sink_channel_mode=kernel.oxygen_sink_channel_mode,
-        )
-        return trial
 
     def _evaporation_signed_amounts(self, transition_start, buffer_before):
         return _evaporation_signed_amounts(self.atom_ledger.transitions[transition_start:],
@@ -4462,26 +4992,15 @@ class EvaporationMixin:
 
     def _evaporation_carrier_zero_reason(self, equilibrium=None, *, oxygen_bar=None):
         """Current inventory/phase proofs, or frozen step-start admission."""
-        if getattr(self, '_frozen_evaporation_carriers', None) == frozenset():
-            return 'frozen_carrier_set_empty'
         oxygen = getattr(self, '_reaction_pO2_bar', None) if oxygen_bar is None else oxygen_bar
         frozen = getattr(self, '_frozen_evaporation_carriers', None)
-        if oxygen == 0.0 and frozen:
-            phase = 'stage0' if self.melt.campaign.name in {'C0', 'C0B'} else 'hot_train'
-            evaluators = [self.vapour_rail_catalog.evaluator_for_hot_train(
-                species, process_phase=phase) for species in frozen]
-            # The catalog owns the mass-action powers. Consuming channels
-            # vanish at zero oxygen; neutral channels keep their own flux.
-            # An intrinsic producing channel whose coproduct stays in the
-            # buffer has no gas-pressure power. Check the source owner's
-            # actual destination, not merely the sign of its vapor exponent.
-            if all(evaluator is not None and (
-                    evaluator.pO2_exponent >= 0.0 or (
-                        evaluator.oxygen_fugacity_channel == 'intrinsic_melt'
-                        and self._project_evaporation_overhead_source_mol_hr(
-                            {species: 1.0}, {}).get('O2', 0.0) == 0.0))
-                   for species, evaluator in zip(frozen, evaluators)):
-                return 'frozen_consuming_carriers_at_zero_oxygen'
+        reason = _frozen_evaporation_zero_reason(frozen, oxygen,
+            lambda species: self.vapour_rail_catalog.evaluator_for_hot_train(species,
+                process_phase=('stage0' if self.melt.campaign.name in {'C0', 'C0B'} else 'hot_train')),
+            lambda species: self._project_evaporation_overhead_source_mol_hr(
+                {species: 1.0}, {}).get('O2', 0.0))
+        if reason is not None:
+            return reason
         if self.melt.temperature_C + 273.15 < 400.0:
             return 'internal_analytical_below_400K'
         if not self.vapour_rail_catalog.build_request(self.atom_ledger.mol_by_account()):
@@ -4496,139 +5015,158 @@ class EvaporationMixin:
                 return 'no_liquid_surface'
         return None
 
-    def _solve_evaporative_oxygen_boundary(self, equilibrium=None, *, overhead_partials_override_Pa=None):
-        from simulator.chemistry.langmuir_knudsen import (
-            OxygenClosureNonconvergence, _SurfaceOxygenEvaluation,
-            _solve_surface_oxygen_balance,
-        )
-        from simulator.transport_regime import series_evaporation_flux
+    def _prepare_evaporation_hour(self, equilibrium=None, *, overhead_partials_override_Pa=None):
+        from simulator.condensation import _condensation_route_inputs, _freeze_catalog_value
+        from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+        from simulator.fe_redox import _OXYGEN_RESERVOIR_NOOP_MOL as OXYGEN_RESERVOIR_NOOP_MOL
+        from simulator.fe_redox import floor_vacuum_pressure_bar
 
-        if getattr(self, '_frozen_evaporation_carriers', None) is None:
-            # Admit once from the current condensed state at its published
-            # intrinsic oxygen potential, before any projected carrier batch.
-            # This is step-start operator splitting, just as for bulk/removal;
-            # C8 will couple admission and those inventories within the step.
-            seed = self._detached_evaporation_projection()
-            seed._reaction_pO2_bar = 10.0 ** seed._intrinsic_oxygen_publication()['published_intrinsic_fO2_log']
-            initial = seed._get_equilibrium() if equilibrium is None else copy.deepcopy(equilibrium)
-            seed._refresh_vapor_pressures_from_kernel(initial, include_diagnostic_shadows=False,
-                                                      simulation_hour=int(self.melt.hour) + 1)
-            # Own the frozen condensation payload before cloning admission,
-            # so every pressure trial shares that same validated identity.
-            condensation_data = seed.condensation_model.vapor_pressure_data
-            admission = seed._detached_evaporation_projection()
-            raw_flux = admission._calculate_evaporation(
-                initial, overhead_partials_override_Pa=overhead_partials_override_Pa)
-            seed._step_start_evaporation_raw_flux = copy.deepcopy(raw_flux)
-            seed._step_start_evaporation_raw_flux.species_kg_hr.update(
-                admission._last_evaporation_flux_diagnostic.get(
-                    'below_threshold_evaporation_flux', {}).get('fluxes_kg_hr', {}))
-            seed._step_start_evaporation_computed_channels = {
-                species for species, diagnostic in admission._last_evaporation_flux_diagnostic.get(
-                    'evaporation_series_resistance', {}).items()
-                if diagnostic['alpha_intrinsic'] > 0.0}
-            flux = admission._apply_analytic_evaporation_depletion(raw_flux)
-            start = len(admission.atom_ledger.transitions)
-            before = admission.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
-            admission._apply_evaporation_carrier_batch(flux)
-            data = admission.condensation_model.vapor_pressure_data
-            if hasattr(data, '_route_catalog'):
-                condensation_data._route_catalog = data._route_catalog
-            amounts, _ = admission._evaporation_signed_amounts(start, before)
-            seed._frozen_evaporation_carriers = frozenset(
-                key.removeprefix('carrier:') for key, value in amounts.items()
-                if key.startswith('carrier:') and value > 0.0)
-            return seed._solve_evaporative_oxygen_boundary(initial,
-                overhead_partials_override_Pa=overhead_partials_override_Pa)
-
-        # C7 freezes the pre-batch bulk partials, removal boundary, T, and
-        # interval (one hour). C8 will couple evolving bulk inventory/removal
-        # and source/settlement within that interval. Every C7 trial still
-        # settles its OWN carrier batch and finite Fe/buffer inventory.
+        authority = self._resolved_melt_redox_gate_authority()
+        if equilibrium is not None:
+            initial = copy.deepcopy(equilibrium)
+        elif (self.backend is None or self._backend_failed or not self.backend.is_available()) and self._backend_allows_internal_analytical_fallback():
+            from simulator.melt_backend.base import EquilibriumResult
+            # Analytical source pressures are supplied by the same registered
+            # pressure owner below. Legacy reporting is published on acceptance.
+            initial = EquilibriumResult(temperature_C=self.melt.temperature_C,
+                pressure_bar=self.melt.p_total_mbar / 1000.0,
+                liquid_fraction=None, phase_assemblage_available=False,
+                fO2_log=self._intrinsic_oxygen_publication()['published_intrinsic_fO2_log'],
+                status='ok', diagnostics=({'vapor_pressure_zero_reason': 'internal_analytical_below_400K'}
+                    if self.melt.temperature_C + 273.15 < 400.0 else {}))
+        else:
+            initial = self._query_equilibrium()[0]
         bulk = self._vapor_pressure_transport_pO2_bar()
         partials = (dict(overhead_partials_override_Pa) if overhead_partials_override_Pa is not None
-                    else self._evaporation_bulk_partials_pa(equilibrium.vapor_pressures_Pa))
-        controls, _ = self._evaporation_flux_control_inputs(
-            equilibrium, overhead_partials_Pa=partials,
+                    else self._evaporation_bulk_partials_pa(initial.vapor_pressures_Pa))
+        controls, _ = self._evaporation_flux_control_inputs(initial, overhead_partials_Pa=partials,
             overhead_pressure_pa=self._evaporation_overhead_total_pressure_Pa(partials))
         area_dt = controls['melt_surface_area_m2'] * 3600.0
         if not math.isfinite(area_dt) or area_dt <= 0.0:
             raise EvaporationFluxRefusal('oxygen_closure_invalid_area', {'area_dt_m2_s': area_dt})
-        mass = resolve_species_formula('O2', self.species_formula_registry).molar_mass_kg_per_mol()
-        config = controls['evaporation_series_resistance']
-        empty_request = not self.vapour_rail_catalog.build_request(self.atom_ledger.mol_by_account())
+        kwargs, intrinsic = self._vapor_pressure_dispatch_inputs(initial,
+            observation_pO2_bar=10.0 ** self._intrinsic_oxygen_publication(initial)['published_intrinsic_fO2_log'],
+            simulation_hour=int(self.melt.hour) + 1)
+        model = self.condensation_model
+        overhead = self.overhead_model
+        pipe_temperature = overhead._pipe_temperature_value(self.melt)
+        lab_refusals = {}
+        lab_temperatures = (self._resolve_lab_surface_temperatures(self._active_surface_temperature_schedule(),
+            sample_time_h=float(self.melt.hour) + 1.0, unavailable=lab_refusals)
+            if self.lab_geometry is not None else None)
+        transport = dict(pipe_diameter_m=overhead.pipe_diameter_m, pipe_length_m=overhead.pipe_length_m,
+            pipe_temperature_C=pipe_temperature,
+            pipe_segment_temperatures_C=overhead._pipe_segment_temperature_values(
+                [segment.name for segment in model.pipe_segments], self.melt, base_C=pipe_temperature),
+            initial_throat_area_m2=overhead.initial_throat_area_m2,
+            stage_areas=overhead.stage_area_m2_by_stage(), geometry_notice=overhead.stage_area_geometry_provenance_notice(),
+            downstream_pressure_override=overhead._downstream_pressure_override,
+            conductance_override=overhead._conductance_override,
+            downstream_pressure_bar=overhead._resolve_downstream_pressure(self.melt, None),
+            background_partials=overhead._background_partial_pressures_mbar(self.melt),
+            cold_train_capacity=self._cold_train_capacity_policy()[0],
+            retained_holdup_kg=sum(max(0.0, float(kg)) for kg in self._overhead_holdup_species_kg().values()),
+            stir_factor=clamp_stir_factor(self.melt.stir_state.axial),
+            radial_stir_factor=clamp_stir_factor(self.melt.stir_state.radial),
+            carrier_gas=self._resolve_condensation_carrier_gas(),
+            lab_surface_temperatures_C=lab_temperatures, lab_surface_refusals=lab_refusals)
+        ledger = self.atom_ledger
+        store = self._pt0_store()
+        temperature, pressure = self.melt.temperature_C, self.melt.p_total_mbar / 1000.0
+        quantization = None
+        if store is not None and getattr(store, 'quantize_live_controls', False):
+            quantized = store.quantized_controls(self, fO2_log=kwargs['fO2_log'])
+            temperature, pressure = quantized['temperature_C'], quantized['pressure_bar']
+            quantization = store.control_quantization
+        providers, requests = {}, {}
+        for intent in (ChemistryIntent.VAPOR_PRESSURE, ChemistryIntent.EVAPORATION_FLUX,
+                       ChemistryIntent.EVAPORATION_TRANSITION, ChemistryIntent.CONDENSATION_ROUTE,
+                       ChemistryIntent.FE_REDOX_RESPECIATION, ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE):
+            provider = self._chem_registry.authoritative_for(intent)
+            if provider is None:
+                raise ProviderUnavailableError(f'no authoritative provider registered for {intent.value}')
+            providers[intent] = provider, provider.capability_profile()
+            requests[intent] = IntentRequest(intent=intent,
+                account_view=ProviderAccountView(accounts={}, species_formula_registry=self.species_formula_registry),
+                temperature_C=temperature, pressure_bar=pressure,
+                control_inputs=kwargs['control_inputs'] if intent == ChemistryIntent.VAPOR_PRESSURE else {})
+        reservoir = self.melt.oxygen_reservoir
+        T_K = self.melt.temperature_C + 273.15
+        redox = dict(fO2_log=self._melt_fO2_reference_state_at_temperature(T_K, gate_authority=authority)[0],
+            upper_bound_log=self._melt_redox_fO2_upper_bound_log(),
+            liquid_fraction=self._melt_redox_liquid_fraction_factor(T_K, gate_authority=authority),
+            is_liquid=self._melt_redox_temperature_shift_is_liquid(T_K, gate_authority=authority),
+            composition_wt_pct=self._melt_oxide_wt_pct(),
+            pressure_bar=floor_vacuum_pressure_bar(self.melt.p_total_mbar / 1000.0, floor_bar=self._oxygen_numerical_floor_bar()),
+            internal_capacity_mol=self._fe_redox_internal_o2_capacity_mol_this_hr,
+            internal_consumed_mol=self._fe_redox_internal_o2_consumed_mol_this_hr,
+            capacity_mol_per_ln=reservoir.melt_redox_capacity_mol_per_ln_fO2,
+            exchange_o2_mol=reservoir.exchange_o2_mol,
+            replenished_mol=self._fe_redox_passive_o2_replenished_mol_this_hr,
+            noop_mol=OXYGEN_RESERVOIR_NOOP_MOL)
+        hour = _FrozenEvaporationHour(
+            melt=_EvaporationHourMelt(self.melt.temperature_C, self.melt.p_total_mbar, self.melt.atmosphere,
+                self.melt.campaign, self.melt.campaign_hour, self.melt.hour, self.melt.sweep_mol_per_s),
+            accounts_mol=_freeze_catalog_value(ledger.mol_by_account()),
+            species_formula_registry=_freeze_catalog_value(self.species_formula_registry),
+            ledger_controls=_freeze_catalog_value(dict(quantization=quantization,
+                movement_scale_kg=ledger._movement_scale_kg,
+                allow_negative_accounts=frozenset(account for account, policy in ledger._policies.items() if policy.allow_negative),
+                balance_absolute_floor_kg=ledger.balance_absolute_floor_kg,
+                balance_relative_tolerance=ledger.balance_relative_tolerance,
+                balance_tolerance_kg=ledger.balance_tolerance_kg)),
+            vapor_pressure_data=self.vapor_pressures, catalog=self.vapour_rail_catalog,
+            provider_requests=_freeze_catalog_value(requests), providers=_freeze_catalog_value(providers),
+            equilibrium_inputs=_freeze_catalog_value({item.name: getattr(initial, item.name) for item in fields(initial)}),
+            intrinsic_publication=_freeze_catalog_value(intrinsic), flux_controls=_freeze_catalog_value(controls),
+            phase=_freeze_catalog_value(dict(physical_zero_reason=self._evaporation_carrier_zero_reason(initial),
+                freeze_gate_fraction=self._freeze_gate_liquid_fraction_factor() if self._freeze_gate_enabled() else None,
+                native_fe_capacity_mol=getattr(self, '_native_fe_vapor_residual_capacity_mol_this_hr', None),
+                composition_kg=self.melt.composition_kg, allow_fallback_vapor=self._allow_fallback_vapor)),
+            redox=_freeze_catalog_value(redox), bulk_pO2_bar=bulk, bulk_partials_Pa=_freeze_catalog_value(partials),
+            area_dt_m2_s=area_dt, transport=_freeze_catalog_value(transport), condensation_inputs=_condensation_route_inputs(model),
+            frozen_carriers=getattr(self, '_frozen_evaporation_carriers', None))
+        if hour.frozen_carriers is not None:
+            return hour
+        seed_oxygen = 10.0 ** intrinsic['published_intrinsic_fO2_log']
+        for _ in range(2):
+            result, diagnostic = _frozen_pressure(hour, seed_oxygen)
+            requests = dict(hour.provider_requests)
+            request = requests[ChemistryIntent.VAPOR_PRESSURE]
+            continuation = dict(request.control_inputs)
+            if diagnostic.get('high_t_melt_activity'):
+                continuation.update(high_t_melt_activity_previous=diagnostic['high_t_melt_activity'],
+                    high_t_melt_activity_previous_temperature_K=T_K)
+            requests[ChemistryIntent.VAPOR_PRESSURE] = replace(request, control_inputs=continuation)
+            hour = replace(hour, provider_requests=_freeze_catalog_value(requests),
+                equilibrium_inputs=_freeze_catalog_value({item.name: getattr(result, item.name) for item in fields(result)}))
+        flux, flux_diagnostic, raw = _frozen_flux_from_pressure(hour, seed_oxygen, result, diagnostic)
+        raw_rates = dict(raw.species_kg_hr)
+        raw_rates.update(flux_diagnostic.get('below_threshold_evaporation_flux', {}).get('fluxes_kg_hr', {}))
+        amounts, _ = _project_frozen_carrier_batch(hour, flux)[0]
+        return replace(hour, frozen_carriers=frozenset(key.removeprefix('carrier:') for key, value in amounts.items()
+            if key.startswith('carrier:') and value > 0.0), seed_raw_rates=_freeze_catalog_value(raw_rates),
+            seed_alpha_authority=_freeze_catalog_value(raw.alpha_authority_status_by_species),
+            seed_carrier_authority=_freeze_catalog_value(raw.carrier_authority_by_species),
+            seed_computed_channels=frozenset(species for species, item in flux_diagnostic.get(
+                'evaporation_series_resistance', {}).items() if item['alpha_intrinsic'] > 0.0))
+
+    def _solve_evaporative_oxygen_boundary(self, equilibrium=None, *, overhead_partials_override_Pa=None):
+        from simulator.chemistry.langmuir_knudsen import (
+            OxygenClosureNonconvergence, _solve_surface_oxygen_balance,
+        )
+        hour = self._prepare_evaporation_hour(equilibrium,
+            overhead_partials_override_Pa=overhead_partials_override_Pa)
+        bulk = hour.bulk_pO2_bar
 
         def evaluate(excess, *, bound_uptake=False):
-            oxygen = bulk + excess
-            trial = self._detached_evaporation_projection()
-            trial._reaction_pO2_bar = oxygen
-            result = copy.deepcopy(equilibrium)
-            if not empty_request:
-                trial._refresh_vapor_pressures_from_kernel(result, include_diagnostic_shadows=False,
-                                                           simulation_hour=int(self.melt.hour) + 1)
-            flux = trial._apply_analytic_evaporation_depletion(trial._calculate_evaporation(
-                result, overhead_partials_override_Pa=partials))
-            series = series_evaporation_flux(
-                'O2', oxygen * 100000.0, bulk * 100000.0,
-                self.melt.temperature_C + 273.15, mass, 1.0,
-                overhead_pressure_pa=controls['overhead_pressure_pa'],
-                carrier_gas=controls['carrier_gas'], T_gas_K=controls['gas_temperature_K'],
-                gas_resistance_enabled=bool(config.get('gas_resistance_enabled', True)),
-                melt_surface_area_m2=controls['melt_surface_area_m2'],
-                surface_flow=controls['surface_flow'], signed=True,
-                pressure_excess_pa=excess * 100000.0,
-                stir_diagnostic=dict(axial_stir_applied=0.0, radial_stir_applied=0.0,
-                    axial_stir_clamped=False, radial_stir_clamped=False,
-                    frozen_skull_stir_clamped=False, frozen_skull_stir_ceiling='not applicable to oxygen'),
-            )
-            oxygen_flux = series.flux_kg_s_m2 / mass
-            # Every interval transition is partitioned into source/ferric/other:
-            # S_source+S_ferric+S_other = dn_overhead+dn_buffer (mol O2).
-            # Thus R*A*dt = j*A*dt - sum(S) + dn_buffer
-            #             = j*A*dt - dn_overhead. Internal coproduct cancels.
-            # Bound only gas-funded uptake: D <= max(0,-j)*A*dt (mol).
-            # As p_bulk -> 0 the inward supply tends to zero; an already
-            # feasible debit leaves the clip idle. Outward credit is unbounded
-            # by this uptake capacity and still requires its outward film root.
-            capacity = max(0.0, -oxygen_flux) * area_dt if bound_uptake else None
-            unbounded_rates = dict(flux.species_kg_hr)
-            flux = trial._bound_evaporation_oxygen_uptake(flux, capacity)
-            carrier_limited = flux.species_kg_hr != unbounded_rates
-            start = len(trial.atom_ledger.transitions)
-            buffer_before = trial.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
-            # Preserve the proposed pre-routing batch: acceptance executes the
-            # identical owner once, then checks every signed term and carrier.
-            proposed_flux = copy.deepcopy(flux)
-            trial._apply_evaporation_carrier_batch(flux, oxygen_uptake_capacity_mol=capacity,
-                oxygen_release_capacity_mol=max(0.0, oxygen_flux) * area_dt)
-            trial._oxygen_uptake_transport_limited |= carrier_limited
-            receipt = trial._evaporation_signed_amounts(start, buffer_before)
-            amounts, _ = receipt
-            # p_face = p_bulk + j*M*R_film, with the same owner's effective
-            # film resistance (including its Stefan correction). Units:
-            # (mol/m²/s)(kg/mol)(Pa*m²*s/kg)=Pa. R_film=0 gives EXACT bulk,
-            # avoiding cancellation of x and its equal HK jump at vacuum.
-            gas_face = (bulk * 100000.0 + series.flux_kg_s_m2 * series.r_gas) / 100000.0
-            return _SurfaceOxygenEvaluation(
-                # Atomic O is dormant_pending_r2_epoch in the runtime catalog;
-                # its unacquired diagnostic pressure cannot mint an escape flux.
-                oxygen, gas_face, oxygen_flux, 0.0,
-                {key.removeprefix('source:'): value / area_dt for key, value in amounts.items()
-                 if key.startswith('source:')},
-                2.0 * amounts['ferric_oxygen'] / area_dt,
-                amounts['other_oxygen'] / area_dt, amounts['storage'] / area_dt,
-                amounts.get('gas:O2', 0.0) / area_dt,
-                (proposed_flux, receipt, trial, result, series.as_diagnostic()),
-                bulk_pO2_bar=bulk,
-                oxygen_uptake_transport_limited=(bound_uptake and trial._oxygen_uptake_transport_limited),
-            )
+            return _evaluate_evaporation_hour(excess, hour, bound_uptake=bound_uptake)
 
         try:
             # Cold/no-liquid gates avoid positive-pressure trial work, but
             # settlement must still close the same direct overhead residual.
             zero = None
-            zero_reason = (self._evaporation_carrier_zero_reason(equilibrium, oxygen_bar=0.0)
-                           if bulk == 0.0 else None)
+            zero_reason = _hour_zero_reason(hour, 0.0) if bulk == 0.0 else None
             if bulk == 0.0 and zero_reason:
                 # Reuse the verified endpoint hook for admitted mass-action
                 # limits too. The same ledger residual must be exactly zero;
@@ -4640,72 +5178,58 @@ class EvaporationMixin:
                 evaluate, bulk_pO2_bar=bulk, source_free_zero=zero,
                 settle_inward_endpoint=lambda excess: evaluate(excess, bound_uptake=True),
                 bracket_log10_pO2_bar=(-12.0, 0.0))
-            audit = self._detached_evaporation_projection()
-            audit._frozen_evaporation_carriers = None
-            audit._reaction_pO2_bar = solved.reaction_pO2_bar
+            audit_hour = replace(hour, frozen_carriers=None)
             admitted = ({key.removeprefix('carrier:') for key, value in solved.payload[1][0].items()
                          if key.startswith('carrier:') and value > 0.0}
                         if zero_reason == 'frozen_consuming_carriers_at_zero_oxygen' else set())
             limit_basis = None
             if solved.reaction_pO2_bar > 0.0:
-                ordinary = copy.deepcopy(equilibrium)
-                audit._refresh_vapor_pressures_from_kernel(ordinary, include_diagnostic_shadows=False,
-                                                           simulation_hour=int(self.melt.hour) + 1)
-                flux = audit._apply_analytic_evaporation_depletion(audit._calculate_evaporation(
-                    ordinary, overhead_partials_override_Pa=partials))
-                start = len(audit.atom_ledger.transitions)
-                before = audit.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
-                audit._apply_evaporation_carrier_batch(flux)
-                amounts, _ = audit._evaporation_signed_amounts(start, before)
+                flux, _, _, _, _ = _frozen_source(audit_hour, solved.reaction_pO2_bar)
+                amounts, _ = _project_frozen_carrier_batch(audit_hour, flux)[0]
                 admitted = {key.removeprefix('carrier:') for key, value in amounts.items()
                             if key.startswith('carrier:') and value > 0.0}
-            elif (zero_reason != 'frozen_consuming_carriers_at_zero_oxygen'
-                  and not audit._evaporation_carrier_zero_reason(equilibrium)):
-                # Reuse the existing depletion owner's exact positive-side
-                # endpoint, then the ordinary batch's stock/authority/leg gates.
-                # Candidates already passed the source provider's executable
-                # channel and alpha checks, including its subthreshold receipt.
-                flux = copy.deepcopy(self._step_start_evaporation_raw_flux)
+            elif zero_reason != 'frozen_consuming_carriers_at_zero_oxygen' and not hour.phase['physical_zero_reason']:
                 exponents = {}
-                for species in self._step_start_evaporation_computed_channels:
-                    evaluator = self.vapour_rail_catalog.evaluator_for_hot_train(
-                        species, process_phase=('stage0' if self.melt.campaign.name in {'C0', 'C0B'}
-                                                else 'hot_train'))
+                for species in hour.seed_computed_channels:
+                    evaluator = hour.catalog.evaluator_for_hot_train(species,
+                        process_phase=('stage0' if hour.melt.campaign.name in {'C0', 'C0B'} else 'hot_train'))
                     if evaluator is not None and evaluator._unbounded_at_zero_oxygen():
                         exponents[species] = evaluator.pO2_exponent
-                flux.species_kg_hr = audit._analytic_evaporation_depletion_rates(
-                    flux.species_kg_hr, dt_hr=1.0,
-                    phase_scalar=audit._record_phase_context_diagnostic(
-                        'evaporation_depletion', scalar_liquid_fraction=1.0),
-                    cleaned_melt_kg=audit.atom_ledger.kg_by_account('process.cleaned_melt'),
-                    available_o2_kg=audit.atom_ledger.kg_by_account('process.overhead_gas').get('O2', 0.0),
-                    zero_oxygen_exponents=exponents)
+                flux = EvaporationFlux(species_kg_hr=_analytic_evaporation_depletion_rates(
+                    hour.seed_raw_rates or {}, vapor_pressures=hour.vapor_pressure_data,
+                    frozen_carriers=None, species_formula_registry=hour.species_formula_registry,
+                    dt_hr=1.0, phase_scalar=1.0,
+                    cleaned_melt_kg=_hour_account_kg(hour, hour.accounts_mol, 'process.cleaned_melt'),
+                    available_o2_kg=_hour_account_kg(hour, hour.accounts_mol, 'process.overhead_gas').get('O2', 0.0),
+                    zero_oxygen_exponents=exponents),
+                    alpha_authority_status_by_species=dict(hour.seed_alpha_authority or {}),
+                    carrier_authority_by_species=dict(hour.seed_carrier_authority or {}))
                 flux.update_totals()
-                start = len(audit.atom_ledger.transitions)
-                before = audit.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0)
-                audit._apply_evaporation_carrier_batch(flux)
-                amounts, _ = audit._evaporation_signed_amounts(start, before)
+                amounts, _ = _project_frozen_carrier_batch(audit_hour, flux)[0]
                 admitted = {key.removeprefix('carrier:') for key, value in amounts.items()
                             if key.startswith('carrier:') and value > 0.0}
                 limit_basis = 'positive-side mass-action limit at exact zero'
             projected = solved.payload[2]
-            frozen = self._frozen_evaporation_carriers
-            projected._carrier_admission_flips = [
+            frozen = hour.frozen_carriers
+            flips = [
                 {'species': species, 'direction': 'admitted' if species in admitted else 'excluded',
                  **({'basis': limit_basis} if limit_basis else {})}
                 for species in sorted(frozen ^ admitted)]
-            projected._carrier_admission_notices = [
+            notices = [
                 'carrier admission flips at the solved surface oxygen; frozen-set solution used'
                 + f"; {item['species']}: {item['direction']}"
-                for item in projected._carrier_admission_flips]
+                for item in flips]
             if solved.reaction_pO2_bar == 0.0 and zero_reason == 'frozen_consuming_carriers_at_zero_oxygen':
-                projected._carrier_admission_notices.append(
+                notices.append(
                     'oxygen-consuming carriers stop at zero oxygen; zero-bulk boundary prediction used')
             if solved.oxygen_uptake_transport_limited:
-                projected._carrier_admission_notices.append('oxygen_uptake_transport_limited')
-            if projected._oxygen_release_transport_limited:
-                projected._carrier_admission_notices.append('oxygen_release_transport_limited')
-            return solved
+                notices.append('oxygen_uptake_transport_limited')
+            if projected.oxygen_release_transport_limited:
+                notices.append('oxygen_release_transport_limited')
+            projected = replace(projected, carrier_admission_flips=tuple(flips),
+                carrier_admission_notices=tuple(notices))
+            return replace(solved, payload=(solved.payload[0], solved.payload[1], projected,
+                solved.payload[3], solved.payload[4]))
         except OxygenClosureNonconvergence as exc:
             raise EvaporationFluxRefusal('oxygen_closure_nonconvergence', {'detail': str(exc)}) from exc
 
@@ -5179,47 +5703,11 @@ class EvaporationMixin:
         Uses the existing CONDENSATION_ROUTE wall split. Hot walls
         (default 1500 C) leave tar in overhead_gas.
         """
-        from simulator.chemistry.organics_pyrolysis import tar_fate
-
-        tar_kg = float(
-            self.atom_ledger.kg_by_account('process.overhead_gas').get(
-                'organic_tar', 0.0,
-            )
-            or 0.0
-        )
-        if tar_kg <= 1e-12:
-            return
-        if self.condensation_model.wall_temperature_C is None:
-            from simulator.condensation import DepositionInputRefusal
-
-            raise DepositionInputRefusal(
-                "T_wall_K", None,
-                str(self.condensation_model.wall_temperature_input_refusals),
-            )
-        wall_T = float(self.condensation_model.wall_temperature_C)
-        melt_T = float(getattr(self.melt, 'temperature_C', wall_T) or wall_T)
-        formula = resolve_species_formula(
-            'organic_tar', self.species_formula_registry
-        )
-        tar_mol = tar_kg / formula.molar_mass_kg_per_mol()
-        atoms = formula.atom_moles(tar_mol)
-        fate = tar_fate(atoms, melt_T, wall_T)
-        if fate.coat_frac <= 1e-12:
-            return
-
-        class _TarRoute:
-            wall_deposit_fraction_by_species = {'organic_tar': 1.0}
-            wall_deposit_account_fractions_by_species = {
-                'organic_tar': {'process.wall_deposit': 1.0}
-            }
-
-        coat_kg = tar_kg * fate.coat_frac
-        self._dispatch_condensation_route(
-            'organic_tar',
-            coat_kg,
-            {},
-            _TarRoute(),
-        )
+        projected = _organic_tar_wall_route(self.atom_ledger.kg_by_account('process.overhead_gas'),
+            self.condensation_model, self.melt.temperature_C, self.species_formula_registry)
+        if projected is not None:
+            coat_kg, route = projected
+            self._dispatch_condensation_route('organic_tar', coat_kg, {}, route)
 
     def _record_wall_deposit_delta(
         self,

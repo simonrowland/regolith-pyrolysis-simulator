@@ -117,6 +117,14 @@ def test_nonzero_cro2_condensation_returns_gas_oxygen():
         sim._frozen_evaporation_carriers = frozenset({'CrO2'})
         flux = EvaporationFlux(species_kg_hr={'CrO2': 0.001})
         flux.update_totals()
+        from simulator.evaporation import _project_frozen_carrier_batch
+        from simulator.chemistry.kernel import ChemistryIntent
+        from simulator.chemistry.kernel.validation import _proposal_to_ledger_transition
+        _, projected = _project_frozen_carrier_batch(sim._prepare_evaporation_hour(), flux)
+        predicted_returns = [sim._transition_species_mol(
+            _proposal_to_ledger_transition(proposal, sim.species_formula_registry),
+            side='credits', account='process.overhead_gas', species='O2')
+            for intent, proposal in projected.proposals if intent == ChemistryIntent.CONDENSATION_ROUTE]
         start = len(sim.atom_ledger.transitions)
         sim._apply_evaporation_carrier_batch(flux)
         returns = [sim._transition_species_mol(transition, side='credits',
@@ -125,6 +133,7 @@ def test_nonzero_cro2_condensation_returns_gas_oxygen():
                    if not transition.name.startswith('evaporate_')]
         assert returns and sum(returns) > 0.0
         assert [value.hex() for value in returns] == ['0x1.860dbad355075p-9']
+        assert [value.hex() for value in predicted_returns] == [value.hex() for value in returns]
     finally:
         close_test_owned_magemin_backend(sim)
 
@@ -134,28 +143,29 @@ def test_rh03_hour9_seed_and_solved_sio_operands(monkeypatch):
     from simulator.run_executor import RunExecutor
     from tests.test_condensation_extrapolation_honesty import _rh03_run
 
-    calculate = PyrolysisSimulator._calculate_evaporation
+    import simulator.evaporation as evaporation
+    calculate = evaporation._frozen_flux_from_pressure
     solve = PyrolysisSimulator._solve_evaporative_oxygen_boundary
     seeds = []
     accepted = []
 
-    def observe_source(owner, equilibrium, **kwargs):
-        if owner.melt.hour == 8 and getattr(owner, '_frozen_evaporation_carriers', None) is None:
+    def observe_source(hour, oxygen, equilibrium, diagnostic):
+        if hour.melt.hour == 8 and hour.frozen_carriers is None:
             seeds.append({
-                'sio2_kg': owner.atom_ledger.kg_by_account('process.cleaned_melt')['SiO2'],
-                'intrinsic_bar': owner._last_vapor_pressure_diagnostic['source_reaction_fO2_bar'],
+                'sio2_kg': evaporation._hour_account_kg(hour, hour.accounts_mol, 'process.cleaned_melt')['SiO2'],
+                'intrinsic_bar': diagnostic['source_reaction_fO2_bar'],
                 'source_pa': equilibrium.vapor_pressures_Pa['SiO'],
-                'bulk_pa': owner._evaporation_bulk_partials_pa()['SiO'],
+                'bulk_pa': hour.bulk_partials_Pa['SiO'],
             })
-        return calculate(owner, equilibrium, **kwargs)
+        return calculate(hour, oxygen, equilibrium, diagnostic)
 
     def observe_solve(owner, *args, **kwargs):
         result = solve(owner, *args, **kwargs)
         if owner.melt.hour == 8:
-            accepted.append((result.reaction_pO2_bar, result.payload[2]._frozen_evaporation_carriers))
+            accepted.append((result.reaction_pO2_bar, result.payload[2].frozen_carriers))
         return result
 
-    monkeypatch.setattr(PyrolysisSimulator, '_calculate_evaporation', observe_source)
+    monkeypatch.setattr(evaporation, '_frozen_flux_from_pressure', observe_source)
     monkeypatch.setattr(PyrolysisSimulator, '_solve_evaporative_oxygen_boundary', observe_solve)
     execution = RunExecutor().execute(_rh03_run(9)._session_config())
     assert execution.status == 'ok', execution.error_message
@@ -169,13 +179,13 @@ def test_rh03_hour9_seed_and_solved_sio_operands(monkeypatch):
                             for oxygen, carriers in accepted)
 
 
-def test_trial_ledger_still_refuses_unbalanced_transitions():
+def test_hour_rollback_ledger_still_refuses_unbalanced_transitions():
     from simulator.accounting.exceptions import UnbalancedTransitionError
     from simulator.accounting.ledger import snapshot_atom_ledger
     from tests.accounting.test_ledger_api import _api
 
     original = _api().ledger
-    trial = snapshot_atom_ledger(original, _pressure_trial=True)
+    trial = snapshot_atom_ledger(original)
     before = trial.mol_by_account()
     with pytest.raises(UnbalancedTransitionError):
         trial.move('invalid trial', 'process.cleaned_melt', 'process.overhead_gas',
@@ -207,32 +217,17 @@ def test_pressure_trials_keep_checks_without_materializing_diagnostics(monkeypat
             conservation_calls.append(1)
             return validate(transition, *args, **kwargs)
 
-        from simulator.core import PyrolysisSimulator
-        gate_record = PyrolysisSimulator._melt_redox_liquidus_gate_record
-        sweep_plan = PyrolysisSimulator._continuous_sweep_plan
-
-        def parent_gate_only(owner, *args, **kwargs):
-            assert not getattr(owner, '_pressure_trial', False), 'trial re-entered liquidus finder'
-            return gate_record(owner, *args, **kwargs)
-
-        def parent_sweep_only(owner, *args, **kwargs):
-            assert not getattr(owner, '_pressure_trial', False), 'trial re-entered sweep balance'
-            return sweep_plan(owner, *args, **kwargs)
-
-        monkeypatch.setattr(PyrolysisSimulator, '_melt_redox_liquidus_gate_record', parent_gate_only)
-        monkeypatch.setattr(PyrolysisSimulator, '_continuous_sweep_plan', parent_sweep_only)
         monkeypatch.setattr(catalog, 'compiled_catalog_for', compile_once)
         monkeypatch.setattr(LedgerTransition, 'validate_conservation', check)
         monkeypatch.setattr('simulator.diagnostics.wall_sticking_alpha_provenance_notice',
                             lambda *a, **k: pytest.fail('trial materialized authority diagnostics'))
         solved = sim._solve_evaporative_oxygen_boundary()
-        trial = solved.payload[2]
+        proposal = solved.payload[2]
         assert len(compile_calls) == 1
         assert conservation_calls
-        assert len(trial.atom_ledger._gross_account_flow_events) == journal_count
+        assert proposal.proposals
+        assert not hasattr(proposal, 'atom_ledger')
         assert len(sim.atom_ledger._gross_account_flow_events) == journal_count
-        assert trial.atom_ledger._gross_account_flow_events is not sim.atom_ledger._gross_account_flow_events
-        assert trial.atom_ledger._gross_account_flow_events[0] is sim.atom_ledger._gross_account_flow_events[0]
         assert solved.source_terms_mol_m2_s
     finally:
         close_test_owned_magemin_backend(sim)
@@ -274,23 +269,22 @@ def test_pressure_trial_freezes_liquidus_and_sweep_boundary(monkeypatch):
         sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
         bulk = sim._vapor_pressure_transport_pO2_bar()
         fraction = sim._melt_redox_liquid_fraction_factor(1873.15, gate_authority=authority)
-        trial = sim._detached_evaporation_projection()
-        # Redox changes during a batch must not invalidate the hour's frozen
-        # phase measurement or trigger another physical sweep ODE.
-        trial.melt.oxygen_reservoir.melt_intrinsic_fO2_log += 2.0
-        trial._melt_redox_gate_authority_tick_hour = None
-        trial.melt.sweep_mol_per_s = 1.0
-        monkeypatch.setattr(trial, '_melt_redox_liquidus_gate_record',
+        hour = sim._prepare_evaporation_hour()
+        from dataclasses import replace
+        from simulator.evaporation import _frozen_source
+        altered = replace(hour, redox={**hour.redox, 'fO2_log': hour.redox['fO2_log'] + 2.0})
+        monkeypatch.setattr(sim, '_melt_redox_liquidus_gate_record',
                             lambda **kw: pytest.fail('pressure trial repeated liquidus lookup'))
-        monkeypatch.setattr(trial, '_sweep_boundary_pO2_bar',
+        monkeypatch.setattr(sim, '_sweep_boundary_pO2_bar',
                             lambda: pytest.fail('pressure trial repeated sweep balance'))
-        assert trial._melt_redox_liquid_fraction_factor(1873.15) == fraction
-        assert trial._headspace_transport_pO2_bar_from_ledger(0.0, head_o2_mol=0.0) == bulk
+        _frozen_source(altered, 1e-7)
+        assert hour.redox['liquid_fraction'] == fraction
+        assert hour.bulk_pO2_bar == bulk
     finally:
         close_test_owned_magemin_backend(sim)
 
 
-def test_pressure_trial_and_hour_rollback_defer_cold_spot_history(monkeypatch):
+def test_frozen_hour_omits_cold_spot_history_and_rollback_defers_it(monkeypatch):
     from types import MappingProxyType
     import simulator.core as core
 
@@ -305,11 +299,9 @@ def test_pressure_trial_and_hour_rollback_defer_cold_spot_history(monkeypatch):
             return copy_proxy(value, memo)
 
         monkeypatch.setattr(core, '_deepcopy_refusal_mappingproxy', copy_frontier_only)
-        trial = sim._detached_evaporation_projection()
-        assert trial.condensation_model.cold_spot_history is not sim.condensation_model.cold_spot_history
-        assert trial.condensation_model.cold_spot_history[0] is row
-        trial.condensation_model.cold_spot_history.append({'temperature_C': 99.0})
-        assert len(sim.condensation_model.cold_spot_history) == 1
+        hour = sim._prepare_evaporation_hour()
+        assert 'cold_spot_history' not in hour.condensation_inputs
+        assert sim.condensation_model.cold_spot_history == [row]
         state, _, _ = sim._snapshot_terminal_refusal_hour_state(defer_committed_history=True)
         history = state['_condensation_model'].cold_spot_history
         assert isinstance(history, core._RefusalSnapshotHistoryPrefix)

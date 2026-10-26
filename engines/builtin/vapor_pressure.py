@@ -438,7 +438,7 @@ def _o2_channel_term_and_potential(
 
     from simulator.vapour_rail.channels import (
         compile_o2_channel_term,
-        o2_potential_from_pO2_bar,
+        _o2_potential_from_pO2_bar as o2_potential_from_pO2_bar,
     )
 
     exponent = float(pO2_exponent)
@@ -2672,6 +2672,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         for species, data in pseudo_fallbacks:
             warn_pseudo_vapor_pressure_fallback(
                 species, data, self._pseudo_vapor_pressure_warning_seen, stacklevel=2)
+        for warning in result.warnings:
+            if 'pO2_outside_evaluator_band' in warning:
+                runtime_warnings.warn(warning, UserWarning, stacklevel=2)
         return result
 
     def _evaluate_pressure(self, request: IntentRequest, *, pseudo_fallbacks) -> IntentResult:
@@ -2683,7 +2686,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         from simulator.vapour_rail.channels import (
             REACTION_PLANE_MELT_INTERFACE,
             channel_linear_mass_action_factor,
-            o2_potential_from_pO2_bar,
+            _o2_potential_from_pO2_bar as o2_potential_from_pO2_bar,
         )
 
         wrong_intent = reject_wrong_intent(request, ChemistryIntent.VAPOR_PRESSURE)
