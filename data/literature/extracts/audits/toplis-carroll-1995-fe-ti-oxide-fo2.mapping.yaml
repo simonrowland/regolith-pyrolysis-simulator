@@ -1,0 +1,131 @@
+source_id: toplis-carroll-1995-fe-ti-oxide-fo2
+source:
+  citation: Toplis, M. J. & Carroll, M. R. (1995). An experimental study of the influence of oxygen fugacity on Fe-Ti oxide stability, phase relations, and mineral-melt equilibria in ferro-basaltic systems. Journal of Petrology 36, 1137-1170.
+extraction:
+  method: MinerU table emit for Table 2 glass analyses; run-specific Table 1 temperature, log fO2, delta FMQ, duration, and assemblage joined per run
+  date: '2026-10-26'
+  worker: w1025e-topl95b
+review_status: draft
+# table_index is the tool's per-page MinerU block index. Production locators use the printed caption number, Table 2.
+# The source has no text layer; draft rows on pages 8 and 13 are corrected OCR variants and rendered checks.
+# Table 1 is MinerU block p005-t01 and spans PDF pages 5-6: run label col 1, D1 col 2, ramp col 3, D2 col 4, T1 col 5, log10 fO2 col 6, delta FMQ col 7, run products col 8. Its rows are hand-transcribed into experiment records because emit creates observations, not experiments; conditions are joined from this table per run.
+# Table 2 has 177 phase rows (38 Liq, 139 crystal). Eight oxide columns are mapped below for Liq; crystal rows are retained as typed refusals because the schema has no crystal PhaseRole. Three starting-composition rows are retained as context.
+# MinerU omitted the Fe-42 Liq row on page 9 and the Fe-23 Liq row on page 11; those eight-component rows were restored from the page renders.
+# Table 3 has 38 calculated run rows and four FMQ section rows; its modal proportions remain typed-refused context because no phase-mode quantity token exists. The mass-balance inputs include Table 2 glass analyses, typed-refusal crystal analyses, and starting-glass context; crystal and starting-glass records are not migrated observations, so the outputs are quoted_attributed. Table 4 has 12 fitted-proportion rows plus two section rows and remains typed-refused because no phase-mode quantity token exists. Its regional fits use plotted modal-abundance data from Figs. 11–14 within regions defined in Fig. 20, but the source does not identify per-region migrated observation inputs; the outputs are quoted_attributed. Region IV is extrapolated from adjoining regions (footnote e), with no regional regression inputs.
+tables:
+  - page: 7
+    table_index: 3
+    published_page: 1143
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: wt%
+    phase: glass
+    rows: [7, 10, 14, 19]
+    values: &oxide_columns
+      - {column: 4, species: SiO2}
+      - {column: 5, species: TiO2}
+      - {column: 6, species: Al2O3}
+      - {column: 7, species: FeO*}
+      - {column: 8, species: MgO}
+      - {column: 9, species: CaO}
+      - {column: 10, species: Na2O}
+      - {column: 11, species: K2O}
+  - page: 8
+    table_index: 1
+    published_page: 1144
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: wt%
+    phase: glass
+    row_predicate:
+      column: 2
+      matches: '^(Liq|Lig)$'
+    render_verified:
+      - {row: 3, column: 5, text: '3·25(1.7)'}
+    values: *oxide_columns
+  - page: 9
+    table_index: 5
+    published_page: 1145
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: wt%
+    phase: glass
+    row_predicate:
+      column: 2
+      matches: '^(Liq|Lig)$'
+    values: *oxide_columns
+  - page: 10
+    table_index: 6
+    published_page: 1146
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: wt%
+    phase: glass
+    row_predicate:
+      column: 2
+      matches: '^(Liq|Lig)$'
+    values: *oxide_columns
+  - page: 11
+    table_index: 7
+    published_page: 1147
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: wt%
+    phase: glass
+    row_predicate:
+      column: 2
+      matches: '^(Liq|Lig)$'
+    values: *oxide_columns
+  - page: 12
+    table_index: 8
+    published_page: 1148
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: wt%
+    phase: glass
+    row_predicate:
+      column: 2
+      matches: '^(Liq|Lig)$'
+    values: *oxide_columns
+  - page: 13
+    table_index: 1
+    published_page: 1149
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: wt%
+    phase: glass
+    row_predicate:
+      column: 2
+      matches: '^(Liq|Lig)$'
+    values: *oxide_columns
+  - page: 14
+    table_index: 10
+    published_page: 1150
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: wt%
+    phase: glass
+    row_predicate:
+      column: 2
+      matches: '^(Liq|Lig)$'
+    values: *oxide_columns
+  - page: 15
+    table_index: 11
+    published_page: 1151
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    evidence_class: measured_direct
+    unit: wt%
+    phase: glass
+    row_predicate:
+      column: 2
+      matches: '^(Liq|Lig)$'
+    values: *oxide_columns

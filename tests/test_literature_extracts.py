@@ -5888,3 +5888,341 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
             ("(675.55,1619.08)", "(675.50,1620.00)"),
         )
     documents["shornikov-1997-cao-alumina-vapor"] = original
+
+
+def test_toplis_carroll_1995_full_table_migration_and_render_pins() -> None:
+    """Lock the full run/phase inventory, printed cells, and identity axes."""
+    source_id = "toplis-carroll-1995-fe-ti-oxide-fo2"
+    path = EXTRACTS / f"{source_id}.yaml"
+    extract = yaml.safe_load(path.read_text(encoding="utf-8"))
+
+    assert len(extract["experiments"]) == 42
+    experiments_by_id = {
+        experiment["experiment_id"]: experiment
+        for experiment in extract["experiments"]
+    }
+    for experiment in extract["experiments"]:
+        conditions = experiment["conditions"]
+        for key in ("fO2_log", "delta_FMQ"):
+            condition = conditions[key]
+            assert condition["state"]["tag"] == "value"
+            assert condition["state"]["value"]["kind"] == "point"
+            assert condition["locator"]["table"] == "1"
+            assert condition["locator"]["page"] == experiment["locator"]["page"]
+    for experiment_id, expected_values in {
+        "toplis_1995_fe_20": ("-8.92", "-0.10", 5),
+        "toplis_1995_fe_18": ("-10.57", "-1.80", 5),
+        "toplis_1995_fe_48": ("-10.67", "-1.34", 5),
+        "toplis_1995_fe_50": ("-9.23", "+0.13", 5),
+        "toplis_1995_fe_76": ("-12.35", "-1.99", 6),
+    }.items():
+        experiment = experiments_by_id[experiment_id]
+        assert experiment["conditions"]["fO2_log"]["state"]["value"]["point"] == expected_values[0]
+        assert experiment["conditions"]["delta_FMQ"]["state"]["value"]["point"] == expected_values[1]
+        assert experiment["locator"]["page"] == expected_values[2]
+    glass_observations = [
+        row
+        for species in extract["species"].values()
+        for row in species.get("observations", [])
+        if row.get("phase") == "glass"
+    ]
+    source_glass_by_id = {
+        row["observation_id"]: row for row in glass_observations
+    }
+    glass_runs = {row["experiment"] for row in glass_observations}
+    crystal_refusals = [
+        row for row in extract["species"]["Fe"]["observations"]
+        if row.get("values", {}).get("status") == "typed_refusal"
+    ]
+    assert len(glass_runs) == 38
+    assert len(glass_observations) == 304
+    assert len(crystal_refusals) == 139
+    assert len(glass_runs) + len(crystal_refusals) == 177
+    assert all(len(row["values"]["oxide_values_wt_pct_as_published"]) == 8 for row in crystal_refusals)
+    assert all("D1_h" in row["thermal_history_as_published"] for row in extract["experiments"])
+    table4 = [
+        row for row in extract["species"]["Fe"]["context"]
+        if row["observation_id"].startswith("toplis95_table4_")
+    ]
+    assert len(table4) == 12
+    assert all(row["values"]["status"] == "typed_refusal" for row in table4)
+    table4_by_id = {row["observation_id"]: row for row in table4}
+    expected_table4_regions = {
+        "toplis95_table4_variation_i": ("I", []),
+        "toplis95_table4_variation_ii": ("II", []),
+        "toplis95_table4_variation_iiia": ("IIIa", []),
+        "toplis95_table4_variation_iiib": ("IIIb", []),
+        "toplis95_table4_variation_iv": ("IV", ["d", "e"]),
+        "toplis95_table4_variation_v": ("V", ["d"]),
+        "toplis95_table4_crystallizing_i": ("I", []),
+        "toplis95_table4_crystallizing_ii": ("II", []),
+        "toplis95_table4_crystallizing_iiia": ("IIIa", []),
+        "toplis95_table4_crystallizing_iiib": ("IIIb", []),
+        "toplis95_table4_crystallizing_iv": ("IV", ["d", "e"]),
+        "toplis95_table4_crystallizing_v": ("V", ["d"]),
+    }
+    assert set(table4_by_id) == set(expected_table4_regions)
+    for observation_id, (region, footnotes) in expected_table4_regions.items():
+        row = table4_by_id[observation_id]
+        assert row["locator"]["page"] == 30
+        assert row["locator"]["table"] == "4"
+        assert row["locator"]["row"] == region
+        assert row["values"]["region_as_published"] == region
+        assert row["values"].get("region_footnotes_as_published", []) == footnotes
+        assert row["values"]["method_class"] == "quoted_attributed"
+        method = row["derivation"]["method"]
+        if observation_id == "toplis95_table4_variation_iv":
+            assert method["state"]["value"] == (
+                "Region IV is extrapolated from adjoining regions "
+                "(Table 4 footnote e); no regional regression inputs are used."
+            )
+            assert method["locator"]["page"] == 30
+            assert method["locator"]["table"] == "4"
+            assert method["locator"]["note"] == "Table 4 footnote e"
+        else:
+            assert method["locator"]["page"] == 29
+        assert "derived_from" not in row
+        assert "inputs" not in row["derivation"]
+    for observation_id in (
+        "toplis95_table4_variation_iiib",
+        "toplis95_table4_crystallizing_iiib",
+    ):
+        assert table4_by_id[observation_id]["values"]["phase_values_as_published"][
+            "Ol"
+        ] == "res $^{c}$"
+    assert next(
+        row for row in table4
+        if row["observation_id"] == "toplis95_table4_variation_i"
+    )["values"]["phase_values_as_published"]["Ol"] == "21 ( $1$ ) $^{b}$"
+    expected_ferric_estimates = {
+        "toplis95_fe_79_cpx_ferric_oxide_estimate": (
+            "Fe-79", "18", "toplis95_fe_79_crystal_cpx_p7_r13"
+        ),
+        "toplis95_fe_41_cpx_ferric_oxide_estimate": (
+            "Fe-41", "29", "toplis95_fe_41_crystal_cpx_p7_r17"
+        ),
+        "toplis95_fe_95_cpx_ferric_oxide_estimate": (
+            "Fe-95", "14", "toplis95_fe_95_crystal_cpx_p7_r21"
+        ),
+    }
+    ferric_estimates = [
+        row for row in extract["species"]["Fe"]["context"]
+        if row["observation_id"] in expected_ferric_estimates
+    ]
+    assert {row["observation_id"] for row in ferric_estimates} == set(
+        expected_ferric_estimates
+    )
+    for row in ferric_estimates:
+        run, percent, parent_id = expected_ferric_estimates[row["observation_id"]]
+        assert row["locator"]["page"] == 22
+        assert row["units"] == "wt% Fe2O3 relative to FeO* as printed"
+        assert row["attribution"] == (
+            "Toplis & Carroll (1995), ferric-oxide estimate from ideal "
+            "clinopyroxene stoichiometry."
+        )
+        assert row["values"]["run_as_published"] == run
+        assert row["values"]["percent_of_FeO_star_as_Fe2O3"] == percent
+        assert row["values"]["method_class"] == "quoted_attributed"
+        assert row["derivation"]["inputs"] == [parent_id]
+        assert "derived_from" not in row
+    table3 = [
+        row for row in extract["species"]["Fe"]["context"]
+        if row["observation_id"].startswith("toplis95_table3_row_")
+    ]
+    table3_runs = [
+        row for row in table3
+        if row["values"].get("row_as_published", [""])[0].startswith("Fe-")
+    ]
+    assert len(table3) == 42
+    assert len(table3_runs) == 38
+    for row in table3_runs:
+        assert row["values"]["method_class"] == "quoted_attributed"
+        assert row["attribution"] == (
+            "Toplis & Carroll (1995), weighted least-squares mass-balance result "
+            "using the method of Albarède & Provost (1977)."
+        )
+        assert "derived_from" not in row
+        assert row["derivation"]["inputs"]
+        assert row["derivation"]["method"]["locator"]["page"] == 17
+        assert row["derivation"]["references"] == ["Albarède & Provost (1977)"]
+    assert all(
+        "method_class" not in row["values"]
+        for row in table3
+        if row not in table3_runs
+    )
+    table3_page17 = next(
+        row for row in table3
+        if row["observation_id"] == "toplis95_table3_row_33"
+    )
+    assert table3_page17["locator"]["page"] == 17
+    assert table3_page17["values"]["row_as_published"][0] == "Fe-16"
+    table3_page16 = next(
+        row for row in extract["species"]["Fe"]["context"]
+        if row["observation_id"] == "toplis95_table3_row_3"
+    )
+    assert table3_page16["locator"]["page"] == 16
+    assert table3_page16["locator"]["table"] == "3"
+    assert table3_page16["values"]["row_as_published"][0] == "Fe-40"
+
+    for experiment in extract["experiments"]:
+        pressure = experiment["pressure_environment"]
+        assert pressure["sweep_gas"]["state"]["tag"] == "unknown"
+        assert "gas_ratio" not in pressure
+
+    expected = {
+        ("SiO2", "toplis95_fe_45_glass_si"): ("48.5", 8),
+        ("TiO2", "toplis95_fe_45_glass_ti"): ("3.25", 8),
+        ("SiO2", "toplis95_fe_23_glass_si"): ("48.40", 11),
+        ("SiO2", "toplis95_fe_70_glass_si"): ("56.19", 13),
+        ("TiO2", "toplis95_fe_70_glass_ti"): ("2.80", 13),
+    }
+    for (species, observation_id), (printed, page) in expected.items():
+        row = next(
+            item for item in extract["species"][species]["observations"]
+            if item["observation_id"] == observation_id
+        )
+        assert row["units"] == "wt%"
+        assert row["values"]["component_amount"] == printed
+        assert row["locator"]["page"] == page
+        assert row["locator"]["table"] == "2"
+
+    migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+    assert result.validation.hard_issues == ()
+    assert len(result.observations) == 304
+    assert len(result.experiments) == 42
+    assert sum(
+        observation.value.kind.value == "unavailable"
+        for observation in result.observations.values()
+    ) == 0
+    migrated_observation_ids = {
+        observation.observation_id.rsplit("::", 1)[-1]
+        for observation in result.observations.values()
+    }
+    table3_input_ids = {
+        input_id
+        for row in table3_runs
+        for input_id in row["derivation"]["inputs"]
+    }
+    unresolved_crystal_inputs = {
+        input_id for input_id in table3_input_ids if "_crystal_" in input_id
+    }
+    assert len(unresolved_crystal_inputs) == 139
+    assert unresolved_crystal_inputs.isdisjoint(migrated_observation_ids)
+    unresolved_table3_inputs = table3_input_ids - migrated_observation_ids
+    assert unresolved_crystal_inputs <= unresolved_table3_inputs
+    assert all(
+        "_starting_" in input_id or "_crystal_" in input_id
+        for input_id in unresolved_table3_inputs
+    )
+    assert table3_input_ids - unresolved_table3_inputs <= migrated_observation_ids
+    ferric_input_ids = {
+        input_id
+        for row in ferric_estimates
+        for input_id in row["derivation"]["inputs"]
+    }
+    assert ferric_input_ids == {
+        parent_id for _, _, parent_id in expected_ferric_estimates.values()
+    }
+    assert ferric_input_ids.isdisjoint(migrated_observation_ids)
+    calculated_rows = [*table3_runs, *ferric_estimates, *table4]
+    for row in calculated_rows:
+        assert row["values"]["method_class"] == "quoted_attributed"
+        assert "derived_from" not in row
+        derived_from = set(row.get("derived_from", []))
+        assert derived_from <= migrated_observation_ids
+        input_ids = set(row.get("derivation", {}).get("inputs", []))
+        if input_ids - migrated_observation_ids:
+            assert row["values"]["method_class"] == "quoted_attributed"
+    table4_ids = {row["observation_id"] for row in table4}
+    assert table4_ids.isdisjoint(migrated_observation_ids)
+    for row in table4:
+        relation = row["derivation"]["relation"]
+        is_variation = row["values"]["section_as_published"].startswith(
+            "variation of mineral abundance"
+        )
+        if is_variation and row["values"]["region_as_published"] == "IV":
+            assert "extrapolated from adjoining regions" in relation
+            assert "no regional regression inputs" in relation
+        elif is_variation:
+            assert "Figs. 11–14" in relation
+            assert "does not identify per-region inputs as migrated observations" in relation
+        elif row["values"]["region_as_published"] == "IV":
+            assert "extrapolated adjoining-region summary" in relation
+            assert "no regional regression inputs" in relation
+        else:
+            assert "corresponding Table 4 regional gradient" in relation
+
+    for source_experiment in extract["experiments"]:
+        experiment_id = source_experiment["experiment_id"]
+        migrated_experiment = next(
+            experiment for experiment in result.experiments.values()
+            if experiment.experiment_id.endswith(experiment_id)
+        )
+        for key in ("fO2_log", "delta_FMQ"):
+            condition = migrated_experiment.conditions[key]
+            source_condition = source_experiment["conditions"][key]
+            assert condition.state.is_value
+            assert condition.state.value.point == Decimal(
+                source_condition["state"]["value"]["point"]
+            )
+            assert condition.locator.page == source_experiment["locator"]["page"]
+            assert condition.locator.table == "1"
+
+    for (species, observation_id), (printed, page) in expected.items():
+        migrated = next(
+            row for row in result.observations.values()
+            if row.observation_id.endswith(f"::{observation_id}")
+        )
+        assert migrated.value.point == Decimal(printed)
+        assert (migrated.locator.page, migrated.locator.table) == (page, "2")
+        assert migrated.identity.composition.is_value
+        assert migrated.identity.total_pressure_Pa.value == Decimal("101325")
+        assert migrated.identity.fO2_Pa.is_value
+        assert migrated.identity.temperature_K.is_value
+        assert migrated.point_conditions["T_C"].state.is_value
+        assert migrated.point_conditions["fO2_log"].state.is_value
+        assert migrated.point_conditions["total_pressure_Pa"].state.value == Decimal("101325")
+        assert migrated.point_conditions["composition"].state.is_value
+        assert "gas_ratio" not in migrated.point_conditions
+
+    fe56_cpx = next(
+        row for row in crystal_refusals
+        if row["experiment"] == "toplis_1995_fe_56"
+        and row["phase_as_published"] == "clinopyroxene"
+    )
+    assert fe56_cpx["locator"]["page"] == 13
+    assert fe56_cpx["values"]["oxide_values_wt_pct_as_published"]["TiO2"] == "1·39(18)"
+
+    for migrated in result.observations.values():
+        observation_id = migrated.observation_id.rsplit("::", 1)[-1]
+        source = source_glass_by_id[observation_id]
+        assert migrated.identity.composition.is_value
+        assert migrated.identity.total_pressure_Pa.value == Decimal("101325")
+        assert migrated.identity.fO2_Pa.is_value
+        assert migrated.identity.temperature_K.is_value
+
+        source_conditions = source["point_conditions"]
+        migrated_conditions = migrated.point_conditions
+        for key in ("T_C", "fO2_log", "fO2_buffer_offset", "total_pressure_Pa", "composition"):
+            source_condition = source_conditions[key]
+            migrated_condition = migrated_conditions[key]
+            assert migrated_condition.state.is_value
+            assert migrated_condition.locator.page == source_condition["locator"]["page"]
+            assert migrated_condition.locator.table == source_condition["locator"].get("table")
+
+        assert migrated_conditions["T_C"].state.value == Decimal(
+            source_conditions["T_C"]["state"]["value"]
+        )
+        assert migrated_conditions["fO2_log"].state.value.point == Decimal(
+            source_conditions["fO2_log"]["state"]["value"]["point"]
+        )
+        assert migrated_conditions["fO2_buffer_offset"].state.value == {
+            "buffer": source_conditions["fO2_buffer_offset"]["state"]["value"]["buffer"],
+            "offset": Decimal(
+                source_conditions["fO2_buffer_offset"]["state"]["value"]["offset"]
+            ),
+        }
+        assert migrated_conditions["total_pressure_Pa"].state.value == Decimal("101325")
