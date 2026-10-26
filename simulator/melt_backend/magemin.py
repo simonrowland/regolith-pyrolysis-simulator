@@ -2700,6 +2700,16 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             diagnostic_detail,
                         )
                         raise timeout from exc
+                    except (
+                        OSError,
+                        subprocess.SubprocessError,
+                        MemoryError,
+                    ) as exc:
+                        raise _MAGEMinEngineCallError(
+                            type(exc).__name__,
+                            f'MAGEMin warm worker could not be started: {exc}',
+                            failure_disposition='environment',
+                        ) from exc
                 except EngineWorkerTimeout:
                     raise
                 except (

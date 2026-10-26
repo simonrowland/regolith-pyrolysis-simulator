@@ -2329,6 +2329,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """Refuse missing declared input before the first campaign hour."""
         if self._liquid_fraction_provider == 'analytical':
             return
+        store = self._pt0_store()
+        if store is not None and getattr(store, 'replay_enabled', False):
+            return
         self._register_freeze_gate_liquid_fraction_providers()
         provider = self._chem_registry.fallback_for(
             ChemistryIntent.GATE_LIQUID_FRACTION
