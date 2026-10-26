@@ -346,6 +346,10 @@ def test_pressure_residual_reuses_hour_invariants(monkeypatch):
                 lambda *a, **k: pytest.fail('residual rebuilt hour activity authority'))
             guard.setattr(transport_regime, 'surface_gas_film',
                 lambda *a, **k: pytest.fail('residual rebuilt a prepared gas film'))
+            guard.setattr(vapor_pressure.openimcc_bridge, '_load_pack',
+                lambda *a, **k: pytest.fail('residual called the cached OpenIMCC loader'))
+            guard.setattr(transport_regime, '_default_fan_service_T_C',
+                lambda *a, **k: pytest.fail('residual called the cached fan-rating loader'))
             return solve(evaluate, **kwargs)
 
     monkeypatch.setattr(langmuir_knudsen, '_solve_surface_oxygen_balance', checked_solve)
