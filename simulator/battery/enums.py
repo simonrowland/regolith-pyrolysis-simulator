@@ -232,6 +232,7 @@ class NoticeKind(StrEnum):
     OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
     OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
     DERIVATION_USES_COMPILATION = "derivation_uses_compilation"
+    MEASURED_REDUCED_ANCESTRY_DOWNGRADED = "measured_reduced_ancestry_downgraded"
     COMPOSITION_PROJECTED = "composition_projected"
     TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
