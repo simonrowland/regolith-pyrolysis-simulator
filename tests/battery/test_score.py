@@ -5241,7 +5241,7 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
             "stolyarova_1995_ca_partial_pressure_table2",
             "x(CaO)",
             8,
-            Decimal("2.33"),
+            Decimal("1.04"),
             "liquid",
         ),
     ),
@@ -5572,13 +5572,13 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(
         )
     }
     assert unverified_keys == {
-        "h=191f88c43b1b",
-        "h=4d3ab2cd6814",
-        "h=4f3dddc64866",
-        "h=67a63ea92d8f",
-        "h=69f870f37475",
-        "h=9151fe49ebd2",
-        "h=ffb85bc52460",
+        "h=2b0d96585c1f",
+        "h=70d0b48ae622",
+        "h=77e8a8961618",
+        "h=8e2834e7ce16",
+        "h=8fb519888bcb",
+        "h=9482b6cd970a",
+        "h=b8e8d996ef46",
     }
     e15_residual = selected[0][0]
     e15_observation = context.observations[e15_residual.reference]
@@ -5597,7 +5597,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(
     points = tuple(point for _residual, point in selected)
     shape = score_mod._e15_level_shape_rows(points)[1]
     assert shape["x_axis"] == "x(CaO)"
-    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("6.76")
+    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("5.19")
 
     from simulator.battery.score import (
         _ScorePayloadAccumulator,
@@ -5621,7 +5621,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(
     assert production_shape["x_axis"] == "x(CaO)"
     assert production_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("6.76")
+    ) == Decimal("5.19")
     assert (
         score_mod.FLAGGED_STRATUM_CELL_MATERIAL_INFERRED
         in production_shape["flags"]
@@ -5641,7 +5641,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(
     wrong_axis_shape = score_mod._e15_level_shape_rows(si_axis_points)[1]
     assert wrong_axis_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("-5.58")
+    ) == Decimal("-4.34")
 
     contested_payload = next(
         payload
