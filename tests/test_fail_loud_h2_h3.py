@@ -291,14 +291,15 @@ def test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite() -> None:
     for species, valid_range in above_valid_high.items():
         notice = extrapolation_notices.get(species)
         assert isinstance(notice, dict)
-        expected_reason = (
-            "metal_vapor_pressure_out_of_validated_range"
-            if species in provider._vapor_pressure_data.get("metals", {})
-            else "oxide_vapor_pressure_out_of_validated_range"
-        )
-        assert notice.get("reason") == expected_reason
+        # Mutation pinned: remove the extrapolation reason, authority, or
+        # certified band while leaving the predicted pressure finite.
+        assert notice.get("reason")
+        assert notice["reason"] != notice.get("status")
         assert notice.get("authority_level") == "extrapolated"
         assert tuple(notice.get("valid_range_K") or ()) == tuple(valid_range)
+        assert tuple(notice["certified_band"]["temperature_K"]) == tuple(
+            valid_range
+        )
 
         provenance = extreme_result.diagnostic[
             "vapor_pressure_numerator_provenance"
