@@ -1,3 +1,5 @@
+# Tables 3–5 are manually retained as context where no complete quantity
+# identity is supported. Table 6's mixed matrix was assembled by hand.
 source_id: mysen-kushiro-1988-condensation-evaporation-am-min
 source:
   citation: 'Mysen and Kushiro (1988), American Mineralogist 73:1-19'
@@ -13,12 +15,13 @@ tables:
     unit: wt%
     evidence_class: quoted_attributed
     rows: [2, 3, 4]
+    species_form: printed_formula
     value_pairs:
-      species_column: 1
-      value_column: 7
-      species_form: printed_formula
+      - species_column: 1
+        value_column: 7
     temperature: {column: 2, unit: C}
     attribution: Table 1 reports wt% derived from measured mass loss; starting mass is not tabulated.
+    schema_gap: Printed single-component Ag/Cu material is retained as point-condition composition; the existing identity path does not promote printed_species_formula for mass-loss rows.
   - page: 4
     table_index: 2
     type: mass_loss
@@ -26,38 +29,9 @@ tables:
     unit: wt%
     evidence_class: quoted_attributed
     rows: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+    species_form: printed_formula
     value_pairs:
-      species_column: 1
-      value_column: 8
-      species_form: printed_formula
+      - species_column: 1
+        value_column: 8
     temperature: {column: 2, unit: C}
     attribution: Table 2 reports wt% derived from measured mass loss; starting mass is not tabulated.
-  - page: 6
-    table_index: 3
-    type: context_record
-    quantity: unavailable
-    unit: 'wt% and atomic proportions'
-    rows: []
-  - page: 6
-    table_index: 4
-    type: context_record
-    quantity: unavailable
-    unit: 'temperature C, pressure bar, duration min as printed'
-    rows: []
-  - page: 7
-    table_index: 5
-    type: context_record
-    quantity: unavailable
-    unit: 'kJ/mol and J/(K mol)'
-    rows: []
-  - page: 9
-    table_index: 6
-    type: residue_component_composition
-    quantity: residue_component_composition
-    unit: wt%
-    evidence_class: measured_direct
-    rows: [3, 4, 5]
-    value_pairs:
-      species_column: 1
-      value_column: 2
-      species_form: printed_formula
