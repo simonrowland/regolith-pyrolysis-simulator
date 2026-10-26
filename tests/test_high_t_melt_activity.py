@@ -61,6 +61,138 @@ BASE_MELT_MOL = {
     "Al2O3": 1.00,
     "TiO2": 0.10,
 }
+# Exact cleaned-melt inputs from the R4 ordinary and quantized hour-132
+# vapor-pressure reads. Kept inline so tests do not depend on docs-private.
+_H133_T_K = 2378.15
+_H133_ORDINARY_MOL = {
+    "Ag": 0.00019044727877515409,
+    "Al2O3": 1347.4478962548742,
+    "As": 0.0010967841865285478,
+    "Au": 2.0859585726320976e-05,
+    "B": 0.19003890061400625,
+    "Ba": 0.8975600642134791,
+    "Bi": 2.457551659913331e-05,
+    "Br": 0.003213732284424759,
+    "CaO": 2012.0042177254709,
+    "Cd": 0.00027411895079403916,
+    "Ce2O3": 0.21300269917779982,
+    "Cr2O3": 3.2858891814505425e-10,
+    "Cs": 0.0011592755330998505,
+    "Cu": 0.16164042706365525,
+    "Dy2O3": 0.042053325622322495,
+    "Er2O3": 0.02477977297400363,
+    "Eu2O3": 0.003718412072063732,
+    "F": 4.325248807517177,
+    "Fe2O3": 1.730234222986687e-07,
+    "FeO": 7.223071870166733e-05,
+    "Ga": 0.0736600732770179,
+    "Gd2O3": 0.03822767923108917,
+    "Ge": 0.007071184481747926,
+    "HfO2": 0.031651027289974314,
+    "Ho2O3": 0.008951621435958164,
+    "I": 0.00040469821820252034,
+    "In": 4.472993162303401e-05,
+    "Ir": 4.2750027638292285e-05,
+    "K2O": 0.6032114743142483,
+    "La2O3": 0.08730964684295656,
+    "Li": 1.4800580083842994,
+    "Lu2O3": 0.003304006100581209,
+    "MgO": 76.33529920404698,
+    "MnO": 0.001875541491775934,
+    "Mo": 0.0016057742435935962,
+    "Na2O": 1.0516043821788383e-06,
+    "Nb": 0.1326703765718588,
+    "Nd2O3": 0.1323325750233767,
+    "Os": 3.7796992087109955e-05,
+    "P2O5": 7.236451972966535,
+    "Pb": 0.005948804581961605,
+    "Pr2O3": 0.026792994567377926,
+    "Pt": 6.318264488027949e-05,
+    "Rb": 0.030045240950940116,
+    "Sb": 0.0002530782501195886,
+    "Sc2O3": 0.43412808320737667,
+    "Se": 0.001951020484390543,
+    "SiO2": 961.8054661351188,
+    "Sm2O3": 0.03415649466376944,
+    "Sn": 0.002595805554255001,
+    "Sr": 1.6412056162362307,
+    "Tb2O3": 0.006701782013152592,
+    "Te": 0.00016099690561421692,
+    "TiO2": 192.59122511490912,
+    "Tm2O3": 0.003540413318432653,
+    "V": 2.4196231155000234,
+    "W": 0.001396812796206897,
+    "Y2O3": 0.25995526130272445,
+    "Yb2O3": 0.021818427195518682,
+    "Zn": 0.3142123762063946
+}
+_H133_QUANTIZED_MOL = {
+    "Ag": 0.0001904475081877867,
+    "Al2O3": 1347.4411362328551,
+    "As": 0.0010967758606925998,
+    "Au": 2.085926122946834e-05,
+    "B": 0.19003711066160783,
+    "Ba": 0.8975716682102776,
+    "Bi": 2.457543388505869e-05,
+    "Br": 0.00321373541455161,
+    "CaO": 2012.0084561530462,
+    "Cd": 0.0002741178802385213,
+    "Ce2O3": 0.21300092729498663,
+    "Cs": 0.001159257731251291,
+    "Cu": 0.1616412908165583,
+    "Dy2O3": 0.04205283505048687,
+    "Er2O3": 0.024779710406516258,
+    "Eu2O3": 0.003718386035506826,
+    "F": 4.325221029272418,
+    "Fe2O3": 1.7359815357365694e-07,
+    "FeO": 7.245591380728534e-05,
+    "Ga": 0.07365943913686604,
+    "Gd2O3": 0.0382273767615208,
+    "Ge": 0.007071287712306503,
+    "HfO2": 0.03165087168470858,
+    "Ho2O3": 0.008951738399674348,
+    "I": 0.0004046934616857878,
+    "In": 4.472964138696807e-05,
+    "Ir": 4.274958860335907e-05,
+    "K2O": 0.6039299326252252,
+    "La2O3": 0.08730861528843255,
+    "Li": 1.4800594828946974,
+    "Lu2O3": 0.003303976758229366,
+    "MgO": 76.38927436717935,
+    "MnO": 0.0018856152405062766,
+    "Mo": 0.00160576101731757,
+    "Na2O": 1.007133974075555e-06,
+    "Nb": 0.13266906995159466,
+    "Nd2O3": 0.13233245175596478,
+    "Os": 3.7796689919440956e-05,
+    "P2O5": 7.236368964409909,
+    "Pb": 0.005948919646329716,
+    "Pr2O3": 0.026792963888872326,
+    "Pt": 6.318277419890688e-05,
+    "Rb": 0.03004524900363579,
+    "Sb": 0.000253076937407576,
+    "Sc2O3": 0.4341268033666828,
+    "Se": 0.0019510021722053354,
+    "SiO2": 961.8980220326943,
+    "Sm2O3": 0.034156141077663335,
+    "Sn": 0.002595787409122074,
+    "Sr": 1.641175095981094,
+    "Tb2O3": 0.006701929938745531,
+    "Te": 0.00016099572167425447,
+    "TiO2": 192.59171998186724,
+    "Tm2O3": 0.0035403934005573436,
+    "V": 2.4195931453547233,
+    "W": 0.0013968271756190974,
+    "Y2O3": 0.2599522487731117,
+    "Yb2O3": 0.021818392526605446,
+    "Zn": 0.3142123351837479
+}
+_H133_WARM_SIO2_ACTIVITY = {
+    "ordinary": 0.020796595595499484,
+    "quantized": 0.02080166433881563,
+}
+
+
 ZHANG_KO0_5_COMPOSITION_WT_PCT = {
     "SiO2": 45.94,
     "Al2O3": 16.0,
@@ -827,6 +959,64 @@ _BRIDGE_REFERENCE = json.loads(
 
 def _call_record(engine: str, index: int) -> dict:
     return _BRIDGE_REFERENCE["records"][f"{engine}:{index}"]
+
+
+def test_h133_nonconvergence_uses_nearest_neighbor_without_activity_seam(
+    monkeypatch,
+) -> None:
+    """The two h133 targets refuse; all off-target work uses pinned OpenIMCC."""
+
+    real_evaluate = openimcc_bridge_module.evaluate
+    refused_targets = []
+    solved_anchor_calls = []
+
+    def refuse_h133_targets(**kwargs):
+        temperature_K = float(kwargs["temperature_K"])
+        if math.isclose(temperature_K, _H133_T_K, abs_tol=1e-9):
+            refused_targets.append(temperature_K)
+            raise ImccNonconvergenceError("h133 target refusal", {})
+        result = real_evaluate(**kwargs)
+        if math.isclose(temperature_K, 2403.15, abs_tol=1e-9):
+            solved_anchor_calls.append(temperature_K)
+        return result
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", refuse_h133_targets)
+    cases = (
+        ("ordinary", _H133_ORDINARY_MOL),
+        ("quantized", _H133_QUANTIZED_MOL),
+    )
+    activities = {}
+    for name, composition in cases:
+        result = _provider().dispatch(_request(
+            dict(composition), _H133_T_K, high_t_melt_activity="openimcc",
+        ))
+        authority = result.diagnostic["high_t_melt_activity"]
+        assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
+        assert authority["temperature_bridge"]["call_count"] == 6
+        notice = authority["held_effective_gamma_by_parent"]["SiO2"]
+        assert notice["method"] == "nearest_converged_temperature_neighbor"
+        assert notice["anchor_temperature_K"] == 2403.15
+        assert notice["anchor_gap_K"] == pytest.approx(25.0)
+
+        activity = vapor_pressure_module._high_t_activity_for_parent(
+            "SiO2", composition, temperature_K=_H133_T_K, authority=authority,
+        )
+        anchored = evaluate_cleaned_melt(composition, 2403.15)
+        anchor_activity, current_fraction = single_cation_activity_and_fraction(
+            "SiO2", anchored.single_cation_activities["SiO2"], composition,
+        )
+        assert activity.effective_gamma == pytest.approx(
+            anchor_activity / current_fraction, rel=1e-12,
+        )
+        assert activity.activity == pytest.approx(anchor_activity, rel=1e-12)
+        warm_activity = _H133_WARM_SIO2_ACTIVITY[name]
+        assert abs(activity.activity - warm_activity) / warm_activity < 0.01
+        activities[name] = activity.activity
+
+    assert len(refused_targets) == 2
+    assert all(math.isclose(t, _H133_T_K, abs_tol=1e-9) for t in refused_targets)
+    assert len(solved_anchor_calls) >= 4
+    assert abs(activities["ordinary"] - activities["quantized"]) <= 1e-5
 
 
 def test_refused_calls_use_nearest_same_composition_temperature_neighbor(
