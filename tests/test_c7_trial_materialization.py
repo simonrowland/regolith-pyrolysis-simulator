@@ -13,12 +13,16 @@ pytestmark = [pytest.mark.serial, pytest.mark.xdist_group('serial')]
 
 @pytest.mark.parametrize('frontier', (
     'snapshot', 'ledger', 'history', 'cost', 'notice', 'observer', 'liquidus', 'sweep',
+    'wall_notice', 'warning', 'kernel_init',
 ))
 def test_pressure_evaluation_has_no_write_frontier(monkeypatch, frontier):
     from simulator.accounting.ledger import AtomLedger
     from simulator.condensation import CondensationModel
     from simulator.core import PyrolysisSimulator
     from simulator.chemistry import langmuir_knudsen
+    from simulator.chemistry.kernel import ChemistryKernel
+    from simulator import wall_deposition
+    import warnings
 
     sim = simulation()
     targets = {
@@ -30,6 +34,9 @@ def test_pressure_evaluation_has_no_write_frontier(monkeypatch, frontier):
         'observer': (PyrolysisSimulator, '_commit_proposal'),
         'liquidus': (PyrolysisSimulator, '_melt_redox_liquidus_gate_record'),
         'sweep': (PyrolysisSimulator, '_continuous_sweep_plan'),
+        'wall_notice': (wall_deposition, '_record_wall_pressure_notice'),
+        'warning': (warnings, 'warn'),
+        'kernel_init': (ChemistryKernel, '__init__'),
     }
     solve = langmuir_knudsen._solve_surface_oxygen_balance
 
@@ -43,6 +50,8 @@ def test_pressure_evaluation_has_no_write_frontier(monkeypatch, frontier):
         endpoint = kwargs.get('settle_inward_endpoint')
         if endpoint is not None:
             kwargs['settle_inward_endpoint'] = lambda excess: guarded(endpoint, excess)
+        if frontier == 'warning':
+            guarded(evaluate, 1e-42)
         return solve(lambda excess: guarded(evaluate, excess), **kwargs)
 
     monkeypatch.setattr(langmuir_knudsen, '_solve_surface_oxygen_balance', checked_solve)
