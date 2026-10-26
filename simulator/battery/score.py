@@ -13912,8 +13912,12 @@ def _battery_hero_deck_store_observations(
 
 def _battery_hero_deck_join_key(
     observation: Observation,
-) -> tuple[str, str | Decimal] | None:
+) -> tuple[
+    tuple[str, str] | None,
+    tuple[str, Decimal] | None,
+]:
     point_conditions = observation.point_conditions or {}
+    time_key: tuple[str, Decimal] | None = None
     for key, multiplier in (
         ("time_s", Decimal(1)),
         ("duration_s", Decimal(1)),
@@ -13935,16 +13939,19 @@ def _battery_hero_deck_join_key(
         except (TypeError, ValueError, ArithmeticError):
             continue
         if seconds.is_finite():
-            return "time_s", seconds
+            time_key = ("time_s", seconds)
+            break
 
-    identity = observation.identity
-    if isinstance(identity, Identity) and identity.exposure is not None:
-        exposure_state = identity.exposure
-        if exposure_state.is_value and exposure_state.value is not None:
-            duration = exposure_state.value.duration_s
-            if duration.is_value and duration.value is not None:
-                return "time_s", duration.value
+    if time_key is None:
+        identity = observation.identity
+        if isinstance(identity, Identity) and identity.exposure is not None:
+            exposure_state = identity.exposure
+            if exposure_state.is_value and exposure_state.value is not None:
+                duration = exposure_state.value.duration_s
+                if duration.is_value and duration.value is not None:
+                    time_key = ("time_s", duration.value)
 
+    run_key: tuple[str, str] | None = None
     for key in ("run_key", "run_id"):
         located = point_conditions.get(key)
         if (
@@ -13953,8 +13960,9 @@ def _battery_hero_deck_join_key(
             and located.state.is_value
             and located.state.value is not None
         ):
-            return "run", str(located.state.value)
-    return None
+            run_key = ("run", str(located.state.value))
+            break
+    return run_key, time_key
 
 
 def _battery_hero_mass_loss_fraction(
@@ -13964,16 +13972,24 @@ def _battery_hero_mass_loss_fraction(
     residue = observations.get(reference)
     if residue is None:
         return None, "no recorded mass loss"
-    join_key = _battery_hero_deck_join_key(residue)
-    if join_key is None:
+    run_key, time_key = _battery_hero_deck_join_key(residue)
+    if run_key is None and time_key is None:
         return None, "no recorded mass loss"
-    matches = [
-        observation
-        for observation in observations.values()
-        if observation.experiment_id == residue.experiment_id
-        and quantity_token(observation.identity) is Quantity.MASS_LOSS_FRACTION
-        and _battery_hero_deck_join_key(observation) == join_key
-    ]
+
+    matches = []
+    for observation in observations.values():
+        if (
+            observation.experiment_id != residue.experiment_id
+            or quantity_token(observation.identity) is not Quantity.MASS_LOSS_FRACTION
+        ):
+            continue
+        endpoint_run_key, endpoint_time_key = _battery_hero_deck_join_key(observation)
+        if run_key is not None:
+            # A time-only fallback could pair this residue with another run's endpoint.
+            if endpoint_run_key == run_key:
+                matches.append(observation)
+        elif endpoint_time_key == time_key:
+            matches.append(observation)
     if not matches:
         return None, "no recorded mass loss"
     if len(matches) != 1:

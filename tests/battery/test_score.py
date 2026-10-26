@@ -6744,6 +6744,95 @@ def test_battery_hero_residue_requires_typed_mass_loss_at_same_time() -> None:
     ] == 1
 
 
+def test_battery_hero_residue_joins_mass_loss_by_printed_run_identity() -> None:
+    experiment_id = "deck-run-identity-experiment"
+
+    def observation(
+        observation_id: str,
+        quantity: Quantity,
+        value: str,
+        *,
+        run_id: str | None,
+    ):
+        identity = Identity(
+            quantity=quantity,
+            species=Species(
+                "Fe",
+                Phase.L
+                if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                else Phase.G,
+            ),
+            temperature_K=State.of(Decimal("1200")),
+        )
+        stored = F.observation(
+            observation_id,
+            experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="deck-test",
+        )
+        conditions = {
+            **(stored.point_conditions or {}),
+            "time_s": Located(State.of(Decimal("120"))),
+        }
+        if run_id is not None:
+            conditions["run_id"] = Located(State.of(run_id))
+        return replace(stored, point_conditions=conditions)
+
+    first_residue = observation(
+        "residue-run-1", Quantity.RESIDUE_COMPONENT_COMPOSITION, "2", run_id="run-1"
+    )
+    second_residue = observation(
+        "residue-run-2", Quantity.RESIDUE_COMPONENT_COMPOSITION, "3", run_id="run-2"
+    )
+    first_endpoint = observation(
+        "mass-loss-run-1", Quantity.MASS_LOSS_FRACTION, "0.25", run_id="run-1"
+    )
+    second_endpoint = observation(
+        "mass-loss-run-2", Quantity.MASS_LOSS_FRACTION, "0.75", run_id="run-2"
+    )
+    run_observations = {
+        row.observation_id: row
+        for row in (first_residue, second_residue, first_endpoint, second_endpoint)
+    }
+
+    assert score_mod._battery_hero_mass_loss_fraction(
+        first_residue.observation_id, run_observations
+    ) == (Decimal("0.25"), None)
+    assert score_mod._battery_hero_mass_loss_fraction(
+        second_residue.observation_id, run_observations
+    ) == (Decimal("0.75"), None)
+
+    untagged_residue = observation(
+        "residue-no-run-id",
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        "2",
+        run_id=None,
+    )
+    untagged_observations = {
+        **run_observations,
+        untagged_residue.observation_id: untagged_residue,
+    }
+    assert score_mod._battery_hero_mass_loss_fraction(
+        untagged_residue.observation_id, untagged_observations
+    ) == (None, "ambiguous recorded mass loss")
+
+    endpoint_without_run_id = observation(
+        "mass-loss-no-run-id",
+        Quantity.MASS_LOSS_FRACTION,
+        "0.5",
+        run_id=None,
+    )
+    endpoint_missing_identity = {
+        first_residue.observation_id: first_residue,
+        endpoint_without_run_id.observation_id: endpoint_without_run_id,
+    }
+    assert score_mod._battery_hero_mass_loss_fraction(
+        first_residue.observation_id, endpoint_missing_identity
+    ) == (None, "no recorded mass loss")
+
+
 def test_battery_hero_sweet_spot_scores_shared_mole_fraction_bins() -> None:
     mole_composition = {
         "amount_basis": AmountBasis.MOLE_FRACTION.value,
