@@ -113,13 +113,16 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # 2584074346931c132b487ffb6ce56511d26f76805d63bcfa14eb996d1fe5ea57.
     # The combined t-1457 C0 contract and b154 Stage-6/7 bands produce the
     # resolved digest below.
+    # c3 adds route/equipment/purity declarations to the resolved setpoints,
+    # four searchable substage route controls, and their engineering provenance.
+    # Recomputed through the production resolvers; empty patch bytes stay fixed.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "911f820f280e2141010189a727b3a8dcbce5c65826a1960f25f9d26465926b4a"
+        "3ea049d2f81042afd1ac3e16fc7467cc24b014fca2b0a32d733d016699931dd6"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
     assert schema.bounds_digest == (
-        "21c0c4905a878d30051332ef69cc25cbd395a52ed5fd0f9a68484280efa7e0dc"
+        "91e880ade556a1eef2386089eb9fd28d49326239a6915c3c1b52f4254611984d"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
@@ -128,7 +131,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
     # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
     assert empty.recipe_id(schema) == (
-        "be70d44b9d30688788e535c9e84b42d51111956487b2b7e962deb1a70790d95e"
+        "d6cfaf190c45d114706f45ef63f9ba07483b129d9d52891377ce8f5be1e23a42"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -141,7 +144,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "0cfae3821a514712c36151ca997fd5d9381191deeccca66ceb807628e179b160"
+        "255051630d3663996a6ddee301361a160c6be33d98aacbb8d95df256868a55b8"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -357,6 +360,7 @@ def _write_c5_mre_cap_bound_yaml(data_dir: Path, high: float, mtime_ns: int) -> 
             {
                 "campaigns": {
                     "C5": {
+                        **yaml.safe_load(SETPOINTS_PATH.read_text())["campaigns"]["C5"],
                         "allow_mre_voltage_cap_upper_bound_V": high,
                     }
                 },
@@ -588,10 +592,11 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
     assert unpinned is schema
-    assert len(paths) == 65
+    # c3: four per-substage route controls extend the 65-dimensional search.
+    assert len(paths) == 69
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
+        == "9b36f69e58eeb0f8662c2b6ab62c537d8ca0dda65a1b1927b2afb33006216b0d"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -1727,9 +1732,10 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # difference between two moving numbers, written down as a constant, goes
     # stale every time either moves. It is now evaluated, not pinned. Recomputed
     # 2026-09-29 for C2 loader-scalar pressure coupling.
+    # c3 route controls and engineering provenance move the schema bounds digest.
     assert (
         first.recipe_id()
-                == "cb77c9b93e43903f3820c491df51dce7a7a3d4f8784d9b55121f64906bca7b6d"
+                == "a0ab70b974d16ab5068bed3b0275f6be71cd5309f7826f1779bd5ca9487340ce"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

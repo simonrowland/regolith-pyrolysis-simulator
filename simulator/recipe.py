@@ -450,7 +450,7 @@ def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
         _knob(
             f"{prefix}.stage3_route", "categorical",
             choices=STAGE3_ROUTES,
-            bounds_source="physical Stage-3 diverter command",
+            bounds_source="engineering_envelope physical Stage-3 diverter command",
         ),
         _knob(
             f"{prefix}.pO2_mbar",
@@ -577,13 +577,13 @@ class RecipeSchema:
 
     ALLOWLIST: tuple[KnobSpec, ...] = (
         *(_knob(f"condensation_train.{field}", low=0.0, high=1.0,
-                bounds_source="owner d-279 purity mass fraction; (0, 1]",
+                bounds_source="engineering_envelope owner d-279 purity mass fraction; (0, 1]",
                 search_enabled=False) for field in STAGE3_PURITY_FIELDS),
         *(_knob(
             f"campaigns.{phase}.stage3_route", "categorical",
             choices=STAGE3_ROUTES,
             search_enabled=False,
-            bounds_source="physical Stage-3 diverter command",
+            bounds_source="engineering_envelope physical Stage-3 diverter command",
         ) for phase in (
             "C0", "C0b_p_cleanup", "C2A_continuous", "C2A_staged",
             "C2B", "C3", "C3.Na_phase", "C3.K_phase", "C4", "C5", "C6",
