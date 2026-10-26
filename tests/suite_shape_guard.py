@@ -241,7 +241,7 @@ def _is_whole_suite_request(config) -> bool:
         if not path.is_absolute():
             path = root / path
         requested.append(path.resolve())
-    return len(requested) == 1 and requested[0] == tests_root
+    return root in requested or tests_root in requested
 
 
 def pytest_itemcollected(item: pytest.Item) -> None:
@@ -257,9 +257,13 @@ def pytest_collection_finish(session: pytest.Session) -> None:
     """Enforce suite shape during normal and collect-only pytest runs."""
     items = getattr(session, "_suite_shape_collected_items", ())
     full_suite = _is_whole_suite_request(session.config)
-    violations = _suite_shape_violations(items, check_phantoms=full_suite)
-    violations.extend(_nightly_yield_violations())
+    violations = _suite_shape_violations(
+        items,
+        roster=HEAVY_ROSTER,
+        check_phantoms=full_suite,
+    )
     if full_suite:
+        violations.extend(_nightly_yield_violations())
         collected_groups = {
             group
             for item in items

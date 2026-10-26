@@ -6,6 +6,8 @@ import json
 import textwrap
 from pathlib import Path
 
+import pytest
+
 pytest_plugins = ("pytester",)
 
 
@@ -13,6 +15,12 @@ def _make_guard_suite(pytester, *, source: str, roster: tuple[tuple[str, str], .
     tests_dir = pytester.path / "tests"
     tests_dir.mkdir()
     (tests_dir / "test_synthetic.py").write_text(source, encoding="utf-8")
+    subdirectory = tests_dir / "sub"
+    subdirectory.mkdir()
+    (subdirectory / "test_subdirectory.py").write_text(
+        "def test_subdirectory_node():\n    pass\n",
+        encoding="utf-8",
+    )
     (tests_dir / "xdist_loadgroup_durations.json").write_text(
         json.dumps({"durations_seconds": {"magemin_fullrun_a": 1}}),
         encoding="utf-8",
@@ -40,8 +48,16 @@ def _make_guard_suite(pytester, *, source: str, roster: tuple[tuple[str, str], .
     )
 
 
+@pytest.mark.parametrize(
+    "collection_args",
+    [
+        pytest.param(("tests/", "tests/sub/"), id="tests-plus-subdirectory"),
+        pytest.param((".",), id="repository-root"),
+        pytest.param((), id="configured-testpaths"),
+    ],
+)
 def test_suite_shape_collection_audit_catches_deselected_phantom_and_unrostered_heavy(
-    pytester,
+    pytester, collection_args: tuple[str, ...],
 ) -> None:
     _make_guard_suite(
         pytester,
@@ -62,19 +78,32 @@ def test_suite_shape_collection_audit_catches_deselected_phantom_and_unrostered_
     result = pytester.runpytest_subprocess(
         "--collect-only",
         "-m",
-        "not serial and not nightly",
-        "tests/",
+        "not nightly",
+        *collection_args,
     )
 
-    output = result.stdout.str()
-    assert result.ret != 0
-    assert "phantom row" in output
-    assert "test_unrostered_heavy_node" in output
-    assert "not in the shrink-only heavy roster" in output
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    result.stderr.fnmatch_lines(
+        [
+            "*suite-shape collection audit failed:*",
+            "*test_unrostered_heavy_node*not in the shrink-only heavy roster*",
+            "*roster entry ('tests/test_synthetic.py', 'test_phantom_node') matches no collected test*",
+        ]
+    )
 
 
-def test_suite_shape_collection_audit_skips_phantoms_for_focused_k_run(
-    pytester,
+@pytest.mark.parametrize(
+    "run_args",
+    [
+        pytest.param(
+            ("-k", "real_node", "tests/test_synthetic.py"),
+            id="focused-file-and-k",
+        ),
+        pytest.param(("tests/sub/",), id="focused-subdirectory"),
+    ],
+)
+def test_suite_shape_collection_audit_skips_phantoms_for_focused_run(
+    pytester, run_args: tuple[str, ...],
 ) -> None:
     _make_guard_suite(
         pytester,
@@ -82,13 +111,7 @@ def test_suite_shape_collection_audit_skips_phantoms_for_focused_k_run(
         source="def test_real_node():\n    pass\n",
     )
 
-    result = pytester.runpytest_subprocess(
-        "--collect-only",
-        "-k",
-        "real_node",
-        "tests/test_synthetic.py",
-    )
+    result = pytester.runpytest_subprocess("--collect-only", *run_args)
 
-    output = result.stdout.str()
-    assert result.ret == 0
-    assert "phantom row" not in output
+    assert result.ret == pytest.ExitCode.OK
+    assert "phantom row" not in result.stderr.str()
