@@ -14,7 +14,7 @@ extraction:
   worker: codex-resume-89762-1792373109
 review_status: draft
 fidelity_samples:
-- path: species.SiO2.observations[lu_2024_table1_residue_composition].values.series[0].SiO2_wt_pct
+- path: species.SiO2.observations[lu_2024_table1_residue_composition_M01].values.series[0].SiO2_wt_pct
   value: '53.62'
   locator:
     page: 3
@@ -117,7 +117,7 @@ experiments:
 species:
   SiO2:
     observations:
-    - observation_id: lu_2024_table1_residue_composition
+    - observation_id: lu_2024_table1_residue_composition_M01
       experiment: lu-2024-enstatite-levitation-series
       type: composition_series
       phase: glass
@@ -127,13 +127,25 @@ species:
         published_page: 1195
         pdf_page_index: 2
         table: '1'
+        row: M01
       point_conditions:
+        run_id:
+          state:
+            tag: value
+            value: M01
+          locator:
+            page: 3
+            published_page: 1195
+            pdf_page_index: 2
+            table: '1'
+            note: row=M01
         total_pressure_Pa: *lu_chamber_pressure_unknown
         atmosphere: *lu_sweep_gas
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
-        note: Recovered silicate samples are homogeneous glasses. Major oxide values have ±2σ entries in Table 1;
+        note: &lu_residue_note >-
+          Recovered silicate samples are homogeneous glasses. Major oxide values have ±2σ entries in Table 1;
           those uncertainties are retained in context because this series migrator does not map per-component uncertainty
           fields.
         composition_wt_pct: *lu_starting_composition
@@ -165,6 +177,37 @@ species:
           SiO2_wt_pct: '53.62'
           MgO_wt_pct: '44.44'
           CaO_wt_pct: '1.64'
+
+    - observation_id: lu_2024_table1_residue_composition_M02
+      experiment: lu-2024-enstatite-levitation-series
+      type: composition_series
+      phase: glass
+      units: wt%
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        row: M02
+      point_conditions:
+        run_id:
+          state:
+            tag: value
+            value: M02
+          locator:
+            page: 3
+            published_page: 1195
+            pdf_page_index: 2
+            table: '1'
+            note: row=M02
+        total_pressure_Pa: *lu_chamber_pressure_unknown
+        atmosphere: *lu_sweep_gas
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        note: *lu_residue_note
+        composition_wt_pct: *lu_starting_composition
+        series:
         - run_id: M02
           sample: M02
           T_K: '2623'
@@ -192,6 +235,37 @@ species:
           SiO2_wt_pct: '46.32'
           MgO_wt_pct: '51.40'
           CaO_wt_pct: '2.14'
+
+    - observation_id: lu_2024_table1_residue_composition_M03
+      experiment: lu-2024-enstatite-levitation-series
+      type: composition_series
+      phase: glass
+      units: wt%
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        row: M03
+      point_conditions:
+        run_id:
+          state:
+            tag: value
+            value: M03
+          locator:
+            page: 3
+            published_page: 1195
+            pdf_page_index: 2
+            table: '1'
+            note: row=M03
+        total_pressure_Pa: *lu_chamber_pressure_unknown
+        atmosphere: *lu_sweep_gas
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        note: *lu_residue_note
+        composition_wt_pct: *lu_starting_composition
+        series:
         - run_id: M03
           sample: M03
           T_K: '2623'
@@ -219,6 +293,37 @@ species:
           SiO2_wt_pct: '45.30'
           MgO_wt_pct: '52.59'
           CaO_wt_pct: '2.22'
+
+    - observation_id: lu_2024_table1_residue_composition_M04
+      experiment: lu-2024-enstatite-levitation-series
+      type: composition_series
+      phase: glass
+      units: wt%
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        row: M04
+      point_conditions:
+        run_id:
+          state:
+            tag: value
+            value: M04
+          locator:
+            page: 3
+            published_page: 1195
+            pdf_page_index: 2
+            table: '1'
+            note: row=M04
+        total_pressure_Pa: *lu_chamber_pressure_unknown
+        atmosphere: *lu_sweep_gas
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        note: *lu_residue_note
+        composition_wt_pct: *lu_starting_composition
+        series:
         - run_id: M04
           sample: M04
           T_K: '2523'
@@ -246,6 +351,37 @@ species:
           SiO2_wt_pct: '57.07'
           MgO_wt_pct: '40.69'
           CaO_wt_pct: '1.44'
+
+    - observation_id: lu_2024_table1_residue_composition_M05
+      experiment: lu-2024-enstatite-levitation-series
+      type: composition_series
+      phase: glass
+      units: wt%
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        row: M05
+      point_conditions:
+        run_id:
+          state:
+            tag: value
+            value: M05
+          locator:
+            page: 3
+            published_page: 1195
+            pdf_page_index: 2
+            table: '1'
+            note: row=M05
+        total_pressure_Pa: *lu_chamber_pressure_unknown
+        atmosphere: *lu_sweep_gas
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        note: *lu_residue_note
+        composition_wt_pct: *lu_starting_composition
+        series:
         - run_id: M05
           sample: M05
           T_K: '2523'
@@ -273,6 +409,37 @@ species:
           SiO2_wt_pct: '52.97'
           MgO_wt_pct: '45.63'
           CaO_wt_pct: '1.74'
+
+    - observation_id: lu_2024_table1_residue_composition_M06
+      experiment: lu-2024-enstatite-levitation-series
+      type: composition_series
+      phase: glass
+      units: wt%
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        row: M06
+      point_conditions:
+        run_id:
+          state:
+            tag: value
+            value: M06
+          locator:
+            page: 3
+            published_page: 1195
+            pdf_page_index: 2
+            table: '1'
+            note: row=M06
+        total_pressure_Pa: *lu_chamber_pressure_unknown
+        atmosphere: *lu_sweep_gas
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        note: *lu_residue_note
+        composition_wt_pct: *lu_starting_composition
+        series:
         - run_id: M06
           sample: M06
           T_K: '2523'
@@ -300,6 +467,37 @@ species:
           SiO2_wt_pct: '48.55'
           MgO_wt_pct: '49.62'
           CaO_wt_pct: '1.97'
+
+    - observation_id: lu_2024_table1_residue_composition_M07
+      experiment: lu-2024-enstatite-levitation-series
+      type: composition_series
+      phase: glass
+      units: wt%
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        row: M07
+      point_conditions:
+        run_id:
+          state:
+            tag: value
+            value: M07
+          locator:
+            page: 3
+            published_page: 1195
+            pdf_page_index: 2
+            table: '1'
+            note: row=M07
+        total_pressure_Pa: *lu_chamber_pressure_unknown
+        atmosphere: *lu_sweep_gas
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        note: *lu_residue_note
+        composition_wt_pct: *lu_starting_composition
+        series:
         - run_id: M07
           sample: M07
           T_K: '2423'
@@ -327,6 +525,37 @@ species:
           SiO2_wt_pct: '57.53'
           MgO_wt_pct: '40.37'
           CaO_wt_pct: '1.32'
+
+    - observation_id: lu_2024_table1_residue_composition_M08
+      experiment: lu-2024-enstatite-levitation-series
+      type: composition_series
+      phase: glass
+      units: wt%
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        row: M08
+      point_conditions:
+        run_id:
+          state:
+            tag: value
+            value: M08
+          locator:
+            page: 3
+            published_page: 1195
+            pdf_page_index: 2
+            table: '1'
+            note: row=M08
+        total_pressure_Pa: *lu_chamber_pressure_unknown
+        atmosphere: *lu_sweep_gas
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        note: *lu_residue_note
+        composition_wt_pct: *lu_starting_composition
+        series:
         - run_id: M08
           sample: M08
           T_K: '2423'
@@ -354,6 +583,37 @@ species:
           SiO2_wt_pct: '49.91'
           MgO_wt_pct: '47.80'
           CaO_wt_pct: '1.87'
+
+    - observation_id: lu_2024_table1_residue_composition_M09
+      experiment: lu-2024-enstatite-levitation-series
+      type: composition_series
+      phase: glass
+      units: wt%
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        row: M09
+      point_conditions:
+        run_id:
+          state:
+            tag: value
+            value: M09
+          locator:
+            page: 3
+            published_page: 1195
+            pdf_page_index: 2
+            table: '1'
+            note: row=M09
+        total_pressure_Pa: *lu_chamber_pressure_unknown
+        atmosphere: *lu_sweep_gas
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        note: *lu_residue_note
+        composition_wt_pct: *lu_starting_composition
+        series:
         - run_id: M09
           sample: M09
           T_K: '2423'
@@ -381,6 +641,7 @@ species:
           SiO2_wt_pct: '53.68'
           MgO_wt_pct: '43.97'
           CaO_wt_pct: '1.53'
+
     context:
     - observation_id: lu_2024_table1_unscored_results
       type: printed_data_context
