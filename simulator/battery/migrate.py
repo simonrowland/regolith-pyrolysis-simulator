@@ -20205,6 +20205,89 @@ class Migrator:
                 ),
             )
 
+    def _downgrade_measured_reduced_with_unmeasured_parents(self) -> None:
+        """Reclassify measured reductions with known invalid parents."""
+
+        observations = self.result.observations
+        asset_ids = {
+            asset.asset_id
+            for work in self.result.works.values()
+            for asset in work.source_files.files
+        }
+        while True:
+            pending: list[tuple[str, Observation, list[str]]] = []
+            for observation_id, observation in list(observations.items()):
+                evidence_class = observation.evidence.class_
+                if not (
+                    evidence_class.is_value
+                    and evidence_class.value is EvidenceClass.MEASURED_REDUCED
+                ):
+                    continue
+                parent_ids = list(observation.derived_from or ())
+                if observation.derivation is not None:
+                    parent_ids.extend(observation.derivation.inputs)
+                nonmeasured_parents: list[str] = []
+                for parent_id in dict.fromkeys(parent_ids):
+                    parent = observations.get(parent_id)
+                    if parent is None:
+                        # Stored assets are valid d-110 parents. Dangling IDs
+                        # are not, and must not retain measured_reduced.
+                        if parent_id not in asset_ids:
+                            nonmeasured_parents.append(
+                                f"{parent_id} (not a stored observation or asset)"
+                            )
+                        continue
+                    parent_class = parent.evidence.class_
+                    if (
+                        parent_class.is_value
+                        and parent_class.value not in MEASURED_EVIDENCE
+                    ):
+                        nonmeasured_parents.append(
+                            f"{parent_id} ({parent_class.value})"
+                        )
+                if nonmeasured_parents:
+                    pending.append((observation_id, observation, nonmeasured_parents))
+            if not pending:
+                break
+
+            for observation_id, observation, nonmeasured_parents in pending:
+                identity = observation.identity
+                affected_quantities = (
+                    (identity.quantity.value,)
+                    if isinstance(identity, Identity) and identity.quantity.is_value
+                    else ()
+                )
+                experiment = self.result.experiments.get(observation.experiment_id)
+                work = (
+                    None
+                    if experiment is None or experiment.work_id is None
+                    else self.result.works.get(experiment.work_id)
+                )
+                attribution = (
+                    observation.evidence.attribution
+                    or (None if work is None else work.citation)
+                    or observation.source_id
+                    or "this work"
+                )
+                notice = Notice(
+                    kind=NoticeKind.MEASURED_REDUCED_ANCESTRY_DOWNGRADED,
+                    affected_quantities=affected_quantities,
+                    reason=(
+                        "measured_reduced reclassified because observation parent(s) "
+                        "are not measured evidence: " + "; ".join(nonmeasured_parents)
+                    ),
+                    origin=observation_id,
+                )
+                observations[observation_id] = replace(
+                    observation,
+                    evidence=replace(
+                        observation.evidence,
+                        class_=State.of(EvidenceClass.QUOTED_ATTRIBUTED),
+                        attribution=attribution,
+                    ),
+                    notices=(*observation.notices, notice),
+                )
+
     def _expand_exploded_id(self, token: str, self_id: str) -> list[str]:
         """Replace one id with the children of a parent this run exploded.
 
@@ -20284,6 +20367,7 @@ class Migrator:
         self._resolve_queue_ids()
         self._retarget_exploded_parents()
         self._close_conditional_method_classes()
+        self._downgrade_measured_reduced_with_unmeasured_parents()
         # Drop superseded_by pointers that do not resolve in the corpus.
         for obs in list(self.result.observations.values()):
             target = obs.admission.superseded_by

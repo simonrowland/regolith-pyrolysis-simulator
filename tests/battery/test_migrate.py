@@ -10455,7 +10455,15 @@ def test_kume_tables3_and4_derivation_evidence_fresh_migration_and_mutations(
         obs for obs in result.observations.values()
         if obs.observation_id.endswith(f"::{table4_id}")
     )
-    assert table3.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert table3.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert table3.value.point == Decimal("0.103")
+    ancestry_notice, = [
+        notice
+        for notice in table3.notices
+        if notice.kind is NoticeKind.MEASURED_REDUCED_ANCESTRY_DOWNGRADED
+    ]
+    assert "kume_2000_table3_sample_207_sio2_activity" in ancestry_notice.reason
+    assert "quoted_attributed" in ancestry_notice.reason
     assert table3.derivation is not None
     assert "exchange reaction (3) and Eq. (4)" in table3.derivation.relation
     assert table3.derivation.inputs == table3.derived_from

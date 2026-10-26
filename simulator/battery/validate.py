@@ -1154,10 +1154,21 @@ def validate_observation(
                         "authority must be extrapolated",
                     )
                 )
-    if ev.is_value and ev.value in {
-        EvidenceClass.MODEL_DERIVED,
-        EvidenceClass.MEASURED_REDUCED,
-    }:
+    # Reclassification does not remove a derived row's lineage requirements.
+    has_ancestry_downgrade = any(
+        notice.kind is NoticeKind.MEASURED_REDUCED_ANCESTRY_DOWNGRADED
+        for notice in observation.notices
+    )
+    if (
+        has_ancestry_downgrade
+        or (
+            ev.is_value
+            and ev.value in {
+                EvidenceClass.MODEL_DERIVED,
+                EvidenceClass.MEASURED_REDUCED,
+            }
+        )
+    ):
         # A caption-only figure admission with no numeric value is never scored,
         # so there is no derived numeric value whose ancestry needs tracing.
         figure_only_without_value = (

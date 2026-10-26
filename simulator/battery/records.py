@@ -496,8 +496,12 @@ class Notice:
     def __post_init__(self) -> None:
         if not self.affected_quantities:
             # FIGURE_ONLY may label a row whose quantity is still unknown
-            # (typed quantity_unknown refusal); empty is allowed only there.
-            if self.kind is not NoticeKind.FIGURE_ONLY:
+            # (typed quantity_unknown refusal). An ancestry downgrade notice
+            # concerns evidence class and can also apply when quantity is unknown.
+            if self.kind not in {
+                NoticeKind.FIGURE_ONLY,
+                NoticeKind.MEASURED_REDUCED_ANCESTRY_DOWNGRADED,
+            }:
                 raise ValueError("Notice.affected_quantities is required")
         if not self.reason:
             raise ValueError("Notice.reason is required")
