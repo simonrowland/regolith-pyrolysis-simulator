@@ -441,12 +441,11 @@ class EquilibriumMixin:
         vapor_pressure_authority_limits = {}
         warnings = []
         antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
-        # b-149 instance 3: typed notes on the `_sz_omit` paths in this
-        # method (missing activity, activity-threshold skip, P <= 1e-15 Pa).
-        # Those omissions keep status='ok' with a note. Other continues in
-        # this method (inactive row, missing parent, A<=0, oxide-vapor
-        # outside valid_range_K) omit without a typed silent-zero note.
+        # Omitted species on this status='ok' path carry a typed note, whether
+        # the omission is a skipped metal row, non-positive metal activity, or
+        # an oxide-vapor temperature outside its declared range.
         from simulator.silent_zero import (
+            CATEGORY_MARK,
             CATEGORY_PROVEN_ZERO,
             CATEGORY_REFUSE,
             ZeroBecause,
@@ -617,10 +616,30 @@ class EquilibriumMixin:
             if not sp_data:
                 continue
             if str(sp_data.get('consumer_status', '')).lower() == 'inactive':
+                _sz_omit(
+                    species,
+                    ZeroBecause.REFUSED_UPSTREAM,
+                    field='consumer_status',
+                    detail=(
+                        "consumer_status='inactive'; species omitted from "
+                        "vapor_pressures_Pa while status=ok"
+                    ),
+                    category=CATEGORY_REFUSE,
+                )
                 continue
 
             parent_oxide = sp_data.get('parent_oxide', '')
             if not parent_oxide:
+                _sz_omit(
+                    species,
+                    ZeroBecause.MISSING_THERMO,
+                    field='parent_oxide',
+                    detail=(
+                        'metal row has no parent_oxide; species omitted from '
+                        'vapor_pressures_Pa while status=ok'
+                    ),
+                    category=CATEGORY_REFUSE,
+                )
                 continue
 
             # --- Pressure reference rail ---
@@ -1242,6 +1261,17 @@ class EquilibriumMixin:
             numerator = K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar
 
             if numerator <= 0:
+                _sz_omit(
+                    species,
+                    ZeroBecause.PROVEN_BELOW_THRESHOLD,
+                    field='metal_activity_numerator',
+                    detail=(
+                        f'metal activity numerator={numerator!r} <= 0; no '
+                        'positive metal activity is available, so the species '
+                        'is omitted from vapor_pressures_Pa while status=ok'
+                    ),
+                    category=CATEGORY_PROVEN_ZERO,
+                )
                 continue
 
             metal_activity_root = numerator ** (1.0 / n_M)
@@ -1383,6 +1413,17 @@ class EquilibriumMixin:
                     field="P_sat",
                 )
             else:
+                _sz_omit(
+                    str(name),
+                    ZeroBecause.OUT_OF_DOMAIN_MARKED,
+                    field='valid_range_K',
+                    detail=(
+                        f'temperature_K={T_K!r} is outside valid_range_K '
+                        f'[{valid[0]!r}, {valid[1]!r}]; species omitted from '
+                        'vapor_pressures_Pa while status=ok'
+                    ),
+                    category=CATEGORY_MARK,
+                )
                 continue
 
             parent_oxide = data.get('parent_oxide', '')
@@ -1484,10 +1525,8 @@ class EquilibriumMixin:
                 consumer='legacy-equilibrium-fallback',
             ),
         }
-        # b-149: merge notes collected on the `_sz_omit` paths. This
-        # completed path sets status='ok'; invalid T/P already returned
-        # out_of_domain above. Oxide-vapor valid_range_K misses remain
-        # un-noted on this path.
+        # This completed path sets status='ok'; invalid T/P already returned
+        # out_of_domain above. Merge every typed omission note into its result.
         if silent_zero_notes:
             merge_notes_into_mapping(_eq_diagnostics, silent_zero_notes)
         return EquilibriumResult(
