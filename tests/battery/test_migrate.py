@@ -6798,16 +6798,11 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         if "alpha_times_Gamma" in item:
             return _num(item["alpha_times_Gamma"])
         return None
-    if q_token == "evaporation_rate":
-        candidates = [
-            (key, value)
-            for key, value in item.items()
-            if isinstance(key, str)
-            and (key == q_token or key.startswith(f"{q_token}_"))
-        ]
-        if len(candidates) != 1:
-            return None
-        return _num(candidates[0][1])
+    if q_token in {"evaporation_rate", "mass_loss_rate"}:
+        selection = select_declared_source(
+            Quantity(q_token), units or None, item
+        )
+        return selection.amount if selection.value.kind is ValueKind.POINT else None
     if q_token == "mass_loss_areal_density":
         amount = _num(item.get("mass_loss_areal_density"))
         converted, _relation = convert_areal_mass_to_kg_per_m2(amount, units)
@@ -7233,12 +7228,10 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # mirror; the KEMS owner extract retains the cells (Fedkin et al. 2006, Table 3,
     # p. 212, DOI 10.1016/j.gca.2005.08.014).
     assert census.get("evaporation_coefficient_alpha") == 22
-    # Re-pinned with the d-032 store regen. _series_census skips a source with no
-    # extracts-v2 sibling, and the pre-regen store was missing 26 sources' derived
-    # files, so their series went uncounted: evaporation_rate 21->25,
-    # mass_loss_fraction 9->19, n_numeric 209->223. The counts moved because the
-    # data became visible, not because a check was relaxed - mismatches stays 0.
-    assert census.get("evaporation_rate") == 25
+    # Shaw's 21 mol/s/m2 flux cells need geometric area; Nagahara's four m/s
+    # recession rates need both material density and exposed area to map to kg/s.
+    # The production converter refuses both because those inputs are absent.
+    assert census.get("evaporation_rate", 0) == 0
     # Re-pinned after the loader-survival regeneration: Richter +50 measured
     # mass_loss_pct / 100 singleton series; mismatches remains 0.
     assert census.get("mass_loss_fraction") == 69
@@ -7302,15 +7295,12 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "isotope_delta": 22
     }
     # Family car (F39-F50): Bonnand, Bruand, Matzen et al. (2020) adds 14 printed
-    # Fe3+/Fe2+ ratio series. Measured with _series_census on a regenerated store
-    # of the family car re-merge: fe3_fe2_ratio 38->52 and n_numeric 3136->3150,
-    # no other category or source moved, mismatches stays 0. The count moved
-    # because the data became visible, not because a check was relaxed.
+    # Fe3+/Fe2+ ratio series. The 25 noncanonical rate series cells are unavailable.
     assert per_source.get(
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 52
-    assert n_numeric == 3150, (n_numeric, census, n_unavailable)
+    assert n_numeric == 3125, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
@@ -7374,6 +7364,63 @@ def test_j01_declared_quantity_refuses_regolith_specific_rate_without_mass() -> 
     assert selection.value.kind is ValueKind.UNAVAILABLE
     assert selection.field_name == "evaporation_rate"
     assert "unmapped evaporation rate unit" in (selection.reason or "")
+
+
+def test_rate_census_oracle_uses_production_unit_conversion() -> None:
+    assert _census_expected_point(
+        {"evaporation_rate": "4.6e-06"},
+        "evaporation_rate",
+        "mol/s/m2 as printed",
+    ) is None
+    assert _census_expected_point(
+        {"evaporation_rate": "2"}, "evaporation_rate", "kg/s"
+    ) == as_decimal("2")
+    assert _census_expected_point(
+        {"mass_loss_rate": "19"},
+        "mass_loss_rate",
+        "as printed; Table 2 does not state the rate unit",
+    ) is None
+
+
+def test_dacko_mass_loss_rates_without_units_migrate_as_unavailable(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path,
+        "ta-dacko-conradt-low-p-transpiration.yaml",
+        write=False,
+    )
+    rates = [
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.MASS_LOSS_RATE
+    ]
+    assert len(rates) == 18
+    assert all(rate.value.kind is ValueKind.UNAVAILABLE for rate in rates)
+    assert sum(
+        rate.evidence.class_.is_value
+        and rate.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        for rate in rates
+    ) == 9
+
+
+def test_area_and_velocity_evaporation_rates_migrate_as_unavailable(
+    tmp_path: Path,
+) -> None:
+    for index, name in enumerate(
+        (
+            "mendybaev-2018-cmas-evaporation.yaml",
+            "nagahara-ozawa-1999-forsterite-surface-microstructures.yaml",
+        )
+    ):
+        result = _migrate_real_extract(tmp_path / str(index), name, write=False)
+        rates = [
+            observation
+            for observation in result.observations.values()
+            if quantity_token(observation.identity) is Quantity.EVAPORATION_RATE
+        ]
+        assert len(rates) == 4, name
+        assert all(rate.value.kind is ValueKind.UNAVAILABLE for rate in rates), name
 
 
 def test_density_source_converts_g_per_cm3_and_refuses_unknown_unit() -> None:
@@ -13502,6 +13549,53 @@ def test_shaw_lms1_quoted_density_is_attributed_context(tmp_path: Path) -> None:
     assert row["values"]["attribution"].startswith("Isachenkov et al. 2022")
     assert row["values"]["value_as_published"] == "3.03 g/cm3"
     assert row["values"]["density_kg_m3"] == 3030
+
+
+def test_real_condensed_density_points_are_at_least_100_kg_per_m3(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import CONDENSED_PHASES
+
+    extracts = REPO_ROOT / "data" / "literature" / "extracts"
+    density_sources: list[str] = []
+    for source_path in sorted(extracts.glob("*.yaml")):
+        source_text = source_path.read_text(encoding="utf-8")
+        if re.search(r"quantity:\s*['\"]?density(?:['\"]|\b)", source_text) is None:
+            continue
+        source = yaml.safe_load(source_text)
+        if not isinstance(source, dict):
+            continue
+        for body in (source.get("species") or {}).values():
+            if not isinstance(body, dict):
+                continue
+            rows = (body.get("observations") or []) + (body.get("context") or [])
+            if any(
+                isinstance(row, dict)
+                and isinstance(row.get("values"), dict)
+                and row["values"].get("quantity") == "density"
+                for row in rows
+            ):
+                density_sources.append(source_path.name)
+                break
+
+    assert density_sources
+    migrated_density_rows = []
+    for index, name in enumerate(density_sources):
+        result = _migrate_real_extract(tmp_path / str(index), name, write=False)
+        migrated_density_rows.extend(
+            observation
+            for observation in result.observations.values()
+            if quantity_token(observation.identity) is Quantity.DENSITY
+        )
+    assert migrated_density_rows
+    for observation in migrated_density_rows:
+        phase = observation.identity.species.phase
+        if (
+            phase.is_value
+            and phase.value in CONDENSED_PHASES
+            and observation.value.kind is ValueKind.POINT
+        ):
+            assert observation.value.point >= Decimal("100"), observation.observation_id
 
 
 def test_d036_equipment_fk_resolves_through_context_row(tmp_path: Path) -> None:
