@@ -1,0 +1,59 @@
+source_id: omori-1961-cao-activity-cas
+source:
+  citation: Omori Y. and Sanbongi K. (1961). Activity of CaO in the Slag of CaO-SiO2-Al2O3 System. Journal of the Japan Institute of Metals 25(2), 139-143.
+  doi: 10.2320/jinstmet1952.25.2_139
+  year: 1961
+extraction:
+  method: MinerU table draft emitted from rendered-table-audited cells. Values and row assignments checked against PDF page renders.
+  date: '2026-10-25'
+  worker: w1025e-omor61
+review_status: draft
+tables:
+  - page: 3
+    table_index: 1
+    published_page: 141
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: liquid
+    rows: all
+    temperature:
+      as_printed: '1630'
+      unit: C
+    values:
+      - column: 9
+        species: CaO
+        evidence_class: measured_reduced
+      - column: 11
+        species: SiO2
+        evidence_class: quoted_attributed
+        attribution: Omori and Sanbongi [1] and [2] prior e.m.f. measurements.
+      - column: 12
+        species: Al2O3
+        evidence_class: quoted_attributed
+        attribution: Omori and Sanbongi [1] and [2] prior e.m.f. measurements.
+  - page: 4
+    table_index: 2
+    published_page: 142
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: liquid
+    rows: all
+    temperature:
+      as_printed: '1630'
+      unit: C
+    values:
+      - column: 7
+        species: SiO2
+        evidence_class: quoted_attributed
+        attribution: Omori and Sanbongi [1] and [2] prior e.m.f. measurements.
+      - column: 8
+        species: CaO
+        evidence_class: quoted_attributed
+        attribution: Omori and Sanbongi calculated Table 2 column A by interpolation of the Figure 8 activity curve.
+      - column: 9
+        species: CaO
+        evidence_class: measured_reduced
