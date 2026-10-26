@@ -131,7 +131,7 @@ def test_declared_non_sio_extension_invalid_area_aborts_hour(monkeypatch):
     from simulator.runner import PyrolysisRun
     from simulator.run_executor import RunExecutor
 
-    original = condensation.CondensationModel._condensation_efficiency
+    original = condensation._CondensationRoutePhysics._condensation_efficiency
 
     def missing_area(self, **kwargs):
         areas = self.stage_area_m2_by_stage
@@ -142,7 +142,7 @@ def test_declared_non_sio_extension_invalid_area_aborts_hour(monkeypatch):
         finally:
             self.stage_area_m2_by_stage = areas
 
-    monkeypatch.setattr(condensation.CondensationModel, "_condensation_efficiency", missing_area)
+    monkeypatch.setattr(condensation._CondensationRoutePhysics, "_condensation_efficiency", missing_area)
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti", campaign="C0", hours=24,
         additives_kg={}, allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
@@ -226,9 +226,9 @@ def test_predict_flag_invalid_wall_input_is_typed_and_terminal(monkeypatch, inva
     original = condensation._species_vapor_data
 
     def missing_coefficient(species, **kwargs):
-        import copy
-        data = copy.deepcopy(original(species, **kwargs))
+        data = dict(original(species, **kwargs))
         if species == "Mg":
+            data["pure_component_antoine"] = dict(data["pure_component_antoine"])
             if invalid_value is None:
                 del data["pure_component_antoine"]["B"]
             else:
