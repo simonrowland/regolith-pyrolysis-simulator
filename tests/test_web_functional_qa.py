@@ -358,7 +358,9 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     # Offgas species masses and their Cr equivalents come from the same live
     # terminal.offgas projection used by the headless full-run path.
     _PINNED_CRO_OFFGAS_KG = 0.0
-    _PINNED_CR_OFFGAS_EQ_KG = 9.214098061941436e-06
+    # t-1457 d-252 C0 contract: the full-run trajectory shifts the terminal Cr-bearing offgas;
+    # the move enters at 375537bff with the residual Cr2O3 re-pin below (CrO offgas stays 0).
+    _PINNED_CR_OFFGAS_EQ_KG = 9.216286830238766e-06
     cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _CR_MASS_FRACTION_IN_CR2O3
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
