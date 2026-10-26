@@ -3776,6 +3776,13 @@ def test_pt0_equilibrium_lookup_capture_and_replay_stay_receipt_gated(
         curve=curve,
     )
     replay = capture.clone_for_replay()
+    assert replay.mode == "replay"
+    assert replay.persistent_path == db_path
+    assert replay.persistent_store is not capture.persistent_store
+    assert replay.entries == capture.entries
+    assert replay.entries is not capture.entries
+    assert replay.capture_sequence == capture.capture_sequence
+    assert replay.capture_sequence is not capture.capture_sequence
 
     receipt_path = binding_receipt_path()
     receipt_path.unlink()

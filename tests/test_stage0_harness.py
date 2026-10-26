@@ -153,6 +153,12 @@ def test_real_feedstock_stops_at_c0b_path_ab_pause(monkeypatch):
     assert abs(session.simulator._make_snapshot().mass_balance_error_pct) <= 5.0e-12
 
     carriers = {"PO", "PO2", "P2", "P4", "P4O6", "P4O10"}
+    batch_report = session.simulator._last_vapour_batch_report
+    channels = batch_report["channels_by_species"]
+    retired_channel = channels["P2O5_gas"]
+    assert retired_channel["extra"]["applicability_evidence"][
+        "flux_dormant"
+    ] is False
     flux_overlay = session.simulator._last_vapour_batch_flux_overlay
     channel_states = flux_overlay["batch_channel_states"]
     assert carriers <= set(channel_states)
@@ -161,9 +167,6 @@ def test_real_feedstock_stops_at_c0b_path_ab_pause(monkeypatch):
     assert {species: channel_states[species] for species in carriers} == {
         species: "eligible" for species in carriers
     }
-    batch_report = session.simulator._last_vapour_batch_report
-    channels = batch_report["channels_by_species"]
-    retired_channel = channels["P2O5_gas"]
     assert retired_channel["is_refused"] is True
     assert retired_channel["is_union_flux_eligible"] is False
     assert retired_channel["flux"]["kind"] == "refusal"

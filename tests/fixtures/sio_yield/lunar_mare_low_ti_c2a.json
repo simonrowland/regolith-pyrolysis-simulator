@@ -6122,7 +6122,7 @@
               ],
               "species_id": "Bi",
               "detail": "declared applicability predicate 'not_applicable' is inactive",
-              "flux_dormant": true
+              "flux_dormant": false
             }
           },
           "out_of_range": false,
@@ -6131,7 +6131,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": true
+          "is_flux_dormant_by_epoch": false
         },
         "Ca": {
           "species_id": "Ca",
@@ -6278,7 +6278,18 @@
             "activity_detail": null,
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:Ca2",
-            "status": "out_of_range_conservative_continuation"
+            "status": "out_of_range_conservative_continuation",
+            "extrapolation_notice": {
+              "temperature_K": 1638.15,
+              "valid_range_K": [
+                1757.0,
+                2273.15
+              ],
+              "status": "out_of_range_conservative_continuation",
+              "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:Ca2",
+              "authority_level": "extrapolated",
+              "reason": "oxide_vapor_pressure_out_of_validated_range"
+            }
           },
           "out_of_range": true,
           "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:Ca2",
@@ -6335,6 +6346,17 @@
                 "alphamelts_cross_check_status": "inconclusive_no_activities",
                 "melt_oxide_activity_temperature_K": 1638.15,
                 "equivalent_parent_oxide_activity": 0.03724198005527538,
+                "extrapolation_notice": {
+                  "temperature_K": 1638.15,
+                  "valid_range_K": [
+                    1757.0,
+                    2273.15
+                  ],
+                  "status": "out_of_range_conservative_continuation",
+                  "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:Ca2",
+                  "authority_level": "extrapolated",
+                  "reason": "oxide_vapor_pressure_out_of_validated_range"
+                },
                 "authority_class": "analytical_non_authoritative"
               }
             }
@@ -6383,7 +6405,18 @@
             "activity_detail": null,
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:CaO_gas",
-            "status": "out_of_range_conservative_continuation"
+            "status": "out_of_range_conservative_continuation",
+            "extrapolation_notice": {
+              "temperature_K": 1638.15,
+              "valid_range_K": [
+                1757.0,
+                2273.15
+              ],
+              "status": "out_of_range_conservative_continuation",
+              "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:CaO_gas",
+              "authority_level": "extrapolated",
+              "reason": "oxide_vapor_pressure_out_of_validated_range"
+            }
           },
           "out_of_range": true,
           "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:CaO_gas",
@@ -6440,6 +6473,17 @@
                 "alphamelts_cross_check_status": "inconclusive_no_activities",
                 "melt_oxide_activity_temperature_K": 1638.15,
                 "equivalent_parent_oxide_activity": 0.0013869650784375295,
+                "extrapolation_notice": {
+                  "temperature_K": 1638.15,
+                  "valid_range_K": [
+                    1757.0,
+                    2273.15
+                  ],
+                  "status": "out_of_range_conservative_continuation",
+                  "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:CaO_gas",
+                  "authority_level": "extrapolated",
+                  "reason": "oxide_vapor_pressure_out_of_validated_range"
+                },
                 "authority_class": "analytical_non_authoritative"
               }
             }
@@ -7045,7 +7089,16 @@
             "activity_status": "status-bearing-not-point",
             "out_of_range": true,
             "acquisition_flag": "vapour_pressure_out_of_range:K",
-            "status": "out_of_range_conservative_continuation"
+            "status": "out_of_range_conservative_continuation",
+            "extrapolation_notice": {
+              "temperature_K": 1638.15,
+              "valid_range_K": [
+                1190.0,
+                1600.0
+              ],
+              "authority_level": "extrapolated",
+              "reason": "metal_vapor_pressure_out_of_validated_range"
+            }
           },
           "out_of_range": true,
           "acquisition_flag": "vapour_pressure_out_of_range:K",
@@ -7113,7 +7166,16 @@
                   "gamma": 3.5e-05,
                   "anchor_T_K": 1500.0
                 },
-                "melt_oxide_activity_warning": "constant_gamma_extrapolated_out_of_domain: parent_oxide=K2O temperature_K=1638.150 valid_range_K=[1500, 1500] cannot_certify"
+                "melt_oxide_activity_warning": "constant_gamma_extrapolated_out_of_domain: parent_oxide=K2O temperature_K=1638.150 valid_range_K=[1500, 1500] cannot_certify",
+                "extrapolation_notice": {
+                  "temperature_K": 1638.15,
+                  "valid_range_K": [
+                    1190.0,
+                    1600.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "metal_vapor_pressure_out_of_validated_range"
+                }
               }
             }
           },
@@ -7158,7 +7220,18 @@
             "activity_status": "status-bearing-not-point",
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_proxy:K2",
-            "status": "out_of_range_conservative_continuation"
+            "status": "out_of_range_conservative_continuation",
+            "extrapolation_notice": {
+              "temperature_K": 1638.15,
+              "valid_range_K": [
+                1190.0,
+                1600.0
+              ],
+              "status": "out_of_range_conservative_continuation",
+              "acquisition_flag": "evaporation_alpha_proxy:K2",
+              "authority_level": "extrapolated",
+              "reason": "oxide_vapor_pressure_out_of_validated_range"
+            }
           },
           "out_of_range": true,
           "acquisition_flag": "evaporation_alpha_proxy:K2",
@@ -7226,6 +7299,17 @@
                 },
                 "melt_oxide_activity_warning": "constant_gamma_extrapolated_out_of_domain: parent_oxide=K2O temperature_K=1638.150 valid_range_K=[1500, 1500] cannot_certify",
                 "equivalent_parent_oxide_activity": 1.912284635254148e-15,
+                "extrapolation_notice": {
+                  "temperature_K": 1638.15,
+                  "valid_range_K": [
+                    1190.0,
+                    1600.0
+                  ],
+                  "status": "out_of_range_conservative_continuation",
+                  "acquisition_flag": "evaporation_alpha_proxy:K2",
+                  "authority_level": "extrapolated",
+                  "reason": "oxide_vapor_pressure_out_of_validated_range"
+                },
                 "authority_class": "analytical_non_authoritative"
               }
             }
@@ -7271,7 +7355,18 @@
             "activity_status": "status-bearing-not-point",
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_proxy:K2O_gas",
-            "status": "out_of_range_conservative_continuation"
+            "status": "out_of_range_conservative_continuation",
+            "extrapolation_notice": {
+              "temperature_K": 1638.15,
+              "valid_range_K": [
+                1190.0,
+                1600.0
+              ],
+              "status": "out_of_range_conservative_continuation",
+              "acquisition_flag": "evaporation_alpha_proxy:K2O_gas",
+              "authority_level": "extrapolated",
+              "reason": "oxide_vapor_pressure_out_of_validated_range"
+            }
           },
           "out_of_range": true,
           "acquisition_flag": "evaporation_alpha_proxy:K2O_gas",
@@ -7339,6 +7434,17 @@
                 },
                 "melt_oxide_activity_warning": "constant_gamma_extrapolated_out_of_domain: parent_oxide=K2O temperature_K=1638.150 valid_range_K=[1500, 1500] cannot_certify",
                 "equivalent_parent_oxide_activity": 1.912284635254148e-15,
+                "extrapolation_notice": {
+                  "temperature_K": 1638.15,
+                  "valid_range_K": [
+                    1190.0,
+                    1600.0
+                  ],
+                  "status": "out_of_range_conservative_continuation",
+                  "acquisition_flag": "evaporation_alpha_proxy:K2O_gas",
+                  "authority_level": "extrapolated",
+                  "reason": "oxide_vapor_pressure_out_of_validated_range"
+                },
                 "authority_class": "analytical_non_authoritative"
               }
             }
@@ -7835,7 +7941,16 @@
             "activity_status": "status-bearing-not-point",
             "out_of_range": true,
             "acquisition_flag": "vapour_pressure_out_of_range:Na",
-            "status": "out_of_range_conservative_continuation"
+            "status": "out_of_range_conservative_continuation",
+            "extrapolation_notice": {
+              "temperature_K": 1638.15,
+              "valid_range_K": [
+                1405.0,
+                1600.0
+              ],
+              "authority_level": "extrapolated",
+              "reason": "metal_vapor_pressure_out_of_validated_range"
+            }
           },
           "out_of_range": true,
           "acquisition_flag": "vapour_pressure_out_of_range:Na",
@@ -7904,6 +8019,15 @@
                   "anchor_T_K": 1673.0
                 },
                 "melt_oxide_activity_warning": "constant_gamma_extrapolated_out_of_domain: parent_oxide=Na2O temperature_K=1638.150 valid_range_K=[1673, 1673] cannot_certify",
+                "extrapolation_notice": {
+                  "temperature_K": 1638.15,
+                  "valid_range_K": [
+                    1405.0,
+                    1600.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "metal_vapor_pressure_out_of_validated_range"
+                },
                 "authority_class": "uncertified",
                 "coherent_pair": {
                   "standard": "lamoreaux_hildenbrand_1984_liquid_nao0_5",
@@ -8253,7 +8377,7 @@
               ],
               "species_id": "P2O5_gas",
               "detail": "declared applicability predicate 'not_applicable' is inactive",
-              "flux_dormant": true
+              "flux_dormant": false
             }
           },
           "out_of_range": false,
@@ -8262,7 +8386,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": true
+          "is_flux_dormant_by_epoch": false
         },
         "P4": {
           "species_id": "P4",
@@ -9156,7 +9280,18 @@
             "activity_detail": null,
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:TiO",
-            "status": "out_of_range_conservative_continuation"
+            "status": "out_of_range_conservative_continuation",
+            "extrapolation_notice": {
+              "temperature_K": 1638.15,
+              "valid_range_K": [
+                1923.15,
+                2273.15
+              ],
+              "status": "out_of_range_conservative_continuation",
+              "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:TiO",
+              "authority_level": "extrapolated",
+              "reason": "oxide_vapor_pressure_out_of_validated_range"
+            }
           },
           "out_of_range": true,
           "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:TiO",
@@ -9213,6 +9348,17 @@
                 "alphamelts_cross_check_status": "inconclusive_no_activities",
                 "melt_oxide_activity_temperature_K": 1638.15,
                 "equivalent_parent_oxide_activity": 0.01770643430956777,
+                "extrapolation_notice": {
+                  "temperature_K": 1638.15,
+                  "valid_range_K": [
+                    1923.15,
+                    2273.15
+                  ],
+                  "status": "out_of_range_conservative_continuation",
+                  "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:TiO",
+                  "authority_level": "extrapolated",
+                  "reason": "oxide_vapor_pressure_out_of_validated_range"
+                },
                 "authority_class": "analytical_non_authoritative"
               }
             }
@@ -9261,7 +9407,18 @@
             "activity_detail": null,
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:TiO2_gas",
-            "status": "out_of_range_conservative_continuation"
+            "status": "out_of_range_conservative_continuation",
+            "extrapolation_notice": {
+              "temperature_K": 1638.15,
+              "valid_range_K": [
+                1923.15,
+                2273.15
+              ],
+              "status": "out_of_range_conservative_continuation",
+              "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:TiO2_gas",
+              "authority_level": "extrapolated",
+              "reason": "oxide_vapor_pressure_out_of_validated_range"
+            }
           },
           "out_of_range": true,
           "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:TiO2_gas",
@@ -9318,6 +9475,17 @@
                 "alphamelts_cross_check_status": "inconclusive_no_activities",
                 "melt_oxide_activity_temperature_K": 1638.15,
                 "equivalent_parent_oxide_activity": 0.01770643430956777,
+                "extrapolation_notice": {
+                  "temperature_K": 1638.15,
+                  "valid_range_K": [
+                    1923.15,
+                    2273.15
+                  ],
+                  "status": "out_of_range_conservative_continuation",
+                  "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:TiO2_gas",
+                  "authority_level": "extrapolated",
+                  "reason": "oxide_vapor_pressure_out_of_validated_range"
+                },
                 "authority_class": "analytical_non_authoritative"
               }
             }
@@ -9469,7 +9637,7 @@
               ],
               "species_id": "Bi",
               "detail": "declared applicability predicate 'not_applicable' is inactive",
-              "flux_dormant": true
+              "flux_dormant": false
             }
           },
           "out_of_range": false,
@@ -9478,7 +9646,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": true
+          "is_flux_dormant_by_epoch": false
         },
         "P2": {
           "species_id": "P2",
@@ -9575,7 +9743,7 @@
               ],
               "species_id": "P2O5_gas",
               "detail": "declared applicability predicate 'not_applicable' is inactive",
-              "flux_dormant": true
+              "flux_dormant": false
             }
           },
           "out_of_range": false,
@@ -9584,7 +9752,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": true
+          "is_flux_dormant_by_epoch": false
         },
         "P4": {
           "species_id": "P4",
