@@ -651,6 +651,24 @@ def match_reported_species(
     *,
     oxide_activity: bool = False,
 ) -> tuple[str, float] | None:
+    """Match one reported species, ignoring repair notices."""
+
+    matched, _repair_notices = _match_reported_species_with_notices(
+        formula,
+        reported,
+        oxide_activity=oxide_activity,
+    )
+    return matched
+
+
+def _match_reported_species_with_notices(
+    formula: str,
+    reported: Mapping[str, float],
+    *,
+    oxide_activity: bool = False,
+    notice_field: str = "diagnostic_oxide_activities",
+    notice_phase: str = "liquid",
+) -> tuple[tuple[str, float] | None, tuple[str, ...]]:
     """Closed-formula match. Oxide activity never accepts a raw element label.
 
     ``oxide_activity`` compares a parent-oxide formula to the canonical oxide
@@ -667,15 +685,29 @@ def match_reported_species(
 
     target = parse_species_formula(formula)
     if target is None:
-        return None
+        return None, ()
     if oxide_activity and _is_raw_element_label(formula):
-        return None
+        return None, ()
+    oxide_activities: Mapping[str, float] = {}
+    repair_notices: tuple[str, ...] = ()
+    if oxide_activity:
+        from engines.alphamelts.domain import (
+            _canonical_oxide_value_map_with_notices,
+        )
+
+        oxide_activities, repair_notices = (
+            _canonical_oxide_value_map_with_notices(
+                reported,
+                field=notice_field,
+                phase=notice_phase,
+            )
+        )
     for name, value in reported.items():
         if oxide_activity and _is_raw_element_label(str(name)):
             continue
         parsed = parse_species_formula(str(name))
         if parsed == target:
-            return str(name), float(value)
+            return (str(name), float(value)), repair_notices
     if not oxide_activity:
         suffix = _GAS_PHASE_SUFFIX
         for name, value in reported.items():
@@ -684,15 +716,33 @@ def match_reported_species(
                 continue
             stem = text[: -len(suffix)]
             if parse_species_formula(stem) == target:
-                return text, float(value)
-        return None
-    from engines.alphamelts.domain import canonical_oxide_activity_map
+                return (text, float(value)), ()
+        return None, ()
 
-    for name, value in canonical_oxide_activity_map(reported).items():
+    for name, value in oxide_activities.items():
         parsed = parse_species_formula(name)
         if parsed == target:
-            return str(name), float(value)
-    return None
+            return (str(name), float(value)), repair_notices
+    return None, repair_notices
+
+
+def _oxide_projection_notices(
+    warnings: Sequence[str],
+    *,
+    quantity: Quantity | None,
+    engine: Engine,
+) -> tuple[Notice, ...]:
+    if quantity is None:
+        return ()
+    return tuple(
+        Notice(
+            kind=NoticeKind.INPUT_OMITTED,
+            affected_quantities=(quantity,),
+            reason=warning,
+            origin=f"engine:{engine.value}",
+        )
+        for warning in warnings
+    )
 
 
 def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -> Rail | None:
@@ -7400,11 +7450,23 @@ def _select_phase_composition(
     return None, "phase_not_in_assemblage"
 
 
-def _component_wt(formula: str, phase_map: Mapping[str, float], *, oxide: bool) -> float | None:
-    matched = match_reported_species(formula, phase_map, oxide_activity=oxide)
+def _component_wt(
+    formula: str,
+    phase_map: Mapping[str, float],
+    *,
+    oxide: bool,
+    phase: str,
+) -> tuple[float | None, tuple[str, ...]]:
+    matched, repair_notices = _match_reported_species_with_notices(
+        formula,
+        phase_map,
+        oxide_activity=oxide,
+        notice_field="phase_compositions",
+        notice_phase=phase,
+    )
     if matched is None:
-        return None
-    return matched[1]
+        return None, repair_notices
+    return matched[1], repair_notices
 
 
 def _predict_phase_row(
@@ -7423,12 +7485,14 @@ def _predict_phase_row(
         detail: dict[str, object],
         *,
         execution: ExecutionState = ExecutionState.UNSUPPORTED,
+        notices: tuple[Notice, ...] = (),
     ) -> EnginePrediction:
         return EnginePrediction(
             engine=engine,
             channel=channel,
             execution=Execution(state=execution),
             authority=Authority.REFUSED,
+            notices=notices,
             coefficient_sources=sources,
             lineage_complete=False,
             refusal_reason=reason,
@@ -7599,7 +7663,17 @@ def _predict_phase_row(
     # Capacity uses the solute weight percent, including an elemental label.
     # Oxide matching would drop raw S and Cl.
     oxide = solute is None and role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}
-    amount = _component_wt(formula, phase_map, oxide=oxide)
+    amount, amount_warnings = _component_wt(
+        formula,
+        phase_map,
+        oxide=oxide,
+        phase=role.value,
+    )
+    notices = _oxide_projection_notices(
+        amount_warnings,
+        quantity=quantity,
+        engine=engine,
+    )
     if amount is None or not math.isfinite(amount):
         return refused(
             RefusalReason.UNSUPPORTED,
@@ -7608,6 +7682,7 @@ def _predict_phase_row(
                 "phase_role": role.value,
                 "formula": formula,
             },
+            notices=notices,
         )
     if quantity is Quantity.DISTRIBUTION_RATIO:
         assert counter is not None
@@ -7620,9 +7695,23 @@ def _predict_phase_row(
                     "phase_role": counter.value,
                     "engine": engine.value,
                 },
+                notices=notices,
             )
         counter_oxide = counter in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}
-        counter_amount = _component_wt(formula, counter_map, oxide=counter_oxide)
+        counter_amount, counter_warnings = _component_wt(
+            formula,
+            counter_map,
+            oxide=counter_oxide,
+            phase=counter.value,
+        )
+        notices = union_notices(
+            notices,
+            _oxide_projection_notices(
+                counter_warnings,
+                quantity=quantity,
+                engine=engine,
+            ),
+        )
         if counter_amount is None or not math.isfinite(counter_amount):
             return refused(
                 RefusalReason.UNSUPPORTED,
@@ -7631,6 +7720,7 @@ def _predict_phase_row(
                     "phase_role": counter.value,
                     "formula": formula,
                 },
+                notices=notices,
             )
         if amount <= 0 or counter_amount <= 0:
             return refused(
@@ -7640,6 +7730,7 @@ def _predict_phase_row(
                     "numerator": str(amount),
                     "denominator": str(counter_amount),
                 },
+                notices=notices,
             )
         predicted = Decimal(str(amount)) / Decimal(str(counter_amount))
     elif solute is not None:
@@ -7652,12 +7743,14 @@ def _predict_phase_row(
             return refused(
                 RefusalReason.METRIC_DOMAIN,
                 {"reason": "nonpositive_phase_amount", "amount": str(amount)},
+                notices=notices,
             )
     else:
         if amount <= 0:
             return refused(
                 RefusalReason.METRIC_DOMAIN,
                 {"reason": "nonpositive_phase_amount", "amount": str(amount)},
+                notices=notices,
             )
         predicted = Decimal(str(amount))
     return EnginePrediction(
@@ -7669,6 +7762,7 @@ def _predict_phase_row(
         value=predicted,
         unit=QUANTITY_UNITS[quantity] if quantity is not None else None,
         authority=Authority.BRIDGE,
+        notices=notices,
         coefficient_sources=sources,
         lineage_complete=False,
         identity=identity,
@@ -9214,6 +9308,7 @@ def predict_with_engine(
 
     magnitude: float | None = None
     converter_reason = ""
+    activity_repair_warnings: tuple[str, ...] = ()
     # The melt-activity gate already required the measured species to equal
     # the admitted endmember. Compare that exact identity; never substitute a
     # different species into the residual.
@@ -9309,20 +9404,36 @@ def predict_with_engine(
         # The converter refuses Na2O, CaO, MgO, FeO, and K2O, including a
         # same-named key. It returns a(SiO2) from SiO2_Liq and a(H2O)
         # from H2O or H2O_Liq. Element labels are not oxide activities.
-        from engines.alphamelts.domain import melts_endmember_to_parent_oxide_activity
+        from engines.alphamelts.domain import (
+            _canonical_oxide_activity_map_with_notices,
+            melts_endmember_to_parent_oxide_activity,
+        )
 
+        if engine is Engine.ALPHAMELTS:
+            _, activity_repair_warnings = (
+                _canonical_oxide_activity_map_with_notices(reported)
+            )
         value, converter_reason = melts_endmember_to_parent_oxide_activity(
             reported, compared,
         )
         magnitude = value
     else:
-        matched = match_reported_species(
+        matched, activity_repair_warnings = _match_reported_species_with_notices(
             compared,
             reported,
             oxide_activity=quantity in MELT_ACTIVITY_QUANTITIES,
         )
         if matched is not None:
             _name, magnitude = matched
+    if activity_repair_warnings:
+        notices = union_notices(
+            notices,
+            _oxide_projection_notices(
+                activity_repair_warnings,
+                quantity=quantity,
+                engine=engine,
+            ),
+        )
     if magnitude is None:
         detail: dict[str, object] = {
             "reason": "species_unmatched_in_engine_output",

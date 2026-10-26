@@ -114,14 +114,46 @@ def _request(
     )
 
 
-def _physics(result) -> tuple[dict, dict, dict, dict, tuple[str, ...]]:
+def _physics_numeric_payload(result) -> tuple[dict, dict]:
     diagnostic = result.diagnostic
     return (
         dict(diagnostic["vapor_pressures_Pa"]),
         dict(diagnostic["activities"]),
+    )
+
+
+def _physics_metadata_payload(
+    result,
+    *,
+    exclude_b813_temperature_notices: bool = False,
+) -> tuple[dict, dict, tuple[str, ...]]:
+    diagnostic = result.diagnostic
+    provenance = copy.deepcopy(
+        diagnostic["vapor_pressure_numerator_provenance"]
+    )
+    if exclude_b813_temperature_notices:
+        # The merged green base already attaches temperature notices with
+        # their existing authority, reason, status and acquisition fields.
+        # b-813 adds certified_band; project that key out while preserving
+        # every notice field that was already present on green.
+        for record in provenance.values():
+            notice = record.get("extrapolation_notice")
+            if not isinstance(notice, dict):
+                continue
+            if not {"temperature_K", "valid_range_K"} <= notice.keys():
+                continue
+            notice.pop("certified_band", None)
+    return (
         dict(diagnostic["vapor_pressures_source"]),
-        copy.deepcopy(diagnostic["vapor_pressure_numerator_provenance"]),
+        provenance,
         tuple(result.warnings),
+    )
+
+
+def _physics(result) -> tuple[dict, dict, dict, dict, tuple[str, ...]]:
+    return (
+        *_physics_numeric_payload(result),
+        *_physics_metadata_payload(result),
     )
 
 
@@ -354,9 +386,21 @@ def _history_request(composition, temperature_K, hour, previous=None):
 def test_successful_openimcc_physics_is_bit_identical() -> None:
     result = _provider().dispatch(_history_request(BASE_MELT_MOL, 2400.65, 61))
     # Re-measured after merging green a822c275f: d-173 moves the engine pin
-    # from e975edd to e1423d8. JSON round-trips preserve float bits.
+    # from e975edd to e1423d8. Keep the numeric maps separate from metadata;
+    # the historical digest excludes only b-813's new temperature notice
+    # fields so their values remain bit-pinned to green.
+    numeric_payload = _physics_numeric_payload(result)
+    metadata_payload = _physics_metadata_payload(
+        result,
+        exclude_b813_temperature_notices=True,
+    )
+    # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
     assert hashlib.sha256(
-        json.dumps(_physics(result), sort_keys=True).encode()
+        json.dumps(numeric_payload, sort_keys=True).encode()
+    ).hexdigest() == "7d93eda6e2a5812bad5bfa80351c187c88adc91e79c2e369b9f7d64d336fdfc8"
+    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    assert hashlib.sha256(
+        json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
     ).hexdigest() == "934e52dd541fc5e6933b7fa9d3b106003b5d20f103aa0c6489c4f4ced3f74cc9"
 
 
@@ -364,9 +408,18 @@ def test_1800_k_pre_switch_physics_pin() -> None:
     result = _provider().dispatch(
         _request(BASE_MELT_MOL, 1800.0, high_t_melt_activity="constant_gamma")
     )
-    # b-813 adds complete extrapolation notices to numerator provenance; this is metadata only.
+    numeric_payload = _physics_numeric_payload(result)
+    metadata_payload = _physics_metadata_payload(
+        result,
+        exclude_b813_temperature_notices=True,
+    )
+    # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
     assert hashlib.sha256(
-        json.dumps(_physics(result), sort_keys=True).encode()
+        json.dumps(numeric_payload, sort_keys=True).encode()
+    ).hexdigest() == "61e9be015d7f7fc80787b36f2836523b4094950b6fb8d1a0fa917cdb882cf2b1"
+    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    assert hashlib.sha256(
+        json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
     ).hexdigest() == "7f0cbcb90a852319495d1eaf070ab30efa5d4361413d01e7bcfb57934e8ea102"
 
 

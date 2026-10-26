@@ -48,8 +48,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 from engines.alphamelts.domain import (
+    _canonical_oxide_activity_map_with_notices,
     canonical_melt_oxide_activity_name,
-    canonical_oxide_activity_map,
 )
 from engines.alphamelts.petthermo import (
     _PetThermoToolsExternalCallFailure,
@@ -2192,8 +2192,13 @@ class _MELTSBackendSupport(MeltBackend):
         result_status = str(status)
         result_diagnostics = dict(diagnostics or {})
         reported_activities = dict(activity_coefficients or {})
-        result_diagnostics.update(
+        activity_diagnostics, activity_notices = (
             self._activity_diagnostic_payload(reported_activities)
+        )
+        result_diagnostics.update(activity_diagnostics)
+        result_warnings = list(warnings or [])
+        result_warnings.extend(
+            notice for notice in activity_notices if notice not in result_warnings
         )
         resolved_liquid_fraction = liquid_fraction
         if result_status == 'ok':
@@ -2241,7 +2246,7 @@ class _MELTSBackendSupport(MeltBackend):
             activity_coefficients=reported_activities,
             vapor_pressures_Pa=dict(vapor_pressures_Pa or {}),
             vapor_pressures_source=dict(vapor_pressures_source or {}),
-            warnings=list(warnings or []),
+            warnings=result_warnings,
             status=result_status,
             diagnostics=result_diagnostics,
             requested_temperature_C=(
@@ -2762,13 +2767,13 @@ class _MELTSBackendSupport(MeltBackend):
             key = key[:-4]
         return MELTS_OXIDE_ALIASES.get(key.lower())
 
-    def _canonical_activity_mapping(self, values: Mapping[str, object]) -> dict:
-        return canonical_oxide_activity_map(values)
-
     def _activity_diagnostic_payload(
         self,
         values: Mapping[str, object],
-    ) -> dict[str, object]:
+    ) -> tuple[dict[str, object], tuple[str, ...]]:
+        oxide_activities, repair_notices = (
+            _canonical_oxide_activity_map_with_notices(values)
+        )
         reported: Dict[str, float] = {}
         label_map: Dict[str, dict[str, object]] = {}
         for raw_name, raw_value in dict(values or {}).items():
@@ -2790,18 +2795,19 @@ class _MELTSBackendSupport(MeltBackend):
                 ),
             }
         if not reported:
-            return {}
-        return {
-            'diagnostic_activity_basis': (
-                'reported_label; endmember/component labels are NOT '
-                'oxide activities without an explicit basis conversion'
-            ),
-            'diagnostic_reported_activities': reported,
-            'diagnostic_oxide_activities': self._canonical_activity_mapping(
-                reported
-            ),
-            'diagnostic_activity_label_map': label_map,
-        }
+            return {}, repair_notices
+        return (
+            {
+                'diagnostic_activity_basis': (
+                    'reported_label; endmember/component labels are NOT '
+                    'oxide activities without an explicit basis conversion'
+                ),
+                'diagnostic_reported_activities': reported,
+                'diagnostic_oxide_activities': oxide_activities,
+                'diagnostic_activity_label_map': label_map,
+            },
+            repair_notices,
+        )
 
     def _normalize_composition_to_melts_basis(self, comp_wt: dict) -> dict:
         self._last_normalization_warnings = []
