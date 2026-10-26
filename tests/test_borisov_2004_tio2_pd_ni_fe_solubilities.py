@@ -257,6 +257,7 @@ def test_isolated_migration_preserves_species_conditions_and_activity_standards(
             assert observation.point_conditions["fO2_log"].state.is_value
             assert observation.point_conditions["fO2_log"].state.value == Decimal(expected_f)
         if source_row["type"] == "equilibrium_phase_composition":
+            assert observation.point_conditions["sample_id"].state.is_value
             assert values["basis"] == "wt_percent"
             assert values["phase_label_as_published"] in {"l", "glass"}
             assert source_row["phase_as_measured"] in {
@@ -278,7 +279,6 @@ def test_isolated_migration_preserves_species_conditions_and_activity_standards(
         if source_row.get("phase") == "l":
             assert observation.identity.species.phase.value is Phase.L
             assert observation.point_conditions["total_pressure_Pa"].state.value == Decimal("101325")
-            assert observation.point_conditions["sample_id"].state.is_value
         if source_row["type"] == "activity_coefficient":
             assert observation.identity.reference_state is not None
             assert observation.identity.reference_state.is_value
