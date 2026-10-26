@@ -7354,14 +7354,83 @@ def test_residue_point_condition_values_keep_their_printed_types() -> None:
     assert condition.state.value == nominal_pressure
 
 
-def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
+def test_j01_declared_quantity_refuses_area_normalized_rate_without_area() -> None:
     selection = select_declared_source(
         Quantity.EVAPORATION_RATE,
-        "mol/s/m2",
+        "mol/s/m2 as printed",
         {"evaporation_rate_1200C": "4.6e-06"},
     )
-    assert selection.amount == as_decimal("4.6e-06")
+    assert selection.value.kind is ValueKind.UNAVAILABLE
     assert selection.field_name == "evaporation_rate_1200C"
+    assert "unmapped evaporation rate unit" in (selection.reason or "")
+
+
+def test_j01_declared_quantity_refuses_regolith_specific_rate_without_mass() -> None:
+    selection = select_declared_source(
+        Quantity.EVAPORATION_RATE,
+        "g/h/g of regolith as printed",
+        {"evaporation_rate": "1.38"},
+    )
+    assert selection.value.kind is ValueKind.UNAVAILABLE
+    assert selection.field_name == "evaporation_rate"
+    assert "unmapped evaporation rate unit" in (selection.reason or "")
+
+
+def test_density_source_converts_g_per_cm3_and_refuses_unknown_unit() -> None:
+    selection = select_declared_source(
+        Quantity.DENSITY,
+        "g/cm3 as printed",
+        {"density_g_cm3": "3.03"},
+    )
+    assert selection.value.kind is ValueKind.POINT
+    assert selection.amount == as_decimal("3030")
+    assert selection.unit_trail == "g_per_cm3_to_kg_per_m3"
+
+    refused = select_declared_source(
+        Quantity.DENSITY,
+        "lb/ft3 as printed",
+        {"density_g_cm3": "3.03"},
+    )
+    assert refused.value.kind is ValueKind.UNAVAILABLE
+    assert refused.field_name == "density_g_cm3"
+    assert "unmapped density unit" in (refused.reason or "")
+
+
+def test_evolved_gas_yield_units_convert_to_mol_per_initial_kg() -> None:
+    from simulator.accounting.formulas import parse_formula
+
+    water = select_declared_source(
+        Quantity.EVOLVED_GAS_YIELD,
+        "wt.% as printed",
+        {"evolved_gas_yield_H2O": "2.3"},
+    )
+    water_molar_mass = as_decimal(
+        str(parse_formula("H2O").molar_mass_kg_per_mol())
+    )
+    assert water.value.kind is ValueKind.POINT
+    assert water.amount == as_decimal("0.023") / water_molar_mass
+
+    carbon_dioxide = select_declared_source(
+        Quantity.EVOLVED_GAS_YIELD,
+        "µg/g as printed",
+        {"evolved_gas_yield_CO2": "225"},
+    )
+    co2_molar_mass = as_decimal(
+        str(parse_formula("CO2").molar_mass_kg_per_mol())
+    )
+    assert carbon_dioxide.value.kind is ValueKind.POINT
+    assert carbon_dioxide.amount == as_decimal("0.000225") / co2_molar_mass
+
+    legacy_field = select_declared_source(
+        Quantity.EVOLVED_GAS_YIELD,
+        "µg/g as printed",
+        {"yield_ug_g": "4.98", "gas_species": "H2"},
+    )
+    h2_molar_mass = as_decimal(
+        str(parse_formula("H2").molar_mass_kg_per_mol())
+    )
+    assert legacy_field.value.kind is ValueKind.POINT
+    assert legacy_field.amount == as_decimal("0.00000498") / h2_molar_mass
 
 
 def test_equal_temperature_range_is_a_point_but_true_range_is_not() -> None:
@@ -13402,6 +13471,28 @@ def test_d032_context_rows_carried_not_observed(tmp_path: Path) -> None:
     works, experiments, observations = load_migrated_store(root)
     assert qualified not in observations
     assert not any(oid.endswith("::na_bench_note") for oid in observations)
+
+
+def test_shaw_lms1_quoted_density_is_attributed_context(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "sublimation-kinetics-2023-minerals.yaml", write=False
+    )
+    context_id = (
+        "sublimation-kinetics-2023-minerals::context::"
+        "shaw_2023_lms1_quoted_spec_density"
+    )
+    assert context_id not in result.observations
+    row = next(
+        row
+        for rows in result.context_by_work.values()
+        for row in rows
+        if row.get("context_id") == context_id
+    )
+    assert row["type"] == "characterization"
+    assert row["values"]["method_class"] == "quoted_attributed"
+    assert row["values"]["attribution"].startswith("Isachenkov et al. 2022")
+    assert row["values"]["value_as_published"] == "3.03 g/cm3"
+    assert row["values"]["density_kg_m3"] == 3030
 
 
 def test_d036_equipment_fk_resolves_through_context_row(tmp_path: Path) -> None:
