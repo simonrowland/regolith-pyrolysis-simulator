@@ -890,7 +890,7 @@ def _same_composition_temperature_bridge(
     *,
     activity_basis_mol: Mapping[str, float],
 ) -> dict[str, Any]:
-    """Resolve each parent's nearest same-composition gamma on the T schedule."""
+    """Resolve each parent's bracketed or nearest gamma on the T schedule."""
 
     from simulator.melt_backend.openimcc_bridge import evaluate_cleaned_melt
 
@@ -947,7 +947,7 @@ def _same_composition_temperature_bridge(
                 gammas[oxide] = float(activity.effective_gamma)
             if gammas:
                 points.append((probe_T, gammas))
-    nearest_neighbors: dict[str, dict[str, float]] = {}
+    continuations_by_parent: dict[str, dict[str, Any]] = {}
     parents = {oxide for _probe_T, gammas in points for oxide in gammas}
     for oxide in sorted(parents):
         observations = [
@@ -955,13 +955,78 @@ def _same_composition_temperature_bridge(
             for probe_T, gammas in points
             if oxide in gammas
         ]
-        anchor_temperature_K, gamma = min(
-            observations,
-            key=lambda observation: abs(observation[0] - float(temperature_K)),
+        target_T = float(temperature_K)
+        lower = min(
+            (point for point in observations if point[0] < target_T),
+            key=lambda point: abs(point[0] - target_T),
+            default=None,
         )
-        anchor_gap_K = abs(anchor_temperature_K - float(temperature_K))
-        if anchor_gap_K <= _TEMPERATURE_BRIDGE_CAP_K:
-            nearest_neighbors[oxide] = {
+        upper = min(
+            (point for point in observations if point[0] > target_T),
+            key=lambda point: abs(point[0] - target_T),
+            default=None,
+        )
+        lower_gap_K = abs(lower[0] - target_T) if lower is not None else None
+        upper_gap_K = abs(upper[0] - target_T) if upper is not None else None
+        lower_in_span = (
+            lower is not None and lower_gap_K <= _TEMPERATURE_BRIDGE_CAP_K
+        )
+        upper_in_span = (
+            upper is not None and upper_gap_K <= _TEMPERATURE_BRIDGE_CAP_K
+        )
+        if lower_in_span and upper_in_span:
+            lower_T, lower_gamma = lower
+            upper_T, upper_gamma = upper
+            # Regular-solution behaviour gives RT ln(gamma) ~= W, so
+            # ln(gamma) ~= W/(R T) is approximately linear in 1/T. For
+            # x=1/T, alpha=(x_target-x_upper)/(x_lower-x_upper), and
+            # ln(gamma_target)=alpha ln(gamma_lower)+(1-alpha)ln(gamma_upper).
+            # Each x has units K^-1; alpha and gamma are dimensionless. If
+            # the target equals an anchor, or the anchors coincide, the limit
+            # is that anchor's gamma. At h133 quantized SiO2, the 2303.15 K
+            # and 2403.15 K anchors give 0.020802418536658367 at 2378.15 K,
+            # close to its independent warm-solver activity 0.02080166433881563;
+            # fixed composition makes interpolating ln(activity) equivalent.
+            if lower_T == upper_T or target_T == lower_T:
+                gamma = float(lower_gamma)
+            elif target_T == upper_T:
+                gamma = float(upper_gamma)
+            else:
+                target_inverse_T = 1.0 / target_T
+                lower_inverse_T = 1.0 / lower_T
+                upper_inverse_T = 1.0 / upper_T
+                lower_weight = (
+                    (target_inverse_T - upper_inverse_T)
+                    / (lower_inverse_T - upper_inverse_T)
+                )
+                gamma = math.exp(
+                    lower_weight * math.log(float(lower_gamma))
+                    + (1.0 - lower_weight) * math.log(float(upper_gamma))
+                )
+            continuations_by_parent[oxide] = {
+                "method": "interpolated_converged_temperature_neighbors",
+                "gamma": gamma,
+                "lower_anchor_temperature_K": float(lower_T),
+                "upper_anchor_temperature_K": float(upper_T),
+                "lower_anchor_gap_K": float(lower_gap_K),
+                "upper_anchor_gap_K": float(upper_gap_K),
+            }
+        else:
+            available = [
+                point for point, in_span in (
+                    (lower, lower_in_span), (upper, upper_in_span),
+                )
+                if point is not None and in_span
+            ]
+            if not available:
+                continue
+            anchor_temperature_K, gamma = min(
+                available,
+                key=lambda point: abs(point[0] - target_T),
+            )
+            anchor_gap_K = abs(anchor_temperature_K - target_T)
+            continuations_by_parent[oxide] = {
+                "method": "nearest_converged_temperature_neighbor",
                 "gamma": float(gamma),
                 "anchor_temperature_K": float(anchor_temperature_K),
                 "anchor_gap_K": float(anchor_gap_K),
@@ -970,7 +1035,7 @@ def _same_composition_temperature_bridge(
         "call_count": len(attempted),
         "attempted_temperatures_K": attempted,
         "cap_K": _TEMPERATURE_BRIDGE_CAP_K,
-        "nearest_neighbors": nearest_neighbors,
+        "continuations_by_parent": continuations_by_parent,
     }
 
 
@@ -1148,10 +1213,9 @@ def _build_high_t_melt_activity_authority(
             base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
         held = {}
         last_extrapolated: dict[str, float] = {}
-        # A numerical nonconvergence uses one rule for every probe set:
-        # the nearest successful same-composition temperature neighbour.
-        # The trajectory continuation remains the fallback when no neighbour
-        # converges; the table remains the fallback without either source.
+        # A numerical nonconvergence uses the nearest successful probe on
+        # each side when both exist; otherwise it holds the nearest one-sided
+        # neighbour. Trajectory continuation remains the no-neighbour fallback.
         bridge_result = (
             _same_composition_temperature_bridge(
                 solve_composition, float(temperature_K), expected_refusal_types,
@@ -1160,8 +1224,8 @@ def _build_high_t_melt_activity_authority(
             if code == "imcc_nonconvergence"
             else None
         )
-        bridge_neighbors = (
-            bridge_result["nearest_neighbors"] if bridge_result else {}
+        bridge_continuations = (
+            bridge_result["continuations_by_parent"] if bridge_result else {}
         )
         if bridge_result is not None:
             base["temperature_bridge"] = {
@@ -1179,42 +1243,86 @@ def _build_high_t_melt_activity_authority(
         # numerical refusal bridges the projected composition above.
         # ImccTOutsideDatapackDomainError keeps its existing secant/freeze
         # route; the MELTS handoff below 1700 K is t-1314, not d-175.
-        if bridge_neighbors or can_continue:
+        if bridge_continuations or can_continue:
             composition = _high_t_composition_vector(composition_mol)
             prior_extrapolated = dict(
                 previous.get("last_extrapolated_gamma_by_parent") or {}
             )
             refusal_count = int(previous.get("consecutive_refusal_count") or 0) + 1
             parents = list(certificates)
-            for parent in bridge_neighbors:
+            for parent in bridge_continuations:
                 if parent not in parents:
                     parents.append(parent)
             for parent in parents:
                 if parent not in composition_mol:
                     continue
                 certificate = certificates.get(parent)
-                neighbor = bridge_neighbors.get(parent)
-                if (
-                    neighbor is not None
-                    and float(neighbor["anchor_gap_K"])
-                    <= _TEMPERATURE_BRIDGE_CAP_K
-                ):
-                    anchor_gap = float(neighbor["anchor_gap_K"])
-                    far_anchor = (
-                        anchor_gap > _TEMPERATURE_BRIDGE_FAR_ANCHOR_WARNING_GAP_K
+                continuation = bridge_continuations.get(parent)
+                if continuation is not None:
+                    method = str(continuation["method"])
+                    if method == "interpolated_converged_temperature_neighbors":
+                        anchor_gaps = [
+                            float(continuation["lower_anchor_gap_K"]),
+                            float(continuation["upper_anchor_gap_K"]),
+                        ]
+                        anchor_details = {
+                            "lower_anchor_temperature_K": float(
+                                continuation["lower_anchor_temperature_K"]
+                            ),
+                            "upper_anchor_temperature_K": float(
+                                continuation["upper_anchor_temperature_K"]
+                            ),
+                            "lower_anchor_gap_K": anchor_gaps[0],
+                            "upper_anchor_gap_K": anchor_gaps[1],
+                        }
+                    else:
+                        anchor_gaps = [float(continuation["anchor_gap_K"])]
+                        anchor_details = {
+                            "anchor_temperature_K": float(
+                                continuation["anchor_temperature_K"]
+                            ),
+                            "anchor_gap_K": anchor_gaps[0],
+                        }
+                    if not all(
+                        0.0 <= gap <= _TEMPERATURE_BRIDGE_CAP_K
+                        for gap in anchor_gaps
+                    ):
+                        continue
+                    far_anchor = any(
+                        gap > _TEMPERATURE_BRIDGE_FAR_ANCHOR_WARNING_GAP_K
+                        for gap in anchor_gaps
                     )
+                    if method == "interpolated_converged_temperature_neighbors":
+                        anchor_message = (
+                            "Interpolated the effective single-cation gamma in 1/T "
+                            "between same-composition neighbours at "
+                            f"{anchor_details['lower_anchor_temperature_K']:.2f} K "
+                            f"(gap {anchor_gaps[0]:.2f} K) and "
+                            f"{anchor_details['upper_anchor_temperature_K']:.2f} K "
+                            f"(gap {anchor_gaps[1]:.2f} K)"
+                        )
+                    else:
+                        anchor_message = (
+                            "Nearest converged same-composition temperature "
+                            f"neighbour at {anchor_details['anchor_temperature_K']:.2f} K "
+                            f"(gap {anchor_gaps[0]:.2f} K) supplies the effective "
+                            "single-cation gamma"
+                        )
+                    if far_anchor:
+                        anchor_message += (
+                            "; at least one anchor gap exceeds the schedule-derived "
+                            f"{_TEMPERATURE_BRIDGE_FAR_ANCHOR_WARNING_GAP_K:.1f} K "
+                            "notice threshold"
+                        )
                     notice = {
                         "code": "hold_last_certified_effective_gamma",
                         "type": "typed_notice",
                         "authority": "extrapolated",
                         "parent": parent,
                         **(certificate or {}),
-                        "method": "nearest_converged_temperature_neighbor",
-                        "gamma_applied": float(neighbor["gamma"]),
-                        "anchor_temperature_K": float(
-                            neighbor["anchor_temperature_K"]
-                        ),
-                        "anchor_gap_K": anchor_gap,
+                        "method": method,
+                        "gamma_applied": float(continuation["gamma"]),
+                        **anchor_details,
                         "bridge_call_count": bridge_result["call_count"],
                         "bridge_cap_K": bridge_result["cap_K"],
                         "bridge_attempted_temperatures_K": list(
@@ -1222,18 +1330,7 @@ def _build_high_t_melt_activity_authority(
                         ),
                         "original_refusal": dict(fallback_reason),
                         "consecutive_refusal_count": refusal_count,
-                        "message": (
-                            "Nearest converged same-composition temperature "
-                            f"neighbour at {neighbor['anchor_temperature_K']:.2f} K "
-                            f"(gap {anchor_gap:.2f} K) supplies the effective "
-                            "single-cation gamma"
-                            + (
-                                "; gap exceeds the schedule-derived "
-                                f"{_TEMPERATURE_BRIDGE_FAR_ANCHOR_WARNING_GAP_K:.1f} K "
-                                "notice threshold"
-                                if far_anchor else ""
-                            )
-                        ),
+                        "message": anchor_message,
                     }
                     if certificate is not None:
                         notice["temperature_gap_K"] = abs(
@@ -3717,6 +3814,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                             "extrapolated_first_order_ln_gamma",
                             "extrapolation_capped_frozen",
                             "nearest_converged_temperature_neighbor",
+                            "interpolated_converged_temperature_neighbors",
                         }
                         else "openimcc_single_cation"
                     )

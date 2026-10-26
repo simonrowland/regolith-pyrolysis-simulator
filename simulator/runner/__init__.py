@@ -3813,6 +3813,10 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         item.get("method") == "nearest_converged_temperature_neighbor"
         for item in items
     )
+    interpolated_neighbors = any(
+        item.get("method") == "interpolated_converged_temperature_neighbors"
+        for item in items
+    )
     projected = any(
         item.get("method") == "projected_composition_solve" for item in items
     )
@@ -3827,15 +3831,26 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         (
             str(item.get("message"))
             for item in items
-            if item.get("method") == "nearest_converged_temperature_neighbor"
+            if item.get("method") in {
+                "nearest_converged_temperature_neighbor",
+                "interpolated_converged_temperature_neighbors",
+            }
             and "schedule-derived" in str(item.get("message", ""))
         ),
         None,
     )
     if projected:
         prediction = "projected-composition extrapolated predictions"
-        if nearest_neighbor:
+        if interpolated_neighbors:
+            prediction += ", using bracketed 1/T temperature neighbours"
+        elif nearest_neighbor:
             prediction += ", using the nearest solved temperature neighbour"
+    elif interpolated_neighbors:
+        prediction = "bracketed same-composition temperature-neighbour predictions"
+        if nearest_neighbor:
+            prediction += ", with nearest-neighbour holds where only one side solved"
+        if first_order or frozen:
+            prediction += ", with certified-gamma continuation where no neighbour solved"
     elif nearest_neighbor:
         prediction = "nearest same-composition temperature-neighbour predictions"
         if first_order or frozen:
