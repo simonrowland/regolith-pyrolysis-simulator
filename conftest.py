@@ -56,7 +56,11 @@ from tests.e2e.playwright_support import (
 )
 
 
-pytest_plugins = ("_pytest_loadgroup_order", "_pytest_known_red")
+pytest_plugins = (
+    "_pytest_loadgroup_order",
+    "_pytest_known_red",
+    "tests.suite_shape_guard",
+)
 
 
 def _safe_worker_id(worker_id: str) -> str:
@@ -285,15 +289,6 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     for item in items:
         if item.get_closest_marker("browser_e2e") is not None:
             item.add_marker(PLAYWRIGHT_SKIP_MARK)
-
-
-def pytest_itemcollected(item: pytest.Item) -> None:
-    """Retain every collected item before pytest applies ``-m`` selection."""
-    collected = getattr(item.session, "_suite_shape_collected_items", None)
-    if collected is None:
-        collected = []
-        item.session._suite_shape_collected_items = collected
-    collected.append(item)
 
 
 # CI-speed (process-scoped VapoRock warm-boot cache): share one VR-5 warm pool

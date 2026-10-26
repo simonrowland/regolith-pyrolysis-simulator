@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the deterministic two-pass PR-tier pytest gate.
+"""Run an unfiltered suite-shape audit and the two-pass PR-tier pytest gate.
 
 Bulk tests inherit pyproject's ``-n auto`` xdist addopts. Tests marked
 ``serial`` are run in a second ``-n0`` pass so coscheduling-sensitive families
@@ -57,6 +57,16 @@ def main(argv: list[str] | None = None) -> int:
 
     repo_root = Path(__file__).resolve().parents[1]
     python = sys.executable
+    # The collection hook owns this guard; run it on the unfiltered tree before
+    # either PR bucket applies a marker expression.
+    audit_code = _run_bucket(
+        "suite-shape-collection",
+        [python, "-m", "pytest", "-n0", "--collect-only", "tests/"],
+        repo_root,
+    )
+    if audit_code != 0:
+        return audit_code
+
     buckets = [
         (
             "bulk",
