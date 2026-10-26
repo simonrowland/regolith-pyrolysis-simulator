@@ -1290,6 +1290,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ] = {}
         self._freeze_gate_curve_in_progress: bool = False
         self._last_freeze_gate_diagnostic: Dict[str, Any] = {}
+        self._last_melt_redox_liquidus_gate_diagnostic: Dict[str, Any] = {}
+        self._last_melt_redox_liquid_fraction_diagnostic: Dict[str, Any] = {}
         self._melt_redox_liquidus_gate_fallback_diagnostics: deque[
             Dict[str, Any]
         ] = deque(maxlen=_MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN)
