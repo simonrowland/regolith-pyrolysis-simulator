@@ -256,8 +256,11 @@ def test_isolated_migration_preserves_species_conditions_and_activity_standards(
             expected_f = source_row["point_conditions"]["fO2_log"]["state"]["value"]
             assert observation.point_conditions["fO2_log"].state.is_value
             assert observation.point_conditions["fO2_log"].state.value == Decimal(expected_f)
-        if source_row["type"] == "equilibrium_phase_composition":
+        if source_row["type"] == "equilibrium_phase_composition" or (
+            source_row["type"] == "activity_coefficient" and source_row.get("phase") == "l"
+        ):
             assert observation.point_conditions["sample_id"].state.is_value
+        if source_row["type"] == "equilibrium_phase_composition":
             assert values["basis"] == "wt_percent"
             assert values["phase_label_as_published"] in {"l", "glass"}
             assert source_row["phase_as_measured"] in {
