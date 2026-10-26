@@ -1190,7 +1190,20 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         kernel_flux = dict(
             sim._calculate_evaporation(equilibrium).species_kg_hr
         )
-        refusals = sim._last_vapour_batch_report["refusals_by_species"]
+        batch_report = sim._last_vapour_batch_report
+        if batch_report is None:
+            # The source-free C0B fast path need not publish a batch (e.g.
+            # asteroid P2O5 stock is zero). Prove inactivity at the catalog
+            # owner, then keep the same typed-refusal and numerical guards.
+            assert not kernel_flux
+            assert sim._last_evaporation_flux_diagnostic['reason'] == 'frozen_carrier_set_empty'
+            _, _, batch, error, _, _ = sim._resolve_evaporation_batch_flux_state(
+                equilibrium, temperature_K=T_C + 273.15)
+            assert not error
+            assert batch is not None and not batch.flux_active_species_ids
+            from simulator.vapour_rail.instrumentation import serialize_vapour_batch
+            batch_report = serialize_vapour_batch(batch)
+        refusals = batch_report["refusals_by_species"]
         refused_reference_species = set(reference_flux) & set(refusals)
         # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4), later pinned as b-114
         # in 1a6ad25, made batch eligibility authoritative.
