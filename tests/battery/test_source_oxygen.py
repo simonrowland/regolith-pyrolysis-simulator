@@ -8,7 +8,12 @@ import pytest
 
 from simulator.battery.enums import Engine, EvidenceClass, Phase, Quantity
 from simulator.battery.records import Species, State
-from simulator.battery.score import _bench_for_score, compile_residual, load_score_context
+from simulator.battery.score import (
+    ScoreContext,
+    _bench_for_score,
+    compile_residual,
+    load_score_context,
+)
 from simulator.battery.source_oxygen import (
     SourceOxygenCondition,
     SourceOxygenFallback,
@@ -119,13 +124,36 @@ def test_conditioning_cell_gases_remain_visible_but_are_not_scored(source_contex
 
 
 def test_typed_1996_source_oxygen_commands_the_reduced_condition(
-    source_context, monkeypatch
+    tmp_path, monkeypatch
 ):
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    migrated = _migrate_real_extract(
+        tmp_path,
+        "stolyarova-1996-cao-alumina-silica-kems.yaml",
+        use_repository_index_row=True,
+    )
+    source_context = ScoreContext(
+        works=migrated.works,
+        experiments=migrated.experiments,
+        observations=migrated.observations,
+        benches=migrated.benches,
+    )
     row = _row(source_context, "stolyarova-1996-cao-alumina-silica-kems", "AlO")
     condition = _resolve(source_context, row)
     assert isinstance(condition, SourceOxygenCondition)
+    assert condition.observation.identity.species.formula == "O2"
     assert condition.observation.derived_from
     assert set(condition.observation.derived_from) <= condition.used_observations
+    oxygen_row = source_context.observations[condition.observation.derived_from[0]]
+    assert oxygen_row.identity.species.formula == "O"
+    assert oxygen_row.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert oxygen_row.identity.reaction is not None
+    assert oxygen_row.identity.reaction.is_value
+    assert {
+        term.species.formula
+        for term in oxygen_row.identity.reaction.value.terms
+    } == {"MoO3", "MoO2", "O"}
 
     requests, handles = _capture_engine(monkeypatch, row)
     residual, candidate = compile_residual(

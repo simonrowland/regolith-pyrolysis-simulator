@@ -1236,8 +1236,10 @@ def test_backtest_rejects_extra_cells_and_same_key_column_swaps(
         for measurement in table["values"]
         if measurement["species"] == "O"
         and (measurement.get("quantity") or table["quantity"]) == "partial_pressure"
-        and (measurement.get("evidence_class") or table.get("evidence_class"))
-        == "model_derived"
+        and (
+            (measurement.get("evidence_class") or table.get("evidence_class"))
+            == "quoted_attributed"
+        )
     ]
     first_column, second_column = duplicate_columns[:2]
     for observation in swapped_document["species"]["O"]["observations"]:

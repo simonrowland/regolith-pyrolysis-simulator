@@ -4761,8 +4761,8 @@ species:
       units: "atm as printed (column P_O · 10^8; pressure_atm = printed value × 10^-8 atm)"
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
         admission_status: admitted
         attribution: Stolyarova et al. (1996), Table 2 footnote a and Eq. (7), pp. 19–20
         method: author reduction by the printed gas equilibrium
@@ -4782,16 +4782,7 @@ species:
           references:
           - Gurvich K°(T)
           - Mann cross-sections
-          raw_inputs:
-            state:
-              tag: value
-              value: not_printed
-            locator:
-              page: 5
-              published_page: 19
-              pdf_page_index: 4
-              equation: "7–9"
-              note: "The row-wise ion-current inputs are not printed."
+          inputs: [pdf:stolyarova-1996-cao-alumina-silica-kems]
         composition_component: CaO-Al2O3-SiO2 melt
         composition_basis: printed xA/xC ratio and xS mole fraction; normalized components explicitly derived for scoring
         composition_conversion: x_CaO=(1-xS)/(1+xA/xC); x_Al2O3=(xA/xC)*x_CaO; x_SiO2=xS
@@ -5730,8 +5721,8 @@ species:
       units: "atm as printed (column P_O_prime · 10^8; pressure_atm = printed value × 10^-8 atm)"
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
         admission_status: admitted
         attribution: Stolyarova et al. (1996), Table 2 footnote a and Eq. (8), pp. 19–20
         method: author reduction by the printed gas equilibrium
@@ -5751,16 +5742,7 @@ species:
           references:
           - Gurvich K°(T)
           - Mann cross-sections
-          raw_inputs:
-            state:
-              tag: value
-              value: not_printed
-            locator:
-              page: 5
-              published_page: 19
-              pdf_page_index: 4
-              equation: "7–9"
-              note: "The row-wise ion-current inputs are not printed."
+          inputs: [pdf:stolyarova-1996-cao-alumina-silica-kems]
         composition_component: CaO-Al2O3-SiO2 melt
         composition_basis: printed xA/xC ratio and xS mole fraction; normalized components explicitly derived for scoring
         composition_conversion: x_CaO=(1-xS)/(1+xA/xC); x_Al2O3=(xA/xC)*x_CaO; x_SiO2=xS
@@ -6099,8 +6081,8 @@ species:
       units: "atm as printed (column P_O_double_prime · 10^8; pressure_atm = printed value × 10^-8 atm)"
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
         admission_status: admitted
         attribution: Stolyarova et al. (1996), Table 2 footnote a and Eq. (9), pp. 19–20
         method: author reduction by the printed gas equilibrium
@@ -6120,16 +6102,7 @@ species:
           references:
           - Gurvich K°(T)
           - Mann cross-sections
-          raw_inputs:
-            state:
-              tag: value
-              value: not_printed
-            locator:
-              page: 5
-              published_page: 19
-              pdf_page_index: 4
-              equation: "7–9"
-              note: "The row-wise ion-current inputs are not printed."
+          inputs: [pdf:stolyarova-1996-cao-alumina-silica-kems]
         composition_component: CaO-Al2O3-SiO2 melt
         composition_basis: printed xA/xC ratio and xS mole fraction; normalized components explicitly derived for scoring
         composition_conversion: x_CaO=(1-xS)/(1+xA/xC); x_Al2O3=(xA/xC)*x_CaO; x_SiO2=xS

@@ -39,9 +39,9 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
     assert "Mann" in method
     assert "not printed" in method
     assert [observation["values"]["method_class"] for observation in observations] == [
-        "model_derived",
-        "model_derived",
-        "model_derived",
+        "quoted_attributed",
+        "quoted_attributed",
+        "quoted_attributed",
     ]
     assert all(
         "row ion currents and numerical constants are not printed"
@@ -71,10 +71,10 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
             "K_ref = Gurvich K°(T)"
         )
         assert derivation["method"]["locator"]["equation"] == "7–9"
-        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
-        assert derivation["raw_inputs"]["locator"]["note"] == (
-            "The row-wise ion-current inputs are not printed."
-        )
+        assert derivation["inputs"] == [
+            "pdf:stolyarova-1996-cao-alumina-silica-kems"
+        ]
+        assert "raw_inputs" not in derivation
 
     bench = document["benches"][0]
     assert bench["cell_material_and_liner"]["state"]["tag"] == "unknown"
@@ -90,7 +90,10 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
     focused_document = deepcopy(document)
     focused_document["species"] = {"O": focused_document["species"]["O"]}
     migrated = _migrate_real_extract(
-        tmp_path, EXTRACT_NAME, extract_doc=focused_document
+        tmp_path,
+        EXTRACT_NAME,
+        use_repository_index_row=True,
+        extract_doc=focused_document,
     )
     assert migrated.validation is not None
     oxygen_rows = [
@@ -101,30 +104,27 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
     assert len(oxygen_rows) == 55
     assert all(
         observation.evidence.class_.is_value
-        and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         for observation in oxygen_rows
     )
     assert all(observation.derived_from is None for observation in oxygen_rows)
     assert all(
         observation.derivation is not None
-        and observation.derivation.has_located_unprinted_raw_inputs
-        and observation.derivation.has_located_method
-        and observation.derivation.references
-        == ("Gurvich K°(T)", "Mann cross-sections")
+        and observation.derivation.relation == "atm_to_Pa"
+        and observation.derivation.inputs
+        == ("pdf:stolyarova-1996-cao-alumina-silica-kems",)
+        and observation.derivation.raw_inputs is None
+        and observation.derivation.method is None
         for observation in oxygen_rows
     )
     for observation in oxygen_rows:
-        assert observation.derivation is not None
-        assert observation.derivation.method is not None
-        assert observation.derivation.raw_inputs is not None
-        for located in (
-            observation.derivation.method,
-            observation.derivation.raw_inputs,
-        ):
-            assert located.locator is not None
-            assert located.locator.pdf_page_index is not None
-            assert located.locator.page == located.locator.pdf_page_index + 1
-            assert (located.locator.page, located.locator.published_page) == (5, 19)
+        assert observation.locator is not None
+        assert observation.locator.pdf_page_index is not None
+        assert observation.locator.page == observation.locator.pdf_page_index + 1
+        assert (observation.locator.page, observation.locator.published_page) == (
+            6,
+            20,
+        )
         temperature = observation.identity.temperature_K
         assert temperature is not None and temperature.is_value
         assert temperature.value == Decimal("1933")
@@ -158,7 +158,7 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
     }
     for observation in oxygen_rows:
         assert observation.evidence.class_.is_value
-        assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         assert observation.identity.reaction is not None
         assert observation.identity.reaction.is_value
         assert {

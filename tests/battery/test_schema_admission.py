@@ -915,8 +915,8 @@ def test_geometry_context_keeps_original_source_record():
 
 _BOULLIUNG_APPARATUS = "boulliung_2025_ssas_apparatus_and_run_conditions"
 _BOULLIUNG_STARTING = "boulliung_2025_starting_material_hg_and_trace_doping"
-# Unresolved printed parents kept on both derived_from and derivation.inputs.
-_BOULLIUNG_UNRESOLVED = {
+# Context parents are retained as qualified work-context references.
+_BOULLIUNG_CONTEXT_INPUTS = {
     "boulliung_2025_hg_equilibrium_partial_pressure": (_BOULLIUNG_APPARATUS,),
     "boulliung_2025_hg_equilibrium_partial_pressure_1400c": (
         _BOULLIUNG_STARTING, _BOULLIUNG_APPARATUS,
@@ -998,12 +998,24 @@ def test_ancestry_lookup_preserves_nonconditional_derivation_emission(source):
             "cross_interaction_coefficients",
         }
     elif source == "boulliung-2025-mercury-volatile-metals-magmatic":
-        expected = {
-            _printed_lineage_issue(source, local_id, field, text)
-            for local_id, texts in _BOULLIUNG_UNRESOLVED.items()
-            for text in texts
-            for field in ("derived_from", "derivation.inputs")
-        }
+        expected = set()
+        for local_id, context_inputs in _BOULLIUNG_CONTEXT_INPUTS.items():
+            observation = migrator.result.observations[f"{source}::{local_id}"]
+            expected_context_ids = {
+                f"{source}::context::{context_input}"
+                for context_input in context_inputs
+            }
+            assert expected_context_ids <= set(observation.derived_from or ())
+            assert observation.derivation is not None
+            assert expected_context_ids <= set(observation.derivation.inputs)
+            assert not any(
+                issue.path
+                in {
+                    f"observation[{observation.observation_id}].derived_from",
+                    f"observation[{observation.observation_id}].derivation.inputs",
+                }
+                for issue in hard
+            )
     else:
         expected = {
             _printed_lineage_issue(

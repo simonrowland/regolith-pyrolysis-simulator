@@ -5108,11 +5108,28 @@ def test_measured_no_rail_refusal_stays_in_accumulator_and_legacy_report() -> No
     assert "`unsupported:no_headline_rail:viscosity` | 1" in refusal_census
 
 
-def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
+def test_e15_stolyarova_1996_real_axis_slope_and_report_path(
+    tmp_path: Path,
+) -> None:
     from simulator.battery import score as score_mod
+    from tests.battery.test_migrate import _migrate_real_extract
 
     context = load_score_context(
         sources=("stolyarova-1996-cao-alumina-silica-kems",)
+    )
+    fresh_stolyarova = _migrate_real_extract(
+        tmp_path,
+        "stolyarova-1996-cao-alumina-silica-kems.yaml",
+        use_repository_index_row=True,
+    )
+    observations = {
+        key: observation
+        for key, observation in context.observations.items()
+        if observation.source_id != "stolyarova-1996-cao-alumina-silica-kems"
+    }
+    context = replace(
+        context,
+        observations={**observations, **fresh_stolyarova.observations},
     )
     residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
     selected = [
@@ -14277,6 +14294,34 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             "kems-012-sossi-2019",
         )
     )
+    fresh_sources = {
+        source_id: _migrate_real_extract(
+            tmp_path / source_id,
+            f"{source_id}.yaml",
+            use_repository_index_row=True,
+        )
+        for source_id in (
+            "kems-053-stolyarova-1991",
+            "stolyarova-1995-cao-alumina-kems",
+            "stolyarova-1996-cao-alumina-silica-kems",
+            "kems-ms2000-044",
+            "kems-012-sossi-2019",
+        )
+    }
+    fresh_observations = {
+        key: observation
+        for migrated in fresh_sources.values()
+        for key, observation in migrated.observations.items()
+    }
+    observations = {
+        key: observation
+        for key, observation in context.observations.items()
+        if observation.source_id not in fresh_sources
+    }
+    context = replace(
+        context,
+        observations={**observations, **fresh_observations},
+    )
     observations = context.observations
     filtered = context
     stolyarova_atomic_oxygen_pressures = {
@@ -14358,12 +14403,11 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         observations[key].admission.status is AdmissionStatus.ADMITTED
         for key in stolyarova_atomic_oxygen_pressures
     )
-    fresh_stolyarova = _migrate_real_extract(
-        tmp_path, "kems-053-stolyarova-1991.yaml"
-    )
     fresh_stolyarova_pressures = {
         key: observation
-        for key, observation in fresh_stolyarova.observations.items()
+        for key, observation in fresh_sources[
+            "kems-053-stolyarova-1991"
+        ].observations.items()
         if key in stolyarova_atomic_oxygen_pressures
     }
     assert set(fresh_stolyarova_pressures) == stolyarova_atomic_oxygen_pressures

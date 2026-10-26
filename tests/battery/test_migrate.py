@@ -16683,7 +16683,11 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
                 if oxide != "locator"
             }
         )
+        assert identity.composition.is_value
         assert identity.composition.value.components == expected_start.components
+        assert identity.composition.value.proxy_flag is None
+        component_value = item[f"{identity.species.formula}_wt_pct"]
+        assert obs.value.point == Decimal(str(component_value))
         assert identity.temperature_K.value == conditions["temperature_K"].state.value
         assert identity.sample_mass_kg.value == Decimal("0.0001")
         assert identity.exposure.value.duration_s.value == conditions["time_min"].state.value * Decimal("60")
