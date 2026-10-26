@@ -774,6 +774,8 @@ def test_phase_rows_reuse_engine_handle_and_refuse_emfile_launch(
     assert residual.status is ResidualStatus.REFUSED
     assert residual.numeric is None
     assert not residual.score_eligible
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.ATTEMPTED_UNAVAILABLE
 
 
 @pytest.mark.parametrize(
@@ -881,6 +883,133 @@ def test_phase_rows_reopen_cached_handle_after_transport_death(
     assert len(opened) == 2
     assert backends[0].close_calls >= 1
     assert backends[1].close_calls == 1
+
+
+def test_magemin_worker_lifecycle_result_is_transport_refusal_in_score_loop(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from concurrent.futures import Future
+    from functools import wraps
+    from pathlib import Path
+
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.engine_pool import EngineWorkerDied
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    class FailedPool:
+        def __init__(self) -> None:
+            self.close_calls = 0
+
+        def submit(self, *_args, **_kwargs):
+            future = Future()
+            future.set_exception(
+                EngineWorkerDied("call", "fake MAGEMin worker exited")
+            )
+            return future
+
+        def close(self, *, cancel_pending: bool = False) -> None:
+            self.close_calls += 1
+
+    pool = FailedPool()
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._subprocess_pool = pool
+    results: list[EquilibriumResult] = []
+    equilibrate = backend.equilibrate
+
+    @wraps(equilibrate)
+    def capture_result(*args, **kwargs):
+        result = equilibrate(*args, **kwargs)
+        results.append(result)
+        return result
+
+    backend.equilibrate = capture_result
+    handle = EngineHandle(
+        name="magemin",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    monkeypatch.setattr(
+        binary_pot_battery, "open_battery_engine", lambda _name: handle
+    )
+
+    work = F.work()
+    experiment = F.tabulation_experiment()
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    observation = F.observation(
+        "magemin-worker-lifecycle",
+        experiment.experiment_id,
+        identity,
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+    )
+    predictions: list[EnginePrediction] = []
+
+    def capture_prediction(engine, observation, *, handles, **kwargs):
+        prediction = predict_with_engine(
+            engine, observation, handles=handles, **kwargs
+        )
+        predictions.append(prediction)
+        return prediction
+
+    import simulator.battery.score as score_module
+
+    residuals, _candidates, _events = score_module._score_store_with_decisions(
+        context,
+        engines=(Engine.MAGEMIN,),
+        include_diagnostics=False,
+        predict=capture_prediction,
+    )
+
+    assert len(results) == 1
+    assert results[0].status == "not_converged"
+    assert (
+        results[0].diagnostics["backend_failure_exception"] == "EngineWorkerDied"
+    )
+    assert len(predictions) == 1
+    prediction = predictions[0]
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert (
+        prediction.refusal_detail["reason"] == "engine_transport_error:magemin"
+    )
+    assert prediction.value is None
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert (
+        residual.refusal.detail["reason"] == "engine_transport_error:magemin"
+    )
+    assert not residual.score_eligible
+    assert pool.close_calls == 1
+
+    monkeypatch.setattr(
+        score_module,
+        "_equilibrate_phase_assemblage",
+        lambda *_args, **_kwargs: EquilibriumResult(status="not_converged"),
+    )
+    physical_nonconvergence = predict_with_engine(
+        Engine.MAGEMIN, observation, handles={}
+    )
+    assert physical_nonconvergence.refusal_reason is RefusalReason.UNSUPPORTED
+    assert physical_nonconvergence.refusal_detail["reason"] == (
+        "phase_not_in_assemblage"
+    )
 
 
 def test_phase_prediction_closes_replacement_for_read_only_handle_map(

@@ -276,6 +276,7 @@ def test_isolated_cell_request_reopens_dead_backend(
         )
 
     stale = make_handle("fake", live=False)
+    stale_backend = stale.backend
     replacement = make_handle("fake", live=True)
     monkeypatch.setattr(battery, "open_battery_engine", lambda _name: replacement)
 
@@ -292,8 +293,98 @@ def test_isolated_cell_request_reopens_dead_backend(
     )
 
     assert result == {"status": "ok"}
-    assert stale.backend.closed
+    assert stale_backend.closed
     assert resource.handle is replacement
+
+
+@pytest.mark.parametrize("raises", (False, True), ids=("success", "exception"))
+def test_run_isolated_cell_worker_closes_acquired_handle(
+    monkeypatch: pytest.MonkeyPatch, raises: bool
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    class FakeBackend:
+        def __init__(self) -> None:
+            self.close_calls = 0
+
+        def close(self) -> None:
+            self.close_calls += 1
+
+    backend = FakeBackend()
+    handle = EngineHandle(
+        name="fake",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    monkeypatch.setattr(battery, "open_battery_engine", lambda _name: handle)
+
+    def equilibrate(*_args, **_kwargs):
+        if raises:
+            raise RuntimeError("fake cell failure")
+        return SimpleNamespace(as_payload=lambda: {"status": "ok"})
+
+    monkeypatch.setattr(battery, "equilibrate_cell", equilibrate)
+    payload = {
+        "pot_id": "isolated-worker-test",
+        "composition_wt_pct": {"SiO2": 100.0},
+        "why": "handle ownership test",
+        "po2": {"mode": "engine_default"},
+        "engine": "fake",
+        "temperature_K": 1500.0,
+    }
+
+    if raises:
+        with pytest.raises(RuntimeError, match="fake cell failure"):
+            battery.run_isolated_cell_worker(payload)
+    else:
+        assert battery.run_isolated_cell_worker(payload) == {"status": "ok"}
+    assert backend.close_calls == 1
+
+
+def test_run_isolated_cell_worker_leaves_supplied_handle_to_owner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    class FakeBackend:
+        def __init__(self) -> None:
+            self.close_calls = 0
+
+        def close(self) -> None:
+            self.close_calls += 1
+
+    backend = FakeBackend()
+    handle = EngineHandle(
+        name="fake",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    monkeypatch.setattr(
+        battery,
+        "equilibrate_cell",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            as_payload=lambda: {"status": "ok"}
+        ),
+    )
+    payload = {
+        "pot_id": "isolated-worker-test",
+        "composition_wt_pct": {"SiO2": 100.0},
+        "why": "handle ownership test",
+        "po2": {"mode": "engine_default"},
+        "engine": "fake",
+        "temperature_K": 1500.0,
+    }
+
+    assert battery.run_isolated_cell_worker(payload, handle=handle) == {
+        "status": "ok"
+    }
+    assert backend.close_calls == 0
 
 
 def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> None:
