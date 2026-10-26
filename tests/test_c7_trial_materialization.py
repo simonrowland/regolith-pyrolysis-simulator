@@ -146,6 +146,12 @@ def test_rh03_hour9_seed_and_solved_sio_operands(monkeypatch):
     import simulator.evaporation as evaporation
     calculate = evaporation._frozen_flux_from_pressure
     solve = PyrolysisSimulator._solve_evaporative_oxygen_boundary
+    eligible = getattr(evaporation, '_eligible_surface_evaporation_carriers', lambda *a: frozenset())
+    # Replay the round-6 prefix to retain the independently captured hour-9
+    # inventory/backpressure operands; only that hour exercises the correction.
+    monkeypatch.setattr(evaporation, '_eligible_surface_evaporation_carriers',
+        lambda hour, *args: eligible(hour, *args) if hour.melt.hour >= 8 else frozenset(),
+        raising=False)
     seeds = []
     accepted = []
 
@@ -175,7 +181,7 @@ def test_rh03_hour9_seed_and_solved_sio_operands(monkeypatch):
         'source_pa': 51.367338836827116,
         'bulk_pa': 786.6334028886312,
     })
-    assert accepted and all(oxygen == 0.0 and 'SiO' not in carriers
+    assert accepted and all(oxygen > 0.0 and 'SiO' in carriers
                             for oxygen, carriers in accepted)
 
 
