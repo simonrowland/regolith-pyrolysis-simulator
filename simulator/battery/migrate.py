@@ -8864,7 +8864,6 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.H_MINUS_H298: (
         "enthalpy_increment",
         "H_minus_H298",
-        "H_rel_kJ_mol-1",
         "minus_delta_H_cool_kJ_mol-1",
         "value",
     ),

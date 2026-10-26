@@ -217,10 +217,12 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 195, pdf_page_index: 3, table: I}
         T_range_K: [1506, 1780]
-        phase: crystalline_pseudowollastonite_alpha_wollastonite
+        phase: cr
         condensed_form: {polymorph: pseudowollastonite}
         polymorph_notes: 'The authors identify the solid as α-wollastonite (pseudowollastonite).'
-        standard_state: 'Cooling enthalpy from each stated T to 298 K; values are per mole of CaSiO3.'
+        standard_state: 'Cooling enthalpy from each stated T to 298 K; values are per mole of CaSiO3. Table I prints this column as the enthalpy increment; Eq. (1) adds the 298 K solution heat to make Hrel.'
+        reference_temperature_K: 298
+        per: mol_species
         units: 'T in K; enthalpy in kJ mol−1 CaSiO3'
         values:
           quantity: negative_enthalpy_change_on_cooling
@@ -268,15 +270,13 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 195, pdf_page_index: 3, table: I}
         T_range_K: [1506, 1780]
-        phase: cr
+        phase: crystalline_pseudowollastonite_alpha_wollastonite
         condensed_form: {polymorph: pseudowollastonite}
         polymorph_notes: 'The authors identify the solid as α-wollastonite (pseudowollastonite).'
-        standard_state: 'Relative enthalpy Hrel defined by Eq. (1), from T to the 298 K reference.'
-        reference_temperature_K: 298
-        per: mol_species
-        units: 'kJ mol−1 CaSiO3'
+        standard_state: 'Relative enthalpy Hrel defined by Eq. (1), from T to the 298 K reference. Hrel is the cooling increment plus the 298 K solution heat, not H(T)-H(298 K).'
+        units: 'T in K; Hrel in kJ mol−1 CaSiO3'
         values:
-          quantity: H_minus_H298
+          quantity: relative_enthalpy
           method_class: measured_reduced
           table_csv: tables/adamkovicova-1980-casio3-heat-of-fusion/t1.csv
           points:
@@ -371,8 +371,9 @@ species:
         standard_state: 'Cooling enthalpy from each stated T to 298 K; values are per mole of CaSiO3.'
         units: 'T in K; enthalpy in kJ mol−1 CaSiO3'
         values:
-          quantity: negative_enthalpy_change_on_cooling
+          quantity: sample_dependent_enthalpy_change_on_cooling
           method_class: measured_direct
+          note: 'Printed pp. 194-195: melt ΔHcool depends on the structure of the glass formed on cooling in the drop calorimeter, so the drop is not liquid H(T)-H(298 K).'
           table_csv: tables/adamkovicova-1980-casio3-heat-of-fusion/t3.csv
           sign_convention: 'Table III explicitly prints −ΔHcool as positive values.'
           points:
@@ -409,13 +410,11 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 196, pdf_page_index: 4, table: III}
         T_range_K: [1829, 1961]
-        phase: l
-        standard_state: 'Relative enthalpy Hrel defined by Eq. (1), from T to the 298 K reference.'
-        reference_temperature_K: 298
-        per: mol_species
-        units: 'kJ mol−1 CaSiO3'
+        phase: CaSiO3_melt
+        standard_state: 'Relative enthalpy Hrel defined by Eq. (1), from T to the 298 K reference. Hrel is the cooling increment plus the solution heat of that sample, not liquid H(T)-H(298 K).'
+        units: 'T in K; Hrel in kJ mol−1 CaSiO3'
         values:
-          quantity: H_minus_H298
+          quantity: relative_enthalpy
           method_class: measured_reduced
           table_csv: tables/adamkovicova-1980-casio3-heat-of-fusion/t3.csv
           points:
