@@ -11459,6 +11459,45 @@ def test_g5_compilation_column_explode_migrate(tmp_path: Path) -> None:
     )
 
 
+def test_h298_compilation_migration_emits_printed_anchor_and_basis(
+    tmp_path: Path,
+) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(root, "pankratz-1984-usbm-b677", "table-0007.json")
+    _copy_compilation_record(root, "pankratz-1987-usbm-b689", "page-0003.json")
+    _copy_compilation_record(root, "pankratz-1994-usbm-b696", "page-0006.json")
+    _copy_compilation_record(
+        root,
+        "robie-waldbaum-1968-usgs-b1259",
+        "b1259-ht-0001-silver-reference-state.json",
+    )
+
+    result = migrate(root, write=False)
+    expected_sources = {
+        "pankratz-1984-usbm-b677",
+        "pankratz-1987-usbm-b689",
+        "pankratz-1994-usbm-b696",
+        "robie-waldbaum-1968-usgs-b1259",
+    }
+    h_rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id in expected_sources
+        and quantity_token(obs.identity) is Quantity.H_MINUS_H298
+    ]
+    assert {obs.source_id for obs in h_rows} == expected_sources
+    assert all(
+        obs.identity.subtype.is_value
+        and obs.identity.subtype.value == "H(T)-H(298.15 K)"
+        for obs in h_rows
+    )
+    assert all(
+        obs.identity.per.is_value
+        and obs.identity.per.value is PerBasis.MOL_SPECIES
+        for obs in h_rows
+    )
+
+
 def test_g5_compilation_column_mapping_mutation_proof() -> None:
     """Clearing label maps restores the pre-fix empty explode / census path."""
     from simulator.battery import migrate as migrate_mod
