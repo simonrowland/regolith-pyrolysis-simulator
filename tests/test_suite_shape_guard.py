@@ -67,9 +67,7 @@ HEAVY_ROSTER = frozenset({
     ("tests/chemistry/test_builtin_metallothermic_step_provider.py",
      "test_full_run_mass_balance_holds_with_kernel_committed_metallothermic"),
     ("tests/test_mass_balance.py",
-     "test_cumulative_transition_mass_closure_bounded"),
-    ("tests/test_run_executor.py",
-     "test_run_executor_partial_path_sets_status_and_decisions"),
+     "test_cumulative_transition_mass_closure_bounded_at_transitional_refusal"),
     ("tests/test_runner_smoke.py",
      "test_runner_records_operator_decision_in_shadow_trace"),
     ("tests/test_sio_tsweep_smoke.py", "test_sio_tsweep_cli_smoke_2x2x2_grid"),
@@ -187,9 +185,14 @@ def _group_names(item) -> list[str]:
     return sorted(set(names))
 
 
-def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
-    violations: list[str] = []
-    for item in request.session.items:
+def _suite_shape_violations(
+    items,
+    *,
+    roster=HEAVY_ROSTER,
+    check_phantoms: bool = False,
+) -> list[str]:
+    violations = []
+    for item in items:
         groups = _group_names(item)
         if len(groups) > 1:
             violations.append(
@@ -207,41 +210,116 @@ def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
                 f"recognized serialized-chain group "
                 f"(magemin_fullrun_<x> or serial; got {groups})"
             )
-        if _item_key(item) not in HEAVY_ROSTER:
+        if _item_key(item) not in roster:
             violations.append(
                 f"{item.nodeid}: timeout {ceiling:g}s but not in the "
                 "shrink-only heavy roster — reduce its cost or demote a "
                 "roster entry (see module docstring)"
             )
-    # ``request.session.items`` contains only items surviving pytest's
-    # selection filters. Inspect the yield functions directly so this tiering
-    # invariant still sees nodes deselected by ``-m`` or ``-k``.
+    if check_phantoms:
+        collected = {_item_key(item) for item in items}
+        for entry in sorted(roster - collected):
+            violations.append(
+                f"roster entry {entry} matches no collected test — "
+                "phantom row (typo or removed test); fix the name or "
+                "delete the entry"
+            )
+    return violations
+
+
+class _SyntheticItem:
+    def __init__(self, nodeid: str, marks=()):
+        self.nodeid = nodeid
+        self._marks = tuple(marks)
+
+    def get_closest_marker(self, name: str):
+        return next((mark for mark in self._marks if mark.name == name), None)
+
+    def iter_markers(self, name: str):
+        return (mark for mark in self._marks if mark.name == name)
+
+
+def test_suite_shape_guard_catches_phantom_nightly_roster_row_under_pr_selection(
+    tmp_path,
+) -> None:
+    test_file = tmp_path / "tests" / "test_synthetic.py"
+    test_file.parent.mkdir()
+    test_file.write_text(
+        "import pytest\n"
+        "@pytest.mark.nightly\n"
+        "def test_real_node():\n"
+        "    pass\n",
+        encoding="utf-8",
+    )
+    item = _SyntheticItem(
+        "tests/test_synthetic.py::test_real_node",
+        marks=(pytest.mark.nightly.mark,),
+    )
+
+    # This nightly node would be removed from session.items by the PR selector.
+    violations = _suite_shape_violations(
+        [item],
+        roster=frozenset({("tests/test_synthetic.py", "test_missing_node")}),
+        check_phantoms=True,
+    )
+
+    assert any("phantom row" in violation for violation in violations)
+
+
+def test_suite_shape_guard_catches_unrostered_nightly_node_under_pr_selection(
+    tmp_path,
+) -> None:
+    test_file = tmp_path / "tests" / "test_synthetic.py"
+    test_file.parent.mkdir()
+    test_file.write_text(
+        "import pytest\n"
+        "@pytest.mark.nightly\n"
+        "@pytest.mark.xdist_group('magemin_fullrun_a')\n"
+        "@pytest.mark.timeout(600)\n"
+        "def test_unrostered_heavy_node():\n"
+        "    pass\n",
+        encoding="utf-8",
+    )
+    item = _SyntheticItem(
+        "tests/test_synthetic.py::test_unrostered_heavy_node",
+        marks=(
+            pytest.mark.nightly.mark,
+            pytest.mark.xdist_group("magemin_fullrun_a").mark,
+            pytest.mark.timeout(600).mark,
+        ),
+    )
+
+    # The PR selector (``not serial and not nightly``) removes this node from
+    # session.items; the pre-selection collection audit still sees it.
+    violations = _suite_shape_violations(
+        [item], roster=frozenset(), check_phantoms=False
+    )
+
+    assert any(
+        "not in the shrink-only heavy roster" in violation
+        for violation in violations
+    )
+
+
+def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
+    all_items = getattr(
+        request.session,
+        "_suite_shape_collected_items",
+        request.session.items,
+    )
+    full_collection = len(all_items) > 1000
+    items_to_check = all_items if full_collection else request.session.items
+    violations = _suite_shape_violations(
+        items_to_check,
+        check_phantoms=full_collection,
+    )
+    # Inspect the yield functions directly so this tiering invariant sees
+    # nodes deselected by ``-m`` or ``-k``.
     violations.extend(_nightly_yield_violations())
-    # Phantom-roster check (2026-07-23 gate-3 catch): a roster row whose
-    # name matches no collected test silently un-rosters the real heavy
-    # test it was meant to cover (a truncated name survived exactly this
-    # way). Only enforceable when the whole suite is collected — under -k
-    # or single-file runs most roster rows are legitimately absent, so
-    # gate on a full-collection heuristic rather than skipping silently.
-    #
-    # Marker expressions (``-m``) also deselect real roster members by
-    # design (CI-tiering: ``@pytest.mark.nightly`` + ``-m "not nightly"``
-    # on the PR tier). Treat those as legitimately absent — do not report
-    # phantom rows when any mark expression is active. The group/duration-
-    # hint invariants still run; they only care about collected items.
-    if len(request.session.items) > 1000:
-        markexpr = (getattr(request.config.option, "markexpr", None) or "").strip()
-        if not markexpr:
-            collected = {_item_key(item) for item in request.session.items}
-            for entry in sorted(HEAVY_ROSTER - collected):
-                violations.append(
-                    f"roster entry {entry} matches no collected test — "
-                    "phantom row (typo or removed test); fix the name or "
-                    "delete the entry"
-                )
+    if full_collection:
         collected_groups = {
             group
-            for item in request.session.items
+            for item in all_items
             for group in _group_names(item)
         }
         hint_groups = set(

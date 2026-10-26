@@ -287,6 +287,15 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
             item.add_marker(PLAYWRIGHT_SKIP_MARK)
 
 
+def pytest_itemcollected(item: pytest.Item) -> None:
+    """Retain every collected item before pytest applies ``-m`` selection."""
+    collected = getattr(item.session, "_suite_shape_collected_items", None)
+    if collected is None:
+        collected = []
+        item.session._suite_shape_collected_items = collected
+    collected.append(item)
+
+
 # CI-speed (process-scoped VapoRock warm-boot cache): share one VR-5 warm pool
 # across lazy VapoRockProvider constructions within each pytest process.
 # Golden-neutral — equilibrate still runs; only the import/worker boot is
