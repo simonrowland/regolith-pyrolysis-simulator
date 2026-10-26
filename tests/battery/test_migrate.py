@@ -12312,6 +12312,53 @@ def test_thermochemical_calorie_to_kilojoule_conversion_is_independently_pinned(
     assert named.unit_trail == "thermochemical_cal_to_kJ_exact"
 
 
+def test_calorie_conventions_remain_distinct_and_unknown_variants_refuse() -> None:
+    from simulator.battery.migrate import (
+        CALORIE_15_C_J,
+        INTERNATIONAL_TABLE_CALORIE_J,
+        THERMOCHEMICAL_CALORIE_J,
+    )
+
+    assert THERMOCHEMICAL_CALORIE_J == Decimal("4.184")
+    assert CALORIE_15_C_J == Decimal("4.1855")
+    assert INTERNATIONAL_TABLE_CALORIE_J == Decimal("4.1868")
+
+    cal15_energy = _convert_compilation_amount(
+        Decimal("2"), Quantity.H_MINUS_H298, "cal.15 mole−1"
+    )
+    assert cal15_energy == (Decimal("0.0083710"), "calorie_15C_to_kJ_exact")
+    cal15_cp = _convert_compilation_amount(
+        Decimal("2"), Quantity.CP, "cal.15 mole−1 °C−1"
+    )
+    assert cal15_cp == (Decimal("8.3710"), "calorie_15C_to_J_exact")
+    cal15_cp_kelvin = _convert_compilation_amount(
+        Decimal("2"), Quantity.CP, "cal.15 mole−1 K−1"
+    )
+    assert cal15_cp_kelvin == cal15_cp
+
+    assert _convert_compilation_amount(
+        Decimal("1"), Quantity.CP, "cal/mol/K"
+    ) == (Decimal("4.184"), "thermochemical_calorie_to_J_exact")
+    assert _convert_compilation_amount(
+        Decimal("1"), Quantity.H_MINUS_H298, "cal_IT/mol"
+    ) == (Decimal("0.0041868"), "international_table_calorie_to_kJ_exact")
+    assert _convert_compilation_amount(
+        Decimal("1"), Quantity.H_MINUS_H298, "cal.16 mole−1"
+    ) is None
+    unknown = select_declared_source(
+        Quantity.H_MINUS_H298,
+        None,
+        {
+            "enthalpy_increment": "1",
+            "units": {"enthalpy_increment": "cal.16 mole−1"},
+        },
+    )
+    assert unknown.value.kind is ValueKind.UNAVAILABLE
+    assert unknown.value.unavailable_reason == (
+        "unsupported printed unit for enthalpy_increment"
+    )
+
+
 def test_g1_delta_fh_migrate_refuses_blank_units_and_admits_declared_point(
     tmp_path: Path,
 ) -> None:
@@ -16341,6 +16388,311 @@ def test_residue_series_keeps_legacy_no_temperature_point_ids(
     assert observation.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
     assert observation.identity.species.formula == "SiO2"
     assert observation.value.point == Decimal("27.17")
+def test_residue_identity_uses_only_printed_fo2_from_row_or_experiment(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.identity import profile_for
+
+    log_fO2 = {
+        "state": {"tag": "value", "value": "-0.68"},
+        "locator": {
+            "source_path": "raw/sugawara-1999-fixture.pdf",
+            "page": 5,
+            "published_page": 429,
+            "table": "2",
+            "row_label": "m48313",
+            "column_header": "Log fO2",
+        },
+    }
+
+    def migrate_fixture(*, row_fO2: bool, experiment_fO2: bool, label: str):
+        document = deepcopy(FIXTURE_EXTRACT)
+        document["source_id"] = "sugawara-1999-residue-fixture"
+        document["source"]["citation"] = "Sugawara-like synthetic residue row"
+        document["experiments"] = [
+            {
+                "experiment_id": "m48313",
+                "conditions": {"log_fO2": deepcopy(log_fO2)}
+                if experiment_fO2
+                else {},
+            }
+        ]
+        observation = {
+            "observation_id": f"residue-{label}",
+            "experiment": "m48313",
+            "type": "residue_component_composition",
+            "locator": {
+                "source_path": "raw/sugawara-1999-fixture.pdf",
+                "page": 5,
+                "published_page": 429,
+                "table": "2",
+                "row_label": "m48313",
+            },
+            "units": "wt%",
+            "phase": "glass",
+            "values": {
+                "quantity": "residue_component_composition",
+                "method_class": "measured_direct",
+                "FeO_wt_pct": "12.59",
+                "T_C": "1199",
+                "duration_h_as_published": "48",
+                "total_pressure_atm": "1",
+                "composition_wt_pct": {
+                    "SiO2": "43.47",
+                    "Al2O3": "14.43",
+                    "FeO": "20.34",
+                    "MgO": "5.70",
+                    "CaO": "14.11",
+                    "Na2O": "1.95",
+                },
+            },
+        }
+        if row_fO2:
+            observation["point_conditions"] = {
+                "fO2_log": deepcopy(log_fO2),
+            }
+        document["species"] = {"FeO": {"observations": [observation]}}
+        return _migrate_real_extract(
+            tmp_path / label,
+            "sugawara-1999-residue-fixture.yaml",
+            extract_doc=document,
+        )
+
+    expected_pa = Decimal("20892.96130854039483122233736")
+    for label, row_fO2, experiment_fO2 in (
+        ("row", True, False),
+        ("experiment", False, True),
+    ):
+        result = migrate_fixture(
+            row_fO2=row_fO2, experiment_fO2=experiment_fO2, label=label
+        )
+        observation = next(
+            row
+            for row in result.observations.values()
+            if row.source_id == "sugawara-1999-residue-fixture"
+            and row.identity.quantity.is_value
+            and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        )
+        assert observation.identity.fO2_Pa.is_value
+        assert observation.identity.fO2_Pa.value == expected_pa
+        assert observation.identity.temperature_K.value == Decimal("1472.15")
+        printed_condition = observation.point_conditions["fO2_log"]
+        assert printed_condition.state.value == Decimal("-0.68")
+        assert printed_condition.locator.table == "2"
+        assert "fO2_Pa" in profile_for(observation.identity).required
+
+    missing = migrate_fixture(
+        row_fO2=False, experiment_fO2=False, label="unprinted"
+    )
+    observation = next(
+        row
+        for row in missing.observations.values()
+        if row.source_id == "sugawara-1999-residue-fixture"
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    assert observation.identity.fO2_Pa.is_unknown
+    assert observation.identity.temperature_K.value == Decimal("1472.15")
+    outcome = identity_equal(observation.identity, observation.identity)
+    assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "fO2_Pa" in outcome.fields
+
+
+def test_residue_series_resolves_printed_oxygen_once_at_final_identity(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import Quantity
+
+    log_fO2 = {
+        "state": {"tag": "value", "value": "-0.68"},
+        "locator": {"page": 5, "table": "2", "column_header": "Log fO2"},
+    }
+
+    def migrate_series(
+        label: str,
+        *,
+        row_conditions: dict | None = None,
+        experiment_conditions: dict | None = None,
+        unbuffered: bool = False,
+        parent_ratio: bool = False,
+    ):
+        document = deepcopy(FIXTURE_EXTRACT)
+        document["source_id"] = "sugawara-1999-residue-series-fixture"
+        document["source"]["citation"] = "Sugawara-like synthetic residue series"
+        document["experiments"] = [
+            {
+                "experiment_id": "m48313",
+                "conditions": experiment_conditions or {},
+            }
+        ]
+        values = {
+            "quantity": "residue_component_composition",
+            "method_class": "measured_direct",
+            "series": [
+                {
+                    "T_C": "1199",
+                    "t_min": "48",
+                    "run_id": "m48313",
+                    "residue_ppm": "12.59",
+                    "point_conditions": row_conditions or {},
+                }
+            ],
+        }
+        if parent_ratio:
+            values.update(
+                {
+                    "po2_over_pK_as_published": "0.226",
+                    "P_K_atm_as_published": "1e-6",
+                    "oxygen_partial_pressure": {
+                        "value": "9e-7",
+                        "units": "atm",
+                        "locator": {"page": 5, "table": "2"},
+                    },
+                }
+            )
+        if unbuffered:
+            values["fO2_control"] = {"during_run": "none"}
+        document["species"] = {
+            "FeO": {
+                "observations": [
+                    {
+                        "observation_id": f"residue-series-{label}",
+                        "experiment": "m48313",
+                        "type": "residue_component_composition",
+                        "locator": {
+                            "source_path": "raw/sugawara-1999-fixture.pdf",
+                            "page": 5,
+                            "table": "2",
+                        },
+                        "phase": "glass",
+                        "units": "ppm",
+                        "values": values,
+                    }
+                ]
+            }
+        }
+        result = _migrate_real_extract(
+            tmp_path / label,
+            "sugawara-1999-residue-series-fixture.yaml",
+            extract_doc=document,
+        )
+        return next(
+            observation
+            for observation in result.observations.values()
+            if observation.identity.quantity.is_value
+            and observation.identity.quantity.value
+            is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and observation.point_conditions is not None
+            and "time_min" in observation.point_conditions
+        )
+
+    row_log = migrate_series(
+        "row-log", row_conditions={"fO2_log": deepcopy(log_fO2)}
+    )
+    assert row_log.identity.fO2_Pa.value == Decimal(
+        "20892.96130854039483122233736"
+    )
+
+    row_pressure = migrate_series(
+        "row-pressure",
+        row_conditions={
+            "oxygen_partial_pressure": {
+                "value": "0.2",
+                "units": "bar",
+                "locator": {"page": 5, "table": "2"},
+            }
+        },
+    )
+    assert row_pressure.identity.fO2_Pa.value == Decimal("20000")
+
+    inherited_log = migrate_series(
+        "experiment-log",
+        experiment_conditions={"log_fO2": deepcopy(log_fO2)},
+    )
+    assert inherited_log.identity.fO2_Pa.value == Decimal(
+        "20892.96130854039483122233736"
+    )
+
+    atm_log_fO2 = {
+        "state": {"tag": "value", "value": "-13.9"},
+        "units": "log10(atm)",
+        "locator": {"page": 5, "table": "2", "column_header": "Log fO2"},
+    }
+    expected_atm_pa = Decimal("1.275606173500439925962071498E-9")
+    row_atm_log = migrate_series(
+        "row-atm-log", row_conditions={"fO2_log": deepcopy(atm_log_fO2)}
+    )
+    experiment_atm_log = migrate_series(
+        "experiment-atm-log",
+        experiment_conditions={"log_fO2": deepcopy(atm_log_fO2)},
+    )
+    assert row_atm_log.identity.fO2_Pa.value == expected_atm_pa
+    assert experiment_atm_log.identity.fO2_Pa.value == expected_atm_pa
+
+    unbuffered_row_log = migrate_series(
+        "unbuffered-row-log",
+        row_conditions={"fO2_log": deepcopy(log_fO2)},
+        unbuffered=True,
+    )
+    assert unbuffered_row_log.identity.fO2_Pa.value == Decimal(
+        "20892.96130854039483122233736"
+    )
+
+    no_oxygen = migrate_series("no-oxygen")
+    assert no_oxygen.identity.fO2_Pa.is_unknown
+
+    parent_ratio = migrate_series("parent-ratio", parent_ratio=True)
+    assert parent_ratio.identity.fO2_Pa.is_unknown
+    assert "fO2_Pa" not in (parent_ratio.point_conditions or {})
+
+
+def test_residue_identity_rejects_disagreeing_derived_ratio_oxygen(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import Quantity
+
+    document = deepcopy(FIXTURE_EXTRACT)
+    document["source_id"] = "residue-rejected-derived-oxygen-fixture"
+    document["experiments"] = [{"experiment_id": "run-1", "conditions": {}}]
+    document["species"] = {
+        "FeO": {
+            "observations": [
+                {
+                    "observation_id": "residue-derived-ratio",
+                    "experiment": "run-1",
+                    "type": "residue_component_composition",
+                    "locator": {"page": 5, "table": "2"},
+                    "phase": "glass",
+                    "units": "wt%",
+                    "values": {
+                        "quantity": "residue_component_composition",
+                        "method_class": "measured_direct",
+                        "FeO_wt_pct": "12.59",
+                        "T_C": "1199",
+                        "po2_over_pK_as_published": "0.226",
+                        "P_K_atm_as_published": "1e-6",
+                        "oxygen_partial_pressure": {
+                            "value": "9e-7",
+                            "units": "atm",
+                            "locator": {"page": 5, "table": "2"},
+                        },
+                    },
+                }
+            ]
+        }
+    }
+    result = _migrate_real_extract(
+        tmp_path,
+        "residue-rejected-derived-oxygen-fixture.yaml",
+        extract_doc=document,
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    assert observation.identity.fO2_Pa.is_unknown
 
 
 def test_hashimoto_row_left_live_diagnostics_are_final(
@@ -17095,12 +17447,78 @@ def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path
                 "observation_id": "na_heat_content",
                 "type": "heat_capacity_and_heat_content_series",
                 "locator": {"table": "3", "row": "Na"},
-                "phase": "cr",
+                "phase": "l",
+                "per": "mol_species",
                 "units": "kJ/mol",
                 "values": {
                     "quantity": "H_minus_H298",
                     "enthalpy_increment": 2.0,
                     "T_K": 500,
+                    "standard_pressure_Pa": 100000,
+                },
+            },
+            {
+                "observation_id": "na_heat_content_reference",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "3", "row": "Na"},
+                "phase": "l",
+                "per": "mol_species",
+                "standard_state": "heat content relative to 298.15 K",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 3.0,
+                    "T_K": 600,
+                    "standard_pressure_Pa": 100000,
+                },
+            },
+            {
+                "observation_id": "na_heat_content_reference_phase",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "3", "row": "Na"},
+                "phase": "l",
+                "per": "mol_species",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 4.0,
+                    "T_K": 700,
+                    "standard_pressure_Pa": 100000,
+                    "method": "The enthalpy reference is the glass at 298.15 K.",
+                },
+            },
+            {
+                "observation_id": "na_heat_content_column_reference",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {
+                    "table": "3",
+                    "row": "Na",
+                    "column": "H_T-H_298",
+                },
+                "phase": "l",
+                "per": "mol_species",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 5.0,
+                    "T_K": 800,
+                    "standard_pressure_Pa": 100000,
+                },
+            },
+            {
+                "observation_id": "na_heat_content_printed_relation",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "3", "row": "Na"},
+                "phase": "l",
+                "per": "mol_species",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 6.0,
+                    "T_K": 900,
+                    "standard_pressure_Pa": 100000,
+                    "quantity_as_printed": "H1373(L) minus H298(S)",
+                    "printed_relation": "H1373(L) − H298(S) = 209.5",
                 },
             },
         ]
@@ -17140,6 +17558,78 @@ def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path
     assert quantity_token(heat_content.identity) is Quantity.H_MINUS_H298
     assert heat_content.value.kind is ValueKind.POINT
     assert heat_content.value.point == Decimal("2.0")
+    assert heat_content.identity.subtype is not None
+    assert heat_content.identity.subtype.is_unknown
+    incomplete = identity_equal(heat_content.identity, heat_content.identity)
+    assert incomplete.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert incomplete.fields == ("subtype",)
+
+    reference = by_id["na_heat_content_reference"]
+    assert reference.identity.subtype is not None
+    assert reference.identity.subtype.value == "H(T)-H(298.15 K)"
+    assert (
+        identity_equal(reference.identity, reference.identity).kind
+        is IdentityEqualKind.EQUAL
+    )
+
+    reference_phase = by_id["na_heat_content_reference_phase"]
+    assert reference_phase.identity.subtype is not None
+    assert reference_phase.identity.subtype.value == (
+        "H(T)-H(298.15 K); reference phase: glass"
+    )
+
+    column_reference = by_id["na_heat_content_column_reference"]
+    assert column_reference.identity.subtype is not None
+    assert column_reference.identity.subtype.value == "H(T)-H(298 K)"
+
+    printed_relation = by_id["na_heat_content_printed_relation"]
+    assert printed_relation.identity.subtype is not None
+    assert printed_relation.identity.subtype.value == (
+        "H(T)-H(298 K); reference phase: solid"
+    )
+
+    from simulator.battery.migrate import _enthalpy_increment_subtype
+
+    assert _enthalpy_increment_subtype(
+        {"locator": {"column": "H_T-H_298"}},
+        {"series": [{"T_K": 298.15, "enthalpy_increment": 0}]},
+    ) == "H(T)-H(298.15 K)"
+
+
+@pytest.mark.parametrize(
+    ("obs", "values"),
+    [
+        (
+            {"reference_phase": "liquid"},
+            {
+                "reference_temperature_K": 298,
+                "quantity_as_printed": "H1373(L) minus H298(S)",
+            },
+        ),
+        (
+            {},
+            {
+                "reference_temperature_K": 298,
+                "quantity_as_printed": "H1373(L) minus H298(S)",
+                "printed_relation": "H1373(L) minus H298(L) = 209.5",
+            },
+        ),
+        (
+            {},
+            {
+                "method": "Reference is the glass at 298 K.",
+                "quantity_as_printed": "H1373(L) minus H298(S)",
+            },
+        ),
+    ],
+    ids=("explicit-vs-relation", "relation-vs-relation", "method-vs-relation"),
+)
+def test_enthalpy_increment_conflicting_reference_phases_remain_unknown(
+    obs: dict[str, object], values: dict[str, object]
+) -> None:
+    from simulator.battery.migrate import _enthalpy_increment_subtype
+
+    assert _enthalpy_increment_subtype(obs, values) is None
 
 
 def test_fusion_temperature_join_preserves_matching_melting_point(tmp_path: Path) -> None:

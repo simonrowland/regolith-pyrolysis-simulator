@@ -195,7 +195,9 @@ def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInpu
         reference_state=reference_state_value(observation),
         activity_quantity=_activity_quantity(observation),
         measured_species=(
-            observation.identity.species.formula if observation is not None else None
+            observation.identity.species.formula
+            if observation is not None and observation.identity.species is not None
+            else None
         ),
         method=experiment.method,
     )
