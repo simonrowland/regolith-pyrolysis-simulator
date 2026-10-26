@@ -275,10 +275,8 @@ def test_predict_flag_finite_below_band_wall_input_completes():
                and record["reason"] for record in notices.values())
 
 
-@pytest.mark.parametrize("hours", [2, 24])
-def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
+def _rh03_run(hours):
     from simulator.runner import PyrolysisRun
-    from simulator.run_executor import RunExecutor
     from tests.test_lab_geometry_runtime import dynamic_lab_schedule, dynamic_surface_geometry_fixture
 
     schedule = dynamic_lab_schedule()
@@ -291,13 +289,20 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         for profile in (schedule["melt_temperature_C"], schedule["chamber_pressure_mbar"],
                         *schedule["surface_temperature_C"].values()):
             profile.append({**profile[-1], "t_h": float(hours)})
-    run = PyrolysisRun(
+    return PyrolysisRun(
         feedstock_id="lunar_mare_low_ti", campaign="C2A", hours=hours,
         mass_kg=1000.0, backend_name="internal-analytical",
         setpoints_patch={"lab_geometry": dynamic_surface_geometry_fixture()},
         lab_schedule=schedule, force_builtin_vapor_pressure=True,
         allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
     )
+
+
+@pytest.mark.parametrize("hours", [2, 24])
+def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
+    from simulator.run_executor import RunExecutor
+
+    run = _rh03_run(hours)
     execution = RunExecutor().execute(run._session_config())
     assert execution.status == "ok", execution.error_message
     assert len(execution.snapshots) == hours

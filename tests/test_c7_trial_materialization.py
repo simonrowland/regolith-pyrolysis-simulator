@@ -112,6 +112,46 @@ def test_nonzero_cro2_condensation_returns_gas_oxygen():
         close_test_owned_magemin_backend(sim)
 
 
+def test_rh03_hour9_seed_and_solved_sio_operands(monkeypatch):
+    from simulator.core import PyrolysisSimulator
+    from simulator.run_executor import RunExecutor
+    from tests.test_condensation_extrapolation_honesty import _rh03_run
+
+    calculate = PyrolysisSimulator._calculate_evaporation
+    solve = PyrolysisSimulator._solve_evaporative_oxygen_boundary
+    seeds = []
+    accepted = []
+
+    def observe_source(owner, equilibrium, **kwargs):
+        if owner.melt.hour == 8 and getattr(owner, '_frozen_evaporation_carriers', None) is None:
+            seeds.append({
+                'sio2_kg': owner.atom_ledger.kg_by_account('process.cleaned_melt')['SiO2'],
+                'intrinsic_bar': owner._last_vapor_pressure_diagnostic['source_reaction_fO2_bar'],
+                'source_pa': equilibrium.vapor_pressures_Pa['SiO'],
+                'bulk_pa': owner._evaporation_bulk_partials_pa()['SiO'],
+            })
+        return calculate(owner, equilibrium, **kwargs)
+
+    def observe_solve(owner, *args, **kwargs):
+        result = solve(owner, *args, **kwargs)
+        if owner.melt.hour == 8:
+            accepted.append((result.reaction_pO2_bar, result.payload[2]._frozen_evaporation_carriers))
+        return result
+
+    monkeypatch.setattr(PyrolysisSimulator, '_calculate_evaporation', observe_source)
+    monkeypatch.setattr(PyrolysisSimulator, '_solve_evaporative_oxygen_boundary', observe_solve)
+    execution = RunExecutor().execute(_rh03_run(9)._session_config())
+    assert execution.status == 'ok', execution.error_message
+    assert hex_tree(seeds[0]) == hex_tree({
+        'sio2_kg': 453.4187361911669,
+        'intrinsic_bar': 0.013,
+        'source_pa': 51.367338836827116,
+        'bulk_pa': 786.6334028886312,
+    })
+    assert accepted and all(oxygen == 0.0 and 'SiO' not in carriers
+                            for oxygen, carriers in accepted)
+
+
 def test_trial_ledger_still_refuses_unbalanced_transitions():
     from simulator.accounting.exceptions import UnbalancedTransitionError
     from simulator.accounting.ledger import snapshot_atom_ledger
