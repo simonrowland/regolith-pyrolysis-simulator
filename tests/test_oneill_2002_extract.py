@@ -98,3 +98,37 @@ def test_feo_table_7_rows_keep_their_own_printed_one_sigma():
         Decimal("0.01462079132824429539788449331"),
         Decimal("0.007325359695819540850617842192"),
     ]
+
+
+def test_phase_parent_pressure_inference_survives_in_observation_provenance():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    source_parents = [
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row.get("type") == "equilibrium_phase_composition"
+    ]
+    assert len(source_parents) == 230
+    pressure_source = source_parents[0]["provenance"]["identity"]["total_pressure_Pa"]
+    assert pressure_source["state"] == {"tag": "value", "value": "101325"}
+    assert pressure_source["inference"]["relation"] == "extract_inference"
+    assert "inferred=true" in pressure_source["inference"]["inputs"]
+
+    migrator = migrate_one_extract(ROOT, EXTRACT, index=None, aliases={})
+    migrator.finalize()
+    parents = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == document["source_id"]
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    ]
+    assert len(parents) == 230
+    for observation in parents:
+        assert observation.identity.total_pressure_Pa.value == Decimal("101325")
+        assert observation.provenance is not None
+        pressure = observation.provenance["identity"]["total_pressure_Pa"]
+        assert pressure["state"]["value"] == "101325"
+        assert pressure["inference"]["relation"] == "extract_inference"
+        assert "inferred=true" in pressure["inference"]["inputs"]

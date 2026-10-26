@@ -1041,6 +1041,20 @@ species:
     - observation_id: oneill_2002_table4_xfeo_ad_eutectic
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: &oneill_inferred_total_pressure
+        identity:
+          total_pressure_Pa:
+            state:
+              tag: value
+              value: '101325'
+            units: Pa
+            inference:
+              relation: extract_inference
+              inputs:
+                - inferred=true
+                - NOT PRINTED; inferred from the p. 155 oil-trap vent and taken as nominal 1 atm.
+              parameters: []
+              output_unit: Pa
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -1116,6 +1130,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_ad_fo
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -1191,6 +1206,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_ad_en
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -1266,6 +1282,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_ad_wo
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -1341,6 +1358,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_ad_qz
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -1416,6 +1434,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_ad_tio2
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -1493,6 +1512,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_a
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -1568,6 +1588,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_b
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -1643,6 +1664,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_c
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -1718,6 +1740,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_d
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -1793,6 +1816,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_e
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -1868,6 +1892,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_f
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -1943,6 +1968,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_g
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -2018,6 +2044,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_mas1
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -2091,6 +2118,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_mas2
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -2164,6 +2192,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_cas1
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -2237,6 +2266,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_cas2
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -2310,6 +2340,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_cas3
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -2383,6 +2414,7 @@ species:
     - observation_id: oneill_2002_table4_xfeo_cas4
       type: equilibrium_phase_composition
       units: mole_fraction
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -5492,6 +5524,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_ad_eutectic
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -5561,6 +5594,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_ad_eutectic
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -5634,6 +5668,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_ad_fo
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -5703,6 +5738,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_ad_fo
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -5776,6 +5812,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_ad_en
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -5845,6 +5882,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_ad_en
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -5918,6 +5956,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_ad_wo
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -5987,6 +6026,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_ad_wo
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6060,6 +6100,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_ad_qz
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6129,6 +6170,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_ad_qz
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6202,6 +6244,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_ad_tio2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6273,6 +6316,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_ad_tio2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6348,6 +6392,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_a
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6417,6 +6462,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_a
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6490,6 +6536,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_b
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6559,6 +6606,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_b
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6632,6 +6680,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_c
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6701,6 +6750,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_c
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6774,6 +6824,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_d
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6843,6 +6894,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_d
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6916,6 +6968,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_e
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -6985,6 +7038,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_e
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7058,6 +7112,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_f
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7127,6 +7182,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_f
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7200,6 +7256,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_g
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7269,6 +7326,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_g
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7342,6 +7400,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_mas1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7409,6 +7468,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_mas1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7480,6 +7540,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_mas2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7547,6 +7608,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_mas2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7618,6 +7680,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_cas1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7685,6 +7748,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_cas1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7756,6 +7820,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_cas2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7823,6 +7888,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_cas2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7894,6 +7960,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_cas3
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -7961,6 +8028,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_cas3
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8032,6 +8100,7 @@ species:
     - observation_id: oneill_2002_table3_ni_laicpms_cas4
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8099,6 +8168,7 @@ species:
     - observation_id: oneill_2002_table3_ni_emp_cas4
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8172,6 +8242,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_ad_eutectic
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8241,6 +8312,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_ad_eutectic
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8314,6 +8386,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_ad_fo
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8383,6 +8456,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_ad_fo
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8456,6 +8530,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_ad_en
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8525,6 +8600,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_ad_en
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8598,6 +8674,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_ad_wo
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8667,6 +8744,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_ad_wo
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8740,6 +8818,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_ad_qz
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8809,6 +8888,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_ad_qz
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8882,6 +8962,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_ad_tio2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -8953,6 +9034,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_ad_tio2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9028,6 +9110,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_a
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9097,6 +9180,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_a
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9170,6 +9254,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_b
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9239,6 +9324,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_b
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9312,6 +9398,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_c
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9381,6 +9468,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_c
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9454,6 +9542,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_d
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9523,6 +9612,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_d
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9596,6 +9686,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_e
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9665,6 +9756,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_e
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9738,6 +9830,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_f
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9807,6 +9900,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_f
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9880,6 +9974,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_g
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -9949,6 +10044,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_g
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10022,6 +10118,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_mas1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10089,6 +10186,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_mas1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10160,6 +10258,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_mas2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10227,6 +10326,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_mas2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10298,6 +10398,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_cas1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10365,6 +10466,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_cas1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10436,6 +10538,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_cas2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10503,6 +10606,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_cas2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10574,6 +10678,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_cas3
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10641,6 +10746,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_cas3
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10712,6 +10818,7 @@ species:
     - observation_id: oneill_2002_table3_co_laicpms_cas4
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10779,6 +10886,7 @@ species:
     - observation_id: oneill_2002_table3_co_emp_cas4
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10852,6 +10960,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_eutectic_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10921,6 +11030,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_eutectic_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -10990,6 +11100,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_eutectic_m10p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11059,6 +11170,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_eutectic_m10p60_r1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11128,6 +11240,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_eutectic_m10p60_r2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11197,6 +11310,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_eutectic_m10p60_r3
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11266,6 +11380,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_eutectic_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11335,6 +11450,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_eutectic_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11404,6 +11520,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_fo_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11473,6 +11590,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_fo_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11542,6 +11660,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_fo_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11611,6 +11730,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_fo_m10p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11680,6 +11800,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_fo_m10p60_r1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11749,6 +11870,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_fo_m10p60_r2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11818,6 +11940,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_fo_m10p60_r3
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11887,6 +12010,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_fo_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -11956,6 +12080,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_en_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12025,6 +12150,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_en_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12094,6 +12220,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_en_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12163,6 +12290,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_en_m10p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12232,6 +12360,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_en_m10p60_r1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12301,6 +12430,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_en_m10p60_r2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12370,6 +12500,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_en_m10p60_r3
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12439,6 +12570,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_en_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12508,6 +12640,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_en_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12577,6 +12710,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_wo_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12646,6 +12780,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_wo_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12715,6 +12850,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_wo_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12784,6 +12920,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_wo_m10p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12853,6 +12990,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_wo_m10p60_r1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12922,6 +13060,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_wo_m10p60_r2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -12991,6 +13130,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_wo_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13060,6 +13200,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_wo_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13129,6 +13270,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_qz_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13198,6 +13340,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_qz_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13267,6 +13410,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_qz_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13336,6 +13480,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_qz_m10p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13405,6 +13550,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_qz_m10p60_r1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13474,6 +13620,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_qz_m10p60_r2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13543,6 +13690,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_qz_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13612,6 +13760,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_qz_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13681,6 +13830,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_tio2_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13752,6 +13902,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_tio2_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13823,6 +13974,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_tio2_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13894,6 +14046,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_tio2_m10p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -13965,6 +14118,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_tio2_m10p60_r1
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14036,6 +14190,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_tio2_m10p60_r2
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14107,6 +14262,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_tio2_m10p60_r3
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14178,6 +14334,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_tio2_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14249,6 +14406,7 @@ species:
     - observation_id: oneill_2002_table2_mo_ad_tio2_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14320,6 +14478,7 @@ species:
     - observation_id: oneill_2002_table2_mo_a_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14389,6 +14548,7 @@ species:
     - observation_id: oneill_2002_table2_mo_a_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14458,6 +14618,7 @@ species:
     - observation_id: oneill_2002_table2_mo_a_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14527,6 +14688,7 @@ species:
     - observation_id: oneill_2002_table2_mo_a_m10p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14596,6 +14758,7 @@ species:
     - observation_id: oneill_2002_table2_mo_a_m10p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14665,6 +14828,7 @@ species:
     - observation_id: oneill_2002_table2_mo_a_m10p40
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14734,6 +14898,7 @@ species:
     - observation_id: oneill_2002_table2_mo_a_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14803,6 +14968,7 @@ species:
     - observation_id: oneill_2002_table2_mo_a_m10p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14872,6 +15038,7 @@ species:
     - observation_id: oneill_2002_table2_mo_a_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -14941,6 +15108,7 @@ species:
     - observation_id: oneill_2002_table2_mo_a_m9p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15010,6 +15178,7 @@ species:
     - observation_id: oneill_2002_table2_mo_b_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15079,6 +15248,7 @@ species:
     - observation_id: oneill_2002_table2_mo_b_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15148,6 +15318,7 @@ species:
     - observation_id: oneill_2002_table2_mo_b_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15217,6 +15388,7 @@ species:
     - observation_id: oneill_2002_table2_mo_b_m10p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15286,6 +15458,7 @@ species:
     - observation_id: oneill_2002_table2_mo_b_m10p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15355,6 +15528,7 @@ species:
     - observation_id: oneill_2002_table2_mo_b_m10p40
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15424,6 +15598,7 @@ species:
     - observation_id: oneill_2002_table2_mo_b_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15493,6 +15668,7 @@ species:
     - observation_id: oneill_2002_table2_mo_b_m10p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15562,6 +15738,7 @@ species:
     - observation_id: oneill_2002_table2_mo_b_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15631,6 +15808,7 @@ species:
     - observation_id: oneill_2002_table2_mo_b_m9p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15700,6 +15878,7 @@ species:
     - observation_id: oneill_2002_table2_mo_c_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15769,6 +15948,7 @@ species:
     - observation_id: oneill_2002_table2_mo_c_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15838,6 +16018,7 @@ species:
     - observation_id: oneill_2002_table2_mo_c_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15907,6 +16088,7 @@ species:
     - observation_id: oneill_2002_table2_mo_c_m10p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -15976,6 +16158,7 @@ species:
     - observation_id: oneill_2002_table2_mo_c_m10p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16045,6 +16228,7 @@ species:
     - observation_id: oneill_2002_table2_mo_c_m10p40
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16114,6 +16298,7 @@ species:
     - observation_id: oneill_2002_table2_mo_c_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16183,6 +16368,7 @@ species:
     - observation_id: oneill_2002_table2_mo_c_m10p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16252,6 +16438,7 @@ species:
     - observation_id: oneill_2002_table2_mo_c_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16321,6 +16508,7 @@ species:
     - observation_id: oneill_2002_table2_mo_c_m9p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16390,6 +16578,7 @@ species:
     - observation_id: oneill_2002_table2_mo_d_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16459,6 +16648,7 @@ species:
     - observation_id: oneill_2002_table2_mo_d_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16528,6 +16718,7 @@ species:
     - observation_id: oneill_2002_table2_mo_d_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16597,6 +16788,7 @@ species:
     - observation_id: oneill_2002_table2_mo_d_m10p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16666,6 +16858,7 @@ species:
     - observation_id: oneill_2002_table2_mo_d_m10p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16735,6 +16928,7 @@ species:
     - observation_id: oneill_2002_table2_mo_d_m10p40
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16804,6 +16998,7 @@ species:
     - observation_id: oneill_2002_table2_mo_d_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16873,6 +17068,7 @@ species:
     - observation_id: oneill_2002_table2_mo_d_m10p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -16942,6 +17138,7 @@ species:
     - observation_id: oneill_2002_table2_mo_d_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17011,6 +17208,7 @@ species:
     - observation_id: oneill_2002_table2_mo_d_m9p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17080,6 +17278,7 @@ species:
     - observation_id: oneill_2002_table2_mo_e_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17149,6 +17348,7 @@ species:
     - observation_id: oneill_2002_table2_mo_e_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17218,6 +17418,7 @@ species:
     - observation_id: oneill_2002_table2_mo_e_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17287,6 +17488,7 @@ species:
     - observation_id: oneill_2002_table2_mo_e_m10p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17356,6 +17558,7 @@ species:
     - observation_id: oneill_2002_table2_mo_e_m10p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17425,6 +17628,7 @@ species:
     - observation_id: oneill_2002_table2_mo_e_m10p40
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17494,6 +17698,7 @@ species:
     - observation_id: oneill_2002_table2_mo_e_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17563,6 +17768,7 @@ species:
     - observation_id: oneill_2002_table2_mo_e_m10p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17632,6 +17838,7 @@ species:
     - observation_id: oneill_2002_table2_mo_e_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17701,6 +17908,7 @@ species:
     - observation_id: oneill_2002_table2_mo_e_m9p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17770,6 +17978,7 @@ species:
     - observation_id: oneill_2002_table2_mo_f_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17839,6 +18048,7 @@ species:
     - observation_id: oneill_2002_table2_mo_f_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17908,6 +18118,7 @@ species:
     - observation_id: oneill_2002_table2_mo_f_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -17977,6 +18188,7 @@ species:
     - observation_id: oneill_2002_table2_mo_f_m10p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18046,6 +18258,7 @@ species:
     - observation_id: oneill_2002_table2_mo_f_m10p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18115,6 +18328,7 @@ species:
     - observation_id: oneill_2002_table2_mo_f_m10p40
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18184,6 +18398,7 @@ species:
     - observation_id: oneill_2002_table2_mo_f_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18253,6 +18468,7 @@ species:
     - observation_id: oneill_2002_table2_mo_f_m10p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18322,6 +18538,7 @@ species:
     - observation_id: oneill_2002_table2_mo_f_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18391,6 +18608,7 @@ species:
     - observation_id: oneill_2002_table2_mo_f_m9p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18460,6 +18678,7 @@ species:
     - observation_id: oneill_2002_table2_mo_mas1_m10p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18527,6 +18746,7 @@ species:
     - observation_id: oneill_2002_table2_mo_mas1_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18594,6 +18814,7 @@ species:
     - observation_id: oneill_2002_table2_mo_mas1_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18661,6 +18882,7 @@ species:
     - observation_id: oneill_2002_table2_mo_mas2_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18728,6 +18950,7 @@ species:
     - observation_id: oneill_2002_table2_mo_mas2_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18795,6 +19018,7 @@ species:
     - observation_id: oneill_2002_table2_mo_mas2_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18862,6 +19086,7 @@ species:
     - observation_id: oneill_2002_table2_mo_mas2_m10p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18929,6 +19154,7 @@ species:
     - observation_id: oneill_2002_table2_mo_mas2_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -18996,6 +19222,7 @@ species:
     - observation_id: oneill_2002_table2_mo_mas2_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19063,6 +19290,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas1_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19130,6 +19358,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas1_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19197,6 +19426,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas1_m10p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19264,6 +19494,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas1_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19331,6 +19562,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas1_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19398,6 +19630,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas2_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19465,6 +19698,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas2_m11p27
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19532,6 +19766,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas2_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19599,6 +19834,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas2_m10p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19666,6 +19902,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas2_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19733,6 +19970,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas2_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19800,6 +20038,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas4_m11p63
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19867,6 +20106,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas4_m11p00
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -19934,6 +20174,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas4_m10p60
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -20001,6 +20242,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas4_m10p20
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
@@ -20068,6 +20310,7 @@ species:
     - observation_id: oneill_2002_table2_mo_cas4_m9p80
       type: equilibrium_phase_composition
       units: ppm_mass
+      provenance: *oneill_inferred_total_pressure
       experiment: oneill-2002-fe-saturated-cmas
       regime: quench_equilibration
       locator:
