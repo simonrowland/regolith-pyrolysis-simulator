@@ -8,9 +8,11 @@ from typing import Any
 import pytest
 
 from simulator import condensation as condensation_module
+from simulator.accounting import resolve_species_formula
 from simulator.condensation import (
     CondensationModel,
     CondensationTrain,
+    MolarMassUnavailable,
     WallSaturationPressureRefusal,
     _antoine_psat_pa,
     _flowing_species_partial_pressures_pa,
@@ -349,6 +351,36 @@ def test_flowing_species_partial_pressure_limits() -> None:
         1000.0,
     )
     assert single_species["Na"] == pytest.approx(1000.0)
+
+
+def test_flowing_species_partial_pressure_uses_formula_for_unlisted_carrier() -> None:
+    carrier = "NaAlSi3O8"
+    assert carrier not in condensation_module.MOLAR_MASS
+    carrier_mass = resolve_species_formula(carrier).molar_mass_g_per_mol()
+    iron_mass = resolve_species_formula("Fe").molar_mass_g_per_mol()
+
+    partial_pressures = _flowing_species_partial_pressures_pa(
+        {
+            carrier: carrier_mass / 1000.0,
+            "Fe": iron_mass / 1000.0,
+        },
+        1000.0,
+    )
+
+    assert partial_pressures[carrier] == pytest.approx(500.0)
+    assert partial_pressures["Fe"] == pytest.approx(500.0)
+
+
+def test_flowing_species_partial_pressures_refuse_unknown_formula_as_a_set() -> None:
+    iron_mass = resolve_species_formula("Fe").molar_mass_g_per_mol()
+
+    with pytest.raises(MolarMassUnavailable) as refusal:
+        _flowing_species_partial_pressures_pa(
+            {"Fe": iron_mass / 1000.0, "Unobtainium": 1.0},
+            1000.0,
+        )
+
+    assert refusal.value.species == "Unobtainium"
 
 
 def test_flowing_species_partial_pressure_above_total_fails_loudly() -> None:

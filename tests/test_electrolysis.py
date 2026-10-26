@@ -16,14 +16,43 @@ from simulator.electrolysis import (
     MREElectrolysisInvalidInput,
     MREElectrolysisRefusal,
     MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+    MRE_MOLAR_MASS_UNAVAILABLE_REFUSAL,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
+    melt_account_mol_from_kg,
     mre_selectivity_weight,
 )
+from simulator.accounting import resolve_species_formula
 from simulator.run_executor import RunExecutor
 from simulator.runner import DATA_DIR
 from simulator.session import SimSessionConfig
 from simulator.state import MeltState
+
+
+def test_mre_melt_conversion_uses_formula_mass_without_legacy_entry(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    from simulator.electrolysis import MOLAR_MASS
+
+    monkeypatch.delitem(MOLAR_MASS, "Na2O")
+    na2o_mass = resolve_species_formula("Na2O").molar_mass_g_per_mol()
+    k2o_mass = resolve_species_formula("K2O").molar_mass_g_per_mol()
+    composition_kg = {"Na2O": 0.6, "K2O": 0.4}
+
+    account_mol = melt_account_mol_from_kg(composition_kg)
+
+    assert account_mol == pytest.approx({
+        "Na2O": composition_kg["Na2O"] * 1000.0 / na2o_mass,
+        "K2O": composition_kg["K2O"] * 1000.0 / k2o_mass,
+    })
+
+
+def test_mre_melt_conversion_refuses_unresolved_formula_as_a_set():
+    with pytest.raises(MREElectrolysisRefusal) as refusal:
+        melt_account_mol_from_kg({"FeO": 1.0, "Unobtainium": 0.25})
+
+    assert refusal.value.reason == MRE_MOLAR_MASS_UNAVAILABLE_REFUSAL
+    assert refusal.value.diagnostic["unresolved_species"] == ["Unobtainium"]
 
 
 def test_mre_baseline_multi_oxide_partition_is_typed_refusal_not_poisoned_hour(

@@ -4,6 +4,9 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator import evaporation as evaporation_module
+from simulator.accounting import resolve_species_formula
+from simulator.chemistry.melt_activity import single_cation_mole_fractions
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.runner import build_per_hour_summary
@@ -69,6 +72,47 @@ def _install_eligible_vapour_batch(sim):
 
     sim._resolve_evaporation_vapour_batch = _resolve
     return sim
+
+
+def test_freeze_gate_cation_fractions_use_formula_mass_when_legacy_mass_is_absent(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _sim(vapor_pressure_data, feedstocks_data, setpoints_data)
+    monkeypatch.delitem(evaporation_module.MOLAR_MASS, "Na2O")
+    na2o_mass = resolve_species_formula("Na2O").molar_mass_g_per_mol()
+    k2o_mass = resolve_species_formula("K2O").molar_mass_g_per_mol()
+
+    fractions = sim._single_cation_mole_fractions_from_wt_pct(
+        {"Na2O": 60.0, "K2O": 40.0}
+    )
+    expected = single_cation_mole_fractions(
+        {"Na2O": 60.0 / na2o_mass, "K2O": 40.0 / k2o_mass}
+    )
+
+    assert fractions == pytest.approx(expected)
+
+
+def test_freeze_gate_cation_fraction_refuses_unresolved_formula_without_renormalizing(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _sim(vapor_pressure_data, feedstocks_data, setpoints_data)
+
+    fractions = sim._single_cation_mole_fractions_from_wt_pct(
+        {"Na2O": 50.0, "Unobtainium": 50.0}
+    )
+
+    assert fractions == {}
+    refusals = [
+        notice
+        for notice in sim._reduced_real_repair_notices
+        if notice.get("kind") == "freeze_gate_cation_molar_mass_unavailable"
+    ]
+    assert [notice["species"] for notice in refusals] == ["Unobtainium"]
 
 
 def test_partial_melt_offgassing_diagnostic_warns_on_partition_fallback(
