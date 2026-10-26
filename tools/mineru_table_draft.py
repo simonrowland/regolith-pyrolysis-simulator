@@ -24,11 +24,18 @@ import yaml
 
 
 _CHUNK_START = re.compile(r"p(\d+)-p\d+")
+_TABLE_LABEL_PREFIX = r"(?:tabelle|tableau|table|tab\.?)\s*(?:no\.?\s*)?"
+_TABLE_LABEL_PREFIX_RE = re.compile(r"^" + _TABLE_LABEL_PREFIX, re.IGNORECASE)
 _TABLE_CAPTION_LABEL = re.compile(
-    r"^\s*(?:[#>*_`|~]+\s*)?(?:tableau|table|tab\.?)\s*(?:no\.?\s*)?"
-    r"([IVXLCDM]+(?:\.\d+)*|\d+(?:\.\d+)*[A-Z]?|[A-Z](?:-\d+)?)\b",
+    r"^\s*(?:[#>*_`|~]+\s*)?"
+    + _TABLE_LABEL_PREFIX
+    + r"([IVXLCDM]+(?:\.\d+)*|\d+(?:\.\d+)*[A-Z]?|[A-Z](?:-\d+)?)\b",
     re.IGNORECASE,
 )
+_APPENDIX_HEADER_LABEL = re.compile(
+    r"^\s*(?:[#>*_`|~]+\s*)?annexe\s+([IVXLCDM]+)\b", re.IGNORECASE
+)
+_DRAFT_TABLE_ID = re.compile(r"_p(?P<page>\d+)_t(?P<table>\d+)_r\d+_c\d+$", re.I)
 _NUMBER = re.compile(
     r"^[+\-−–—]?(?:\d+(?:\.\d+)?|\.\d+)(?:\(\d+\))?(?:[eE][+\-]?\d+)?$"
 )
@@ -449,9 +456,7 @@ def _normalize_table_label(value: Any) -> str | None:
     if value is None:
         return None
     token = str(value).strip()
-    token = re.sub(
-        r"^(?:tableau|table|tab\.?)\s*(?:no\.?\s*)?", "", token, flags=re.I
-    )
+    token = _TABLE_LABEL_PREFIX_RE.sub("", token, count=1)
     token = token.strip().rstrip(".,:;")
     return token.upper() if token else None
 
@@ -465,15 +470,52 @@ def _printed_table_label(caption: Any, text: Any = None) -> str | None:
     return None
 
 
-def _published_page(item: Mapping[str, Any]) -> int | None:
+def _appendix_header_label(text: Any) -> str | None:
+    for value in _caption_lines(text):
+        for line in str(value).splitlines():
+            match = _APPENDIX_HEADER_LABEL.match(line)
+            if match:
+                return f"ANNEXE {match.group(1).upper()}"
+    return None
+
+
+def _caption_evidence(
+    content: list[Any], chunk_start_page: int
+) -> dict[int, set[str]]:
+    """Return printed captions by PDF page, including next-page appendix tables."""
+    captions_by_page: dict[int, set[str]] = defaultdict(set)
+    for item in content:
+        if not isinstance(item, Mapping) or item.get("page_idx") is None:
+            continue
+        page = absolute_pdf_page(chunk_start_page, int(item["page_idx"]))
+        if item.get("type") == "table" and any(
+            line.strip() for line in _caption_lines(item.get("table_caption"))
+        ):
+            captions_by_page.setdefault(page, set())
+        label = _printed_table_label(item.get("table_caption"), item.get("text"))
+        if label:
+            captions_by_page[page].add(label)
+        if item.get("type") == "header":
+            appendix_label = _appendix_header_label(item.get("text"))
+            if appendix_label:
+                captions_by_page[page].add(appendix_label)
+                captions_by_page[page + 1].add(appendix_label)
+    return captions_by_page
+
+
+def _published_page(item: Mapping[str, Any]) -> int | str | None:
     value = item.get("published_page")
     if value is None or isinstance(value, bool):
         return None
-    try:
-        page = int(value)
-    except (TypeError, ValueError):
-        return None
-    return page if page > 0 else None
+    if isinstance(value, int):
+        return value if value > 0 else None
+    if isinstance(value, str):
+        try:
+            page = int(value)
+        except ValueError:
+            return value if value else None
+        return page if page > 0 else None
+    return None
 
 
 def _locator_page(locator: Mapping[str, Any]) -> int | None:
@@ -617,11 +659,14 @@ def convert_source(
     table_dir = Path(out_dir).expanduser() / "tables" / sid
     table_dir.mkdir(parents=True, exist_ok=True)
     tables: list[dict[str, Any]] = []
+    caption_evidence: dict[int, set[str]] = defaultdict(set)
     for content_file in content_files:
         chunk_start_page = _chunk_start_page(content_file)
         content = json.loads(content_file.read_text(encoding="utf-8"))
         if not isinstance(content, list):
             raise ValueError(f"expected a list of content blocks in {content_file}")
+        for page, labels in _caption_evidence(content, chunk_start_page).items():
+            caption_evidence[page].update(labels)
         for item_index, item in enumerate(content):
             if not isinstance(item, Mapping) or item.get("type") != "table":
                 continue
@@ -656,6 +701,10 @@ def convert_source(
             {
                 "source_id": sid,
                 "source_files": [str(path) for path in content_files],
+                "caption_evidence": [
+                    {"page": page, "labels": sorted(labels)}
+                    for page, labels in sorted(caption_evidence.items())
+                ],
                 "tables": tables,
             },
             sort_keys=False,
@@ -689,10 +738,12 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                 table_label = _normalize_table_label(locator.get("table"))
                 if table_label == "UNKNOWN":
                     table_label = None
+                observation_id = str(observation.get("observation_id", ""))
+                draft_table = _DRAFT_TABLE_ID.search(observation_id)
                 points.append(
                     {
                         "species": species_name,
-                        "observation_id": observation.get("observation_id", ""),
+                        "observation_id": observation_id,
                         "point_index": point_index,
                         "path": (
                             f"species.{species_name}.observations"
@@ -701,6 +752,14 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                         ),
                         "pdf_page": pdf_page,
                         "table_number": table_label,
+                        "draft_table_key": (
+                            f"p{int(draft_table.group('page')):03d}-"
+                            f"t{int(draft_table.group('table')):02d}"
+                            if draft_table
+                            and pdf_page == int(draft_table.group("page"))
+                            else None
+                        ),
+                        "equation_locator": locator.get("equation") is not None,
                         "phase": point.get(
                             "phase", locator.get("phase", observation.get("phase"))
                         ),
@@ -757,18 +816,36 @@ def _locator_issues(
     """Find printed-caption mismatches and inconsistent published-page offsets."""
     issues: list[dict[str, Any]] = []
     captions_by_page: dict[int, set[str]] = defaultdict(set)
-    for table in index.get("tables") or []:
-        page = _locator_page(table.get("locator") or table)
-        if page is None:
-            continue
-        caption_label = _printed_table_label(table.get("caption"))
-        if caption_label:
-            captions_by_page[page].add(caption_label)
+    pages_with_caption_evidence: set[int] = set()
+    for evidence in index.get("caption_evidence") or []:
+        page = _locator_page(evidence)
+        if page is not None:
+            pages_with_caption_evidence.add(page)
+            captions_by_page[page].update(
+                label
+                for label in (
+                    _normalize_table_label(raw_label)
+                    for raw_label in evidence.get("labels") or []
+                )
+                if label
+            )
+    if "caption_evidence" not in index:
+        for table in index.get("tables") or []:
+            page = _locator_page(table.get("locator") or table)
+            if page is None:
+                continue
+            if any(line.strip() for line in _caption_lines(table.get("caption"))):
+                pages_with_caption_evidence.add(page)
+            caption_label = _printed_table_label(table.get("caption"))
+            if caption_label:
+                captions_by_page[page].add(caption_label)
 
     mappings = _walk_mappings(extract)
     for path, row, inherited_page in mappings:
         locator = row.get("locator")
         if not isinstance(locator, Mapping):
+            continue
+        if locator.get("equation") is not None:
             continue
         label = _normalize_table_label(locator.get("table"))
         if label is None or label == "UNKNOWN":
@@ -777,12 +854,25 @@ def _locator_issues(
         if page is None:
             continue
         page_captions = captions_by_page.get(page, set())
-        if label not in page_captions:
-            found = ", ".join(sorted(page_captions)) or "none"
+        if page not in pages_with_caption_evidence:
             issues.append(
                 {
                     "path": f"{path}.locator.table",
                     "page": page,
+                    "status": "unverifiable",
+                    "message": (
+                        f"cannot verify table label {label!r} on PDF page {page}: "
+                        "no printed-caption evidence is available"
+                    ),
+                }
+            )
+        elif label not in page_captions:
+            found = ", ".join(sorted(page_captions)) or "no printed labels"
+            issues.append(
+                {
+                    "path": f"{path}.locator.table",
+                    "page": page,
+                    "status": "locator-error",
                     "message": (
                         f"table label {label!r} is not among printed captions on "
                         f"PDF page {page} (found: {found})"
@@ -794,6 +884,10 @@ def _locator_issues(
     unique_pairs: set[tuple[int, int]] = set()
     for path, row, _ in mappings:
         if row.get("page") is None or row.get("published_page") is None:
+            continue
+        if isinstance(row["page"], bool) or isinstance(row["published_page"], bool):
+            continue
+        if not isinstance(row["published_page"], (int, str)):
             continue
         try:
             page = int(row["page"])
@@ -826,6 +920,7 @@ def _locator_issues(
                     {
                         "path": path,
                         "page": page,
+                        "status": "locator-error",
                         "message": (
                             f"page/published_page offset {actual_offset:+d} "
                             f"contradicts mapped offset {expected_offset:+d}"
@@ -842,8 +937,12 @@ def compare_extract_to_draft(
     index = yaml.safe_load(index_path.read_text(encoding="utf-8")) or {}
     draft_by_page: dict[int, list[tuple[dict[str, Any], Decimal]]] = defaultdict(list)
     draft_by_table: dict[tuple[int, str], list[tuple[dict[str, Any], Decimal]]] = defaultdict(list)
+    draft_by_key: dict[str, list[tuple[dict[str, Any], Decimal]]] = defaultdict(list)
+    draft_table_keys: set[str] = set()
     for table in index.get("tables") or []:
         page = int(table["pdf_page"])
+        table_key = str(table["table_key"])
+        draft_table_keys.add(table_key)
         locator = table.get("locator") or {}
         table_label = _normalize_table_label(locator.get("table"))
         column_headers = {
@@ -875,6 +974,7 @@ def compare_extract_to_draft(
                         "flags": json.loads(cell["flags"] or "[]"),
                     }
                     draft_by_page[page].append((candidate, number))
+                    draft_by_key[table_key].append((candidate, number))
                     if table_label and table_label != "UNKNOWN":
                         draft_by_table[(page, table_label)].append((candidate, number))
 
@@ -883,9 +983,15 @@ def compare_extract_to_draft(
     for point in _numeric_points(extract):
         page = point["pdf_page"]
         table_number = point["table_number"]
-        location = (page, table_number)
-        if page is None:
+        draft_table_key = point.pop("draft_table_key")
+        equation_locator = point.pop("equation_locator")
+        keyed_candidates = draft_by_key.get(draft_table_key, [])
+        use_draft_table_key = draft_table_key in draft_table_keys
+        location = (page, draft_table_key if use_draft_table_key else table_number)
+        if equation_locator or page is None:
             indexed_candidates = []
+        elif use_draft_table_key:
+            indexed_candidates = keyed_candidates
         elif table_number is None:
             indexed_candidates = draft_by_page.get(page, [])
         else:
@@ -914,6 +1020,8 @@ def compare_extract_to_draft(
         if matched is not None:
             consumed[location].add(matched_index)
             status = "matched" if has_location else "presence-only"
+        elif equation_locator:
+            status = "unverifiable"
         elif indexed_candidates:
             status = "mismatch"
         else:
@@ -934,11 +1042,11 @@ def compare_extract_to_draft(
                 "point_index": "",
                 "pdf_page": issue["page"],
                 "value": "",
-                "status": "locator-error",
                 "matched_cell": None,
                 "draft_candidate_count": 0,
                 "path": issue["path"],
                 "locator_issue": issue["message"],
+                "status": issue.get("status", "locator-error"),
             }
         )
     for result in results:
@@ -986,6 +1094,7 @@ def _compare_command(args: argparse.Namespace) -> int:
         f"compare: matched={counts['matched']} no-match={counts['no-match']} "
         f"mismatch={counts['mismatch']} presence-only={counts['presence-only']} "
         f"locator-error={counts['locator-error']} "
+        f"unverifiable={counts['unverifiable']} "
         f"total={len(results)}",
         file=sys.stderr,
     )

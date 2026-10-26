@@ -118,6 +118,7 @@ def test_printed_caption_label_wins_over_table_block_ordinal(tmp_path: Path) -> 
     }
     assert "locator_todo" not in fifth_table
     assert draft._printed_table_label(["TABLE II. Caption text"]) == "II"
+    assert draft._printed_table_label(["Tabelle 2. Deutsche Bildunterschrift"]) == "2"
     assert (
         draft._printed_table_label(["Tableau III.3 : Légende"]) == "III.3"
     )
@@ -134,6 +135,71 @@ def test_captionless_table_locator_is_unknown_with_visible_todo(tmp_path: Path) 
 
     assert table["locator"] == {"page": 1, "table": "unknown"}
     assert "TODO" in table["locator_todo"]
+
+
+def test_published_folio_keeps_non_numeric_printed_text(tmp_path: Path) -> None:
+    table = draft._render_table(
+        {
+            "page_idx": 10,
+            "published_page": "SI-4",
+            "table_caption": ["Table S-1. Supplementary results"],
+            "table_body": "<table><tr><td>1.0</td></tr></table>",
+        },
+        block_ordinal=1,
+        source_file=Path("p001-p020_content_list.json"),
+        chunk_start_page=1,
+        table_dir=tmp_path,
+    )
+
+    assert table["locator"] == {
+        "page": 11,
+        "table": "S-1",
+        "published_page": "SI-4",
+    }
+
+
+def test_appendix_headers_cover_heading_and_following_table_page(tmp_path: Path) -> None:
+    source_root = tmp_path / "raw" / "appendix" / "ocr-mineru" / "p201-p214"
+    source_root.mkdir(parents=True)
+    (source_root / "content_list.json").write_text(
+        json.dumps(
+            [
+                {"type": "header", "page_idx": 1, "text": "ANNEXE II"},
+                {
+                    "type": "table",
+                    "page_idx": 2,
+                    "table_body": "<table><tr><td>1.0</td></tr></table>",
+                },
+                {
+                    "type": "table",
+                    "page_idx": 3,
+                    "table_caption": ["Tabelle 2. Werte"],
+                    "table_body": "<table><tr><td>2.0</td></tr></table>",
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    index_path = draft.convert_source(
+        "appendix", tmp_path / "draft", corpus_root=tmp_path / "raw"
+    )
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    captions = {row["page"]: row["labels"] for row in index["caption_evidence"]}
+
+    assert index["tables"][0]["locator"]["table"] == "unknown"
+    assert captions[202] == ["ANNEXE II"]
+    assert captions[203] == ["ANNEXE II"]
+    assert captions[204] == ["2"]
+    extract = {
+        "tables": [
+            {"page": 202, "locator": {"table": "Annexe II"}},
+            {"page": 203, "locator": {"table": "ANNEXE II"}},
+            {"page": 204, "locator": {"table": "Tabelle 2"}},
+        ]
+    }
+
+    assert draft.compare_extract_to_draft(extract, index_path) == []
 
 
 def test_each_mechanical_flag_fires_only_on_the_suspect_cell() -> None:
@@ -550,14 +616,165 @@ def test_compare_flags_fake_printed_table_label(tmp_path: Path) -> None:
     index_path = draft.convert_source(
         "caption-check", tmp_path / "draft", corpus_root=tmp_path / "raw"
     )
-    extract = {"tables": [{"page": 1, "locator": {"table": "6"}}]}
+    extract = {
+        "tables": [
+            {"page": 1, "locator": {"table": "6"}},
+            {"page": 11, "locator": {"table": "S-1", "published_page": "SI-4"}},
+        ]
+    }
 
     results = draft.compare_extract_to_draft(extract, index_path)
     locator_errors = [row for row in results if row["status"] == "locator-error"]
+    unverifiable = [row for row in results if row["status"] == "unverifiable"]
 
     assert len(locator_errors) == 1
     assert "table label '6'" in locator_errors[0]["locator_issue"]
     assert "found: 3" in locator_errors[0]["locator_issue"]
+    assert len(unverifiable) == 1
+    assert "PDF page 11" in unverifiable[0]["locator_issue"]
+
+
+def test_compare_treats_missing_caption_evidence_as_unverifiable(tmp_path: Path) -> None:
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(
+        yaml.safe_dump({"caption_evidence": [], "tables": []}), encoding="utf-8"
+    )
+    extract = {
+        "tables": [
+            {"page": 11, "locator": {"table": "S-1", "published_page": "SI-4"}},
+        ]
+    }
+
+    results = draft.compare_extract_to_draft(extract, index_path)
+
+    assert len(results) == 1
+    assert results[0]["status"] == "unverifiable"
+    assert "no printed-caption evidence" in results[0]["locator_issue"]
+
+
+def test_caption_text_without_a_printed_number_does_not_accept_guessed_label(
+    tmp_path: Path,
+) -> None:
+    source_root = tmp_path / "raw" / "unlabeled-caption" / "ocr-mineru" / "p001-p008"
+    source_root.mkdir(parents=True)
+    (source_root / "content_list.json").write_text(
+        json.dumps(
+            [
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_caption": ["A. Système Na₂O-SiO₂"],
+                    "table_body": "<table><tr><td>1.0</td></tr></table>",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    index_path = draft.convert_source(
+        "unlabeled-caption", tmp_path / "draft", corpus_root=tmp_path / "raw"
+    )
+    extract = {"tables": [{"page": 1, "locator": {"table": "20"}}]}
+
+    results = draft.compare_extract_to_draft(extract, index_path)
+
+    assert results[0]["status"] == "locator-error"
+    assert "no printed labels" in results[0]["locator_issue"]
+
+
+def test_equation_located_points_are_unverifiable_and_not_table_matched(
+    tmp_path: Path,
+) -> None:
+    source_root = tmp_path / "raw" / "equation" / "ocr-mineru" / "p001-p008"
+    source_root.mkdir(parents=True)
+    (source_root / "content_list.json").write_text(
+        json.dumps(
+            [
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_caption": ["Table 3. Printed caption."],
+                    "table_body": "<table><tr><td>1.5</td></tr></table>",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    index_path = draft.convert_source(
+        "equation", tmp_path / "draft", corpus_root=tmp_path / "raw"
+    )
+    extract = {
+        "species": {
+            "Fe": {
+                "observations": [
+                    {
+                        "observation_id": "equation_p001_t01_r02_c01",
+                        "locator": {"page": 1, "table": "3", "equation": "Eq. 4"},
+                        "values": {"points": [{"value": 1.5}]},
+                    }
+                ]
+            }
+        }
+    }
+
+    results = draft.compare_extract_to_draft(extract, index_path)
+
+    assert len(results) == 1
+    assert results[0]["status"] == "unverifiable"
+    assert results[0]["matched_cell"] is None
+    assert results[0]["draft_candidate_count"] == 0
+
+
+def test_compare_prefers_draft_table_id_when_printed_label_is_unknown(
+    tmp_path: Path,
+) -> None:
+    source_root = tmp_path / "raw" / "draft-id" / "ocr-mineru" / "p001-p008"
+    source_root.mkdir(parents=True)
+    (source_root / "content_list.json").write_text(
+        json.dumps(
+            [
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_body": "<table><tr><td>not numeric</td></tr></table>",
+                },
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_body": "<table><tr><td>1.5</td></tr></table>",
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+    index_path = draft.convert_source(
+        "draft-id", tmp_path / "draft", corpus_root=tmp_path / "raw"
+    )
+    extract = {
+        "species": {
+            "Fe": {
+                "observations": [
+                    {
+                        "observation_id": "sample_p001_t01_r02_c01",
+                        "locator": {"page": 1, "table": "unknown"},
+                        "values": {"points": [{"value": 1.5}]},
+                    },
+                    {
+                        "observation_id": "sample_p001_t02_r02_c01",
+                        "locator": {"page": 1, "table": "unknown"},
+                        "values": {"points": [{"value": 1.5}]},
+                    }
+                ]
+            }
+        }
+    }
+
+    results = draft.compare_extract_to_draft(extract, index_path)
+
+    assert results[0]["status"] == "no-match"
+    assert results[0]["draft_candidate_count"] == 0
+    assert results[1]["status"] == "presence-only"
+    assert results[1]["matched_cell"]["table_key"] == "p001-t02"
+    assert results[1]["draft_candidate_count"] == 1
 
 
 def test_compare_flags_page_pair_outside_mapping_page_offset(tmp_path: Path) -> None:
@@ -569,6 +786,7 @@ def test_compare_flags_page_pair_outside_mapping_page_offset(tmp_path: Path) -> 
             {"page": 4, "published_page": 409},
             {"page": 5, "published_page": 410},
             {"page": 6, "published_page": 999},
+            {"page": 11, "published_page": "SI-4"},
         ]
     }
 
@@ -838,4 +1056,6 @@ def test_compare_summary_prints_presence_only_count(tmp_path: Path, capsys) -> N
         argparse.Namespace(extract=str(extract_path), draft_index=str(index_path))
     )
 
-    assert "presence-only=1" in capsys.readouterr().err
+    summary = capsys.readouterr().err
+    assert "presence-only=1" in summary
+    assert "unverifiable=0" in summary
