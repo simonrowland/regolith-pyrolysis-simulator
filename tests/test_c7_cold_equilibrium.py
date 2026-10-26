@@ -12,8 +12,9 @@ def test_cold_step_queries_condensed_backend_once(monkeypatch):
     sim = simulation('lunar_mare_low_ti', 'C0')
     calls = []
 
-    def condensed(**kwargs):
-        calls.append(kwargs)
+    def condensed(*, vapor_transport_pO2_bar=None, **kwargs):
+        calls.append({**kwargs, 'vapor_transport_pO2_bar': vapor_transport_pO2_bar,
+            'seed_pO2_bar': 10.0 ** sim._intrinsic_oxygen_publication()['published_intrinsic_fO2_log']})
         return EquilibriumResult(
             temperature_C=kwargs['temperature_C'], pressure_bar=kwargs['pressure_bar'],
             fO2_log=kwargs['fO2_log'], liquid_fraction=0.0, status='ok',
@@ -24,6 +25,7 @@ def test_cold_step_queries_condensed_backend_once(monkeypatch):
     try:
         sim.step()
         assert len(calls) == 1
+        assert calls[0]['vapor_transport_pO2_bar'] == calls[0]['seed_pO2_bar']
         assert sim._last_surface_oxygen_diagnostic['oxygen_flux_mol_m2_s'] == 0.0
         assert not sim._last_surface_oxygen_diagnostic['source_terms_mol_m2_s']
     finally:
