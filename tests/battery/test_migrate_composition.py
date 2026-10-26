@@ -1476,6 +1476,209 @@ def test_mass_percent_composition_keeps_printed_map_and_derives_moles() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("amount_basis", "components_parser"),
+    (
+        (AmountBasis.MASS_PERCENT, migrate_module._mass_percent_components),
+        (AmountBasis.MOLE_PERCENT, migrate_module._mole_percent_components),
+    ),
+)
+def test_percent_component_identity_validation_is_pinned(
+    amount_basis: AmountBasis, components_parser
+) -> None:
+    def payload(components):
+        return {
+            "amount_basis": amount_basis.value,
+            "components": components,
+        }
+
+    assert components_parser(payload([["SiO2", "60"], ["MgO", "40"]])) == {
+        "SiO2": Decimal("60"),
+        "MgO": Decimal("40"),
+    }
+    assert components_parser(
+        payload([["SiO2", "60"], ["SiO2", "40"]])
+    ) is None
+    assert components_parser(
+        payload([["SiO2", "60"], ["unknown-component", "40"]])
+    ) is None
+
+
+def test_mass_percent_nonclosing_map_keeps_existing_conversion_behavior() -> None:
+    composition = migrate_module._composition_located_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": [["SiO2", "45"], ["MgO", "45"]],
+                },
+            }
+        }
+    )
+
+    assert composition.state.is_value
+    assert composition.state.value == wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("45"), "MgO": Decimal("45")}
+    )
+
+
+def test_mole_percent_composition_converts_to_mole_fraction() -> None:
+    composition = migrate_module._composition_located_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_mole_percent",
+                    "amount_basis": "mole_percent",
+                    "components": [["SiO2", "75.0"], ["MgO", "25.0"]],
+                },
+            },
+            "locator": {"table": "1"},
+        }
+    )
+
+    assert composition.state.is_value
+    assert composition.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert composition.state.value.as_map() == {
+        "SiO2": Decimal("0.75"),
+        "MgO": Decimal("0.25"),
+    }
+    assert composition.locator is not None
+    assert composition.locator.table == "1"
+
+
+def test_nonclosing_mole_percent_composition_is_flagged() -> None:
+    composition = migrate_module._composition_located_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_mole_percent",
+                    "amount_basis": "mole_percent",
+                    "components": [["SiO2", "45"], ["MgO", "45"]],
+                },
+            }
+        }
+    )
+
+    assert composition.state.is_unknown
+    assert composition.state.reason == (
+        "mole-percent composition does not close to 100 (sum=90)"
+    )
+
+
+@pytest.mark.parametrize("wrapped", [False, True])
+@pytest.mark.parametrize(
+    "components",
+    [
+        None,
+        [],
+        [["SiO2", None], ["MgO", "25.0"]],
+        [["SiO2", "not printed"], ["MgO", "25.0"]],
+    ],
+    ids=["missing", "empty", "null-amount", "nonnumeric-amount"],
+)
+def test_invalid_declared_mole_percent_composition_is_unknown_with_locator(
+    wrapped: bool, components
+) -> None:
+    body = {
+        "basis": "printed_mole_percent",
+        "amount_basis": "mole_percent",
+    }
+    if components is not None:
+        body["components"] = components
+    payload = {
+        "locator": {"table": "9", "note": "invalid printed map"},
+        "state": {"tag": "value", "value": body},
+    } if wrapped else {
+        **body,
+        "locator": {"table": "9", "note": "invalid printed map"},
+    }
+
+    composition = migrate_module._composition_located_from_plain(payload)
+
+    assert composition.state.is_unknown
+    assert composition.locator is not None
+    assert composition.locator.table == "9"
+
+
+@pytest.mark.parametrize("row_consumer", [False, True], ids=["sample", "row"])
+def test_inferred_mole_percent_matches_mole_fraction_consumer_provenance(
+    row_consumer: bool,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.waypoints import normalized_composition
+    from tests.battery.test_waypoints import _bench
+
+    def source_composition(amount_basis: str, amounts: list[list[str]]):
+        return {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_composition",
+                    "amount_basis": amount_basis,
+                    "components": amounts,
+                },
+            },
+            "inferred": True,
+            "locator": {"table": "1", "note": "author-derived map"},
+        }
+
+    def consume(amount_basis: str, amounts: list[list[str]]):
+        source = source_composition(amount_basis, amounts)
+        experiment = tabulation_experiment("inferred-mole-percent")
+        if not row_consumer:
+            sample = _sample_from_plain({"initial_composition": source})
+            experiment = replace(experiment, sample=sample)
+            return normalized_composition(experiment, _bench())
+        located = migrate_module._composition_located_from_plain(source)
+        row = SimpleNamespace(
+            observation_id="inferred-composition-row",
+            experiment_id=experiment.experiment_id,
+            point_conditions={"composition": located},
+        )
+        return normalized_composition(experiment, _bench(), row)
+
+    percent_result = consume(
+        "mole_percent", [["SiO2", "75.0"], ["MgO", "25.0"]]
+    )
+    fraction_result = consume(
+        "mole_fraction", [["SiO2", "0.75"], ["MgO", "0.25"]]
+    )
+
+    assert percent_result.selected is None
+    assert percent_result.absence is not None
+    assert fraction_result.selected is None
+    assert fraction_result.absence is not None
+    assert percent_result.absence.reason is fraction_result.absence.reason
+    assert percent_result.absence.reason.value == "unsupported_print_form"
+
+
+def test_mole_percent_rounding_tolerance_does_not_renormalize() -> None:
+    composition = migrate_module._composition_located_from_plain(
+        {
+            "basis": "printed_mole_percent",
+            "amount_basis": "mole_percent",
+            "components": {
+                "SiO2": "33.3",
+                "MgO": "33.3",
+                "CaO": "33.3",
+            },
+        }
+    )
+
+    assert composition.state.is_value
+    assert composition.state.value.as_map() == {
+        "SiO2": Decimal("0.333"),
+        "MgO": Decimal("0.333"),
+        "CaO": Decimal("0.333"),
+    }
+    assert sum(composition.state.value.as_map().values()) == Decimal("0.999")
+
+
 def test_printed_wt_percent_does_not_replace_a_typed_initial_composition() -> None:
     printed = {"SiO2": "50", "FeOT": "30", "SO3": "20"}
     raw = {
@@ -3386,3 +3589,37 @@ def test_plante_1979_one_k2si2o5_charge_not_eight_series_experiments() -> None:
     assert _identity_composition_components(first) != _identity_composition_components(
         later
     )
+@pytest.mark.parametrize(
+    "components",
+    [
+        {"SiO2": "60", "MgO": "40"},
+        [["SiO2", "60"], ["MgO", "40"]],
+    ],
+    ids=["mapping", "pairs"],
+)
+def test_mass_percent_parser_behavior_is_pinned(components) -> None:
+    payload = {
+        "amount_basis": "mass_percent",
+        "components": components,
+    }
+    assert migrate_module._mass_percent_components(payload) == {
+        "SiO2": Decimal("60"),
+        "MgO": Decimal("40"),
+    }
+    assert migrate_module._mass_percent_components(
+        {**payload, "components": [["SiO2", "60"], ["SiO2", "40"]]}
+    ) is None
+    assert migrate_module._mass_percent_components(
+        {**payload, "components": [["Unsupported oxide", "60"]]}
+    ) is None
+
+
+def test_mass_percent_conversion_behavior_is_pinned() -> None:
+    payload = {
+        "amount_basis": "mass_percent",
+        "components": [["SiO2", "45"], ["MgO", "45"]],
+    }
+    composition = migrate_module._composition_from_plain(payload)
+    assert composition.as_map() == migrate_module.wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("45"), "MgO": Decimal("45")}
+    ).as_map()

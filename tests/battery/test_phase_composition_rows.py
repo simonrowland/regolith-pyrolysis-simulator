@@ -24,6 +24,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     ExecutionState,
     MetricOperation,
+    NoticeKind,
     Phase,
     PhaseRole,
     Quantity,
@@ -729,6 +730,69 @@ def test_phase_rows_score_component_dex_from_the_assemblage(
         )
         assert call["composition_kg"] == expected_kg
         assert set(call["composition_kg"]) == {"SiO2", "MgO"}
+
+
+def test_alphamelts_phase_score_surfaces_invalid_oxide_notice(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Kill mutation: discard_phase_oxide_projection_notices."""
+
+    def hook(engine, *, temperature_C, composition_kg, fO2_log, pressure_bar):
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={
+                "liquid": {
+                    "SiO2_Liq": 10.0,
+                    "FeO": float("nan"),
+                    "CaO": 0.0,
+                }
+            },
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    observation = F.observation(
+        "sio2-melt-repaired-map",
+        "sample-1",
+        identity,
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    prediction = predict_with_engine(Engine.ALPHAMELTS, observation)
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == Decimal("10")
+    assert [notice.kind for notice in prediction.notices] == [
+        NoticeKind.INPUT_OMITTED,
+        NoticeKind.INPUT_OMITTED,
+    ]
+    assert any(
+        "phase_compositions field 'FeO'" in notice.reason
+        for notice in prediction.notices
+    )
+    assert any(
+        "phase_compositions field 'CaO'" in notice.reason
+        for notice in prediction.notices
+    )
+    assert all(
+        notice.origin == "engine:alphamelts" for notice in prediction.notices
+    )
+
+    numeric, reason, _detail = populate_numeric(
+        quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        candidate=prediction.value,
+        reference=Decimal("5"),
+        source_relation=SourceRelation.INDEPENDENT,
+        operation_override=metric_operation_for_identity(identity),
+    )
+    assert reason is None
+    assert numeric is not None
+    assert numeric.value == _dex(Decimal("10"), Decimal("5"))
 
 
 def test_closed_phase_residual_keeps_derived_dex_decision_band(

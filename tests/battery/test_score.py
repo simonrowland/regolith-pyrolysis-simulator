@@ -6705,6 +6705,49 @@ def test_magemin_melt_activity_call_stays_observable() -> None:
             )
 
 
+def test_alphamelts_invalid_activity_notice_reaches_typed_score_notice() -> None:
+    """Kill mutation: drop_activity_repair_warnings_before_score_notices."""
+    from types import SimpleNamespace
+
+    from engines.alphamelts.domain import (
+        _canonical_oxide_activity_map_with_notices,
+    )
+    from simulator.battery.score import (
+        _match_reported_species_with_notices,
+        cell_notices,
+        match_reported_species,
+    )
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        engine_flags_from_result,
+    )
+
+    activities = {'SiO2': 0.42, 'Al2O3': float('nan'), 'FeO': 0.0}
+    oxide_activities, repair_warnings = (
+        _canonical_oxide_activity_map_with_notices(activities)
+    )
+    assert oxide_activities == {'SiO2': 0.42}
+    assert match_reported_species(
+        'SiO2', activities, oxide_activity=True
+    ) == ('SiO2', 0.42)
+    matched, score_repair_warnings = _match_reported_species_with_notices(
+        'SiO2', activities, oxide_activity=True
+    )
+    assert matched == ('SiO2', 0.42)
+    assert score_repair_warnings == repair_warnings
+
+    result = SimpleNamespace(warnings=repair_warnings, diagnostics={})
+    raw_notices, _authority, _band = engine_flags_from_result(result)
+    scored_notices = cell_notices(
+        Quantity.ACTIVITY,
+        Engine.ALPHAMELTS,
+        SimpleNamespace(notices=raw_notices),
+    )
+
+    assert [notice.kind for notice in scored_notices] == [NoticeKind.INPUT_OMITTED] * 2
+    assert [notice.reason for notice in scored_notices] == list(repair_warnings)
+    assert all(notice.origin == 'engine:alphamelts' for notice in scored_notices)
+
+
 def _hero_deck_score_row(
     *,
     rail: str,
