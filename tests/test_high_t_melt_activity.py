@@ -1229,7 +1229,10 @@ def test_temperature_neighbor_probe_selection_and_notice_follow_schedule(
     assert held["method"] == "nearest_converged_temperature_neighbor"
     assert held["anchor_temperature_K"] == target_T + selected_offset_K
     assert held["anchor_gap_K"] == selected_offset_K
-    assert held["gamma_applied"] == pytest.approx(0.36)
+    held_activity = vapor_pressure_module._high_t_activity_for_parent(
+        "SiO2", BASE_MELT_MOL, temperature_K=target_T, authority=authority,
+    )
+    assert held_activity.activity == pytest.approx(0.36)
     if selected_offset_K == 50.0:
         assert "schedule-derived" not in held["message"]
     else:
