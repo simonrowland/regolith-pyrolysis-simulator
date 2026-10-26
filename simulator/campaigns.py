@@ -1303,6 +1303,20 @@ class CampaignManager:
             resolved['stages'] = self._c2a_staged_enabled_stages()
             resolved['legacy_fraction'] = self._c2a_staged_depletion_flux_decay_fraction()
             resolved['has_log_slope'] = self._c2a_staged_has_log_slope_depletion(resolved['stages'])
+            stage_idx = min(max(0, int(self._c2a_staged_stage_idx)), len(resolved['stages']) - 1)
+            stage = resolved['stages'][stage_idx]
+            endpoint = stage.get('endpoint', {})
+            if not isinstance(endpoint, Mapping):
+                endpoint = {}
+            resolved['stage_idx'] = stage_idx
+            resolved['stage'] = stage
+            resolved['stage_species'] = self._c2a_staged_flux_decay_species(stage)
+            resolved['stage_duration_h'] = max(1, int(self._float(stage.get('duration_h'), 1.0)))
+            resolved['stage_minimum_h'] = self._float(
+                endpoint.get('min_hold_h', endpoint.get('min_hold_hr')),
+                self._float(cfg.get('stage_min_hold_h_default'), 1.0),
+            )
+            resolved['stage_log_slope_epsilon'] = self._c2a_staged_stage_depletion_log_slope_epsilon_per_hr(stage)
         elif campaign == CampaignPhase.C5:
             branch = 'branch_two' if record.branch == 'two' else 'branch_one'
             resolved['budget_hr'] = self._configured_max_hold_hr(campaign, branch)
@@ -1317,7 +1331,10 @@ class CampaignManager:
             resolved['acquisition_hr'], resolved['acquisition_source'] = self._c6_target_acquisition_limit()
             resolved['composition'] = self._configured_endpoint(campaign, 'composition_endpoint')
             resolved['composition_threshold_wt_pct'] = self._endpoint_float(campaign, resolved['composition'], 'threshold_wt_pct')
-            resolved['minimum_hr'] = self._float(ovr.get('min_hold_hr'), 0.0)
+            resolved['minimum_hr'] = self._float(
+                ovr.get('min_hold_hr'),
+                self._float(resolved['composition'].get('min_hold_hr'), 0.0),
+            )
         elif campaign == CampaignPhase.MRE_BASELINE:
             resolved['budget_hr'] = self._configured_max_hold_hr(campaign)
             resolved['rate'] = self._configured_endpoint(campaign, 'soft_endpoint')
@@ -2731,25 +2748,14 @@ class CampaignManager:
                     }
                 return self._finish_endpoint(melt, predicates, clocks, legacy=self.last_c2a_staged_termination)
 
-            stage_idx = min(
-                max(0, int(self._c2a_staged_stage_idx)),
-                len(stages) - 1,
-            )
+            stage_idx = resolved['stage_idx']
             self._c2a_staged_stage_idx = stage_idx
-            stage = stages[stage_idx]
-            species = self._c2a_staged_flux_decay_species(stage)
-            endpoint = stage.get('endpoint', {})
-            if not isinstance(endpoint, Mapping):
-                endpoint = {}
+            stage = resolved['stage']
+            species = resolved['stage_species']
             stage_elapsed_h = melt.campaign_hour - self._c2a_staged_stage_start_hour + 1
-            duration_h = max(1, int(self._float(stage.get('duration_h'), 1.0)))
-            min_hold_h = self._float(
-                endpoint.get('min_hold_h', endpoint.get('min_hold_hr')),
-                1.0,
-            )
-            log_slope_epsilon = (
-                self._c2a_staged_stage_depletion_log_slope_epsilon_per_hr(stage)
-            )
+            duration_h = resolved['stage_duration_h']
+            min_hold_h = resolved['stage_minimum_h']
+            log_slope_epsilon = resolved['stage_log_slope_epsilon']
             if log_slope_epsilon > 0.0:
                 log_slope_complete = self._c2a_staged_log_slope_depletion_complete(
                     species=species,

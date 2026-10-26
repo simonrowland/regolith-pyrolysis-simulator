@@ -198,6 +198,41 @@ def test_staged_operator_cap_records_concurrent_stage_predicates_without_advanci
     assert manager._c2a_staged_stage_idx == 0
 
 
+@pytest.mark.parametrize('endpoint,expected_ticks', [
+    ({}, 2),
+    ({'min_hold_hr': 3}, 3),
+    ({'min_hold_h': 1, 'min_hold_hr': 3}, 1),
+])
+def test_staged_minimum_is_resolved_from_data_with_existing_alias_priority(endpoint, expected_ticks):
+    setpoints = _setpoints()
+    cfg = setpoints['campaigns']['C2A_staged']
+    cfg['stage_min_hold_h_default'] = 2
+    cfg['stages'][0]['endpoint'].update(endpoint)
+    manager = CampaignManager(setpoints)
+    manager.overrides['C2A_STAGED'] = {'depletion_flux_decay_fraction': 0.1}
+    manager._c2a_staged_peak_flux_by_species = {'Na': 1.0, 'K': 1.0}
+    melt = _melt(CampaignPhase.C2A_STAGED, 0)
+    for hour in range(expected_ticks):
+        melt.campaign_hour = hour
+        assert manager.check_endpoint(melt, _flux(), CondensationTrain(), BatchRecord()) is False
+        assert manager._c2a_staged_stage_idx == (1 if hour == expected_ticks - 1 else 0)
+
+
+@pytest.mark.parametrize('runtime_minimum,expected_ticks', [(None, 3), (1, 1)])
+def test_c6_minimum_is_resolved_from_data_with_runtime_precedence(runtime_minimum, expected_ticks):
+    setpoints = _setpoints()
+    setpoints['campaigns']['C6']['composition_endpoint']['min_hold_hr'] = 3
+    manager = CampaignManager(setpoints)
+    if runtime_minimum is not None:
+        manager.overrides['C6'] = {'min_hold_hr': runtime_minimum}
+    record = BatchRecord()
+    melt = _melt(CampaignPhase.C6, 0, temperature_C=1400.0, composition_kg={'CaO': 100.0})
+    for hour in range(expected_ticks):
+        melt.campaign_hour = hour
+        assert manager.check_endpoint(melt, _flux(), CondensationTrain(), record) is (hour == expected_ticks - 1)
+        record.snapshots.append(HourSnapshot(campaign=CampaignPhase.C6, c6_at_hold_target=True))
+
+
 @pytest.mark.parametrize("mode", ["off", "not_applicable"])
 @pytest.mark.parametrize("eligible", [True, False])
 def test_yield_off_is_inert_without_reading_inventories(mode, eligible):
