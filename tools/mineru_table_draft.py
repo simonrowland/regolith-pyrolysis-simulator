@@ -42,7 +42,9 @@ Table keys:
   as ``values.T_K`` plus ``point_conditions.temperature_K``. ``C`` is stored as
   ``values.T_C`` only; the migrator derives kelvin
 - the locator row label is the temperature cell, or the species cell of a value
-  pair, otherwise the CSV row number
+  pair, otherwise the CSV row number. ``locator.table`` is the draft's printed
+  label, or ``unknown`` when the draft has none. The observation id keeps the
+  draft ordinal (``tNN``) used to select the mapping table
 - ``values`` — ``{column, species}`` plus optional ``phase``, ``evidence_class``,
   ``unit``, ``quantity``, ``uncertainty``, ``attribution``, and ``scale_factor``.
   ``scale_factor`` is ``{header, exponent, direction}`` for a printed power-of-ten
@@ -150,7 +152,10 @@ _TABLE_CAPTION_LABEL = re.compile(
 _APPENDIX_HEADER_LABEL = re.compile(
     r"^\s*(?:[#>*_`|~]+\s*)?annexe\s+([IVXLCDM]+)\b", re.IGNORECASE
 )
-_DRAFT_TABLE_ID = re.compile(r"_p(?P<page>\d+)_t(?P<table>\d+)_r\d+_c\d+$", re.I)
+_DRAFT_TABLE_ID = re.compile(
+    r"_p(?P<page>\d+)_t(?P<table>\d+)_r(?P<row>\d+)_c(?P<column>\d+)$",
+    re.I,
+)
 _NUMBER = re.compile(
     r"^[+\-−–—]?(?:\d+(?:\.\d+)?|\.\d+)(?:\(\d+\))?(?:[eE][+\-]?\d+)?$"
 )
@@ -998,19 +1003,29 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                 if table_label == "UNKNOWN":
                     table_label = None
                 draft_table = _DRAFT_TABLE_ID.search(observation_id)
-                # The _rN_cM suffix selects the draft table key. Cell coordinates
-                # come only from explicit table_row_number / table_column_number
-                # fields; reading them out of the id would reject a value match
-                # in a table whose printed label is unknown.
-                table_row_number = point.get(
+                # Explicit table_row_number / table_column_number fields win.
+                # Otherwise the emitted _rN_cM suffix is the cell. Compare drops
+                # those id coordinates when they hit no candidate, so a value in
+                # a table whose printed label is unknown can still match.
+                explicit_row = point.get(
                     "table_row_number",
                     locator.get("table_row_number", observation.get("table_row_number")),
                 )
-                table_column_number = point.get(
+                explicit_column = point.get(
                     "table_column_number",
                     locator.get(
                         "table_column_number", observation.get("table_column_number")
                     ),
+                )
+                row_from_id = explicit_row is None and draft_table is not None
+                column_from_id = explicit_column is None and draft_table is not None
+                table_row_number = (
+                    int(draft_table.group("row")) if row_from_id else explicit_row
+                )
+                table_column_number = (
+                    int(draft_table.group("column"))
+                    if column_from_id
+                    else explicit_column
                 )
                 points.append(
                     {
@@ -1038,6 +1053,8 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                         ),
                         "table_row_number": table_row_number,
                         "table_column_number": table_column_number,
+                        "row_from_id": row_from_id,
+                        "column_from_id": column_from_id,
                         "table_phase_column": point.get(
                             "table_phase_column",
                             locator.get(
@@ -1221,6 +1238,7 @@ def compare_extract_to_draft(
         for table in tables
     }
     scale_factors: dict[tuple[int, str, int], int] = {}
+    verified_header_cells: set[tuple[int, str, int, int]] = set()
     if mapping is not None:
         mapping = _require_mapping(mapping, "mapping")
         _unknown_keys(mapping, _DOCUMENT_KEYS, "mapping")
@@ -1230,6 +1248,16 @@ def compare_extract_to_draft(
             draft_table = indexed_tables.get((page, table_number))
             if draft_table is None:
                 continue
+            for entry in mapped_table.get("render_verified") or []:
+                if (
+                    not isinstance(entry, Mapping)
+                    or "row" not in entry
+                    or "column" not in entry
+                ):
+                    continue
+                verified_header_cells.add(
+                    (page, table_number, int(entry["row"]), int(entry["column"]))
+                )
             for measurement in _measurement_columns(mapped_table):
                 raw_scale = measurement.get("scale_factor")
                 if raw_scale is None:
@@ -1246,9 +1274,13 @@ def compare_extract_to_draft(
     draft_by_page: dict[
         int, list[tuple[dict[str, Any], Decimal, int]]
     ] = defaultdict(list)
-    draft_by_table: dict[
+    draft_by_label: dict[
         tuple[int, str], list[tuple[dict[str, Any], Decimal, int]]
     ] = defaultdict(list)
+    draft_by_ordinal: dict[
+        tuple[int, str], list[tuple[dict[str, Any], Decimal, int]]
+    ] = defaultdict(list)
+    labeled_table_keys: set[tuple[int, str]] = set()
     draft_by_key: dict[str, list[tuple[dict[str, Any], Decimal, int]]] = defaultdict(
         list
     )
@@ -1268,10 +1300,20 @@ def compare_extract_to_draft(
             for column in table.get("columns") or []
         }
         csv_path = index_path.parent / table["csv"]
-        table_ordinal = str(int(table_key.rsplit("-t", 1)[1]))
+        table_ordinal = str(_table_index_number(table))
+        if table_label and table_label != "UNKNOWN":
+            labeled_table_keys.add((page, table_label))
+            draft_by_label.setdefault((page, table_label), [])
         with csv_path.open(encoding="utf-8", newline="") as stream:
             for cell in csv.DictReader(stream):
-                if cell.get("row_type") not in (None, "", "body"):
+                row_type = cell.get("row_type")
+                selected_header = row_type not in (None, "", "body") and (
+                    page,
+                    table_ordinal,
+                    int(cell["row"]),
+                    int(cell["column"]),
+                ) in verified_header_cells
+                if row_type not in (None, "", "body") and not selected_header:
                     continue
                 if (
                     not cell["origin_row"]
@@ -1299,57 +1341,27 @@ def compare_extract_to_draft(
                     stored = (candidate, number, scale_exponent)
                     draft_by_page[page].append(stored)
                     draft_by_key[table_key].append(stored)
-                    draft_by_table[(page, table_ordinal)].append(stored)
+                    draft_by_ordinal[(page, table_ordinal)].append(stored)
                     if table_label and table_label != "UNKNOWN":
-                        draft_by_table[(page, table_label)].append(stored)
+                        draft_by_label[(page, table_label)].append(stored)
 
-    results: list[dict[str, Any]] = []
-    consumed: dict[tuple[int | None, str | None], set[int]] = defaultdict(set)
-    for point in _numeric_points(extract):
-        page = point["pdf_page"]
-        table_number = point["table_number"]
-        draft_table_key = point.pop("draft_table_key")
-        equation_locator = point.pop("equation_locator")
-        keyed_candidates = draft_by_key.get(draft_table_key, [])
-        use_draft_table_key = draft_table_key in draft_table_keys
-        locator_issue = ""
-        if equation_locator or page is None:
-            indexed_candidates = []
-        elif use_draft_table_key:
-            draft_table_label = draft_labels_by_key.get(draft_table_key)
-            if table_number is None:
-                indexed_candidates = keyed_candidates
-            elif draft_table_label == table_number:
-                indexed_candidates = keyed_candidates
-            elif draft_table_label is not None:
-                locator_issue = (
-                    f"draft observation ID selects printed table "
-                    f"{draft_table_label!r}, but locator declares {table_number!r}"
-                )
-                indexed_candidates = []
-            else:
-                indexed_candidates = draft_by_table.get((page, table_number), [])
-                use_draft_table_key = False
-        elif table_number is None:
-            indexed_candidates = draft_by_page.get(page, [])
-        else:
-            indexed_candidates = draft_by_table.get((page, table_number), [])
-        location = (
-            page,
-            draft_table_key if use_draft_table_key else table_number,
-        )
-        point_value = Decimal(str(point["value"]))
-        has_location = any(
-            point.get(key) is not None
-            for key in (
-                "table_number",
-                "table_row_number",
-                "table_column_number",
-                "phase",
-                "table_phase_column",
-            )
-        )
-        located_candidates = [
+    def candidates_for_table_number(
+        page_number: int | None, table_number: str | None
+    ) -> list[tuple[dict[str, Any], Decimal, int]]:
+        # A printed label owns its key. The draft ordinal is only the fallback
+        # when no table on the page carries that printed label.
+        if page_number is None or table_number is None:
+            return []
+        if (page_number, table_number) in labeled_table_keys:
+            return draft_by_label.get((page_number, table_number), [])
+        return draft_by_ordinal.get((page_number, table_number), [])
+
+    def located_rows(
+        point: Mapping[str, Any],
+        indexed_candidates: list[tuple[dict[str, Any], Decimal, int]],
+        location: tuple[int | None, str | None],
+    ) -> list[tuple[int, dict[str, Any], Decimal, int]]:
+        return [
             (index, candidate, value, exponent)
             for index, (candidate, value, exponent) in enumerate(indexed_candidates)
             if index not in consumed[location]
@@ -1367,6 +1379,67 @@ def compare_extract_to_draft(
             )
             and _phase_matches_column(point.get("phase"), candidate["column_header"])
         ]
+
+    results: list[dict[str, Any]] = []
+    consumed: dict[tuple[int | None, str | None], set[int]] = defaultdict(set)
+    for point in _numeric_points(extract):
+        page = point["pdf_page"]
+        table_number = point["table_number"]
+        draft_table_key = point.pop("draft_table_key")
+        equation_locator = point.pop("equation_locator")
+        keyed_candidates = draft_by_key.get(draft_table_key, [])
+        use_draft_table_key = draft_table_key in draft_table_keys
+        locator_issue = ""
+        if equation_locator or page is None:
+            indexed_candidates = []
+        elif use_draft_table_key:
+            draft_table_label = draft_labels_by_key.get(draft_table_key)
+            draft_ordinal = str(int(str(draft_table_key).rsplit("-t", 1)[1]))
+            label_occupied = (
+                table_number is not None
+                and (page, table_number) in labeled_table_keys
+            )
+            if table_number is None or draft_table_label == table_number or (
+                table_number == draft_ordinal and not label_occupied
+            ):
+                indexed_candidates = keyed_candidates
+            elif draft_table_label is not None:
+                locator_issue = (
+                    f"draft observation ID selects printed table "
+                    f"{draft_table_label!r}, but locator declares {table_number!r}"
+                )
+                indexed_candidates = []
+            else:
+                indexed_candidates = candidates_for_table_number(page, table_number)
+                use_draft_table_key = False
+        elif table_number is None:
+            indexed_candidates = draft_by_page.get(page, [])
+        else:
+            indexed_candidates = candidates_for_table_number(page, table_number)
+        location = (
+            page,
+            draft_table_key if use_draft_table_key else table_number,
+        )
+        point_value = Decimal(str(point["value"]))
+        row_from_id = bool(point.pop("row_from_id"))
+        column_from_id = bool(point.pop("column_from_id"))
+        located_candidates = located_rows(point, indexed_candidates, location)
+        if not located_candidates and (row_from_id or column_from_id):
+            if row_from_id:
+                point["table_row_number"] = None
+            if column_from_id:
+                point["table_column_number"] = None
+            located_candidates = located_rows(point, indexed_candidates, location)
+        has_location = any(
+            point.get(key) is not None
+            for key in (
+                "table_number",
+                "table_row_number",
+                "table_column_number",
+                "phase",
+                "table_phase_column",
+            )
+        )
         mapped_column = point.get("table_column_number")
         if mapped_column is None:
             mapped_column = point.get("table_phase_column")
@@ -1923,7 +1996,7 @@ def _origin_text(cells: list[dict[str, Any]], row: int, column: int) -> str:
 def _locator(
     *,
     page: int,
-    table_index: int,
+    printed_table: str,
     row_label: str,
     column_header: str,
     published_page: Any,
@@ -1931,7 +2004,7 @@ def _locator(
     locator: dict[str, Any] = {
         "page": page,
         "pdf_page_index": page - 1,
-        "table": str(table_index),
+        "table": printed_table,
         "row_label": _printed(row_label),
         "column_header": _printed(column_header),
     }
@@ -2053,6 +2126,8 @@ def _emit_table(
             raise ValueError(f"table mapping needs {key}")
     page = int(spec["page"])
     table_index = int(spec["table_index"])
+    stored_label = str((draft_table.get("locator") or {}).get("table") or "").strip()
+    printed_table = stored_label if stored_label.casefold() != "unknown" else "unknown"
     if int(draft_table["pdf_page"]) != page or _table_index_number(draft_table) != table_index:
         raise ValueError(
             f"draft table {draft_table['table_key']} does not match page {page} index {table_index}"
@@ -2128,7 +2203,7 @@ def _emit_table(
             temperature_text = temperature_cell["text"].strip()
             temperature_locator = _locator(
                 page=page,
-                table_index=table_index,
+                printed_table=printed_table,
                 row_label=temperature_text,
                 column_header=headers.get(int(temperature["column"]), ""),
                 published_page=published_page,
@@ -2141,7 +2216,7 @@ def _emit_table(
             else:
                 temperature_locator = _locator(
                     page=page,
-                    table_index=table_index,
+                    printed_table=printed_table,
                     row_label=temperature_text,
                     column_header=str(temperature.get("column_header") or ""),
                     published_page=published_page,
@@ -2208,7 +2283,7 @@ def _emit_table(
                 row_label = _origin_text(cells, row, default_label_column).strip()
             locator = _locator(
                 page=page,
-                table_index=table_index,
+                printed_table=printed_table,
                 row_label=row_label,
                 column_header=headers.get(column, ""),
                 published_page=published_page,

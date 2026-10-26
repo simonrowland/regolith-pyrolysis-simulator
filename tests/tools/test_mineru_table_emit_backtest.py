@@ -507,9 +507,14 @@ def _assert_emitted_cells_bind_to_mapping(
     index_path = draft.resolve_draft_index(draft_dir, mapping["source_id"])
     index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
     source_cells: dict[tuple[int, int, int, int], str] = {}
+    headers: dict[tuple[int, int], dict[int, str]] = {}
     for table in index["tables"]:
         page = int(table["pdf_page"])
         table_index = int(str(table["table_key"]).rsplit("-t", 1)[1])
+        headers[(page, table_index)] = {
+            int(column["column"]): str(column["header"])
+            for column in table["columns"]
+        }
         csv_path = index_path.parent / table["csv"]
         with csv_path.open(encoding="utf-8", newline="") as stream:
             for cell in csv.DictReader(stream):
@@ -523,13 +528,6 @@ def _assert_emitted_cells_bind_to_mapping(
                 source_cells[
                     (page, table_index, int(cell["row"]), int(cell["column"]))
                 ] = cell["text"]
-    headers = {
-        (int(table["pdf_page"]), int(table["source_table_number"])): {
-            int(column["column"]): str(column["header"])
-            for column in table["columns"]
-        }
-        for table in index["tables"]
-    }
     specs: dict[tuple[int, int], list[dict]] = defaultdict(list)
     for spec in mapping.get("tables") or []:
         specs[(int(spec["page"]), int(spec["table_index"]))].append(spec)
