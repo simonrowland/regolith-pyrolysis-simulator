@@ -54,6 +54,83 @@ def test_engine_arm_pots_unchanged() -> None:
     assert [pot.pot_id for pot in pots] == list(ENGINE_ARM_POT_IDS)
 
 
+@pytest.mark.parametrize("fail_cell", (False, True))
+def test_run_scoring_arm_closes_owned_handles_on_every_exit(
+    monkeypatch: pytest.MonkeyPatch, fail_cell: bool
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    import simulator.diagnostic_helpers.binary_pot_scoring as scoring
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.diagnostic_helpers.binary_pot_scoring import ScoringPot, run_scoring_arm
+
+    class FakeBackend:
+        def __init__(self) -> None:
+            self.close_calls = 0
+
+        def close(self) -> None:
+            self.close_calls += 1
+
+    class FakeCell:
+        status = "ok"
+        refusal_reason = None
+        engine = "fake"
+        pot_id = "fake-pot"
+        temperature_K = 1500.0
+        melt_activities: dict[str, float] = {}
+        gas_partial_pressures_Pa: dict[str, float] = {}
+        wall_s = 0.0
+
+        def as_payload(self):
+            return {}
+
+    backend = FakeBackend()
+    handle = EngineHandle(
+        name="fake",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    monkeypatch.setattr(battery, "probe_battery_engines", lambda _names: {"fake": handle})
+    monkeypatch.setattr(battery, "_emit_progress", lambda *_args: None)
+
+    def equilibrate(*_args, **_kwargs):
+        if fail_cell:
+            raise RuntimeError("fake scoring cell failure")
+        return FakeCell()
+
+    monkeypatch.setattr(battery, "equilibrate_cell", equilibrate)
+    monkeypatch.setattr(battery, "_engine_identities_from_toml", lambda: {})
+    monkeypatch.setattr(battery, "_refusal_matrix", lambda *_args, **_kwargs: {})
+    monkeypatch.setattr(scoring, "score_scoring_arm", lambda **_kwargs: [])
+
+    pot = ScoringPot(
+        pot_id="fake-pot",
+        source_id="fake-source",
+        observation_id="fake-observation",
+        sample_no=None,
+        temperatures_K=(1500.0,),
+        composition_basis="test",
+        composition_conversion="test",
+        composition_as_printed={"SiO2": 100.0},
+        composition_wt_pct={"SiO2": 100.0},
+        why="test handle ownership",
+    )
+    if fail_cell:
+        with pytest.raises(RuntimeError, match="fake scoring cell failure"):
+            run_scoring_arm(
+                engine_names=("fake",), pots=(pot,), extract_paths=()
+            )
+    else:
+        report = run_scoring_arm(
+            engine_names=("fake",), pots=(pot,), extract_paths=()
+        )
+        assert report["n_cells"] == 1
+
+    assert backend.close_calls == 1
+
+
 def test_scoring_pots_are_content_derived_from_extracts(tmp_path: Path) -> None:
     derived = build_scoring_pots_from_extracts(SCORING_EXTRACTS)
     loaded = load_scoring_pots(DEFAULT_POTS_PATH)

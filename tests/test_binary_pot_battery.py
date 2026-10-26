@@ -36,6 +36,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     _FLOOR_INVERSION_REASON,
     _internal_analytical_vapor_pressure_adapter,
     BinaryPot,
+    BatteryGrid,
     EngineHandle,
     EquilibrateCell,
     Po2Request,
@@ -53,6 +54,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     melts_certified_band,
     open_battery_engine,
     pairwise_residuals,
+    run_engine_arm,
     qualification_sio2_sweep_pots,
     reclassify_projected_composition_cells,
     recompute_residuals_from_report,
@@ -74,6 +76,78 @@ FIXTURE_REPORT = (
     / "binary_pot_battery"
     / "engine_arm_report.json"
 )
+
+
+@pytest.mark.parametrize("fail_cell", (False, True))
+def test_run_engine_arm_closes_owned_handles_on_every_exit(
+    monkeypatch: pytest.MonkeyPatch, fail_cell: bool
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    class FakeBackend:
+        def __init__(self) -> None:
+            self.close_calls = 0
+
+        def close(self) -> None:
+            self.close_calls += 1
+
+    backend = FakeBackend()
+    handle = EngineHandle(
+        name="fake",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    monkeypatch.setattr(battery, "probe_battery_engines", lambda _names: {"fake": handle})
+    monkeypatch.setattr(battery, "_emit_progress", lambda *_args: None)
+    monkeypatch.setattr(
+        battery,
+        "build_report",
+        lambda **_kwargs: {
+            "ok": True,
+            "hostname": "test",
+            "n_cells": 1,
+            "n_ok": 1,
+            "n_refused": 0,
+            "n_matched_residuals": 0,
+            "n_qualification_cells": 0,
+            "receipt": {"wall_s": 0.0, "cpu_s": 0.0},
+        },
+    )
+
+    def equilibrate(_handle, pot, *, temperature_K, **_kwargs):
+        if fail_cell:
+            raise RuntimeError("fake cell failure")
+        return SimpleNamespace(
+            arm="headline",
+            pot_id=pot.pot_id,
+            engine="fake",
+            temperature_K=temperature_K,
+            status="ok",
+            refusal_reason=None,
+            melt_activities={},
+            gas_partial_pressures_Pa={},
+            wall_s=0.0,
+        )
+
+    monkeypatch.setattr(battery, "equilibrate_cell", equilibrate)
+    pot = BinaryPot(
+        pot_id="fake-pot",
+        kato_1993_table4_system=None,
+        why="test handle ownership",
+        composition_wt_pct={"SiO2": 100.0},
+    )
+    grid = BatteryGrid(temperatures_K=(1500.0,), engine_default_po2=True, commanded_po2_bar=())
+
+    if fail_cell:
+        with pytest.raises(RuntimeError, match="fake cell failure"):
+            run_engine_arm(engine_names=("fake",), pots=(pot,), grid=grid)
+    else:
+        assert run_engine_arm(engine_names=("fake",), pots=(pot,), grid=grid)["ok"]
+
+    assert backend.close_calls == 1
 
 
 def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> None:

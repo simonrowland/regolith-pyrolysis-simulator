@@ -13,6 +13,7 @@ import math
 import os
 from dataclasses import replace
 from decimal import Decimal
+from types import MappingProxyType
 
 import pytest
 import yaml
@@ -677,6 +678,7 @@ def test_phase_rows_reuse_engine_handle_and_refuse_emfile_launch(
         def __init__(self) -> None:
             self.read_fd, self.write_fd = os.pipe()
             self.closed = False
+            self.close_calls = 0
 
         def equilibrate(self, **_kwargs) -> EquilibriumResult:
             return EquilibriumResult(
@@ -685,6 +687,7 @@ def test_phase_rows_reuse_engine_handle_and_refuse_emfile_launch(
             )
 
         def close(self) -> None:
+            self.close_calls += 1
             if self.closed:
                 return
             os.close(self.read_fd)
@@ -709,25 +712,34 @@ def test_phase_rows_reuse_engine_handle_and_refuse_emfile_launch(
     identity = _phase_identity(
         "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
     )
-    observation = F.observation(
-        "phase-worker-reuse",
-        experiment.experiment_id,
-        identity,
-        Decimal("5"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id=work.work_id,
+    observations = {
+        f"phase-worker-reuse-{index}": F.observation(
+            f"phase-worker-reuse-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal("5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=work.work_id,
+        )
+        for index in range(32)
+    }
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations=observations,
     )
-    handles: dict[str, object] = {}
-    try:
-        for _ in range(32):
-            prediction = predict_with_engine(
-                Engine.THERMOENGINE, observation, handles=handles
-            )
-            assert prediction.value == Decimal("10")
-        assert len(opened) == 1, f"opened {len(opened)} engine handles for 32 rows"
-    finally:
-        for handle in opened:
-            handle.backend.close()
+    import simulator.battery.score as score_module
+
+    residuals, _candidates, _events = score_module._score_store_with_decisions(
+        context,
+        engines=(Engine.THERMOENGINE,),
+        include_diagnostics=False,
+    )
+    assert len(residuals) == 32
+    assert all(residual.numeric is not None for residual in residuals)
+    assert len(opened) == 1, f"opened {len(opened)} engine handles for 32 rows"
+    assert opened[0].backend.close_calls == 1
+    observation = observations["phase-worker-reuse-0"]
 
     def fail_to_start(_name: str) -> EngineHandle:
         raise OSError(24, "Too many open files")
@@ -753,6 +765,190 @@ def test_phase_rows_reuse_engine_handle_and_refuse_emfile_launch(
     assert residual.status is ResidualStatus.REFUSED
     assert residual.numeric is None
     assert not residual.score_eligible
+
+
+def test_phase_rows_reopen_cached_handle_after_transport_death(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.engine_pool import EngineWorkerDied
+
+    opened: list[EngineHandle] = []
+
+    class FakeBackend:
+        def __init__(self, *, dies: bool) -> None:
+            self.live = True
+            self.close_calls = 0
+            self.dies = dies
+
+        def is_available(self) -> bool:
+            return self.live
+
+        def equilibrate(self, **_kwargs) -> EquilibriumResult:
+            if self.dies:
+                self.dies = False
+                self.live = False
+                raise EngineWorkerDied("call", "fake worker exited")
+            if not self.live:
+                raise AssertionError("a closed transport was reused")
+            return EquilibriumResult(
+                liquid_fraction=1.0,
+                phase_compositions={"liquid": {"SiO2": 10.0, "MgO": 40.0}},
+            )
+
+        def close(self) -> None:
+            self.close_calls += 1
+            self.live = False
+
+    def open_fake_engine(name: str) -> EngineHandle:
+        backend = FakeBackend(dies=not opened)
+        handle = EngineHandle(
+            name=name,
+            backend=backend,
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=False,
+        )
+        opened.append(handle)
+        return handle
+
+    monkeypatch.setattr(binary_pot_battery, "open_battery_engine", open_fake_engine)
+    work = F.work()
+    experiment = F.tabulation_experiment()
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    observations = {
+        f"phase-worker-death-{index}": F.observation(
+            f"phase-worker-death-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal("5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=work.work_id,
+        )
+        for index in range(2)
+    }
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations=observations,
+    )
+
+    predictions: list[EnginePrediction] = []
+
+    def predict_after_worker_death(engine, observation, *, handles, **kwargs):
+        try:
+            prediction = predict_with_engine(
+                engine, observation, handles=handles, **kwargs
+            )
+            predictions.append(prediction)
+            return prediction
+        except EngineWorkerDied as exc:
+            return EnginePrediction(
+                engine=engine,
+                channel=engine.value,
+                execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE),
+                authority=Authority.REFUSED,
+                coefficient_sources=(engine.value,),
+                lineage_complete=False,
+                refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+                refusal_detail={"reason": "unavailable", "detail": str(exc)},
+                identity=observation.identity,
+            )
+
+    import simulator.battery.score as score_module
+
+    residuals, _candidates, _events = score_module._score_store_with_decisions(
+        context,
+        engines=(Engine.THERMOENGINE,),
+        include_diagnostics=False,
+        predict=predict_after_worker_death,
+    )
+    by_id = {residual.reference: residual for residual in residuals}
+    assert by_id["phase-worker-death-0"].numeric is None
+    assert len(predictions) == 1
+    assert predictions[0].value == Decimal("10")
+    assert by_id["phase-worker-death-1"].numeric is not None
+    assert len(opened) == 2
+    assert opened[0].backend.close_calls >= 1
+    assert opened[1].backend.close_calls == 1
+
+
+def test_phase_prediction_closes_replacement_for_read_only_handle_map(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    class FakeBackend:
+        def __init__(self, *, live: bool) -> None:
+            self.live = live
+            self.close_calls = 0
+
+        def is_available(self) -> bool:
+            return self.live
+
+        def equilibrate(self, **_kwargs) -> EquilibriumResult:
+            assert self.live
+            return EquilibriumResult(
+                liquid_fraction=1.0,
+                phase_compositions={"liquid": {"SiO2": 10.0, "MgO": 40.0}},
+            )
+
+        def close(self) -> None:
+            self.close_calls += 1
+            self.live = False
+
+    stale_backend = FakeBackend(live=False)
+    stale = EngineHandle(
+        name=Engine.THERMOENGINE.value,
+        backend=stale_backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    opened: list[EngineHandle] = []
+
+    def open_fake_engine(name: str) -> EngineHandle:
+        handle = EngineHandle(
+            name=name,
+            backend=FakeBackend(live=True),
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=False,
+        )
+        opened.append(handle)
+        return handle
+
+    monkeypatch.setattr(binary_pot_battery, "open_battery_engine", open_fake_engine)
+    work = F.work()
+    experiment = F.tabulation_experiment()
+    identity = _phase_identity(
+        "SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    observation = F.observation(
+        "phase-read-only-handles",
+        experiment.experiment_id,
+        identity,
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE,
+        observation,
+        handles=MappingProxyType({Engine.THERMOENGINE.value: stale}),
+    )
+
+    assert prediction.value == Decimal("10")
+    assert len(opened) == 1
+    assert opened[0].backend.close_calls == 1
 
 
 def test_closed_phase_residual_keeps_derived_dex_decision_band(
