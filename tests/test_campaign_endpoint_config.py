@@ -285,6 +285,15 @@ def test_provider_refusal_uses_the_endpoint_owner_outcome():
     assert metadata['campaign_endpoints'] == [manager.last_termination]
 
 
+def test_ladder_completion_without_signal_does_not_claim_rate_depletion():
+    manager = CampaignManager(_setpoints())
+    melt = _melt(CampaignPhase.C5, 0, current_A=0.0)
+    melt.mre_c5_ladder_complete = True
+    assert manager.check_endpoint(melt, _flux(), CondensationTrain(), BatchRecord()) is True
+    assert manager.last_termination['winning_condition'] == 'ladder_complete'
+    assert manager.last_termination['classification'] == 'no_signal'
+
+
 def test_run_metadata_projects_campaign_endpoint_history_including_repeated_phases():
     outcome = {'campaign': 'C2A', 'winning_condition': 'maximum_hold'}
     execution = SimpleNamespace(simulator=SimpleNamespace(campaign_mgr=SimpleNamespace(last_termination=outcome)), session=SimpleNamespace(_step_results=[

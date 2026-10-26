@@ -3107,7 +3107,8 @@ class CampaignManager:
                 melt.mre_low_current_hours = next_low_hours
             bind_yield(at_cap)
             clocks.update(low_current_hours=next_low_hours, signal_armed=signal_armed, at_cap=at_cap)
-            bind('ladder_complete', ladder_complete, bool(ladder_complete), True, 'rate_depleted')
+            bind('ladder_complete', ladder_complete, bool(ladder_complete), True,
+                 'rate_depleted' if signal_armed else 'no_signal')
             bind('current_floor', next_low_hours >= consecutive_hours,
                  {'current_A': float(melt.mre_current_A), 'consecutive_hours': next_low_hours},
                  {'current_A': threshold_A, 'consecutive_hours': consecutive_hours}, 'rate_depleted')
