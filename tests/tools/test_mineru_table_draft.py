@@ -22,6 +22,12 @@ FIXTURE = (
 )
 
 
+def test_phase_comparison_accepts_canonical_liquid_token() -> None:
+    assert draft._phase_matches_column("l", "activity coefficient")
+    assert draft._phase_matches_column("l", "liquid activity")
+    assert not draft._phase_matches_column("l", "gas activity")
+
+
 def test_berry_table_rowspan_and_colspan_expansion() -> None:
     item = json.loads(FIXTURE.read_text(encoding="utf-8"))[0]
     grid = draft.parse_table_html(item["table_body"])

@@ -1,0 +1,58 @@
+source_id: stolyarova-2023-rcr5059-cs-sr-ba
+source:
+  citation: >-
+    Stolyarova VL, Shilov AL, Sokolova TV, Kurata M, Costa D (2023).
+    Thermodynamics and vapourization of Cs-, Sr-, Ba-containing oxide systems
+    valid for nuclear safety problems. Russian Chemical Reviews 92(5):RCR5059.
+  doi: 10.57634/RCR5059
+  url: https://doi.org/10.57634/RCR5059
+extraction:
+  method: MinerU table draft plus pdftotext and page-render audit
+  date: '2026-10-26'
+  worker: w1026a-stol23
+review_status: audited
+# Table index 2 is the printed Table 2 on PDF page 8. The source prints both
+# sample and estimated-phase compositions in mol.%; the extract retains both
+# maps verbatim in its source fields.
+# The controller ruled that the current reader has no mol.% basis: identity
+# composition is typed unknown and no normalized twin is stored. Render check
+# confirmed Table 2 sample row 10's SiO2 cell is 10, leaving a printed 70 mol.%.
+tables:
+  - page: 8
+    table_index: 2
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless
+    evidence_class: quoted_attributed
+    attribution: >-
+      Stolyarova VL, Lopatin SI, Belousova OL, Grishchenko LV (2006),
+      Glass Physics and Chemistry 32:55, reference 55 in Stolyarova et al. (2023).
+    phase: l
+    regime: kems_effusion
+    temperature:
+      as_printed: '1020'
+      unit: K
+      locator:
+        page: 8
+        table: '2'
+        note: Table 2 caption
+    values:
+      - column: 9
+        species: CsBO2
+        quantity: activity
+        unit: dimensionless
+        evidence_class: quoted_attributed
+        attribution: Stolyarova et al. (2023), Table 2, citing reference 55.
+    conditions:
+      - key: total_pressure_Pa
+        state: {tag: unknown, reason: not_published}
+        locator:
+          page: 8
+          table: '2'
+          note: The review does not print total pressure for these measurements.
+      - key: fO2_Pa
+        state: {tag: unknown, reason: not_published}
+        locator:
+          page: 8
+          table: '2'
+          note: The review does not print fO2 or pO2 for these measurements.

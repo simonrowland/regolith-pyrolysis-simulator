@@ -859,6 +859,8 @@ def _phase_matches_column(phase: Any, column_header: str) -> bool:
     token = str(phase).strip().casefold()
     if token == "cr":
         token = "solid"
+    elif token == "l":
+        token = "liquid"
     if token not in {"gas", "liquid", "solid"}:
         return False
     # A column with no phase qualifier cannot contradict the row phase.

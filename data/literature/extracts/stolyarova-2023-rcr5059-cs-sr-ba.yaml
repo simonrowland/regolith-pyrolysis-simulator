@@ -1,0 +1,2371 @@
+schema_version: literature_extract.v1
+source_id: stolyarova-2023-rcr5059-cs-sr-ba
+source:
+  citation: Stolyarova VL, Shilov AL, Sokolova TV, Kurata M, Costa D (2023). Thermodynamics and vapourization of
+    Cs-, Sr-, Ba-containing oxide systems valid for nuclear safety problems. Russian Chemical Reviews 92(5):RCR5059.
+  doi: 10.57634/RCR5059
+  url: https://doi.org/10.57634/RCR5059
+  year: 2023
+extraction:
+  method: MinerU table draft plus pdftotext and page-render audit; cited values retained as printed
+  date: '2026-10-26'
+  worker: w1026a-stol23
+  provenance_path: raw/stolyarova-2023-rcr5059-cs-sr-ba/stolyarova-2023-rcr5059-cs-sr-ba.pdf
+review_status: draft
+fidelity_samples:
+- species: CsBO2
+  observation_id: stolyarova_2023_rcr5059_table2_sample_01_csbo2_activity
+  observable: activity_coefficient
+  field: activity_as_published
+  value: 8 × 10^-3
+  locator:
+    page: 8
+    table: '2'
+    row: 1
+- species: CsBO2
+  observation_id: stolyarova_2023_rcr5059_table2_sample_04_csbo2_activity
+  observable: activity_coefficient
+  field: activity_as_published
+  value: '0.29'
+  locator:
+    page: 8
+    table: '2'
+    row: 4
+- species: CsBO2
+  observation_id: stolyarova_2023_rcr5059_table2_sample_10_csbo2_activity
+  observable: activity_coefficient
+  field: activity_as_published
+  value: '0.67'
+  locator:
+    page: 8
+    table: '2'
+    row: 10
+experiments:
+- experiment_id: table2-ref55
+  method: knudsen_effusion
+  locator:
+    page: 8
+    table: '2'
+    note: Quoted CsBO2 activities from reference 55 in the review.
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 8
+          table: '2'
+          note: The review does not state an apparatus pressure-calibration method for the reference 55 measurements.
+      reference_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 8
+          table: '2'
+          note: The review does not identify a pressure-calibration reference substance for the reference 55 measurements.
+- experiment_id: sro-b2o3-ref70
+  method: knudsen_effusion
+  locator:
+    page: 10
+    section: 4.1 The SrO-B2O3 system
+    note: Table 3 and Table 4 rows 1-18 are attributed to reference 70.
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Ion-current comparison using the reference 69 procedure
+        locator:
+          page: 10
+          section: 4.1 The SrO-B2O3 system
+          note: The review says most results in this section used reference 69's procedure; this record applies
+            that qualified statement only to the reference 70 SrO-B2O3 rows.
+      reference_substance:
+        state:
+          tag: value
+          value: Gold vapour-pressure standard (reference 69 procedure)
+        locator:
+          page: 10
+          section: 4.1 The SrO-B2O3 system
+          note: The preceding description of reference 69 identifies gold as the partial-vapour-pressure standard;
+            not assigned to reference 75 or 78.
+- experiment_id: bao-b2o3-ref75
+  method: knudsen_effusion
+  locator:
+    page: 11
+    table: '4'
+    note: Table 4 rows 19-24 are attributed to reference 75.
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 11
+          table: '4'
+          note: No apparatus calibration method is stated for the reference 75 rows.
+      reference_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 11
+          table: '4'
+          note: No pressure-calibration reference substance is stated for the reference 75 rows.
+- experiment_id: bao-b2o3-ref78
+  method: knudsen_effusion
+  locator:
+    page: 11
+    table: '4'
+    note: Table 4 rows 25-36 are attributed to reference 78.
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 11
+          table: '4'
+          note: No apparatus calibration method is stated for the reference 78 rows.
+      reference_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 11
+          table: '4'
+          note: No pressure-calibration reference substance is stated for the reference 78 rows.
+species:
+  CsBO2:
+    observations:
+    - observation_id: stolyarova_2023_rcr5059_table2_sample_01_csbo2_activity
+      type: activity_coefficient
+      locator:
+        page: 8
+        table: '2'
+        row: 1
+        note: Table 2; activity and composition row
+        pdf_page: 8
+        table_row_number: 3
+        table_column_number: 9
+      phase: l
+      regime: kems_effusion
+      units: dimensionless
+      standard_state: not stated in this review
+      attribution: Stolyarova VL, Lopatin SI, Belousova OL, Grishchenko LV (2006), Glass Physics and Chemistry 32:55;
+        reference 55 in Stolyarova et al. (2023).
+      values:
+        quantity: activity
+        activity: '0.008'
+        activity_as_published: 8 × 10^-3
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ref. 55 (Stolyarova, Lopatin, Belousova, and Grishchenko, 2006).
+        T_K: '1020'
+        composition_unit_as_published: mol.%
+        composition_as_published:
+          Cs2O: '6'
+          B2O3: '56'
+          SiO2: '38'
+        estimated_phase_composition_unit_as_published: mol.%
+        estimated_phase_composition_as_published:
+          CsBO2: '12'
+          B2O3: '50'
+          SiO2: '38'
+          Cs2SiO3: '-'
+        activity_method_as_published: Monomer and dimer ratio method (review p. 8).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1020'
+          locator:
+            page: 8
+            table: '2'
+            row: 1
+            note: 'Table 2 caption: at 1020 K.'
+            pdf_page: 8
+            table_row_number: 3
+            table_column_number: 9
+        composition:
+          state:
+            tag: unknown
+            reason: printed mol.% composition; reader lacks a mole-percent basis (t-1524)
+          locator:
+            page: 8
+            table: '2'
+            row: 1
+            note: Printed composition is retained in values; identity basis is unsupported.
+            pdf_page: 8
+            table_row_number: 3
+            table_column_number: 9
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 1
+            note: Review does not print total experiment pressure.
+            pdf_page: 8
+            table_row_number: 3
+            table_column_number: 9
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 1
+            note: Review does not print fO2 or pO2 for these measurements.
+            pdf_page: 8
+            table_row_number: 3
+            table_column_number: 9
+      experiment: table2-ref55
+    - observation_id: stolyarova_2023_rcr5059_table2_sample_02_csbo2_activity
+      type: activity_coefficient
+      locator:
+        page: 8
+        table: '2'
+        row: 2
+        note: Table 2; activity and composition row
+        pdf_page: 8
+        table_row_number: 4
+        table_column_number: 9
+      phase: l
+      regime: kems_effusion
+      units: dimensionless
+      standard_state: not stated in this review
+      attribution: Stolyarova VL, Lopatin SI, Belousova OL, Grishchenko LV (2006), Glass Physics and Chemistry 32:55;
+        reference 55 in Stolyarova et al. (2023).
+      values:
+        quantity: activity
+        activity: '0.01'
+        activity_as_published: '0.01'
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ref. 55 (Stolyarova, Lopatin, Belousova, and Grishchenko, 2006).
+        T_K: '1020'
+        composition_unit_as_published: mol.%
+        composition_as_published:
+          Cs2O: '10'
+          B2O3: '54'
+          SiO2: '36'
+        estimated_phase_composition_unit_as_published: mol.%
+        estimated_phase_composition_as_published:
+          CsBO2: '20'
+          B2O3: '44'
+          SiO2: '36'
+          Cs2SiO3: '-'
+        activity_method_as_published: Monomer and dimer ratio method (review p. 8).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1020'
+          locator:
+            page: 8
+            table: '2'
+            row: 2
+            note: 'Table 2 caption: at 1020 K.'
+            pdf_page: 8
+            table_row_number: 4
+            table_column_number: 9
+        composition:
+          state:
+            tag: unknown
+            reason: printed mol.% composition; reader lacks a mole-percent basis (t-1524)
+          locator:
+            page: 8
+            table: '2'
+            row: 2
+            note: Printed composition is retained in values; identity basis is unsupported.
+            pdf_page: 8
+            table_row_number: 4
+            table_column_number: 9
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 2
+            note: Review does not print total experiment pressure.
+            pdf_page: 8
+            table_row_number: 4
+            table_column_number: 9
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 2
+            note: Review does not print fO2 or pO2 for these measurements.
+            pdf_page: 8
+            table_row_number: 4
+            table_column_number: 9
+      experiment: table2-ref55
+    - observation_id: stolyarova_2023_rcr5059_table2_sample_03_csbo2_activity
+      type: activity_coefficient
+      locator:
+        page: 8
+        table: '2'
+        row: 3
+        note: Table 2; activity and composition row
+        pdf_page: 8
+        table_row_number: 5
+        table_column_number: 9
+      phase: l
+      regime: kems_effusion
+      units: dimensionless
+      standard_state: not stated in this review
+      attribution: Stolyarova VL, Lopatin SI, Belousova OL, Grishchenko LV (2006), Glass Physics and Chemistry 32:55;
+        reference 55 in Stolyarova et al. (2023).
+      values:
+        quantity: activity
+        activity: '0.06'
+        activity_as_published: '0.06'
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ref. 55 (Stolyarova, Lopatin, Belousova, and Grishchenko, 2006).
+        T_K: '1020'
+        composition_unit_as_published: mol.%
+        composition_as_published:
+          Cs2O: '20'
+          B2O3: '48'
+          SiO2: '32'
+        estimated_phase_composition_unit_as_published: mol.%
+        estimated_phase_composition_as_published:
+          CsBO2: '40'
+          B2O3: '28'
+          SiO2: '32'
+          Cs2SiO3: '-'
+        activity_method_as_published: Monomer and dimer ratio method (review p. 8).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1020'
+          locator:
+            page: 8
+            table: '2'
+            row: 3
+            note: 'Table 2 caption: at 1020 K.'
+            pdf_page: 8
+            table_row_number: 5
+            table_column_number: 9
+        composition:
+          state:
+            tag: unknown
+            reason: printed mol.% composition; reader lacks a mole-percent basis (t-1524)
+          locator:
+            page: 8
+            table: '2'
+            row: 3
+            note: Printed composition is retained in values; identity basis is unsupported.
+            pdf_page: 8
+            table_row_number: 5
+            table_column_number: 9
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 3
+            note: Review does not print total experiment pressure.
+            pdf_page: 8
+            table_row_number: 5
+            table_column_number: 9
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 3
+            note: Review does not print fO2 or pO2 for these measurements.
+            pdf_page: 8
+            table_row_number: 5
+            table_column_number: 9
+      experiment: table2-ref55
+    - observation_id: stolyarova_2023_rcr5059_table2_sample_04_csbo2_activity
+      type: activity_coefficient
+      locator:
+        page: 8
+        table: '2'
+        row: 4
+        note: Table 2; activity and composition row
+        pdf_page: 8
+        table_row_number: 6
+        table_column_number: 9
+      phase: l
+      regime: kems_effusion
+      units: dimensionless
+      standard_state: not stated in this review
+      attribution: Stolyarova VL, Lopatin SI, Belousova OL, Grishchenko LV (2006), Glass Physics and Chemistry 32:55;
+        reference 55 in Stolyarova et al. (2023).
+      values:
+        quantity: activity
+        activity: '0.29'
+        activity_as_published: '0.29'
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ref. 55 (Stolyarova, Lopatin, Belousova, and Grishchenko, 2006).
+        T_K: '1020'
+        composition_unit_as_published: mol.%
+        composition_as_published:
+          Cs2O: '33.3'
+          B2O3: '40'
+          SiO2: '26.7'
+        estimated_phase_composition_unit_as_published: mol.%
+        estimated_phase_composition_as_published:
+          CsBO2: '66.7'
+          B2O3: '6.6'
+          SiO2: '26.7'
+          Cs2SiO3: '-'
+        activity_method_as_published: Monomer and dimer ratio method (review p. 8).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1020'
+          locator:
+            page: 8
+            table: '2'
+            row: 4
+            note: 'Table 2 caption: at 1020 K.'
+            pdf_page: 8
+            table_row_number: 6
+            table_column_number: 9
+        composition:
+          state:
+            tag: unknown
+            reason: printed mol.% composition; reader lacks a mole-percent basis (t-1524)
+          locator:
+            page: 8
+            table: '2'
+            row: 4
+            note: Printed composition is retained in values; identity basis is unsupported.
+            pdf_page: 8
+            table_row_number: 6
+            table_column_number: 9
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 4
+            note: Review does not print total experiment pressure.
+            pdf_page: 8
+            table_row_number: 6
+            table_column_number: 9
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 4
+            note: Review does not print fO2 or pO2 for these measurements.
+            pdf_page: 8
+            table_row_number: 6
+            table_column_number: 9
+      experiment: table2-ref55
+    - observation_id: stolyarova_2023_rcr5059_table2_sample_05_csbo2_activity
+      type: activity_coefficient
+      locator:
+        page: 8
+        table: '2'
+        row: 5
+        note: Table 2; activity and composition row
+        pdf_page: 8
+        table_row_number: 7
+        table_column_number: 9
+      phase: l
+      regime: kems_effusion
+      units: dimensionless
+      standard_state: not stated in this review
+      attribution: Stolyarova VL, Lopatin SI, Belousova OL, Grishchenko LV (2006), Glass Physics and Chemistry 32:55;
+        reference 55 in Stolyarova et al. (2023).
+      values:
+        quantity: activity
+        activity: '0.78'
+        activity_as_published: '0.78'
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ref. 55 (Stolyarova, Lopatin, Belousova, and Grishchenko, 2006).
+        T_K: '1020'
+        composition_unit_as_published: mol.%
+        composition_as_published:
+          Cs2O: '40'
+          B2O3: '36'
+          SiO2: '24'
+        estimated_phase_composition_unit_as_published: mol.%
+        estimated_phase_composition_as_published:
+          CsBO2: '75'
+          B2O3: '-'
+          SiO2: '20.8'
+          Cs2SiO3: '4.2'
+        activity_method_as_published: Monomer and dimer ratio method (review p. 8).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1020'
+          locator:
+            page: 8
+            table: '2'
+            row: 5
+            note: 'Table 2 caption: at 1020 K.'
+            pdf_page: 8
+            table_row_number: 7
+            table_column_number: 9
+        composition:
+          state:
+            tag: unknown
+            reason: printed mol.% composition; reader lacks a mole-percent basis (t-1524)
+          locator:
+            page: 8
+            table: '2'
+            row: 5
+            note: Printed composition is retained in values; identity basis is unsupported.
+            pdf_page: 8
+            table_row_number: 7
+            table_column_number: 9
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 5
+            note: Review does not print total experiment pressure.
+            pdf_page: 8
+            table_row_number: 7
+            table_column_number: 9
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 5
+            note: Review does not print fO2 or pO2 for these measurements.
+            pdf_page: 8
+            table_row_number: 7
+            table_column_number: 9
+      experiment: table2-ref55
+    - observation_id: stolyarova_2023_rcr5059_table2_sample_06_csbo2_activity
+      type: activity_coefficient
+      locator:
+        page: 8
+        table: '2'
+        row: 6
+        note: Table 2; activity and composition row
+        pdf_page: 8
+        table_row_number: 8
+        table_column_number: 9
+      phase: l
+      regime: kems_effusion
+      units: dimensionless
+      standard_state: not stated in this review
+      attribution: Stolyarova VL, Lopatin SI, Belousova OL, Grishchenko LV (2006), Glass Physics and Chemistry 32:55;
+        reference 55 in Stolyarova et al. (2023).
+      values:
+        quantity: activity
+        activity: '0.84'
+        activity_as_published: '0.84'
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ref. 55 (Stolyarova, Lopatin, Belousova, and Grishchenko, 2006).
+        T_K: '1020'
+        composition_unit_as_published: mol.%
+        composition_as_published:
+          Cs2O: '50'
+          B2O3: '30'
+          SiO2: '20'
+        estimated_phase_composition_unit_as_published: mol.%
+        estimated_phase_composition_as_published:
+          CsBO2: '75'
+          B2O3: '-'
+          SiO2: '-'
+          Cs2SiO3: '25'
+        activity_method_as_published: Monomer and dimer ratio method (review p. 8).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1020'
+          locator:
+            page: 8
+            table: '2'
+            row: 6
+            note: 'Table 2 caption: at 1020 K.'
+            pdf_page: 8
+            table_row_number: 8
+            table_column_number: 9
+        composition:
+          state:
+            tag: unknown
+            reason: printed mol.% composition; reader lacks a mole-percent basis (t-1524)
+          locator:
+            page: 8
+            table: '2'
+            row: 6
+            note: Printed composition is retained in values; identity basis is unsupported.
+            pdf_page: 8
+            table_row_number: 8
+            table_column_number: 9
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 6
+            note: Review does not print total experiment pressure.
+            pdf_page: 8
+            table_row_number: 8
+            table_column_number: 9
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 6
+            note: Review does not print fO2 or pO2 for these measurements.
+            pdf_page: 8
+            table_row_number: 8
+            table_column_number: 9
+      experiment: table2-ref55
+    - observation_id: stolyarova_2023_rcr5059_table2_sample_07_csbo2_activity
+      type: activity_coefficient
+      locator:
+        page: 8
+        table: '2'
+        row: 7
+        note: Table 2; activity and composition row
+        pdf_page: 8
+        table_row_number: 9
+        table_column_number: 9
+      phase: l
+      regime: kems_effusion
+      units: dimensionless
+      standard_state: not stated in this review
+      attribution: Stolyarova VL, Lopatin SI, Belousova OL, Grishchenko LV (2006), Glass Physics and Chemistry 32:55;
+        reference 55 in Stolyarova et al. (2023).
+      values:
+        quantity: activity
+        activity: '1.0'
+        activity_as_published: '1.0'
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ref. 55 (Stolyarova, Lopatin, Belousova, and Grishchenko, 2006).
+        T_K: '1020'
+        composition_unit_as_published: mol.%
+        composition_as_published:
+          Cs2O: '50'
+          B2O3: '50'
+          SiO2: '-'
+        estimated_phase_composition_unit_as_published: mol.%
+        estimated_phase_composition_as_published:
+          CsBO2: '100'
+          B2O3: '-'
+          SiO2: '-'
+          Cs2SiO3: '-'
+        activity_method_as_published: Monomer and dimer ratio method (review p. 8).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1020'
+          locator:
+            page: 8
+            table: '2'
+            row: 7
+            note: 'Table 2 caption: at 1020 K.'
+            pdf_page: 8
+            table_row_number: 9
+            table_column_number: 9
+        composition:
+          state:
+            tag: unknown
+            reason: printed mol.% composition; reader lacks a mole-percent basis (t-1524)
+          locator:
+            page: 8
+            table: '2'
+            row: 7
+            note: Printed composition is retained in values; identity basis is unsupported.
+            pdf_page: 8
+            table_row_number: 9
+            table_column_number: 9
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 7
+            note: Review does not print total experiment pressure.
+            pdf_page: 8
+            table_row_number: 9
+            table_column_number: 9
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 7
+            note: Review does not print fO2 or pO2 for these measurements.
+            pdf_page: 8
+            table_row_number: 9
+            table_column_number: 9
+      experiment: table2-ref55
+    - observation_id: stolyarova_2023_rcr5059_table2_sample_08_csbo2_activity
+      type: activity_coefficient
+      locator:
+        page: 8
+        table: '2'
+        row: 8
+        note: Table 2; activity and composition row
+        pdf_page: 8
+        table_row_number: 10
+        table_column_number: 9
+      phase: l
+      regime: kems_effusion
+      units: dimensionless
+      standard_state: not stated in this review
+      attribution: Stolyarova VL, Lopatin SI, Belousova OL, Grishchenko LV (2006), Glass Physics and Chemistry 32:55;
+        reference 55 in Stolyarova et al. (2023).
+      values:
+        quantity: activity
+        activity: '0.88'
+        activity_as_published: '0.88'
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ref. 55 (Stolyarova, Lopatin, Belousova, and Grishchenko, 2006).
+        T_K: '1020'
+        composition_unit_as_published: mol.%
+        composition_as_published:
+          Cs2O: '50'
+          B2O3: '40'
+          SiO2: '10'
+        estimated_phase_composition_unit_as_published: mol.%
+        estimated_phase_composition_as_published:
+          CsBO2: '88.9'
+          B2O3: '-'
+          SiO2: '-'
+          Cs2SiO3: '11.1'
+        activity_method_as_published: Monomer and dimer ratio method (review p. 8).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1020'
+          locator:
+            page: 8
+            table: '2'
+            row: 8
+            note: 'Table 2 caption: at 1020 K.'
+            pdf_page: 8
+            table_row_number: 10
+            table_column_number: 9
+        composition:
+          state:
+            tag: unknown
+            reason: printed mol.% composition; reader lacks a mole-percent basis (t-1524)
+          locator:
+            page: 8
+            table: '2'
+            row: 8
+            note: Printed composition is retained in values; identity basis is unsupported.
+            pdf_page: 8
+            table_row_number: 10
+            table_column_number: 9
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 8
+            note: Review does not print total experiment pressure.
+            pdf_page: 8
+            table_row_number: 10
+            table_column_number: 9
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 8
+            note: Review does not print fO2 or pO2 for these measurements.
+            pdf_page: 8
+            table_row_number: 10
+            table_column_number: 9
+      experiment: table2-ref55
+    - observation_id: stolyarova_2023_rcr5059_table2_sample_09_csbo2_activity
+      type: activity_coefficient
+      locator:
+        page: 8
+        table: '2'
+        row: 9
+        note: Table 2; activity and composition row
+        pdf_page: 8
+        table_row_number: 11
+        table_column_number: 9
+      phase: l
+      regime: kems_effusion
+      units: dimensionless
+      standard_state: not stated in this review
+      attribution: Stolyarova VL, Lopatin SI, Belousova OL, Grishchenko LV (2006), Glass Physics and Chemistry 32:55;
+        reference 55 in Stolyarova et al. (2023).
+      values:
+        quantity: activity
+        activity: '0.81'
+        activity_as_published: '0.81'
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ref. 55 (Stolyarova, Lopatin, Belousova, and Grishchenko, 2006).
+        T_K: '1020'
+        composition_unit_as_published: mol.%
+        composition_as_published:
+          Cs2O: '50'
+          B2O3: '20'
+          SiO2: '30'
+        estimated_phase_composition_unit_as_published: mol.%
+        estimated_phase_composition_as_published:
+          CsBO2: '57.1'
+          B2O3: '-'
+          SiO2: '-'
+          Cs2SiO3: '42.9'
+        activity_method_as_published: Monomer and dimer ratio method (review p. 8).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1020'
+          locator:
+            page: 8
+            table: '2'
+            row: 9
+            note: 'Table 2 caption: at 1020 K.'
+            pdf_page: 8
+            table_row_number: 11
+            table_column_number: 9
+        composition:
+          state:
+            tag: unknown
+            reason: printed mol.% composition; reader lacks a mole-percent basis (t-1524)
+          locator:
+            page: 8
+            table: '2'
+            row: 9
+            note: Printed composition is retained in values; identity basis is unsupported.
+            pdf_page: 8
+            table_row_number: 11
+            table_column_number: 9
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 9
+            note: Review does not print total experiment pressure.
+            pdf_page: 8
+            table_row_number: 11
+            table_column_number: 9
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 9
+            note: Review does not print fO2 or pO2 for these measurements.
+            pdf_page: 8
+            table_row_number: 11
+            table_column_number: 9
+      experiment: table2-ref55
+    - observation_id: stolyarova_2023_rcr5059_table2_sample_10_csbo2_activity
+      type: activity_coefficient
+      locator:
+        page: 8
+        table: '2'
+        row: 10
+        note: Table 2; activity and composition row
+        pdf_page: 8
+        table_row_number: 12
+        table_column_number: 9
+      phase: l
+      regime: kems_effusion
+      units: dimensionless
+      standard_state: not stated in this review
+      attribution: Stolyarova VL, Lopatin SI, Belousova OL, Grishchenko LV (2006), Glass Physics and Chemistry 32:55;
+        reference 55 in Stolyarova et al. (2023).
+      values:
+        quantity: activity
+        activity: '0.67'
+        activity_as_published: '0.67'
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ref. 55 (Stolyarova, Lopatin, Belousova, and Grishchenko, 2006).
+        T_K: '1020'
+        composition_unit_as_published: mol.%
+        composition_as_published:
+          Cs2O: '50'
+          B2O3: '10'
+          SiO2: '10'
+        estimated_phase_composition_unit_as_published: mol.%
+        estimated_phase_composition_as_published:
+          CsBO2: '33.3'
+          B2O3: '-'
+          SiO2: '-'
+          Cs2SiO3: '66.7'
+        activity_method_as_published: Monomer and dimer ratio method (review p. 8).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1020'
+          locator:
+            page: 8
+            table: '2'
+            row: 10
+            note: 'Table 2 caption: at 1020 K.'
+            pdf_page: 8
+            table_row_number: 12
+            table_column_number: 9
+        composition:
+          state:
+            tag: unknown
+            reason: printed mol.% composition; reader lacks a mole-percent basis (t-1524); printed 50/10/10 sums
+              to 70%, remainder not stated
+          locator:
+            page: 8
+            table: '2'
+            row: 10
+            note: Printed composition is retained in values; identity basis is unsupported.
+            pdf_page: 8
+            table_row_number: 12
+            table_column_number: 9
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 10
+            note: Review does not print total experiment pressure.
+            pdf_page: 8
+            table_row_number: 12
+            table_column_number: 9
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 10
+            note: Review does not print fO2 or pO2 for these measurements.
+            pdf_page: 8
+            table_row_number: 12
+            table_column_number: 9
+      experiment: table2-ref55
+    - observation_id: stolyarova_2023_rcr5059_table2_sample_11_csbo2_activity
+      type: activity_coefficient
+      locator:
+        page: 8
+        table: '2'
+        row: 11
+        note: Table 2; activity and composition row
+        pdf_page: 8
+        table_row_number: 13
+        table_column_number: 9
+      phase: l
+      regime: kems_effusion
+      units: dimensionless
+      standard_state: not stated in this review
+      attribution: Stolyarova VL, Lopatin SI, Belousova OL, Grishchenko LV (2006), Glass Physics and Chemistry 32:55;
+        reference 55 in Stolyarova et al. (2023).
+      values:
+        quantity: activity
+        activity: '0'
+        activity_as_published: '0'
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ref. 55 (Stolyarova, Lopatin, Belousova, and Grishchenko, 2006).
+        T_K: '1020'
+        composition_unit_as_published: mol.%
+        composition_as_published:
+          Cs2O: '50'
+          B2O3: '-'
+          SiO2: '50'
+        estimated_phase_composition_unit_as_published: mol.%
+        estimated_phase_composition_as_published:
+          CsBO2: '-'
+          B2O3: '-'
+          SiO2: '-'
+          Cs2SiO3: '100'
+        activity_method_as_published: Monomer and dimer ratio method (review p. 8).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1020'
+          locator:
+            page: 8
+            table: '2'
+            row: 11
+            note: 'Table 2 caption: at 1020 K.'
+            pdf_page: 8
+            table_row_number: 13
+            table_column_number: 9
+        composition:
+          state:
+            tag: unknown
+            reason: printed mol.% composition; reader lacks a mole-percent basis (t-1524)
+          locator:
+            page: 8
+            table: '2'
+            row: 11
+            note: Printed composition is retained in values; identity basis is unsupported.
+            pdf_page: 8
+            table_row_number: 13
+            table_column_number: 9
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 11
+            note: Review does not print total experiment pressure.
+            pdf_page: 8
+            table_row_number: 13
+            table_column_number: 9
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 8
+            table: '2'
+            row: 11
+            note: Review does not print fO2 or pO2 for these measurements.
+            pdf_page: 8
+            table_row_number: 13
+            table_column_number: 9
+      experiment: table2-ref55
+  Sr:
+    observations:
+    - observation_id: stolyarova_2023_rcr5059_table3_sr_qualitative_trend
+      type: partial_pressure
+      locator:
+        page: 10
+        table: '3'
+        row: 3
+        note: Table 3 qualitative trend row
+      units: qualitative trend symbols
+      phase: g
+      regime: kems_effusion
+      attribution: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), reference 70 in Stolyarova et al.
+        (2023).
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_qualitative_partial_pressure_trend
+        species_formula: Sr
+        temperature_range_K_as_published: 1282–1572 K
+        composition_columns_as_published:
+        - 2 SrO · B2O3
+        - SrO · B2O3
+        - SrO · 2 B2O3
+        trend_symbols_as_published:
+        - '>^{\mathrm{a}}'
+        - \approx^{\mathrm{b}}
+        - \approx
+        note: Table 3 trend symbols encode increase, approximate independence, or decrease with B2O3 content; no
+          numerical partial pressures are printed.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_01_sr_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 1
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: 2 SrO · B2O3
+        species_formula: Sr
+        temperature_range_K_as_published: 1452-1572
+        A_times_10^-3_as_published: 23.93 ± 1.00
+        B_as_published: 10.00 ± 0.66
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_07_sr_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 7
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: SrO · B2O3
+        species_formula: Sr
+        temperature_range_K_as_published: 1373-1442
+        A_times_10^-3_as_published: 32.30 ± 1.48
+        B_as_published: 15.32 ± 1.05
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_13_sr_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 13
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: SrO · 2 B2O3
+        species_formula: Sr
+        temperature_range_K_as_published: 1304-1440
+        A_times_10^-3_as_published: 25.60 ± 0.58
+        B_as_published: 10.59 ± 0.42
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+  SrBO2:
+    observations:
+    - observation_id: stolyarova_2023_rcr5059_table3_srbo2_qualitative_trend
+      type: partial_pressure
+      locator:
+        page: 10
+        table: '3'
+        row: 4
+        note: Table 3 qualitative trend row
+      units: qualitative trend symbols
+      phase: g
+      regime: kems_effusion
+      attribution: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), reference 70 in Stolyarova et al.
+        (2023).
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_qualitative_partial_pressure_trend
+        species_formula: SrBO2
+        temperature_range_K_as_published: 1282–1572 K
+        composition_columns_as_published:
+        - 2 SrO · B2O3
+        - SrO · B2O3
+        - SrO · 2 B2O3
+        trend_symbols_as_published:
+        - <^{\mathrm{c}}
+        - <
+        - <
+        note: Table 3 trend symbols encode increase, approximate independence, or decrease with B2O3 content; no
+          numerical partial pressures are printed.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_02_srbo2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 2
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: 2 SrO · B2O3
+        species_formula: SrBO2
+        temperature_range_K_as_published: 1452-1572
+        A_times_10^-3_as_published: 28.18 ± 1.45
+        B_as_published: 13.74 ± 0.96
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_08_srbo2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 8
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: SrO · B2O3
+        species_formula: SrBO2
+        temperature_range_K_as_published: 1310-1442
+        A_times_10^-3_as_published: 30.80 ± 0.53
+        B_as_published: 16.06 ± 0.38
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_14_srbo2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 14
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: SrO · 2 B2O3
+        species_formula: SrBO2
+        temperature_range_K_as_published: 1304-1440
+        A_times_10^-3_as_published: 24.92 ± 0.28
+        B_as_published: 12.46 ± 0.20
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+  BO:
+    observations:
+    - observation_id: stolyarova_2023_rcr5059_table3_bo_qualitative_trend
+      type: partial_pressure
+      locator:
+        page: 10
+        table: '3'
+        row: 5
+        note: Table 3 qualitative trend row
+      units: qualitative trend symbols
+      phase: g
+      regime: kems_effusion
+      attribution: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), reference 70 in Stolyarova et al.
+        (2023).
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_qualitative_partial_pressure_trend
+        species_formula: BO
+        temperature_range_K_as_published: 1282–1572 K
+        composition_columns_as_published:
+        - 2 SrO · B2O3
+        - SrO · B2O3
+        - SrO · 2 B2O3
+        trend_symbols_as_published:
+        - <
+        - <
+        - <
+        note: Table 3 trend symbols encode increase, approximate independence, or decrease with B2O3 content; no
+          numerical partial pressures are printed.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_03_bo_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 3
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: 2 SrO · B2O3
+        species_formula: BO
+        temperature_range_K_as_published: 1473-1572
+        A_times_10^-3_as_published: 22.34 ± 0.68
+        B_as_published: 9.79 ± 0.45
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_09_bo_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 9
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: SrO · B2O3
+        species_formula: BO
+        temperature_range_K_as_published: 1310-1442
+        A_times_10^-3_as_published: 21.21 ± 0.35
+        B_as_published: 10.10 ± 0.26
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_15_bo_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 15
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: SrO · 2 B2O3
+        species_formula: BO
+        temperature_range_K_as_published: 1281-1440
+        A_times_10^-3_as_published: 20.75 ± 0.27
+        B_as_published: 9.79 ± 0.20
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_21_bo_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 21
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 75: M. Asano and T. Kou, High Temperature Science 29, 171 (1990), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: 3 BaO · B2O3
+        species_formula: BO
+        temperature_range_K_as_published: 1434-1630
+        A_times_10^-3_as_published: 11.41 ± 0.33
+        B_as_published: 2.88 ± 0.22
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '75'
+        cited_source_as_attributed: M. Asano and T. Kou, High Temperature Science 29, 171 (1990)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref75
+    - observation_id: stolyarova_2023_rcr5059_table4_row_27_bo_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 27
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 78: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989), as cited in
+        Stolyarova et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: BaO · B2O3
+        species_formula: BO
+        temperature_range_K_as_published: 1389-1535
+        A_times_10^-3_as_published: 17.83 ± 1.34
+        B_as_published: 7.38 ± 0.91
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '78'
+        cited_source_as_attributed: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref78
+    - observation_id: stolyarova_2023_rcr5059_table4_row_33_bo_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 33
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 78: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989), as cited in
+        Stolyarova et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: BaO · 2 B2O3
+        species_formula: BO
+        temperature_range_K_as_published: 1277-1431
+        A_times_10^-3_as_published: 17.84 ± 0.71
+        B_as_published: 8.08 ± 0.53
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '78'
+        cited_source_as_attributed: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref78
+  BO2:
+    observations:
+    - observation_id: stolyarova_2023_rcr5059_table3_bo2_qualitative_trend
+      type: partial_pressure
+      locator:
+        page: 10
+        table: '3'
+        row: 6
+        note: Table 3 qualitative trend row
+      units: qualitative trend symbols
+      phase: g
+      regime: kems_effusion
+      attribution: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), reference 70 in Stolyarova et al.
+        (2023).
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_qualitative_partial_pressure_trend
+        species_formula: BO2
+        temperature_range_K_as_published: 1282–1572 K
+        composition_columns_as_published:
+        - 2 SrO · B2O3
+        - SrO · B2O3
+        - SrO · 2 B2O3
+        trend_symbols_as_published:
+        - <
+        - <
+        - <
+        note: Table 3 trend symbols encode increase, approximate independence, or decrease with B2O3 content; no
+          numerical partial pressures are printed.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_04_bo2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 4
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: 2 SrO · B2O3
+        species_formula: BO2
+        temperature_range_K_as_published: 1473-1572
+        A_times_10^-3_as_published: 29.95 ± 0.86
+        B_as_published: 11.33 ± 0.57
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_10_bo2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 10
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: SrO · B2O3
+        species_formula: BO2
+        temperature_range_K_as_published: 1310-1442
+        A_times_10^-3_as_published: 32.78 ± 0.38
+        B_as_published: 14.36 ± 0.27
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_16_bo2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 16
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: SrO · 2 B2O3
+        species_formula: BO2
+        temperature_range_K_as_published: 1281-1440
+        A_times_10^-3_as_published: 28.97 ± 0.16
+        B_as_published: 12.24 ± 0.12
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_22_bo2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 22
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 75: M. Asano and T. Kou, High Temperature Science 29, 171 (1990), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: 3 BaO · B2O3
+        species_formula: BO2
+        temperature_range_K_as_published: 1434-1630
+        A_times_10^-3_as_published: 27.12 ± 0.33
+        B_as_published: 8.79 ± 0.22
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '75'
+        cited_source_as_attributed: M. Asano and T. Kou, High Temperature Science 29, 171 (1990)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref75
+    - observation_id: stolyarova_2023_rcr5059_table4_row_28_bo2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 28
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 78: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989), as cited in
+        Stolyarova et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: BaO · B2O3
+        species_formula: BO2
+        temperature_range_K_as_published: 1389-1535
+        A_times_10^-3_as_published: 29.69 ± 1.07
+        B_as_published: 12.43 ± 0.73
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '78'
+        cited_source_as_attributed: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref78
+    - observation_id: stolyarova_2023_rcr5059_table4_row_34_bo2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 34
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 78: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989), as cited in
+        Stolyarova et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: BaO · 2 B2O3
+        species_formula: BO2
+        temperature_range_K_as_published: 1277-1431
+        A_times_10^-3_as_published: 32.20 ± 0.78
+        B_as_published: 14.67 ± 0.58
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '78'
+        cited_source_as_attributed: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref78
+  B2O2:
+    observations:
+    - observation_id: stolyarova_2023_rcr5059_table3_b2o2_qualitative_trend
+      type: partial_pressure
+      locator:
+        page: 10
+        table: '3'
+        row: 7
+        note: Table 3 qualitative trend row
+      units: qualitative trend symbols
+      phase: g
+      regime: kems_effusion
+      attribution: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), reference 70 in Stolyarova et al.
+        (2023).
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_qualitative_partial_pressure_trend
+        species_formula: B2O2
+        temperature_range_K_as_published: 1282–1572 K
+        composition_columns_as_published:
+        - 2 SrO · B2O3
+        - SrO · B2O3
+        - SrO · 2 B2O3
+        trend_symbols_as_published:
+        - <
+        - <
+        - <
+        note: Table 3 trend symbols encode increase, approximate independence, or decrease with B2O3 content; no
+          numerical partial pressures are printed.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_05_b2o2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 5
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: 2 SrO · B2O3
+        species_formula: B2O2
+        temperature_range_K_as_published: 1473-1572
+        A_times_10^-3_as_published: 23.03 ± 1.03
+        B_as_published: 11.05 ± 0.68
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_11_b2o2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 11
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: SrO · B2O3
+        species_formula: B2O2
+        temperature_range_K_as_published: 1310-1442
+        A_times_10^-3_as_published: 19.34 ± 0.49
+        B_as_published: 9.85 ± 0.35
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_17_b2o2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 17
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: SrO · 2 B2O3
+        species_formula: B2O2
+        temperature_range_K_as_published: 1281-1440
+        A_times_10^-3_as_published: 19.83 ± 0.19
+        B_as_published: 11.02 ± 0.14
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_23_b2o2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 23
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 75: M. Asano and T. Kou, High Temperature Science 29, 171 (1990), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: 3 BaO · B2O3
+        species_formula: B2O2
+        temperature_range_K_as_published: 1434-1630
+        A_times_10^-3_as_published: 11.57 ± 0.31
+        B_as_published: 3.95 ± 0.20
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '75'
+        cited_source_as_attributed: M. Asano and T. Kou, High Temperature Science 29, 171 (1990)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref75
+    - observation_id: stolyarova_2023_rcr5059_table4_row_29_b2o2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 29
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 78: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989), as cited in
+        Stolyarova et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: BaO · B2O3
+        species_formula: B2O2
+        temperature_range_K_as_published: 1389-1535
+        A_times_10^-3_as_published: 16.95 ± 1.17
+        B_as_published: 7.75 ± 0.80
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '78'
+        cited_source_as_attributed: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref78
+    - observation_id: stolyarova_2023_rcr5059_table4_row_35_b2o2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 35
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 78: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989), as cited in
+        Stolyarova et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: BaO · 2 B2O3
+        species_formula: B2O2
+        temperature_range_K_as_published: 1277-1431
+        A_times_10^-3_as_published: 15.42 ± 0.39
+        B_as_published: 9.39 ± 0.29
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '78'
+        cited_source_as_attributed: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref78
+  B2O3:
+    observations:
+    - observation_id: stolyarova_2023_rcr5059_table3_b2o3_qualitative_trend
+      type: partial_pressure
+      locator:
+        page: 10
+        table: '3'
+        row: 8
+        note: Table 3 qualitative trend row
+      units: qualitative trend symbols
+      phase: g
+      regime: kems_effusion
+      attribution: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), reference 70 in Stolyarova et al.
+        (2023).
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_qualitative_partial_pressure_trend
+        species_formula: B2O3
+        temperature_range_K_as_published: 1282–1572 K
+        composition_columns_as_published:
+        - 2 SrO · B2O3
+        - SrO · B2O3
+        - SrO · 2 B2O3
+        trend_symbols_as_published:
+        - <
+        - <
+        - <
+        note: Table 3 trend symbols encode increase, approximate independence, or decrease with B2O3 content; no
+          numerical partial pressures are printed.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_06_b2o3_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 6
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: 2 SrO · B2O3
+        species_formula: B2O3
+        temperature_range_K_as_published: 1453-1572
+        A_times_10^-3_as_published: 23.85 ± 0.73
+        B_as_published: 10.88 ± 0.48
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_12_b2o3_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 12
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: SrO · B2O3
+        species_formula: B2O3
+        temperature_range_K_as_published: 1310-1442
+        A_times_10^-3_as_published: 25.31 ± 0.28
+        B_as_published: 13.91 ± 0.20
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_18_b2o3_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 18
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 70: T. Kou and M. Asano, High Temperature Science 24, 1 (1987), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: SrO · 2 B2O3
+        species_formula: B2O3
+        temperature_range_K_as_published: 1281-1440
+        A_times_10^-3_as_published: 22.00 ± 0.42
+        B_as_published: 12.82 ± 0.31
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '70'
+        cited_source_as_attributed: T. Kou and M. Asano, High Temperature Science 24, 1 (1987)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: sro-b2o3-ref70
+    - observation_id: stolyarova_2023_rcr5059_table4_row_24_b2o3_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 24
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 75: M. Asano and T. Kou, High Temperature Science 29, 171 (1990), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: 3 BaO · B2O3
+        species_formula: B2O3
+        temperature_range_K_as_published: 1434-1630
+        A_times_10^-3_as_published: 10.95 ± 0.27
+        B_as_published: 1.92 ± 0.18
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '75'
+        cited_source_as_attributed: M. Asano and T. Kou, High Temperature Science 29, 171 (1990)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref75
+    - observation_id: stolyarova_2023_rcr5059_table4_row_30_b2o3_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 30
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 78: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989), as cited in
+        Stolyarova et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: BaO · B2O3
+        species_formula: B2O3
+        temperature_range_K_as_published: 1389-1535
+        A_times_10^-3_as_published: 21.64 ± 1.04
+        B_as_published: 11.21 ± 0.72
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '78'
+        cited_source_as_attributed: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref78
+    - observation_id: stolyarova_2023_rcr5059_table4_row_36_b2o3_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 36
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 78: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989), as cited in
+        Stolyarova et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: BaO · 2 B2O3
+        species_formula: B2O3
+        temperature_range_K_as_published: 1277-1431
+        A_times_10^-3_as_published: 22.07 ± 0.68
+        B_as_published: 12.66 ± 0.51
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '78'
+        cited_source_as_attributed: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref78
+  Ba:
+    observations:
+    - observation_id: stolyarova_2023_rcr5059_table4_row_19_ba_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 19
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 75: M. Asano and T. Kou, High Temperature Science 29, 171 (1990), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: 3 BaO · B2O3
+        species_formula: Ba
+        temperature_range_K_as_published: 1434-1630
+        A_times_10^-3_as_published: 21.41 ± 0.86
+        B_as_published: 7.40 ± 0.56
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '75'
+        cited_source_as_attributed: M. Asano and T. Kou, High Temperature Science 29, 171 (1990)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref75
+    - observation_id: stolyarova_2023_rcr5059_table4_row_25_ba_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 25
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 78: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989), as cited in
+        Stolyarova et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: BaO · B2O3
+        species_formula: Ba
+        temperature_range_K_as_published: 1333-1535
+        A_times_10^-3_as_published: 22.48 ± 0.34
+        B_as_published: 8.40 ± 0.24
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '78'
+        cited_source_as_attributed: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref78
+    - observation_id: stolyarova_2023_rcr5059_table4_row_31_ba_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 31
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 78: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989), as cited in
+        Stolyarova et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: BaO · 2 B2O3
+        species_formula: Ba
+        temperature_range_K_as_published: 1277-1431
+        A_times_10^-3_as_published: 25.29 ± 0.49
+        B_as_published: 10.14 ± 0.37
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '78'
+        cited_source_as_attributed: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref78
+  BaBO2:
+    observations:
+    - observation_id: stolyarova_2023_rcr5059_table4_row_20_babo2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 20
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 75: M. Asano and T. Kou, High Temperature Science 29, 171 (1990), as cited in Stolyarova
+        et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: 3 BaO · B2O3
+        species_formula: BaBO2
+        temperature_range_K_as_published: 1434-1630
+        A_times_10^-3_as_published: 23.04 ± 1.46
+        B_as_published: 9.10 ± 0.30
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '75'
+        cited_source_as_attributed: M. Asano and T. Kou, High Temperature Science 29, 171 (1990)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref75
+    - observation_id: stolyarova_2023_rcr5059_table4_row_26_babo2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 26
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 78: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989), as cited in
+        Stolyarova et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: BaO · B2O3
+        species_formula: BaBO2
+        temperature_range_K_as_published: 1333-1535
+        A_times_10^-3_as_published: 23.26 ± 0.87
+        B_as_published: 11.73 ± 0.60
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '78'
+        cited_source_as_attributed: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref78
+    - observation_id: stolyarova_2023_rcr5059_table4_row_32_babo2_log_pressure_equation
+      type: partial_pressure
+      locator:
+        page: 11
+        table: '4'
+        row: 32
+        note: Table 4 fitted log-pressure equation row
+      units: log p_i(Torr) equation
+      phase: g
+      regime: kems_effusion
+      attribution: 'Ref. 78: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989), as cited in
+        Stolyarova et al. (2023), Table 4.'
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: no_schema_token_for_temperature_dependent_log_pressure_equation
+        condensed_phase_as_published: BaO · 2 B2O3
+        species_formula: BaBO2
+        temperature_range_K_as_published: 1277-1431
+        A_times_10^-3_as_published: 25.65 ± 0.22
+        B_as_published: 13.24 ± 0.17
+        equation_as_published: log p_i(Torr) = -A × 10^-3/T + B
+        reference_as_published: '78'
+        cited_source_as_attributed: M. Asano and T. Kou, Journal of Chemical Thermodynamics 21, 837 (1989)
+        uncertainty_note: Printed ± widths; confidence level not stated.
+      experiment: bao-b2o3-ref78
+  NaBO2:
+    observations: []
+    context:
+    - observation_id: stolyarova_2023_table13_borosilicate_vapour_context
+      type: quoted_table_context
+      locator:
+        page: 18
+        table: '13'
+        note: Table 13; six borosilicate glass compositions and identified vapour species.
+      attribution: >-
+        V.L. Stolyarova (2013), ECS Transactions 46, 55, reference 111 in
+        Stolyarova et al. (2023).
+      units: wt%
+      reason: >-
+        Qualitative-only context: the table identifies vapour species but prints
+        no species quantities or partial pressures; no species-presence measure
+        exists in the schema.
+      values:
+        quantity_as_published: vapour composition over borosilicate glasses
+        schema_gap: no scored quantity token for the identified-vapour-species list
+        printed_unit_as_published: wt.% oxide content
+        temperature_K_as_published: '1270'
+        apparatus_calibration_statement: Not stated in the review for reference 111.
+        rows:
+        - glass_number_as_printed: '1'
+          locator: {page: 18, table: '13', row: 1}
+          composition_as_published: {SiO2: '45.5', Al2O3: '4.9', B2O3: '14.0', Na2O: '9.9', CaO: '4.0', Li2O: '2.0', Cs2O: '1.4', Fe2O3: '2.9', others: '15.4'}
+          identified_vapour_species_as_published: [CsBO2, NaBO2, LiBO2]
+        - glass_number_as_printed: '2'
+          locator: {page: 18, table: '13', row: 2}
+          composition_as_published: {SiO2: '45.3', Al2O3: '4.9', B2O3: '14.0', Na2O: '9.8', CaO: '4.0', Li2O: '2.0', Cs2O: '1.4', Fe2O3: '2.9', others: '15.7'}
+          identified_vapour_species_as_published: [CsBO2, NaBO2, LiBO2]
+        - glass_number_as_printed: '3'
+          locator: {page: 18, table: '13', row: 3}
+          composition_as_published: {SiO2: '46.6', Al2O3: '5.0', B2O3: '14.2', Na2O: '10.0', CaO: '3.0', Li2O: '3.0', Cs2O: '0.8', Fe2O3: '2.0', others: '15.4'}
+          identified_vapour_species_as_published: [CsBO2, NaBO2, LiBO2]
+        - glass_number_as_printed: '4'
+          locator: {page: 18, table: '13', row: 4}
+          composition_as_published: {SiO2: '46.2', Al2O3: '4.2', B2O3: '13.4', Na2O: '9.1', CaO: '2.5', Li2O: '3.4', Cs2O: '-', Fe2O3: '5.2', others: '16.0'}
+          identified_vapour_species_as_published: [NaBO2, LiBO2, KBO2]
+        - glass_number_as_printed: '5'
+          locator: {page: 18, table: '13', row: 5}
+          composition_as_published: {SiO2: '40.7', Al2O3: '1.7', B2O3: '15.1', Na2O: '12.5', CaO: '15.6', Li2O: '-', Cs2O: '2.1', Fe2O3: '1.7', others: '10.6'}
+          identified_vapour_species_as_published: [CsBO2, NaBO2, KBO2]
+        - glass_number_as_printed: '6'
+          locator: {page: 18, table: '13', row: 6}
+          composition_as_published: {SiO2: '43.0', Al2O3: '2.8', B2O3: '20.5', Na2O: '16.4', CaO: '11.6', Li2O: '-', Cs2O: '1.8', Fe2O3: '3.9', others: '-'}
+          identified_vapour_species_as_published: [CsBO2, NaBO2, Na]
