@@ -13332,7 +13332,11 @@ class Migrator:
         facts = collect_printed_oxygen(specific, locator, skip_tables=skip_tables)
         ratio_payload = _has_author_ratio_oxygen_payload(specific)
         if ratio_oxygen is None and ratio_payload:
-            return point_conditions, facts
+            return point_conditions, PrintedOxygenFacts(
+                log_fO2=facts.log_fO2,
+                rejected_log_fO2=facts.rejected_log_fO2,
+                log_fO2_reference_Pa=facts.log_fO2_reference_Pa,
+            )
         if (
             ratio_oxygen is None
             and facts.log_fO2 is None
@@ -17753,10 +17757,6 @@ class Migrator:
             point_locator,
             fallback=(parent_values,) if isinstance(parent_values, Mapping) else (),
         )
-        if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
-            printed_fO2 = _printed_fO2_identity_state(printed_oxygen)
-            if printed_fO2 is not None:
-                identity = replace(identity, fO2_Pa=printed_fO2)
         if point_oxide_map:
             if point_printed_composition is None:
                 printed, residual = _located_printed_and_initial(
@@ -17939,9 +17939,14 @@ class Migrator:
                             "source has no located run duration for this point"
                         )
                     )
-                    log_fO2 = _as_dec_or_none(raw_item.get("log10_fO2"))
-                    if log_fO2 is not None:
-                        oxygen = State.of(_log_fO2_to_pa(log_fO2, _BAR_PA))
+                    printed_fO2 = _printed_fO2_identity_state(printed_oxygen)
+                    if printed_fO2 is not None:
+                        oxygen = printed_fO2
+                    elif identity.fO2_Pa is not None and (
+                        identity.fO2_Pa.is_value
+                        or identity.fO2_Pa.is_not_applicable
+                    ):
+                        oxygen = identity.fO2_Pa
                     elif (
                         isinstance(parent_values, Mapping)
                         and isinstance(parent_values.get("fO2_control"), Mapping)
