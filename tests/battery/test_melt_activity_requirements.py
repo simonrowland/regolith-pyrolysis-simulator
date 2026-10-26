@@ -645,6 +645,53 @@ def test_redox_free_activity_is_scored_without_an_oxygen_input(monkeypatch):
     assert prediction.value == Decimal('0.4')
 
 
+def test_alphamelts_activity_score_surfaces_invalid_oxide_notice(monkeypatch):
+    """Kill mutation:
+
+    ``drop_activity_repair_notice_forwarding_in_predict_with_engine``
+    """
+
+    from engines.alphamelts.domain import (
+        _canonical_oxide_activity_map_with_notices,
+    )
+    from simulator.battery.enums import Engine, NoticeKind
+    from simulator.battery.score import predict_with_engine
+
+    activities = {
+        "SiO2_Liq": 0.42,
+        "Al2O3": float("nan"),
+        "FeO": 0.0,
+    }
+    retained, repair_warnings = _canonical_oxide_activity_map_with_notices(
+        activities
+    )
+    assert retained == {"SiO2": 0.42}
+
+    _install_scoring_cell(monkeypatch, melt_activities=activities)
+    experiment, _bench, observation = _case(
+        composition=_composition(
+            ("SiO2", "0.5"), ("CaO", "0.3"), ("Al2O3", "0.2"),
+        ),
+        formula="SiO2",
+    )
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS,
+        observation,
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.value == Decimal("0.42")
+    assert [notice.kind for notice in prediction.notices] == [
+        NoticeKind.INPUT_OMITTED,
+        NoticeKind.INPUT_OMITTED,
+    ]
+    assert [notice.reason for notice in prediction.notices] == list(repair_warnings)
+    assert all(
+        notice.origin == "engine:alphamelts" for notice in prediction.notices
+    )
+
+
 def test_multivalent_psat_without_oxygen_keeps_green_scorer_decision(monkeypatch):
     seen = _install_scoring_cell(monkeypatch, gas_pressures={"FeO": 3.0})
     from simulator.battery.enums import Engine
