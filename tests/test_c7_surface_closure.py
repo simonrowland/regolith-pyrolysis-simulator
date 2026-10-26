@@ -456,7 +456,7 @@ def test_consuming_pressure_underflow_is_zero():
     assert evaluator.evaluate(1343.15, source_activity=0.1, pO2_bar=1e-300).pressure_pa == 0.0
 
 
-def test_mixed_asteroid_zero_keeps_neutral_pressure():
+def test_mixed_asteroid_zero_keeps_neutral_pressure(monkeypatch):
     from simulator.melt_backend.base import EquilibriumResult
     sim = simulation('s_type_asteroid_silicate')
     try:
@@ -474,7 +474,16 @@ def test_mixed_asteroid_zero_keeps_neutral_pressure():
         assert legacy.vapor_pressures_Pa == result.vapor_pressures_Pa
         flux = sim._calculate_evaporation(result)
         assert flux.species_kg_hr['SiO2_gas'] > 0.0
+        projections = []
+        project = sim._detached_evaporation_projection
+        def count_projection():
+            projections.append(1)
+            return project()
+        monkeypatch.setattr(sim, '_detached_evaporation_projection', count_projection)
         solved = sim._solve_evaporative_oxygen_boundary(result)
+        # The proven zero needs its ledger projection and admission audit,
+        # not a decade search that repeatedly snapshots the same zero source.
+        assert len(projections) <= 2
         assert solved.reaction_pO2_bar == solved.residual == 0.0
         proposed, amounts, trial, _, _ = solved.payload
         assert proposed.species_kg_hr.get('CrO2', 0.0) == 0.0
