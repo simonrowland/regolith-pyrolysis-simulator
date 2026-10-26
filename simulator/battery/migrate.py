@@ -1197,6 +1197,26 @@ def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
     return _percent_components(payload, AmountBasis.MASS_PERCENT)
 
 
+def _mole_percent_components(payload: object) -> dict[str, Decimal] | None:
+    return _percent_components(payload, AmountBasis.MOLE_PERCENT)
+
+
+def _mole_percent_closure_error(components: Mapping[str, Decimal]) -> str | None:
+    if any(not amount.is_finite() or amount < 0 for amount in components.values()):
+        return "mole-percent composition contains a negative or non-finite amount"
+    total = sum(components.values(), Decimal("0"))
+    rounding_bound = sum(
+        (
+            Decimal("0.5").scaleb(amount.as_tuple().exponent)
+            for amount in components.values()
+        ),
+        Decimal("0"),
+    )
+    if abs(total - Decimal("100")) > rounding_bound:
+        return f"mole-percent composition does not close to 100 (sum={total})"
+    return None
+
+
 def _mass_percent_printed_from_plain(
     payload: object,
 ) -> Located[Mapping[str, Any]] | None:
@@ -1214,6 +1234,44 @@ def _mass_percent_printed_from_plain(
 
 
 def _composition_located_from_plain(payload: object) -> Located[Composition]:
+    body: object = payload
+    if isinstance(payload, Mapping) and "state" in payload:
+        state = payload.get("state")
+        body = (
+            state.get("value")
+            if isinstance(state, Mapping)
+            and str(state.get("tag") or "value") == "value"
+            else None
+        )
+    if (
+        isinstance(body, Mapping)
+        and _enum(AmountBasis, body.get("amount_basis"))
+        is AmountBasis.MOLE_PERCENT
+    ):
+        source_payload = payload
+        if isinstance(payload, Mapping) and "state" not in payload:
+            source_payload = {
+                **payload,
+                "state": {"tag": "value", "value": {}},
+            }
+        source = _located_from_plain(source_payload, lambda value: value)
+        body: object = payload
+        if isinstance(body, Mapping) and "state" in body:
+            state = body.get("state")
+            body = state.get("value") if isinstance(state, Mapping) else None
+        try:
+            composition = _composition_from_plain(body)
+        except (ArithmeticError, ValueError) as exc:
+            return Located(
+                State.unknown(str(exc)),
+                locator=source.locator,
+                inference=source.inference,
+            )
+        return Located(
+            State.of(composition),
+            locator=source.locator,
+            inference=source.inference,
+        )
     wt = _mass_percent_components(payload)
     if wt is not None:
         if isinstance(payload, Mapping) and "state" not in payload:
@@ -1463,7 +1521,6 @@ def migrate_species_payload(payload: Mapping[str, Any]) -> Species:
 def _composition_from_plain(payload: object) -> Composition:
     assert isinstance(payload, Mapping)
     components = payload.get("components") or ()
-    pairs = tuple((str(k), as_decimal(v)) for k, v in components)
     amount_basis = _enum(AmountBasis, payload.get("amount_basis"))
     metadata = {
         "proxy_flag": (
@@ -1489,6 +1546,25 @@ def _composition_from_plain(payload: object) -> Composition:
         raise ValueError(
             "mass-percent composition contains unsupported or ambiguous components"
         )
+    if amount_basis is AmountBasis.MOLE_PERCENT:
+        mole_percent = _mole_percent_components(payload)
+        if mole_percent is None:
+            raise ValueError(
+                "mole-percent composition contains unsupported or ambiguous components"
+            )
+        closure_error = _mole_percent_closure_error(mole_percent)
+        if closure_error is not None:
+            raise ValueError(closure_error)
+        return Composition(
+            basis=str(payload.get("basis") or "printed_mole_percent"),
+            components=tuple(
+                (name, amount / Decimal("100"))
+                for name, amount in mole_percent.items()
+            ),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+            **metadata,
+        )
+    pairs = tuple((str(k), as_decimal(v)) for k, v in components)
     return Composition(
         basis=str(payload.get("basis") or "unknown"),
         components=pairs,
