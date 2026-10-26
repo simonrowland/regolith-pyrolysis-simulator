@@ -417,9 +417,9 @@ species:
             note: HSC thermodynamic simulation at 10 mbar; normalized from the printed pressure
       values:
         quantity: equilibrium_molecular_oxygen_yield
-        method_class: model_derived
+        method_class: quoted_attributed
         attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
-        admission_status: admitted
+        admission_status: model_output_not_measurement
         gas_species: O2
         mass_yield_percent_about: 1.37
         approximate: true

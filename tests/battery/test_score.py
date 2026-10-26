@@ -1550,6 +1550,8 @@ def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
 ) -> None:
     from simulator.battery.score import _source_band_catalog
 
+    # Keep the uncalibrated rows below the 10 Pa regime limit so this test
+    # isolates their calibration status when building pressure bands.
     experiment = F.kems_experiment("calibrated-kems")
     uncalibrated_experiment = F.kems_experiment(
         "uncalibrated-kems", kn=None, calibrated=False
@@ -1598,7 +1600,7 @@ def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
 
     uncalibrated_row = replace(
         _uncalibrated_kems_partial_row(
-            uncalibrated_experiment, "uncalibrated-kems-pressure", Decimal("1000")
+            uncalibrated_experiment, "uncalibrated-kems-pressure", Decimal("1")
         ),
         identity=identity,
         source_id="uncalibrated-source",
@@ -1661,7 +1663,7 @@ def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
             identity=identity,
             source_id=f"uncalibrated-source-{index}",
         )
-        for index, value in enumerate(("10", "100", "1000"))
+        for index, value in enumerate(("0.01", "0.1", "1"))
     )
     uncalibrated_context = context_for(
         uncalibrated_only,
@@ -1676,6 +1678,7 @@ def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
 def test_uncalibrated_kems_partial_pressure_is_excluded_from_band_population() -> None:
     from simulator.battery.score import derive_kems_partial_pressure_band
 
+    # Keep these points below the 10 Pa regime limit to isolate calibration.
     uncalibrated = F.kems_experiment(kn=None, calibrated=False)
     uncertainty = Uncertainty(
         kind=UncertaintyKind.PRINTED,
@@ -1690,7 +1693,7 @@ def test_uncalibrated_kems_partial_pressure_is_excluded_from_band_population() -
             ),
             uncertainty=uncertainty,
         )
-        for index, value in enumerate(("10", "100"))
+        for index, value in enumerate(("0.1", "1"))
     )
     calibrated = F.kems_experiment("calibrated-kems")
     identity = replace(

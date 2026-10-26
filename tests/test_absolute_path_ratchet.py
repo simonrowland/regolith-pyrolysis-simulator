@@ -208,7 +208,20 @@ def test_private_value_on_every_path_key_is_refused(key: str, form: str) -> None
     assert len(refused) == 1, errors
     assert f"extraction.{key}" in refused[0]
     assert _PLANT_PRIVATE in refused[0]
-    assert errors == refused  # the refusal is the only error, not buried
+    prose = [error for error in errors if "[docs-private-prose]" in error]
+    path_key = f"<document>:extraction.{key}"
+    if form in {"list_element", "alias_in_list"}:
+        path_key += "[1]"
+    expected_prose_paths = set()
+    if not key.endswith("_path"):
+        expected_prose_paths.add(path_key)
+    if form in {"alias", "alias_in_list"}:
+        expected_prose_paths.add("<document>:extraction.probe_anchor")
+    assert len(prose) == len(expected_prose_paths), errors
+    assert {
+        error.split(": [docs-private-prose]", maxsplit=1)[0] for error in prose
+    } == expected_prose_paths
+    assert len(errors) == len(refused) + len(prose), errors
 
 
 @pytest.mark.parametrize("form", sorted(_PLANT_FORMS))

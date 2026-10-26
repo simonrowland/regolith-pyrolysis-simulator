@@ -8292,6 +8292,8 @@ def test_mendybaev_table2_splits_isotopes_and_refuses_element_fractions() -> Non
     def source_rows(observation_id: str):
         return [row for row in rows if f"::{observation_id}::" in row.observation_id]
 
+    assert not source_rows("mendybaev_2021_isotope_table2_readable_rows")
+
     for element in ("Mg", "Si"):
         unavailable = source_rows(f"mendybaev_2021_table2_fraction_{element}_unavailable")
         assert len(unavailable) == 17
@@ -14816,8 +14818,8 @@ def test_robinot_hsc_model_yield_maps_with_printed_conditions() -> None:
     assert pressure.locator.pdf_page_index == 11
     assert observation.locator.pdf_page_index == 11
     assert observation.identity.species.formula == "O2"
-    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
-    assert observation.admission.status is AdmissionStatus.ADMITTED
+    assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert observation.admission.status is AdmissionStatus.PENDING
 
 
 def test_robinot_peak_about_is_not_invented_as_point_t(tmp_path: Path) -> None:
@@ -17973,11 +17975,6 @@ def test_shornikov_1994_printed_mullite_composition_reaches_every_point(
 
 def _assert_jacobson_table1_predictions_migrated(result) -> None:
     source_id = "kems-139-jacobson-2024"
-    document = yaml.safe_load(
-        (REPO_ROOT / "data/literature/extracts/kems-139-jacobson-2024.yaml").read_text()
-    )
-    source_observation = document["species"]["SiO"]["observations"][0]
-    source_points = source_observation["values"]["points"]
     expected_species = [
         "PO2", "SiO", "Fe", "Na", "PO", "K", "FeO", "O", "O2", "Mg",
         "SiO2", "TiO2", "P", "KO", "TiO", "Ca", "CaO", "Al", "Si", "K2", "Ti",
@@ -17991,34 +17988,29 @@ def _assert_jacobson_table1_predictions_migrated(result) -> None:
     ]
     assert len(points) == len(expected_species)
     assert [observation.identity.species.formula for observation in points] == expected_species
-    for observation, source_point in zip(points, source_points, strict=True):
-        formula = observation.identity.species.formula
-        assert quantity_token(observation.identity) is Quantity.P_PARTIAL
-        assert observation.value.kind is ValueKind.POINT
-        assert observation.value.point == (
-            Decimal(str(source_point["p_bar"])) * Decimal("1e5")
+    for observation in points:
+        assert observation.identity.quantity.is_unknown
+        assert "source semantics bound_not_point_ordering" in (
+            observation.identity.quantity.reason or ""
         )
-        assert observation.identity.species.phase.is_value
-        assert observation.identity.species.phase.value is Phase.G
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert "declared quantity is unknown" in (
+            observation.value.unavailable_reason or ""
+        )
+        assert observation.identity.species.phase.is_unknown
+        assert "not in the closed automatic map" in (
+            observation.identity.species.phase.reason or ""
+        )
         assert observation.identity.temperature_K is not None
         assert observation.identity.temperature_K.value == Decimal("2500.0")
         assert observation.evidence.class_.is_value
-        assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
-        composition_id = (
-            f"{source_id}::jacobson_2024_t1_snyder_12022_composition"
-        )
-        assert observation.derived_from == (composition_id,)
-        assert observation.derivation is not None
-        assert observation.derivation.inputs == (composition_id,)
-        assert observation.derivation.output_unit == "Pa"
         assert observation.evidence.attribution == (
             "Jacobson et al. 2024, Table 1, calculated with FactSage "
             "(ref. 115, Bale et al. 2002)"
         )
-        assert (
-            rail_for_quantity(Quantity.P_PARTIAL, species_formula=formula)
-            is not None
-        )
+        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert observation.derived_from is None
+        assert observation.derivation is None
         assert observation.locator is not None
         assert observation.locator.published_page == 18
         assert observation.locator.table == "1"
@@ -19020,7 +19012,7 @@ def test_exploded_rows_keep_parent_evidence_outside_author_estimates(
         } == {expected_attribution}
 
 
-def test_jacobson_2024_predicted_partial_pressures_migrate_as_p_partial(
+def test_jacobson_2024_predicted_pressures_keep_bound_semantics(
     tmp_path: Path,
 ) -> None:
     source_id = "kems-139-jacobson-2024"
@@ -19035,10 +19027,22 @@ def test_jacobson_2024_predicted_partial_pressures_migrate_as_p_partial(
 
     assert len(observations) == 21
     for observation in observations:
-        assert quantity_token(observation.identity) is Quantity.P_PARTIAL
-        assert observation.value.kind is ValueKind.POINT
+        assert observation.identity.quantity.is_unknown
+        assert "source semantics bound_not_point_ordering" in (
+            observation.identity.quantity.reason or ""
+        )
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert "declared quantity is unknown" in (
+            observation.value.unavailable_reason or ""
+        )
         assert observation.evidence.class_.is_value
-        assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert observation.evidence.attribution == (
+            "Jacobson et al. 2024, Table 1, calculated with FactSage "
+            "(ref. 115, Bale et al. 2002)"
+        )
+        assert observation.derived_from is None
+        assert observation.derivation is None
         assert observation.identity.temperature_K is not None
         assert observation.identity.temperature_K.value == Decimal("2500.0")
         assert observation.point_conditions is not None
@@ -19050,13 +19054,6 @@ def test_jacobson_2024_predicted_partial_pressures_migrate_as_p_partial(
         assert observation.locator is not None
         assert observation.locator.published_page == 18
         assert observation.locator.table == "1"
-
-    sio = next(
-        observation
-        for observation in observations
-        if observation.identity.species.formula == "SiO"
-    )
-    assert sio.value.point == Decimal("454.113900")
 
     expected = (
         ("1934.0", "170.4", "616914.8", "8.3"),

@@ -30,8 +30,6 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     REFUSAL_COMPOSITION_PROJECTED,
     REFUSAL_ENGINE_CRASH,
     REFUSAL_GATE_REFUSED_IN_ADAPTER,
-    REFUSAL_MAJOR_SUM,
-    REFUSAL_OUT_OF_BASIS,
     REFUSAL_TIMEOUT,
     REFUSAL_UNAVAILABLE,
     REFUSAL_VALUE_IS_FLOOR,
@@ -1996,12 +1994,12 @@ def test_qualification_cell_carries_gate_notice_and_extrapolated_authority() -> 
     (
         pytest.param(
             {"SrO": 25.9, "Al2O3": 74.1},
-            REFUSAL_MAJOR_SUM,
+            REFUSAL_GATE_REFUSED_IN_ADAPTER,
             id="unsupported-oxide-dominates",
         ),
         pytest.param(
             {"SrO": 1.0, "Al2O3": 29.7, "SiO2": 69.3},
-            REFUSAL_OUT_OF_BASIS,
+            REFUSAL_GATE_REFUSED_IN_ADAPTER,
             id="unsupported-minor-oxide",
         ),
     ),
@@ -2051,7 +2049,9 @@ def test_alphamelts_qualification_refuses_unsupported_oxide_before_subprocess(
     assert cell.refusal_reason == expected_refusal
     notice = next(n for n in cell.notices if n["kind"] == "melts_domain_gate")
     assert cell.engine == "alphamelts"
-    assert notice["run_anyway"] is False
+    assert "AlphaMELTSBackend._domain_gate" in " ".join(
+        notice["not_bypassable_from_harness"]
+    )
     assert subprocess_calls == []
 
 

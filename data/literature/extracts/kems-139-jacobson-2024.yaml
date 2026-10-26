@@ -178,15 +178,11 @@ species:
       units: bar as printed
       values:
         quantity: predicted_partial_pressure
-        method_class: model_derived
+        method_class: quoted_attributed
         attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
+        semantics: bound_not_point_ordering
         factsage_note: factsage_model_output_not_measurement
         model_as_printed: SLAG database in FactSage at 2500 K
-        derived_from: [jacobson_2024_t1_snyder_12022_composition]
-        derivation:
-          relation: Table 1 FactSage SLAG equilibrium pressures calculated for the lunar basalt 12022 composition at 2500 K; printed bar values are converted to Pa.
-          inputs: [jacobson_2024_t1_snyder_12022_composition]
-          output_unit: Pa
         cited_primary: '[115] Bale CW et al., FactSage thermochemical software and databases, CAL 26 (2002)
           189-228'
         cited_primary_doi: 10.1016/S0364-5916(02)00035-4

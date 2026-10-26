@@ -3076,13 +3076,14 @@ fidelity_samples:
     source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
     figure: '3'
     line_range: 114, 125
-- path: species.AlO.observations[demaria_1971_alo_al_o_kp_table8].values.points[0].Kp
+- path: species.AlO.observations[demaria_1971_alo_al_o_table8_Kp].values.points[0].value
   value: 3.19e-05
   note: 'Table 8: Kp(AlO=Al+O) at 2360 K = 3.19e-5'
   locator:
     source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
     table: '8'
-    line_range: 328-330
+    published_page: 1377
+    line_range: 337-341
 - species: Na
   observable: psat_series
   observation_id: demaria_1971_na_psat_figure1_sample_12022_digitized

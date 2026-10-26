@@ -292,7 +292,25 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # are rerun from the current 62d9d561a green.
     assert staged_silica == pytest.approx(0.06888507997517511, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
-    assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
+    # wall-chunk1/2's segment-certified Antoine paths now surface the staged
+    # trace-vapor captures as well; pin the complete Stage 3 composition.
+    assert staged_sio_stage == pytest.approx(
+        {
+            "Si": 0.021942626248784066,
+            "SiO2": 0.04694245372639105,
+            "Fe": 0.010360695537019618,
+            "CrO": 4.291406147946311e-05,
+            "SiO2_gas": 9.886248921808778e-05,
+            "TiO2_gas": 1.2448953034475534e-07,
+            "TiO": 9.92183822112173e-10,
+            "AlO": 4.017861590296685e-09,
+            "CaO_gas": 3.202812676524206e-11,
+            "Al2O": 1.4075793050725825e-12,
+            "Al2O2": 1.5182352811494474e-12,
+        },
+        rel=1e-9,
+        abs=1e-15,
+    )
     assert staged_sio_stage["Fe"] > 0.0
     assert staged_sio_stage["Si"] + staged_sio_stage["SiO2"] == pytest.approx(
         staged_silica, rel=1e-12

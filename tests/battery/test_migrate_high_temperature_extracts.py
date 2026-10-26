@@ -228,14 +228,17 @@ def test_demaria_in_band_rows_have_thirty_points_and_twelve_context_rows(
     context = [observation for observation in rows if observation.value.kind is not ValueKind.POINT]
     assert len(points) == 30
     assert len(context) == 12
-    assert all(
-        observation.identity.quantity.is_value
-        and observation.identity.quantity.value is Quantity.P_PARTIAL
-        and observation.evidence.class_.is_value
-        and observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
-        and observation.admission.status is AdmissionStatus.ADMITTED
-        for observation in points
-    )
+    for observation in points:
+        assert observation.identity.quantity.is_value
+        assert observation.identity.quantity.value is Quantity.P_PARTIAL
+        assert observation.evidence.class_.is_value
+        expected_class = (
+            EvidenceClass.MEASURED_REDUCED
+            if "table4" in observation.observation_id
+            else EvidenceClass.MEASURED_DIRECT
+        )
+        assert observation.evidence.class_.value is expected_class
+        assert observation.admission.status is AdmissionStatus.ADMITTED
     assert all(observation.value.kind is ValueKind.UNAVAILABLE for observation in context)
     assert all(not observation.identity.quantity.is_value for observation in context)
 
@@ -319,7 +322,7 @@ def test_demaria_table4_points_use_sample_smales_catalogue_composition(
     }
     for observation in table4:
         assert observation.identity.quantity.value is Quantity.P_PARTIAL
-        assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         assert observation.admission.status is AdmissionStatus.ADMITTED
     _assert_smales_catalogue_composition(table4, expected_sources)
 

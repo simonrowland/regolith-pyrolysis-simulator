@@ -1562,6 +1562,8 @@ def _pure_phase_attempt(
         notices = tuple(collected_notices)
         if notices:
             authority = Authority.EXTRAPOLATED
+    elif engine is Engine.MAGEMIN:
+        notices = _unrequested_phase_notices(props, second, quantity, origin)
     call_evidence = f"pure-phase:{engine.value}:{symbol}:T={temperature_K}"
     if engine is Engine.ALPHAMELTS:
         call_evidence += f":phase={getattr(props, '_alphamelts_phase_name', '')}"

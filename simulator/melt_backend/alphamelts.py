@@ -785,7 +785,7 @@ def _run_petthermotools_worker(
 def _stop_petthermotools_process(process) -> None:
     """Bound cleanup for the per-call spawn, including partial start failures."""
     try:
-        if process.pid is None:
+        if getattr(process, 'pid', None) is None:
             return
     except (AssertionError, OSError, ValueError):
         return

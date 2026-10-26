@@ -2412,11 +2412,12 @@ def test_read_scores_streams_residuals_from_archive_member(tmp_path: Path) -> No
         "refused_count": 1,
         "not_observable_count": 0,
     }
+    # amelts-thermo adds H-H298 to AlphaMELTS' advertised thermo quantities.
     assert coverage[("thermochemistry", "alphamelts")] == {
         "rail": "thermochemistry",
         "engine": "alphamelts",
-        "refused_count": 0,
-        "not_observable_count": 1,
+        "refused_count": 1,
+        "not_observable_count": 0,
     }
 
 

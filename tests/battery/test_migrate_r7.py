@@ -706,7 +706,7 @@ def test_g2_plante_pressure_rows_lift_page_271_calibration(tmp_path):
     )
 
 
-def test_g1_jacobson_predictions_migrate_as_partial_pressures(tmp_path):
+def test_g1_jacobson_predictions_keep_bound_semantics(tmp_path):
     root = _write_min_tree(tmp_path)
     _copy_extract(root, "kems-139-jacobson-2024.yaml")
     result = migrate(root, write=False)

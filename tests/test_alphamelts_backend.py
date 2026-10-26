@@ -475,6 +475,8 @@ def test_petthermotools_cold_worker_keeps_base_model_payload_and_code(
             return ('ok', {})
 
     class Process:
+        pid = 12345
+
         def __init__(self, **kwargs):
             process_calls.append(kwargs)
 
@@ -574,6 +576,8 @@ def test_decompression_worker_receives_owner_model_code(
             return ('ok', {})
 
     class Process:
+        pid = 12345
+
         def __init__(self, **kwargs):
             process_calls.append(kwargs)
 
@@ -4387,6 +4391,7 @@ def test_alphamelts_python_native_hang_is_killed_and_marks_unavailable(
 
     class FakeProcess:
         alive = True
+        pid = 12345
 
         def start(self):
             events.append(('start',))
@@ -5744,12 +5749,15 @@ def test_thermoengine_transport_close_is_idempotent(monkeypatch):
     transport.close()
     transport.close()
 
-    assert events == [
+    assert events[:4] == [
         ('send', None),
         ('close',),
         ('join', 1.0),
         ('killpg', 424242, signal.SIGKILL),
     ]
+    assert len(events) == 5
+    assert events[4][0] == 'join'
+    assert 0.0 <= events[4][1] <= 1.0
     assert transport._worker_process is None
     assert transport._worker_connection is None
 

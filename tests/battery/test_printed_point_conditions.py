@@ -93,7 +93,7 @@ def test_printed_point_temperature_routes(
         assert getattr(locator, locator_key) == locator_value
 
 
-def test_jacobson_table1_predictions_migrate_as_partial_pressures(
+def test_jacobson_table1_predictions_keep_bound_semantics(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(tmp_path, "kems-139-jacobson-2024")

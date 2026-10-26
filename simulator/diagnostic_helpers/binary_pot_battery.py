@@ -4135,20 +4135,9 @@ def equilibrate_cell(
                     f"(SiO2={sio2_wt_pct:g} wt%, "
                     f"observed_floor={crash_floor_wt_pct:g} wt%)"
                 )
-        alpha_input_validation_reason = (
-            diagnostics.get("backend_failure_reason_code")
-            or diagnostics.get("backend_status_reason")
-        )
-        alpha_input_validation_refusal = (
-            handle.name == "alphamelts"
-            and refusal in {REFUSAL_OUT_OF_BASIS, REFUSAL_MAJOR_SUM}
-            and alpha_input_validation_reason
-            in {"forbidden_species", "major_sum", "silicate_window"}
-        )
         if (
             qualification
             and status == "refusal"
-            and not alpha_input_validation_refusal
             and refusal not in {
                 REFUSAL_TIMEOUT,
                 REFUSAL_ENGINE_CRASH,

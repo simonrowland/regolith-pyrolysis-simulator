@@ -62,7 +62,10 @@ def test_piacente_matousek_1973_table_rows_and_render_pins() -> None:
     assert len(result.observations) == 86
     assert not result.validation.hard_issues
 
-    from simulator.battery.score import _cell_material_class, _uniform_modelled_reactive_cell
+    from simulator.battery.oxygen_balance import (
+        _cell_material_class,
+        _uniform_modelled_reactive_cell,
+    )
 
     expected_benches = {
         "Mo": ("piacente-1973-mo-cell", "reactive", "Mo"),

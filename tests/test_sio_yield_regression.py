@@ -583,12 +583,18 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     extrapolations = authority["wall_saturation_pressure_extrapolations_by_species"]
     assert extrapolations
     assert "Wall saturation includes EXTRAPOLATED quantities" in report["fouling_rate"]["status_reason"]
-    for by_segment in extrapolations.values():
+    assert set(extrapolations) == {"Fe", "K", "Mg", "Na"}
+    for species, by_segment in extrapolations.items():
         assert by_segment
         for event in by_segment.values():
             assert event["authority_level"] == "extrapolated"
-            assert event["valid_range_K"]
             assert event["reason"]
+            if species == "Fe":
+                # The Fe sidecar has no certified Antoine interval.
+                assert event["valid_range_K"] is None
+                assert event["reason"] == "wall_saturation_pressure_has_no_finite_valid_range"
+            else:
+                assert event["valid_range_K"]
 
 
 def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
