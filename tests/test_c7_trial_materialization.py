@@ -11,7 +11,9 @@ from tests.magemin_test_support import close_test_owned_magemin_backend
 pytestmark = [pytest.mark.serial, pytest.mark.xdist_group('serial')]
 
 
-@pytest.mark.parametrize('frontier', ('snapshot', 'ledger', 'history', 'notice', 'observer'))
+@pytest.mark.parametrize('frontier', (
+    'snapshot', 'ledger', 'history', 'cost', 'notice', 'observer', 'liquidus', 'sweep',
+))
 def test_pressure_evaluation_has_no_write_frontier(monkeypatch, frontier):
     from simulator.accounting.ledger import AtomLedger
     from simulator.condensation import CondensationModel
@@ -23,19 +25,25 @@ def test_pressure_evaluation_has_no_write_frontier(monkeypatch, frontier):
         'snapshot': (PyrolysisSimulator, '_snapshot_terminal_refusal_hour_state'),
         'ledger': (AtomLedger, 'apply'),
         'history': (CondensationModel, 'configure_operating_conditions'),
+        'cost': (PyrolysisSimulator, '_observe_cost_transition_best_effort'),
         'notice': (PyrolysisSimulator, '_record_degraded_path_engagement'),
         'observer': (PyrolysisSimulator, '_commit_proposal'),
+        'liquidus': (PyrolysisSimulator, '_melt_redox_liquidus_gate_record'),
+        'sweep': (PyrolysisSimulator, '_continuous_sweep_plan'),
     }
     solve = langmuir_knudsen._solve_surface_oxygen_balance
 
     def checked_solve(evaluate, **kwargs):
-        def checked(excess, **options):
+        def guarded(call, excess, **options):
             with monkeypatch.context() as guard:
                 owner, name = targets[frontier]
                 guard.setattr(owner, name, lambda *a, **k: pytest.fail(
                     f'pressure evaluation crossed {frontier} write frontier'))
-                return evaluate(excess, **options)
-        return solve(checked, **kwargs)
+                return call(excess, **options)
+        endpoint = kwargs.get('settle_inward_endpoint')
+        if endpoint is not None:
+            kwargs['settle_inward_endpoint'] = lambda excess: guarded(endpoint, excess)
+        return solve(lambda excess: guarded(evaluate, excess), **kwargs)
 
     monkeypatch.setattr(langmuir_knudsen, '_solve_surface_oxygen_balance', checked_solve)
     try:
