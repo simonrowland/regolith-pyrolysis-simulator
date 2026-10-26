@@ -36,7 +36,9 @@ socket.on('simulation_tick', (data) => {
         ? 'Mars CO₂: ' + (data.p_total_mbar || 0).toFixed(1) + ' mbar'
         : data.atmosphere === 'HARD_VACUUM'
             ? 'Hard vacuum'
-            : (data.atmosphere || '—');
+            : data.atmosphere === 'ARGON_FLOW'
+                ? 'Argon flow'
+                : (data.atmosphere || '—');
     setEl('status-atmosphere', 'Atmosphere: ' + atmosphereLabel);
 
     // Temperature chart

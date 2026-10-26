@@ -965,9 +965,11 @@ def _applicability_evidence(
         and not (stage == "c0b_p_cleanup" and "P2O5" not in rule.parent_species_ids)
     ):
         return {}
+    # Permanent inapplicability is a typed refusal, not epoch dormancy (for
+    # example, the retired P2O5_gas placeholder). Only stage-scoped gates can
+    # make a channel dormant for this batch.
     determined = (
-        rule.applicability_predicate in {"not_applicable", "inapplicable"}
-        or (rule.applicability_predicate == "stage0_only" and bool(phase or stage))
+        (rule.applicability_predicate == "stage0_only" and bool(phase or stage))
         or (stage == "c0b_p_cleanup" and "P2O5" not in rule.parent_species_ids)
     )
     return {

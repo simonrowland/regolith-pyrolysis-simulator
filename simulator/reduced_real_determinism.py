@@ -383,11 +383,18 @@ class PT0DeterminismStore:
     def write_through_enabled(self) -> bool:
         return self.capture_enabled and self.persistent_store is not None
 
-    def clone_for_replay(self) -> "PT0DeterminismStore":
+    def _clone_for_context(
+        self,
+        mode: str,
+        *,
+        persistent_cache: bool,
+    ) -> "PT0DeterminismStore":
         clone = PT0DeterminismStore(
-            "replay",
-            db_path=self.persistent_path,
-            read_only_base_db_path=self.read_only_base_db_path,
+            mode,
+            db_path=(self.persistent_path if persistent_cache else None),
+            read_only_base_db_path=(
+                self.read_only_base_db_path if persistent_cache else None
+            ),
             strict_vapor_gate=self.strict_vapor_gate,
             control_quantization=self._control_quantization,
         )
@@ -398,6 +405,22 @@ class PT0DeterminismStore:
         clone.cache_tier_ceiling = self.cache_tier_ceiling
         clone.cached_real_miss_policy = self.cached_real_miss_policy
         return clone
+
+    def clone_for_replay(self) -> "PT0DeterminismStore":
+        return self._clone_for_context("replay", persistent_cache=True)
+
+    def clone_for_forecast(self) -> "PT0DeterminismStore":
+        """Capture omits PT1; replay reopens its path.
+
+        Replay initialization may write schema metadata.
+        """
+        # Capture forecasts compute cache misses against their detached backend
+        # and retain fills only in the copied in-memory store. Replay forecasts
+        # reopen the live PT1 path, whose initializer may write schema metadata.
+        return self._clone_for_context(
+            self.mode,
+            persistent_cache=self.replay_enabled,
+        )
 
     def quantized_controls(
         self,

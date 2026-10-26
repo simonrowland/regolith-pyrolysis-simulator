@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -9,16 +11,24 @@ import pytest
 import yaml
 
 import simulator.session as session_module
+from simulator.accounting import MaterialLot
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
-from simulator.campaigns import CampaignManager
+from simulator.campaigns import CampaignManager, c0_exit_run_notice
 from simulator.feedstock_guard import is_blocked_feedstock
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.session import (
     DecisionPolicy,
     SimSession,
     SimSessionConfig,
     drive_auto_apply,
 )
-from simulator.state import CampaignPhase, DecisionPoint, DecisionType, HourSnapshot
+from simulator.state import (
+    CampaignPhase,
+    DecisionPoint,
+    DecisionType,
+    EvaporationFlux,
+    HourSnapshot,
+)
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -41,6 +51,54 @@ def _config(**overrides) -> SimSessionConfig:
     }
     values.update(overrides)
     return SimSessionConfig(**values)
+
+
+def _cross_surface_parity_setpoints() -> dict:
+    setpoints = _load_yaml("setpoints.yaml")
+    kernel = dict(setpoints.get("chemistry_kernel", {}) or {})
+    kernel["allow_unmeasured_alpha_fallback"] = True
+    series = dict(kernel.get("evaporation_series_resistance", {}) or {})
+    series["gas_resistance_enabled"] = False
+    kernel["evaporation_series_resistance"] = series
+    setpoints["chemistry_kernel"] = kernel
+    return setpoints
+
+
+def _pt0_store_state_bytes(store) -> bytes:
+    memory_state = {
+        name: getattr(store, name)
+        for name in (
+            "mode",
+            "entries",
+            "physics_bucket_entries",
+            "capture_sequence",
+            "replay_sequence",
+            "misses",
+            "cache_events",
+            "hits",
+            "live_fills",
+            "last_cache_state",
+            "quantize_live_controls",
+            "cache_tier_ceiling",
+            "cached_real_miss_policy",
+            "strict_vapor_gate",
+            "_control_quantization",
+        )
+    }
+    memory_bytes = json.dumps(
+        memory_state, sort_keys=True, separators=(",", ":"), default=str
+    ).encode("utf-8")
+    backing_bytes = bytearray()
+    if store.persistent_path is not None:
+        for suffix in ("", "-wal", "-shm"):
+            path = Path(f"{store.persistent_path}{suffix}")
+            backing_bytes.extend(suffix.encode("ascii"))
+            backing_bytes.extend(b"\0")
+            backing_bytes.extend(
+                path.read_bytes() if path.exists() else b"<absent>"
+            )
+            backing_bytes.extend(b"\0")
+    return memory_bytes + b"\0" + bytes(backing_bytes)
 
 
 def test_session_passes_stage0_subprocess_inputs_to_resolver(monkeypatch):
@@ -103,6 +161,66 @@ def test_cached_real_python_api_model_session_reaches_build_simulator(
         )
 
     assert reached == [model]
+
+
+def test_cached_real_capture_session_c0_forecast_computes_without_pt0_writes(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    class CachedRealForecastBackend(InternalAnalyticalBackend):
+        backend_name = "cached-real"
+
+    def resolve_cached_real(*_args, **_kwargs):
+        backend = CachedRealForecastBackend()
+        assert backend.initialize({})
+        return backend
+
+    monkeypatch.setattr(session_module, "resolve_backend", resolve_cached_real)
+    original_build_simulator = session_module.build_simulator
+    store_state: list[tuple[bytes, bytes]] = []
+    forecast_results: list[dict] = []
+
+    def build_simulator_with_pt0_guard(build_config):
+        sim = original_build_simulator(build_config)
+        original_predict = sim._predict_c0_exit
+
+        def predict_with_pt0_guard(*args, **kwargs):
+            store = sim._pt0_determinism_store
+            before = _pt0_store_state_bytes(store)
+            prediction = original_predict(*args, **kwargs)
+            after = _pt0_store_state_bytes(store)
+            store_state.append((before, after))
+            forecast_results.append(prediction)
+            return prediction
+
+        sim._predict_c0_exit = predict_with_pt0_guard
+        return sim
+
+    monkeypatch.setattr(
+        session_module, "build_simulator", build_simulator_with_pt0_guard
+    )
+    session = SimSession().start(
+        _config(
+            backend_name="cached-real",
+            reduced_real_cache={
+                "db_path": str(tmp_path / "cached-real-forecast.db"),
+                "miss_policy": "live-fill",
+                "authorized_backend_name": "alphamelts",
+                "authorized_mode": "python_api",
+                "authorized_model": "MELTSv1.0.2",
+            },
+        )
+    )
+
+    prediction = session.simulator.campaign_mgr.c0_exit_prediction
+    assert prediction["prediction_status"] == "ok"
+    assert prediction["T_exit_C"] is not None
+    assert prediction["forecast_engine"] == "cached-real"
+    assert session.simulator._pt0_determinism_store.mode == "capture"
+    assert forecast_results
+    assert forecast_results[-1]["T_exit_C"] is not None
+    assert store_state
+    assert all(before == after for before, after in store_state)
 
 
 def test_session_rejects_metallic_real_backend_before_resolver(monkeypatch):
@@ -472,6 +590,454 @@ def test_campaign_transition_zero_po2_override_leaves_atmosphere_at_default():
     # Atmosphere stays at C2A's documented default (PN2_SWEEP) —
     # operator only cleared the setpoint, not requested CONTROLLED_O2.
     assert sim.melt.atmosphere == Atmosphere.PN2_SWEEP
+
+
+def test_c0_forecast_reacts_to_web_ordered_ramp_override():
+    setpoints = _cross_surface_parity_setpoints()
+    configured_before_start = SimSession().start(
+        _config(
+            setpoints=setpoints,
+            runtime_campaign_overrides={
+                "C0": {"max_hours": 1.0, "ramp_rate": 2000.0}
+            },
+        )
+    )
+    started_before_adjustment = SimSession().start(
+        _config(setpoints=setpoints)
+    )
+    started_before_adjustment.adjust(
+        "campaign_override",
+        1.0,
+        campaign="C0",
+        field="max_hours",
+    )
+    started_before_adjustment.adjust(
+        "campaign_override",
+        2000.0,
+        campaign="C0",
+        field="ramp_rate",
+    )
+
+    def ledger_after_c0(session):
+        sim = session.simulator
+        steps = 0
+        while sim.melt.campaign == CampaignPhase.C0 and steps < 10:
+            sim.step()
+            steps += 1
+        assert sim.melt.campaign != CampaignPhase.C0
+        return json.dumps(
+            sim.atom_ledger.mol_by_account(),
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+
+    assert ledger_after_c0(configured_before_start) == ledger_after_c0(
+        started_before_adjustment
+    )
+
+
+def test_c0_feasible_midrun_reforecast_preserves_the_startup_trajectory():
+    config = _config(setpoints=_cross_surface_parity_setpoints())
+    baseline = SimSession().start(config)
+    reforecasted = SimSession().start(_config(
+        setpoints=_cross_surface_parity_setpoints()
+    ))
+    baseline_sim = baseline.simulator
+    reforecasted_sim = reforecasted.simulator
+    startup_prediction = deepcopy(
+        reforecasted_sim.campaign_mgr.c0_exit_prediction
+    )
+
+    assert baseline_sim.step().temperature_C == reforecasted_sim.step().temperature_C
+    reforecasted.adjust(
+        "campaign_override",
+        200.0,
+        campaign="C0",
+        field="ramp_rate",
+    )
+
+    updated_prediction = reforecasted_sim.campaign_mgr.c0_exit_prediction
+    assert updated_prediction["prediction_status"] == "ok"
+    assert updated_prediction["T_exit_C"] == startup_prediction["T_exit_C"]
+    assert updated_prediction["runtime_exit_window_hr"] <= (
+        updated_prediction["remaining_hold_budget_hr"]
+    )
+    assert updated_prediction["runtime_exit_campaign_hour"] == (
+        updated_prediction["runtime_exit_window_hr"] + 1.0
+    )
+    assert reforecasted_sim.campaign_mgr.c0_remaining_budget_exit is None
+
+    while (
+        baseline_sim.melt.campaign == CampaignPhase.C0
+        and reforecasted_sim.melt.campaign == CampaignPhase.C0
+    ):
+        baseline_snapshot = baseline_sim.step()
+        reforecasted_snapshot = reforecasted_sim.step()
+        assert baseline_snapshot.temperature_C == reforecasted_snapshot.temperature_C
+        assert baseline_snapshot.evap_flux.species_kg_hr == (
+            reforecasted_snapshot.evap_flux.species_kg_hr
+        )
+        assert baseline_sim.atom_ledger.mol_by_account() == (
+            reforecasted_sim.atom_ledger.mol_by_account()
+        )
+
+    assert baseline_sim.melt.campaign == reforecasted_sim.melt.campaign
+    assert baseline_sim.melt.campaign == CampaignPhase.C0B
+
+
+def test_c0_gas_bearing_noop_adjustments_keep_the_startup_exit_deadline():
+    session = SimSession().start(
+        _config(
+            feedstock_id="mars_phyllosilicate_clay",
+            setpoints=_cross_surface_parity_setpoints(),
+        )
+    )
+    sim = session.simulator
+    startup_prediction = deepcopy(sim.campaign_mgr.c0_exit_prediction)
+    startup_deadline = startup_prediction["runtime_exit_window_hr"]
+    assert startup_prediction["M_C0_gas_kg"] > 0.0
+    assert startup_deadline > 7.0
+    _target_C, ramp_rate = sim.campaign_mgr._configured_temperature_ramp(
+        CampaignPhase.C0
+    )
+
+    for completed_hour in range(1, 8):
+        snapshot = sim.step()
+        assert snapshot.campaign == CampaignPhase.C0
+        assert sim.melt.campaign_hour == completed_hour
+        if completed_hour not in {1, 7}:
+            continue
+
+        session.adjust(
+            "campaign_override",
+            ramp_rate,
+            campaign="C0",
+            field="ramp_rate",
+        )
+        updated_prediction = sim.campaign_mgr.c0_exit_prediction
+        assert updated_prediction["prediction_status"] == "ok"
+        assert updated_prediction["T_exit_C"] == startup_prediction["T_exit_C"]
+        assert updated_prediction["M_C0_gas_kg"] == (
+            startup_prediction["M_C0_gas_kg"]
+        )
+        assert updated_prediction["runtime_exit_campaign_hour"] == (
+            startup_deadline
+        )
+        assert updated_prediction["runtime_exit_window_hr"] == (
+            startup_deadline - completed_hour
+        )
+        assert sim.campaign_mgr.c0_remaining_budget_exit is None
+
+
+def test_c0_reforecast_counts_alkali_already_lost_during_this_hold(
+    monkeypatch,
+):
+    session = SimSession().start(
+        _config(
+            feedstock_id="mars_phyllosilicate_clay",
+            setpoints=_cross_surface_parity_setpoints(),
+        )
+    )
+    sim = session.simulator
+    startup_prediction = deepcopy(sim.campaign_mgr.c0_exit_prediction)
+    sim.step()
+    assert sim.melt.campaign == CampaignPhase.C0
+    assert sim.melt.campaign_hour == 1
+
+    feed_alkali_kg = startup_prediction["Na_plus_K_feed_mass_kg"]
+    budget_fraction = startup_prediction["alkali_retention_budget_fraction"]
+    projected_future_loss_kg = feed_alkali_kg * budget_fraction * 0.2
+
+    def project_fixed_future_loss(_flux, *, dt_hr=1.0):
+        if dt_hr <= 0.0:
+            return EvaporationFlux()
+        integrated = EvaporationFlux(
+            species_kg_hr={"Na": projected_future_loss_kg / dt_hr}
+        )
+        integrated.update_totals()
+        return integrated
+
+    monkeypatch.setattr(
+        sim,
+        "_apply_analytic_evaporation_depletion",
+        project_fixed_future_loss,
+    )
+    remaining_hold_hr = (
+        sim.campaign_mgr._max_hold_hr(CampaignPhase.C0)
+        - sim.melt.campaign_hour
+    )
+    future_prediction = sim._predict_c0_exit(
+        remaining_hold_budget_hr=remaining_hold_hr,
+        preferred_exit_temperature_C=startup_prediction["T_exit_C"],
+    )
+    assert future_prediction["prediction_status"] == "ok"
+
+    current_train_alkali_kg = sim._c0_nak_mass_kg_from_atom_moles(
+        sim.atom_ledger.atom_moles_by_account("process.condensation_train")
+    )
+    prior_c0_loss_kg = max(
+        0.0,
+        current_train_alkali_kg - sim._c0_start_train_alkali_kg,
+    )
+    total_projected_loss_kg = (
+        future_prediction["Na_plus_K_to_train_kg"]
+    )
+    projected_future_loss_kg = total_projected_loss_kg - prior_c0_loss_kg
+    assert 0.0 < projected_future_loss_kg < feed_alkali_kg * budget_fraction
+
+    target_prior_loss_kg = (
+        feed_alkali_kg * budget_fraction - projected_future_loss_kg / 2.0
+    )
+    additional_prior_loss_kg = target_prior_loss_kg - prior_c0_loss_kg
+    assert additional_prior_loss_kg > 0.0
+    na_kg_per_na2o_kg = sim._c0_nak_mass_kg_from_atom_moles(
+        sim._atom_moles_for_kg("Na2O", 1.0)
+    )
+    transferred_na2o_kg = additional_prior_loss_kg / na_kg_per_na2o_kg
+    assert transferred_na2o_kg <= sim.atom_ledger.kg_by_account(
+        "process.cleaned_melt"
+    ).get("Na2O", 0.0)
+    sim.atom_ledger.transfer(
+        "test_c0_prior_alkali_transfer_to_train",
+        debits=(
+            MaterialLot(
+                "process.cleaned_melt",
+                {"Na2O": transferred_na2o_kg},
+                source="C0 accumulated-loss budget test",
+            ),
+        ),
+        credits=(
+            MaterialLot(
+                "process.condensation_train",
+                {"Na2O": transferred_na2o_kg},
+                source="C0 accumulated-loss budget test",
+            ),
+        ),
+        reason="record prior C0 alkali loss to the train",
+    )
+    sim._project_cleaned_melt_from_atom_ledger()
+
+    _target_C, ramp_rate = sim.campaign_mgr._configured_temperature_ramp(
+        CampaignPhase.C0
+    )
+    session.adjust(
+        "campaign_override",
+        ramp_rate,
+        campaign="C0",
+        field="ramp_rate",
+    )
+    failed_prediction = sim.campaign_mgr.c0_exit_prediction
+    assert failed_prediction["prediction_status"] == (
+        "no_candidate_fits_remaining_budget"
+    )
+    assert failed_prediction["T_exit_C"] is None
+    assert failed_prediction["Na_plus_K_feed_loss_fraction"] > budget_fraction
+    assert failed_prediction["remaining_budget_exit_reason"] == (
+        "no_candidate_satisfies_alkali_budget"
+    )
+
+
+def test_c0_zero_window_projects_no_future_alkali_loss(monkeypatch):
+    session = SimSession().start(
+        _config(setpoints=_cross_surface_parity_setpoints())
+    )
+    sim = session.simulator
+    sim.step()
+    assert sim.melt.campaign == CampaignPhase.C0
+    sim.melt.temperature_C = float(round(sim.melt.temperature_C))
+    current_temperature_C = sim.melt.temperature_C
+    calls = []
+
+    def record_depletion_call(_flux, *, dt_hr=1.0):
+        calls.append(dt_hr)
+        return EvaporationFlux()
+
+    monkeypatch.setattr(
+        sim,
+        "_apply_analytic_evaporation_depletion",
+        record_depletion_call,
+    )
+    prior_c0_loss_kg = max(
+        0.0,
+        sim._c0_nak_mass_kg_from_atom_moles(
+            sim.atom_ledger.atom_moles_by_account(
+                "process.condensation_train"
+            )
+        )
+        - sim._c0_start_train_alkali_kg,
+    )
+    prediction = sim._predict_c0_exit(
+        remaining_hold_budget_hr=(
+            sim.campaign_mgr._max_hold_hr(CampaignPhase.C0)
+            - sim.melt.campaign_hour
+        ),
+        preferred_exit_temperature_C=current_temperature_C,
+    )
+
+    assert prediction["prediction_status"] == "ok"
+    assert prediction["T_exit_C"] == current_temperature_C
+    assert prediction["runtime_exit_window_hr"] == 0.0
+    assert prediction["Na_plus_K_to_train_kg"] == pytest.approx(
+        prior_c0_loss_kg
+    )
+    assert calls == []
+
+
+def test_c0_unexpected_reforecast_error_records_typed_unavailable_exit(
+    monkeypatch,
+):
+    session = SimSession().start(
+        _config(
+            feedstock_id="mars_phyllosilicate_clay",
+            setpoints=_cross_surface_parity_setpoints(),
+        )
+    )
+    sim = session.simulator
+    sim.step()
+    assert sim.melt.campaign == CampaignPhase.C0
+    _target_C, ramp_rate = sim.campaign_mgr._configured_temperature_ramp(
+        CampaignPhase.C0
+    )
+
+    def fail_projection(_flux, *, dt_hr=1.0):
+        raise RuntimeError("forced C0 forecast failure")
+
+    monkeypatch.setattr(
+        sim,
+        "_apply_analytic_evaporation_depletion",
+        fail_projection,
+    )
+    session.adjust(
+        "campaign_override",
+        ramp_rate,
+        campaign="C0",
+        field="ramp_rate",
+    )
+
+    assert sim.campaign_mgr.c0_exit_prediction["prediction_status"].startswith(
+        "unavailable:RuntimeError:"
+    )
+    assert sim.campaign_mgr.c0_remaining_budget_exit["type"] == (
+        "c0_remaining_budget_exit"
+    )
+    assert sim.campaign_mgr.c0_remaining_budget_exit["reason"] == (
+        "forecast_unavailable"
+    )
+
+
+def test_c0_adjustment_with_no_remaining_hold_candidate_exits_nonterminally():
+    session = SimSession().start(
+        _config(
+            feedstock_id="mars_phyllosilicate_clay",
+            setpoints=_cross_surface_parity_setpoints(),
+        )
+    )
+    sim = session.simulator
+    assert sim.campaign_mgr.c0_exit_prediction["runtime_exit_window_hr"] <= 25.0
+
+    first_hour = sim.step()
+    assert first_hour.campaign == CampaignPhase.C0
+    assert sim.melt.campaign == CampaignPhase.C0
+    assert sim.melt.campaign_hour == 1
+
+    session.adjust(
+        "campaign_override",
+        1.5,
+        campaign="C0",
+        field="max_hours",
+    )
+    failed_prediction = sim.campaign_mgr.c0_exit_prediction
+    assert failed_prediction["prediction_status"] == (
+        "no_candidate_fits_remaining_budget"
+    )
+    assert failed_prediction["T_exit_C"] is None
+    assert failed_prediction["best_candidate_hold_shortfall_hr"] > 0.0
+    assert sim.campaign_mgr.c0_remaining_budget_exit["reason"] == (
+        "no_candidate_fits_remaining_hold"
+    )
+    assert sim.campaign_mgr.c0_remaining_budget_exit["remaining_budget_hr"] == 0.5
+    target, _ramp = sim.campaign_mgr.get_temp_target(
+        CampaignPhase.C0,
+        sim.melt.campaign_hour,
+        sim.melt,
+    )
+    assert target == sim.melt.temperature_C
+
+    second_hour = sim.step()
+    expected_notice = {
+        "type": "c0_forecast_predates_adjustment",
+        "adjusted_fields": ["C0.max_hours"],
+        "campaign_hour": 1,
+        "loss_budget_re_evaluated": True,
+    }
+    assert second_hour.subsolidus_bakeout_diagnostic[
+        "forecast_adjustment_notices"
+    ] == [expected_notice]
+    assert sim.campaign_mgr.last_c0_exit["forecast_adjustment_notices"] == [
+        expected_notice
+    ]
+    assert sim.campaign_mgr.last_c0_exit["backstop"] == "remaining_budget"
+    assert sim.campaign_mgr.last_c0_exit["remaining_budget_exit"] == (
+        sim.campaign_mgr.c0_remaining_budget_exit
+    )
+    assert sim.campaign_mgr.last_c0_exit["remaining_budget_exit"][
+        "best_candidate_shortfall_unit"
+    ] == "hold_hr"
+    assert sim.campaign_mgr.last_c0_exit["remaining_budget_exit"][
+        "best_candidate_shortfall"
+    ] == failed_prediction["best_candidate_hold_shortfall_hr"]
+    assert c0_exit_run_notice(sim) == sim.campaign_mgr.last_c0_exit
+    assert sim.melt.campaign == CampaignPhase.C0B
+    assert sim.is_complete() is False
+
+
+def test_c0_post_step_pressure_adjustment_reforecasts_without_losing_cap(
+    monkeypatch,
+):
+    session = SimSession().start(
+        _config(setpoints=_cross_surface_parity_setpoints())
+    )
+    sim = session.simulator
+    startup_prediction = deepcopy(sim.campaign_mgr.c0_exit_prediction)
+    startup_cap = startup_prediction["T_exit_C"]
+    assert startup_cap is not None
+
+    sim.step()
+    assert sim.melt.campaign == CampaignPhase.C0
+    assert sim.melt.campaign_hour == 1
+
+    calls = []
+
+    def no_acceptable_candidate(**kwargs):
+        calls.append(kwargs)
+        return {
+            **startup_prediction,
+            "T_exit_C": None,
+            "prediction_status": "no_candidate_fits_remaining_budget",
+            "remaining_budget_exit_reason": "no_candidate_fits_remaining_hold",
+            "best_candidate_temperature_C": startup_cap,
+            "best_candidate_required_hold_hr": 30.0,
+            "best_candidate_hold_shortfall_hr": 6.0,
+        }
+
+    monkeypatch.setattr(sim, "_predict_c0_exit", no_acceptable_candidate)
+    session.adjust("pO2_mbar", 0.5)
+
+    assert calls == [
+        {
+            "remaining_hold_budget_hr": 24.0,
+            "preferred_exit_temperature_C": startup_cap,
+        }
+    ]
+    assert sim.campaign_mgr.c0_exit_prediction["T_exit_C"] is None
+    assert sim.campaign_mgr.c0_remaining_budget_exit is not None
+    target_C, _ramp_rate = sim.campaign_mgr.get_temp_target(
+        CampaignPhase.C0,
+        sim.melt.campaign_hour,
+        sim.melt,
+    )
+    assert target_C is not None
+    assert target_C <= startup_cap
 
 
 def test_session_adjust_stir_state_writes_canonical_2_axis_state():

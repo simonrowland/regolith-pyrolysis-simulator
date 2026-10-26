@@ -10419,7 +10419,11 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeyp
     })
     monkeypatch.setattr(sim, '_validate_backend_account_scope_support', lambda _view: None)
     monkeypatch.setattr(sim, '_sync_oxygen_reservoir_mirror', lambda: None)
-    monkeypatch.setattr(sim, '_record_equilibrium_status', lambda result: result)
+    monkeypatch.setattr(
+        sim,
+        '_record_equilibrium_status',
+        lambda result, *, run_post_equilibrium_sulfsat=True: result,
+    )
     result = sim._get_equilibrium()
     if route == 'kernel':
         # Diagnostic MELTS vapour is discarded before the builtin refresh.

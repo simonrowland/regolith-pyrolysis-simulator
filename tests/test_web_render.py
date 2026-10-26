@@ -221,7 +221,7 @@ def test_simulation_tick_payload_renders_operator_dom_readouts(
     assert rendered["text"]["status-mass"] == (
         f"Melt: {payload['melt_mass_kg']:.0f} kg"
     )
-    assert rendered["text"]["status-atmosphere"] == "Atmosphere: Hard vacuum"
+    assert rendered["text"]["status-atmosphere"] == "Atmosphere: Argon flow"
     assert rendered["text"]["energy-cumulative"] == (
         f"{payload['energy_electrical_plus_evaporation_cumulative_kWh']:.1f} kWh"
     )
@@ -1366,7 +1366,8 @@ def test_new_advisory_panels_render_empty_payloads_as_na():
 def _assert_producer_tick_baseline(payload):
     assert payload["hour"] == 1
     assert payload["campaign"] == "C0"
-    assert payload["temperature_C"] == pytest.approx(75.0)
+    # d-252 made C0 a 200 C/hr dry-Ar bakeout; its live tick starts at 25 C.
+    assert payload["temperature_C"] == pytest.approx(225.0)
     # 2026-08-05 MC-1 trace wiring d1b4f5d: Stage-0 routes 1.2285257819218 kg
     # of lunar trace passengers before this rounded operator payload is emitted.
     assert payload["melt_mass_kg"] == pytest.approx(998.8)
@@ -1374,9 +1375,9 @@ def _assert_producer_tick_baseline(payload):
     assert payload["mass_balance_error_breached"] is False
     assert payload["pot_composition_units"] == "kg"
     assert payload["pot_composition"]["SiO2"] > 0
-    assert payload["atmosphere"] == "HARD_VACUUM"
-    assert payload["actual_ramp_rate"] == pytest.approx(50.0)
-    assert payload["nominal_ramp_rate"] == pytest.approx(50.0)
+    assert payload["atmosphere"] == "ARGON_FLOW"
+    assert payload["actual_ramp_rate"] == pytest.approx(200.0)
+    assert payload["nominal_ramp_rate"] == pytest.approx(200.0)
     assert "backend_fallback_active" in payload
     assert "backend_message" in payload
 

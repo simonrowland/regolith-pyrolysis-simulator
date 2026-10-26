@@ -7,7 +7,10 @@ from pathlib import Path
 import yaml
 import pytest
 
-from simulator.accounting.stage0_inventory import STAGE0_RELEASE_KINETICS
+from simulator.accounting.stage0_inventory import (
+    STAGE0_RELEASE_KINETICS,
+    depletion_record,
+)
 from simulator.runner import PyrolysisRun, main
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
@@ -83,8 +86,8 @@ def test_lunar_c0_depleted_from_load_with_kinetics_gap() -> None:
     _assert_kinetics_gap(record)
     assert record["campaign"] == "C0"
     assert record["depleted"] is True
-    assert record["depletion_hour"] == "load"
-    assert record["would_be_inventory_advance"] is True
+    assert record["depletion_hour"] is None
+    assert record["would_be_inventory_advance"] is False
     assert record["exclude_elements"] == ["P"]
     assert "P" not in record["chnops_expansion"]["included_elements"]
     assert record["chnops_expansion"]["map"]["P"] == "excluded"
@@ -127,7 +130,7 @@ def test_ci_c0_larger_denominators_still_depleted_from_load() -> None:
     record = sim._last_target_inventory_diagnostic
     _assert_kinetics_gap(record)
     assert record["depleted"] is True
-    assert record["depletion_hour"] == "load"
+    assert record["depletion_hour"] is None
     assert "P" not in record["chnops_expansion"]["included_elements"]
     assert record["chnops_expansion"]["map"]["P"] == "excluded"
 
@@ -152,6 +155,48 @@ def test_ci_c0_larger_denominators_still_depleted_from_load() -> None:
     assert s2["primary_destination"] == "cleanup_sequestered"
     assert "P" not in record["chnops_expansion"]["elements"]
     assert float(sim.record.initial_inventory.melt_oxide_kg.get("P2O5") or 0.0) == 0.0
+
+
+def test_unavailable_target_after_hour_zero_is_not_depleted() -> None:
+    sim = _c0_sim("lunar_mare_low_ti")
+    common = {
+        "hour": 3,
+        "campaign": "C0",
+        "temperature_C": 200.0,
+        "ledger": sim.atom_ledger,
+        "initial_inventory": sim.record.initial_inventory,
+        "registry": sim.species_formula_registry,
+        "feedstocks": sim.feedstocks,
+        "feedstock_key": "lunar_mare_low_ti",
+    }
+    deferred = depletion_record(
+        **common,
+        setpoints={"campaigns": {"C0": {"target_species": ["CHNOPS"]}}},
+    )
+    assert deferred["depleted"] is False
+    assert deferred["depletion_hour"] is None
+    assert deferred["target_evidence"] == "unavailable"
+    assert deferred["aggregate_remaining_fraction"] is None
+    assert deferred["would_be_inventory_advance"] is False
+    chnops = _target(deferred, "CHNOPS")
+    assert chnops["status"] == "deferred_semantic_split"
+
+    empty = depletion_record(
+        **common,
+        setpoints={"campaigns": {"C0": {"target_species": ["H2O"]}}},
+    )
+    assert _target(empty, "H2O")["status"] == "zero_denominator"
+    assert empty["depleted"] is False
+    assert empty["depletion_hour"] is None
+    assert empty["target_evidence"] == "unavailable"
+
+    latched = depletion_record(
+        **common,
+        setpoints={"campaigns": {"C0": {"target_species": ["CHNOPS"]}}},
+        previous_depletion_hour=2,
+    )
+    assert latched["depleted"] is False
+    assert latched["depletion_hour"] == 2
 
 
 def test_target_inventory_not_on_hour_snapshot() -> None:
@@ -180,7 +225,7 @@ def test_runner_envelope_omits_target_inventory_keys() -> None:
     assert run._target_inventory_by_hour
     for record in run._target_inventory_by_hour:
         _assert_kinetics_gap(record)
-        assert record["depletion_hour"] == "load"
+        assert record["depletion_hour"] is None
 
 
 def test_sibling_artifact_written_only_with_flag(tmp_path: Path) -> None:

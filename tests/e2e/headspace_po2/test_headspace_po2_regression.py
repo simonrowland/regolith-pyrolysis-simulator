@@ -48,20 +48,13 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     # 2026-08-05 MC-4 wave 1B (a34318c): the composed Na carrier set routes
     # the tick flux exactly; the residual Na roundoff dust is gone and the
     # audited overhead is now empty. HI-2 above remains <= 1e-12 %.
-    # Restored flagged routing leaves only these identified roundoff parcels.
-    # 2026-10-13 b-850 round 2: parent-oxide alkali-dimer pressures no longer
-    # leave the prior 1.994e-20 kg Na roundoff parcel. The remaining SiO2_gas
-    # residual shifts from 9.409239450400745e-14 to 9.409239449650439e-14 kg.
-    # 2026-10-13 t-1236: the hour-18 overhead_bleed debit now keeps its
-    # 1.5660402193050345e-12 mol SiO2_gas (9.409239449650439e-14 kg) mol-lot
-    # entry, so it consumes the residual that the old lot materialization lost.
-    # b-894/t-1236 merged-tree measurement: the matching mol-basis credit
-    # retains that parcel in terminal.offgas, leaving overhead empty.
+    # The computed C0 exit shortens this run, so the old hour-18 SiO2 roundoff
+    # parcel is no longer produced. Missing account keys mean zero material.
     assert set(sim.atom_ledger.kg_by_account("process.overhead_gas")) == set()
     assert set(sim.atom_ledger.project_account_kg("process.overhead_gas")) == set()
-    assert sim.atom_ledger.kg_by_account("terminal.offgas")["SiO2_gas"] == pytest.approx(
-        9.409239449650439e-14, rel=1.0e-12, abs=0.0,
-    )
+    assert sim.atom_ledger.kg_by_account("terminal.offgas").get(
+        "SiO2_gas", 0.0
+    ) == pytest.approx(0.0, abs=0.0)
 
 
 def test_empty_overhead_expectations_do_not_use_numeric_approx():
