@@ -131,6 +131,98 @@ def test_run_scoring_arm_closes_owned_handles_on_every_exit(
     assert backend.close_calls == 1
 
 
+def test_run_scoring_arm_reopens_dead_backend_after_worker_death(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    import simulator.diagnostic_helpers.binary_pot_scoring as scoring
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.diagnostic_helpers.binary_pot_scoring import ScoringPot
+    from simulator.engine_pool import EngineWorkerDied
+    from simulator.melt_backend.base import EquilibriumResult
+
+    class FakeBackend:
+        def __init__(self, *, dies: bool) -> None:
+            self.live = True
+            self.dies = dies
+            self.closed = False
+            self.close_calls = 0
+
+        def is_available(self) -> bool:
+            return self.live
+
+        def equilibrate(self, **_kwargs) -> EquilibriumResult:
+            if self.dies:
+                self.dies = False
+                self.live = False
+                raise EngineWorkerDied("call", "fake worker exited")
+            assert self.live
+            return EquilibriumResult(
+                liquid_fraction=1.0,
+                melt_activities={"SiO2": 0.5},
+            )
+
+        def close(self) -> None:
+            if not self.closed:
+                self.closed = True
+                self.close_calls += 1
+            self.live = False
+
+    opened: list[EngineHandle] = []
+    backends: list[FakeBackend] = []
+
+    def make_handle(name: str, *, dies: bool) -> EngineHandle:
+        backend = FakeBackend(dies=dies)
+        backends.append(backend)
+        handle = EngineHandle(
+            name=name,
+            backend=backend,
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=False,
+        )
+        opened.append(handle)
+        return handle
+
+    initial = make_handle("fake", dies=True)
+    monkeypatch.setattr(
+        battery, "probe_battery_engines", lambda _names: {"fake": initial}
+    )
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda name: make_handle(name, dies=False),
+    )
+    monkeypatch.setattr(battery, "_emit_progress", lambda *_args: None)
+    monkeypatch.setattr(battery, "_engine_identities_from_toml", lambda: {})
+    monkeypatch.setattr(battery, "_refusal_matrix", lambda *_args, **_kwargs: {})
+    monkeypatch.setattr(scoring, "score_scoring_arm", lambda **_kwargs: [])
+
+    pot = ScoringPot(
+        pot_id="fake-pot",
+        source_id="fake-source",
+        observation_id="fake-observation",
+        sample_no=None,
+        temperatures_K=(1500.0, 1550.0),
+        composition_basis="test",
+        composition_conversion="test",
+        composition_as_printed={"SiO2": 100.0},
+        composition_wt_pct={"SiO2": 100.0},
+        why="test dead worker recovery",
+    )
+
+    report = run_scoring_arm(
+        engine_names=("fake",), pots=(pot,), extract_paths=()
+    )
+
+    assert report["n_ok"] == 1
+    assert report["n_refused"] == 1
+    assert len(opened) == 2
+    assert backends[0].close_calls == 1
+    assert backends[1].close_calls == 1
+
+
 def test_scoring_pots_are_content_derived_from_extracts(tmp_path: Path) -> None:
     derived = build_scoring_pots_from_extracts(SCORING_EXTRACTS)
     loaded = load_scoring_pots(DEFAULT_POTS_PATH)

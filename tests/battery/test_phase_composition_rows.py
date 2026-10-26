@@ -607,6 +607,7 @@ def test_phase_rows_score_component_dex_from_the_assemblage(
         composition_kg,
         fO2_log,
         pressure_bar,
+        handles=None,
     ):
         calls.append(
             {
@@ -775,8 +776,15 @@ def test_phase_rows_reuse_engine_handle_and_refuse_emfile_launch(
     assert not residual.score_eligible
 
 
+@pytest.mark.parametrize(
+    "engine",
+    (
+        pytest.param(Engine.THERMOENGINE, id="thermoengine"),
+        pytest.param(Engine.MAGEMIN, id="magemin"),
+    ),
+)
 def test_phase_rows_reopen_cached_handle_after_transport_death(
-    monkeypatch: pytest.MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch, engine: Engine
 ) -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
     from simulator.diagnostic_helpers import binary_pot_battery
@@ -860,7 +868,7 @@ def test_phase_rows_reopen_cached_handle_after_transport_death(
 
     residuals, _candidates, _events = score_module._score_store_with_decisions(
         context,
-        engines=(Engine.THERMOENGINE,),
+        engines=(engine,),
         include_diagnostics=False,
         predict=capture_prediction,
     )
@@ -1094,7 +1102,10 @@ def test_closed_phase_residual_keeps_derived_dex_decision_band(
 def test_distribution_ratio_dex_uses_both_phase_amounts(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def hook(engine, *, temperature_C, composition_kg, fO2_log, pressure_bar):
+    def hook(
+        engine, *, temperature_C, composition_kg, fO2_log, pressure_bar,
+        handles=None,
+    ):
         return EquilibriumResult(
             liquid_fraction=1.0,
             phase_compositions={
@@ -1301,7 +1312,10 @@ def test_printed_experiment_pressure_reaches_the_scorer(
 ) -> None:
     calls: list[dict] = []
 
-    def hook(engine, *, temperature_C, composition_kg, fO2_log, pressure_bar):
+    def hook(
+        engine, *, temperature_C, composition_kg, fO2_log, pressure_bar,
+        handles=None,
+    ):
         calls.append(
             {
                 "engine": engine,
@@ -1447,6 +1461,7 @@ def test_capacity_scores_only_when_the_adapter_declares_the_solute(
         pressure_bar,
         solute_fugacity_bar=None,
         solute_fugacity_parameter=None,
+        handles=None,
     ):
         calls.append(
             {
