@@ -10588,8 +10588,13 @@ def select_declared_source(
                     field_name=field_name,
                 )
             if not isinstance(gas_species, str) or not gas_species.strip():
+                reason = (
+                    "yield_ug_g conversion requires the printed gas_species"
+                    if field_name == "yield_ug_g"
+                    else "evolved gas yield conversion requires a printed species"
+                )
                 return _unavailable_selection(
-                    "evolved gas yield conversion requires a printed species",
+                    reason,
                     condition_ranges=condition_ranges,
                     field_name=field_name,
                 )
