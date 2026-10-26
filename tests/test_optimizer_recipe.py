@@ -113,8 +113,12 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # 2584074346931c132b487ffb6ce56511d26f76805d63bcfa14eb996d1fe5ea57.
     # The combined t-1457 C0 contract and b154 Stage-6/7 bands produce the
     # resolved digest below.
+    # d-294 adds endpoint/yield declarations, data-owned minima and final-pass
+    # defaults; d-293 moves the unchanged recipe bound pairs into YAML.
+    # Re-derived through PyrolysisRun._session_config(); existing leaves and
+    # bounds_digest remain unchanged (endpoint-r1 config/pin proofs).
     assert hashlib.sha256(resolved).hexdigest() == (
-        "911f820f280e2141010189a727b3a8dcbce5c65826a1960f25f9d26465926b4a"
+        "1db63935cf38f17a53f56f9021aaaa2601d10e5a403bc04b60573036603a3651"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
@@ -2154,7 +2158,8 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
         + grounded_sources
         == len(RecipeSchema().allowlist)
     )
-    assert range_sourced == 41
+    # Twelve unchanged cap/duration pairs now cite their data-owned bounds.
+    assert range_sourced == 53
     assert converted_setpoint_ranges == 2
     assert engineering_envelopes > 0
     assert grounded_sources > 0
@@ -2205,6 +2210,18 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
         "campaigns.C6.pO2_mbar": (0.08, 0.35),
         "campaigns.C6.pO2_mbar_default": (0.08, 0.35),
         "campaigns.C6.p_total_mbar_default": (0.08, 0.35),
+        "campaigns.C2A_continuous.duration_hr": (18, 160),
+        "campaigns.C2A_continuous.max_hold_hr": (18, 160),
+        "campaigns.C2A_staged.stages.alkali_early_fe.duration_hr": (1, 6),
+        "campaigns.C2A_staged.stages.sio_window.duration_hr": (1, 6),
+        "campaigns.C2A_staged.stages.fe_hot_hold.duration_hr": (1, 4),
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_hr": (1, 3),
+        "campaigns.C2A_staged.na_shuttle_stage.duration_hr": (1, 6),
+        "campaigns.C2B.max_hold_hr": (8, 20),
+        "campaigns.C4.max_hold_hr": (6, 20),
+        "campaigns.C5.max_hold_hr.branch_one": (1, 800),
+        "campaigns.C5.max_hold_hr.branch_two": (1, 800),
+        "campaigns.C6.max_hold_hr": (1, 20),
     }
     schema = RecipeSchema()
     actual = {
@@ -2221,7 +2238,7 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
         )
     }
 
-    assert len(actual) == 43
+    assert len(actual) == 55
     assert actual == {
         path: (type(low), low, type(high), high)
         for path, (low, high) in expected.items()
