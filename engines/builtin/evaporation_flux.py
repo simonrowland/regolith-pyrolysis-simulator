@@ -477,6 +477,13 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             )
         _batch_flux_raw = controls.get("vapour_batch_flux_pressures_Pa")
         vapor_pressures = dict(_batch_flux_raw or {})
+        source_thermo_refusals = {
+            species: dict(refusal)
+            for species, refusal in (controls.get("source_thermo_refusals") or {}).items()
+            if species in vapor_pressures
+        }
+        vapor_pressures = {species: pressure for species, pressure in vapor_pressures.items()
+                           if species not in source_thermo_refusals}
         overhead_partials = dict(controls.get("overhead_partials_Pa") or {})
         vapor_pressure_sources = dict(controls.get("vapor_pressures_source") or {})
         pressure_provenance_by_species = dict(
@@ -1093,6 +1100,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 "missing-species-state-dependent-melt-transfer-inputs"
             ),
         }
+        if source_thermo_refusals:
+            diagnostic["source_thermo_refusals"] = source_thermo_refusals
         if below_threshold_flux_kg_hr:
             diagnostic["below_threshold_evaporation_flux"] = {
                 "threshold_kg_hr": _NONTRIVIAL_FLUX_KG_HR,

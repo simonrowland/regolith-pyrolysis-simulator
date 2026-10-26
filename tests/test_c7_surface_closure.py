@@ -376,9 +376,10 @@ def test_cold_inverse_sources_are_eligible_without_seed_flow(disabled_p4, monkey
         projected = solved.payload[2]
         # Inventory and executable inverse-source contracts survive the zero
         # seed flux. Their finite positive-side depletion closes above zero.
-        assert {'P4O6', 'SiO', 'Si2', 'Si3'} <= projected.frozen_carriers
+        assert {'SiO', 'Si2', 'Si3'} <= projected.frozen_carriers
+        assert 'P4O6' not in projected.frozen_carriers
         assert solved.reaction_pO2_bar > 0.0
-        assert solved.source_terms_mol_m2_s['P4O6'] > 0.0
+        assert 'P4O6' not in solved.source_terms_mol_m2_s
         gross = math.fsum(abs(value) for value in solved.balance_terms)
         assert abs(solved.residual) / gross < math.sqrt(math.ulp(1.0))
         if disabled_p4:

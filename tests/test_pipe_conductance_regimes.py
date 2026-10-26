@@ -283,3 +283,26 @@ def test_tiny_positive_c0_source_uses_zero_flow_pipe_limit(sink_bar):
     assert state["p_mean_Pa"] == sink_bar * 1e5
     assert state["pipe_conductance_kg_hr"] == 0.0
     assert melt.p_total_mbar == 0.0
+
+
+@pytest.mark.parametrize("dimension", ["pipe_diameter_m", "pipe_length_m"])
+def test_tiny_source_still_refuses_invalid_pipe_geometry(dimension):
+    model = OverheadGasModel({})
+    setattr(model, dimension, 0.0)
+    melt = MeltState()
+    melt.p_total_mbar = 0.0
+    source = 5.640458934168655e-70
+    with pytest.raises(OverheadConfigurationError, match="valid pipe"):
+        model.estimate_transport_state(
+            EvaporationFlux(species_kg_hr={"CrO": source}, total_kg_hr=source), melt)
+
+
+def test_tiny_source_still_refuses_negative_pipe_capacity(monkeypatch):
+    model = OverheadGasModel({})
+    monkeypatch.setattr(model, '_pipe_conductance', lambda *a, **k: -1.0)
+    melt = MeltState()
+    melt.p_total_mbar = 0.0
+    with pytest.raises(OverheadConfigurationError, match="pipe conductance"):
+        model.estimate_transport_state(
+            EvaporationFlux(species_kg_hr={"CrO": 5.640458934168655e-70},
+                            total_kg_hr=5.640458934168655e-70), melt)

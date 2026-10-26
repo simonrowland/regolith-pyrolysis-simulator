@@ -54,6 +54,7 @@ populate; turbine speed/capacity is not an input to this model.
 from __future__ import annotations
 
 import math
+from numbers import Real
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Optional
 
@@ -1046,6 +1047,7 @@ class OverheadGasModel:
             pipe_conductance=self._pipe_conductance,
             vapor_pressure_mbar_from_flux=self._vapor_pressure_mbar_from_flux,
             initial_throat_area_m2=self.initial_throat_area_m2, pipe_diameter_m=self.pipe_diameter_m,
+            pipe_length_m=self.pipe_length_m,
             stage_areas=self.stage_area_m2_by_stage,
             geometry_notice=self.stage_area_geometry_provenance_notice,
             p_downstream_bar=p_downstream_bar, effective_transport_capacity=effective_transport_capacity)
@@ -1864,7 +1866,7 @@ def _estimate_transport_state(
     evap_flux: EvaporationFlux,
     melt: MeltState,
     resolve_pipe_temperature_C, resolve_downstream_pressure, pipe_conductance,
-    vapor_pressure_mbar_from_flux, initial_throat_area_m2, pipe_diameter_m,
+    vapor_pressure_mbar_from_flux, initial_throat_area_m2, pipe_diameter_m, pipe_length_m,
     stage_areas, geometry_notice,
     p_downstream_bar: Optional[float] = None,
     effective_transport_capacity: Optional[EffectiveTransportCapacity] = None,
@@ -1918,12 +1920,12 @@ def _estimate_transport_state(
         conductance = pipe_conductance_kg_hr / 3600.0
         vapor_pressure_mbar = allowed_pressure_Pa / 100.0
     else:
-        conductance = pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream/downstream pressures
+        conductance = _required_finite_nonnegative_float(pipe_conductance(
             allowed_pressure_Pa,
             conductance_temperature_C,
             p_downstream_Pa=downstream_pressure_Pa,
-            species_kg_for_M_avg=evap_flux.species_kg_hr,  # kg/hr by species — composition basis for M_avg
-        )
+            species_kg_for_M_avg=evap_flux.species_kg_hr,
+        ), 'pipe conductance')  # kg/s — capacity at the declared pressure
         pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — capacity at allowed pressure; kg/s -> kg/hr
     if not controlled_flow and (
         conductance > 0.0
@@ -1943,14 +1945,26 @@ def _estimate_transport_state(
         if allowed_pressure_Pa == 0.0:
             allowed_pressure_Pa = vapor_pressure_mbar * 100.0
             if total_evap_kg_hr > 0.0 and allowed_pressure_Pa <= downstream_pressure_Pa:
-                raise OverheadConfigurationError(
-                    'hard-vacuum source requires a valid pipe with positive forward capacity'
-                )
-            conductance = pipe_conductance(
+                if not all(isinstance(value, Real) and not isinstance(value, bool)
+                           and math.isfinite(value) and value > 0.0
+                           for value in (pipe_diameter_m, pipe_length_m)):
+                    raise OverheadConfigurationError(
+                        'hard-vacuum source requires a valid pipe with positive forward capacity'
+                    )
+                # Owner law: F=A*(P1²-P2²)+B*(P1-P2)*r((P1+P2)/2),
+                # with r(0)=1 and A,B>0 for a valid pipe. Set δ=P1-P2:
+                # F=[2*A*P2+B*r(P2)]*δ+O(δ²), so δ=F/K+O(F²)
+                # and P1 -> P2 as F -> 0. At vacuum K=B. K has units
+                # kg/(s Pa); (kg/s)/K is Pa. If the finite inverse cannot
+                # resolve a positive increment, retain this analytic limit,
+                # not a pressure floor. Invalid geometry still refuses above.
+                allowed_pressure_Pa = downstream_pressure_Pa
+                vapor_pressure_mbar = downstream_pressure_Pa / 100.0
+            conductance = _required_finite_nonnegative_float(pipe_conductance(
                 allowed_pressure_Pa, conductance_temperature_C,
                 p_downstream_Pa=downstream_pressure_Pa,
                 species_kg_for_M_avg=evap_flux.species_kg_hr,
-            )
+            ), 'pipe conductance')
             pipe_conductance_kg_hr = conductance * 3600.0
     elif not controlled_flow:
         # Premise: zero forward conductance is a closed-line condition,

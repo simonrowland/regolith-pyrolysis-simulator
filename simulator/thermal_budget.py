@@ -281,6 +281,25 @@ _OXIDE_VAPOR_SPECIES: frozenset[str] = frozenset(
 )
 
 
+def _evaporation_source_thermo_refusals(vapor_pressures, temperature_K):
+    """Read the existing source-energy law; no unowned thermo extension."""
+    refused = {}
+    for section in ('metals', 'oxide_vapors'):
+        for species, metadata in vapor_pressures.get(section, {}).items():
+            try:
+                _analytical_reaction_enthalpy(species, metadata,
+                    temperature_K=temperature_K)
+            except ValueError as exc:
+                # The owner refuses domain errors and unavailable reaction
+                # thermo. Preserve the specific type/reason per carrier.
+                refused[species] = {
+                    'status': 'unavailable', 'authority_level': 'unavailable',
+                    'refusal_type': type(exc).__name__, 'reason': str(exc),
+                    'temperature_K': temperature_K,
+                }
+    return refused
+
+
 def evaporation_enthalpy_budget(
     species_kg_hr: Mapping[str, float],
     *,

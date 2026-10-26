@@ -41,6 +41,7 @@ def test_cold_source_thermo_refusal_excludes_species_without_aborting_hour():
         refused = sim._last_evaporation_flux_diagnostic['source_thermo_refusals']
         assert refused['P4O6']['refusal_type'] == 'NasaCeaDomainError'
         assert refused['P4O6']['temperature_K'] == 448.15
+        assert sim._last_vapour_batch_report['metadata']['source_thermo_refusals'] == refused
         assert snapshot.evap_flux.species_kg_hr.get('P4O6', 0.0) == 0.0
         assert 'P4O6' not in sim._last_surface_oxygen_diagnostic['frozen_carriers']
         assert abs(snapshot.mass_balance_error_pct) <= 5e-12

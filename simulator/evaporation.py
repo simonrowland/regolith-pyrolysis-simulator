@@ -1317,6 +1317,18 @@ def _build_evaporation_aux_maps(
 
 def _project_evaporation_flux(kernel_result, flux, diagnostic, *,
         freeze_gate_fraction, native_fe_capacity_mol, molar_masses_kg_mol, frozen_carriers):
+    # Catalog pressure/request closure stays intact; source execution also
+    # requires the hour's energy law, with per-species typed refusals.
+    from simulator.vapour_rail.batch import FluxRefusal
+    from simulator.vapour_rail.instrumentation import _flux_payload
+    for species, refusal in diagnostic.get('source_thermo_refusals', {}).items():
+        record = flux.carrier_authority_by_species.get(species)
+        if record is not None:
+            flux.carrier_authority_by_species[species] = {
+                **record, 'is_refused': True,
+                'refusal_code': 'source_thermo_unavailable',
+                'flux': _flux_payload(FluxRefusal('source_thermo_unavailable', refusal['reason'])),
+            }
     alpha_authority_statuses = dict(diagnostic.get('alpha_authority_status_by_species', {}) or {})
     # Promote EVERY non-OK EVAPORATION_FLUX result to a typed refusal.
     # Previously only missing_alpha / missing_transport_parameters raised;
@@ -2067,6 +2079,7 @@ def _frozen_condensation_route(hour, flux, *, materialize_authority=False):
         pipe_conductance=lambda *args, **kwargs: conductance(*args, **kwargs)[0],
         vapor_pressure_mbar_from_flux=inverse,
         initial_throat_area_m2=inputs['initial_throat_area_m2'], pipe_diameter_m=inputs['pipe_diameter_m'],
+        pipe_length_m=inputs['pipe_length_m'],
         stage_areas=lambda: dict(inputs['stage_areas']), geometry_notice=lambda: dict(inputs['geometry_notice']),
         effective_transport_capacity=capacity)
     oxygen_mol_hr = (_project_evaporation_overhead_source_mol_hr(flux.species_kg_hr, {},
@@ -2830,6 +2843,12 @@ class EvaporationMixin:
             control_inputs=control_inputs,
         )
         diagnostic = dict(kernel_result.diagnostic or {})
+        if batch_report is not None and diagnostic.get('source_thermo_refusals'):
+            batch_report = {**batch_report, 'metadata': {
+                **(batch_report.get('metadata') or {}),
+                'source_thermo_refusals': diagnostic['source_thermo_refusals'],
+            }}
+            self._last_vapour_batch_report = batch_report
         if batch_report is not None:
             diagnostic[CONTROL_BATCH_REPORT_KEY] = batch_report
         diagnostic['vapour_batch_flux_overlay'] = flux_overlay_report
@@ -4891,8 +4910,12 @@ class EvaporationMixin:
         carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
         carrier_gas = carrier_resolver() if callable(carrier_resolver) else 'N2'
         frozen = getattr(self, '_frozen_evaporation_carriers', None)
+        from simulator.thermal_budget import _evaporation_source_thermo_refusals
+        source_thermo_refusals = _evaporation_source_thermo_refusals(
+            self.vapor_pressures, self.melt.temperature_C + 273.15)
         controls: dict[str, Any] = {
             # Batch-gated flux map; pre-RG values came through the typed seam.
+            'source_thermo_refusals': source_thermo_refusals,
             CONTROL_FLUX_PRESSURES_KEY: vapor_pressures,
             # Reporting / shadow projection only — kernel must NOT read this
             # for flux (source guard). Distinct from the batch flux map so a
