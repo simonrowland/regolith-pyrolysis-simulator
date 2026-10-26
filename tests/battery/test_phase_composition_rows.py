@@ -772,9 +772,9 @@ def test_phase_rows_reopen_cached_handle_after_transport_death(
 ) -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
     from simulator.diagnostic_helpers import binary_pot_battery
-    from simulator.engine_pool import EngineWorkerDied
 
     opened: list[EngineHandle] = []
+    backends: list[object] = []
 
     class FakeBackend:
         def __init__(self, *, dies: bool) -> None:
@@ -803,6 +803,7 @@ def test_phase_rows_reopen_cached_handle_after_transport_death(
 
     def open_fake_engine(name: str) -> EngineHandle:
         backend = FakeBackend(dies=not opened)
+        backends.append(backend)
         handle = EngineHandle(
             name=name,
             backend=backend,
@@ -839,25 +840,12 @@ def test_phase_rows_reopen_cached_handle_after_transport_death(
 
     predictions: list[EnginePrediction] = []
 
-    def predict_after_worker_death(engine, observation, *, handles, **kwargs):
-        try:
-            prediction = predict_with_engine(
-                engine, observation, handles=handles, **kwargs
-            )
-            predictions.append(prediction)
-            return prediction
-        except EngineWorkerDied as exc:
-            return EnginePrediction(
-                engine=engine,
-                channel=engine.value,
-                execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE),
-                authority=Authority.REFUSED,
-                coefficient_sources=(engine.value,),
-                lineage_complete=False,
-                refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
-                refusal_detail={"reason": "unavailable", "detail": str(exc)},
-                identity=observation.identity,
-            )
+    def capture_prediction(engine, observation, *, handles, **kwargs):
+        prediction = predict_with_engine(
+            engine, observation, handles=handles, **kwargs
+        )
+        predictions.append(prediction)
+        return prediction
 
     import simulator.battery.score as score_module
 
@@ -865,16 +853,17 @@ def test_phase_rows_reopen_cached_handle_after_transport_death(
         context,
         engines=(Engine.THERMOENGINE,),
         include_diagnostics=False,
-        predict=predict_after_worker_death,
+        predict=capture_prediction,
     )
     by_id = {residual.reference: residual for residual in residuals}
     assert by_id["phase-worker-death-0"].numeric is None
-    assert len(predictions) == 1
-    assert predictions[0].value == Decimal("10")
+    assert len(predictions) == 2
+    assert predictions[0].value is None
+    assert predictions[1].value == Decimal("10")
     assert by_id["phase-worker-death-1"].numeric is not None
     assert len(opened) == 2
-    assert opened[0].backend.close_calls >= 1
-    assert opened[1].backend.close_calls == 1
+    assert backends[0].close_calls >= 1
+    assert backends[1].close_calls == 1
 
 
 def test_phase_prediction_closes_replacement_for_read_only_handle_map(
