@@ -523,12 +523,28 @@ def canonical_oxide_activity_map(values: Mapping[str, object] | None) -> dict[st
 def _canonical_oxide_activity_map_with_notices(
     values: Mapping[str, object] | None,
 ) -> tuple[dict[str, float], tuple[str, ...]]:
-    """Project oxide activities and describe values omitted from the map.
+    """Project oxide activities and describe values omitted from the map."""
+
+    return _canonical_oxide_value_map_with_notices(
+        values,
+        field="diagnostic_oxide_activities",
+        phase="liquid",
+    )
+
+
+def _canonical_oxide_value_map_with_notices(
+    values: Mapping[str, object] | None,
+    *,
+    field: str,
+    phase: str,
+) -> tuple[dict[str, float], tuple[str, ...]]:
+    """Project canonical oxide values and describe values omitted from the map.
 
     The map remains numerically identical to :func:`canonical_oxide_activity_map`.
     Notices follow the AlphaMELTS/MAGEMin provider warning convention so a
-    projection can surface an invalid value without changing the activities
-    retained for downstream consumers.
+    projection can surface an invalid value without changing the values
+    retained for downstream consumers. ``field`` and ``phase`` identify the
+    source map in the warning.
     """
     activities: dict[str, float] = {}
     notices: list[str] = []
@@ -548,8 +564,8 @@ def _canonical_oxide_activity_map_with_notices(
         if reason:
             notices.append(
                 f'{_ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX} '
-                f'{reason} diagnostic_oxide_activities field '
-                f'{str(raw_name)!r} for phase liquid: {raw_value!r}'
+                f'{reason} {field} field '
+                f'{str(raw_name)!r} for phase {phase}: {raw_value!r}'
             )
             continue
         activities.setdefault(oxide, value)
