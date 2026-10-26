@@ -98,6 +98,12 @@ def test_series_item_derived_from_stays_on_that_row(tmp_path: Path) -> None:
             "phase": "gas",
             "regime": "knudsen_effusion",
             "units": "atm",
+            "derivation": {
+                "relation": "fit from source measurements",
+                "inputs": ["parent_a", "parent_b"],
+                "parameters": [],
+                "output_unit": "atm",
+            },
             "values": {
                 "quantity": "pure_Psat",
                 "method_class": "directly_reduced_measurement",
@@ -128,6 +134,10 @@ def test_series_item_derived_from_stays_on_that_row(tmp_path: Path) -> None:
             assert series_row_extra(bare_b) in obs_id
     assert by_suffix["a"].derived_from == ("fixture-source::parent_a",)
     assert by_suffix["b"].derived_from == ("fixture-source::parent_b",)
+    assert by_suffix["a"].derivation is not None
+    assert by_suffix["a"].derivation.inputs == by_suffix["a"].derived_from
+    assert by_suffix["b"].derivation is not None
+    assert by_suffix["b"].derivation.inputs == by_suffix["b"].derived_from
     assert "fixture-source::parent_a" in result.observations
     assert "fixture-source::parent_b" in result.observations
 

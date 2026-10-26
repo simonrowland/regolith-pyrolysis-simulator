@@ -16757,6 +16757,7 @@ class Migrator:
                 # The parent observation's list remains the fallback when the
                 # item does not state one. The id hash skips this key.
                 point_derived_from = derived_from
+                point_source_derivation = source_derivation
                 raw_point = item.get("item") if isinstance(item, Mapping) else None
                 if (
                     isinstance(raw_point, Mapping)
@@ -16774,6 +16775,10 @@ class Migrator:
                         item_parents, item_prose = (), (str(exc),)
                     if item_parents:
                         point_derived_from = item_parents
+                        if source_derivation is not None:
+                            point_source_derivation = replace(
+                                source_derivation, inputs=item_parents
+                            )
                     if item_prose:
                         self._flag_printed_lineage(
                             item_prose,
@@ -16800,7 +16805,7 @@ class Migrator:
                     units=str(obs.get("units") or ""),
                     read_from=read_from,
                     derived_from=point_derived_from,
-                    source_derivation=source_derivation,
+                    source_derivation=point_source_derivation,
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(
