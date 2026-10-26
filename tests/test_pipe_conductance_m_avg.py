@@ -7,8 +7,8 @@ real recipe compositions (alkali sweep ~23 g/mol → Fe vapor mid
 
 These tests pin:
 1. ``_mean_molar_mass_kg_mol`` math (mole-weighted, not mass-weighted).
-2. Defensive fallback to ``DEFAULT_PIPE_M_AVG_KG_MOL`` for empty /
-   None / unknown-only inputs.
+2. Defensive fallback to ``DEFAULT_PIPE_M_AVG_KG_MOL`` for empty inputs and
+   typed refusal for a positive carrier whose formula cannot be resolved.
 3. Backward-compat invariant: ``_pipe_conductance`` without the new
    kwarg matches pre-W7 bit-for-bit.
 4. ``estimate_transport_state`` passes evap_flux species through.
@@ -254,12 +254,12 @@ def test_empty_mapping_returns_default_fallback():
     assert _mean_molar_mass_kg_mol({}) == DEFAULT_PIPE_M_AVG_KG_MOL
 
 
-def test_unknown_species_only_returns_default_fallback():
-    """A mixture made entirely of species not in ``MOLAR_MASS`` (e.g.,
-    a typo'd or experimental species) must NOT poison the denominator
-    with a zero — fall back to the documented default."""
-    M_avg = _mean_molar_mass_kg_mol({"ZZZ": 1.0, "Vibranium": 0.5})
-    assert M_avg == DEFAULT_PIPE_M_AVG_KG_MOL
+def test_unresolved_species_refuses_molar_mass_instead_of_dropping_carrier():
+    """An unresolved positive carrier must not disappear from the mixture."""
+    with pytest.raises(EvaporationFluxRefusal) as refusal:
+        _mean_molar_mass_kg_mol({"Na": 1.0, "Vibranium": 0.5})
+
+    assert refusal.value.diagnostic["unresolved_species"] == ["Vibranium"]
 
 
 def test_negative_and_nan_masses_are_skipped():
