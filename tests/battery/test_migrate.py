@@ -15374,6 +15374,42 @@ def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path
     ) == "H(T)-H(298.15 K)"
 
 
+@pytest.mark.parametrize(
+    ("obs", "values"),
+    [
+        (
+            {"reference_phase": "liquid"},
+            {
+                "reference_temperature_K": 298,
+                "quantity_as_printed": "H1373(L) minus H298(S)",
+            },
+        ),
+        (
+            {},
+            {
+                "reference_temperature_K": 298,
+                "quantity_as_printed": "H1373(L) minus H298(S)",
+                "printed_relation": "H1373(L) minus H298(L) = 209.5",
+            },
+        ),
+        (
+            {},
+            {
+                "method": "Reference is the glass at 298 K.",
+                "quantity_as_printed": "H1373(L) minus H298(S)",
+            },
+        ),
+    ],
+    ids=("explicit-vs-relation", "relation-vs-relation", "method-vs-relation"),
+)
+def test_enthalpy_increment_conflicting_reference_phases_remain_unknown(
+    obs: dict[str, object], values: dict[str, object]
+) -> None:
+    from simulator.battery.migrate import _enthalpy_increment_subtype
+
+    assert _enthalpy_increment_subtype(obs, values) is None
+
+
 def test_fusion_temperature_join_preserves_matching_melting_point(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["SiO2"] = {

@@ -8487,6 +8487,10 @@ def _enthalpy_increment_subtype(
 ) -> str | None:
     """Read a printed H(T)-H(Tref) anchor without inventing one."""
 
+    def normalize_reference_phase(raw: str) -> str:
+        phase = raw.strip().casefold()
+        return {"s": "solid", "l": "liquid"}.get(phase, phase)
+
     def decimal(raw: object) -> Decimal | None:
         if raw is None or isinstance(raw, bool):
             return None
@@ -8509,7 +8513,11 @@ def _enthalpy_increment_subtype(
         ):
             raw = payload.get(key)
             if isinstance(raw, str) and raw.strip():
-                target.add(raw.strip())
+                target.add(
+                    normalize_reference_phase(raw)
+                    if key == "reference_phase"
+                    else raw.strip()
+                )
 
     text_fields = [
         obs.get("standard_state"),
@@ -8518,14 +8526,13 @@ def _enthalpy_increment_subtype(
     ]
     method = values.get("method")
     if isinstance(method, str):
-        match = re.search(
+        for match in re.finditer(
             r"reference is (?:the )?([\wα-ωΑ-Ω′' -]+?) at (\d+(?:\.\d+)?)\s*K",
             method,
             re.IGNORECASE,
-        )
-        if match:
+        ):
             explicit_temperatures.add(Decimal(match.group(2)))
-            reference_phases.add(match.group(1).strip())
+            reference_phases.add(normalize_reference_phase(match.group(1)))
     for raw in text_fields:
         if not isinstance(raw, str):
             continue
@@ -8570,13 +8577,13 @@ def _enthalpy_increment_subtype(
                 raw,
             )
         )
-        relation = re.search(
-            r"\bH\s*\d+(?:\.\d+)?\s*\([^)]*\)\s*(?:minus|[-−])\s*H\s*(\d+(?:\.\d+)?)\s*\([^)]+\)",
+        for relation in re.finditer(
+            r"\bH\s*\d+(?:\.\d+)?\s*\([^)]*\)\s*(?:minus|[-−])\s*H\s*(\d+(?:\.\d+)?)\s*\(([^)]+)\)",
             raw,
             re.IGNORECASE,
-        )
-        if relation:
+        ):
             label_temperatures.add(Decimal(relation.group(1)))
+            reference_phases.add(normalize_reference_phase(relation.group(2)))
 
     if (
         len(explicit_temperatures) > 1
@@ -8613,24 +8620,6 @@ def _enthalpy_increment_subtype(
     if temperature is None:
         temperature = label_temperature
     if temperature is None:
-        return None
-
-    if not reference_phases:
-        for raw in (values.get("quantity_as_printed"), values.get("printed_relation")):
-            if not isinstance(raw, str):
-                continue
-            match = re.search(
-                r"\bH\s*\d+(?:\.\d+)?\s*\([^)]*\)\s*(?:minus|[-−])\s*H\s*\d+(?:\.\d+)?\s*\(([^)]+)\)",
-                raw,
-                re.IGNORECASE,
-            )
-            if match:
-                reference_phases.add({
-                    "s": "solid",
-                    "l": "liquid",
-                }.get(match.group(1).strip().casefold(), match.group(1).strip()))
-                break
-    if len(reference_phases) > 1:
         return None
 
     return _format_enthalpy_increment_subtype(
