@@ -682,13 +682,26 @@ def test_alphamelts_activity_score_surfaces_invalid_oxide_notice(monkeypatch):
     )
 
     assert prediction.value == Decimal("0.42")
+    assert len(prediction.notices) == 3
     assert [notice.kind for notice in prediction.notices] == [
         NoticeKind.INPUT_OMITTED,
         NoticeKind.INPUT_OMITTED,
+        NoticeKind.INPUT_OMITTED,
     ]
-    assert [notice.reason for notice in prediction.notices] == list(repair_warnings)
-    assert all(
-        notice.origin == "engine:alphamelts" for notice in prediction.notices
+    oxide_notices = [
+        notice
+        for notice in prediction.notices
+        if notice.origin == "engine:alphamelts"
+    ]
+    assert [notice.reason for notice in oxide_notices] == list(repair_warnings)
+    oxygen_notices = [
+        notice
+        for notice in prediction.notices
+        if notice.origin == "score:predict_with_engine"
+    ]
+    assert len(oxygen_notices) == 1
+    assert oxygen_notices[0].reason.endswith(
+        "oxygen is not an input and was omitted"
     )
 
 
