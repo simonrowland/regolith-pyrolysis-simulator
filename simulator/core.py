@@ -9628,7 +9628,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._project_cleaned_melt_from_atom_ledger()
         return self._record_equilibrium_status(result)
 
-    def _query_equilibrium(self):
+    def _query_equilibrium(self, *, vapor_transport_pO2_bar=None):
         """
         Query backend with the mol inventory from the atom ledger.
 
@@ -9752,6 +9752,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'fO2_log': intrinsic_fO2_log,
                 'fe_redox_policy': 'intrinsic',
             }
+            transport_pO2_bar = (self._vapor_pressure_dispatch_pO2_bar()
+                if vapor_transport_pO2_bar is None else vapor_transport_pO2_bar)
             if (
                 self._chem_registry.authoritative_for(
                     ChemistryIntent.SILICATE_EQUILIBRIUM
@@ -9765,7 +9767,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 kernel_result = self._dispatch_only(
                     ChemistryIntent.SILICATE_EQUILIBRIUM,
                     control_inputs={
-                        'pO2_bar': self._vapor_pressure_dispatch_pO2_bar(),
+                        'pO2_bar': transport_pO2_bar,
                         'vacuum_floor_bar': self._vacuum_floor_bar(),
                         'pO2_admission': 'environment',
                     },
@@ -9805,7 +9807,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 }
                 if self._backend_accepts_kwarg('vapor_transport_pO2_bar'):
                     backend_kwargs['vapor_transport_pO2_bar'] = (
-                        self._vapor_pressure_dispatch_pO2_bar()
+                        transport_pO2_bar
                     )
                 if self._backend_accepts_kwarg('vapor_transport_floor_bar'):
                     backend_kwargs['vapor_transport_floor_bar'] = (

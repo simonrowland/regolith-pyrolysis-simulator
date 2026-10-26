@@ -5023,12 +5023,16 @@ class EvaporationMixin:
 
         authority = self._resolved_melt_redox_gate_authority()
         store = self._pt0_store()
+        # The original seed queried the backend at this gas coordinate before
+        # reading its result. Pass it explicitly; preparation never edits the
+        # live reaction coordinate just to run a read-only native query.
+        seed_oxygen = 10.0 ** self._intrinsic_oxygen_publication()['published_intrinsic_fO2_log']
         initial_pressure_queries = 1
         if equilibrium is not None:
             initial = copy.deepcopy(equilibrium)
         elif store is not None and (getattr(store, 'replay_enabled', False)
                                     or getattr(store, 'write_through_enabled', False)):
-            initial, requires_publication = self._query_equilibrium()
+            initial, requires_publication = self._query_equilibrium(vapor_transport_pO2_bar=seed_oxygen)
             initial_pressure_queries += int(requires_publication)
         elif (self.backend is None or self._backend_failed or not self.backend.is_available()) and self._backend_allows_internal_analytical_fallback():
             from simulator.melt_backend.base import EquilibriumResult
@@ -5042,7 +5046,7 @@ class EvaporationMixin:
                     if self.melt.temperature_C + 273.15 < 400.0 else {}))
             initial_pressure_queries += 1
         else:
-            initial, requires_publication = self._query_equilibrium()
+            initial, requires_publication = self._query_equilibrium(vapor_transport_pO2_bar=seed_oxygen)
             initial_pressure_queries += int(requires_publication)
         bulk = self._vapor_pressure_transport_pO2_bar()
         partials = (dict(overhead_partials_override_Pa) if overhead_partials_override_Pa is not None
@@ -5136,7 +5140,6 @@ class EvaporationMixin:
             frozen_carriers=getattr(self, '_frozen_evaporation_carriers', None))
         if hour.frozen_carriers is not None:
             return hour
-        seed_oxygen = 10.0 ** intrinsic['published_intrinsic_fO2_log']
         # Ordinary _get_equilibrium publishes one pressure query before the
         # explicit seed refresh. Supplied/replayed results omit that first call.
         for _ in range(initial_pressure_queries):
