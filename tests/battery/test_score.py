@@ -6354,7 +6354,11 @@ def test_alphamelts_invalid_activity_notice_reaches_typed_score_notice() -> None
     from engines.alphamelts.domain import (
         _canonical_oxide_activity_map_with_notices,
     )
-    from simulator.battery.score import cell_notices, match_reported_species
+    from simulator.battery.score import (
+        _match_reported_species_with_notices,
+        cell_notices,
+        match_reported_species,
+    )
     from simulator.diagnostic_helpers.binary_pot_battery import (
         engine_flags_from_result,
     )
@@ -6367,6 +6371,11 @@ def test_alphamelts_invalid_activity_notice_reaches_typed_score_notice() -> None
     assert match_reported_species(
         'SiO2', activities, oxide_activity=True
     ) == ('SiO2', 0.42)
+    matched, score_repair_warnings = _match_reported_species_with_notices(
+        'SiO2', activities, oxide_activity=True
+    )
+    assert matched == ('SiO2', 0.42)
+    assert score_repair_warnings == repair_warnings
 
     result = SimpleNamespace(warnings=repair_warnings, diagnostics={})
     raw_notices, _authority, _band = engine_flags_from_result(result)
