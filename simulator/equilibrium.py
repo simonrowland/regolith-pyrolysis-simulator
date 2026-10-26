@@ -439,7 +439,6 @@ class EquilibriumMixin:
         from simulator.vapour_rail.channels import (
             REACTION_PLANE_MELT_INTERFACE,
         )
-        from simulator.accounting.formulas import parse_formula
 
         refusal = _internal_analytical_control_refusal(
             self.melt.temperature_C,
@@ -657,9 +656,9 @@ class EquilibriumMixin:
             parent_oxide = sp_data.get('parent_oxide', '')
             if not parent_oxide:
                 continue
+            # Ellingham's metal keys are elemental, including gas-releasing Ti.
             source_oxygen_bar = (pO2_bar if _oxygen_coproduct_enters_gas(
-                str(sp_data.get('oxygen_destination') or ''),
-                float(parse_formula(str(sp_data.get('formula') or species)).elements.get('O', 0.0)))
+                str(sp_data.get('oxygen_destination') or ''), vapor_oxygen_atoms=0.0)
                 else melt_dissociation_pO2_bar)
 
             # --- Pressure reference rail ---

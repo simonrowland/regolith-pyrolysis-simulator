@@ -2851,8 +2851,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             # oxygen-free-metal receiver is the buffer. The same receiver
             # owner drives both the transition and this pressure argument.
             source_oxygen_bar = (transport_pO2_bar if _oxygen_coproduct_enters_gas(
-                str(sp_data.get('oxygen_destination') or ''),
-                float(parse_formula(str(sp_data.get('formula') or species)).elements.get('O', 0.0)))
+                str(sp_data.get('oxygen_destination') or ''), vapor_oxygen_atoms=0.0)
                 else melt_dissociation_pO2_bar)
             # A fit range has no diagnostic meaning when its parent oxide is
             # absent; gate presence before selecting or warning about the fit.
