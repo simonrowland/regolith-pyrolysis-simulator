@@ -136,15 +136,50 @@ def test_isolated_migration_preserves_species_temperature_and_conditions() -> No
         assert row.locator.page == row.locator.pdf_page_index + 1
         conditions = row.point_conditions or {}
         assert "temperature_K" in conditions
-        assert "total_pressure_Pa" in conditions
         assert "fO2_Pa" in conditions
         assert all(condition.locator is not None for condition in conditions.values())
         assert conditions["temperature_K"].state.is_value
 
-    mass_loss_observations = [row for row in observations if row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION]
+    mass_loss_observations = [
+        row for row in observations
+        if row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+    ]
     assert all(
         row.locator.table == "1" and "row=" in (row.locator.note or "")
         for row in mass_loss_observations
     )
-    assert all(row.point_conditions["total_pressure_Pa"].locator.table == "1" for row in mass_loss_observations)
+
+    pressure_by_run = {
+        point["run_id_as_printed"].rstrip("†").casefold():
+        point["point_conditions"]["total_pressure_Pa"]["state"]
+        for point in table1
+    }
+    assert len(pressure_by_run) == len(table1)
+    table1_observations = [
+        row for row in observations
+        if row.identity.quantity.value in {
+            Quantity.MASS_LOSS_FRACTION,
+            Quantity.ISOTOPE_DELTA,
+        }
+    ]
+    for row in table1_observations:
+        run_id = row.observation_id.rsplit(":row=", 1)[1].split(":", 1)[0].casefold()
+        source_pressure = pressure_by_run[run_id]
+        pressure = (row.point_conditions or {}).get("total_pressure_Pa")
+        if source_pressure["tag"] == "value":
+            assert pressure is not None
+            assert pressure.state.is_value
+            assert pressure.state.value.point == Decimal(source_pressure["value"]["point"])
+            assert pressure.locator.table == "1"
+        else:
+            # Table 1 uses a dash for runs whose pressure was not measured.
+            assert source_pressure["tag"] == "unknown"
+            assert pressure is None
+
+    # Table 3a averages several experiments and gives no single run pressure.
+    rate_observations = [
+        row for row in observations
+        if row.identity.quantity.value is Quantity.EVAPORATION_RATE
+    ]
+    assert all("total_pressure_Pa" not in (row.point_conditions or {}) for row in rate_observations)
 

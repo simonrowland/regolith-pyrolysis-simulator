@@ -71,4 +71,5 @@ def test_isolated_migration_preserves_species_conditions_and_points() -> None:
         assert record.point_conditions["temperature_K"].locator is not None
         assert record.point_conditions["composition"].state.value == composition
         assert record.point_conditions["composition"].locator is not None
-        assert not record.point_conditions["total_pressure_Pa"].state.is_value
+        # Table 1 totals are vapor-species pressures, not effusion-cell background pressure.
+        assert "total_pressure_Pa" not in record.point_conditions

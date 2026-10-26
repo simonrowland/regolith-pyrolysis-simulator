@@ -173,7 +173,8 @@ def test_species_conditions_fidelity_and_isolated_migration() -> None:
         assert row.point_conditions["water_vapor_pressure_Pa"].state.value == Decimal("60000")
         assert row.point_conditions["gas_velocity_m_s"].state.value == Decimal(velocity)
         assert row.point_conditions["composition"].state.is_unknown
-        assert row.point_conditions["total_pressure_Pa"].state.is_unknown
+        # The paper gives partial pressures, not a total furnace pressure.
+        assert "total_pressure_Pa" not in row.point_conditions
 
     salt = next(row for row in rows if row.identity.species.formula == "NaCl")
     assert salt.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
@@ -182,5 +183,7 @@ def test_species_conditions_fidelity_and_isolated_migration() -> None:
     assert salt.identity.temperature_K is not None
     assert salt.identity.temperature_K.is_unknown
     assert salt.point_conditions is not None
-    for condition in ("temperature_C", "fO2_Pa", "total_pressure_Pa", "composition"):
+    for condition in ("temperature_C", "fO2_Pa", "composition"):
         assert salt.point_conditions[condition].state.is_unknown
+    # Do not infer total pressure from the separately printed gas pressures.
+    assert "total_pressure_Pa" not in salt.point_conditions

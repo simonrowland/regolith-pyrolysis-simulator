@@ -170,13 +170,10 @@ def test_isolated_migration_preserves_typed_species_temperature_and_conditions()
     for observation_id, expected_value in expected_transition_values.items():
         migrated = rows[f"{SOURCE_ID}::{observation_id}"]
         assert migrated.value.point == expected_value
-        pressure = migrated.point_conditions["total_pressure_Pa"]
-        assert pressure.state.is_unknown
-        assert pressure.locator is not None
+        # The calorimetry paper reports no run pressure; the figure's 1 atm is not an experimental condition.
+        assert "total_pressure_Pa" not in migrated.point_conditions
 
     heat_fusion = rows[f"{SOURCE_ID}::rb86_capobianco_1982_si_albite_heat_fusion_quoted"]
     assert heat_fusion.identity.temperature_K.is_value
     assert heat_fusion.identity.temperature_K.value == Decimal("1373.15")
-    pressure = heat_fusion.point_conditions["total_pressure_Pa"]
-    assert pressure.state.is_unknown
-    assert pressure.locator is not None
+    assert "total_pressure_Pa" not in heat_fusion.point_conditions

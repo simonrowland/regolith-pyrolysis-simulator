@@ -188,7 +188,8 @@ def test_valence_fidelity_and_isolated_migration() -> None:
     assert observation.point_conditions["temperature_K"].locator.page == 4
     assert observation.point_conditions["time_s"].state.value == Decimal("450")
     assert observation.point_conditions["oxygen_partial_pressure"].state.is_unknown
-    assert observation.point_conditions["total_pressure_Pa"].state.is_unknown
+    # The source reports oxygen/background partial pressures, not chamber total pressure.
+    assert "total_pressure_Pa" not in observation.point_conditions
     assert observation.point_conditions["quench_state"].state.value == "not_stated"
     composition = observation.point_conditions["composition"]
     assert composition.state.is_value

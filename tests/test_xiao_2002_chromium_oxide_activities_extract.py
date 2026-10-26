@@ -200,7 +200,6 @@ def test_isolated_migration_resolves_assets_and_preserves_every_identity_axis():
         "composition",
         "fO2_Pa",
         "fO2_control",
-        "total_pressure_Pa",
         "atmosphere",
     }
     for observation in result.observations.values():
@@ -217,6 +216,8 @@ def test_isolated_migration_resolves_assets_and_preserves_every_identity_axis():
         assert identity.fO2_Pa is not None and identity.fO2_Pa.is_unknown
         assert identity.total_pressure_Pa is not None and identity.total_pressure_Pa.is_unknown
         assert required_conditions <= set(observation.point_conditions or {})
+        # The source states an argon atmosphere and flow rate, but no total pressure.
+        assert "total_pressure_Pa" not in (observation.point_conditions or {})
         point_composition = observation.point_conditions["composition"]
         assert point_composition.state.is_value
         assert point_composition.state.value.amount_basis is AmountBasis.MOL_INVENTORY

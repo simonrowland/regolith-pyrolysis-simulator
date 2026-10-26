@@ -325,7 +325,7 @@ def test_isolated_migration_preserves_temperature_conditions_and_unavailable_cur
 
     for row in observations:
         if "fig1_" in row.observation_id:
-            assert {"composition", "total_pressure_Pa", "fO2_Pa"} <= set(
-                row.point_conditions
-            )
+            # Figure 1 comparator records do not report total pressure.
+            assert {"composition", "fO2_Pa"} <= set(row.point_conditions)
+            assert "total_pressure_Pa" not in row.point_conditions
             assert row.point_conditions["composition"].locator is not None
