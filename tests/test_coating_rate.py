@@ -602,7 +602,9 @@ def test_lunar_payload_preserves_extrapolated_mg_wall_pressure(
     pareto = payload["run_metadata"]["pressure_coating_pareto_diagnostic"]
     magnesium = pareto["by_species"]["Mg"]
     assert magnesium["status"] == "unavailable"
-    assert magnesium["reason"] == "species_absent_from_latest_evaporation_series_diagnostic"
+    # Mg is present in the latest vapor-series diagnostic, but this run has no
+    # current committed wall-deposition quantity.
+    assert magnesium["reason"] == "current_wall_deposition_quantity_unavailable"
     assert magnesium["authority_level"] == "extrapolated"
     records = magnesium["wall_saturation_pressure_extrapolations"]
     assert records
@@ -610,92 +612,26 @@ def test_lunar_payload_preserves_extrapolated_mg_wall_pressure(
 
 
 def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None:
-    run = PyrolysisRun(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C0",
-        hours=24,
-        additives_kg={},
-        allow_fallback_vapor=True,
-        allow_unmeasured_alpha_fallback=True,
-        run_metadata_overrides={
-            "started_at_utc": "2026-05-15T00:00:00Z",
-            "kernel_commit_sha": "goal-18-fixture",
-        },
-    )
+    from tests.coating_golden import produce_coating_golden
 
-    payload = run.run()
-    # b-238 (2026-08-26): melt_redox_gate_floor_fallback_engagement counts
-    # _melt_redox_liquidus_floor_fallback engagements, and that count depends
-    # on whether _freeze_gate_curve() hits its cross-run cache — measured
-    # total_count 14 (cold) vs 0 (warm) from the SAME tree in back-to-back
-    # processes. A byte-identity pin over a cache-sensitive counter flaps red
-    # and green with zero code change, so the block is asserted by SHAPE here
-    # and excluded from the hash; the hash keeps pinning everything else.
-    engagement = payload.pop("melt_redox_gate_floor_fallback_engagement")
+    actual_bytes, engagement = produce_coating_golden()
     assert set(engagement) == {"engaged", "total_count", "by_hour"}
     assert isinstance(engagement["engaged"], bool)
     assert isinstance(engagement["total_count"], int)
     assert engagement["total_count"] >= 0
     assert engagement["engaged"] == (engagement["total_count"] > 0)
 
-    actual_bytes = (
-        json.dumps(
-            payload,
-            indent=2,
-            sort_keys=False,
-            allow_nan=False,
-        )
-        + "\n"
-    ).encode("utf-8")
-    # Rebaselined 2026-08-18 (t-686) with the cause named, not to make a red
-    # test pass. The prior digest 6e75e35e... was produced by the pre-t-470
-    # rail; TWO intentional rail commits moved this whole-run hash, both
-    # bisected in one tree with the machine-local engines.local.toml held
-    # constant so the comparison could not be confounded:
-    #
-    #   2918b531 feat(rail): six analytical carriers live -- FIRST digest
-    #     mover. vapour_batch.n_requested 15 -> 21 (Al2O, AlO, CaO_gas, CrO3,
-    #     TiO, TiO2_gas). Run still status=ok over 24 h. Its parent 313a7d49
-    #     still hashes to 6e75e35e..., which is what pins the attribution.
-    #
-    #   dd62edf0 fix(rail): t-470 -- transitional-Knudsen band refuses instead
-    #     of silently zeroing -- FIRST status mover. status ok -> refused,
-    #     reason "" -> viscous_p_bulk_transport_out_of_domain, run length
-    #     24 h -> 14 h. End-of-run Kn 0.000273 (viscous, 10 mbar) -> 4.8646
-    #     (transitional, 0.000368 mbar). Its parent 23d48442 already reaches
-    #     Kn 4.8646 at hour 14 and used to continue straight through it.
-    #
-    # So the refusal is the HONEST number and the old 24-hour completion was
-    # the silent one. Nondeterminism is ruled out: two dumps at the tip are
-    # byte-identical, and checking out the pin commit in this same tree
-    # reproduces 6e75e35e... exactly.
-    #
-    # ★ WHAT THIS DIGEST NOW PINS: the default C0 recipe DIES AT HOUR 14
-    # because overhead pressure falls through the viscous-flow band that
-    # mandate section 4 requires (Kn well below 0.01). That is a recipe
-    # question -- raise pN2 before Kn crosses -- not a golden question, and it
-    # is tracked separately. This pin records what the code does; it does not
-    # bless the recipe.
-    #   sc130 wave 2 (2026-08-26) — THIRD intentional mover, prose-only.
-    #     1487 string leaves changed and ZERO numeric leaves (verified by a
-    #     typed structural diff of the full 6 MB payload, base vs wave-2):
-    #     melt_activity.py bucket-A citation/limitation corrections flow into
-    #     reported_activity_provenance / evidence_ref strings in this
-    #     serialization. Same run, same physics, same numbers. The hash also
-    #     changes shape here because the cache-sensitive engagement block
-    #     moved out of the hashed payload (b-238, above).
-    #     Recomputed on the CI machine class (mac-studio-256-1, ci-jobs tree).
-    # Rebaselined after 644fac1a changed out-of-domain C0/C0b transport from
-    # broad refusal to compute-and-mark. The C2A/C4 Knudsen safety gate is
-    # retained; this digest still excludes only the cache-sensitive block
-    # above.
-    # 2026-10-20 b-585 d-045: wall-deposit sticking authority now records
-    # inapplicable carriers (phosphorus vapours and Bi on this lunar C0)
-    # under not_applicable_* instead of the refused/non-authoritative lists.
-    # Every numeric leaf of this payload is unchanged, including the ledger
-    # pin 7cc5144f.... The digest move is those authority fields only.
+    # Rebaselined 2026-10-26 for b-813 and b-1028; sha256 c4756d389c417613353a48b60da4d33d5a163390c6592300eb3e4a4b0d546532.
+    # b-1028: 88 flux_dormant and 88 is_flux_dormant_by_epoch true->false,
+    # 47 channel-state dormancy->refusal leaves, two refusal notes, counts
+    # 5->7 / 2->4. b-813: 611 extrapolation_notice and 21
+    # extrapolation_notices_by_species blocks (5,565 leaves; 2,472 numeric
+    # diagnostic leaves). No existing physical value moved.
+    # Prior cumulative typed diff: 1 d-195, 27,533 d-045, 195,428 d-252, 0 unexplained.
+    # C0 exits at h5 instead of h19; the 24 h regenerated trajectory reaches C3_NA and C4.
+    # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "64045a5e11246bc8f4dac0e63102970fe5b58da8c8aeaea061d15d2b5116be58"
+        "c4756d389c417613353a48b60da4d33d5a163390c6592300eb3e4a4b0d546532"
     )
 
 
@@ -841,3 +777,19 @@ def test_opt_in_refusal_envelope_stays_serializable() -> None:
         "wall_deposition_rate_committed" not in row
         for row in payload["per_hour_summary"]
     )
+
+
+@pytest.mark.parametrize("consumer", ["test_support", "script"])
+def test_coating_producer_and_script_share_exact_preimage(monkeypatch, consumer):
+    import tests.coating_golden as producer
+    from scripts.regenerate_coating_diagnostic_golden import produce_bytes
+
+    engagement = {"engaged": False, "total_count": 0, "by_hour": {}}
+    payload = {"status": "ok", "z": 1.25, "melt_redox_gate_floor_fallback_engagement": engagement,
+               "a": {"diagnostic": None}}
+    monkeypatch.setattr(producer.PyrolysisRun, "run", lambda self: dict(payload))
+    expected = b'{\n  "status": "ok",\n  "z": 1.25,\n  "a": {\n    "diagnostic": null\n  }\n}\n'
+    if consumer == "test_support":
+        assert producer.produce_coating_golden() == (expected, engagement)
+    else:
+        assert produce_bytes() == expected

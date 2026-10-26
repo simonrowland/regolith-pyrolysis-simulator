@@ -73,9 +73,12 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
             .setpoints
         )
     ).encode()
-    # Recomputed after phosphorus batch 7e6bebc: its C0b-P controls changed
-    # data/setpoints.yaml, the sole batch input serialized by this resolved
-    # setpoints digest. Empty recipe/setpoints patch bytes remain neutral.
+    # Recomputed after d-252's C0 move. Diffing the resolved setpoints against
+    # green 0761129d0 shows these exact C0 leaves changed: label, notes,
+    # dT_dt_C_per_hr (50 -> 200), endpoint.type, and the new carrier_gas,
+    # p_total_mbar_default, pO2_mbar_default, and alkali budget; atmosphere,
+    # pO2_mbar, endpoint.threshold, and soft_endpoint were removed. Empty
+    # recipe/setpoints patch bytes remain neutral.
     # Recomputed 2026-08-07 (b-147 Mg TE-μ0 demotion): the derived
     # Mg_threshold_grounding roots in data/setpoints.yaml moved with the
     # Pref_GF retarget (moon 1978.564→1892.647 C; asteroid 1840.802→1768.703 C)
@@ -94,8 +97,24 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # changed, no values. Paths: campaigns.C2A_continuous.adaptive_control.
     # induction_stirring; endpoint_criteria.control.surface_renewal;
     # endpoint_criteria.general; furnace.induction_stirring.note.
+    # Recomputed 2026-10-25 for t-1457 + b154. Relative to b154's normalized
+    # resolved setpoints, the C0 leaves differ as follows: label and notes
+    # changed; dT_dt_C_per_hr 50 -> 200; atmosphere=hard_vacuum and
+    # pO2_mbar=null were removed; carrier_gas=Ar, p_total_mbar_default=1,
+    # pO2_mbar_default=0, and alkali_retention_budget_fraction=0.001 were
+    # added; endpoint.type changed from ir_signal_decay to
+    # computed_alkali_and_evacuation_exit; endpoint.threshold=0.05 and
+    # soft_endpoint.type=temperature_min_after_min_hold,
+    # soft_endpoint.min_hold_hr=10, and soft_endpoint.temperature_min_C=940
+    # were removed. Restoring these C0 leaves to b154 while retaining b154's
+    # condensation_train.stage_6_turbine_compressor.temp_range_C [50, 200]
+    # and condensation_train.stage_7_accumulator.temp_range_C [20, 50]
+    # recovers b154's resolved digest
+    # 2584074346931c132b487ffb6ce56511d26f76805d63bcfa14eb996d1fe5ea57.
+    # The combined t-1457 C0 contract and b154 Stage-6/7 bands produce the
+    # resolved digest below.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "6e96c06bd07493a6db66db50de75fc9599b8a0353c5d08ae37d68f09ec90ccb6"
+        "911f820f280e2141010189a727b3a8dcbce5c65826a1960f25f9d26465926b4a"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
@@ -340,7 +359,10 @@ def _write_c5_mre_cap_bound_yaml(data_dir: Path, high: float, mtime_ns: int) -> 
                     "C5": {
                         "allow_mre_voltage_cap_upper_bound_V": high,
                     }
-                }
+                },
+                "condensation_train": yaml.safe_load(SETPOINTS_PATH.read_text())[
+                    "condensation_train"
+                ],
             },
             sort_keys=True,
         ),

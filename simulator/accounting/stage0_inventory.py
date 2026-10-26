@@ -2,10 +2,10 @@
 
 Remaining unevolved inventory is Stage-0 feed accounts plus leftover
 target carriers in ``process.cleaned_melt``. Frozen ``HourSnapshot.inventory``
-and ``vapor_contract_completeness`` are not sources. Stage-0 currently
-disposes that inventory at load; every record carries
-``stage0_release_kinetics`` so that instant depletion cannot be read as a
-fast bake.
+and ``vapor_contract_completeness`` are not sources. Every record carries
+``stage0_release_kinetics``. The C0 bake is an equilibrium/Hertz-Knudsen
+ceiling, so a depleted record is not a completed bake and hour zero never
+latches depletion as load.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, resolve_spec
 from simulator.accounting.yield_disposition import _ACCOUNT_TO_BIN
 
 
-STAGE0_RELEASE_KINETICS = "not_modelled_load_time_disposal"
+STAGE0_RELEASE_KINETICS = "temperature_resolved_equilibrium_hk_upper_bound"
 TARGET_INVENTORY_SIBLING_SCHEMA_VERSION = 1
 TARGET_INVENTORY_SIBLING_KIND = "target_inventory"
 DEFAULT_EPSILON = 1.0e-6
@@ -150,6 +150,22 @@ def initial_c0_inventory_kg(
     return out
 
 
+def initial_c0_gas_inventory_kg(initial_inventory: Any) -> float:
+    """Mass of the fiat C0 gas ledgered by Stage 0 at load time."""
+    gas = getattr(initial_inventory, "gas_volatiles_kg", None)
+    if not isinstance(gas, Mapping):
+        return 0.0
+    total = 0.0
+    for value in gas.values():
+        try:
+            kg = float(value)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(kg) and kg > 0.0:
+            total += kg
+    return total
+
+
 def remaining_c0_inventory_kg(
     ledger: Any,
     registry: Mapping[str, Any] | None,
@@ -258,14 +274,18 @@ def depletion_record(
         if row.get("status") == STATUS_OK and row.get("remaining_fraction") is not None
     ]
     if present_fractions:
-        aggregate = max(present_fractions)
+        aggregate: float | None = max(present_fractions)
+        depleted = bool(aggregate <= float(epsilon))
+        target_evidence = "inventory"
     else:
-        aggregate = 0.0
-    depleted = bool(aggregate <= float(epsilon))
+        # Deferred, absent, or zero-denominator rows are not a release.
+        aggregate = None
+        depleted = False
+        target_evidence = "unavailable"
     if previous_depletion_hour is not None:
         depletion_hour: int | str | None = previous_depletion_hour
-    elif depleted:
-        depletion_hour = "load" if int(hour) <= 0 else int(hour)
+    elif depleted and int(hour) > 0:
+        depletion_hour = int(hour)
     else:
         depletion_hour = None
 
@@ -283,9 +303,11 @@ def depletion_record(
             "elements": expansion_rows,
         },
         "aggregate_remaining_fraction": aggregate,
+        "target_evidence": target_evidence,
         "depleted": depleted,
         "depletion_hour": depletion_hour,
-        "would_be_inventory_advance": bool(depleted and campaign_name == "C0"),
+        # This kinetics class is a ceiling. It cannot advance C0.
+        "would_be_inventory_advance": False,
         "epsilon": float(epsilon),
         "account_projection_failures": list(projection_failures),
         "exclude_elements": list(exclude),

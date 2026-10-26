@@ -1,0 +1,1505 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  citation: 'Schneider, S. J. (Project Manager) et al. (1980), MHD Materials: Seed/Slag Interactions and Effects, Quarterly
+    Progress Report January–March 1980, NBSIR 80-2059; vaporization studies by E. R. Plante.'
+  source_ids:
+  - kems-212-schneider-1980-nbsir-80-2059
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:kems-212-schneider-1980-nbsir-80-2059
+      role: pdf
+      path: raw/kems-212-schneider-1980-nbsir-80-2059/kems-212-schneider-1980-nbsir-80-2059.pdf
+      sha256:
+        tag: value
+        value: 08ef68ee74434a719eb7dad6bb8636ef97c7cecb1ac48919f6a8506e6ce683bb
+    - asset_id: pdftotext:kems-212-schneider-1980-nbsir-80-2059
+      role: pdftotext
+      path: text/kems-212-schneider-1980-nbsir-80-2059
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-212-schneider-1980-nbsir-80-2059
+      role: table_csv
+      path: tables/kems-212-schneider-1980-nbsir-80-2059
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-212-schneider-1980-nbsir-80-2059
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1::experiment::schneider-1980-kalsio4-vaporization
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: The KAlSiO4 experiment is described, but a complete starting bulk composition is not given here.
+    characterization:
+      state:
+        tag: value
+        value: At the end, the sample was a hard crystalline mass embedded in glass; hot (100°C) dilute HF (~30% conc. HF
+          in H2O) dissolved the glassy matrix but not the crystalline mass; X-ray diffraction identified the crystalline material
+          as mullite (3Al2O3·2SiO2).
+      locator:
+        published_page: 4
+        pdf_page_index: 7
+        section: Vaporization Studies
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: Chamber/background residual pressure is not reported; this is distinct from sample vapor pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: Sweep gas is not reported.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  locator:
+    published_page: 3
+    pdf_page_index: 6
+    section: Vaporization Studies
+    note: Completed potassium vapor-pressure measurements over KAlSiO4. Method token follows the external KEMS attribution
+      in raw/kems-212-schneider-1980-nbsir-80-2059/sidecar.yaml; Knudsen/effusion is not named in the PDF.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 3
+          pdf_page_index: 6
+          section: Vaporization Studies
+          note: Orifice diameter is not reported.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 3
+          pdf_page_index: 6
+          section: Vaporization Studies
+          note: Orifice channel length is not reported.
+    calibration:
+      method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 3
+          pdf_page_index: 6
+          section: Vaporization Studies
+          note: The report refers to a mass-spectrometer constant but does not state the calibration substance or intensity-to-pressure
+            method.
+      reference_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 3
+          pdf_page_index: 6
+          section: Vaporization Studies
+          note: Calibration substance is not identified.
+      intensity_to_pressure_relation:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 3
+          pdf_page_index: 6
+          section: Vaporization Studies
+          note: The pressure-conversion relation is not stated.
+  bench_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1::bench::schneider-1980-plante-kcas-kems
+- experiment_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1::experiment::schneider-1980-kcas-vaporization
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: printed oxide wt% map has unsupported numeric component(s): Ca2Al2SiO7,
+          Ca2SiO4, Ca3Si2O7, KAlSiO4'
+      locator:
+        published_page: 4
+        pdf_page_index: 7
+        section: Vaporization Studies
+    printed_composition:
+      state:
+        tag: value
+        value:
+          amount_basis: mass_percent
+          components:
+          - - KAlSiO4
+            - '49.84'
+          - - Ca2SiO4
+            - '16.47'
+          - - Ca2Al2SiO7
+            - '16.47'
+          - - Ca3Si2O7
+            - '17.21'
+      locator:
+        published_page: 4
+        pdf_page_index: 7
+        section: Vaporization Studies
+    pretreatment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 4
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: The four phases are described as intimately mixed here; printed p. 5 / PDF p. 9 / index 8 states that a composition
+          of 49.8 wt% KAlSiO4, 16.5 wt% Ca2SiO4, 17.2 wt% Ca3Si2O7 and 16.5 wt% Ca2Al2SiO7 was prepared. Detailed pretreatment/preparation
+          procedure and purity are not reported.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 4
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: Chamber/background residual pressure is not reported; this is distinct from sample vapor pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 4
+        pdf_page_index: 7
+        section: Vaporization Studies
+        note: Sweep gas is not reported.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  locator:
+    published_page: 4
+    pdf_page_index: 7
+    section: Vaporization Studies
+    note: Measurements began on the mixed K-Ca-Al-Si composition. Method token follows the external KEMS sidecar attribution;
+      Knudsen/effusion is not named in the PDF.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 4
+          pdf_page_index: 7
+          section: Vaporization Studies
+          note: Orifice diameter is not reported.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 4
+          pdf_page_index: 7
+          section: Vaporization Studies
+          note: Orifice channel length is not reported.
+    calibration:
+      method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 4
+          pdf_page_index: 7
+          section: Vaporization Studies
+          note: The report does not state the calibration substance or intensity-to-pressure method.
+      reference_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 4
+          pdf_page_index: 7
+          section: Vaporization Studies
+          note: Calibration substance is not identified.
+      intensity_to_pressure_relation:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 4
+          pdf_page_index: 7
+          section: Vaporization Studies
+          note: The pressure-conversion relation is not stated.
+  bench_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1::bench::schneider-1980-plante-kcas-kems
+benches:
+- id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1::bench::schneider-1980-plante-kcas-kems
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      published_page: 3
+      pdf_page_index: 6
+      section: Vaporization Studies
+      note: Only ion-current measurements and (p. 4) a mass-spectrometer constant are described; apparatus family is unprinted.
+        Knudsen-effusion method is external sidecar attribution, not a page-grounded apparatus claim.
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      published_page: 3
+      pdf_page_index: 6
+      section: Vaporization Studies
+      note: Cell material and liner are not identified in this report.
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: Ionization energy is not reported.
+    ionization_cross_sections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: Ionization cross-sections are not reported.
+    cross_section_source:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: A source for ionization cross-sections is not reported.
+    multiplier_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: Multiplier correction is not reported.
+    isotope_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: Isotope correction is not reported.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: Temperature measurement method is not stated.
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: Temperature measurement uncertainty is not stated.
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: Temperature calibration is not described.
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: Temperature calibration uncertainty is not stated.
+  other_facts: []
+context:
+- observation_id: schneider_1980_administrative_metadata
+  type: method
+  locator:
+    pdf_page_index: 0
+    section: Cover
+  units: administrative metadata as printed
+  values:
+    quantity: cover_metadata_not_measurements
+    report_number: NBSIR 80-2059
+    quarter: January–March 1980
+    manager_title: Project Manager
+    postal_code: '20234'
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_administrative_metadata
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_conductivity_run_conditions
+  type: laboratory_conditions
+  locator:
+    published_page: 18
+    pdf_page_index: 21
+    section: Electrical Conductivity and Polarization
+  units: as printed
+  values:
+    quantity: atmosphere_and_sample_chamber_conditions_for_table_1
+    method_class: measured_direct
+    composition: YCrO3 doped with 5% Ca on the yttrium site
+    oxygen_in_nitrogen_as_printed: about 5 ppm
+    forming_gas_composition_as_printed: 95 nitrogen to 5 hydrogen
+    forming_gas_reaction_as_printed: 2 H2 + O2 → 2 H2O
+    planned_intermediate_oxygen_pressures_atm:
+    - '0.000005'
+    - '0.0000000000000000000000001'
+    sampling_interval_min:
+    - 5
+    - 10
+    reported_low_oxygen_pressure_atm: '0.0000000000000000000000001'
+    oxygen_sensor: zirconia tube oxygen sensor gauge based on the Nernst-Einstein relation
+    sample_chamber_volume_cm3: 1200
+    gas_flow_rate_cm3_per_min: 450
+    chamber_exchange_time_hr:
+      state: bound
+      operator: '>'
+      value: 4
+    forming_gas_low_pressure_settling_time_hr:
+      state: bound
+      operator: <=
+      value: 1
+    source_internal_inconsistency: The text reports 10^-25 atm; Table 1 reports 5 × 10^-25 atm.
+    printed_qualification: There has been some difficulty in establishing the oxygen partial pressure in the sample chamber
+      that corresponds to the oxygen partial pressure in the flowing gas where oxygen/nitrogen gas mixtures are used.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_conductivity_run_conditions
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_conductivity_sample_qualification
+  type: characterization
+  locator:
+    published_page: 19
+    pdf_page_index: 22
+    section: Electrical Conductivity and Polarization
+  units: as printed
+  values:
+    quantity: qualification_of_table_1_conductivity_values
+    printed_statements:
+    - There has been some difficulty in preparing good single-phase material.
+    - Possibly, as a result of this multi-phase condition, samples oxidized after having been prepared in a highly reduced
+      state sometimes exhibit small hairline cracks.
+    - These cracks will cause erratic results in the conductivity values.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_conductivity_sample_qualification
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_data_table_qualifications
+  type: characterization
+  locator:
+    published_page: 28
+    pdf_page_index: 31
+    section: Corrosion of Downstream MHD Components
+  units: as printed
+  values:
+    quantity: printed_qualifications_for_wastage_table
+    printed_statements:
+    - In each case the second cleaning cycle resulted in no further detectable weight change.
+    - The differences in weight (weight loss) are attributed to loss of metal (wastage) from the specimen.
+    - The greatest change in weight (wastage) was observed in sample 13-4, while a minimal amount was lost in sample 14-4.
+    corrosion_comparison:
+      locator:
+        published_page: 27
+        pdf_page_index: 30
+      quote: However, the extent of corrosion is not as great as in the case of Type 304 stainless steel.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_data_table_qualifications
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_eastern_melt_model_figures_context
+  type: thermodynamic_example
+  locator:
+    figure: 7a–7f
+    published_page: 17
+    pdf_page_index: 20
+    section: Phase Equilibrium Experiments
+  units: free-energy curves as printed; curves not digitized
+  values:
+    quantity: author_calculated_free_energy_of_mixing
+    method_class: figure_only
+    temperature_C: 1550
+    curve_origin: model_derived
+    Fe3_over_Fe_total_values:
+    - '0.3'
+    - '0.25'
+    - '0.2'
+    - '0.15'
+    - '0.0909'
+    - '0.0476'
+    printed_qualification: A large region of liquid unmixing for more oxidized melts is predicted.
+    qualification_locator:
+      published_page: 9
+      pdf_page_index: 12
+    caption_model_provenance: Curves drawn by computer to fit calculated points using a piecewise cubic interpolating polynomial;
+      dashed portions lie slightly off the compositional vector. Tangency in Figure 7b facilitates comparison with observed
+      liquids S and F.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_eastern_melt_model_figures_context
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_electrochemical_figure3_annotations
+  type: figure_only
+  locator:
+    figure: '3'
+    published_page: 24
+    pdf_page_index: 27
+    section: Electrical Conductivity and Polarization
+  units: as printed; curves not digitized
+  values:
+    quantity: explicit_electrochemical_plot_annotations
+    method_class: figure_only
+    current_density_A_per_cm2: '0.2'
+    voltage_marker_V: '3.5'
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_electrochemical_figure3_annotations
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_electrochemical_p19
+  type: laboratory_conditions
+  locator:
+    published_page: 19
+    pdf_page_index: 22
+  units: as printed
+  values:
+    quantity: constant_voltage_electrochemical_cell
+    method_class: measured_direct
+    Pt_probe_count: 4
+    Bow_NH_added_K2SO4_pct: 20
+    temperature_C: 1250
+    total_run_hr: '2.5'
+    applied_voltage_V: 31
+    initial_current_range_mA:
+    - 60
+    - 100
+    reversal_interval_min: 5
+    initial_interval_min: '2.5'
+    displayed_data_duration_min: '23.5'
+    previous_run:
+      duration_hr: 20
+      temperature_C: 1400
+      report_quarter: September–December 1977
+    qualifications: Initial current drops with time. Nearly all potential drop forms across the anode-adjacent probes; reversal
+      switches the large drop. Previous run found iron depletion at anode and enrichment at cathode. Critical breakdown potential
+      is higher for AISI 1018 steel than nickel or Type 304, as attributed to Koester et al. Bulk slag conductivity remains
+      unchanged in this constant-voltage experiment.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_electrochemical_p19
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_electrochemical_p20
+  type: laboratory_conditions
+  locator:
+    published_page: 20
+    pdf_page_index: 23
+  units: as printed
+  values:
+    quantity: constant_current_electrochemical_cell
+    method_class: measured_direct
+    current_mA: 30
+    reversal_interval_min: 5
+    displayed_data_duration_min: 20
+    total_run_hr: '1.5'
+    temperature_C: 1250
+    bottom_anode_breakdown_range_min:
+    - '1.5'
+    - '2'
+    top_anode_breakdown_range_min:
+    - 4
+    - 5
+    top_anode_period_min: 5
+    subsequent_current_off_period_min: 5
+    bottom_anode_depletion_not_completely_repaired_after_min: 50
+    current_off_potential_as_printed: zero
+    current_off_potential_V: 0
+    qualifications: Bottom-anode breakdown occurs earlier; oxidation states may differ down the cell. Top-anode depletion
+      repairs after current-off interval, bottom-anode depletion does not repair completely after 50 minutes. Current-off
+      voltage shows no measurable battery effect. Bulk conductivity decreases slightly, possibly from iron diffusion into
+      Pt electrodes; at 1250°C slag is very viscous, with possible mixed ionic/electronic conductivity.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_electrochemical_p20
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_iron_doped_slag_conductivity_figure
+  type: figure_only
+  locator:
+    figure: '4'
+    published_page: 25
+    pdf_page_index: 28
+    section: Slag Electrical Conductivity
+  units: conductivity and temperature as printed; curve not digitized
+  values:
+    quantity: conductivity_curve_for_iron_doped_Bow_NH_slag
+    method_class: figure_only
+    composition: Bow, NH slag with 20% K2SO4 and additional 20% Fe2O3; companion sample had no added iron
+    atmosphere: air
+    temperature_schedule_C:
+    - 1500
+    - 900
+    - 500
+    high_temperature_comparison_above_C: 1350
+    conductivity_factor_higher_above_1350_C: 5
+    prose_composition:
+      locator:
+        published_page: 21
+        pdf_page_index: 24
+      sample_with_iron_Fe_wt_pct: '24.2'
+      sample_without_added_iron_Fe_wt_pct: '14.7'
+    caption_composition:
+      sample_with_iron_Fe2O3_wt_pct: '34.6'
+      sample_with_iron_Fe_wt_pct: '24.3'
+    source_internal_inconsistency: Prose prints 24.2 w/o Fe; Figure 4 caption prints 24.3 w/o Fe. Both retained separately.
+    near_maximum_comparison_temperature_C: 1200
+    conductivity_factor_higher_near_1200_C: 2
+    heating_and_cooling_context: Heated to 1500 °C until conductivity was constant in less than 1/2 h; cooled to 900 °C in
+      24 min and then lowered slowly to 500 °C; figure data were taken with temperature increasing.
+    thermal_history_locator:
+      published_page: 20
+      pdf_page_index: 23
+    constant_conductivity_hold_hr:
+      state: bound
+      operator: <
+      value: '0.5'
+    comparison_locators:
+    - published_page: 20
+      pdf_page_index: 23
+    - published_page: 21
+      pdf_page_index: 24
+    printed_qualification: The conductivity is higher in this sample than in its companion sample without the added iron.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_iron_doped_slag_conductivity_figure
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_k2o_activity_context
+  type: thermodynamic_example
+  locator:
+    published_page: 4
+    pdf_page_index: 7
+    section: Vaporization Studies
+  units: as printed
+  values:
+    quantity: potassium_oxide_activity_qualification
+    method_class: author_estimate
+    statement: The activity of K2O in the melt is so low that it leads to the question of whether the K2O concentration could
+      be as high as 11 wt%.
+    printed_composition_range_wt_pct:
+    - '28.9'
+    - '10.7'
+    composition_range_locator:
+      published_page: 1
+      pdf_page_index: 4
+    pressure_change_as_printed: K pressure decreases by over 3 orders of magnitude when bulk K2O composition decreases from
+      29 wt% to 11 wt% at constant temperature.
+    mass_spectrometer_constant_error_fraction: '0.3'
+    error_is_assumed: true
+    lower_possible_K2O_wt_pct: '3'
+    standard_state:
+      state: unknown
+      reason: not_published
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_k2o_activity_context
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_kalsio4_activity_figures_context
+  type: thermodynamic_example
+  locator:
+    figures: 6a–6d
+    published_page: 16
+    pdf_page_index: 19
+    section: Phase Equilibrium Experiments
+  units: activity and mixing-energy curves as printed; curves not digitized
+  values:
+    quantity: author_calculated_thermodynamic_curves
+    method_class: figure_only
+    species: KAlSiO4
+    curve_origin: model_derived
+    comparison: ideal_solution_and_precipitation_calculations_using_silicate_structons
+    standard_state:
+      state: unknown
+      reason: not_published
+    printed_qualification: The text reports substantially lower calculated activities with SiO4(0) than predicted, but very
+      good agreement with ideal solution theory when using SiO4(1); the calculated mixing-energy curve is nearly flat.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_kalsio4_activity_figures_context
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_kalsio4_figure1_pressure
+  type: figure_only
+  locator:
+    figure: '1'
+    published_page: 11
+    pdf_page_index: 14
+    section: Vaporization Studies
+  units: potassium vapor pressure and 1/T axes as printed; curves not digitized
+  experiment: schneider-1980-kalsio4-vaporization
+  values:
+    quantity: potassium_partial_pressure_curve
+    method_class: figure_only
+    figure_description: Observed K pressures during the KAlSiO4 experiment; figure documents pressure changes during the run.
+    printed_qualification: Here, the observed K pressures are greater when the temperature is decreased even though the bulk
+      K2O composition decreased in the first part of the experiment.
+    qualification_locator:
+      published_page: 3
+      pdf_page_index: 6
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_kalsio4_figure1_pressure
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_kalsio4_figure2_pressure
+  type: figure_only
+  locator:
+    figure: '2'
+    published_page: 12
+    pdf_page_index: 15
+    section: Vaporization Studies
+  units: potassium vapor pressure (atm) and 10^4/T (K) axes as printed; partial curve digitization
+  experiment: schneider-1980-kalsio4-vaporization
+  values:
+    quantity: potassium_partial_pressure_curve
+    method_class: figure_only
+    figure_description: Representative K pressures as a function of reciprocal temperature and bulk K2O composition; measurements
+      were made while sample temperature decreased throughout the run.
+    printed_bulk_K2O_composition_ranges_wt_pct:
+    - - '28.9'
+      - '28.7'
+    - - '26.1'
+      - '25.2'
+    - - '20.6'
+      - '20.1'
+    - - '14.9'
+      - '14.5'
+    - - '12.5'
+      - '12.2'
+    - - '11.6'
+      - '11.4'
+    - - '10.8'
+      - '10.7'
+    curves_not_fully_digitized: true
+    digitized_temperature_window_K:
+    - 2116
+    - 2160
+    digitized_observation_id: schneider_1980_k_psat_figure2_high_temperature_digitized
+    digitized_marker_count: 1
+    digitization_locator:
+      published_page: 12
+      pdf_page_index: 15
+      note: Measured marker centres from the 500 dpi render of PDF page 16. digitized_marker_count is the number of those
+        centres inside 2116-2160 K. The two cooler centres are stored and lie below that window.
+    composition_origin: measured_reduced
+    composition_derivation:
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+      relation_as_printed: I⁺ Δt/T
+      inputs:
+      - ion_current_I_plus
+      - elapsed_time_delta_t
+      - temperature_T
+      assumptions: Bulk K2O concentrations represent a homogeneous solution; loss of SiO2 was excluded, although it became
+        appreciable late in the experiment at higher temperatures. No numeric ion-current inputs are tabulated.
+    printed_qualification: Linearity of the vapor pressure data with 1/T was better for the experiments in which the temperature
+      decreased than for those in which the temperature was increased.
+    qualification_locator:
+      published_page: 3
+      pdf_page_index: 6
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_kalsio4_figure2_pressure
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_kalsio4_sample_origin
+  type: characterization
+  locator:
+    published_page: 3
+    pdf_page_index: 6
+    section: Vaporization Studies
+  units: as printed
+  values:
+    quantity: KAlSiO4_run_sample_origin_and_purity
+    starting_materials:
+      state: unknown
+      reason: not_published
+    sample_preparation:
+      state: unknown
+      reason: not_published
+      note: This absence concerns the KAlSiO4 run; p. 5 reports preparation of the separate mixed sample.
+    starting_material_purity:
+      state: unknown
+      reason: not_published
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_kalsio4_sample_origin
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_kcas_figure3_pressure
+  type: figure_only
+  locator:
+    figure: '3'
+    published_page: 13
+    pdf_page_index: 16
+    section: Vaporization Studies
+  units: potassium vapor pressure and temperature axes as printed; curves not digitized
+  experiment: schneider-1980-kcas-vaporization
+  values:
+    quantity: potassium_partial_pressure_curve
+    method_class: figure_only
+    figure_description: K pressure in the early evaporation of the mixed KAlSiO4-Ca-silicate sample, until the Ca2SiO4 phase
+      was expected to be exhausted; literature-calculated pressures are shown at 1400, 1600, and 1800 K.
+    printed_qualification: The agreement between the experimental and calculated pressures are reasonable although the experimental
+      slope is significantly steeper.
+    qualification_locator:
+      published_page: 4
+      pdf_page_index: 7
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_kcas_figure3_pressure
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_kems_report_numeric_context
+  type: method
+  locator:
+    published_page: 1
+    pdf_page_index: 4
+    section: Summary of Progress
+  units: as printed
+  values:
+    quantity: numeric_context_and_data_qualifications
+    K2O_bulk_composition_range_wt_pct:
+    - '28.9'
+    - '10.7'
+    K_pressure_change_orders_of_magnitude: 3
+    complete_K2O_removal_temperature_K: 1945
+    detailed_run_values:
+    - locator:
+        published_page: 3
+        pdf_page_index: 6
+      partial_melting_temperature_K: 1880
+    - locator:
+        published_page: 4
+        pdf_page_index: 7
+      highest_temperature_K: 2160
+      possible_K2O_composition_as_low_as_wt_pct: 3
+      assumed_mass_spectrometer_constant_error_pct: 30
+      compared_literature_pressure_temperatures_K:
+      - 1400
+      - 1600
+      - 1800
+    printed_statements:
+    - published_page: 3
+      quote: While analysis of the experimental results obtained is not entirely complete, no evidence that the K pressure
+        was independent of bulk composition of the sample was obtained.
+    - published_page: 3
+      quote: This represents non-equilibrium behavior in the measurements.
+    - published_page: 3
+      quote: This effect is likely due to depletion of KAlSiO4 from the sample.
+    - published_page: 3
+      quote: At the highest temperature (1880 K) partial melting probably caused a redistribution of some remaining KAlSiO4
+        by either bringing the crystals to the surface or dissolving them in the melt.
+    - published_page: 3
+      quote: This effect was noted only in the experiments for which the remaining KAlSiO4 phase was becoming small.
+    - published_page: 4
+      quote: The K pressure at constant temperature decreases by over 3 orders of magnitude when the K2O bulk composition
+        decreases from 29 wt% K2O to 11 wt% K2O.
+    - published_page: 4
+      quote: At the highest temperature, 2160 K, the sample should be entirely molten and under these conditions slow kinetics
+        due to complex crystal chemistry is not a possibility.
+    - published_page: 4
+      quote: These data showed that the activity of SiO2 is close to unity for this system.
+    - published_page: 4
+      quote: The experiment was finally terminated because the P_SiO was greater than P_K and it appeared that the sample
+        might become exhausted in SiO2 before all of the K2O was evaporated.
+    - published_page: 4
+      quote: Additional measurements on this composition were made. It proved possible to vaporize all the K2O from the sample
+        at 1945 K.
+    - published_page: 4
+      quote: This appears to confirm the suspected effect of CaO in ameliorating K2O capture by Al2O3 and SiO2.
+    source_qualification: At 2160 K the sample was expected to be entirely molten; the report says slow kinetics due to complex
+      crystal chemistry was not a possibility under those conditions.
+    source_qualification_locator:
+      published_page: 4
+      pdf_page_index: 7
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_kems_report_numeric_context
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_kems_sample_composition_and_reaction
+  type: method
+  locator:
+    published_page: 4
+    pdf_page_index: 7
+    section: Vaporization Studies
+  units: as printed
+  values:
+    quantity: mixed_sample_composition_and_expected_early_evaporation_reaction
+    sample_composition_wt_pct:
+      KAlSiO4: '49.84'
+      Ca2SiO4: '16.47'
+      Ca2Al2SiO7: '16.47'
+      Ca3Si2O7: '17.21'
+    phases_intimately_mixed: true
+    reaction_as_printed: 2 KAlSiO4(c) + 7 Ca2SiO4 = 4 Ca3Si2O7 + Ca2Al2SiO7 + 2 K(g) + O2(g)
+    preparation:
+      locator:
+        published_page: 5
+        pdf_page_index: 8
+      value: A composition consisting of 49.8 wt% KAlSiO4, 16.5 wt% Ca2SiO4, 17.2 wt% Ca3Si2O7 and 16.5 wt% Ca2Al2SiO7 was
+        prepared.
+    starting_material_purity:
+      state: unknown
+      reason: not_published
+    composition_after_run:
+      state: unknown
+      reason: not_published
+    printed_qualification: KAlSiO4 pressures were not composition independent despite identified crystalline phases; the report
+      calls this non-equilibrium behavior.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_kems_sample_composition_and_reaction
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_metallographic_preparation
+  type: characterization
+  locator:
+    published_page: 26
+    pdf_page_index: 29
+  units: as printed
+  values:
+    quantity: metallographic_specimen_preparation_and_deposits
+    specimen_count: 3
+    specimens:
+    - id: 1-6
+      steel_type: '316'
+      exposure_temperature_C: 590
+    - id: 2-6
+      steel_type: '316'
+      exposure_temperature_C: 500
+    - id: 3-6
+      steel_type: '316'
+      exposure_temperature_C: 400
+    section_offset_from_hot_zone_midpoint_mm_approximate: 10
+    removal_temperature_C_approximate: 40
+    leading_surface_deposit_thickness_mm_approximate: '1.7'
+    trailing_fume_deposit_thickness_mm_range_approximate: '0.2'
+    preparation: Removed after cooldown to about 40°C, immediately encapsulated in epoxy; sections cut, ground and polished
+      using non-aqueous media and stored in evacuated desiccators.
+    qualifications: Leading surface compact somewhat columnar deposit; trailing deposit much thinner. Potassium/sulfur uniform
+      in bulk, but top whitish band higher in potassium, possibly from sulfur vaporization.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_metallographic_preparation
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_model_p6
+  type: thermodynamic_example
+  locator:
+    published_page: 6
+    pdf_page_index: 9
+  units: as printed; temperature in K
+  values:
+    quantity: ideal_crystal_liquid_model
+    method_class: model_derived
+    relation_as_printed: -ln X_B^melt = -ln X_B^xl + (ΔH_B^fusion/R)(1/T - 1/T_B^fusion)
+    definitions: X_B are mole fractions of B in coexisting liquid and crystal; ΔH_B^fusion is enthalpy of fusion of pure crystalline
+      B; T_B^fusion is melting point; R is gas constant; T is temperature in kelvin.
+    assumptions: Relation also applies to multicomponent crystal/liquid equilibria. Small iron content in Western residual
+      melts is assumed ferrous; sample calculations indicate insignificant result changes for Western melts, emphatically
+      not true for Eastern melts.
+    conference_ordinal: 7
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_model_p6
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_model_p7
+  type: thermodynamic_example
+  locator:
+    published_page: 7
+    pdf_page_index: 10
+  units: as printed
+  values:
+    quantity: ideal_activity_and_quasichemical_oxygen_model
+    method_class: model_derived
+    crystal_purity_mol_pct: 85
+    assumed_congruent_melting_temperature_K: 2058
+    fusion_enthalpy_source: Spencer et al., reference 3; no numerical enthalpy printed here.
+    relations_as_printed:
+    - (KAlSiO4)^xl = 1/2(K2O)^melt + 1/2(Al2O3)^melt + (SiO2)^melt
+    - a_KAlSiO4^(ideal,melt) = 8(X_K2O^melt)^(1/2)(X_Al2O3^melt)^(1/2)(X_SiO2^melt)
+    - 2 O⁻ = O²⁻ + O⁰
+    - (8X - 8X²)(n_O⁻)² + (-2X - 2)n_O⁻ + (1 - 4k) = 0
+    - n_O⁰ = (4X - n_O⁻)/2
+    - n_O²⁻ = (1 - X) - n_O⁻/2
+    definitions: O²⁻, O⁻, O⁰ denote free oxide ions, non-bridging oxygens, bridging oxygens; n is moles per mole of melt;
+      X is mole fraction of (SiO2 + KAlO2).
+    model_assumptions: Literature k values from refs. 4/5 with temperature dependence assumed similar to FeO-SiO2 (ref. 6);
+      standard-state correction proportional to Ca²⁺, Fe²⁺, Mg²⁺ ion field strengths (ref. 7); otherwise Fe²⁺/Mg²⁺ k assumed
+      equal. KAlO2 and SiO2 substitute ideally in the polymer network (ref. 8).
+    qualifications: Agreement of predicted and measured activity is not good under oxide precipitation definition. Polymerization
+      increases with (KAlO2 + SiO2), reflected by increased O⁰ content; free oxide-ion content is very low.
+    source_figure_numbering: Text refers to Figure 3a; activity plots are later captioned Figure 6. Source references retained
+      without renumbering.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_model_p7
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_model_p8
+  type: thermodynamic_example
+  locator:
+    published_page: 8
+    pdf_page_index: 11
+  units: as printed
+  values:
+    quantity: structon_activity_and_mixing_energy_model
+    method_class: model_derived
+    basic_SiO4_structural_unit_count: 5
+    structural_unit_definition: Parenthetic index gives number of non-bridging oxygens; SiO4(0) is infinite-framework unit;
+      SiO4(4) is independent tetrahedron.
+    relations_as_printed:
+    - a_KAlSiO4^(ideal,melt) = 4 X_KAlO2^melt X_SiO2^((0),melt)
+    - a_KAlSiO4^(ideal,melt) = 4 X_KAlO2^melt X_SiO2^((1),melt)
+    - ΔG_mixing = (n_O⁻/2) RT ln k
+    definitions: X_SiO2^((0),melt) is mole fraction of (KAlO2 + SiO2) in melt present as SiO4(0) structons.
+    qualifications: Only SiO4(0) and SiO4(1) increase with increasing mole % (KAlO2 + SiO2), hence increasing temperature.
+      SiO4(0) gives substantially lower calculated activities; SiO4(1) gives very good agreement with ideal-solution predictions.
+      SiO4(1) has a non-bridging oxygen essential for reaction; KAlO2/SiO2 mix near ideally, KAlO2 sites have nearly equal
+      reactivity, but silica polymerization determines precipitation.
+    source_figure_numbering: Text refers to Figures 5b, 3c and 3d; later activity plot caption is Figure 6.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_model_p8
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_model_p9
+  type: thermodynamic_example
+  locator:
+    published_page: 9
+    pdf_page_index: 12
+  units: as printed
+  values:
+    quantity: Eastern_melt_free_energy_model_assumptions
+    method_class: model_derived
+    activity_data_irregularity_temperature_range_C:
+    - 1350
+    - 1550
+    composition_vector_component_count: 7
+    coexisting_immiscible_melt_temperature_C: 1550
+    assumed_equilibrium_constants:
+      ferric_iron: '3.81'
+      Al2O3: '4.38'
+    assumptions: Constants correspond to relatively undissociated oxides. Fe³⁺/Fe_total is assumed the same in both immiscible
+      melts. Composition vector is defined by Table 2 liquids. Eastern liquidus is too complex for simple precipitation models;
+      ferric iron likely enters non-ideally. Free-energy description ignores specific polymeric reactions.
+    qualifications: A nearly flat Western curve supports stability against unmixing, but activity irregularities may indicate
+      nearby Eastern miscibility gap. More oxidized Eastern melts predict a large region of liquid unmixing; reasonable agreement
+      can be obtained by judicious choice of constants and assumed iron ratio.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_model_p9
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_planned_seed_detail
+  type: composition
+  locator:
+    published_page: 29
+    pdf_page_index: 32
+  units: wt% as printed
+  values:
+    quantity: planned_seed_mixture_for_Type_316
+    method_class: author_estimate
+    seed_wt_pct_as_printed:
+      K2CO3: 80
+      K2SO4: 20
+    source_internal_inconsistency: Detailed plan prints K2CO3; p. 2 summary prints K2CO4.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_planned_seed_detail
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_planned_seed_summary
+  type: composition
+  locator:
+    published_page: 2
+    pdf_page_index: 5
+  units: wt% as printed
+  values:
+    quantity: planned_seed_mixture_for_Type_304_and_316
+    method_class: author_estimate
+    seed_wt_pct_as_printed:
+      K2CO4: 80
+      K2SO4: 20
+    source_internal_inconsistency: Summary prints K2CO4; detailed plan on p. 29 prints K2CO3. Neither spelling is silently
+      corrected.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_planned_seed_summary
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_reference_metadata
+  type: method
+  locator:
+    published_page: 10
+    pdf_page_index: 13
+  units: bibliographic metadata as printed
+  values:
+    quantity: cited_reference_metadata_not_measurements
+    references:
+    - '1: Hosler, Negas, Schneider; DOE EA-77-A-01-6010; April–June 1978 and July–September 1978.'
+    - '2: Cook, Roth, Parker, Negas; American Mineralogist 62, 1180 (1977).'
+    - '3: Spencer, Hendrie, Bienstock; Sixth International Conference on MHD Electrical Power Generation, 2, 181 (1975).'
+    - '4: Toop and Samis; Trans. Metal. Soc. AIME 224, 878 (1962).'
+    - '5: Masson, Smith, Whiteway; Canad. J. Chem. 48, 1456 (1970).'
+    - '6: Distin, Whiteway, Masson; Canad. Metal. Quart. 10, 73 (1971).'
+    - '7: Fraser, pp. 301–325, Proc. NATO Advanced Study Institute, Oxford, England, 1976 (1977).'
+    - '8: Ryerson, Hess; Geochim. et Cosmochim. Acta 42, 921 (1978).'
+    - '9: Huggins; J. Phys. Chem. 58, 1141 (1954).'
+    - '10: Plante, Cook; 17th Symposium on Engineering Aspects of MHD, Stanford (1978).'
+    conductivity_references:
+      locator:
+        published_page: 21
+        pdf_page_index: 24
+      references:
+      - '1: Westinghouse Electric Corporation quarterly Oct. 1–Dec. 31, 1977; EX-76-C-01-2248.'
+      - '2: Koester, Nelson; 16th Symposium, May 16–18, 1977.'
+      - '3: Hosler, White, Negas; 7th International Symposium, June 16–20, 1980.'
+      - '4: Capps; Argonne conference, April 4–6, 1977.'
+      - '5: International Review of Science—Electrochemistry, Physical Chemistry Series Two, volume 6, p. 290.'
+    prior_conductivity_report:
+      locator:
+        published_page: 20
+        pdf_page_index: 23
+      quarter: July–September 1979
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_reference_metadata
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_residue_treatment
+  type: characterization
+  locator:
+    published_page: 4
+    pdf_page_index: 7
+  units: as printed
+  values:
+    quantity: KAlSiO4_run_residue_treatment
+    temperature_C: 100
+    dilute_HF_preparation_as_printed: ~30% conc. HF in H2O
+    concentrated_HF_pct_approximate: 30
+    treatment_result: Glassy matrix dissolved but crystalline mass did not; XRD identified mullite (3Al2O3·2SiO2).
+    author_inference: It is presumed that in the final stages crystalline mullite was in equilibrium with a liquid phase containing
+      K2O, SiO2 and Al2O3.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_residue_treatment
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_sio2_activity_context
+  type: thermodynamic_example
+  locator:
+    published_page: 4
+    pdf_page_index: 7
+    section: Vaporization Studies
+  units: as printed
+  values:
+    quantity: silica_activity_from_vapor_pressure_product
+    method_class: measured_reduced
+    activity_SiO2_as_printed: close to unity
+    ion_intensities_used:
+    - SiO_plus
+    - O2_plus
+    standard_state: pure liquid SiO2
+    pressure_product_as_printed: P_SiO × P_O2^(1/2)
+    note: The text says this product is related to a(SiO2) and Kp for pure liquid SiO2.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_sio2_activity_context
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_summary_context
+  type: method
+  locator:
+    published_page: 1
+    pdf_page_index: 4
+  units: as printed
+  values:
+    quantity: summary_of_conductivity_and_corrosion
+    electrochemical_cell_probe_count: 4
+    conductivity_YCrO3_Ca_pct: 5
+    conductivity_temperature_range_C:
+    - 1300
+    - 1600
+    conductivity_comparison_temperature_C: 1200
+    high_temperature_comparison_above_C: 1350
+    high_temperature_conductivity_increase_factor: 5
+    iron_content_change_as_printed: doubled
+    iron_content_change_factor: 2
+    Type_316_exposure_temperatures_C:
+    - 400
+    - 500
+    - 590
+    wastage_Type_316_and_304_temperatures_C:
+    - 590
+    - 400
+    qualifications: YCrO3 samples were not single phase; hair-line cracks or phase boundaries may cause errors. Fe penetrated
+      farthest into the salt deposit, while Ni dispersion was hardest to follow.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_summary_context
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_table1_conductivity
+  type: conductivity_series
+  reason: 'source_internally_inconsistent: Table 1 prints 5 × 10^-25 atm, but the preceding prose says the completed atmosphere
+    was 10^-25 atm.'
+  locator:
+    table: '1'
+    published_page: 18
+    pdf_page_index: 21
+  units: conductivity in (ohm cm)^-1; temperature in °C; oxygen pressure in atm; flow and soak times in h
+  values:
+    quantity: electrical_conductivity_of_calcium_doped_YCrO3
+    method_class: measured_tabulated
+    measurement_method: Electrical-conductivity measurement; specific electrical method is not stated.
+    composition_as_printed: YCrO3 doped with 5% calcium on the yttrium site
+    atmosphere: O2_in_N2_or_forming_gas
+    points:
+    - run_order: 1
+      temperature_C: 1300
+      o2_pressure_atm: '0.000005'
+      conductivity_ohm_cm_inverse: '2.9'
+      total_flow_time_before_measurement_hr: 18
+      soak_time_at_temperature_hr: 18
+    - run_order: 2
+      temperature_C: 1500
+      o2_pressure_atm: '0.000005'
+      conductivity_ohm_cm_inverse: '3.12'
+      total_flow_time_before_measurement_hr: 20
+      soak_time_at_temperature_hr: '2.5'
+    - run_order: 3
+      temperature_C: 1400
+      o2_pressure_atm: '0.000005'
+      conductivity_ohm_cm_inverse: '3.05'
+      total_flow_time_before_measurement_hr: '23.5'
+      soak_time_at_temperature_hr: '3'
+    - run_order: 4
+      temperature_C: 1400
+      o2_pressure_atm: '0.0000000000000000000000005'
+      conductivity_ohm_cm_inverse: '1.05'
+      total_flow_time_before_measurement_hr: '11.5'
+      soak_time_at_temperature_hr: '11.5'
+    - run_order: 5
+      temperature_C: 1600
+      o2_pressure_atm: '0.0000000000000000000000005'
+      conductivity_ohm_cm_inverse: '1.3'
+      total_flow_time_before_measurement_hr: '14.5'
+      soak_time_at_temperature_hr: '3'
+    - run_order: 6
+      temperature_C: 1500
+      o2_pressure_atm: '0.0000000000000000000000005'
+      conductivity_ohm_cm_inverse: '1.05'
+      total_flow_time_before_measurement_hr: 16
+      soak_time_at_temperature_hr: '1.5'
+    - run_order: 7
+      temperature_C: 1400
+      o2_pressure_atm: '0.0000000000000000000000005'
+      conductivity_ohm_cm_inverse: '0.92'
+      total_flow_time_before_measurement_hr: 17
+      soak_time_at_temperature_hr: '1'
+    - run_order: 8
+      temperature_C: 1300
+      o2_pressure_atm: '0.0000000000000000000000005'
+      conductivity_ohm_cm_inverse: '1.04'
+      total_flow_time_before_measurement_hr: '36.5'
+      soak_time_at_temperature_hr: '19.5'
+    - run_order: 9
+      temperature_C: 1600
+      o2_pressure_atm: '0.0000000000000000000000005'
+      conductivity_ohm_cm_inverse: '1.02'
+      total_flow_time_before_measurement_hr: '45'
+      soak_time_at_temperature_hr: '8.5'
+    - run_order: 10
+      temperature_C: 1500
+      o2_pressure_atm: '0.0000000000000000000000005'
+      conductivity_ohm_cm_inverse: '0.88'
+      total_flow_time_before_measurement_hr: '56.5'
+      soak_time_at_temperature_hr: '11.5'
+    note: Conductivity is the end-of-soak value; measurements were also taken every 5–10 min before equilibrium. The printed
+      table gives 5 × 10^-25 atm, but the preceding text says the atmosphere was 10^-25 atm; source values are retained and
+      flagged as internally inconsistent.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_table1_conductivity
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_table1_invariant_melt_compositions
+  type: composition
+  locator:
+    table: '1'
+    published_page: 5
+    pdf_page_index: 8
+  units: wt % as printed
+  values:
+    quantity: approximate_invariant_melt_compositions
+    method_class: author_estimate
+    components:
+    - K2O
+    - CaO
+    - Al2O3
+    - SiO2
+    melting_temperature_C:
+      state: unknown
+      reason: not_published
+    points:
+    - solids_present_at_melting: KAlSiO4/CaSiO3
+      K2O_wt_pct: '11.7'
+      CaO_wt_pct: '25.7'
+      Al2O3_wt_pct: '19.2'
+      SiO2_wt_pct: '43.5'
+    - solids_present_at_melting: Ca2Al2SiO7/CaSiO3/CaAl2Si2O8/KAlSi2O6
+      K2O_wt_pct: '6'
+      CaO_wt_pct: '30.3'
+      Al2O3_wt_pct: '25.4'
+      SiO2_wt_pct: '38.4'
+    - solids_present_at_melting: KAlSiO4/KAlSi2O6/Ca2Al2SiO7/CaSiO3
+      K2O_wt_pct: '10.5'
+      CaO_wt_pct: '25.5'
+      Al2O3_wt_pct: '24'
+      SiO2_wt_pct: '40'
+    - solids_present_at_melting: Ca2Al2SiO7/KAlSiO4/KAlSi2O6/CaAl2Si2O8
+      K2O_wt_pct: '11.5'
+      CaO_wt_pct: '17.6'
+      Al2O3_wt_pct: '33.7'
+      SiO2_wt_pct: '37.2'
+    - solids_present_at_melting: Ca2Al2SiO7/Ca3Si2O7/CaSiO3/KAlSiO4
+      K2O_wt_pct: '6.5'
+      CaO_wt_pct: '40.1'
+      Al2O3_wt_pct: '17.1'
+      SiO2_wt_pct: '36.4'
+    - solids_present_at_melting: KAlSiO4/Ca2Al2SiO7
+      K2O_wt_pct: '11.8'
+      CaO_wt_pct: '23.6'
+      Al2O3_wt_pct: '37.4'
+      SiO2_wt_pct: '27.2'
+    note: Approximate compositions; the text says improved accuracy was pending full reduction of EDX data.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_table1_invariant_melt_compositions
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_table1_wastage
+  type: mass_loss_series
+  locator:
+    table: '1'
+    published_page: 30
+    pdf_page_index: 33
+  units: weights and weight change in g; temperature in °C
+  values:
+    quantity: stainless_steel_specimen_wastage
+    method_class: measured_tabulated
+    measurement_method: Gravimetric before/after exposure weight measurement.
+    seed: K2SO4
+    gas_stream_state: O2_rich
+    test_exposure_duration_hr: 4
+    exposed_section_note: Only 75 mm of the middle of an approximately 250 mm total specimen length was exposed to the seeded
+      gas stream.
+    points:
+    - specimen_no: 4-6
+      stainless_steel_type: Type 316
+      exposure_duration_hr: 4
+      specimen_temperature_C: 590
+      weight_before_test_g: '72.427'
+      weight_after_test_and_cleaning_g: '72.417'
+      weight_change_g: '-0.01'
+    - specimen_no: 13-4
+      stainless_steel_type: Type 304
+      exposure_duration_hr: 4
+      specimen_temperature_C: 590
+      weight_before_test_g: '69.257'
+      weight_after_test_and_cleaning_g: '69.071'
+      weight_change_g: '-0.186'
+    - specimen_no: 14-4
+      stainless_steel_type: Type 304
+      exposure_duration_hr: 4
+      specimen_temperature_C: 400
+      weight_before_test_g: '65.853'
+      weight_after_test_and_cleaning_g: '65.85'
+      weight_change_g: '-0.003'
+    method_note: Weights were taken before exposure and after warm-water rinse and 10% HNO3 cleaning at 50 °C in 20 min ultrasonic-bath
+      cycles until constant weight.
+    method_locator:
+      published_page: 28
+      pdf_page_index: 31
+    exposure_locators:
+    - published_page: 26
+      pdf_page_index: 29
+    - figure: '12'
+      published_page: 48
+      pdf_page_index: 51
+    - figures: 13–14
+      published_page: 49
+      pdf_page_index: 52
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_table1_wastage
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_table2_silica_rich_immiscible_liquid
+  type: composition
+  locator:
+    table: '2'
+    published_page: 10
+    pdf_page_index: 13
+  units: mole % as printed
+  values:
+    quantity: coexisting_immiscible_liquid_compositions_at_1550_C
+    method_class: quoted_attributed
+    attribution: Hosler, Negas and Schneider (1978), Development, Testing and Evaluation of MHD Materials, cited as reference
+      1.
+    bulk_composition: Eastern
+    points:
+    - liquid: silica_rich_S
+      SiO2_mole_pct: '45.87'
+      Al2O3_mole_pct: '15.58'
+      FeO_x_mole_pct: '18.57'
+      CaO_mole_pct: '4.92'
+      MgO_mole_pct: '1.3'
+      K2O_mole_pct: '13.76'
+      total_mole_pct: '100'
+    - liquid: iron_rich_F
+      SiO2_mole_pct: '25.07'
+      Al2O3_mole_pct: '9'
+      FeO_x_mole_pct: '49.85'
+      CaO_mole_pct: '6.88'
+      MgO_mole_pct: '1.32'
+      K2O_mole_pct: '7.88'
+      total_mole_pct: '100'
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_table2_silica_rich_immiscible_liquid
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_unexposed_control
+  type: characterization
+  locator:
+    published_page: 28
+    pdf_page_index: 31
+    note: Cleaning sentence continues on printed p. 29 / PDF p. 33.
+  units: as printed
+  values:
+    quantity: unexposed_Type_304_control
+    cleaning_HNO3_pct: 10
+    cleaning_temperature_C: 50
+    cleaning_cycle_min: 20
+    cleaning_continuation_locator:
+      published_page: 29
+      pdf_page_index: 32
+    treatment: Cleaned before sectioning in ultrasonic bath; used for comparison with corrosive-environment specimens.
+    qualifications: Grain boundaries evident in both, but intergranular/surface attack in exposed specimens. Unexposed surface
+      showed no non-uniform Ni, Cr or Fe distribution.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_unexposed_control
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_walden_and_iron_qualification
+  type: thermodynamic_example
+  locator:
+    published_page: 21
+    pdf_page_index: 24
+  units: as printed
+  values:
+    quantity: slag_conductivity_interpretation
+    relation_as_printed: η · σ = const
+    definitions: η is viscosity; σ is electrical conductivity for conducting ionic species (iron ions) in molten glass.
+    qualifications: At conductivity maxima crystalline components are feldspar sesquioxide and spinel solid solutions of undefined
+      compositions; conduction cannot be assigned uniquely to crystals or iron-rich glass, and polarization effects were not
+      observed. Capps reports viscosity decreases with increased iron and decreased silica; relative silica decreases with
+      any non-silica addition. Data are repeatable with repeated treatments. Adding Fe2O3/Fe3O4 to potassium-free Bow slag
+      causes excessive frothing unless highly reducing.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_walden_and_iron_qualification
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K
+- observation_id: schneider_1980_wastage_run_conditions
+  type: laboratory_conditions
+  locator:
+    published_page: 26
+    pdf_page_index: 29
+    section: Corrosion of Downstream MHD Components
+  units: as printed
+  values:
+    quantity: oxygen_rich_K2SO4_seeded_specimen_exposure_conditions
+    method_class: measured_direct
+    seed_mass_g: 250
+    seed_material: K2SO4
+    seed_addition_duration_min: 25
+    exposure_duration_hr: 4
+    specimen_temperature_C:
+    - 400
+    - 500
+    - 590
+    gas_stream_temperature_C:
+      approximate: true
+      value: 1300
+    temperature_sensor: Pt/Pt-10%Rh thermocouple welded into specimen wall at mid-length
+    specimens_exposed: 6
+    preparation_and_test_note: Internal air cooling maintained specimen temperature; K2SO4-seeded oxygen-rich oxygen-propane
+      hot gas stream.
+    printed_qualification: Only the three Table 1 specimens are represented in the wastage table; the report says six stainless-steel
+      specimens were exposed at three temperature levels.
+  context_id: kems-212-schneider-1980-nbsir-80-2059::context::schneider_1980_wastage_run_conditions
+  work_id: b85e1862558cd7c8c6952c9cb33787903663e21564e99b2d5618c7ee25d08bf1
+  source_id: kems-212-schneider-1980-nbsir-80-2059
+  species: K

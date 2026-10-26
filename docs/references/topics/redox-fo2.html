@@ -30,19 +30,19 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/melt_activity_models.yaml:218</code> - model_rows.row_id.source: source: {provider: simulator.fe_redox.kress91_ferrous_feo_activity, engine_version: REF-001-kress-carmichael-1991, database_id: builtin, engine_component_ids: [FeO], basis_coefficients: [1], redox_inputs: [FeOt, Fe2O3], evidence_refs: [REF-001]}</li>
-<li><code>engines/builtin/vapor_pressure.py:2523</code> - def dispatch(self, request: IntentRequest) -&gt; IntentResult: &quot;source_reaction_redox_model_id&quot;: &quot;REF-001-kress-carmichael-1991&quot;,</li>
-<li><code>simulator/equilibrium.py:1066</code> - def _sz_below_threshold(species_id: str, p_pa: float, field: str) -&gt; None: else &#x27;REF-001 Kress &amp; Carmichael 1991&#x27;</li>
-<li><code>simulator/fe_redox.py:24</code> - class Kress91InvalidControls(ValueError): # provenance: Kress91 coefficients — REF-001 CMP 108:82-92; ln(fO2) and inverse-T terms.</li>
-<li><code>simulator/fe_redox.py:56</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # source REF-001 defines the Kress91 liquid relation and 1200 C floor.</li>
-<li><code>simulator/fe_redox.py:62</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 liquid relation; below 1200 C calibration floor&#x27;</li>
-<li><code>simulator/fe_redox.py:68</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # CASE 1200-1630 C: AUTHORITATIVE Kress &amp; Carmichael 1991, REF-001,</li>
-<li><code>simulator/fe_redox.py:75</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 1200-1630 C calibration band&#x27;,</li>
-<li><code>simulator/fe_redox.py:88</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 retained; REF-053 confirms high-T extrapolation&#x27;</li>
-<li><code>simulator/fe_redox.py:100</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 retained beyond REF-053 confirmation band&#x27;,</li>
-<li><code>simulator/fe_redox.py:110</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 outside authorized temperature envelope&#x27;,</li>
-<li><code>simulator/fe_redox.py:215</code> - def kress91_referenced_log_fO2(: # A reference in the REF-001 mid-band is corrupt persisted state and</li>
-<li><code>simulator/vapour_rail/melt_activity_resolver.py:2340</code> - def resolve_feo_shadow(self, query: MeltActivityQuery) -&gt; SourceReactionActivity: chemical_potential_ref=&quot;REF-001-kress-carmichael-1991&quot;,</li>
-<li><code>simulator/vapour_rail/melt_activity_resolver.py:2364</code> - def resolve_feo_shadow(self, query: MeltActivityQuery) -&gt; SourceReactionActivity: &quot;model_version&quot;: &quot;REF-001-kress-carmichael-1991&quot;,</li>
+<li><code>engines/builtin/vapor_pressure.py:4627</code> - def dispatch(self, request: IntentRequest) -&gt; IntentResult: &quot;source_reaction_redox_model_id&quot;: &quot;REF-001-kress-carmichael-1991&quot;,</li>
+<li><code>simulator/equilibrium.py:1208</code> - def _sz_below_threshold(species_id: str, p_pa: float, field: str) -&gt; None: else &#x27;REF-001 Kress &amp; Carmichael 1991&#x27;</li>
+<li><code>simulator/fe_redox.py:57</code> - def intrinsic_melt_fO2(: # provenance: Kress91 coefficients — REF-001 CMP 108:82-92; ln(fO2) and inverse-T terms.</li>
+<li><code>simulator/fe_redox.py:90</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # source REF-001 defines the Kress91 liquid relation and 1200 C floor.</li>
+<li><code>simulator/fe_redox.py:96</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 liquid relation; below 1200 C calibration floor&#x27;</li>
+<li><code>simulator/fe_redox.py:102</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # CASE 1200-1630 C: AUTHORITATIVE Kress &amp; Carmichael 1991, REF-001,</li>
+<li><code>simulator/fe_redox.py:109</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 1200-1630 C calibration band&#x27;,</li>
+<li><code>simulator/fe_redox.py:122</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 retained; REF-053 confirms high-T extrapolation&#x27;</li>
+<li><code>simulator/fe_redox.py:134</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 retained beyond REF-053 confirmation band&#x27;,</li>
+<li><code>simulator/fe_redox.py:144</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 outside authorized temperature envelope&#x27;,</li>
+<li><code>simulator/fe_redox.py:249</code> - def kress91_referenced_log_fO2(: # A reference in the REF-001 mid-band is corrupt persisted state and</li>
+<li><code>simulator/vapour_rail/melt_activity_resolver.py:2363</code> - def resolve_feo_shadow(self, query: MeltActivityQuery) -&gt; SourceReactionActivity: chemical_potential_ref=&quot;REF-001-kress-carmichael-1991&quot;,</li>
+<li><code>simulator/vapour_rail/melt_activity_resolver.py:2387</code> - def resolve_feo_shadow(self, query: MeltActivityQuery) -&gt; SourceReactionActivity: &quot;model_version&quot;: &quot;REF-001-kress-carmichael-1991&quot;,</li>
 </ul>
 </section>
 <section class="entry" id="REF-035">
@@ -51,7 +51,11 @@ ul { padding-left: 1.4rem; }</style>
 <p class="meta"><span class="badge">MODEL</span><span class="badge status-current">current</span><a class="badge" href="redox-fo2.html">redox-fo2</a></p>
 <p><a href="https://pubs.geoscienceworld.org/msa/ammin/article-abstract/72/1-2/67/42166/the-quartz-fayalite-magnetite-equilibria-and-free">source URL</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
-<p><strong>Cited by:</strong> none</p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>docs/chemistry-methods.md:642</code> - §7.1 Iron redox and the total-iron convention: QFM, CCO) are the O&#x27;Neill 1987 (REF-035), Frost 1991 (REF-036), and Jakobsson &amp; Oskarsson 1994</li>
+<li><code>simulator/chemistry/qfm_oneill.py:9</code> - def oneill_qfm_log10_fO2_bar(temperature_K: float) -&gt; float: 72, 67-75 (REF-035): that paper&#x27;s p. 73 gives QFM (reaction 2) as an</li>
+</ul>
 </section>
 <section class="entry" id="REF-036">
 <h2>REF-036</h2>
@@ -59,7 +63,10 @@ ul { padding-left: 1.4rem; }</style>
 <p class="meta"><span class="badge">THEORY</span><span class="badge status-current">current</span><a class="badge" href="redox-fo2.html">redox-fo2</a></p>
 <p><a href="https://doi.org/10.1515/9781501508684-004">doi:10.1515/9781501508684-004</a> | <a href="https://pubs.geoscienceworld.org/msa/rimg/book/874/oxide-minerals-petrologic-and-magnetic-significance">source URL</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
-<p><strong>Cited by:</strong> none</p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>docs/chemistry-methods.md:642</code> - §7.1 Iron redox and the total-iron convention: QFM, CCO) are the O&#x27;Neill 1987 (REF-035), Frost 1991 (REF-036), and Jakobsson &amp; Oskarsson 1994</li>
+</ul>
 </section>
 <section class="entry" id="REF-037">
 <h2>REF-037</h2>
@@ -67,7 +74,10 @@ ul { padding-left: 1.4rem; }</style>
 <p class="meta"><span class="badge">MODEL</span><span class="badge status-current">current</span><a class="badge" href="redox-fo2.html">redox-fo2</a></p>
 <p><a href="https://doi.org/10.1016/0016-7037(94)90442-1">doi:10.1016/0016-7037(94)90442-1</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
-<p><strong>Cited by:</strong> none</p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>docs/chemistry-methods.md:643</code> - §7.1 Iron redox and the total-iron convention: (REF-037) entries in the reference registry. The Jugo 2010 S6+/ST diagnostic is the exception on QFM:</li>
+</ul>
 </section>
 <section class="entry" id="REF-038">
 <h2>REF-038</h2>
@@ -75,7 +85,10 @@ ul { padding-left: 1.4rem; }</style>
 <p class="meta"><span class="badge">OBSERVATION</span><span class="badge status-current">current</span><a class="badge" href="redox-fo2.html">redox-fo2</a></p>
 <p><a href="https://doi.org/10.1016/0016-7037(70)90042-6">doi:10.1016/0016-7037(70)90042-6</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
-<p><strong>Cited by:</strong> none</p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>docs/model-limitations.md:227</code> - Iron redox in the melt (residual gaps): - **The intrinsic-fO₂ seed carries ungrounded offsets.** The melt oxygen fugacity is seeded from a composition-to-fO₂ initializer that still applies ungrounded alkali and ferric `redox_offset` terms. Reduced lunar basalt conditions (Tuthill &amp; Sato 1970, REF-038) and the reduced Martian basalt range (Herd et al. 2002, REF-039) provide planetary context, but neither source grounds these runtime offset coefficients. These perturb the fO₂ *input* only; the Kress91 fO₂→ferric/ferrous mapping downstream of it is grounded, but the starting point it maps from is not fully anchored.</li>
+</ul>
 </section>
 <section class="entry" id="REF-039">
 <h2>REF-039</h2>
@@ -83,7 +96,10 @@ ul { padding-left: 1.4rem; }</style>
 <p class="meta"><span class="badge">OBSERVATION</span><span class="badge status-current">current</span><a class="badge" href="redox-fo2.html">redox-fo2</a></p>
 <p><a href="https://doi.org/10.1016/S0016-7037(02)00828-1">doi:10.1016/S0016-7037(02)00828-1</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
-<p><strong>Cited by:</strong> none</p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>docs/model-limitations.md:227</code> - Iron redox in the melt (residual gaps): - **The intrinsic-fO₂ seed carries ungrounded offsets.** The melt oxygen fugacity is seeded from a composition-to-fO₂ initializer that still applies ungrounded alkali and ferric `redox_offset` terms. Reduced lunar basalt conditions (Tuthill &amp; Sato 1970, REF-038) and the reduced Martian basalt range (Herd et al. 2002, REF-039) provide planetary context, but neither source grounds these runtime offset coefficients. These perturb the fO₂ *input* only; the Kress91 fO₂→ferric/ferrous mapping downstream of it is grounded, but the starting point it maps from is not fully anchored.</li>
+</ul>
 </section>
 <section class="entry" id="REF-053">
 <h2>REF-053</h2>
@@ -93,11 +109,11 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>docs/chemistry-methods.md:597</code> - §7.1 Iron redox and the total-iron convention: an extrapolation. REF-053 is retained only as provisional comparison evidence until its quote-gated source</li>
-<li><code>simulator/fe_redox.py:81</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # Aithala, Macris &amp; Hirschmann 2026 (REF-053, doi:10.7185/geochemlet.2617);</li>
-<li><code>simulator/fe_redox.py:88</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 retained; REF-053 confirms high-T extrapolation&#x27;</li>
-<li><code>simulator/fe_redox.py:94</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # CASE 2100-2500 C: extrapolation with growing uncertainty; REF-053 is</li>
-<li><code>simulator/fe_redox.py:100</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 retained beyond REF-053 confirmation band&#x27;,</li>
+<li><code>docs/chemistry-methods.md:623</code> - §7.1 Iron redox and the total-iron convention: an extrapolation. REF-053 is retained only as provisional comparison evidence until its quote-gated source</li>
+<li><code>simulator/fe_redox.py:115</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # Aithala, Macris &amp; Hirschmann 2026 (REF-053, doi:10.7185/geochemlet.2617);</li>
+<li><code>simulator/fe_redox.py:122</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 retained; REF-053 confirms high-T extrapolation&#x27;</li>
+<li><code>simulator/fe_redox.py:128</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # CASE 2100-2500 C: extrapolation with growing uncertainty; REF-053 is</li>
+<li><code>simulator/fe_redox.py:134</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 retained beyond REF-053 confirmation band&#x27;,</li>
 </ul>
 </section>
 <section class="entry" id="REF-054">
@@ -108,7 +124,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>simulator/fe_redox.py:69</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # doi:10.1007/BF00307328. Kilinc 1983 (REF-054) and Jayasuriya 2004</li>
+<li><code>simulator/fe_redox.py:103</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # doi:10.1007/BF00307328. Kilinc 1983 (REF-054) and Jayasuriya 2004</li>
 </ul>
 </section>
 <section class="entry" id="REF-055">
@@ -119,7 +135,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>simulator/fe_redox.py:70</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # (REF-055) are comparison/validation sources, not wider model authority.</li>
+<li><code>simulator/fe_redox.py:104</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # (REF-055) are comparison/validation sources, not wider model authority.</li>
 </ul>
 </section>
 </body>

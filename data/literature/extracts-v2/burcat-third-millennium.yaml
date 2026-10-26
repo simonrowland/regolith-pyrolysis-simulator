@@ -6,8 +6,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: CO2
       phase:
@@ -19,9 +19,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '-393.472'
     approximate: false
   uncertainty:
     kind: none
@@ -31,9 +76,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table1_CO2_gas
   source_id: burcat-third-millennium
   locator:
     page: 13
@@ -43,8 +93,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: CO
       phase:
@@ -56,9 +106,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '-110.538'
     approximate: false
   uncertainty:
     kind: none
@@ -68,9 +163,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table1_CO_gas
   source_id: burcat-third-millennium
   locator:
     page: 13
@@ -80,8 +180,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: C
       phase:
@@ -93,9 +193,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '717.065'
     approximate: false
   uncertainty:
     kind: none
@@ -105,9 +250,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table1_C_gas
   source_id: burcat-third-millennium
   locator:
     page: 13
@@ -117,8 +267,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: Cl
       phase:
@@ -130,9 +280,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '121.302'
     approximate: false
   uncertainty:
     kind: none
@@ -142,9 +337,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table1_Cl_gas
   source_id: burcat-third-millennium
   locator:
     page: 13
@@ -154,8 +354,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: H2O
       phase:
@@ -167,9 +367,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '-241.815'
     approximate: false
   uncertainty:
     kind: none
@@ -179,9 +424,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table1_H2O_gas
   source_id: burcat-third-millennium
   locator:
     page: 13
@@ -191,8 +441,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: H
       phase:
@@ -204,9 +454,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '217.997'
     approximate: false
   uncertainty:
     kind: none
@@ -216,9 +511,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table1_H_gas
   source_id: burcat-third-millennium
   locator:
     page: 13
@@ -228,8 +528,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: NO2
       phase:
@@ -241,9 +541,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '34.025'
     approximate: false
   uncertainty:
     kind: none
@@ -253,9 +598,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table1_NO2_gas
   source_id: burcat-third-millennium
   locator:
     page: 13
@@ -265,8 +615,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: 'NO'
       phase:
@@ -278,9 +628,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '91.097'
     approximate: false
   uncertainty:
     kind: none
@@ -290,9 +685,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table1_NO_gas
   source_id: burcat-third-millennium
   locator:
     page: 13
@@ -302,8 +702,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: N
       phase:
@@ -315,9 +715,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '472.459'
     approximate: false
   uncertainty:
     kind: none
@@ -327,9 +772,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table1_N_gas
   source_id: burcat-third-millennium
   locator:
     page: 13
@@ -339,8 +789,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: O
       phase:
@@ -352,9 +802,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '249.229'
     approximate: false
   uncertainty:
     kind: none
@@ -364,9 +859,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table1_O_gas
   source_id: burcat-third-millennium
   locator:
     page: 13
@@ -376,8 +876,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: SO2
       phase:
@@ -389,9 +889,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '-296.84'
     approximate: false
   uncertainty:
     kind: none
@@ -401,9 +946,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table1_SO2_gas
   source_id: burcat-third-millennium
   locator:
     page: 13
@@ -413,8 +963,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: S
       phase:
@@ -426,9 +976,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '277.17'
     approximate: false
   uncertainty:
     kind: none
@@ -438,20 +1033,25 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table1_S_gas
   source_id: burcat-third-millennium
   locator:
     page: 13
     table: '1'
   read_from: pdf:burcat-third-millennium
-- observation_id: burcat-third-millennium::burcat_2005_table2_C2H6
+- observation_id: burcat-third-millennium::burcat_2005_table2_C2H6_bomb_calorimeter
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: C2H6
       phase:
@@ -463,32 +1063,203 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '-84.68'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.5'
+      units: kJ/mol
+      verbatim: ±0.50 kJ/mol
+      locator:
+        page: 14
+        table: '2'
   evidence:
     class:
       tag: value
       value: compilation_assessed
     original_method_class: compilation_assessed
+    attribution: Cohen and Benson (1992)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table2_C2H6_bomb_calorimeter
   source_id: burcat-third-millennium
   locator:
     page: 14
     table: '2'
   read_from: pdf:burcat-third-millennium
-- observation_id: burcat-third-millennium::burcat_2005_table2_C3H8
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 14
+        table: '2'
+- observation_id: burcat-third-millennium::burcat_2005_table2_C2H6_flame_calorimeter
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: C2H6
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
       tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-83.85'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.29'
+      units: kJ/mol
+      verbatim: ±0.29 kJ/mol
+      locator:
+        page: 14
+        table: '2'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: Cohen and Benson (1992)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table2_C2H6_flame_calorimeter
+  source_id: burcat-third-millennium
+  locator:
+    page: 14
+    table: '2'
+  read_from: pdf:burcat-third-millennium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 14
+        table: '2'
+- observation_id: burcat-third-millennium::burcat_2005_table2_C3H8_bomb_calorimeter
+  experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
     species:
       formula: C3H8
       phase:
@@ -500,32 +1271,203 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '-103.89'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.59'
+      units: kJ/mol
+      verbatim: ±0.59 kJ/mol
+      locator:
+        page: 14
+        table: '2'
   evidence:
     class:
       tag: value
       value: compilation_assessed
     original_method_class: compilation_assessed
+    attribution: Cohen and Benson (1992)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table2_C3H8_bomb_calorimeter
   source_id: burcat-third-millennium
   locator:
     page: 14
     table: '2'
   read_from: pdf:burcat-third-millennium
-- observation_id: burcat-third-millennium::burcat_2005_table2_CH4
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 14
+        table: '2'
+- observation_id: burcat-third-millennium::burcat_2005_table2_C3H8_flame_calorimeter
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: C3H8
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
       tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-104.68'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.5'
+      units: kJ/mol
+      verbatim: ±0.50 kJ/mol
+      locator:
+        page: 14
+        table: '2'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: Cohen and Benson (1992)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table2_C3H8_flame_calorimeter
+  source_id: burcat-third-millennium
+  locator:
+    page: 14
+    table: '2'
+  read_from: pdf:burcat-third-millennium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 14
+        table: '2'
+- observation_id: burcat-third-millennium::burcat_2005_table2_CH4_bomb_calorimeter
+  experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
     species:
       formula: CH4
       phase:
@@ -537,32 +1479,203 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '-74.85'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.29'
+      units: kJ/mol
+      verbatim: ±0.29 kJ/mol
+      locator:
+        page: 14
+        table: '2'
   evidence:
     class:
       tag: value
       value: compilation_assessed
     original_method_class: compilation_assessed
+    attribution: Cohen and Benson (1992)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table2_CH4_bomb_calorimeter
   source_id: burcat-third-millennium
   locator:
     page: 14
     table: '2'
   read_from: pdf:burcat-third-millennium
-- observation_id: burcat-third-millennium::burcat_2005_table2_iC4H10
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 14
+        table: '2'
+- observation_id: burcat-third-millennium::burcat_2005_table2_CH4_flame_calorimeter
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: CH4
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
       tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-74.48'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.42'
+      units: kJ/mol
+      verbatim: ±0.42 kJ/mol
+      locator:
+        page: 14
+        table: '2'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: Cohen and Benson (1992)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table2_CH4_flame_calorimeter
+  source_id: burcat-third-millennium
+  locator:
+    page: 14
+    table: '2'
+  read_from: pdf:burcat-third-millennium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 14
+        table: '2'
+- observation_id: burcat-third-millennium::burcat_2005_table2_iC4H10_bomb_calorimeter
+  experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
     species:
       formula: i-C4H10
       phase:
@@ -574,32 +1687,203 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '-135.6'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.54'
+      units: kJ/mol
+      verbatim: ±0.54 kJ/mol
+      locator:
+        page: 14
+        table: '2'
   evidence:
     class:
       tag: value
       value: compilation_assessed
     original_method_class: compilation_assessed
+    attribution: Cohen and Benson (1992)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table2_iC4H10_bomb_calorimeter
   source_id: burcat-third-millennium
   locator:
     page: 14
     table: '2'
   read_from: pdf:burcat-third-millennium
-- observation_id: burcat-third-millennium::burcat_2005_table2_nC4H10
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 14
+        table: '2'
+- observation_id: burcat-third-millennium::burcat_2005_table2_iC4H10_flame_calorimeter
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: i-C4H10
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
       tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-134.18'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.63'
+      units: kJ/mol
+      verbatim: ±0.63 kJ/mol
+      locator:
+        page: 14
+        table: '2'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: Cohen and Benson (1992)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table2_iC4H10_flame_calorimeter
+  source_id: burcat-third-millennium
+  locator:
+    page: 14
+    table: '2'
+  read_from: pdf:burcat-third-millennium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 14
+        table: '2'
+- observation_id: burcat-third-millennium::burcat_2005_table2_nC4H10_bomb_calorimeter
+  experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
     species:
       formula: n-C4H10
       phase:
@@ -611,32 +1895,203 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '-127.03'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.67'
+      units: kJ/mol
+      verbatim: ±0.67 kJ/mol
+      locator:
+        page: 14
+        table: '2'
   evidence:
     class:
       tag: value
       value: compilation_assessed
     original_method_class: compilation_assessed
+    attribution: Cohen and Benson (1992)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table2_nC4H10_bomb_calorimeter
   source_id: burcat-third-millennium
   locator:
     page: 14
     table: '2'
   read_from: pdf:burcat-third-millennium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 14
+        table: '2'
+- observation_id: burcat-third-millennium::burcat_2005_table2_nC4H10_flame_calorimeter
+  experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: n-C4H10
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-125.65'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.67'
+      units: kJ/mol
+      verbatim: ±0.67 kJ/mol
+      locator:
+        page: 14
+        table: '2'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: Cohen and Benson (1992)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table2_nC4H10_flame_calorimeter
+  source_id: burcat-third-millennium
+  locator:
+    page: 14
+    table: '2'
+  read_from: pdf:burcat-third-millennium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 14
+        table: '2'
 - observation_id: burcat-third-millennium::burcat_2005_table3_C2H3_radical
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: C2H3
       phase:
@@ -648,9 +2103,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '296.61'
     approximate: false
   uncertainty:
     kind: none
@@ -660,9 +2160,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_C2H3_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -672,8 +2177,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: C2H5
       phase:
@@ -685,9 +2190,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '118.66'
     approximate: false
   uncertainty:
     kind: none
@@ -697,9 +2247,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_C2H5_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -709,8 +2264,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: C2H
       phase:
@@ -722,9 +2277,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '568.06'
     approximate: false
   uncertainty:
     kind: none
@@ -734,9 +2334,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_C2H_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -746,8 +2351,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: C2O
       phase:
@@ -759,9 +2364,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '291.04'
     approximate: false
   uncertainty:
     kind: none
@@ -771,9 +2421,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_C2O_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -783,8 +2438,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: C3H3
       phase:
@@ -796,9 +2451,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '339'
     approximate: false
   uncertainty:
     kind: none
@@ -808,9 +2508,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_C3H3_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -820,8 +2525,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: C3H5
       phase:
@@ -833,9 +2538,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '171'
     approximate: false
   uncertainty:
     kind: none
@@ -845,9 +2595,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_C3H5_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -857,8 +2612,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: C6H5
       phase:
@@ -870,9 +2625,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '339.7'
     approximate: false
   uncertainty:
     kind: none
@@ -882,9 +2682,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_C6H5_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -894,8 +2699,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: CH2OH
       phase:
@@ -907,9 +2712,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '-17.18'
     approximate: false
   uncertainty:
     kind: none
@@ -919,9 +2769,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_CH2OH_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -931,8 +2786,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: CH2
       phase:
@@ -944,9 +2799,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '391.465'
     approximate: false
   uncertainty:
     kind: none
@@ -956,9 +2856,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_CH2_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -968,8 +2873,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: CH3O
       phase:
@@ -981,9 +2886,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '20.257'
     approximate: false
   uncertainty:
     kind: none
@@ -993,9 +2943,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_CH3O_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -1005,8 +2960,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: CH3
       phase:
@@ -1018,9 +2973,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '146.582'
     approximate: false
   uncertainty:
     kind: none
@@ -1030,9 +3030,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_CH3_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -1042,8 +3047,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: CHO
       phase:
@@ -1055,9 +3060,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '42.296'
     approximate: false
   uncertainty:
     kind: none
@@ -1067,9 +3117,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_CHO_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -1079,8 +3134,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: CH
       phase:
@@ -1092,9 +3147,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '596.3'
     approximate: false
   uncertainty:
     kind: none
@@ -1104,9 +3204,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_CH_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -1116,8 +3221,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: CN
       phase:
@@ -1129,9 +3234,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '438.81'
     approximate: false
   uncertainty:
     kind: none
@@ -1141,9 +3291,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_CN_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -1153,8 +3308,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: HO2
       phase:
@@ -1166,9 +3321,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '12.296'
     approximate: false
   uncertainty:
     kind: none
@@ -1178,9 +3378,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_HO2_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -1190,8 +3395,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: NH
       phase:
@@ -1203,9 +3408,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '358.76'
     approximate: false
   uncertainty:
     kind: none
@@ -1215,9 +3465,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_NH_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -1227,8 +3482,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: OH
       phase:
@@ -1240,9 +3495,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '37.34'
     approximate: false
   uncertainty:
     kind: none
@@ -1252,9 +3552,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_OH_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -1264,8 +3569,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: SH
       phase:
@@ -1277,9 +3582,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '141.87'
     approximate: false
   uncertainty:
     kind: none
@@ -1289,9 +3639,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_SH_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -1301,8 +3656,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: i-C3H7
       phase:
@@ -1314,9 +3669,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '90.19'
     approximate: false
   uncertainty:
     kind: none
@@ -1326,9 +3726,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_iC3H7_radical
   source_id: burcat-third-millennium
   locator:
     page: 15
@@ -1338,8 +3743,8 @@ observations:
   experiment_id: 6ffd239db4f8cb39cd176084bbd1ff5bee94f3c3fa899058df45d5ff7f419634::burcat-third-millennium
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'delta_fH298'
+      tag: value
+      value: delta_fH
     species:
       formula: n-C3H7
       phase:
@@ -1351,9 +3756,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fH298'; refusing to pick a number
+    kind: point
+    point: '101.32'
     approximate: false
   uncertainty:
     kind: none
@@ -1363,9 +3813,14 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_assessed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: burcat-third-millennium::burcat_2005_table3_nC3H7_radical
   source_id: burcat-third-millennium
   locator:
     page: 15

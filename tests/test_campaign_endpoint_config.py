@@ -7,6 +7,8 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from engines.engine_commissioning import PUBLISHED_AUTHORITY_OUTSIDE
+from simulator.accounting.stage0_inventory import STAGE0_RELEASE_KINETICS
 from simulator.campaigns import (
     CAMPAIGN_DEPLETION_SIGNAL_INVALID_REFUSAL_REASON,
     CampaignC4EndpointRefusal,
@@ -14,8 +16,11 @@ from simulator.campaigns import (
     CampaignHoldAcquisitionRefusal,
     CampaignHoldTargetRefusal,
     CampaignManager,
+    c0_exit_record,
+    c0_exit_run_notice,
 )
 from simulator.core import PyrolysisSimulator
+from simulator.runner import _attach_c0_exit_notice
 from simulator.state import (
     BatchRecord,
     CampaignPhase,
@@ -138,8 +143,10 @@ def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
         "expected",
     ),
     [
+        # Without a computed prediction, C0 remains incomplete until its
+        # configured maximum-hold backstop.
         (CampaignPhase.C0, 9, 940.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, False),
-        (CampaignPhase.C0, 10, 940.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
+        (CampaignPhase.C0, 10, 940.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C0, 25, 25.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C0B, 3, 1199.9, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C0B, 3, 1200.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
@@ -230,6 +237,277 @@ def test_configured_campaign_endpoints_match_legacy_trip_points(
     )
 
     assert manager.check_endpoint(melt, flux, CondensationTrain(), record) is expected
+
+
+def _assert_computed_c0_exit_notice(notice: dict) -> None:
+    assert notice["outcome"] == "incomplete"
+    assert notice["backstop"] == "computed_exit"
+    assert notice["kinetics"] == STAGE0_RELEASE_KINETICS
+    assert notice["release_curves"] == "uncertified (t-1417)"
+    assert notice["ticket"] == "t-1417"
+    assert notice["authority"] == PUBLISHED_AUTHORITY_OUTSIDE
+    message = str(notice["message"])
+    assert "fiat-ledgered" in message
+    assert "uncertified" in message
+    assert "t-1417" in message
+    assert str(notice["authority"]) in message
+    assert notice["alkali_retention_budget_fraction"] == 1.0e-3
+    assert notice["budget_authority"] == "owner:d-244"
+    assert notice["phase_state_ticket"] == "t-1460"
+    assert "liquid-law extrapolated" in notice["phase_state"]
+    assert notice["ramp_authority"] == "owner_fiat"
+    assert notice["ramp_model_bounded"] is False
+    assert notice["ramp_C_per_hr"] == float(
+        _setpoints()["campaigns"]["C0"]["dT_dt_C_per_hr"]
+    )
+
+
+def test_c0_computed_exit_uses_temperature_and_evacuation_bound():
+    manager = CampaignManager(_setpoints())
+    prediction = {
+        "T_exit_C": 900.0,
+        "T_exit_reached_hr": 4.375,
+        "t_evac_hr": 8.0,
+        "forecast_engine": "internal-analytical",
+        "requested_exit_window_hr": 8.0,
+        "runtime_exit_window_hr": 8.0,
+        "alkali_retention_budget_fraction": 1.0e-3,
+        "budget_authority": "owner:d-244",
+        "phase_state": "unknown; analytical liquid-law extrapolated",
+        "phase_state_ticket": "t-1460",
+        "release_curves": "uncertified (t-1417)",
+    }
+    manager.c0_exit_prediction = prediction
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 6, temperature_C=900.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is False
+    assert manager.last_c0_exit is None
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 7, temperature_C=899.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is False
+    assert manager.last_c0_exit is None
+
+    inventory_diagnostic = {
+        "targets": [{
+            "key": "H2O",
+            "remaining_kg": 1.0,
+            "remaining_fraction": 0.5,
+            "status": "ok",
+            "remaining_accounts": ["process.stage0_volatile_feed"],
+        }],
+        "aggregate_remaining_fraction": 0.5,
+        "stage0_release_kinetics": "diagnostic_only",
+    }
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 7, temperature_C=900.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+        transport_state={"target_inventory_diagnostic": inventory_diagnostic},
+    ) is True
+    notice = manager.last_c0_exit
+    _assert_computed_c0_exit_notice(notice)
+    assert notice["forecast_engine"] == "internal-analytical"
+    assert notice["T_exit_C"] == 900.0
+    assert notice["t_evac_hr"] == 8.0
+    assert notice["unreleased_inventory_at_exit"] == {
+        "targets": [{
+            "key": "H2O",
+            "remaining_kg": 1.0,
+            "remaining_fraction": 0.5,
+            "status": "ok",
+        }],
+    }
+    assert "aggregate_remaining_fraction" not in notice["unreleased_inventory_at_exit"]
+    assert "remaining_accounts" not in notice["unreleased_inventory_at_exit"]["targets"][0]
+    assert notice["sulfates_routed_to"] == "melt_or_C0b"
+    sim = SimpleNamespace(campaign_mgr=manager)
+    assert c0_exit_run_notice(sim) == notice
+    metadata: dict = {}
+    _attach_c0_exit_notice(metadata, sim)
+    _attach_c0_exit_notice(metadata, sim)
+    assert list(metadata) == ["c0_exit"]
+    assert metadata["c0_exit"] == notice
+
+    backstop = CampaignManager(_setpoints())
+    backstop.c0_exit_prediction = {
+        **prediction,
+        "t_evac_hr": 56.0,
+        "runtime_exit_window_hr": 56.0,
+        "evacuation_max_hold_hr": 25.0,
+        "evacuation_bound_unmet": True,
+        "evacuation_bound_unmet_hr": 31.0,
+        "evacuation_unreleased_gas_mass_kg": 21.0,
+        "evacuation_unreleased_gas_inventory_kg": {"H2O": 21.0},
+    }
+    assert backstop.check_endpoint(
+        _melt(CampaignPhase.C0, 25, temperature_C=25.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert backstop.last_c0_exit["outcome"] == "incomplete"
+    assert backstop.last_c0_exit["backstop"] == "maximum_hold"
+    assert backstop.last_c0_exit["T_exit_C"] == 900.0
+    assert backstop.last_c0_exit["t_evac_hr"] == 56.0
+    assert backstop.last_c0_exit["evacuation_bound_unmet"] is True
+    assert backstop.last_c0_exit["evacuation_bound_unmet_hr"] == 31.0
+    assert backstop.last_c0_exit["evacuation_unreleased_gas_mass_kg"] == 21.0
+    assert backstop.last_c0_exit["evacuation_unreleased_gas_inventory_kg"] == {
+        "H2O": 21.0
+    }
+    assert backstop.last_c0_exit["evacuation_bound_backstop_fired"] is True
+    assert c0_exit_run_notice(SimpleNamespace(campaign_mgr=backstop)) == (
+        backstop.last_c0_exit
+    )
+
+
+def test_c0_exit_forecast_engine_is_optional_and_closed():
+    prediction = {
+        "T_exit_C": 900.0,
+        "t_evac_hr": 8.0,
+        "prediction_status": "ok",
+    }
+    kwargs = {
+        "kinetics": STAGE0_RELEASE_KINETICS,
+        "backstop": "computed_exit",
+        "ramp_C_per_hr": 200.0,
+    }
+
+    legacy_notice = c0_exit_record(prediction=prediction, **kwargs)
+    assert "forecast_engine" not in legacy_notice
+
+    recorded_notice = c0_exit_record(
+        prediction={**prediction, "forecast_engine": "internal-analytical"},
+        **kwargs,
+    )
+    assert recorded_notice["forecast_engine"] == "internal-analytical"
+
+    refusal_detail = {
+        "exception_class": "TypeError",
+        "exception_message": "cannot pickle '_thread.lock' object",
+    }
+    refused_notice = c0_exit_record(
+        prediction={
+            **prediction,
+            "forecast_context_refusal_detail": refusal_detail,
+        },
+        **kwargs,
+    )
+    assert "forecast_context_refusal_detail" not in refused_notice
+    assert "TypeError" in refused_notice["message"]
+    assert refusal_detail["exception_message"] in refused_notice["message"]
+
+    with pytest.raises(ValueError, match="unknown C0 forecast engine"):
+        c0_exit_record(
+            prediction={**prediction, "forecast_engine": "free-text-engine"},
+            **kwargs,
+        )
+
+
+def test_c0_exit_forecast_does_not_raise_for_scalar_temperature_range():
+    sim = SimpleNamespace(
+        campaign_mgr=SimpleNamespace(
+            _campaign_config=lambda _campaign: {
+                "alkali_retention_budget_fraction": 1.0e-3,
+                "temp_range_C": 900.0,
+            }
+        )
+    )
+    sim._build_c0_forecast_context = lambda: (sim, "")
+    sim._evaluate_c0_exit_forecast = (
+        lambda **kwargs: PyrolysisSimulator._evaluate_c0_exit_forecast(
+            sim, **kwargs
+        )
+    )
+
+    prediction = PyrolysisSimulator._predict_c0_exit(sim)
+
+    assert prediction["T_exit_C"] is None
+    assert prediction["prediction_status"] == (
+        "unavailable_invalid_temperature_range"
+    )
+
+
+def test_c0_first_melt_backstop_beats_the_maximum_hold():
+    manager = CampaignManager(_setpoints())
+    manager.c0_first_melt_backstop = True
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 25, temperature_C=940.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert manager.last_c0_exit["outcome"] == "incomplete"
+    assert manager.last_c0_exit["backstop"] == "first_melt"
+    assert manager.last_c0_exit["kinetics"] == STAGE0_RELEASE_KINETICS
+    assert c0_exit_run_notice(SimpleNamespace(campaign_mgr=manager)) == (
+        manager.last_c0_exit
+    )
+
+
+def test_c0_operator_max_hours_stays_an_incomplete_hold():
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C0"] = {"max_hours": 1.0}
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 0, temperature_C=940.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert manager.last_c0_exit["outcome"] == "incomplete"
+    assert manager.last_c0_exit["backstop"] == "maximum_hold"
+    assert manager.last_c0_exit["kinetics"] == STAGE0_RELEASE_KINETICS
+    assert manager.last_c0_exit["release_curves"] == "uncertified (t-1417)"
+    assert c0_exit_run_notice(SimpleNamespace(campaign_mgr=manager)) == (
+        manager.last_c0_exit
+    )
+
+
+def test_c0_first_melt_beats_an_operator_max_hours_override():
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C0"] = {"max_hours": 1.0}
+    manager.c0_first_melt_backstop = True
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 0, temperature_C=20.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert manager.last_c0_exit["outcome"] == "incomplete"
+    assert manager.last_c0_exit["backstop"] == "first_melt"
+    assert manager.last_c0_exit["kinetics"] == STAGE0_RELEASE_KINETICS
+    assert c0_exit_run_notice(SimpleNamespace(campaign_mgr=manager)) == (
+        manager.last_c0_exit
+    )
+
+
+def test_c0_first_melt_stays_ahead_of_computed_exit_and_max_hold():
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C0"] = {"max_hours": 1.0}
+    manager.c0_first_melt_backstop = True
+    manager.c0_exit_prediction = {
+        "T_exit_C": 900.0,
+        "runtime_exit_window_hr": 1.0,
+    }
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 0, temperature_C=900.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert manager.last_c0_exit["backstop"] == "first_melt"
+    assert manager.last_c0_exit["T_exit_C"] == 900.0
+    assert c0_exit_run_notice(SimpleNamespace(campaign_mgr=manager)) == (
+        manager.last_c0_exit
+    )
 
 
 def _c4_snapshot(*, temperature_C: float, mg_rate: float) -> HourSnapshot:

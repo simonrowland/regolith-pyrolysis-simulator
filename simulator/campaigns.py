@@ -18,13 +18,14 @@ from __future__ import annotations
 
 import ast
 import math
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Literal, Optional, Tuple, TypedDict
 
 from simulator import mre_ladder
 from simulator.accounting import UnknownSpeciesError, resolve_species_formula
+from simulator.backend_names import C0_FORECAST_ENGINE_NAMES
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LAB_SCHEDULE_PO2_SETPOINT_KEY,
@@ -89,6 +90,30 @@ C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
 C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
     'c4_preheat_wall_clock_exhausted'
 )
+
+
+class C0ForecastAdjustmentNotice(TypedDict):
+    type: Literal["c0_forecast_predates_adjustment"]
+    adjusted_fields: list[str]
+    campaign_hour: int
+    loss_budget_re_evaluated: bool
+
+
+class C0RemainingBudgetExit(TypedDict):
+    type: Literal["c0_remaining_budget_exit"]
+    reason: Literal[
+        "no_candidate_fits_remaining_hold",
+        "no_candidate_satisfies_alkali_budget",
+        "forecast_unavailable",
+    ]
+    campaign_hour: int
+    remaining_budget_hr: float
+    best_candidate_temperature_C: float | None
+    best_candidate_required_hold_hr: float | None
+    best_candidate_shortfall: float | None
+    best_candidate_shortfall_unit: Literal[
+        "hold_hr", "Na_plus_K_feed_loss_fraction"
+    ] | None
 
 
 class CampaignPressureSetpointRefusal(ValueError):
@@ -233,6 +258,134 @@ class _CampaignOverrideStore(dict):
             self[str(key)] = value
 
 
+def c0_exit_record(
+    kinetics: str,
+    *,
+    backstop: str,
+    ramp_C_per_hr: float,
+    prediction: Mapping[str, object],
+    unreleased_inventory: Mapping[str, object] | None = None,
+    forecast_adjustment_notices: Sequence[C0ForecastAdjustmentNotice] = (),
+    remaining_budget_exit: C0RemainingBudgetExit | None = None,
+) -> dict[str, object]:
+    """One predict-and-flag record for any C0 exit.
+
+    The release curves remain uncertified until t-1417. The analytical
+    liquid-law continuation is extrapolated below the unverified feed
+    solidus; the real engines refuse these full-catalog compositions.
+
+    ``prediction`` is computed by the core physics and transport owners.
+    This layer only records the result and flags inventory that remains.
+    """
+    from engines.engine_commissioning import PUBLISHED_AUTHORITY_OUTSIDE
+
+    authority = PUBLISHED_AUTHORITY_OUTSIDE
+    if backstop not in {
+        "computed_exit",
+        "maximum_hold",
+        "first_melt",
+        "remaining_budget",
+    }:
+        raise ValueError(f"unknown C0 exit backstop {backstop!r}")
+    if backstop == "remaining_budget" and remaining_budget_exit is None:
+        raise ValueError("C0 remaining-budget exit requires its typed event")
+    ramp = float(ramp_C_per_hr)
+    if not math.isfinite(ramp) or ramp <= 0.0:
+        raise ValueError(
+            f"C0 ramp must be finite and positive; got {ramp_C_per_hr!r}"
+        )
+    raw_targets = (
+        unreleased_inventory.get("targets", [])
+        if isinstance(unreleased_inventory, Mapping)
+        else []
+    )
+    unreleased_targets = []
+    if isinstance(raw_targets, (list, tuple)):
+        unreleased_targets = [
+            {
+                "key": target.get("key"),
+                "remaining_kg": target.get("remaining_kg"),
+                "remaining_fraction": target.get("remaining_fraction"),
+                "status": target.get("status"),
+            }
+            for target in raw_targets
+            if isinstance(target, Mapping)
+        ]
+    prediction_payload = dict(prediction)
+    forecast_engine = prediction_payload.pop("forecast_engine", None)
+    forecast_refusal = prediction_payload.pop(
+        "forecast_context_refusal_detail", None
+    )
+    if forecast_engine is not None and (
+        not isinstance(forecast_engine, str)
+        or forecast_engine not in C0_FORECAST_ENGINE_NAMES
+    ):
+        raise ValueError(f"unknown C0 forecast engine {forecast_engine!r}")
+    message = (
+        "C0 gas is fiat-ledgered at load and release curves are "
+        "uncertified (t-1417); any computed T_exit is a "
+        "liquid-law extrapolation with unknown real-engine phase state; "
+        f"authority level {authority}."
+    )
+    if isinstance(forecast_refusal, Mapping):
+        exception_class = forecast_refusal.get("exception_class")
+        exception_message = forecast_refusal.get("exception_message")
+        if exception_class is not None and exception_message is not None:
+            message += (
+                " Forecast context refusal: "
+                f"{exception_class}: {exception_message}"
+            )
+    record = {
+        "outcome": "incomplete",
+        "backstop": backstop,
+        "kinetics": kinetics,
+        "release_curves": "uncertified (t-1417)",
+        "ticket": "t-1417",
+        "authority": authority,
+        "message": message,
+        "ramp_C_per_hr": ramp,
+        "ramp_authority": "owner_fiat",
+        "ramp_model_bounded": False,
+        **prediction_payload,
+        "evacuation_bound_backstop_fired": bool(
+            backstop == "maximum_hold"
+            and prediction.get("evacuation_bound_unmet") is True
+        ),
+        "unreleased_inventory_at_exit": {"targets": unreleased_targets},
+        "sulfates_routed_to": "melt_or_C0b",
+    }
+    if forecast_engine is not None:
+        record["forecast_engine"] = forecast_engine
+    if forecast_adjustment_notices:
+        record["forecast_adjustment_notices"] = [
+            dict(notice) for notice in forecast_adjustment_notices
+        ]
+    if remaining_budget_exit is not None:
+        record["remaining_budget_exit"] = dict(remaining_budget_exit)
+    return record
+
+
+def c0_exit_run_notice(sim: object) -> dict[str, object] | None:
+    """Return the C0 exit record, or None if C0 did not exit."""
+    manager = getattr(sim, "campaign_mgr", None)
+    record = getattr(manager, "last_c0_exit", None)
+    if not isinstance(record, Mapping):
+        return None
+    if record.get("backstop") not in {
+        "computed_exit",
+        "maximum_hold",
+        "first_melt",
+        "remaining_budget",
+    }:
+        return None
+    if (
+        record.get("backstop") == "remaining_budget"
+        and not isinstance(record.get("remaining_budget_exit"), Mapping)
+    ):
+        return None
+    return dict(record)
+
+
 class CampaignManager:
     """
     Manages campaign sequencing and endpoint detection.
@@ -316,6 +469,13 @@ class CampaignManager:
         self.last_c2a_staged_gas_control: dict[str, object] | None = None
         self.last_c2a_staged_max_hold_adjustment: dict[str, object] | None = None
         self.last_c3_na_hold_adjustment: dict[str, object] | None = None
+        self.last_c0_exit: dict[str, object] | None = None
+        self.c0_exit_prediction: dict[str, object] | None = None
+        self.c0_remaining_budget_exit: C0RemainingBudgetExit | None = None
+        self.c0_forecast_adjustment_notices: list[
+            C0ForecastAdjustmentNotice
+        ] = []
+        self.c0_first_melt_backstop = False
         self.c5_enabled = False
         self._c2a_staged_stage_idx: int = 0
         self._c2a_staged_stage_start_hour: int = 0
@@ -632,6 +792,67 @@ class CampaignManager:
                     merged.setdefault('setpoints', ovr['setpoints'])
                 merged.update(ovr)
         return merged
+
+    def record_c0_forecast_adjustment(
+        self,
+        adjusted_field: str,
+        campaign_hour: int,
+        *,
+        loss_budget_re_evaluated: bool,
+    ) -> C0ForecastAdjustmentNotice:
+        notice: C0ForecastAdjustmentNotice = {
+            "type": "c0_forecast_predates_adjustment",
+            "adjusted_fields": [adjusted_field],
+            "campaign_hour": int(campaign_hour),
+            "loss_budget_re_evaluated": loss_budget_re_evaluated,
+        }
+        self.c0_forecast_adjustment_notices.append(notice)
+        return notice
+
+    def record_c0_remaining_budget_exit(
+        self,
+        prediction: Mapping[str, object],
+        *,
+        campaign_hour: int,
+        remaining_budget_hr: float,
+    ) -> C0RemainingBudgetExit:
+        reason = prediction.get("remaining_budget_exit_reason")
+        if reason == "no_candidate_fits_remaining_hold":
+            shortfall = prediction.get("best_candidate_hold_shortfall_hr")
+            shortfall_unit = "hold_hr"
+        elif reason == "no_candidate_satisfies_alkali_budget":
+            shortfall = prediction.get(
+                "best_candidate_alkali_shortfall_fraction"
+            )
+            shortfall_unit = "Na_plus_K_feed_loss_fraction"
+        else:
+            reason = "forecast_unavailable"
+            shortfall = None
+            shortfall_unit = None
+        event: C0RemainingBudgetExit = {
+            "type": "c0_remaining_budget_exit",
+            "reason": reason,
+            "campaign_hour": int(campaign_hour),
+            "remaining_budget_hr": float(remaining_budget_hr),
+            "best_candidate_temperature_C": (
+                float(value)
+                if (value := prediction.get("best_candidate_temperature_C"))
+                is not None
+                else None
+            ),
+            "best_candidate_required_hold_hr": (
+                float(value)
+                if (value := prediction.get("best_candidate_required_hold_hr"))
+                is not None
+                else None
+            ),
+            "best_candidate_shortfall": (
+                float(shortfall) if shortfall is not None else None
+            ),
+            "best_candidate_shortfall_unit": shortfall_unit,
+        }
+        self.c0_remaining_budget_exit = event
+        return event
 
     @staticmethod
     def _float(value, default: float) -> float:
@@ -1498,15 +1719,15 @@ class CampaignManager:
             self.last_c4_termination = None
 
         if campaign == CampaignPhase.C0:
-            ambient_pressure = max(
-                0.0, float(getattr(melt, 'ambient_pressure_mbar', 0.0) or 0.0))
-            if ambient_pressure > 0:
-                melt.atmosphere = Atmosphere.CO2_BACKPRESSURE
-                melt.p_total_mbar = ambient_pressure
-            else:
-                melt.atmosphere = Atmosphere.HARD_VACUUM
-                melt.p_total_mbar = 0.0
-            melt.pO2_mbar = 0.0
+            cfg = self._campaign_config(campaign)
+            melt.atmosphere = Atmosphere.ARGON_FLOW
+            melt.background_gas_species = _canonical_carrier_gas_key(
+                str(cfg.get('carrier_gas', 'Ar') or 'Ar')
+            )
+            melt.p_total_mbar = self._pressure_config_float(
+                cfg, 'p_total_mbar', 'p_total_mbar_default', 1.0)
+            melt.pO2_mbar = self._pressure_config_float(
+                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
 
         elif campaign == CampaignPhase.C0B:
             cfg = self._campaign_config(campaign)
@@ -1698,6 +1919,17 @@ class CampaignManager:
         """
         result = self._get_base_temp_target(campaign, campaign_hour, melt)
         target_T, ramp_rate = self._apply_ramp_override(campaign, result[0], result[1])
+        if campaign == CampaignPhase.C0:
+            prediction = self.c0_exit_prediction
+            predicted_exit_C = (
+                prediction.get("T_exit_C")
+                if isinstance(prediction, Mapping)
+                else None
+            )
+            if predicted_exit_C is not None:
+                target_T = min(float(target_T), float(predicted_exit_C))
+            if self.c0_remaining_budget_exit is not None:
+                target_T = float(melt.temperature_C)
         return (self._clamp_to_furnace_max(target_T), ramp_rate)
 
     def _clamp_to_furnace_max(self, target_T: Optional[float]) -> Optional[float]:
@@ -2174,7 +2406,9 @@ class CampaignManager:
         Runtime completion on the paths in this function (not IR peak
         fractions; numeric thresholds come from setpoints.yaml
         ``soft_endpoint`` / ``endpoint`` / ``composition_endpoint``):
-        - C0: temperature >= configured min after min hold, else max_hold
+        - C0: computed Na+K budget temperature and evacuation bound,
+          incomplete and predict-and-flag (t-1417). Maximum hold and
+          first melt stay incomplete backstops.
         - C0B: max_hold only
         - C2A: armed total kg/hr below configured threshold after min
           hold, else max_hold
@@ -2202,9 +2436,14 @@ class CampaignManager:
 
         # Check user-specified max_hours override first. C6 handles this as a
         # hold-acquisition refusal below so the wall clock cannot claim a
-        # successful reaction without provider dispatch.
+        # successful reaction without provider dispatch. C0 records the same
+        # stop inside its own branch so the incomplete outcome is not skipped.
         ovr = self._campaign_overrides(campaign)
-        if campaign not in (CampaignPhase.C4, CampaignPhase.C6) and 'max_hours' in ovr:
+        if campaign not in (
+            CampaignPhase.C4,
+            CampaignPhase.C6,
+            CampaignPhase.C0,
+        ) and 'max_hours' in ovr:
             raw_max_hours = ovr['max_hours']
             if not is_declared_real_scalar(
                 raw_max_hours,
@@ -2216,19 +2455,98 @@ class CampaignManager:
                 return True
 
         if campaign == CampaignPhase.C0:
-            soft = self._configured_endpoint(campaign, 'soft_endpoint')
-            min_temperature_C = self._endpoint_float(
-                campaign, soft, 'temperature_min_C')
-            min_hold_hr = self._float(
-                ovr.get('min_hold_hr'),
-                self._endpoint_float(campaign, soft, 'min_hold_hr'),
+            from simulator.accounting.stage0_inventory import (
+                STAGE0_RELEASE_KINETICS,
             )
+
+            prediction = self.c0_exit_prediction
+            prediction_payload = (
+                dict(prediction) if isinstance(prediction, Mapping) else {}
+            )
+            raw_unreleased = (
+                transport_state.get("target_inventory_diagnostic", {})
+                if isinstance(transport_state, Mapping)
+                else {}
+            )
+            unreleased_inventory = (
+                raw_unreleased if isinstance(raw_unreleased, Mapping) else {}
+            )
+
+            # First melt has priority over the computed exit and maximum hold.
+            if self.c0_first_melt_backstop:
+                _target_T, ramp_C_per_hr = self.get_temp_target(
+                    campaign, int(melt.campaign_hour), melt)
+                self.last_c0_exit = c0_exit_record(
+                    STAGE0_RELEASE_KINETICS,
+                    backstop="first_melt",
+                    ramp_C_per_hr=ramp_C_per_hr,
+                    prediction=prediction_payload,
+                    unreleased_inventory=unreleased_inventory,
+                    forecast_adjustment_notices=(
+                        self.c0_forecast_adjustment_notices
+                    ),
+                )
+                return True
+
+            if self.c0_remaining_budget_exit is not None:
+                _target_T, ramp_C_per_hr = self.get_temp_target(
+                    campaign, int(melt.campaign_hour), melt)
+                self.last_c0_exit = c0_exit_record(
+                    STAGE0_RELEASE_KINETICS,
+                    backstop="remaining_budget",
+                    ramp_C_per_hr=ramp_C_per_hr,
+                    prediction=prediction_payload,
+                    unreleased_inventory=unreleased_inventory,
+                    forecast_adjustment_notices=(
+                        self.c0_forecast_adjustment_notices
+                    ),
+                    remaining_budget_exit=self.c0_remaining_budget_exit,
+                )
+                return True
+
+            if isinstance(prediction, Mapping):
+                exit_temperature_C = prediction.get('T_exit_C')
+                exit_window_hr = prediction.get('runtime_exit_window_hr')
+                exit_campaign_hour = prediction.get(
+                    'runtime_exit_campaign_hour',
+                    exit_window_hr,
+                )
+                if (
+                    exit_temperature_C is not None
+                    and exit_campaign_hour is not None
+                    and float(melt.temperature_C) >= float(exit_temperature_C)
+                    and completed_campaign_hour >= float(exit_campaign_hour)
+                ):
+                    _target_T, ramp_C_per_hr = self.get_temp_target(
+                        campaign, int(melt.campaign_hour), melt)
+                    self.last_c0_exit = c0_exit_record(
+                        STAGE0_RELEASE_KINETICS,
+                        backstop="computed_exit",
+                        ramp_C_per_hr=ramp_C_per_hr,
+                        prediction=prediction_payload,
+                        unreleased_inventory=unreleased_inventory,
+                        forecast_adjustment_notices=(
+                            self.c0_forecast_adjustment_notices
+                        ),
+                    )
+                    return True
+
             max_hold_hr = self._max_hold_hr(campaign)
-            if (melt.temperature_C >= min_temperature_C
-                    and melt.campaign_hour >= min_hold_hr):
-                return True
             if completed_campaign_hour >= max_hold_hr:
+                _target_T, ramp_C_per_hr = self.get_temp_target(
+                    campaign, int(melt.campaign_hour), melt)
+                self.last_c0_exit = c0_exit_record(
+                    STAGE0_RELEASE_KINETICS,
+                    backstop="maximum_hold",
+                    ramp_C_per_hr=ramp_C_per_hr,
+                    prediction=prediction_payload,
+                    unreleased_inventory=unreleased_inventory,
+                    forecast_adjustment_notices=(
+                        self.c0_forecast_adjustment_notices
+                    ),
+                )
                 return True
+            return False
 
         elif campaign == CampaignPhase.C0B:
             max_hold_hr = self._max_hold_hr(campaign)
