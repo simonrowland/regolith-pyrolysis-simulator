@@ -303,6 +303,62 @@ def close_battery_engine_handles(
     raise first_error
 
 
+def battery_engine_handle_is_live(handle: object) -> bool:
+    if not getattr(handle, "available", False):
+        return False
+    backend = getattr(handle, "backend", None)
+    if backend is None:
+        return False
+    backend_available = getattr(backend, "is_available", None)
+    if backend_available is None:
+        return True
+    try:
+        state = backend_available() if callable(backend_available) else backend_available
+        return bool(state)
+    except Exception:  # noqa: BLE001 - failed liveness probes mean dead transport
+        return False
+
+
+def retire_battery_engine_handle(handle: object) -> None:
+    try:
+        close_battery_engine_handle(handle)
+    except Exception:  # noqa: BLE001 - continue retiring a failed transport
+        pass
+    for field_name, value in (("backend", None), ("available", False)):
+        try:
+            setattr(handle, field_name, value)
+        except (AttributeError, TypeError):
+            pass
+
+
+def open_cached_battery_engine_handle(
+    engine_name: str,
+    handles: Mapping[str, object] | None,
+) -> tuple[object, bool]:
+    """Return a live cached engine or open one, with ownership for replacements."""
+
+    handle_map: Mapping[str, object] = {} if handles is None else handles
+    handle = handle_map.get(engine_name)
+    if handle is not None and not battery_engine_handle_is_live(handle):
+        retire_battery_engine_handle(handle)
+        if isinstance(handle_map, dict):
+            handle_map.pop(engine_name, None)
+        handle = None
+
+    owned_handle = True
+    if handle is None:
+        handle = open_battery_engine(engine_name)
+        if (
+            isinstance(handle_map, dict)
+            and battery_engine_handle_is_live(handle)
+        ):
+            handle_map[engine_name] = handle
+            owned_handle = False
+    else:
+        owned_handle = False
+    return handle, owned_handle
+
+
 def _handle_model_id(handle: EngineHandle) -> str | None:
     """Return the loaded OpenIMCC backend's model id, if one is available."""
 
@@ -3582,6 +3638,10 @@ def _handle_isolated_cell_request(
     payload: Mapping[str, Any],
     _diagnostic_log: Any,
 ) -> dict[str, Any]:
+    handles = {resource.handle.name: resource.handle}
+    resource.handle, _owns_handle = open_cached_battery_engine_handle(
+        resource.handle.name, handles
+    )
     return run_isolated_cell_worker(payload, handle=resource.handle)
 
 
@@ -4189,13 +4249,8 @@ def equilibrate_cell(
             or isinstance(exc, TimeoutError)
             or "timeout" in type(exc).__name__.lower()
         )
-        if is_timeout:
-            try:
-                close_battery_engine_handle(handle)
-            except Exception:  # noqa: BLE001 - close is best-effort after timeout
-                pass
-            handle.backend = None
-            handle.available = False
+        if is_timeout or not battery_engine_handle_is_live(handle):
+            retire_battery_engine_handle(handle)
             handle.unavailable_reason = engine_reason
         return _done(
             status=status,
@@ -4382,6 +4437,17 @@ def run_engine_arm(
                         if existing is not None:
                             cell = existing
                         else:
+                            had_live_handle = battery_engine_handle_is_live(handle)
+                            if handle.backend is not None and not had_live_handle:
+                                handle, _owns_handle = (
+                                    open_cached_battery_engine_handle(
+                                        name, resolved
+                                    )
+                                )
+                                resolved[name] = handle
+                                had_live_handle = battery_engine_handle_is_live(
+                                    handle
+                                )
                             cell = equilibrate_cell(
                                 handle,
                                 job.pot,
@@ -4390,6 +4456,20 @@ def run_engine_arm(
                                 qualification=job.qualification,
                                 arm=job.arm,
                             )
+                            if not battery_engine_handle_is_live(handle) and (
+                                had_live_handle
+                                or (
+                                    not handle.available
+                                    and "timeout"
+                                    in (handle.unavailable_reason or "").lower()
+                                )
+                            ):
+                                handle, _owns_handle = (
+                                    open_cached_battery_engine_handle(
+                                        name, resolved
+                                    )
+                                )
+                                resolved[name] = handle
                         cells.append(cell)
                         po2_label = (
                             "default"
@@ -4409,15 +4489,6 @@ def run_engine_arm(
                                 f"wall={cell.wall_s:.3f}"
                             ),
                         )
-                        if not handle.available:
-                            # Re-open once after a kill; if still dead, stamp the rest.
-                            if handle.unavailable_reason and "timeout" in (
-                                handle.unavailable_reason or ""
-                            ).lower():
-                                revived = open_battery_engine(name)
-                                resolved[name] = revived
-                                handle = revived
-
         report = build_report(
             pots=catalog,
             grid=grid,

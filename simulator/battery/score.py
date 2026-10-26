@@ -5711,52 +5711,10 @@ def _open_cached_battery_handle(
     """Open or reuse a battery engine, reporting whether this caller owns it."""
 
     from simulator.diagnostic_helpers.binary_pot_battery import (
-        close_battery_engine_handle,
-        open_battery_engine,
+        open_cached_battery_engine_handle,
     )
 
-    handle_map: Mapping[str, object] = {} if handles is None else handles
-    handle = handle_map.get(engine.value)
-    backend = None if handle is None else getattr(handle, "backend", None)
-    backend_available = getattr(backend, "is_available", None)
-    try:
-        backend_live = (
-            bool(backend_available() if callable(backend_available) else backend_available)
-            if backend_available is not None
-            else True
-        )
-    except Exception:  # noqa: BLE001 - a failed liveness probe is a dead handle
-        backend_live = False
-    if handle is not None and (
-        not getattr(handle, "available", False)
-        or backend is None
-        or not backend_live
-    ):
-        try:
-            close_battery_engine_handle(handle)
-        except Exception:  # noqa: BLE001 - retire dead entry and try a fresh worker
-            pass
-        for field, value in (("backend", None), ("available", False)):
-            try:
-                setattr(handle, field, value)
-            except (AttributeError, TypeError):
-                pass
-        if isinstance(handle_map, dict):
-            handle_map.pop(engine.value, None)
-        handle = None
-    owned_handle = True
-    if handle is None:
-        handle = open_battery_engine(engine.value)
-        if (
-            isinstance(handle_map, dict)
-            and getattr(handle, "available", False)
-            and getattr(handle, "backend", None) is not None
-        ):
-            handle_map[engine.value] = handle
-            owned_handle = False
-    else:
-        owned_handle = False
-    return handle, owned_handle
+    return open_cached_battery_engine_handle(engine.value, handles)
 
 
 def _printed_condition_decimal(observation: Observation, key: str) -> Decimal | None:

@@ -916,7 +916,9 @@ def run_scoring_arm(
         _hostname,
         _refusal_matrix,
         _utc_stamp,
+        battery_engine_handle_is_live,
         equilibrate_cell,
+        open_cached_battery_engine_handle,
         probe_battery_engines,
     )
 
@@ -949,6 +951,13 @@ def run_scoring_arm(
                 handle = resolved.get(name) or probe_battery_engines((name,))[name]
                 resolved[name] = handle
                 for temperature_K in pot.temperatures_K:
+                    had_live_handle = battery_engine_handle_is_live(handle)
+                    if handle.backend is not None and not had_live_handle:
+                        handle, _owns_handle = open_cached_battery_engine_handle(
+                            name, resolved
+                        )
+                        resolved[name] = handle
+                        had_live_handle = battery_engine_handle_is_live(handle)
                     cell = equilibrate_cell(
                         handle,
                         binary,
@@ -968,10 +977,13 @@ def run_scoring_arm(
                             f"wall={cell.wall_s:.3f}"
                         ),
                     )
-                    if not handle.available:
-                        revived = probe_battery_engines((name,))[name]
-                        resolved[name] = revived
-                        handle = revived
+                    if not battery_engine_handle_is_live(handle) and (
+                        not handle.available or had_live_handle
+                    ):
+                        handle, _owns_handle = open_cached_battery_engine_handle(
+                            name, resolved
+                        )
+                        resolved[name] = handle
 
         envelopes = score_scoring_arm(
             pots=scoring_pots,
