@@ -60,7 +60,6 @@ from simulator.thermal_train import (
     integrate_molar_sensible_enthalpy_j_per_mol,
     oxygen_cp_shomate_j_per_mol_k,
 )
-from engines.alphamelts import AlphaMELTSProvider
 from engines.magemin import MAGEMinShadowProvider
 
 
@@ -553,9 +552,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
 
     intent = ChemistryIntent.GATE_LIQUID_FRACTION
     registry = ProviderRegistry()
-    authoritative = AlphaMELTSProvider(backend=None)
     shadow = MAGEMinShadowProvider()
-    registry.register(authoritative, [intent])
     registry.register(shadow, [intent], shadow=True)
     registry_before = registry.capability_summary()
 
@@ -568,6 +565,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
         last_sticking_alpha_provenance_notice={},
     )
     sim.backend = None
+    sim._liquid_fraction_provider = "magemin"
     sim._chem_registry = registry
     sim._chem_kernel = object()
     sim.atom_ledger = FakeLedger()
@@ -593,7 +591,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
 
     assert raised.value is refusal
     assert registry.capability_summary() == registry_before
-    assert registry.authoritative_for(intent) is authoritative
+    assert registry.authoritative_for(intent) is None
     assert registry.shadows_for(intent) == (shadow,)
     assert registry.fallback_for(intent) is None
 
@@ -628,6 +626,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_authority(
         last_sticking_alpha_provenance_notice={},
     )
     sim.backend = SimpleNamespace(backend_name=backend_name)
+    sim._liquid_fraction_provider = "magemin"
     sim._chem_registry = registry
     sim._chem_kernel = object()
     sim.atom_ledger = FakeLedger()
@@ -637,7 +636,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_authority(
 
     def refuse_after_registering_authority() -> None:
         sim._register_freeze_gate_liquid_fraction_providers()
-        assert registry.authoritative_for(intent) is not None
+        assert registry.authoritative_for(intent) is None
         assert registry.fallback_for(intent) is not None
         raise refusal
 
@@ -733,6 +732,7 @@ def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
         last_sticking_alpha_provenance_notice={},
     )
     sim.backend = SimpleNamespace(backend_name="alphamelts")
+    sim._liquid_fraction_provider = "magemin"
     sim._chem_registry = registry
     sim._chem_kernel = object()
     sim.atom_ledger = FakeLedger()
@@ -747,7 +747,7 @@ def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
     assert sim.step().hour == 4
     assert registry.capability_summary() == {
         "gate_liquid_fraction": {
-            "authoritative": "alphamelts-diagnostic",
+            "authoritative": None,
             "fallback": "magemin-shadow",
             "shadows": (),
         },
