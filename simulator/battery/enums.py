@@ -412,6 +412,7 @@ class AmountBasis(StrEnum):
     MOL_INVENTORY = "mol_inventory"
     MOLE_FRACTION = "mole_fraction"
     MASS_PERCENT = "mass_percent"
+    MOLE_PERCENT = "mole_percent"
 
 
 class MethodToken(StrEnum):
