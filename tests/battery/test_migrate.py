@@ -15225,12 +15225,78 @@ def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path
                 "observation_id": "na_heat_content",
                 "type": "heat_capacity_and_heat_content_series",
                 "locator": {"table": "3", "row": "Na"},
-                "phase": "cr",
+                "phase": "l",
+                "per": "mol_species",
                 "units": "kJ/mol",
                 "values": {
                     "quantity": "H_minus_H298",
                     "enthalpy_increment": 2.0,
                     "T_K": 500,
+                    "standard_pressure_Pa": 100000,
+                },
+            },
+            {
+                "observation_id": "na_heat_content_reference",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "3", "row": "Na"},
+                "phase": "l",
+                "per": "mol_species",
+                "standard_state": "heat content relative to 298.15 K",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 3.0,
+                    "T_K": 600,
+                    "standard_pressure_Pa": 100000,
+                },
+            },
+            {
+                "observation_id": "na_heat_content_reference_phase",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "3", "row": "Na"},
+                "phase": "l",
+                "per": "mol_species",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 4.0,
+                    "T_K": 700,
+                    "standard_pressure_Pa": 100000,
+                    "method": "The enthalpy reference is the glass at 298.15 K.",
+                },
+            },
+            {
+                "observation_id": "na_heat_content_column_reference",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {
+                    "table": "3",
+                    "row": "Na",
+                    "column": "H_T-H_298",
+                },
+                "phase": "l",
+                "per": "mol_species",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 5.0,
+                    "T_K": 800,
+                    "standard_pressure_Pa": 100000,
+                },
+            },
+            {
+                "observation_id": "na_heat_content_printed_relation",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "3", "row": "Na"},
+                "phase": "l",
+                "per": "mol_species",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 6.0,
+                    "T_K": 900,
+                    "standard_pressure_Pa": 100000,
+                    "quantity_as_printed": "H1373(L) minus H298(S)",
+                    "printed_relation": "H1373(L) − H298(S) = 209.5",
                 },
             },
         ]
@@ -15270,6 +15336,78 @@ def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path
     assert quantity_token(heat_content.identity) is Quantity.H_MINUS_H298
     assert heat_content.value.kind is ValueKind.POINT
     assert heat_content.value.point == Decimal("2.0")
+    assert heat_content.identity.subtype is not None
+    assert heat_content.identity.subtype.is_unknown
+    incomplete = identity_equal(heat_content.identity, heat_content.identity)
+    assert incomplete.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert incomplete.fields == ("subtype",)
+
+    reference = by_id["na_heat_content_reference"]
+    assert reference.identity.subtype is not None
+    assert reference.identity.subtype.value == "H(T)-H(298.15 K)"
+    assert (
+        identity_equal(reference.identity, reference.identity).kind
+        is IdentityEqualKind.EQUAL
+    )
+
+    reference_phase = by_id["na_heat_content_reference_phase"]
+    assert reference_phase.identity.subtype is not None
+    assert reference_phase.identity.subtype.value == (
+        "H(T)-H(298.15 K); reference phase: glass"
+    )
+
+    column_reference = by_id["na_heat_content_column_reference"]
+    assert column_reference.identity.subtype is not None
+    assert column_reference.identity.subtype.value == "H(T)-H(298 K)"
+
+    printed_relation = by_id["na_heat_content_printed_relation"]
+    assert printed_relation.identity.subtype is not None
+    assert printed_relation.identity.subtype.value == (
+        "H(T)-H(298 K); reference phase: solid"
+    )
+
+    from simulator.battery.migrate import _enthalpy_increment_subtype
+
+    assert _enthalpy_increment_subtype(
+        {"locator": {"column": "H_T-H_298"}},
+        {"series": [{"T_K": 298.15, "enthalpy_increment": 0}]},
+    ) == "H(T)-H(298.15 K)"
+
+
+@pytest.mark.parametrize(
+    ("obs", "values"),
+    [
+        (
+            {"reference_phase": "liquid"},
+            {
+                "reference_temperature_K": 298,
+                "quantity_as_printed": "H1373(L) minus H298(S)",
+            },
+        ),
+        (
+            {},
+            {
+                "reference_temperature_K": 298,
+                "quantity_as_printed": "H1373(L) minus H298(S)",
+                "printed_relation": "H1373(L) minus H298(L) = 209.5",
+            },
+        ),
+        (
+            {},
+            {
+                "method": "Reference is the glass at 298 K.",
+                "quantity_as_printed": "H1373(L) minus H298(S)",
+            },
+        ),
+    ],
+    ids=("explicit-vs-relation", "relation-vs-relation", "method-vs-relation"),
+)
+def test_enthalpy_increment_conflicting_reference_phases_remain_unknown(
+    obs: dict[str, object], values: dict[str, object]
+) -> None:
+    from simulator.battery.migrate import _enthalpy_increment_subtype
+
+    assert _enthalpy_increment_subtype(obs, values) is None
 
 
 def test_fusion_temperature_join_preserves_matching_melting_point(tmp_path: Path) -> None:

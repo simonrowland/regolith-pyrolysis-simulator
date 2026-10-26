@@ -109,6 +109,7 @@ from simulator.battery.identity import (
     atm_to_pa,
     bar_to_pa,
     celsius_to_kelvin,
+    _format_enthalpy_increment_subtype,
     parse_valence_basis,
     _uncompared_axes_for,
     identity_equal,
@@ -8569,6 +8570,153 @@ def polymorph_from_extract(
     return State.of(str(raw))
 
 
+def _enthalpy_increment_subtype(
+    obs: Mapping[str, Any], values: Mapping[str, Any]
+) -> str | None:
+    """Read a printed H(T)-H(Tref) anchor without inventing one."""
+
+    def normalize_reference_phase(raw: str) -> str:
+        phase = raw.strip().casefold()
+        return {"s": "solid", "l": "liquid"}.get(phase, phase)
+
+    def decimal(raw: object) -> Decimal | None:
+        if raw is None or isinstance(raw, bool):
+            return None
+        try:
+            value = Decimal(str(raw))
+        except (ArithmeticError, TypeError, ValueError):
+            return None
+        return value if value.is_finite() else None
+
+    explicit_temperatures: set[Decimal] = set()
+    reference_phases: set[str] = set()
+    reference_polymorphs: set[str] = set()
+    for payload in (obs, values):
+        reference = decimal(payload.get("reference_temperature_K"))
+        if reference is not None and reference > 0:
+            explicit_temperatures.add(reference)
+        for key, target in (
+            ("reference_phase", reference_phases),
+            ("reference_polymorph", reference_polymorphs),
+        ):
+            raw = payload.get(key)
+            if isinstance(raw, str) and raw.strip():
+                target.add(
+                    normalize_reference_phase(raw)
+                    if key == "reference_phase"
+                    else raw.strip()
+                )
+
+    text_fields = [
+        obs.get("standard_state"),
+        values.get("standard_state"),
+        values.get("temperature_basis"),
+    ]
+    method = values.get("method")
+    if isinstance(method, str):
+        for match in re.finditer(
+            r"reference is (?:the )?([\wα-ωΑ-Ω′' -]+?) at (\d+(?:\.\d+)?)\s*K",
+            method,
+            re.IGNORECASE,
+        ):
+            explicit_temperatures.add(Decimal(match.group(2)))
+            reference_phases.add(normalize_reference_phase(match.group(1)))
+    for raw in text_fields:
+        if not isinstance(raw, str):
+            continue
+        for match in re.finditer(
+            r"(?:relative to|corrected to)\s*(\d+(?:\.\d+)?)\s*K",
+            raw,
+            re.IGNORECASE,
+        ):
+            explicit_temperatures.add(Decimal(match.group(1)))
+
+    zero_anchors: set[Decimal] = set()
+    for series_key in ("series", "points"):
+        series = values.get(series_key)
+        if not isinstance(series, (list, tuple)):
+            continue
+        for point in series:
+            if not isinstance(point, Mapping):
+                continue
+            temperature = decimal(point.get("T_K"))
+            enthalpy = decimal(
+                point.get("enthalpy_increment", point.get("H_minus_H298"))
+            )
+            if temperature is not None and temperature > 0 and enthalpy == 0:
+                zero_anchors.add(temperature)
+
+    labels = [
+        (obs.get("locator") or {}).get("column")
+        if isinstance(obs.get("locator"), Mapping)
+        else None,
+        obs.get("units"),
+        values.get("quantity_as_printed"),
+        values.get("printed_relation"),
+    ]
+    label_temperatures: set[Decimal] = set()
+    for raw in labels:
+        if not isinstance(raw, str):
+            continue
+        label_temperatures.update(
+            Decimal(match.group(1))
+            for match in re.finditer(
+                r"\bH(?:_T|\(T\))\s*[-−]\s*H[_\(]\s*(\d+(?:\.\d+)?)\s*K?",
+                raw,
+            )
+        )
+        for relation in re.finditer(
+            r"\bH\s*\d+(?:\.\d+)?\s*\([^)]*\)\s*(?:minus|[-−])\s*H\s*(\d+(?:\.\d+)?)\s*\(([^)]+)\)",
+            raw,
+            re.IGNORECASE,
+        ):
+            label_temperatures.add(Decimal(relation.group(1)))
+            reference_phases.add(normalize_reference_phase(relation.group(2)))
+
+    if (
+        len(explicit_temperatures) > 1
+        or len(label_temperatures) > 1
+        or len(zero_anchors) > 1
+        or len(reference_phases) > 1
+        or len(reference_polymorphs) > 1
+    ):
+        return None
+    explicit_temperature = next(iter(explicit_temperatures), None)
+    label_temperature = next(iter(label_temperatures), None)
+    zero_anchor = next(iter(zero_anchors), None)
+
+    def label_matches_anchor(label: Decimal, anchor: Decimal) -> bool:
+        return label == anchor or (
+            label == label.to_integral_value() and abs(label - anchor) < Decimal("0.5")
+        )
+
+    if explicit_temperature is not None and zero_anchor is not None:
+        if explicit_temperature != zero_anchor:
+            return None
+    if explicit_temperature is not None and label_temperature is not None:
+        if explicit_temperature != label_temperature and (
+            zero_anchor != explicit_temperature
+            or not label_matches_anchor(label_temperature, zero_anchor)
+        ):
+            return None
+    if label_temperature is not None and zero_anchor is not None:
+        if not label_matches_anchor(label_temperature, zero_anchor):
+            return None
+    temperature = explicit_temperature
+    if temperature is None:
+        temperature = zero_anchor
+    if temperature is None:
+        temperature = label_temperature
+    if temperature is None:
+        return None
+
+    return _format_enthalpy_increment_subtype(
+        temperature,
+        reference_phase=next(iter(reference_phases), None),
+        reference_polymorph=next(iter(reference_polymorphs), None),
+    )
+
+
 def fill_identity(
     quantity: Quantity | State[Quantity],
     species: Species,
@@ -15672,6 +15820,10 @@ class Migrator:
             and values.get("Delta_f_G_298_kJ_mol") is not None
         ):
             ident_kwargs["temperature_K"] = State.of(Decimal("298.15"))
+        if q_token is Quantity.H_MINUS_H298:
+            subtype = _enthalpy_increment_subtype(obs, values)
+            if subtype is not None:
+                ident_kwargs["subtype"] = State.of(subtype)
         source_reference_state = None
         if q_token in {
             Quantity.ACTIVITY,
