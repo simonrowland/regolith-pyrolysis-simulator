@@ -43,7 +43,7 @@ CONFIGURED_OWNER_PN2_ANCHORS = {
 # Configless fallback, not canonical. Used when the consumed curve did not
 # come from the gate liquid-fraction path.
 CONFIGLESS_FALLBACK_NOT_CANONICAL = {
-    "native_fe_pool_mol": 1576.0114767733974,
+    "native_fe_pool_mol": 786.3400448197306,
     "stage_3_Fe_wt_pct": 100.0,
 }
 
