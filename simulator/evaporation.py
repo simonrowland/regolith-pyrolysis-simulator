@@ -1326,6 +1326,8 @@ def _project_evaporation_flux(kernel_result, flux, diagnostic, *,
         if record is not None:
             flux.carrier_authority_by_species[species] = {
                 **record, 'is_refused': True,
+                'is_union_flux_eligible': False, 'is_flux_active': False,
+                'is_flux_dormant_by_epoch': False,
                 'refusal_code': 'source_thermo_unavailable',
                 'flux': _flux_payload(FluxRefusal('source_thermo_unavailable', refusal['reason'])),
             }
@@ -2017,7 +2019,8 @@ def _eligible_surface_evaporation_carriers(hour, authority, flux_diagnostic):
                 if record.get('flux', {}).get('kind') == 'eligible'
                 and not record.get('is_refused', False)
                 and record.get('selected_runtime_pressure', {}).get('kind') == 'value'
-                and record['flux'].get('alpha_ref')}
+                and record['flux'].get('alpha_ref')
+                and species not in hour.flux_controls.get('source_thermo_refusals', {})}
     _, _, available = _build_evaporation_aux_maps(eligible,
         vapor_pressure_data=hour.vapor_pressure_data,
         species_formula_registry=hour.species_formula_registry,

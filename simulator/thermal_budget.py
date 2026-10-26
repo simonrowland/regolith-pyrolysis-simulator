@@ -285,10 +285,13 @@ def _evaporation_source_thermo_refusals(vapor_pressures, temperature_K):
     """Read the existing source-energy law; no unowned thermo extension."""
     refused = {}
     for section in ('metals', 'oxide_vapors'):
-        for species, metadata in vapor_pressures.get(section, {}).items():
+        for species in vapor_pressures.get(section, {}):
             try:
-                _analytical_reaction_enthalpy(species, metadata,
-                    temperature_K=temperature_K)
+                # Q = m*q(T): executability of the specific heat q(T)
+                # does not depend on a trial's positive mass m. A unit kg/h
+                # probes the same one-hour law, without a source-rate floor.
+                evaporation_enthalpy_budget({species: 1.0},
+                    vapor_pressures=vapor_pressures, temperature_K=temperature_K)
             except ValueError as exc:
                 # The owner refuses domain errors and unavailable reaction
                 # thermo. Preserve the specific type/reason per carrier.

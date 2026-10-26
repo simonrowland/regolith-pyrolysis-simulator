@@ -518,3 +518,19 @@ def test_injected_furnace_catalog_is_not_labeled_as_canonical_evidence():
     assert context["conductivity_W_m_K"]["status"] == ASSUMED
     assert "caller-supplied" in context["max_service_T_C"]["source"]
     assert "caller-supplied" in context["conductivity_W_m_K"]["source"]
+
+
+@pytest.mark.parametrize('temperature_K,refused', [(448.15, True), (699.0, False), (2473.15, False)])
+def test_source_thermo_eligibility_uses_existing_energy_domain(temperature_K, refused):
+    from simulator.thermal_budget import _evaporation_source_thermo_refusals
+    payload_path = Path(__file__).resolve().parent.parent / 'data' / 'vapor_pressures.yaml'
+    payload = yaml.safe_load(payload_path.read_text(encoding='utf-8'))
+    legacy = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False).legacy_view()
+    outcomes = _evaporation_source_thermo_refusals(legacy, temperature_K)
+    assert ('P4O6' in outcomes) is refused
+    if refused:
+        assert outcomes['P4O6']['refusal_type'] == 'NasaCeaDomainError'
+        assert outcomes['P4O6']['temperature_K'] == temperature_K
+    # RH03 pressure extrapolation remains executable at the energy owner.
+    if temperature_K == 2473.15:
+        assert 'SiO' not in outcomes

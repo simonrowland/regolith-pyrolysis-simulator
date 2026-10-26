@@ -44,6 +44,11 @@ def test_cold_source_thermo_refusal_excludes_species_without_aborting_hour():
         assert sim._last_vapour_batch_report['metadata']['source_thermo_refusals'] == refused
         assert snapshot.evap_flux.species_kg_hr.get('P4O6', 0.0) == 0.0
         assert 'P4O6' not in sim._last_surface_oxygen_diagnostic['frozen_carriers']
+        authority = snapshot.evap_flux.carrier_authority_by_species['P4O6']
+        assert authority['is_refused'] and authority['flux']['kind'] == 'refusal'
+        assert not authority['is_flux_active']
+        assert not authority['is_union_flux_eligible']
+        assert not authority['is_flux_dormant_by_epoch']
         assert abs(snapshot.mass_balance_error_pct) <= 5e-12
     finally:
         close_test_owned_magemin_backend(sim)

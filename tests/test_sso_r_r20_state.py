@@ -308,13 +308,15 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
         if sim.melt.hour == 20:
             # Golden from the accepted signed-excess solve before changing
             # history copying: actual lunar C0B, 980 C and 0.009 bar bulk.
-            # R5 recaptures the retained-coproduct source-channel correction;
-            # retain both finite PO/PO2 sources and the strict hex assertions.
+            # R7 admits every executable inverse source, including P4O6;
+            # the coupled prior hours move PO/PO2 while preserving this root.
+            # Keep the strict hex assertions and unchanged solver tolerance.
             closure = sim._last_surface_oxygen_diagnostic
             assert {key: value.hex() for key, value in closure['source_terms_mol_m2_s'].items()} == {
-                'PO': '0x1.add5e0f914b57p-63', 'PO2': '0x1.dacdc4657e6e0p-46',
+                'P4O6': '0x1.8966df3f20401p-206',
+                'PO': '0x1.add5e0ed9626bp-63', 'PO2': '0x1.dacdc458cc075p-46',
             }
-            assert closure['oxygen_flux_mol_m2_s'].hex() == '0x1.dace9b506eea7p-46'
+            assert closure['oxygen_flux_mol_m2_s'].hex() == '0x1.dace9b43bc7e2p-46'
             assert closure['reaction_pO2_bar'].hex() == '0x1.26e978d4fe7a6p-7'
         if sim.melt.hour in (167, 168):
             hot_hours.add(sim.melt.hour)
