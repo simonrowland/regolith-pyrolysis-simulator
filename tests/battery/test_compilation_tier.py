@@ -4203,6 +4203,104 @@ def test_pure_phase_refuses_non_298_enthalpy_anchor_before_engine_call() -> None
     assert calls == []
 
 
+# Injected engine enthalpies, J/mol. Only the 298.15 K string is scored
+# today; the other temperatures are here so a later outcome change is a
+# diff of the expected table, not of this fixture.
+_ANCHOR_GOLDEN_H_J = {
+    298.0: 987.0,
+    298.15: 1000.0,
+    299.15: 1100.0,
+    1000.0: 5000.0,
+}
+
+
+@pytest.mark.parametrize(
+    ("subtype", "reason", "value", "calls"),
+    [
+        ("H(T)-H(298.15 K)", None, "4", [1000.0, 298.15]),
+        (
+            "H(T)-H(298.15 K); reference phase: solid",
+            "pure-phase-enthalpy-anchor-mismatch",
+            None,
+            [],
+        ),
+        (
+            "H(T)-H(298.15 K); reference phase: glass",
+            "pure-phase-enthalpy-anchor-mismatch",
+            None,
+            [],
+        ),
+        ("H(T)-H(298 K)", "pure-phase-enthalpy-anchor-mismatch", None, []),
+        (
+            "H(T)-H(298 K); reference phase: solid",
+            "pure-phase-enthalpy-anchor-mismatch",
+            None,
+            [],
+        ),
+        (
+            "H(T)-H(298 K); reference phase: liquid",
+            "pure-phase-enthalpy-anchor-mismatch",
+            None,
+            [],
+        ),
+        ("H(T)-H(299.15 K)", "pure-phase-enthalpy-anchor-mismatch", None, []),
+        ("H(T)-H(296.15 K)", "pure-phase-enthalpy-anchor-mismatch", None, []),
+        (
+            "apparent enthalpy, stable-phase anchor",
+            "pure-phase-enthalpy-anchor-mismatch",
+            None,
+            [],
+        ),
+    ],
+)
+def test_h_minus_h298_anchor_scoring_golden(subtype, reason, value, calls) -> None:
+    """Pin the current pure-phase H(T)-H(T_ref) scoring outcome."""
+
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of(subtype),
+    )
+    seen = []
+
+    class _Props:
+        def __init__(self, temperature_K: float) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = _ANCHOR_GOLDEN_H_J[temperature_K]
+            self.Cp_J_K_mol = 37.106
+            self.S_J_K_mol = 26.95
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        seen.append(temperature_K)
+        return _Props(temperature_K)
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo-anchor-golden", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert seen == calls
+    assert [notice.kind for notice in attempt.notices] == []
+    if reason is None:
+        assert attempt.refusal_reason is None
+        assert attempt.value == Decimal(value)
+        assert attempt.authority is Authority.BRIDGE
+    else:
+        assert attempt.value is None
+        assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+        assert attempt.refusal_detail["reason"] == reason
+
+
 def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> None:
     experiment = F.tabulation_experiment()
     identity = _na2o_liquid()
