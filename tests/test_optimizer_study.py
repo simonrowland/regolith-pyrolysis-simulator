@@ -3269,6 +3269,23 @@ def test_optuna_partial_warm_start_is_admitted_in_search_provenance(
     )
 
 
+def test_optuna_warm_start_does_not_fix_default_outside_search_bounds() -> None:
+    from simulator.optimize.strategy.bayesian import _optuna_params_from_seed
+
+    schema = RecipeSchema()
+    seed = WarmStartSeed(
+        id="partial-c0-seed",
+        patch=RecipePatch({}),
+        proposal_source="seed_recipe",
+    )
+
+    params = _optuna_params_from_seed(seed, schema.search_allowlist, schema)
+
+    # C0's production default is 200 C/hr while this search dimension remains
+    # bounded at 10–100; this absent partial-seed value must be sampled normally.
+    assert "campaigns.C0.dT_dt_C_per_hr" not in params
+
+
 def test_evalspec_seed_identity_tracks_canonical_evalspec_fields() -> None:
     schema = RecipeSchema()
     patch = RecipePatch.from_nested(

@@ -1751,6 +1751,9 @@ def test_c6_acquisition_timeout_ends_as_transport_bound_refusal() -> None:
         "c6_hold_target_not_acquired"
     )
     assert refusal["diagnostic"]["unacquired_hold_target_C"] == 1400.0
+    # Target-inventory depletion diagnostics belong to the C0 endpoint only.
+    assert "target_inventory_diagnostic" not in refusal[
+        "diagnostic"]["binding_transport_state"]
     # 2026-08-07 b-147: transport_state now also carries this-hour ramp
     # telemetry (nominal/actual/throttle_reason) for the C4 acquisition
     # opportunity clock; this SimpleNamespace scenario sets none, so the

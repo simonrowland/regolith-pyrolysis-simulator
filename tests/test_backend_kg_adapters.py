@@ -1,4 +1,5 @@
 import importlib
+from copy import deepcopy
 
 import pytest
 
@@ -8,7 +9,7 @@ from simulator.account_ids import (
     METAL_PHASE_ACCOUNT,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
-from simulator.accounting import AccountingError
+from simulator.accounting import AccountingError, LedgerTransition, MaterialLot
 from simulator.equilibrium import EquilibriumMixin
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import EquilibriumResult, InternalAnalyticalBackend
@@ -150,6 +151,102 @@ def _sim(backend):
         },
         {"metals": {}, "oxide_vapors": {}},
     )
+
+
+def _c0_forecast_sim(backend):
+    sim = PyrolysisSimulator(
+        backend,
+        {
+            "campaigns": {
+                "C0": {
+                    "temp_range_C": [20, 950],
+                    "dT_dt_C_per_hr": 200,
+                    "max_hold_hr": 25,
+                    "carrier_gas": "Ar",
+                    "p_total_mbar_default": 1.0,
+                    "pO2_mbar_default": 0.0,
+                    "alkali_retention_budget_fraction": 1.0e-3,
+                }
+            }
+        },
+        {
+            "oxide": {
+                "label": "C0 forecast isolation",
+                "composition_wt_pct": {"SiO2": 60.0, "FeO": 40.0},
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    backend.initialize({})
+    sim.load_batch("oxide", mass_kg=1000.0)
+    return sim
+
+
+def test_c0_forecast_backend_failure_does_not_mutate_live_backend_or_flags():
+    class FailingBackend(InternalAnalyticalBackend):
+        def __init__(self):
+            self._available = True
+
+        def is_available(self):
+            return self._available
+
+        def equilibrate(self, *args, **kwargs):
+            raise ValueError("forecast-only backend failure")
+
+    backend = FailingBackend()
+    sim = _c0_forecast_sim(backend)
+    sim._c0_forecast_backend_factory = FailingBackend
+    flag_names = (
+        "_backend_failed",
+        "_last_backend_error",
+        "_last_backend_status",
+        "_last_backend_diagnostics",
+        "_last_out_of_domain_diagnostics",
+        "_backend_status_history",
+        "_last_sulfur_saturation_result",
+        "_silent_zero_notes",
+        "_last_phase_context_diagnostic",
+        "_degraded_path_engagement",
+        "_engine_commissioning_steps",
+    )
+    before_flags = {
+        name: deepcopy(getattr(sim, name, None)) for name in flag_names
+    }
+    before_backend = deepcopy(vars(backend))
+
+    sim._predict_c0_exit()
+
+    assert vars(backend) == before_backend
+    assert {
+        name: getattr(sim, name, None) for name in flag_names
+    } == before_flags
+
+
+def test_c0_forecast_refuses_missing_equivalent_backend():
+    live_backend = RecordingInternalAnalyticalBackend()
+    sim = _c0_forecast_sim(live_backend)
+    sim._c0_forecast_backend_factory = lambda: None
+    before_backend = deepcopy(vars(live_backend))
+
+    prediction = sim._predict_c0_exit()
+
+    assert prediction["prediction_status"] == "unavailable_forecast_backend"
+    assert vars(live_backend) == before_backend
+
+
+def test_c0_forecast_transition_does_not_commit_to_live_ledger():
+    def new_transition_backend():
+        backend = AtomDeltaBackend(MaterialLot, LedgerTransition)
+        backend.initialize({})
+        return backend
+
+    sim = _c0_forecast_sim(new_transition_backend())
+    sim._c0_forecast_backend_factory = new_transition_backend
+    before = sim.atom_ledger.close_report()
+
+    sim._predict_c0_exit()
+
+    assert sim.atom_ledger.close_report() == before
 
 
 def test_internal_analytical_backend_receives_mol_kernel_payload():

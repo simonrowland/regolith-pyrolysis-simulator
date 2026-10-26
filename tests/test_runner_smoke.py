@@ -95,8 +95,9 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # from the runner JSON because its public envelope does not include raw flux maps.
 SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
-        "flux_maps_sha256": "afada329092a6480dfca8eae25880231bd76c3d95711456fc6d0b7145a4c44aa",
-        "ledger_sha256": "7cc5144f6f9e90caa10e106e4227673954c7b3091d1affddf659fd836c4b8104",
+        # d-252 / physics seq 923: computed C0 exit advances the 24 h run.
+        "flux_maps_sha256": "6f6b8e6f2137ffb369ec3079cd7305324325713cad87be2e6d609fe9911b6267",
+        "ledger_sha256": "fabe87d7c89cd5622ab3b77734e2ef1f307f3b7af48e5175723c14d93a4dea3e",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
@@ -805,6 +806,7 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "stage_3_capture",
     "redox_source_breakdown",
     "oxygen_reservoir",
+    "high_t_melt_activity",
     "mass_balance_error_category",
     "reduced_real_cache_state",
     "c2a_staged_gas",
@@ -2345,8 +2347,8 @@ def test_runner_records_operator_decision_in_shadow_trace():
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",
         # Long enough to traverse C0 -> C0B -> C2 fork.  500h is well
-        # past the C0 endpoint (which fires around T~950C, ~18h on the
-        # default ramp) so the decision pause is reached.
+        # past the C0 endpoint (temperature hold near 950 C on the default
+        # ramp) so the decision pause is reached.
         hours=500,
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,

@@ -214,7 +214,9 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     # C5 exits at its 800 h max hold without the final-rung current-decay endpoint.
     # That incomplete-extraction failure mode is an endpoint miss once b-846 lands.
     # This test asserts Fe reduction and Na2O pins, not extraction success.
-    assert na2o_left == pytest.approx(1.7920509581430417, abs=1e-6)
+    # t-1457 d-252 C0 contract (200 C/h ramp, 1 mbar dry Ar, computed exit): the full-run trajectory shifts.
+    # Bisected along the golden car: the move enters at 375537bff; every later car item is bit-identical.
+    assert na2o_left == pytest.approx(1.7919321517691174, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT
