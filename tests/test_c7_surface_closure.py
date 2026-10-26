@@ -701,3 +701,18 @@ def test_rh03_saturated_buffer_release_respects_film_capacity(monkeypatch, capac
             transition.validate_conservation(sim.species_formula_registry)
     finally:
         close_test_owned_magemin_backend(sim)
+
+
+def test_legacy_retained_source_uses_published_intrinsic_buffer():
+    sim = simulation()
+    try:
+        sim.melt.temperature_C = 2200.0
+        sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -400.0
+        sim._reaction_pO2_bar = 1e-6
+        publication = sim._intrinsic_oxygen_publication()
+        assert publication['published_intrinsic_fO2_log'] > -400.0
+        result = sim._internal_analytical_equilibrium()
+        assert result.status == 'ok'
+        assert all(math.isfinite(pressure) for pressure in result.vapor_pressures_Pa.values())
+    finally:
+        close_test_owned_magemin_backend(sim)
