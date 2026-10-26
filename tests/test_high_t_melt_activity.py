@@ -964,7 +964,7 @@ def _call_record(engine: str, index: int) -> dict:
 def test_h133_nonconvergence_uses_temperature_neighbors_without_activity_seam(
     monkeypatch,
 ) -> None:
-    """h133 exercises a one-sided hold and a two-sided 1/T interpolation."""
+    """Both refused h133 targets use the pinned engine's two-sided bracket."""
 
     real_evaluate = openimcc_bridge_module.evaluate
     refused_targets = []
@@ -994,38 +994,18 @@ def test_h133_nonconvergence_uses_temperature_neighbors_without_activity_seam(
         assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
         assert authority["temperature_bridge"]["call_count"] == 6
         notice = authority["held_effective_gamma_by_parent"]["SiO2"]
+        assert notice["method"] == "interpolated_converged_temperature_neighbors"
+        assert notice["lower_anchor_temperature_K"] == 2353.15
+        assert notice["upper_anchor_temperature_K"] == 2403.15
+        assert notice["lower_anchor_gap_K"] == pytest.approx(25.0)
+        assert notice["upper_anchor_gap_K"] == pytest.approx(25.0)
         activity = vapor_pressure_module._high_t_activity_for_parent(
             "SiO2", composition, temperature_K=_H133_T_K, authority=authority,
         )
-        if name == "ordinary":
-            assert notice["method"] == "nearest_converged_temperature_neighbor"
-            assert notice["anchor_temperature_K"] == 2403.15
-            assert notice["anchor_gap_K"] == pytest.approx(25.0)
-            anchored = evaluate_cleaned_melt(composition, 2403.15)
-            assert activity.activity == pytest.approx(
-                anchored.single_cation_activities["SiO2"], rel=1e-12,
-            )
-        else:
-            assert notice["method"] == "interpolated_converged_temperature_neighbors"
-            assert notice["lower_anchor_temperature_K"] == 2303.15
-            assert notice["upper_anchor_temperature_K"] == 2403.15
-            assert notice["lower_anchor_gap_K"] == pytest.approx(75.0)
-            assert notice["upper_anchor_gap_K"] == pytest.approx(25.0)
-            assert "schedule-derived 50.0 K notice threshold" in notice["message"]
-            assert "schedule-derived 50.0 K notice threshold" in (
-                _high_t_melt_activity_fallback_sentence({
-                    "reason": "imcc_nonconvergence",
-                    "notices": [notice],
-                    "affected_tick_count": 1,
-                    "affected_parent_count": 1,
-                    "first_hour": 1,
-                    "last_hour": 1,
-                })
-            )
-            lower = evaluate_cleaned_melt(composition, 2303.15)
-            upper = evaluate_cleaned_melt(composition, 2403.15)
-            assert lower.single_cation_activities["SiO2"] > 0.0
-            assert upper.single_cation_activities["SiO2"] > 0.0
+        lower = evaluate_cleaned_melt(composition, 2353.15)
+        upper = evaluate_cleaned_melt(composition, 2403.15)
+        assert lower.single_cation_activities["SiO2"] > 0.0
+        assert upper.single_cation_activities["SiO2"] > 0.0
         assert activity.activity_model == notice["method"]
         warm_activity = _H133_WARM_SIO2_ACTIVITY[name]
         assert abs(activity.activity - warm_activity) / warm_activity < 0.01
