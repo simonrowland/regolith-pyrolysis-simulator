@@ -1,0 +1,1537 @@
+source_id: frandsen-1933-phosphorus-pentoxide-calorimetry
+source:
+  citation: M. Frandsen, “The heat capacity, heat of sublimation, and heat of solution of phosphorus pentoxide,”
+    Bureau of Standards Journal of Research 10, Research Paper 514, 35–58 (1933).
+extraction:
+  method: mineru_table_draft emit, completed by row-level source audit and equation transcription
+  date: '2026-10-26'
+  worker: w1026b-fran33
+review_status: draft
+tables:
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 18
+  temperature:
+    as_printed: '545'
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 1
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: &id001
+      page: 11
+      pdf_page_index: 10
+      published_page: 45
+      section: Results for phosphorus pentoxide
+      note: The source says vapor came through the furnace in the first two runs and all later runs, overcoming
+        the external pressure of one atmosphere.
+  render_verified:
+  - row: 18
+    column: 9
+    text: 27,400
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 18
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 18
+    column: 8
+    text: 45,950
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 19
+  temperature:
+    as_printed: '545'
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 2
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: *id001
+  render_verified:
+  - row: 19
+    column: 9
+    text: 26,490
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 19
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 19
+    column: 8
+    text: 45,910
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 20
+  temperature:
+    as_printed: '650'
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 3
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: *id001
+  render_verified:
+  - row: 20
+    column: 9
+    text: 28,000
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 20
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 20
+    column: 8
+    text: 47,020
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 21
+  temperature:
+    as_printed: '650'
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 4
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: *id001
+  render_verified:
+  - row: 21
+    column: 9
+    text: 28,350
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 21
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 21
+    column: 8
+    text: 48,220
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 22
+  temperature:
+    as_printed: '804'
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 5
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: *id001
+  render_verified:
+  - row: 22
+    column: 9
+    text: 38,130
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 22
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 22
+    column: 8
+    text: 46,560
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 23
+  temperature:
+    as_printed: '794'
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 6
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: *id001
+  render_verified:
+  - row: 23
+    column: 9
+    text: 36,300
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 23
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 23
+    column: 8
+    text: 45,110
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 24
+  temperature:
+    as_printed: '792'
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 7
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: *id001
+  render_verified:
+  - row: 24
+    column: 9
+    text: 38,600
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 24
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 24
+    column: 8
+    text: 46,060
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 25
+  temperature:
+    as_printed: '923'
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 8
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: *id001
+  render_verified:
+  - row: 25
+    column: 9
+    text: 44,990
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 25
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 25
+    column: 8
+    text: 44,460
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 26
+  temperature:
+    as_printed: '930'
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 9
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: *id001
+  render_verified:
+  - row: 26
+    column: 9
+    text: 40,950
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 26
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 26
+    column: 8
+    text: 46,490
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 27
+  temperature:
+    as_printed: '936'
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 10
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: *id001
+  render_verified:
+  - row: 27
+    column: 9
+    text: 40,970
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 27
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 27
+    column: 8
+    text: 46,700
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 28
+  temperature:
+    as_printed: 1,062
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 11
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: *id001
+  render_verified:
+  - row: 28
+    column: 9
+    text: 44,000
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 28
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 28
+    column: 8
+    text: 47,630
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 29
+  temperature:
+    as_printed: 1,061
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 12
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: *id001
+  render_verified:
+  - row: 29
+    column: 9
+    text: 45,930
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 29
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 29
+    column: 8
+    text: 47,280
+- page: 12
+  table_index: 4
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: gas
+  rows:
+  - 30
+  temperature:
+    as_printed: 1,058
+    unit: C
+    locator:
+      page: 12
+      pdf_page_index: 11
+      published_page: 46
+      table: '2'
+      row_label: Run 13
+      column_header: Temperature of vapor at orifice
+      note: Upper panel temperature paired with this run number in the lower panel.
+  values:
+  - column: 9
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: gas
+    evidence_class: quoted_attributed
+  published_page: 46
+  conditions:
+  - key: total_pressure_Pa
+    state:
+      tag: value
+      value: 101325
+    locator: *id001
+  render_verified:
+  - row: 30
+    column: 9
+    text: 42,930
+- page: 12
+  table_index: 4
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 30
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 15
+      pdf_page_index: 14
+      published_page: 49
+      figure: '8'
+      note: The source states the heat of solution is taken from Figure 8; the solution measurements and
+        discussion identify 25°C.
+  values:
+  - column: 8
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 46
+  render_verified:
+  - row: 30
+    column: 8
+    text: 47,280
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 3
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified: []
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 4
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 4
+    column: 11
+    text: 1,289
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 5
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 5
+    column: 11
+    text: 3,076
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 6
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 6
+    column: 11
+    text: 4,575
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 7
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 7
+    column: 11
+    text: 6,536
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 8
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified: []
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 9
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 9
+    column: 11
+    text: 1,038
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 10
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 10
+    column: 11
+    text: 2,034
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 11
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 11
+    column: 11
+    text: 2,954
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 12
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 12
+    column: 11
+    text: 4,015
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 13
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 13
+    column: 11
+    text: 4,663
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 14
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 14
+    column: 11
+    text: 5,568
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 15
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 15
+    column: 11
+    text: 1,314
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 16
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 16
+    column: 11
+    text: 3,089
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 17
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 17
+    column: 11
+    text: 4,406
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 18
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 18
+    column: 11
+    text: 6,449
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 19
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 19
+    column: 11
+    text: 8,928
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 20
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 20
+    column: 11
+    text: 8,708
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 21
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 21
+    column: 11
+    text: 9,543
+- page: 19
+  table_index: 6
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 22
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 11
+    species: P2O5
+    quantity: H_minus_H298
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 53
+  render_verified:
+  - row: 22
+    column: 11
+    text: 9,623
+- page: 23
+  table_index: 7
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 3
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 24
+      pdf_page_index: 23
+      published_page: 58
+      equation: 25–26
+      note: The source states the heats of solution at 25°C.
+  values:
+  - column: 7
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 57
+  render_verified:
+  - row: 3
+    column: 7
+    text: 43,890
+- page: 23
+  table_index: 7
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 4
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 24
+      pdf_page_index: 23
+      published_page: 58
+      equation: 25–26
+      note: The source states the heats of solution at 25°C.
+  values:
+  - column: 7
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 57
+  render_verified:
+  - row: 4
+    column: 7
+    text: 44,820
+- page: 23
+  table_index: 7
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 5
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 24
+      pdf_page_index: 23
+      published_page: 58
+      equation: 25–26
+      note: The source states the heats of solution at 25°C.
+  values:
+  - column: 7
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 57
+  render_verified:
+  - row: 5
+    column: 7
+    text: 45,990
+- page: 23
+  table_index: 7
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 6
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 24
+      pdf_page_index: 23
+      published_page: 58
+      equation: 25–26
+      note: The source states the heats of solution at 25°C.
+  values:
+  - column: 7
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 57
+  render_verified:
+  - row: 6
+    column: 7
+    text: 48,210
+- page: 23
+  table_index: 7
+  type: calorimetry_result
+  quantity: heat_of_solution
+  evidence_class: quoted_attributed
+  unit: cal.15 mole−1
+  phase: cr
+  rows:
+  - 7
+  temperature:
+    as_printed: '25'
+    unit: C
+    locator:
+      page: 24
+      pdf_page_index: 23
+      published_page: 58
+      equation: 25–26
+      note: The source states the heats of solution at 25°C.
+  values:
+  - column: 7
+    species: P2O5
+    quantity: heat_of_solution
+    unit: cal.15 mole−1
+    phase: cr
+    evidence_class: quoted_attributed
+  published_page: 57
+  render_verified:
+  - row: 7
+    column: 7
+    text: 47,480

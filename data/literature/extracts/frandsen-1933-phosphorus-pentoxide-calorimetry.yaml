@@ -1,0 +1,4000 @@
+schema_version: literature_extract.v1
+source_id: frandsen-1933-phosphorus-pentoxide-calorimetry
+source:
+  citation: M. Frandsen, “The heat capacity, heat of sublimation, and heat of solution of phosphorus pentoxide,”
+    Bureau of Standards Journal of Research 10, Research Paper 514, 35–58 (1933).
+  year: 1933
+extraction:
+  method: MinerU table draft for Tables 2, 4, and 5; full retained-cell render audit; equation transcription
+    from machine text checked against rendered pages.
+  date: '2026-10-26'
+  worker: w1026b-fran33
+  provenance_path: text/frandsen-1933-phosphorus-pentoxide-calorimetry/pdftotext-layout.txt
+  source_note: Transcribed in the required machine-text order from MinerU tables and the born-digital
+    pdftotext layout. The three target tables and all retained numeric cells were checked against the
+    page renders because table QA reported digit disagreements and grouped comma values. The article occupies
+    PDF pages 1–24, Bureau of Standards Journal pages 35–58. The vapor is called P2O5 for convenience
+    although the source says its molecular form at bright red heat is closer to P4O10.
+  schema_gap: No battery quantity token represents integral heat of solution, heat of sublimation, heat
+    of transformation, or interval-mean Cp. The printed units cal.15 mole−1 and cal.15 mole−1 °C−1 have
+    no exact migrator conversion, and the method vocabulary has no calorimetry token. Supported
+    H_minus_H298 and point-Cp results remain admitted with unavailable values; unsupported heat results and
+    raw calorimeter records remain in the species context with typed-refusal status.
+review_status: draft
+fidelity_samples:
+- species: P2O5
+  observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r18_c09
+  field: value_as_published
+  value: 27,400
+  locator:
+    page: 12
+    table: '2'
+- species: P2O5
+  observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r18_c08
+  field: value_as_published
+  value: 45,950
+  locator:
+    page: 12
+    table: '2'
+- species: P2O5
+  observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r03_c11
+  field: value_as_published
+  value: '237'
+  locator:
+    page: 19
+    table: '4'
+- species: P2O5
+  observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r03_c07
+  field: value_as_published
+  value: 43,890
+  locator:
+    page: 23
+    table: '5'
+- species: P2O5
+  observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_vapor_cp_eq17
+  field: value_as_published
+  value: 36.8 ± 1.0
+  locator:
+    page: 16
+    equation: '17'
+- species: P2O5
+  observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_heat_of_sublimation_eq21
+  field: value_as_published
+  value: 8,800 ± 1,300
+  locator:
+    page: 21
+    equation: '21'
+- species: P2O5
+  observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_metaphosphoric_acid_eq26
+  field: value_as_published
+  value: 42,000 ± 2,100
+  locator:
+    page: 24
+    equation: '26'
+species:
+  P2O5:
+    observations:
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r18_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 1
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '545'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 1
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: &id001
+            tag: value
+            value: 101325
+          locator: &id002
+            page: 11
+            pdf_page_index: 10
+            published_page: 45
+            section: Results for phosphorus pentoxide
+            note: The source says vapor came through the furnace in the first two runs and all later runs,
+              overcoming the external pressure of one atmosphere.
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '545'
+        value: '27400'
+        value_as_published: 27,400
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r18_c08'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r19_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 2
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '545'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 2
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '545'
+        value: '26490'
+        value_as_published: 26,490
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run02_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r19_c08'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r20_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 3
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '650'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 3
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '650'
+        value: '28000'
+        value_as_published: 28,000
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r20_c08'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r21_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 4
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '650'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 4
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '650'
+        value: '28350'
+        value_as_published: 28,350
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run04_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r21_c08'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r22_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 5
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '804'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 5
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '804'
+        value: '38130'
+        value_as_published: 38,130
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run05_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r22_c08'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r23_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 6
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '794'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 6
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '794'
+        value: '36300'
+        value_as_published: 36,300
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run06_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r23_c08'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r24_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 7
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '792'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 7
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '792'
+        value: '38600'
+        value_as_published: 38,600
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run07_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r24_c08'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r25_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 8
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '923'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 8
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '923'
+        value: '44990'
+        value_as_published: 44,990
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run08_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r25_c08'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r26_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 9
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '930'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 9
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '930'
+        value: '40950'
+        value_as_published: 40,950
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run09_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r26_c08'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r27_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 10
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '936'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 10
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '936'
+        value: '40970'
+        value_as_published: 40,970
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run10_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r27_c08'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r28_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 11
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1062'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 11
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '1062'
+        value: '44000'
+        value_as_published: 44,000
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run11_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r28_c08'
+        T_C_as_printed: 1,062
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r29_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 12
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1061'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 12
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '1061'
+        value: '45930'
+        value_as_published: 45,930
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run12_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r29_c08'
+        T_C_as_printed: 1,061
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r30_c09
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 13
+        column_header: Heat content of phosphorus pentoxide vapor
+      units: cal.15 mole−1
+      phase: gas
+      phase_as_printed: phosphorus pentoxide vapor
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1058'
+          locator:
+            page: 12
+            pdf_page_index: 11
+            published_page: 46
+            table: '2'
+            row_label: Run 13
+            column_header: Temperature of vapor at orifice
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '1058'
+        value: '42930'
+        value_as_published: 42,930
+        standard_state_as_printed: H_t − H_25
+        pressure_as_printed: one atmosphere
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 2
+        note: 'Equation (12), the author’s calorimetric reduction for vapor heat content; Q_isoln is the
+          Table 2 value read from Figure 8. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run13_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r30_c08'
+        T_C_as_printed: 1,058
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r03_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 1
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '34.90'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 1
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '34.90'
+        value: '237'
+        value_as_published: '237'
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run01_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r04_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 2
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '76.57'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 2
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '76.57'
+        value: '1289'
+        value_as_published: 1,289
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run02_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r05_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 3
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '131.2'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 3
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '131.2'
+        value: '3076'
+        value_as_published: 3,076
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run03_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r06_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 4
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '183.3'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 4
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '183.3'
+        value: '4575'
+        value_as_published: 4,575
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run04_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r07_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 5
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '238.0'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 5
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '238.0'
+        value: '6536'
+        value_as_published: 6,536
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r08_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 6
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '36.0'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 6
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '36.0'
+        value: '280'
+        value_as_published: '280'
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run06_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r09_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 7
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '64.4'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 7
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '64.4'
+        value: '1038'
+        value_as_published: 1,038
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run07_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r10_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 8
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '99.9'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 8
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '99.9'
+        value: '2034'
+        value_as_published: 2,034
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run08_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r11_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 9
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '131.4'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 9
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '131.4'
+        value: '2954'
+        value_as_published: 2,954
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run09_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r12_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 10
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '164.5'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 10
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '164.5'
+        value: '4015'
+        value_as_published: 4,015
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run10_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r13_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 11
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '183.6'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 11
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '183.6'
+        value: '4663'
+        value_as_published: 4,663
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run11_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r14_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 12
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '210.2'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 12
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '210.2'
+        value: '5568'
+        value_as_published: 5,568
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run12_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r15_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 13
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '76.57'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 13
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '76.57'
+        value: '1314'
+        value_as_published: 1,314
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run13_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r16_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 14
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '131.2'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 14
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '131.2'
+        value: '3089'
+        value_as_published: 3,089
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run14_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r17_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 15
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '183.3'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 15
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '183.3'
+        value: '4406'
+        value_as_published: 4,406
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run15_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r18_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 16
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '239.0'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 16
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '239.0'
+        value: '6449'
+        value_as_published: 6,449
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run16_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r19_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 17
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '288.0'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 17
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '288.0'
+        value: '8928'
+        value_as_published: 8,928
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run17_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r20_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 18
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '288.0'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 18
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '288.0'
+        value: '8708'
+        value_as_published: 8,708
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run18_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r21_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 19
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '335.0'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 19
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '335.0'
+        value: '9543'
+        value_as_published: 9,543
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run19_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p019_t06_r22_c11
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 20
+        column_header: Heat content of phosphorus pentoxide
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: metastable crystalline phosphorus pentoxide
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '335.0'
+          locator:
+            page: 19
+            pdf_page_index: 18
+            published_page: 53
+            table: '4'
+            row_label: Run 20
+            column_header: Bath temperature
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        T_C: '335.0'
+        value: '9623'
+        value_as_published: 9,623
+        standard_state_as_printed: H_t − H_25
+        admission_status: admitted
+        attribution: Frandsen (1933), Table 4
+        note: 'Equation (18), the author’s calorimetric reduction of the crystalline phosphorus pentoxide
+          run. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run20_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_crystal_cp_25C_eq20
+      type: heat_capacity_and_heat_content_series
+      locator: &id003
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        equation: '20'
+      units: cal.15 mole−1 °C−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator: *id003
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        value: '24.07'
+        value_as_published: 24.07 ± 0.38
+        equation_as_printed: Equation (20)
+        supporting_context_row_ids: &table4_run_context_ids
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run01_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run02_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run03_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run04_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run05_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run06_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run07_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run08_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run09_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run10_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run11_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run12_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run13_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run14_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run15_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run16_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run17_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run18_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run19_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run20_calorimeter_inputs
+        T_C: '25'
+        phase_as_printed: metastable crystalline phosphorus pentoxide
+        admission_status: admitted
+        attribution: Frandsen (1933), Eq. (20)
+        note: Equation (20) differentiates the Eq. (19) fit to all 20 Table 4 crystalline heat-content
+          measurements, evaluated at 25 °C.
+      uncertainty:
+        kind: printed
+        verbatim: ±0.38 cal.15 mole−1 °C−1; confidence level not stated
+        locator: *id003
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_crystal_cp_300C_eq20
+      type: heat_capacity_and_heat_content_series
+      locator: &id004
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        equation: '20'
+      units: cal.15 mole−1 °C−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '300'
+          locator: *id004
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        value: '38.08'
+        value_as_published: 38.08 ± 0.60
+        equation_as_printed: Equation (20)
+        supporting_context_row_ids: *table4_run_context_ids
+        T_C: '300'
+        phase_as_printed: metastable crystalline phosphorus pentoxide
+        admission_status: admitted
+        attribution: Frandsen (1933), Eq. (20)
+        note: Equation (20) differentiates the Eq. (19) fit to all 20 Table 4 crystalline heat-content
+          measurements, evaluated at 300 °C.
+      uncertainty:
+        kind: printed
+        verbatim: ±0.60 cal.15 mole−1 °C−1; confidence level not stated
+        locator: *id004
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_vapor_heat_content_358C_eq15
+      type: heat_capacity_and_heat_content_series
+      locator: &id005
+        page: 20
+        pdf_page_index: 19
+        published_page: 54
+        equation: '15'
+      units: cal.15 mole−1
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '358'
+          locator: *id005
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        value: '19900'
+        value_as_published: 19,900 ± 1,300
+        equation_as_printed: Equation (15)
+        supporting_context_row_ids: &table2_run_context_ids
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run01_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run02_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run03_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run04_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run05_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run06_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run07_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run08_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run09_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run10_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run11_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run12_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run13_calorimeter_inputs
+        T_C: '358'
+        pressure_as_printed: one atmosphere
+        phase_as_printed: phosphorus pentoxide vapor
+        admission_status: admitted
+        attribution: Frandsen (1933), Eq. (15)
+        note: Equation (15), fit to all 13 Table 2 vapor heat-content measurements, evaluated at the 358
+          °C sublimation point.
+        standard_state_as_printed: H_t − H_25
+      uncertainty:
+        kind: printed
+        verbatim: ±1,300 cal.15 mole−1; confidence level not stated
+        locator: *id005
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_crystal_heat_content_358C_eq19
+      type: heat_capacity_and_heat_content_series
+      locator: &id006
+        page: 20
+        pdf_page_index: 19
+        published_page: 54
+        equation: '19'
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '358'
+          locator: *id006
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        value: '11070'
+        value_as_published: 11,070 ± 170
+        equation_as_printed: Equation (19)
+        supporting_context_row_ids: *table4_run_context_ids
+        T_C: '358'
+        phase_as_printed: metastable crystalline phosphorus pentoxide
+        admission_status: admitted
+        attribution: Frandsen (1933), Eq. (19)
+        note: Equation (19), fit to all 20 Table 4 crystalline heat-content measurements, evaluated at
+          the 358 °C sublimation point.
+        standard_state_as_printed: H_t − H_25
+      uncertainty:
+        kind: printed
+        verbatim: ±170 cal.15 mole−1; confidence level not stated
+        locator: *id006
+    context:
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run01_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id007
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 1
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '545'
+          locator: *id007
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '545'
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: '549'
+            well_orifice_drop_C: '4'
+            vapor_temperature_at_orifice_C: '545'
+            experimental_period_min: '1.5'
+            p2o5_weight_g_vac: '6.848'
+            equivalent_steam_rate_g_min: '2.357'
+            evaporated_water_g: '0.015'
+            final_calorimeter_temperature_C: '23.19'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 3,710
+            correction_from_blank_experiments_cal15: '254'
+            increase_of_radiation_from_spout_cal15: '3'
+            heat_lost_from_neck_cal15: '76'
+            heat_lost_by_evaporation_of_water_cal15: '9'
+            correction_to_25C_cal15: '-2'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r18_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 1
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '45950'
+        value_as_published: 45,950
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run02_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id008
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 2
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '545'
+          locator: *id008
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '545'
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: '549'
+            well_orifice_drop_C: '4'
+            vapor_temperature_at_orifice_C: '545'
+            experimental_period_min: '1.5'
+            p2o5_weight_g_vac: '6.728'
+            equivalent_steam_rate_g_min: '2.317'
+            evaporated_water_g: '.040'
+            final_calorimeter_temperature_C: '23.08'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 3,590
+            correction_from_blank_experiments_cal15: '254'
+            increase_of_radiation_from_spout_cal15: '3'
+            heat_lost_from_neck_cal15: '74'
+            heat_lost_by_evaporation_of_water_cal15: '25'
+            correction_to_25C_cal15: '-2'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r19_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 2
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '45910'
+        value_as_published: 45,910
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run03_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id009
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 3
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '650'
+          locator: *id009
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '650'
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: '655'
+            well_orifice_drop_C: '5'
+            vapor_temperature_at_orifice_C: '650'
+            experimental_period_min: '2.0'
+            p2o5_weight_g_vac: '11.011'
+            equivalent_steam_rate_g_min: 2,790
+            evaporated_water_g: '.040'
+            final_calorimeter_temperature_C: '25.29'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 6,052
+            correction_from_blank_experiments_cal15: '357'
+            increase_of_radiation_from_spout_cal15: '7'
+            heat_lost_from_neck_cal15: '103'
+            heat_lost_by_evaporation_of_water_cal15: '25'
+            correction_to_25C_cal15: '0'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r20_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 3
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '47020'
+        value_as_published: 47,020
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run04_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id010
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 4
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '650'
+          locator: *id010
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '650'
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: '655'
+            well_orifice_drop_C: '5'
+            vapor_temperature_at_orifice_C: '650'
+            experimental_period_min: '2.0'
+            p2o5_weight_g_vac: '17.407'
+            equivalent_steam_rate_g_min: '4.408'
+            evaporated_water_g: '.296'
+            final_calorimeter_temperature_C: '26.69'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 9,358
+            correction_from_blank_experiments_cal15: '256'
+            increase_of_radiation_from_spout_cal15: '7'
+            heat_lost_from_neck_cal15: '103'
+            heat_lost_by_evaporation_of_water_cal15: '182'
+            correction_to_25C_cal15: '5'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r21_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 4
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '48220'
+        value_as_published: 48,220
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run05_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id011
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 5
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '804'
+          locator: *id011
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '804'
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: '812'
+            well_orifice_drop_C: '8'
+            vapor_temperature_at_orifice_C: '804'
+            experimental_period_min: '1.5'
+            p2o5_weight_g_vac: '9.105'
+            equivalent_steam_rate_g_min: '2.996'
+            evaporated_water_g: '.065'
+            final_calorimeter_temperature_C: '26.45'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 5,631
+            correction_from_blank_experiments_cal15: '326'
+            increase_of_radiation_from_spout_cal15: '10'
+            heat_lost_from_neck_cal15: '91'
+            heat_lost_by_evaporation_of_water_cal15: '40'
+            correction_to_25C_cal15: '2'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r22_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 5
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '46560'
+        value_as_published: 46,560
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run06_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id012
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 6
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '794'
+          locator: *id012
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '794'
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: '805'
+            well_orifice_drop_C: '11'
+            vapor_temperature_at_orifice_C: '794'
+            experimental_period_min: '1.5'
+            p2o5_weight_g_vac: '4.161'
+            equivalent_steam_rate_g_min: '1.369'
+            evaporated_water_g: '.033'
+            final_calorimeter_temperature_C: '24.35'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 2,677
+            correction_from_blank_experiments_cal15: '344'
+            increase_of_radiation_from_spout_cal15: '10'
+            heat_lost_from_neck_cal15: '42'
+            heat_lost_by_evaporation_of_water_cal15: '20'
+            correction_to_25C_cal15: '-1'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r23_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 6
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '45110'
+        value_as_published: 45,110
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run07_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id013
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 7
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '792'
+          locator: *id013
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '792'
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: '801'
+            well_orifice_drop_C: '9'
+            vapor_temperature_at_orifice_C: '792'
+            experimental_period_min: '1.5'
+            p2o5_weight_g_vac: '7.203'
+            equivalent_steam_rate_g_min: '2.372'
+            evaporated_water_g: '.050'
+            final_calorimeter_temperature_C: '25.45'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 4,496
+            correction_from_blank_experiments_cal15: '296'
+            increase_of_radiation_from_spout_cal15: '10'
+            heat_lost_from_neck_cal15: '72'
+            heat_lost_by_evaporation_of_water_cal15: '31'
+            correction_to_25C_cal15: '1'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r24_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 7
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '46060'
+        value_as_published: 46,060
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run08_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id014
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 8
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '923'
+          locator: *id014
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '923'
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: '949'
+            well_orifice_drop_C: '26'
+            vapor_temperature_at_orifice_C: '923'
+            experimental_period_min: '1.5'
+            p2o5_weight_g_vac: '2.360'
+            equivalent_steam_rate_g_min: '.758'
+            evaporated_water_g: '.026'
+            final_calorimeter_temperature_C: '21.88'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 1,998
+            correction_from_blank_experiments_cal15: '538'
+            increase_of_radiation_from_spout_cal15: '18'
+            heat_lost_from_neck_cal15: '29'
+            heat_lost_by_evaporation_of_water_cal15: '16'
+            correction_to_25C_cal15: '-1'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r25_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 8
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '44460'
+        value_as_published: 44,460
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run09_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id015
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 9
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '930'
+          locator: *id015
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '930'
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: '950'
+            well_orifice_drop_C: '20'
+            vapor_temperature_at_orifice_C: '930'
+            experimental_period_min: '1.5'
+            p2o5_weight_g_vac: '8.771'
+            equivalent_steam_rate_g_min: '2.818'
+            evaporated_water_g: '.080'
+            final_calorimeter_temperature_C: '24.50'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 5,766
+            correction_from_blank_experiments_cal15: '506'
+            increase_of_radiation_from_spout_cal15: '18'
+            heat_lost_from_neck_cal15: '109'
+            heat_lost_by_evaporation_of_water_cal15: '49'
+            correction_to_25C_cal15: '-1'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r26_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 9
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '46490'
+        value_as_published: 46,490
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run10_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id016
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 10
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '936'
+          locator: *id016
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '936'
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: '958'
+            well_orifice_drop_C: '22'
+            vapor_temperature_at_orifice_C: '936'
+            experimental_period_min: '1.5'
+            p2o5_weight_g_vac: '9.594'
+            equivalent_steam_rate_g_min: '3.079'
+            evaporated_water_g: '.088'
+            final_calorimeter_temperature_C: '24.70'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 6,261
+            correction_from_blank_experiments_cal15: '494'
+            increase_of_radiation_from_spout_cal15: '18'
+            heat_lost_from_neck_cal15: '119'
+            heat_lost_by_evaporation_of_water_cal15: '54'
+            correction_to_25C_cal15: '-1'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r27_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 10
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '46700'
+        value_as_published: 46,700
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run11_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id017
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 11
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1,062
+          locator: *id017
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: 1,062
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: 1,098
+            well_orifice_drop_C: '36'
+            vapor_temperature_at_orifice_C: 1,062
+            experimental_period_min: '1.5'
+            p2o5_weight_g_vac: '13.889'
+            equivalent_steam_rate_g_min: '4.358'
+            evaporated_water_g: '.100'
+            final_calorimeter_temperature_C: '26.63'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 9,222
+            correction_from_blank_experiments_cal15: '508'
+            increase_of_radiation_from_spout_cal15: '25'
+            heat_lost_from_neck_cal15: '206'
+            heat_lost_by_evaporation_of_water_cal15: '61'
+            correction_to_25C_cal15: '4'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r28_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 11
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '47630'
+        value_as_published: 47,630
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run12_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id018
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 12
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1,061
+          locator: *id018
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: 1,061
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: 1,098
+            well_orifice_drop_C: '37'
+            vapor_temperature_at_orifice_C: 1,061
+            experimental_period_min: '1.5'
+            p2o5_weight_g_vac: '12.159'
+            equivalent_steam_rate_g_min: '3.813'
+            evaporated_water_g: '.489'
+            final_calorimeter_temperature_C: '25.97'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 8,015
+            correction_from_blank_experiments_cal15: '520'
+            increase_of_radiation_from_spout_cal15: '25'
+            heat_lost_from_neck_cal15: '206'
+            heat_lost_by_evaporation_of_water_cal15: '301'
+            correction_to_25C_cal15: '2'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r29_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 12
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '47280'
+        value_as_published: 47,280
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run13_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id019
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 13
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: gas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1,058
+          locator: *id019
+        total_pressure_Pa:
+          state: *id001
+          locator: *id002
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: 1,058
+        row_fields_as_printed:
+          upper_panel:
+            furnace_temperature_C: 1,095
+            well_orifice_drop_C: '37'
+            vapor_temperature_at_orifice_C: 1,058
+            experimental_period_min: '1.5'
+            p2o5_weight_g_vac: '12.159'
+            equivalent_steam_rate_g_min: '3.813'
+            evaporated_water_g: '.036'
+            final_calorimeter_temperature_C: '25.81'
+          lower_panel:
+            total_heat_measured_in_calorimeter_cal15: 8,045
+            correction_from_blank_experiments_cal15: '528'
+            increase_of_radiation_from_spout_cal15: '25'
+            heat_lost_from_neck_cal15: '206'
+            heat_lost_by_evaporation_of_water_cal15: '22'
+            correction_to_25C_cal15: '2'
+        status: typed_refusal
+        pressure_as_printed: one atmosphere
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p012_t04_r30_c08
+      type: calorimetric_result
+      locator:
+        page: 12
+        pdf_page_index: 11
+        published_page: 46
+        table: '2'
+        row_label: Run 13
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '47280'
+        value_as_published: 47,280
+        T_C: '25'
+        attribution: Frandsen (1933), Table 2
+        status: typed_refusal
+        note: 'Table 2 Q_isoln is read from the Figure 8 curve fitted to the Table 5 solution-calorimetry
+          measurements. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs; frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run01_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id020
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 1
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '34.90'
+          locator: *id020
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '34.90'
+        row_fields_as_printed:
+          bath_temperature_C: '34.90'
+          p2o5_weight_g_vac: '12.7209'
+          silica_weight_g_vac: '7.0476'
+          final_calorimeter_temperature_C: '23.56'
+          heat_transferred_to_calorimeter_cal15: '38.59'
+          heat_lost_in_transfer_cal15: '0.2'
+          heat_transferred_with_silica_cal15: '14.45'
+          correction_to_25C_cal15: '-3.11'
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run02_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id021
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 2
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '76.57'
+          locator: *id021
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '76.57'
+        row_fields_as_printed:
+          bath_temperature_C: '76.57'
+          p2o5_weight_g_vac: '12.7209'
+          silica_weight_g_vac: '7.0476'
+          final_calorimeter_temperature_C: '22.67'
+          heat_transferred_to_calorimeter_cal15: '189.62'
+          heat_lost_in_transfer_cal15: '1.4'
+          heat_transferred_with_silica_cal15: '70.55'
+          correction_to_25C_cal15: '-5.04'
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run03_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id022
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 3
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '131.2'
+          locator: *id022
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '131.2'
+        row_fields_as_printed:
+          bath_temperature_C: '131.2'
+          p2o5_weight_g_vac: '12.7209'
+          silica_weight_g_vac: '7.0476'
+          final_calorimeter_temperature_C: '23.15'
+          heat_transferred_to_calorimeter_cal15: '423.2'
+          heat_lost_in_transfer_cal15: '3.0'
+          heat_transferred_with_silica_cal15: '146.7'
+          correction_to_25C_cal15: '-4.00'
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run04_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id023
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 4
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '183.3'
+          locator: *id023
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '183.3'
+        row_fields_as_printed:
+          bath_temperature_C: '183.3'
+          p2o5_weight_g_vac: '12.7209'
+          silica_weight_g_vac: '7.0476'
+          final_calorimeter_temperature_C: '24.03'
+          heat_transferred_to_calorimeter_cal15: '630.8'
+          heat_lost_in_transfer_cal15: '6.0'
+          heat_transferred_with_silica_cal15: '225.0'
+          correction_to_25C_cal15: '-2.10'
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run05_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id024
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 5
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '238.0'
+          locator: *id024
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '238.0'
+        row_fields_as_printed:
+          bath_temperature_C: '238.0'
+          p2o5_weight_g_vac: '12.7209'
+          silica_weight_g_vac: '7.0476'
+          final_calorimeter_temperature_C: '24.63'
+          heat_transferred_to_calorimeter_cal15: '889.4'
+          heat_lost_in_transfer_cal15: '9.4'
+          heat_transferred_with_silica_cal15: '312.7'
+          correction_to_25C_cal15: -.80
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run06_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id025
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 6
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '36.0'
+          locator: *id025
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '36.0'
+        row_fields_as_printed:
+          bath_temperature_C: '36.0'
+          p2o5_weight_g_vac: '8.8274'
+          silica_weight_g_vac: '6.8536'
+          final_calorimeter_temperature_C: '24.25'
+          heat_transferred_to_calorimeter_cal15: '32.7'
+          heat_lost_in_transfer_cal15: '.1'
+          heat_transferred_with_silica_cal15: '14.11'
+          correction_to_25C_cal15: '-1.26'
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run07_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id026
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 7
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '64.4'
+          locator: *id026
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '64.4'
+        row_fields_as_printed:
+          bath_temperature_C: '64.4'
+          p2o5_weight_g_vac: '8.8274'
+          silica_weight_g_vac: '6.8536'
+          final_calorimeter_temperature_C: '25.48'
+          heat_transferred_to_calorimeter_cal15: '112.1'
+          heat_lost_in_transfer_cal15: '.5'
+          heat_transferred_with_silica_cal15: '48.8'
+          correction_to_25C_cal15: '.72'
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run08_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id027
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 8
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '99.9'
+          locator: *id027
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '99.9'
+        row_fields_as_printed:
+          bath_temperature_C: '99.9'
+          p2o5_weight_g_vac: '8.8274'
+          silica_weight_g_vac: '6.8536'
+          final_calorimeter_temperature_C: '25.60'
+          heat_transferred_to_calorimeter_cal15: '220.4'
+          heat_lost_in_transfer_cal15: '1.0'
+          heat_transferred_with_silica_cal15: '95.9'
+          correction_to_25C_cal15: '.90'
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run09_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id028
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 9
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '131.4'
+          locator: *id028
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '131.4'
+        row_fields_as_printed:
+          bath_temperature_C: '131.4'
+          p2o5_weight_g_vac: '8.8274'
+          silica_weight_g_vac: '6.8536'
+          final_calorimeter_temperature_C: '25.52'
+          heat_transferred_to_calorimeter_cal15: '321.0'
+          heat_lost_in_transfer_cal15: '1.7'
+          heat_transferred_with_silica_cal15: '139.9'
+          correction_to_25C_cal15: '.78'
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run10_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id029
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 10
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '164.5'
+          locator: *id029
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '164.5'
+        row_fields_as_printed:
+          bath_temperature_C: '164.5'
+          p2o5_weight_g_vac: '8.8274'
+          silica_weight_g_vac: '6.8536'
+          final_calorimeter_temperature_C: '25.64'
+          heat_transferred_to_calorimeter_cal15: '434.0'
+          heat_lost_in_transfer_cal15: '3.2'
+          heat_transferred_with_silica_cal15: '188.7'
+          correction_to_25C_cal15: '.96'
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run11_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id030
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 11
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '183.6'
+          locator: *id030
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '183.6'
+        row_fields_as_printed:
+          bath_temperature_C: '183.6'
+          p2o5_weight_g_vac: '8.8274'
+          silica_weight_g_vac: '6.8536'
+          final_calorimeter_temperature_C: '26.42'
+          heat_transferred_to_calorimeter_cal15: '500.8'
+          heat_lost_in_transfer_cal15: '3.8'
+          heat_transferred_with_silica_cal15: '216.9'
+          correction_to_25C_cal15: '2.13'
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run12_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id031
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 12
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '210.2'
+          locator: *id031
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '210.2'
+        row_fields_as_printed:
+          bath_temperature_C: '210.2'
+          p2o5_weight_g_vac: '8.8274'
+          silica_weight_g_vac: '6.8536'
+          final_calorimeter_temperature_C: '26.93'
+          heat_transferred_to_calorimeter_cal15: '595.4'
+          heat_lost_in_transfer_cal15: '5.0'
+          heat_transferred_with_silica_cal15: '257.3'
+          correction_to_25C_cal15: '2.90'
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run13_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id032
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 13
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '76.57'
+          locator: *id032
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '76.57'
+        row_fields_as_printed:
+          bath_temperature_C: '76.57'
+          p2o5_weight_g_vac: '3.2269'
+          silica_weight_g_vac: '10.1655'
+          final_calorimeter_temperature_C: '22.84'
+          heat_transferred_to_calorimeter_cal15: '131.1'
+          heat_lost_in_transfer_cal15: '1.4'
+          heat_transferred_with_silica_cal15: '101.45'
+          correction_to_25C_cal15: '-1.19'
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run14_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id033
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 14
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '131.2'
+          locator: *id033
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '131.2'
+        row_fields_as_printed:
+          bath_temperature_C: '131.2'
+          p2o5_weight_g_vac: '3.2269'
+          silica_weight_g_vac: '10.1655'
+          final_calorimeter_temperature_C: '23.89'
+          heat_transferred_to_calorimeter_cal15: '277.7'
+          heat_lost_in_transfer_cal15: '3.3'
+          heat_transferred_with_silica_cal15: '210.2'
+          correction_to_25C_cal15: -.61
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run15_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id034
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 15
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '183.3'
+          locator: *id034
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '183.3'
+        row_fields_as_printed:
+          bath_temperature_C: '183.3'
+          p2o5_weight_g_vac: '3.2269'
+          silica_weight_g_vac: '10.1655'
+          final_calorimeter_temperature_C: '24.98'
+          heat_transferred_to_calorimeter_cal15: '416.2'
+          heat_lost_in_transfer_cal15: '6.4'
+          heat_transferred_with_silica_cal15: '322.5'
+          correction_to_25C_cal15: -.01
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run16_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id035
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 16
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '239.0'
+          locator: *id035
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '239.0'
+        row_fields_as_printed:
+          bath_temperature_C: '239.0'
+          p2o5_weight_g_vac: '3.2269'
+          silica_weight_g_vac: '10.1655'
+          final_calorimeter_temperature_C: '24.09'
+          heat_transferred_to_calorimeter_cal15: '590.4'
+          heat_lost_in_transfer_cal15: '10.4'
+          heat_transferred_with_silica_cal15: '453.8'
+          correction_to_25C_cal15: -.50
+          correction_for_vaporization_cal15: '----'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run17_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id036
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 17
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '288.0'
+          locator: *id036
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '288.0'
+        row_fields_as_printed:
+          bath_temperature_C: '288.0'
+          p2o5_weight_g_vac: '3.2269'
+          silica_weight_g_vac: '10.1655'
+          final_calorimeter_temperature_C: '24.69'
+          heat_transferred_to_calorimeter_cal15: '758.5'
+          heat_lost_in_transfer_cal15: '15.7'
+          heat_transferred_with_silica_cal15: '570.9'
+          correction_to_25C_cal15: -.17
+          correction_for_vaporization_cal15: '0.29'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run18_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id037
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 18
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '288.0'
+          locator: *id037
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '288.0'
+        row_fields_as_printed:
+          bath_temperature_C: '288.0'
+          p2o5_weight_g_vac: '3.2269'
+          silica_weight_g_vac: '10.1655'
+          final_calorimeter_temperature_C: '25.04'
+          heat_transferred_to_calorimeter_cal15: '752.4'
+          heat_lost_in_transfer_cal15: '15.7'
+          heat_transferred_with_silica_cal15: '570.0'
+          correction_to_25C_cal15: '.02'
+          correction_for_vaporization_cal15: '.29'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run19_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id038
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 19
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '335.0'
+          locator: *id038
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '335.0'
+        row_fields_as_printed:
+          bath_temperature_C: '335.0'
+          p2o5_weight_g_vac: '3.2269'
+          silica_weight_g_vac: '10.1655'
+          final_calorimeter_temperature_C: '24.23'
+          heat_transferred_to_calorimeter_cal15: '886.6'
+          heat_lost_in_transfer_cal15: '22.2'
+          heat_transferred_with_silica_cal15: '690.1'
+          correction_to_25C_cal15: -.42
+          correction_for_vaporization_cal15: '1.49'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run20_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id039
+        page: 19
+        pdf_page_index: 18
+        published_page: 53
+        table: '4'
+        row_label: Run 20
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '335.0'
+          locator: *id039
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '335.0'
+        row_fields_as_printed:
+          bath_temperature_C: '335.0'
+          p2o5_weight_g_vac: '3.2269'
+          silica_weight_g_vac: '10.1655'
+          final_calorimeter_temperature_C: '24.53'
+          heat_transferred_to_calorimeter_cal15: '888.0'
+          heat_lost_in_transfer_cal15: '22.2'
+          heat_transferred_with_silica_cal15: '689.8'
+          correction_to_25C_cal15: -.26
+          correction_for_vaporization_cal15: '1.49'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id040
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        table: '5'
+        row_label: Run 1
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator: *id040
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '25'
+        row_fields_as_printed:
+          p2o5_weight_g_vac: '1.4351'
+          p2o5_millimoles_per_1000g_vac_h2o: '6.74'
+          final_calorimeter_temperature_C: '26.4'
+          heat_evolved_in_calorimeter_cal15: '443.5'
+          mole_fraction_HPO3: '0.748'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r03_c07
+      type: calorimetric_result
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        table: '5'
+        row_label: Run 1
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: heat of solution of crystalline phosphorus pentoxide in water
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '43890'
+        value_as_published: 43,890
+        T_C: '25'
+        attribution: Frandsen (1933), Table 5
+        status: typed_refusal
+        note: 'Table 5 solution heat reduced from the calorimeter heat, sample mass, solution concentration,
+          and acid fraction. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id041
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        table: '5'
+        row_label: Run 2
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator: *id041
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '25'
+        row_fields_as_printed:
+          p2o5_weight_g_vac: '2.3318'
+          p2o5_millimoles_per_1000g_vac_h2o: '10.94'
+          final_calorimeter_temperature_C: '26.4'
+          heat_evolved_in_calorimeter_cal15: '735.8'
+          mole_fraction_HPO3: '.823'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r04_c07
+      type: calorimetric_result
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        table: '5'
+        row_label: Run 2
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: heat of solution of crystalline phosphorus pentoxide in water
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '44820'
+        value_as_published: 44,820
+        T_C: '25'
+        attribution: Frandsen (1933), Table 5
+        status: typed_refusal
+        note: 'Table 5 solution heat reduced from the calorimeter heat, sample mass, solution concentration,
+          and acid fraction. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id042
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        table: '5'
+        row_label: Run 3
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator: *id042
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '25'
+        row_fields_as_printed:
+          p2o5_weight_g_vac: '9.3891'
+          p2o5_millimoles_per_1000g_vac_h2o: '43.98'
+          final_calorimeter_temperature_C: '27.5'
+          heat_evolved_in_calorimeter_cal15: 3,040.2
+          mole_fraction_HPO3: '.722'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r05_c07
+      type: calorimetric_result
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        table: '5'
+        row_label: Run 3
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: heat of solution of crystalline phosphorus pentoxide in water
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '45990'
+        value_as_published: 45,990
+        T_C: '25'
+        attribution: Frandsen (1933), Table 5
+        status: typed_refusal
+        note: 'Table 5 solution heat reduced from the calorimeter heat, sample mass, solution concentration,
+          and acid fraction. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id043
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        table: '5'
+        row_label: Run 4
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator: *id043
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '25'
+        row_fields_as_printed:
+          p2o5_weight_g_vac: '12.2138'
+          p2o5_millimoles_per_1000g_vac_h2o: '57.10'
+          final_calorimeter_temperature_C: '28.2'
+          heat_evolved_in_calorimeter_cal15: 4,145.8
+          mole_fraction_HPO3: '.519'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r06_c07
+      type: calorimetric_result
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        table: '5'
+        row_label: Run 4
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: heat of solution of crystalline phosphorus pentoxide in water
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '48210'
+        value_as_published: 48,210
+        T_C: '25'
+        attribution: Frandsen (1933), Table 5
+        status: typed_refusal
+        note: 'Table 5 solution heat reduced from the calorimeter heat, sample mass, solution concentration,
+          and acid fraction. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs
+      type: calorimeter_run_inputs
+      locator: &id044
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        table: '5'
+        row_label: Run 5
+        column_header: calorimeter row inputs
+      units: table measurement units as printed
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator: *id044
+      values:
+        quantity_as_printed: calorimeter row input measurements
+        quantity_token: unavailable
+        candidate_tokens_considered: []
+        schema_gap: Raw calorimeter run inputs have no battery quantity token.
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No battery quantity token represents the raw calorimeter run inputs.
+        T_C: '25'
+        row_fields_as_printed:
+          p2o5_weight_g_vac: '15.1624'
+          p2o5_millimoles_per_1000g_vac_h2o: '71.18'
+          final_calorimeter_temperature_C: '29.0'
+          heat_evolved_in_calorimeter_cal15: 5,068.1
+          mole_fraction_HPO3: '.567'
+        status: typed_refusal
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r07_c07
+      type: calorimetric_result
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        table: '5'
+        row_label: Run 5
+        column_header: Heat of solution
+      units: cal.15 mole−1
+      phase: cr
+      phase_as_printed: heat of solution of crystalline phosphorus pentoxide in water
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator:
+            page: 22
+            pdf_page_index: 21
+            published_page: 56
+            table: Figure 7
+            note: Figure caption states solution measurements at 25 °C.
+      values:
+        quantity_as_printed: heat of solution
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        value: '47480'
+        value_as_published: 47,480
+        T_C: '25'
+        attribution: Frandsen (1933), Table 5
+        status: typed_refusal
+        note: 'Table 5 solution heat reduced from the calorimeter heat, sample mass, solution concentration,
+          and acid fraction. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs'
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_vapor_cp_eq17
+      type: calorimetric_result
+      locator: &id045
+        page: 16
+        pdf_page_index: 15
+        published_page: 50
+        equation: '17'
+      units: cal.15 mole−1 °C−1
+      phase: gas
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '633.15'
+              interval_high: '1373.15'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 35
+            section: Abstract
+            note: The abstract gives 360–1100 °C.
+        total_pressure_Pa:
+          state: *id001
+          locator:
+            page: 16
+            pdf_page_index: 15
+            published_page: 50
+            equation: '17'
+            note: Equation (17) prints C_p, 1 atm.
+      values:
+        method_class: quoted_attributed
+        value: '36.8'
+        value_as_published: 36.8 ± 1.0
+        equation_as_printed: Equation (17)
+        supporting_context_row_ids: *table2_run_context_ids
+        T_range_K:
+        - '633.15'
+        - '1373.15'
+        T_range_C_as_printed:
+        - '360'
+        - '1100'
+        pressure_as_printed: 1 atm
+        phase_as_printed: phosphorus pentoxide vapor
+        admission_status: typed_refusal
+        reason: No battery schema token represents this printed quantity.
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        quantity_as_printed: mean heat capacity of phosphorus pentoxide vapor over 360–1100 °C
+        attribution: Frandsen (1933), Eq. (17)
+        status: typed_refusal
+        note: Equation (17) differentiates the Eq. (15) line fitted to all 13 Table 2 vapor heat-content
+          measurements.
+      uncertainty:
+        kind: printed
+        verbatim: ±1.0 cal.15 mole−1 °C−1; confidence level not stated
+        locator: *id045
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_heat_of_sublimation_eq21
+      type: calorimetric_result
+      locator: &id046
+        page: 21
+        pdf_page_index: 20
+        published_page: 55
+        equation: '21'
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '358'
+          locator: *id046
+        total_pressure_Pa:
+          state: *id001
+          locator:
+            page: 20
+            pdf_page_index: 19
+            published_page: 54
+            section: Heat of sublimation of crystalline phosphorus pentoxide
+            note: The source defines the sublimation point as the temperature at which vapor pressure
+              equals one atmosphere.
+      values:
+        method_class: quoted_attributed
+        value: '8800'
+        value_as_published: 8,800 ± 1,300
+        equation_as_printed: Equation (21)
+        supporting_context_row_ids: &sublimation_run_context_ids
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run01_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run02_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run03_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run04_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run05_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run06_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run07_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run08_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run09_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run10_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run11_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run12_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table2_run13_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run01_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run02_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run03_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run04_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run05_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run06_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run07_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run08_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run09_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run10_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run11_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run12_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run13_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run14_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run15_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run16_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run17_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run18_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run19_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table4_run20_calorimeter_inputs
+        T_C: '358'
+        phase_as_printed: metastable crystalline phosphorus pentoxide
+        admission_status: typed_refusal
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        reason: No battery schema token represents this printed quantity.
+        quantity_as_printed: heat of sublimation
+        attribution: Frandsen (1933), Eq. (21)
+        status: typed_refusal
+        note: 'Equation (21): vapor heat content at sublimation minus crystalline heat content at the
+          358 °C sublimation point.'
+        T_C_as_printed: 358 ± 7 °C
+        pressure_as_printed: one atmosphere
+      uncertainty:
+        kind: printed
+        verbatim: ±1,300 cal.15 mole−1; confidence level not stated
+        locator: *id046
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_meta_ortho_11p5mmol_eq22
+      type: calorimetric_result
+      locator: &id047
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        equation: '22'
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator: *id047
+      values:
+        method_class: quoted_attributed
+        value: '44500'
+        value_as_published: 44,500 ± 800
+        equation_as_printed: Equation (22)
+        supporting_context_row_ids: &table5_run_context_ids
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs
+        T_C: '25'
+        phase_as_printed: crystalline phosphorus pentoxide dissolved in water
+        reaction_as_printed: P2O5(cr) + 1.4 H2O(l) → 1.6 HPO3(aq) + 0.4 H3PO4(aq)
+        admission_status: typed_refusal
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        reason: No battery schema token represents this printed quantity.
+        quantity_as_printed: heat of solution
+        attribution: Frandsen (1933), Eq. (22)
+        status: typed_refusal
+        note: 'Equation (22) derives this printed reaction heat from the Table 5 solution-calorimetry
+          series and the printed acid fractions. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r03_c07;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r04_c07; frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r05_c07;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r06_c07; frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r07_c07'
+      uncertainty:
+        kind: printed
+        verbatim: ±800 cal.15 mole−1; confidence level not stated
+        locator: *id047
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_meta_ortho_79p5mmol_eq23
+      type: calorimetric_result
+      locator: &id048
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        equation: '23'
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator: *id048
+      values:
+        method_class: quoted_attributed
+        value: '48200'
+        value_as_published: 48,200 ± 800
+        equation_as_printed: Equation (23)
+        supporting_context_row_ids: *table5_run_context_ids
+        T_C: '25'
+        phase_as_printed: crystalline phosphorus pentoxide dissolved in water
+        reaction_as_printed: P2O5(cr) + 2 H2O(l) → HPO3(aq) + H3PO4(aq)
+        admission_status: typed_refusal
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        reason: No battery schema token represents this printed quantity.
+        quantity_as_printed: heat of solution
+        attribution: Frandsen (1933), Eq. (23)
+        status: typed_refusal
+        note: 'Equation (23) derives this printed reaction heat from the Table 5 solution-calorimetry
+          series and the printed acid fractions. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r03_c07;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r04_c07; frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r05_c07;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r06_c07; frandsen_1933_phosphorus_pentoxide_calorimetry_p023_t07_r07_c07'
+      uncertainty:
+        kind: printed
+        verbatim: ±800 cal.15 mole−1; confidence level not stated
+        locator: *id048
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_orthophosphoric_acid_eq25
+      type: calorimetric_result
+      locator: &id049
+        page: 24
+        pdf_page_index: 23
+        published_page: 58
+        equation: '25'
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator: *id049
+      values:
+        method_class: quoted_attributed
+        value: '54400'
+        value_as_published: 54,400 ± 2,100
+        equation_as_printed: Equation (25)
+        T_C: '25'
+        phase_as_printed: crystalline phosphorus pentoxide dissolved in water
+        reaction_as_printed: P2O5(cr) + 3 H2O(l) → 2 H3PO4(aq)
+        supporting_context_row_ids: &table5_equation_context_ids
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run01_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run02_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run03_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run04_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_table5_run05_calorimeter_inputs
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_meta_ortho_11p5mmol_eq22
+        - frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_meta_ortho_79p5mmol_eq23
+        admission_status: typed_refusal
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        reason: No battery schema token represents this printed quantity.
+        quantity_as_printed: heat of solution
+        attribution: Frandsen (1933), Eq. (25)
+        status: typed_refusal
+        note: 'Equation (25) derives this printed reaction heat from the Table 5 solution-calorimetry
+          series and the printed acid fractions. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_meta_ortho_11p5mmol_eq22;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_meta_ortho_79p5mmol_eq23'
+      uncertainty:
+        kind: printed
+        verbatim: ±2,100 cal.15 mole−1; confidence level not stated
+        locator: *id049
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_metaphosphoric_acid_eq26
+      type: calorimetric_result
+      locator: &id050
+        page: 24
+        pdf_page_index: 23
+        published_page: 58
+        equation: '26'
+      units: cal.15 mole−1
+      phase: cr
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator: *id050
+      values:
+        method_class: quoted_attributed
+        value: '42000'
+        value_as_published: 42,000 ± 2,100
+        equation_as_printed: Equation (26)
+        supporting_context_row_ids: *table5_equation_context_ids
+        T_C: '25'
+        phase_as_printed: crystalline phosphorus pentoxide dissolved in water
+        reaction_as_printed: P2O5(cr) + H2O(l) → 2 HPO3(aq)
+        admission_status: typed_refusal
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        reason: No battery schema token represents this printed quantity.
+        quantity_as_printed: heat of solution
+        attribution: Frandsen (1933), Eq. (26)
+        status: typed_refusal
+        note: 'Equation (26) derives this printed reaction heat from the Table 5 solution-calorimetry
+          series and the printed acid fractions. Supporting context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_meta_ortho_11p5mmol_eq22;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_meta_ortho_79p5mmol_eq23'
+      uncertainty:
+        kind: printed
+        verbatim: ±2,100 cal.15 mole−1; confidence level not stated
+        locator: *id050
+    - observation_id: frandsen_1933_phosphorus_pentoxide_calorimetry_metaphosphoric_acid_transformation_eq24
+      type: calorimetric_result
+      locator: &id051
+        page: 23
+        pdf_page_index: 22
+        published_page: 57
+        equation: '24'
+      units: cal.15 mole−1
+      phase: aq
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '25'
+          locator: *id051
+      values:
+        method_class: quoted_attributed
+        value: '6200'
+        value_as_published: 6,200 ± 1,900
+        equation_as_printed: Equation (24)
+        supporting_context_row_ids: *table5_equation_context_ids
+        T_C: '25'
+        phase_as_printed: aqueous metaphosphoric acid transforming to aqueous orthophosphoric acid
+        reaction_as_printed: HPO3(aq) + H2O(l) → H3PO4(aq)
+        admission_status: typed_refusal
+        schema_gap: No battery schema quantity token represents this printed quantity.
+        reason: No battery schema token represents this printed quantity.
+        quantity_as_printed: heat of transformation
+        attribution: Frandsen (1933), Eq. (24)
+        status: typed_refusal
+        note: 'Equation (24) is obtained by subtracting Eq. (22) from Eq. (23) and dividing by 0.6. Supporting
+          context row ids: frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_meta_ortho_11p5mmol_eq22;
+          frandsen_1933_phosphorus_pentoxide_calorimetry_heat_solution_meta_ortho_79p5mmol_eq23'
+      uncertainty:
+        kind: printed
+        verbatim: ±1,900 cal.15 mole−1; confidence level not stated
+        locator: *id051
