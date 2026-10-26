@@ -104,6 +104,7 @@ from simulator.battery.migrate import (
     canonicalize_rail,
     iter_observation_store_paths,
     load_migrated_benches,
+    load_migrated_context,
     load_migrated_store,
     load_yaml,
     _convert_compilation_amount,
@@ -163,12 +164,15 @@ from simulator.battery.source_lineage import (
     openimcc_pack_coefficient_sources,
 )
 from simulator.battery.validate import (
+    ValidationIssue,
     _asset_ids,
     _observation_lineage,
+    observation_issue_location,
     _pressure_blocking_notices,
     _resolve_coefficient_sources,
     _table_ids,
     _VAPOUR_EQUILIBRIUM,
+    validate_corpus,
 )
 from simulator.battery.validity import (
     GateOutcome,
@@ -517,6 +521,9 @@ class ScoreContext:
     hostname: str = ""
     benches: Mapping[str, Bench] = field(default_factory=dict)
     root: Path = REPO_ROOT
+    hard_issues_by_observation: Mapping[str, tuple[ValidationIssue, ...]] = field(
+        default_factory=dict
+    )
 
 
 @dataclass(frozen=True)
@@ -10308,6 +10315,31 @@ def compile_residual(
         evidence_class_notices,
         _quench_notices(reference),
     )
+    validation_notices: list[Notice] = []
+    for observation_id in dict.fromkeys(
+        (source_reference.observation_id, lineage_observation_id)
+    ):
+        if observation_id is None:
+            continue
+        issues = context.hard_issues_by_observation.get(observation_id, ())
+        if not issues:
+            continue
+        issue_codes = set()
+        for issue in issues:
+            location = observation_issue_location(issue.path)
+            field = "" if location is None else location[1]
+            issue_codes.add(
+                issue.reason.value if not field else f"{issue.reason.value}:{field}"
+            )
+        validation_notices.append(
+            Notice(
+                kind=NoticeKind.VALIDATION_HARD_ISSUE_LABEL,
+                affected_quantities=() if quantity is None else (quantity,),
+                reason="hard_validation_issue:" + ",".join(sorted(issue_codes)),
+                origin=observation_id,
+            )
+        )
+    notices = union_notices(notices, tuple(validation_notices))
     comparison_ids = comparison_ids or {reference.observation_id}
 
     def _refused(
@@ -11370,6 +11402,13 @@ def load_score_context(
     else:
         works, experiments, observations = load_migrated_store(root, sources=sources)
     benches = load_migrated_benches(root)
+    validation = validate_corpus(
+        works,
+        experiments,
+        observations,
+        benches=benches,
+        context_rows=load_migrated_context(root),
+    )
     origins: dict[str, str] = {}
     extract_review: dict[str, str | None] = {}
     literature = root / "data" / "literature"
@@ -11418,6 +11457,7 @@ def load_score_context(
         hostname=socket.gethostname(),
         benches=benches,
         root=root,
+        hard_issues_by_observation=validation.hard_issues_by_observation,
     )
 
 
