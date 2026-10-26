@@ -267,3 +267,19 @@ def test_c0_positive_source_refuses_invalid_pipe_instead_of_zero_pressure():
         model.estimate_transport_state(
             EvaporationFlux(species_kg_hr={"Na": 1e-6}, total_kg_hr=1e-6), melt,
         )
+
+
+@pytest.mark.parametrize("sink_bar", [0.0, 0.01])
+def test_tiny_positive_c0_source_uses_zero_flow_pipe_limit(sink_bar):
+    model = OverheadGasModel({})
+    melt = MeltState()
+    melt.temperature_C = 175.0
+    melt.p_total_mbar = 0.0
+    melt.atmosphere = Atmosphere.HARD_VACUUM
+    melt.campaign = CampaignPhase.C0
+    source = 5.640458934168655e-70  # captured asteroid hour-3 inlet, kg/h
+    flux = EvaporationFlux(species_kg_hr={"CrO": source}, total_kg_hr=source)
+    state = model.estimate_transport_state(flux, melt, p_downstream_bar=sink_bar)
+    assert state["p_mean_Pa"] == sink_bar * 1e5
+    assert state["pipe_conductance_kg_hr"] == 0.0
+    assert melt.p_total_mbar == 0.0

@@ -30,3 +30,19 @@ def test_cold_step_queries_condensed_backend_once(monkeypatch):
         assert not sim._last_surface_oxygen_diagnostic['source_terms_mol_m2_s']
     finally:
         close_test_owned_magemin_backend(sim)
+
+
+def test_cold_source_thermo_refusal_excludes_species_without_aborting_hour():
+    sim = simulation('lunar_mare_low_ti', 'C0')
+    try:
+        for _ in range(3):
+            snapshot = sim.step()
+        assert sim.melt.hour == 3
+        refused = sim._last_evaporation_flux_diagnostic['source_thermo_refusals']
+        assert refused['P4O6']['refusal_type'] == 'NasaCeaDomainError'
+        assert refused['P4O6']['temperature_K'] == 448.15
+        assert snapshot.evap_flux.species_kg_hr.get('P4O6', 0.0) == 0.0
+        assert 'P4O6' not in sim._last_surface_oxygen_diagnostic['frozen_carriers']
+        assert abs(snapshot.mass_balance_error_pct) <= 5e-12
+    finally:
+        close_test_owned_magemin_backend(sim)
