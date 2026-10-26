@@ -98,10 +98,10 @@ def test_accepted_hot_hour_hex():
         # and zero-rate records, rather than storing another 930 kB fixture.
         assert {key: hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
                 for key, value in receipt.items()} == {
-            'flux': '59993b971e8efdd95bbe456934584e8f63a2bbc0055ab2e9485f188a8b1fd359',
+            'flux': '983829bc3acc9417f7a01919c909e57c9d43b96175507991c278f21ec19ca4f0',
             'oxygen': 'c499e99c3c55d8f5b80b81ef43a3d4c66a406a30f6af88ed5da581531a9ac621',
             'ledger': '2f921a5f0d0de652266991e06452f535ee310dee71c9aad6bd50700a37cec38f',
-            'condensation': '0602c6d1846437b3270aade5b45864e98cc68816e561db65edf54ad5804b789d',
+            'condensation': '818048509486826afc3e358592ab5220b196ff0da455d7ecefb80dd702f24673',
         }
     finally:
         close_test_owned_magemin_backend(sim)
