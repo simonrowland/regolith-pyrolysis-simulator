@@ -2772,6 +2772,34 @@ def test_sio_oxide_vapor_extrapolation_predicts_with_certified_band(
     assert _is_noncertifying_vapor_extrapolation("SiO", source)
 
 
+def test_ca2_compiled_oxide_extrapolation_keeps_source_reason_and_certified_band(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    result = provider.dispatch(_request_for_oxide_at_T_K("CaO", 1638.15))
+    evaluator = provider._vapour_rail_catalog.evaluator_for_hot_train(
+        "Ca2",
+        process_phase=None,
+    )
+
+    assert result.status == "ok"
+    assert evaluator is not None
+    notice = result.diagnostic["extrapolated_beyond_valid_range_K"]["Ca2"]
+    # Mutation pinned: using the evaluator's out_of_range_status as the reason
+    # replaces the source-domain reason while the predicted pressure stays finite.
+    assert result.diagnostic["vapor_pressures_Pa"]["Ca2"] > 0.0
+    assert notice["reason"] == "oxide_vapor_pressure_out_of_validated_range"
+    assert notice["reason"] != notice["status"]
+    assert notice["status"] == evaluator.out_of_range_status
+    assert notice["authority_level"] == "extrapolated"
+    assert tuple(notice["certified_band"]["temperature_K"]) == (
+        evaluator.valid_temperature_K
+    )
+    assert result.diagnostic["vapor_pressure_numerator_provenance"]["Ca2"][
+        "extrapolation_notice"
+    ] == notice
+
+
 def test_sio_extrapolation_notice_reaches_public_numeric_answer(vapor_pressure_data):
     import json
     from simulator.vapour_rail.batch import (

@@ -3350,11 +3350,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                                 _vapor_pressure_temperature_extrapolation_notice(
                                     temperature_K=T_K,
                                     valid_range_K=(valid_low, valid_high),
-                                    reason=(
-                                        compiled_reference_evaluator.out_of_range_status
-                                        if compiled_reference_evaluator is not None
-                                        else "metal_vapor_pressure_out_of_validated_range"
-                                    ),
+                                    reason="metal_vapor_pressure_out_of_validated_range",
                                 )
                             )
                             warnings.append(
@@ -4365,13 +4361,19 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 pO2_exponent = compiled_evaluator.pO2_exponent
                 pO2_scaled = bool(pO2_exponent)
                 if evaluation.out_of_range:
+                    existing_notice = oxide_vapor_extrapolations.get(name)
+                    existing_reason = (
+                        existing_notice.get("reason")
+                        if isinstance(existing_notice, dict)
+                        else None
+                    )
                     oxide_vapor_extrapolations[name] = (
                         _vapor_pressure_temperature_extrapolation_notice(
                             temperature_K=T_K,
                             valid_range_K=compiled_evaluator.valid_temperature_K,
                             reason=(
-                                evaluation.status
-                                or compiled_evaluator.out_of_range_status
+                                existing_reason
+                                or "oxide_vapor_pressure_out_of_validated_range"
                             ),
                         )
                     )

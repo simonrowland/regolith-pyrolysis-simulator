@@ -293,22 +293,8 @@ def test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite() -> None:
         assert isinstance(notice, dict)
         # Mutation pinned: remove the extrapolation reason, authority, or
         # certified band while leaving the predicted pressure finite.
-        if species in provider._vapor_pressure_data.get("metals", {}):
-            evaluator = provider._vapour_rail_catalog.evaluator_for_hot_train(
-                species,
-                process_phase=None,
-            )
-            expected_reason = (
-                evaluator.out_of_range_status
-                if evaluator is not None
-                else "metal_vapor_pressure_out_of_validated_range"
-            )
-        else:
-            expected_reason = notice.get(
-                "status",
-                "oxide_vapor_pressure_out_of_validated_range",
-            )
-        assert notice.get("reason") == expected_reason
+        assert notice.get("reason")
+        assert notice["reason"] != notice.get("status")
         assert notice.get("authority_level") == "extrapolated"
         assert tuple(notice.get("valid_range_K") or ()) == tuple(valid_range)
         assert tuple(notice["certified_band"]["temperature_K"]) == tuple(
