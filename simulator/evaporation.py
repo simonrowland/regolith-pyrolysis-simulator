@@ -2074,7 +2074,7 @@ def _project_frozen_carrier_batch(hour, flux, *, oxygen_uptake_capacity_mol=None
                                  oxygen_release_capacity_mol=None):
     from simulator.fe_redox import (
         _evaporative_redox_source_terms_from_transition, _melt_redox_capacity_mol_per_ln_fO2,
-        _redox_source_response, _evaporative_redox_is_saturated, _film_bounded_buffer_release,
+        _redox_source_response, _liquid_melt_redox_capacity, _evaporative_redox_is_saturated, _film_bounded_buffer_release,
         _remaining_fe_redox_internal_o2_capacity_mol, _fe_redox_settlement_inputs,
         _FE_REDOX_OXYGEN_SOURCE_OVERHEAD, _FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
         )
@@ -2120,9 +2120,9 @@ def _project_frozen_carrier_batch(hour, flux, *, oxygen_uptake_capacity_mol=None
                     hour.species_formula_registry)
                 # The live mirror is projected after the entire carrier batch:
                 # tangent composition is step-start; its Fe amount is current mol.
-                capacity = _melt_redox_capacity_mol_per_ln_fO2(total_fe_mol=max(0.0, total_fe),
+                capacity = _liquid_melt_redox_capacity(_melt_redox_capacity_mol_per_ln_fO2(total_fe_mol=max(0.0, total_fe),
                     comp=redox['composition_wt_pct'], fO2_log=redox['fO2_log'],
-                    T_K=hour.melt.temperature_C + 273.15, pressure_bar=redox['pressure_bar']) * redox['liquid_fraction']
+                    T_K=hour.melt.temperature_C + 273.15, pressure_bar=redox['pressure_bar']), redox['liquid_fraction'])
                 redox['capacity_mol_per_ln'] = capacity
                 _, candidate, skip_reason = _redox_source_response(redox['fO2_log'], sum(terms.values()),
                     capacity, redox['upper_bound_log'], noop)
@@ -5022,8 +5022,14 @@ class EvaporationMixin:
         from simulator.fe_redox import floor_vacuum_pressure_bar
 
         authority = self._resolved_melt_redox_gate_authority()
+        store = self._pt0_store()
+        initial_pressure_queries = 1
         if equilibrium is not None:
             initial = copy.deepcopy(equilibrium)
+        elif store is not None and (getattr(store, 'replay_enabled', False)
+                                    or getattr(store, 'write_through_enabled', False)):
+            initial, requires_publication = self._query_equilibrium()
+            initial_pressure_queries += int(requires_publication)
         elif (self.backend is None or self._backend_failed or not self.backend.is_available()) and self._backend_allows_internal_analytical_fallback():
             from simulator.melt_backend.base import EquilibriumResult
             # Analytical source pressures are supplied by the same registered
@@ -5034,8 +5040,10 @@ class EvaporationMixin:
                 fO2_log=self._intrinsic_oxygen_publication()['published_intrinsic_fO2_log'],
                 status='ok', diagnostics=({'vapor_pressure_zero_reason': 'internal_analytical_below_400K'}
                     if self.melt.temperature_C + 273.15 < 400.0 else {}))
+            initial_pressure_queries += 1
         else:
-            initial = self._query_equilibrium()[0]
+            initial, requires_publication = self._query_equilibrium()
+            initial_pressure_queries += int(requires_publication)
         bulk = self._vapor_pressure_transport_pO2_bar()
         partials = (dict(overhead_partials_override_Pa) if overhead_partials_override_Pa is not None
                     else self._evaporation_bulk_partials_pa(initial.vapor_pressures_Pa))
@@ -5071,7 +5079,6 @@ class EvaporationMixin:
             carrier_gas=self._resolve_condensation_carrier_gas(),
             lab_surface_temperatures_C=lab_temperatures, lab_surface_refusals=lab_refusals)
         ledger = self.atom_ledger
-        store = self._pt0_store()
         temperature, pressure = self.melt.temperature_C, self.melt.p_total_mbar / 1000.0
         quantization = None
         if store is not None and getattr(store, 'quantize_live_controls', False):
@@ -5098,11 +5105,11 @@ class EvaporationMixin:
             is_liquid=self._melt_redox_temperature_shift_is_liquid(T_K, gate_authority=authority),
             composition_wt_pct=self._melt_oxide_wt_pct(),
             pressure_bar=floor_vacuum_pressure_bar(self.melt.p_total_mbar / 1000.0, floor_bar=self._oxygen_numerical_floor_bar()),
-            internal_capacity_mol=self._fe_redox_internal_o2_capacity_mol_this_hr,
-            internal_consumed_mol=self._fe_redox_internal_o2_consumed_mol_this_hr,
+            internal_capacity_mol=getattr(self, '_fe_redox_internal_o2_capacity_mol_this_hr', 0.0),
+            internal_consumed_mol=getattr(self, '_fe_redox_internal_o2_consumed_mol_this_hr', 0.0),
             capacity_mol_per_ln=reservoir.melt_redox_capacity_mol_per_ln_fO2,
             exchange_o2_mol=reservoir.exchange_o2_mol,
-            replenished_mol=self._fe_redox_passive_o2_replenished_mol_this_hr,
+            replenished_mol=getattr(self, '_fe_redox_passive_o2_replenished_mol_this_hr', 0.0),
             noop_mol=OXYGEN_RESERVOIR_NOOP_MOL)
         hour = _FrozenEvaporationHour(
             melt=_EvaporationHourMelt(self.melt.temperature_C, self.melt.p_total_mbar, self.melt.atmosphere,
@@ -5129,14 +5136,18 @@ class EvaporationMixin:
         if hour.frozen_carriers is not None:
             return hour
         seed_oxygen = 10.0 ** intrinsic['published_intrinsic_fO2_log']
-        for _ in range(2):
+        # Ordinary _get_equilibrium publishes one pressure query before the
+        # explicit seed refresh. Supplied/replayed results omit that first call.
+        for _ in range(initial_pressure_queries):
             result, diagnostic = _frozen_pressure(hour, seed_oxygen)
             requests = dict(hour.provider_requests)
             request = requests[ChemistryIntent.VAPOR_PRESSURE]
             continuation = dict(request.control_inputs)
-            if diagnostic.get('high_t_melt_activity'):
-                continuation.update(high_t_melt_activity_previous=diagnostic['high_t_melt_activity'],
-                    high_t_melt_activity_previous_temperature_K=T_K)
+            if 'high_t_melt_activity_previous' in continuation:
+                continuation.update(
+                    high_t_melt_activity_previous=dict(diagnostic.get('high_t_melt_activity') or {}),
+                    high_t_melt_activity_previous_temperature_K=(
+                        None if diagnostic.get('vapor_pressure_zero_reason') else T_K))
             requests[ChemistryIntent.VAPOR_PRESSURE] = replace(request, control_inputs=continuation)
             hour = replace(hour, provider_requests=_freeze_catalog_value(requests),
                 equilibrium_inputs=_freeze_catalog_value({item.name: getattr(result, item.name) for item in fields(result)}))

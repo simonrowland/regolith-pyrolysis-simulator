@@ -437,7 +437,7 @@ from simulator.fe_redox import (
     _fe_redox_settlement_inputs,
     _evaporative_redox_is_saturated,
     _film_bounded_buffer_release,
-    _redox_source_response,
+    _redox_source_response, _liquid_melt_redox_capacity,
     _transition_account_o2_equiv_mol,
     _transition_species_mol,
     _evaporative_redox_source_terms_from_transition,
@@ -5404,10 +5404,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             T_K,
             gate_authority=gate_authority,
         )
-        # Derivation: Kress91 capacity is proportional to melt Fe inventory;
-        # freeze-gate liquid_fraction is the active residual-liquid fraction,
-        # so C_m_effective = C_m_full * liquid_fraction and tends to 0 at solidus.
-        return C_m_full * liquid_fraction
+        return _liquid_melt_redox_capacity(C_m_full, liquid_fraction)
 
     def _melt_redox_temperature_shift_is_liquid(
         self,

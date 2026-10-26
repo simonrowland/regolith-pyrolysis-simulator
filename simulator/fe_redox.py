@@ -1579,6 +1579,13 @@ def _redox_source_increment(base_fO2_log, net_o2_equiv_mol, C_m, upper_bound):
     return applied_delta_ln, candidate_fO2_log
 
 
+def _liquid_melt_redox_capacity(full_capacity_mol_per_ln_fO2, liquid_fraction):
+    # Kress91 capacity is proportional to Fe inventory. Only the active
+    # residual-liquid fraction participates: C_eff = C_full * fraction.
+    # Units remain mol/ln(fO2); capacity tends to zero at the solidus.
+    return full_capacity_mol_per_ln_fO2 * liquid_fraction
+
+
 def _redox_source_response(base_fO2_log, net_o2_equiv_mol, C_m, upper_bound, noop_mol):
     if C_m <= noop_mol:
         return 0.0, base_fO2_log, 'no_melt_redox_capacity'

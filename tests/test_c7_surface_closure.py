@@ -246,6 +246,8 @@ def test_pressure_projection_shares_read_only_inputs_but_rollback_detaches_them(
     sim = simulation()
     names = ('feedstocks', 'vapor_pressure_catalog_data', 'vapor_pressures')
     try:
+        # Initial construction owns its input copy; pressure queries reuse it.
+        sim.condensation_model
         for name in names:
             setattr(sim, name, ReadOnlyInputs(getattr(sim, name)))
         hour = sim._prepare_evaporation_hour()
@@ -366,10 +368,10 @@ def test_cold_admission_jump_accepts_zero_and_flags_positive_side_limit(disabled
         sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
         solved = sim._solve_evaporative_oxygen_boundary()
         projected = solved.payload[2]
-        assert projected._frozen_evaporation_carriers == frozenset()
+        assert projected.frozen_carriers == frozenset()
         assert solved.reaction_pO2_bar == 0.0
         assert not any(solved.balance_terms)
-        admitted = {item['species'] for item in projected._carrier_admission_flips
+        admitted = {item['species'] for item in projected.carrier_admission_flips
                     if item['direction'] == 'admitted'}
         assert ('P4' in admitted) is not disabled_p4
         assert ('P2' in admitted) is disabled_p4
@@ -377,7 +379,7 @@ def test_cold_admission_jump_accepts_zero_and_flags_positive_side_limit(disabled
         # stronger inverse power still dominates Si2 in the exact limit.
         assert 'Si3' in admitted and 'Si2' not in admitted
         assert any('carrier admission flips at the solved surface oxygen; frozen-set solution used'
-                   in notice for notice in projected._carrier_admission_notices)
+                   in notice for notice in projected.carrier_admission_notices)
     finally:
         close_test_owned_magemin_backend(sim)
 
