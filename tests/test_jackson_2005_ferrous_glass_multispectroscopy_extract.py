@@ -30,6 +30,13 @@ def _grid() -> list[dict[str, str]]:
         return list(csv.DictReader(stream))
 
 
+def _elemental_formula(components) -> str:
+    return "".join(
+        element + ("" if amount == 1 else str(amount))
+        for element, amount in components
+    )
+
+
 def _typed_rows(document: dict, species: str, quantity: str) -> dict[str, tuple[dict, dict]]:
     rows = {}
     for observation in document["species"][species]["observations"]:
@@ -104,6 +111,7 @@ def test_render_transcription_pins_typed_rows_and_mutations_fail() -> None:
 
 def test_isolated_migration_preserves_species_composition_conditions_and_quench() -> None:
     document = _document()
+    formula_by_sample = {row["sample"]: row["sample_formula"] for row in _grid()}
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -160,12 +168,17 @@ def test_isolated_migration_preserves_species_composition_conditions_and_quench(
             assert observation.identity.composition is not None
             assert observation.identity.composition.is_value
             assert observation.identity.composition.value.amount_basis is AmountBasis.MOL_INVENTORY
-            source_composition = source["values"]["points"][0]["point_conditions"]["composition"]["state"]["value"]["components"]
-            assert dict(observation.identity.composition.value.components) == {
-                element: Decimal(amount) for element, amount in source_composition
-            }
+            sample_name = source["values"]["points"][0]["sample_as_published"]
+            assert (
+                _elemental_formula(observation.identity.composition.value.components)
+                == formula_by_sample[sample_name]
+            )
             assert conditions["temperature_K"].state.is_value
             assert conditions["composition"].state.is_value
+            assert (
+                _elemental_formula(conditions["composition"].state.value.components)
+                == formula_by_sample[sample_name]
+            )
             assert conditions["fO2_Pa"].state.is_unknown
             assert conditions["total_pressure_Pa"].state.value == Decimal("100000")
             assert source["values"]["points"][0]["quench_statement"]["preservation"] == "not_stated"
@@ -176,7 +189,13 @@ def test_isolated_migration_preserves_species_composition_conditions_and_quench(
             assert observation.identity.temperature_K is not None
             assert observation.identity.temperature_K.is_unknown
             assert observation.identity.composition is not None
+            sample_name = expected_sample
             assert observation.identity.composition.is_not_applicable
+            assert conditions["composition"].state.is_value
+            assert (
+                _elemental_formula(conditions["composition"].state.value.components)
+                == formula_by_sample[sample_name]
+            )
             assert observation.value.approximate is True
 
     expected_fe = {

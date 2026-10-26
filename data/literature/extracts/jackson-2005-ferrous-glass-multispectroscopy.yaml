@@ -603,7 +603,7 @@ species:
       point_conditions:
         sample_id: {state: {tag: value, value: NC1}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
         temperature_K: {state: {tag: unknown, reason: No temperature for the composition analysis is printed.}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
-        composition: {state: {tag: unknown, reason: 'The paper gives a normalized elemental formula and this individual Cr2O3 component, not a complete oxide composition.'}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+        composition: {state: {tag: value, value: {basis: elemental, amount_basis: mol_inventory, components: [[Na, '0.99'], [Ca, '0.92'], [Fe, '0.24'], [Si, '3.17'], [O, '8']]}}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt.%
@@ -622,7 +622,7 @@ species:
       point_conditions:
         sample_id: {state: {tag: value, value: NC2}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
         temperature_K: {state: {tag: unknown, reason: No temperature for the composition analysis is printed.}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
-        composition: {state: {tag: unknown, reason: 'The paper gives a normalized elemental formula and this individual Cr2O3 component, not a complete oxide composition.'}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
+        composition: {state: {tag: value, value: {basis: elemental, amount_basis: mol_inventory, components: [[Na, '1.09'], [Ca, '0.51'], [Fe, '0.72'], [Si, '3.10'], [O, '8']]}}, locator: {page: 2, published_page: 4316, pdf_page_index: 1, section: Sample Preparation}}
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt.%
