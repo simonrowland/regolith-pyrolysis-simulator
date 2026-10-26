@@ -8850,6 +8850,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "cp_150_k",
         "cp_200_k",
         "cp_298_15_k",
+        "value_kJ_mol-1_K-1",
         "value",
     ),
     Quantity.S: (
@@ -8863,6 +8864,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.H_MINUS_H298: (
         "enthalpy_increment",
         "H_minus_H298",
+        "H_rel_kJ_mol-1",
         "minus_delta_H_cool_kJ_mol-1",
         "value",
     ),
@@ -9196,6 +9198,8 @@ def _convert_compilation_amount(
             )
         ):
             return amount, "identity:J_per_mol_K"
+        if heat and token == "kjmol−1k−1casio3":
+            return amount * Decimal("1000"), "kJ_to_J_exact"
         if energy and token in {
             "kcal/mol",
             "kcal/mole",
@@ -9231,6 +9235,7 @@ def _convert_compilation_amount(
             "kj/mole",
             "kjpermol",
             "kjmol^-1",
+            "kjmol−1casio3",
         }:
             return amount, "identity:kJ_per_mol"
     return None

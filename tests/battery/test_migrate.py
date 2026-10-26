@@ -8603,6 +8603,83 @@ def test_l02_empirical_quantity_aliases_are_closed(alias: str, expected: Quantit
     assert QUANTITY_ALIASES[alias] is expected
 
 
+def test_adamkovicova_relative_enthalpy_points_migrate_with_phase_and_units() -> None:
+    extract = REPO_ROOT / "data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml"
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    source_id = "adamkovicova-1980-casio3-heat-of-fusion"
+    rows = {
+        observation.observation_id.removeprefix(f"{source_id}::").split(":h=", 1)[0]: observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == source_id
+        and "relative_enthalpy_measured_reduced::T=" in observation.observation_id
+    }
+    expected = {
+        "adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1506": ("448.8", Phase.CR),
+        "adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1576": ("459.8", Phase.CR),
+        "adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1630": ("466.3", Phase.CR),
+        "adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1678": ("474.2", Phase.CR),
+        "adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1730": ("483.1", Phase.CR),
+        "adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1780": ("492.5", Phase.CR),
+        "adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1829": ("557.6", Phase.L),
+        "adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1848": ("559.4", Phase.L),
+        "adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1859": ("561.2", Phase.L),
+        "adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1915": ("567.8", Phase.L),
+        "adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1961": ("577.9", Phase.L),
+    }
+    assert len(rows) == len(expected)
+    assert not migrator.result.validation.hard_issues
+    for row_id, (value, phase) in expected.items():
+        observation = rows[row_id]
+        assert observation.identity.quantity.value is Quantity.H_MINUS_H298
+        assert observation.identity.species.phase.value is phase
+        assert observation.identity.per.value is PerBasis.MOL_SPECIES
+        assert observation.identity.subtype.value == "H(T)-H(298 K)"
+        if phase is Phase.CR:
+            assert observation.identity.species.polymorph.value is Polymorph.ALPHA
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == Decimal(value)
+        assert observation.identity.temperature_K.is_value
+        assert observation.identity.temperature_K.value == Decimal(
+            row_id.rsplit("=", 1)[1]
+        )
+    assert not any(
+        entry.observation_id in {observation.observation_id for observation in rows.values()}
+        and "quantity" in (entry.axes or ())
+        for entry in migrator.result.queue
+    )
+    cp_rows = {
+        observation.observation_id.removeprefix(f"{source_id}::"): observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == source_id
+        and "melt_heat_capacity" in observation.observation_id
+    }
+    assert {
+        row_id: observation.value.point
+        for row_id, observation in cp_rows.items()
+    } == {
+        "adamkovicova_1980_melt_heat_capacity_stated": Decimal("149.85000"),
+        "adamkovicova_1980_prior_melt_heat_capacity_0_15073_quote": Decimal("150.73000"),
+        "adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote": Decimal("146.54000"),
+    }
+    assert all(
+        observation.identity.quantity.value is Quantity.CP
+        and observation.identity.species.phase.value is Phase.L
+        and observation.identity.per.value is PerBasis.MOL_SPECIES
+        for observation in cp_rows.values()
+    )
+    fit_rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == source_id
+        and "relative_enthalpy_fit_eq" in observation.observation_id
+    ]
+    assert len(fit_rows) == 2
+    assert all(observation.identity.quantity.is_unknown for observation in fit_rows)
+
+
 def test_l02_empirical_quantity_aliases_map_numeric_witnesses() -> None:
     cases = [
         (
@@ -10964,6 +11041,12 @@ def test_calorie_conventions_remain_distinct_and_unknown_variants_refuse() -> No
     assert _convert_compilation_amount(
         Decimal("1"), Quantity.H_MINUS_H298, "cal.16 mole−1"
     ) is None
+    assert _convert_compilation_amount(
+        Decimal("448.8"), Quantity.H_MINUS_H298, "kJ mol−1 CaSiO3"
+    ) == (Decimal("448.8"), "identity:kJ_per_mol")
+    assert _convert_compilation_amount(
+        Decimal("0.14985"), Quantity.CP, "kJ mol−1 K−1 CaSiO3"
+    ) == (Decimal("149.85000"), "kJ_to_J_exact")
     unknown = select_declared_source(
         Quantity.H_MINUS_H298,
         None,
