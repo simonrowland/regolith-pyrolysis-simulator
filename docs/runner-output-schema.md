@@ -277,11 +277,12 @@ prediction with `provider_outcome: "numerical_failure"`,
 `authority: "extrapolated"`. The notice preserves the nested provider and
 projected-solve diagnostics, warnings, and certified temperature/composition
 band; the failed solver's bounds do not determine the prediction. Numerical
-failures are excluded from local, shared, and persistent memo admission. OS
-process-launch failures, including any `OSError` raised while launching the
-binary, remain typed environment refusals and never become numerical
-predictions. Stable MAGEMin domain refusals retain the qualified Kress91
-extrapolation without dispatching another engine.
+failures are excluded from local, shared, and persistent memo admission.
+Launch-time `OSError`, `subprocess.SubprocessError`, and `MemoryError` failures
+remain typed environment refusals and never become numerical predictions;
+ordinary programming exceptions propagate as errors. Stable MAGEMin domain
+refusals retain the qualified Kress91 extrapolation without dispatching another
+engine.
 
 ```jsonc
 "run_metadata": {
@@ -971,9 +972,9 @@ incident, stuck, re-evaporated, and net continuous flux and has
     band. These numerical failures do not enter gate-curve memo admission. A
     stable MAGEMin domain extension carries the same refusal detail with
     `out_of_domain_kress91_floor_prediction`; both predictions survive cache
-    replay. Environment failures such as MAGEMin OS launch errors remain typed
-    refusals and do not produce an hourly floor prediction. Exchange fields
-    retain the ledger-committed O2
+    replay. Launch-time `OSError`, `subprocess.SubprocessError`, and
+    `MemoryError` failures remain typed refusals and do not produce an hourly
+    floor prediction. Exchange fields retain the ledger-committed O2
     amount, unbacked remainder, direction and clamp status, including `false`
     when only the gate record caused the diagnostics object to be emitted.
   * `mass_balance_error_category` -- added inline by `build_per_hour_summary`

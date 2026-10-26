@@ -2727,7 +2727,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             == _MAGEMinEngineLifecycleError.__name__
                             else _MAGEMinEngineCallError
                         )
-                        raise error_type(exception_type, engine_message) from exc
+                        raise error_type(
+                            exception_type,
+                            engine_message,
+                            failure_disposition=exc.failure_disposition,
+                        ) from exc
 
                     remote_exception = getattr(builtins, exc.exc_name, None)
                     remote_message = (
@@ -2957,24 +2961,31 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         timeout=remaining_timeout_s,
                         check=False,
                     )
-                    if capture_native_activities:
-                        matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
-                        matlab_text = (
-                            matlab_path.read_text()
-                            if matlab_path.exists()
-                            else ''
-                        )
                 except subprocess.TimeoutExpired as exc:
                     raise _MAGEMinEngineCallError(
                         type(exc).__name__, f'MAGEMin binary timed out after '
-                        f'{timeout_s:g}s'
+                        f'{timeout_s:g}s',
+                        failure_disposition='environment',
+                    ) from exc
+                except (subprocess.SubprocessError, MemoryError) as exc:
+                    raise _MAGEMinEngineCallError(
+                        type(exc).__name__,
+                        f'MAGEMin binary launch failed: {exc}',
+                        failure_disposition='environment',
                     ) from exc
                 except OSError as exc:
                     raise _MAGEMinEngineCallError(
                         type(exc).__name__,
                         f'MAGEMin binary could not be executed: {exc}',
-                        failure_disposition='environment_os_error',
+                        failure_disposition='environment',
                     ) from exc
+                if capture_native_activities:
+                    matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
+                    matlab_text = (
+                        matlab_path.read_text()
+                        if matlab_path.exists()
+                        else ''
+                    )
 
         if completed.returncode != 0:
             stderr = (completed.stderr or '').strip()

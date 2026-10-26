@@ -2727,7 +2727,7 @@ def gate_curve_provider_outcome_for_status(
 
     normalized_status = str(status).strip().lower()
     reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
-    if "environment_os_error" in reasons:
+    if "environment" in reasons:
         return GateCurveProviderOutcome.FAILED
     if any(reason in {
         "missing_input", "invalid_input", "invalid_fo2_log",

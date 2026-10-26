@@ -90,11 +90,18 @@ def _discard_engine_pool(pool: 'EngineWorkerPool') -> None:
 class EngineWorkerRemoteError(RuntimeError):
     """An engine request raised inside its isolated worker."""
 
-    def __init__(self, exc_name: str, detail: str, remote_traceback: str):
+    def __init__(
+        self,
+        exc_name: str,
+        detail: str,
+        remote_traceback: str,
+        failure_disposition: Optional[str] = None,
+    ):
         super().__init__(detail)
         self.exc_name = exc_name
         self.detail = detail
         self.remote_traceback = remote_traceback
+        self.failure_disposition = failure_disposition
 
 
 class EngineWorkerPoolLifecycleError(RuntimeError):
@@ -274,6 +281,7 @@ def _run_engine_worker(
                 connection.send((
                     'error', type(exc).__name__, str(exc),
                     traceback.format_exc(),
+                    getattr(exc, 'failure_disposition', None),
                 ))
     except EngineWorkerTimeout as exc:  # pragma: no cover - nested bootstrap
         try:
@@ -289,6 +297,7 @@ def _run_engine_worker(
         try:
             connection.send((
                 'error', type(exc).__name__, str(exc), traceback.format_exc(),
+                getattr(exc, 'failure_disposition', None),
             ))
         except BaseException:
             pass
@@ -575,8 +584,11 @@ class WarmEngineWorker:
                 expected_process=process,
                 expected_connection=parent,
             )
-            _tag, exc_name, detail, remote_traceback = message
-            raise EngineWorkerRemoteError(exc_name, detail, remote_traceback)
+            _tag, exc_name, detail, remote_traceback, *metadata = message
+            failure_disposition = metadata[0] if metadata else None
+            raise EngineWorkerRemoteError(
+                exc_name, detail, remote_traceback, failure_disposition,
+            )
         with self._state_lock:
             if (
                 self.disabled
@@ -797,7 +809,8 @@ class WarmEngineWorker:
                 timeout_s,
                 phase=phase,
             )
-        _tag, exc_name, detail, remote_traceback = message
+        _tag, exc_name, detail, remote_traceback, *metadata = message
+        failure_disposition = metadata[0] if metadata else None
         _pool_debug(
             f'{self.name}: remote error {exc_name}: {str(detail)[:120]}'
         )
@@ -806,7 +819,9 @@ class WarmEngineWorker:
             expected_process=process,
             expected_connection=connection,
         )
-        raise EngineWorkerRemoteError(exc_name, detail, remote_traceback)
+        raise EngineWorkerRemoteError(
+            exc_name, detail, remote_traceback, failure_disposition,
+        )
 
     def _discard_current(
         self,
