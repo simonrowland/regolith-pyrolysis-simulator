@@ -417,9 +417,10 @@ def test_1800_k_pre_switch_physics_pin() -> None:
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "61e9be015d7f7fc80787b36f2836523b4094950b6fb8d1a0fa917cdb882cf2b1"
+    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "ccdfb94254defeb15f302b251c93dc46ab420c1a83b43b3a78bd4ceb718c8368"
+    ).hexdigest() == "7f0cbcb90a852319495d1eaf070ab30efa5d4361413d01e7bcfb57934e8ea102"
 
 
 @pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])
