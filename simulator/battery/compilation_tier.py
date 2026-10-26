@@ -1843,12 +1843,22 @@ def _vaporock_gas_attempt(
     *,
     origin: str,
 ) -> ThermoAttempt:
+    if (
+        identity.species is None
+        or quantity not in _engine_thermo_quantities(Engine.VAPOROCK)
+    ):
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "engine-thermo-does-not-emit",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value},
+        )
     phase = identity.species.phase
     if (
         not isinstance(phase, State)
         or not phase.is_value
         or phase.value is not Phase.G
-        or quantity not in _engine_thermo_quantities(Engine.VAPOROCK)
     ):
         return _refuse(
             RefusalReason.UNSUPPORTED,
@@ -2735,7 +2745,11 @@ def _cell_from_observation(
 
         headline_rail = rail_for_quantity(
             token,
-            species_formula=observation.identity.species.formula,
+            species_formula=(
+                observation.identity.species.formula
+                if observation.identity.species is not None
+                else ""
+            ),
         )
         if headline_rail is not None:
             rail = headline_rail.value
@@ -2775,7 +2789,12 @@ def _tier_cell_from_payload(
     rail = NO_HEADLINE_RAIL_TOKEN
     if isinstance(observation.identity, Identity):
         headline_rail = rail_for_quantity(
-            token, species_formula=observation.identity.species.formula
+            token,
+            species_formula=(
+                observation.identity.species.formula
+                if observation.identity.species is not None
+                else ""
+            ),
         )
         if headline_rail is not None:
             rail = headline_rail.value
@@ -3181,6 +3200,8 @@ def _refusal_key(reason: RefusalReason, detail: Mapping[str, object]) -> str:
 
 
 def _nasa9_fit_phase_label(identity: Identity) -> str | None:
+    if identity.species is None:
+        return None
     phase = phase_token(identity.species)
     if not isinstance(phase, Phase):
         return None
@@ -3466,7 +3487,12 @@ def compilation_tier_census(
     measured: dict[str, int] = defaultdict(int)
     for obs in comparison_candidates(context):
         quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
-        formula = obs.identity.species.formula if isinstance(obs.identity, Identity) else ""
+        formula = (
+            obs.identity.species.formula
+            if isinstance(obs.identity, Identity)
+            and obs.identity.species is not None
+            else ""
+        )
         rail = rail_for_quantity(quantity, species_formula=formula)
         measured[NO_HEADLINE_RAIL_TOKEN if rail is None else rail.value] += 1
 
@@ -3563,6 +3589,7 @@ def compilation_tier_census(
         vaporock_gas_table = (
             engine is Engine.VAPOROCK
             and isinstance(observation.identity, Identity)
+            and observation.identity.species is not None
             and isinstance(observation.identity.species.phase, State)
             and observation.identity.species.phase.is_value
             and observation.identity.species.phase.value is Phase.G

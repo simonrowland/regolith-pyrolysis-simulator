@@ -10,6 +10,7 @@ from simulator.battery.enums import (
     BoundDirection,
     BoundInclusivity,
     Engine,
+    EvidenceClass,
     ExecutionState,
     IdentityEqualKind,
     Quantity,
@@ -17,6 +18,10 @@ from simulator.battery.enums import (
     ReferenceStateConvention,
     ResidualStatus,
     ValueKind,
+)
+from simulator.battery.compilation_tier import (
+    compilation_tier_lines,
+    compilation_tier_lines_from_payloads,
 )
 from simulator.battery.identity import identity_equal, profile_for, quantity_token
 from simulator.battery.migrate import (
@@ -27,7 +32,13 @@ from simulator.battery.migrate import (
     to_plain,
 )
 from simulator.battery.records import Reaction, State, Value
-from simulator.battery.score import ScoreContext, compile_residual
+from simulator.battery.score import (
+    ScoreContext,
+    compile_residual,
+    paired_quench_diagnostics,
+    residual_to_plain,
+)
+from simulator.battery.source_oxygen import _lineage
 from simulator.battery.validate import validate_observation
 
 
@@ -335,3 +346,96 @@ def test_reaction_equilibrium_scoring_refuses_without_dropping_source_value(
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.UNSUPPORTED
     assert residual.refusal.detail["reason"] == "quantity_not_predicted"
+
+
+def test_species_free_reaction_is_safe_in_score_report_diagnostics(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_fixture(tmp_path)
+    context = ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations=result.observations,
+        root=tmp_path,
+    )
+
+    assert paired_quench_diagnostics(context) == ()
+
+
+def test_species_free_reaction_is_not_an_oxygen_lineage_parent(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_fixture(tmp_path)
+    parent = result.observations[
+        "t1522-reaction-fixture::exchange-point"
+    ]
+    child = replace(
+        parent,
+        observation_id="t1522-reaction-fixture::linked-child",
+        derived_from=(parent.observation_id,),
+    )
+
+    assert _lineage(
+        child,
+        {parent.observation_id: parent, child.observation_id: child},
+    ) is None
+
+
+def test_bench_readiness_report_handles_species_free_reaction(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import scripts.bench_readiness as readiness
+
+    result = _migrate_fixture(tmp_path)
+    monkeypatch.setattr(
+        readiness,
+        "load_migrated_store",
+        lambda _root: (result.works, result.experiments, result.observations),
+    )
+    monkeypatch.setattr(readiness, "load_migrated_benches", lambda _root: result.benches)
+
+    report = readiness.report(tmp_path)
+
+    assert report["source_count"] == 1
+    assert report["sources"][0]["experiments"]
+
+
+@pytest.mark.parametrize(
+    "payload_mode",
+    (False, True),
+    ids=("typed-record", "payload"),
+)
+def test_compilation_renderers_keep_species_free_reaction_refusal(
+    tmp_path: Path, payload_mode: bool
+) -> None:
+    result = _migrate_fixture(tmp_path)
+    observation = result.observations[
+        "t1522-reaction-fixture::exchange-point"
+    ]
+    observation = replace(
+        observation,
+        evidence=replace(
+            observation.evidence,
+            class_=State.of(EvidenceClass.COMPILATION_ASSESSED),
+        ),
+    )
+    result.observations[observation.observation_id] = observation
+    context = ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations=result.observations,
+        root=tmp_path,
+    )
+    residual, _candidate = compile_residual(
+        observation, Engine.INTERNAL_ANALYTICAL, context=context
+    )
+    renderer = (
+        compilation_tier_lines_from_payloads
+        if payload_mode
+        else compilation_tier_lines
+    )
+    rows = [residual_to_plain(residual)] if payload_mode else [residual]
+
+    lines = renderer(rows, result.observations)
+
+    assert any("log10_K_reaction" in line for line in lines)

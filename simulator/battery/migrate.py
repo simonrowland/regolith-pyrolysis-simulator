@@ -14708,8 +14708,9 @@ class Migrator:
             ).oxygen_partial_pressure_Pa
             if (
                 source is None or source.source_id != source_id
-                or source.identity.species.formula not in {"O", "O2"}
                 or _quantity_token(source.identity.quantity) is not Quantity.P_PARTIAL
+                or source.identity.species is None
+                or source.identity.species.formula not in {"O", "O2"}
                 or point is None or point != printed
             ):
                 self.result.registry_issues.append(ValidationIssue(

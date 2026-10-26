@@ -4967,10 +4967,14 @@ def oxygen_is_scorer_input(
     quantity = quantity_token(identity)
     from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
 
-    redox = multivalent_components(
-        composition,
-        identity.species.formula,
-        oxide_aliases=MELTS_OXIDE_ALIASES,
+    redox = (
+        multivalent_components(
+            composition,
+            identity.species.formula,
+            oxide_aliases=MELTS_OXIDE_ALIASES,
+        )
+        if quantity in MELT_ACTIVITY_QUANTITIES
+        else ()
     )
     if quantity in MELT_ACTIVITY_QUANTITIES:
         if redox:
@@ -5417,9 +5421,9 @@ def paired_quench_diagnostics(
         if not isinstance(identity, Identity):
             continue
         quantity = quantity_token(identity)
-        phase = phase_token(identity.species)
         if quantity not in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
             continue
+        phase = phase_token(identity.species)
         if phase not in {Phase.L, Phase.GLASS}:
             continue
         if not observation.source_id:
@@ -6484,7 +6488,11 @@ def _implied_alpha_activity_observation(observation: Observation) -> Observation
     """
 
     metadata = _implied_alpha_metadata(observation)
-    if metadata is None or not isinstance(observation.identity, Identity):
+    if (
+        metadata is None
+        or not isinstance(observation.identity, Identity)
+        or observation.identity.species is None
+    ):
         return None
     oxide = str(metadata["oxide_formula"])
     coefficient_formula = _IMPLIED_ALPHA_SINGLE_CATION_FORMULAS.get(oxide, oxide)
@@ -6525,6 +6533,8 @@ def _implied_alpha_coefficient_basis_matches(
     if not isinstance(expected_identity, Identity) or not isinstance(
         actual_identity, Identity
     ):
+        return False
+    if expected_identity.species is None or actual_identity.species is None:
         return False
     if actual_identity.species.formula != expected_identity.species.formula:
         return False
@@ -10164,7 +10174,7 @@ def _is_bulk_not_liquid_composition(observation: Observation) -> bool:
     """Read the source's two-phase marker; never classify from composition values."""
 
     identity = observation.identity
-    if isinstance(identity, Identity):
+    if isinstance(identity, Identity) and identity.species is not None:
         phase = identity.species.phase
         if isinstance(phase, State) and phase.is_unknown:
             reason = phase.reason or ""
@@ -12494,11 +12504,14 @@ def _e15_axis_component(observation: Observation, series: str) -> str | None:
         return "SiO2"
     if "_pO_prime_" in series:
         return "Al2O3"
-    if observation.identity.species.formula in {"Ca", "CaO"}:
+    species = observation.identity.species
+    if species is None:
+        return None
+    if species.formula in {"Ca", "CaO"}:
         return "CaO"
-    if observation.identity.species.formula in {"SiO", "SiO2"}:
+    if species.formula in {"SiO", "SiO2"}:
         return "SiO2"
-    if observation.identity.species.formula in {"Al", "AlO", "Al2O3", "O"}:
+    if species.formula in {"Al", "AlO", "Al2O3", "O"}:
         return "Al2O3" if "_pO_" not in series else "CaO"
     return None
 
@@ -12761,6 +12774,7 @@ def _e15_condensed_phase(observation: Observation) -> str | None:
     if (
         observation.source_id == "kems-053-stolyarova-1991"
         and isinstance(identity, Identity)
+        and identity.species is not None
         and identity.species.formula == "SiO2"
     ):
         return "cr"
