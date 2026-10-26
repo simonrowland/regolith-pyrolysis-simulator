@@ -5657,20 +5657,44 @@ class _FeRedoxRefusal:
 def _open_cached_battery_handle(
     engine: Engine,
     handles: Mapping[str, object] | None,
-) -> object:
-    """Open one battery engine, reusing a live handle and dropping a dead one."""
+) -> tuple[object, bool]:
+    """Open or reuse a battery engine, reporting whether this caller owns it."""
 
-    from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        close_battery_engine_handle,
+        open_battery_engine,
+    )
 
     handle_map: Mapping[str, object] = {} if handles is None else handles
     handle = handle_map.get(engine.value)
+    backend = None if handle is None else getattr(handle, "backend", None)
+    backend_available = getattr(backend, "is_available", None)
+    try:
+        backend_live = (
+            bool(backend_available() if callable(backend_available) else backend_available)
+            if backend_available is not None
+            else True
+        )
+    except Exception:  # noqa: BLE001 - a failed liveness probe is a dead handle
+        backend_live = False
     if handle is not None and (
         not getattr(handle, "available", False)
-        or getattr(handle, "backend", None) is None
+        or backend is None
+        or not backend_live
     ):
+        try:
+            close_battery_engine_handle(handle)
+        except Exception:  # noqa: BLE001 - retire dead entry and try a fresh worker
+            pass
+        for field, value in (("backend", None), ("available", False)):
+            try:
+                setattr(handle, field, value)
+            except (AttributeError, TypeError):
+                pass
         if isinstance(handle_map, dict):
             handle_map.pop(engine.value, None)
         handle = None
+    owned_handle = True
     if handle is None:
         handle = open_battery_engine(engine.value)
         if (
@@ -5679,7 +5703,10 @@ def _open_cached_battery_handle(
             and getattr(handle, "backend", None) is not None
         ):
             handle_map[engine.value] = handle
-    return handle
+            owned_handle = False
+    else:
+        owned_handle = False
+    return handle, owned_handle
 
 
 def _printed_condition_decimal(observation: Observation, key: str) -> Decimal | None:
@@ -6016,7 +6043,7 @@ def _predict_fe_redox(
     if fo2_log is None and melts:
         # Missing printed fO2 is a refusal unless this engine computes its own.
         # The flag is on the opened handle, not a hardcoded engine name.
-        handle = _open_cached_battery_handle(engine, handles)
+        handle, _owns_handle = _open_cached_battery_handle(engine, handles)
         if not getattr(handle, "available", False) or getattr(
             handle, "backend", None
         ) is None:
@@ -6270,7 +6297,7 @@ def _predict_fe_redox(
         )
 
     if handle is None:
-        handle = _open_cached_battery_handle(engine, handles)
+        handle, _owns_handle = _open_cached_battery_handle(engine, handles)
         if (
             not getattr(handle, "available", False)
             or getattr(handle, "backend", None) is None
@@ -7298,12 +7325,7 @@ def _equilibrate_phase_assemblage(
 
     import inspect
 
-    # The scorer owns a mutable shared cache; a standalone prediction owns
-    # its temporary handle and closes it below.
-    owns_handle = not isinstance(handles, dict) and (
-        handles is None or handles.get(engine.value) is None
-    )
-    handle = _open_cached_battery_handle(engine, handles)
+    handle, owns_handle = _open_cached_battery_handle(engine, handles)
     backend = getattr(handle, "backend", None)
     if backend is None:
         reason = getattr(handle, "unavailable_reason", None) or "backend unavailable"
@@ -7332,9 +7354,11 @@ def _equilibrate_phase_assemblage(
         return backend.equilibrate(**kwargs)
     finally:
         if owns_handle:
-            close = getattr(backend, "close", None)
-            if callable(close):
-                close()
+            from simulator.diagnostic_helpers.binary_pot_battery import (
+                close_battery_engine_handle,
+            )
+
+            close_battery_engine_handle(handle)
 
 
 def _phase_role_value(identity: Identity, name: str) -> PhaseRole | None:
@@ -7853,6 +7877,50 @@ def _predict_mass_loss_with_residue(
 
 
 def predict_with_engine(
+    engine: Engine,
+    observation: Observation,
+    *,
+    handles: Mapping[str, object] | None = None,
+    isolated: bool | None = None,
+    experiment: Experiment | None = None,
+    bench: Bench | None = None,
+) -> EnginePrediction:
+    """Dispatch one engine and close any handle opened for this call."""
+
+    if isinstance(handles, dict):
+        return _predict_with_engine(
+            engine,
+            observation,
+            handles=handles,
+            isolated=isolated,
+            experiment=experiment,
+            bench=bench,
+        )
+
+    provided_handles = handles or {}
+    resolved_handles = dict(provided_handles)
+    try:
+        return _predict_with_engine(
+            engine,
+            observation,
+            handles=resolved_handles,
+            isolated=isolated,
+            experiment=experiment,
+            bench=bench,
+        )
+    finally:
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            close_battery_engine_handles,
+        )
+
+        close_battery_engine_handles(
+            resolved_handles,
+            exclude=provided_handles,
+            active_error=sys.exc_info()[1],
+        )
+
+
+def _predict_with_engine(
     engine: Engine,
     observation: Observation,
     *,
@@ -8758,7 +8826,7 @@ def predict_with_engine(
             requested_composition=requested,
         )
 
-    handle = _open_cached_battery_handle(engine, handles)
+    handle, _owns_handle = _open_cached_battery_handle(engine, handles)
     name = str(getattr(handle, "name", engine.value))
     engine_version: str | None = None
     if engine is Engine.OPENIMCC:
@@ -11803,33 +11871,15 @@ def _score_store_with_decisions(
                             )
                             last_progress = now
     finally:
-        active_error = sys.exc_info()[1]
-        close_errors: list[BaseException] = []
-        for name, handle in resolved_handles.items():
-            if provided_handles.get(name) is handle:
-                continue
-            backend = getattr(handle, "backend", None)
-            close = getattr(backend, "close", None)
-            if callable(close):
-                try:
-                    close()
-                except BaseException as exc:  # noqa: BLE001 - close every owned handle
-                    close_errors.append(exc)
-        if close_errors:
-            if active_error is not None:
-                for error in close_errors:
-                    add_note = getattr(active_error, "add_note", None)
-                    if callable(add_note):
-                        add_note(f"engine handle cleanup failed: {error!r}")
-                if not callable(getattr(active_error, "add_note", None)):
-                    raise active_error from close_errors[0]
-            else:
-                first_error = close_errors[0]
-                for error in close_errors[1:]:
-                    add_note = getattr(first_error, "add_note", None)
-                    if callable(add_note):
-                        add_note(f"additional engine handle cleanup failure: {error!r}")
-                raise first_error
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            close_battery_engine_handles,
+        )
+
+        close_battery_engine_handles(
+            resolved_handles,
+            exclude=provided_handles,
+            active_error=sys.exc_info()[1],
+        )
 
     if _stream is not None:
         _stream.finalize(
