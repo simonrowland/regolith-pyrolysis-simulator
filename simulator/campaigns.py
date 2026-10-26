@@ -622,6 +622,22 @@ class CampaignManager:
         cfg = self.campaigns.get(self._campaign_config_key(campaign), {})
         return cfg if isinstance(cfg, dict) else {}
 
+    @staticmethod
+    def _apply_recipe_endpoint_defaults(setpoints: dict, setpoints_patch: Mapping) -> None:
+        """Resolve the final-pass default while explicit selection is known.
+
+        Merged setpoints cannot distinguish an explicitly selected 30 h cap
+        from the ordinary default. Both routes then use the same data-owned
+        final-pass default and existing runtime-alias precedence.
+        """
+        campaigns = setpoints_patch.get('campaigns', {})
+        cfg = campaigns.get('C2A_continuous', {}) if isinstance(campaigns, Mapping) else {}
+        if not isinstance(cfg, Mapping) or 'max_hold_hr' not in cfg:
+            return
+        final_pass = setpoints['campaigns']['C2A_continuous'].get('post_mg_final_pass')
+        if isinstance(final_pass, dict):
+            final_pass['max_hold_hr'] = cfg['max_hold_hr']
+
     @classmethod
     def _campaign_phases_for_override_key(
             cls, campaign_name: str) -> Tuple[CampaignPhase, ...]:
@@ -3321,7 +3337,7 @@ class CampaignManager:
         elif current == CampaignPhase.C4:
             if self.c5_enabled:
                 return CampaignPhase.C5
-            # Keep the post-Mg route and scoped-over-recipe precedence intact.
+            # The selected recipe cap has already resolved this data default.
             final_pass = self._campaign_config(CampaignPhase.C2A).get('post_mg_final_pass', {})
             self._pending_post_mg_c2a_overrides = {
                 'min_hold_hr': self._endpoint_float(CampaignPhase.C2A, final_pass, 'min_hold_hr'),

@@ -22,6 +22,8 @@ from simulator.campaigns import (
 )
 from simulator.core import PyrolysisSimulator
 from simulator.runner import _attach_c0_exit_notice, _attach_campaign_endpoint_outcomes
+from simulator.runner import PyrolysisRun
+from simulator.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.state import (
     BatchRecord,
     CampaignPhase,
@@ -117,9 +119,9 @@ def test_green_endpoint_tick_pin_never_depleting_tail(phase, path, branch, ticks
 
 
 @pytest.mark.parametrize("path", ["A", "A_staged", "B"])
-def test_green_post_mg_c2a_scope_and_recipe_shadow_pin(path):
+def test_green_post_mg_c2a_scoped_defaults_pin(path):
     setpoints = _setpoints()
-    # Green's scoped runtime cap shadows this otherwise-valid recipe cap.
+    # A configured nominal cap is not an explicit recipe selection.
     setpoints["campaigns"]["C2A_continuous"]["max_hold_hr"] = 40.0
     manager = CampaignManager(setpoints)
     record = BatchRecord(path=path)
@@ -136,6 +138,47 @@ def test_green_post_mg_c2a_scope_and_recipe_shadow_pin(path):
     for hour, expected in [(158, False), (159, True)]:
         melt.campaign_hour = hour
         assert manager.check_endpoint(melt, _flux(1.0), CondensationTrain(), record) is expected
+
+
+@pytest.mark.parametrize("path", ["A", "A_staged", "B"])
+@pytest.mark.parametrize("cap", [18, 30, 120, 160])
+def test_selected_recipe_cap_wins_post_mg_default(path, cap):
+    patch = RecipePatch({("campaigns", "C2A_continuous", "max_hold_hr"): cap})
+    config = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        setpoints_patch=RecipeSchema().to_setpoints_patch(patch),
+    )._session_config()
+    manager = CampaignManager(config.setpoints)
+    manager.overrides.update(config.runtime_campaign_overrides)
+    record = BatchRecord(path=path)
+    assert manager.get_next_campaign(CampaignPhase.C4, record) == CampaignPhase.C2A
+    melt = _melt(CampaignPhase.C2A, 0)
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+    for hour, expected in [(cap - 2, False), (cap - 1, True)]:
+        melt.campaign_hour = hour
+        assert manager.check_endpoint(melt, _flux(1.0), CondensationTrain(), record) is expected
+    assert manager.last_termination["winning_condition"] == "operator_wall_budget"
+    assert manager.last_termination["observed"] == cap
+    assert manager.last_termination["threshold"] == cap
+
+
+@pytest.mark.parametrize("cap", [17, 161])
+def test_post_mg_recipe_cap_outside_data_bounds_refuses(cap):
+    with pytest.raises(RecipeValidationError):
+        RecipeSchema().to_setpoints_patch(RecipePatch({
+            ("campaigns", "C2A_continuous", "max_hold_hr"): cap,
+        }))
+
+
+@pytest.mark.parametrize("alias", ["max_hours", "hold_time_h", "duration_h"])
+def test_selected_recipe_cap_preserves_explicit_runtime_aliases(alias):
+    overrides = {"C2A": {alias: 40.0}}
+    config = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        setpoints_patch={"campaigns": {"C2A_continuous": {"max_hold_hr": 120}}},
+        runtime_campaign_overrides=overrides,
+    )._session_config()
+    assert config.runtime_campaign_overrides == overrides
 
 
 @pytest.mark.parametrize("phase,minimum,species", [

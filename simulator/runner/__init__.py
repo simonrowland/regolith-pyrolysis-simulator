@@ -1189,6 +1189,7 @@ class PyrolysisRun:
         feedstocks = bundle.feedstocks
         setpoints = copy.deepcopy(bundle.setpoints)
         setpoints = _deep_merge_setpoints(setpoints, self.setpoints_patch)
+        CampaignManager._apply_recipe_endpoint_defaults(setpoints, self.setpoints_patch)
         if self.high_t_melt_activity is not None:
             setpoints = _deep_merge_setpoints(
                 setpoints,
