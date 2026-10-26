@@ -2,6 +2,8 @@
 
 from copy import deepcopy
 from dataclasses import replace
+import errno
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -208,6 +210,61 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
             'backend_status_reason'
         ] == ('silicate_window' if status == 'out_of_domain' else reason)
         assert 'injected projected-bulk solve refusal' in diagnostics[-1]['backend_warnings']
+        assert sim.atom_ledger.mol_by_account() == before
+    finally:
+        backend.close()
+
+
+@pytest.mark.parametrize(('error_type', 'error_number'), [
+    (BlockingIOError, errno.EAGAIN),
+    (ConnectionResetError, errno.ECONNRESET),
+    (FileNotFoundError, errno.ENOENT),
+    (OSError, errno.EMFILE),
+])
+def test_actual_magemin_launch_oserror_is_typed_environment_refusal(
+    monkeypatch, error_type, error_number,
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+    backend = MAGEMinBackend()
+    assert backend.initialize({})
+    backend._subprocess_pool = None
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    provider._backend = backend
+    provider._backend_initialised = True
+    calls = []
+    diagnostics = []
+    original_dispatch = sim._dispatch_only
+
+    def fail_launch(*args, **kwargs):
+        calls.append((args, kwargs))
+        raise error_type(error_number, 'injected process launch failure')
+
+    def dispatch(*args, **kwargs):
+        result = original_dispatch(*args, **kwargs)
+        if args[0] is ChemistryIntent.GATE_LIQUID_FRACTION:
+            diagnostics.append(result.diagnostic)
+        return result
+
+    monkeypatch.setattr('simulator.melt_backend.magemin.subprocess.run', fail_launch)
+    monkeypatch.setattr(sim, '_dispatch_only', dispatch)
+    before = sim.atom_ledger.mol_by_account()
+    try:
+        with pytest.raises(EvaporationFluxRefusal) as error:
+            sim._melt_redox_liquidus_gate_curve()
+
+        assert error.value.diagnostic['reason'] == 'liquid_fraction_provider_failed'
+        assert error.value.diagnostic['outcome'] is GateCurveProviderOutcome.FAILED
+        assert diagnostics
+        projected = diagnostics[-1]['backend_diagnostics'][
+            'projected_liquidus_diagnostics'
+        ]
+        assert projected['backend_failure_exception'] == error_type.__name__
+        assert projected['backend_failure_disposition'] == 'environment_os_error'
+        assert calls
         assert sim.atom_ledger.mol_by_account() == before
     finally:
         backend.close()
