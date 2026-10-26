@@ -66,7 +66,7 @@ same-tick Fe redox re-speciation chain.
 from __future__ import annotations
 
 import math
-from simulator.vapour_rail.batch import _carrier_numerical_floor
+from simulator.vapour_rail.batch import _carrier_numerical_floor, _oxygen_coproduct_enters_gas
 
 from collections.abc import Mapping
 from typing import Any
@@ -341,13 +341,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         if O2_kg > 0.0:
             o2_formula = resolve_species_formula("O2", registry)
             o2_mol = O2_kg / o2_formula.molar_mass_kg_per_mol()
-            if (
-                oxygen_destination == "reservoir.fo2_buffer"
-                or (
-                    not oxygen_destination
-                    and vapor_oxygen_atoms <= 0.0
-                )
-            ):
+            if not _oxygen_coproduct_enters_gas(oxygen_destination, vapor_oxygen_atoms):
                 credits["reservoir.fo2_buffer"] = {"O2": o2_mol}
             else:
                 overhead_credit["O2"] = o2_mol

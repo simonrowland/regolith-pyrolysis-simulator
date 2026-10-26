@@ -19,6 +19,14 @@ from typing import Any
 from simulator.vapour_rail.activity import SourceReactionActivity
 
 
+def _oxygen_coproduct_enters_gas(oxygen_destination, vapor_oxygen_atoms):
+    """Positive evaporation coproduct follows its declared ledger receiver."""
+    return not (
+        oxygen_destination == 'reservoir.fo2_buffer'
+        or (not oxygen_destination and vapor_oxygen_atoms <= 0.0)
+    )
+
+
 def _carrier_numerical_floor(species, frozen_carriers, ordinary_floor):
     """Apply numerical admission once, then retain positive fixed-set flows.
 
