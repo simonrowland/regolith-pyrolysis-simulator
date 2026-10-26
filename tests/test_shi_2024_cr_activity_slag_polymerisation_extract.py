@@ -5,8 +5,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import NoticeKind, ValueKind
 from simulator.battery.migrate import Migrator
+from tests.battery.test_b716_composition_role import _assert_initial_charge_is_context
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -77,8 +78,13 @@ def test_shi_tables_migrate_printed_values_species_and_run_conditions():
                     assert record.identity.fO2_Pa.is_value
                     assert record.identity.fO2_Pa.value == Decimal("0.0000026040525")
                     assert record.identity.composition is not None
-                    assert record.identity.composition.is_value
-                    assert record.point_conditions["composition"].state.value.proxy_flag == "initial_charge_only"
+                    assert record.identity.composition.is_unknown
+                    _assert_initial_charge_is_context(record.point_conditions)
+                    assert any(
+                        notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+                        and "composition_role=initial_charge_only" in notice.reason
+                        for notice in record.notices
+                    )
                     assert item["standard_state"] in {
                         "pure liquid CrO(l), explicit in Eq. (8)",
                         "pure solid CrO1.5(s), explicit in Eq. (11)",
@@ -90,7 +96,11 @@ def test_shi_tables_migrate_printed_values_species_and_run_conditions():
                     # solid reference is represented by the schema's crystal phase.
                     assert reference.value.endmember.phase.value.value == ("l" if formula == "CrO" else "cr")
                 assert record.locator.page == item["locator"]["page"]
-                assert record.point_conditions["composition"].locator.page == 3
+                if item["values"]["quantity"] in {"activity", "activity_coefficient"}:
+                    assert record.point_conditions["printed_composition"].locator.page == record.locator.page
+                    assert record.point_conditions["composition"].locator.page == item["locator"]["page"]
+                else:
+                    assert record.point_conditions["composition"].locator.page == 3
                 if item["values"]["quantity"] == "equilibrium_phase_composition":
                     assert record.identity.composition is not None
                     assert not record.identity.composition.is_value
