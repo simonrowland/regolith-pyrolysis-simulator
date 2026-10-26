@@ -21,6 +21,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.accounting import resolve_species_formula
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.condensation import CondensationModel
 from simulator.core import PyrolysisSimulator
@@ -43,6 +44,7 @@ from simulator.state import (
     MOLAR_MASS,
     MeltState,
 )
+from simulator.evaporation import EvaporationFluxRefusal
 
 
 def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distinct():
@@ -161,6 +163,37 @@ def test_catalog_generated_carriers_reach_overhead_partial_pressures():
     assert gas.composition["TiO2_gas"] == pytest.approx(
         gas.composition["CaO_gas"]
     )
+
+
+def test_formula_only_carrier_contributes_to_overhead_partial_pressure():
+    carrier = "NaAlSi3O8"
+    assert carrier not in MOLAR_MASS
+    carrier_mass = resolve_species_formula(carrier).molar_mass_g_per_mol()
+    iron_mass = resolve_species_formula("Fe").molar_mass_g_per_mol()
+    flux = EvaporationFlux(
+        species_kg_hr={
+            carrier: carrier_mass / 1000.0,
+            "Fe": iron_mass / 1000.0,
+        },
+        total_kg_hr=(carrier_mass + iron_mass) / 1000.0,
+    )
+
+    partials = OverheadGasModel.species_partial_pressures(flux, 100.0)
+
+    assert partials == pytest.approx({carrier: 50.0, "Fe": 50.0})
+
+
+def test_unresolved_overhead_carrier_refuses_without_renormalizing_others():
+    iron_mass = resolve_species_formula("Fe").molar_mass_g_per_mol()
+    flux = EvaporationFlux(
+        species_kg_hr={"Fe": iron_mass / 1000.0, "Unobtainium": 1.0},
+        total_kg_hr=iron_mass / 1000.0 + 1.0,
+    )
+
+    with pytest.raises(EvaporationFluxRefusal) as refusal:
+        OverheadGasModel.species_partial_pressures(flux, 100.0)
+
+    assert refusal.value.diagnostic["unresolved_species"] == ["Unobtainium"]
 
 
 def test_pure_kr_returns_kr_molar_mass_without_fallback():
