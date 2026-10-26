@@ -526,28 +526,6 @@
             "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.CrO",
             "stage_number": 1
           },
-          "stage_3": {
-            "species": "CrO",
-            "alpha_s": 0.8,
-            "source": "No species-specific wall/deposition sticking coefficient is configured; legacy high-capture fallback retained as status-bearing fouling default.",
-            "source_class": "uncertified_unknown_species_default",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1323.15,
-            "alpha_s_extrapolated": false,
-            "source_url": null,
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": "not_applicable_uncertified",
-            "envelope": [
-              0.0,
-              1.0
-            ],
-            "uncertainty_flag": "no_species_specific_sticking_coefficient",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default",
-            "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.CrO",
-            "stage_number": 3
-          },
           "stage_4": {
             "species": "CrO",
             "alpha_s": 0.8,
@@ -671,13 +649,6 @@
                 "alpha_s_temperature_K": 1523.15,
                 "alpha_s_extrapolated": false
               },
-              "3": {
-                "species": "CrO",
-                "alpha_s": 0.8,
-                "alpha_s_form": "scalar",
-                "alpha_s_temperature_K": 1323.15,
-                "alpha_s_extrapolated": false
-              },
               "4": {
                 "species": "CrO",
                 "alpha_s": 0.8,
@@ -708,6 +679,28 @@
               }
             },
             "alpha_s_stage_extrapolated": false
+          },
+          "stage_3": {
+            "species": "CrO",
+            "alpha_s": 0.8,
+            "source": "No species-specific wall/deposition sticking coefficient is configured; legacy high-capture fallback retained as status-bearing fouling default.",
+            "source_class": "uncertified_unknown_species_default",
+            "status": "UNCERTIFIED",
+            "output_status": "status_bearing",
+            "alpha_s_form": "scalar",
+            "alpha_s_temperature_K": 1323.15,
+            "alpha_s_extrapolated": false,
+            "source_url": null,
+            "citation_status": "UNCERTIFIED",
+            "temperature_range_K": "not_applicable_uncertified",
+            "envelope": [
+              0.0,
+              1.0
+            ],
+            "uncertainty_flag": "no_species_specific_sticking_coefficient",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default",
+            "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.CrO",
+            "stage_number": 3
           }
         },
         "Fe": {
@@ -844,51 +837,6 @@
             "alpha_s_domain_status": "out_of_domain",
             "alpha_s_authoritative_at_temperature": false,
             "stage_number": 1
-          },
-          "stage_3": {
-            "species": "Fe",
-            "alpha_s": 0.02,
-            "source": "REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.",
-            "source_class": "cited_hkl_accommodation",
-            "status": "sourced",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1323.15,
-            "alpha_s_extrapolated": true,
-            "alpha_s_valid_range_K": [
-              1700.0,
-              1800.0
-            ],
-            "alpha_s_temperature_range_K": [
-              1700.0,
-              1800.0
-            ],
-            "alpha_s_extrapolation_warning": "Fe alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 1800] at 1323.15 K",
-            "alpha_s_temperature_below_valid_range": true,
-            "source_url": "https://ntrs.nasa.gov/citations/20150002321",
-            "citation_status": "CITED",
-            "temperature_range_K": [
-              1700,
-              1800
-            ],
-            "envelope": [
-              0.011,
-              0.02
-            ],
-            "uncertainty_flag": "collector_surface_proxy_not_cold_wall_measurement",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Fe.value",
-            "material_source": "data/materials.yaml::stages.3.alpha_s_by_species.Fe",
-            "alpha_s_coefficient_spec": {
-              "form": "scalar",
-              "value": 0.02,
-              "temperature_range_K": [
-                1700.0,
-                1800.0
-              ]
-            },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false,
-            "stage_number": 3
           },
           "stage_4": {
             "species": "Fe",
@@ -1128,13 +1076,6 @@
                 "alpha_s_temperature_K": 1523.15,
                 "alpha_s_extrapolated": false
               },
-              "3": {
-                "species": "Fe",
-                "alpha_s": 0.02,
-                "alpha_s_form": "scalar",
-                "alpha_s_temperature_K": 1323.15,
-                "alpha_s_extrapolated": false
-              },
               "4": {
                 "species": "Fe",
                 "alpha_s": 0.02,
@@ -1260,7 +1201,7 @@
             "alpha_s_domain_status": "out_of_domain",
             "alpha_s_authoritative_at_temperature": false
           },
-          "stage_2_to_stage_3": {
+          "stage_2_to_stage_4_bypass": {
             "species": "K",
             "alpha_s": 1.0,
             "source": "REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.",
@@ -1268,8 +1209,8 @@
             "status": "UNCERTIFIED",
             "output_status": "status_bearing",
             "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1473.15,
-            "alpha_s_extrapolated": true,
+            "alpha_s_temperature_K": 1773.15,
+            "alpha_s_extrapolated": false,
             "alpha_s_valid_range_K": [
               1700.0,
               2273.0
@@ -1278,8 +1219,6 @@
               1700.0,
               2273.0
             ],
-            "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 1473.15 K",
-            "alpha_s_temperature_below_valid_range": true,
             "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
             "citation_status": "UNCERTIFIED",
             "temperature_range_K": [
@@ -1292,9 +1231,9 @@
             ],
             "uncertainty_flag": "no_direct_k_sticking_coefficient",
             "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.K.value",
-            "material_source": "data/materials.yaml::liner_materials.fused_silica_baffles.alpha_s_by_species.K",
-            "liner_material": "fused_silica_baffles",
-            "segment": "stage_2_to_stage_3",
+            "material_source": "data/materials.yaml::liner_materials.hot_wall_refractory_liner.alpha_s_by_species.K",
+            "liner_material": "hot_wall_refractory_liner",
+            "segment": "stage_2_to_stage_4_bypass",
             "alpha_s_coefficient_spec": {
               "form": "scalar",
               "value": 1.0,
@@ -1303,54 +1242,8 @@
                 2273.0
               ]
             },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false
-          },
-          "stage_3_to_stage_4": {
-            "species": "K",
-            "alpha_s": 1.0,
-            "source": "REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.",
-            "source_class": "uncertified_na_analogy_default",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1473.15,
-            "alpha_s_extrapolated": true,
-            "alpha_s_valid_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_temperature_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 1473.15 K",
-            "alpha_s_temperature_below_valid_range": true,
-            "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": [
-              1700,
-              2273
-            ],
-            "envelope": [
-              0.8,
-              1.0
-            ],
-            "uncertainty_flag": "no_direct_k_sticking_coefficient",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.K.value",
-            "material_source": "data/materials.yaml::liner_materials.alkali_mg_cyclone_liner.alpha_s_by_species.K",
-            "liner_material": "alkali_mg_cyclone_liner",
-            "segment": "stage_3_to_stage_4",
-            "alpha_s_coefficient_spec": {
-              "form": "scalar",
-              "value": 1.0,
-              "temperature_range_K": [
-                1700.0,
-                2273.0
-              ]
-            },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false
+            "alpha_s_domain_status": "in_domain",
+            "alpha_s_authoritative_at_temperature": true
           },
           "stage_0": {
             "species": "K",
@@ -1439,51 +1332,6 @@
             "alpha_s_domain_status": "out_of_domain",
             "alpha_s_authoritative_at_temperature": false,
             "stage_number": 1
-          },
-          "stage_3": {
-            "species": "K",
-            "alpha_s": 1.0,
-            "source": "REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.",
-            "source_class": "uncertified_na_analogy_default",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1323.15,
-            "alpha_s_extrapolated": true,
-            "alpha_s_valid_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_temperature_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 1323.15 K",
-            "alpha_s_temperature_below_valid_range": true,
-            "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": [
-              1700,
-              2273
-            ],
-            "envelope": [
-              0.8,
-              1.0
-            ],
-            "uncertainty_flag": "no_direct_k_sticking_coefficient",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.K.value",
-            "material_source": "data/materials.yaml::stages.3.alpha_s_by_species.K",
-            "alpha_s_coefficient_spec": {
-              "form": "scalar",
-              "value": 1.0,
-              "temperature_range_K": [
-                1700.0,
-                2273.0
-              ]
-            },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false,
-            "stage_number": 3
           },
           "stage_4": {
             "species": "K",
@@ -1723,13 +1571,6 @@
                 "alpha_s_temperature_K": 1523.15,
                 "alpha_s_extrapolated": false
               },
-              "3": {
-                "species": "K",
-                "alpha_s": 1.0,
-                "alpha_s_form": "scalar",
-                "alpha_s_temperature_K": 1323.15,
-                "alpha_s_extrapolated": false
-              },
               "4": {
                 "species": "K",
                 "alpha_s": 1.0,
@@ -1952,13 +1793,6 @@
                 "alpha_s_temperature_K": 1523.15,
                 "alpha_s_extrapolated": false
               },
-              "3": {
-                "species": "K2",
-                "alpha_s": 0.8,
-                "alpha_s_form": "scalar",
-                "alpha_s_temperature_K": 1323.15,
-                "alpha_s_extrapolated": false
-              },
               "4": {
                 "species": "K2",
                 "alpha_s": 0.8,
@@ -2084,7 +1918,7 @@
             "alpha_s_domain_status": "out_of_domain",
             "alpha_s_authoritative_at_temperature": false
           },
-          "stage_2_to_stage_3": {
+          "stage_2_to_stage_4_bypass": {
             "species": "Mg",
             "alpha_s": 0.2,
             "source": "REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer & Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.",
@@ -2092,7 +1926,7 @@
             "status": "sourced",
             "output_status": "status_bearing",
             "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1473.15,
+            "alpha_s_temperature_K": 1773.15,
             "alpha_s_extrapolated": true,
             "alpha_s_valid_range_K": [
               1873.0,
@@ -2102,7 +1936,7 @@
               1873.0,
               2373.0
             ],
-            "alpha_s_extrapolation_warning": "Mg alpha_s scalar coefficient extrapolated beyond valid_range_K [1873, 2373] at 1473.15 K",
+            "alpha_s_extrapolation_warning": "Mg alpha_s scalar coefficient extrapolated beyond valid_range_K [1873, 2373] at 1773.15 K",
             "alpha_s_temperature_below_valid_range": true,
             "source_url": "https://doi.org/10.1016/S0016-7037(01)00782-7",
             "citation_status": "CITED",
@@ -2116,55 +1950,9 @@
             ],
             "uncertainty_flag": "collector_surface_proxy_not_direct_mg_wall_measurement",
             "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Mg.value",
-            "material_source": "data/materials.yaml::liner_materials.fused_silica_baffles.alpha_s_by_species.Mg",
-            "liner_material": "fused_silica_baffles",
-            "segment": "stage_2_to_stage_3",
-            "alpha_s_coefficient_spec": {
-              "form": "scalar",
-              "value": 0.2,
-              "temperature_range_K": [
-                1873.0,
-                2373.0
-              ]
-            },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false
-          },
-          "stage_3_to_stage_4": {
-            "species": "Mg",
-            "alpha_s": 0.2,
-            "source": "REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer & Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.",
-            "source_class": "cited_hkl_accommodation",
-            "status": "sourced",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1473.15,
-            "alpha_s_extrapolated": true,
-            "alpha_s_valid_range_K": [
-              1873.0,
-              2373.0
-            ],
-            "alpha_s_temperature_range_K": [
-              1873.0,
-              2373.0
-            ],
-            "alpha_s_extrapolation_warning": "Mg alpha_s scalar coefficient extrapolated beyond valid_range_K [1873, 2373] at 1473.15 K",
-            "alpha_s_temperature_below_valid_range": true,
-            "source_url": "https://doi.org/10.1016/S0016-7037(01)00782-7",
-            "citation_status": "CITED",
-            "temperature_range_K": [
-              1873,
-              2373
-            ],
-            "envelope": [
-              0.1,
-              0.21
-            ],
-            "uncertainty_flag": "collector_surface_proxy_not_direct_mg_wall_measurement",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Mg.value",
-            "material_source": "data/materials.yaml::liner_materials.alkali_mg_cyclone_liner.alpha_s_by_species.Mg",
-            "liner_material": "alkali_mg_cyclone_liner",
-            "segment": "stage_3_to_stage_4",
+            "material_source": "data/materials.yaml::liner_materials.hot_wall_refractory_liner.alpha_s_by_species.Mg",
+            "liner_material": "hot_wall_refractory_liner",
+            "segment": "stage_2_to_stage_4_bypass",
             "alpha_s_coefficient_spec": {
               "form": "scalar",
               "value": 0.2,
@@ -2265,51 +2053,6 @@
             "alpha_s_domain_status": "out_of_domain",
             "alpha_s_authoritative_at_temperature": false,
             "stage_number": 1
-          },
-          "stage_3": {
-            "species": "Mg",
-            "alpha_s": 0.2,
-            "source": "REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer & Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.",
-            "source_class": "cited_hkl_accommodation",
-            "status": "sourced",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1323.15,
-            "alpha_s_extrapolated": true,
-            "alpha_s_valid_range_K": [
-              1873.0,
-              2373.0
-            ],
-            "alpha_s_temperature_range_K": [
-              1873.0,
-              2373.0
-            ],
-            "alpha_s_extrapolation_warning": "Mg alpha_s scalar coefficient extrapolated beyond valid_range_K [1873, 2373] at 1323.15 K",
-            "alpha_s_temperature_below_valid_range": true,
-            "source_url": "https://doi.org/10.1016/S0016-7037(01)00782-7",
-            "citation_status": "CITED",
-            "temperature_range_K": [
-              1873,
-              2373
-            ],
-            "envelope": [
-              0.1,
-              0.21
-            ],
-            "uncertainty_flag": "collector_surface_proxy_not_direct_mg_wall_measurement",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Mg.value",
-            "material_source": "data/materials.yaml::stages.3.alpha_s_by_species.Mg",
-            "alpha_s_coefficient_spec": {
-              "form": "scalar",
-              "value": 0.2,
-              "temperature_range_K": [
-                1873.0,
-                2373.0
-              ]
-            },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false,
-            "stage_number": 3
           },
           "stage_4": {
             "species": "Mg",
@@ -2414,13 +2157,6 @@
                 "alpha_s_temperature_K": 1523.15,
                 "alpha_s_extrapolated": false
               },
-              "3": {
-                "species": "Mg",
-                "alpha_s": 0.2,
-                "alpha_s_form": "scalar",
-                "alpha_s_temperature_K": 1323.15,
-                "alpha_s_extrapolated": false
-              },
               "4": {
                 "species": "Mg",
                 "alpha_s": 0.2,
@@ -2497,28 +2233,6 @@
             "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default",
             "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.MgO_gas",
             "stage_number": 1
-          },
-          "stage_3": {
-            "species": "MgO_gas",
-            "alpha_s": 0.8,
-            "source": "No species-specific wall/deposition sticking coefficient is configured; legacy high-capture fallback retained as status-bearing fouling default.",
-            "source_class": "uncertified_unknown_species_default",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1323.15,
-            "alpha_s_extrapolated": false,
-            "source_url": null,
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": "not_applicable_uncertified",
-            "envelope": [
-              0.0,
-              1.0
-            ],
-            "uncertainty_flag": "no_species_specific_sticking_coefficient",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default",
-            "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.MgO_gas",
-            "stage_number": 3
           },
           "stage_4": {
             "species": "MgO_gas",
@@ -2641,13 +2355,6 @@
                 "alpha_s": 0.8,
                 "alpha_s_form": "scalar",
                 "alpha_s_temperature_K": 1523.15,
-                "alpha_s_extrapolated": false
-              },
-              "3": {
-                "species": "MgO_gas",
-                "alpha_s": 0.8,
-                "alpha_s_form": "scalar",
-                "alpha_s_temperature_K": 1323.15,
                 "alpha_s_extrapolated": false
               },
               "4": {
@@ -2876,7 +2583,7 @@
             "alpha_s_domain_status": "out_of_domain",
             "alpha_s_authoritative_at_temperature": false
           },
-          "stage_2_to_stage_3": {
+          "stage_2_to_stage_4_bypass": {
             "species": "Na",
             "alpha_s": 1.0,
             "source": "Unsupported corpus-created Sossi interval withdrawn 2026-08-11; alpha_s=1 retained only as the physical HKL capture ceiling. Sossi's separate author-adopted alpha_e=1 is context, not a wall-sticking measurement.",
@@ -2884,8 +2591,8 @@
             "status": "UNCERTIFIED",
             "output_status": "status_bearing",
             "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1473.15,
-            "alpha_s_extrapolated": true,
+            "alpha_s_temperature_K": 1773.15,
+            "alpha_s_extrapolated": false,
             "alpha_s_valid_range_K": [
               1700.0,
               2273.0
@@ -2894,8 +2601,6 @@
               1700.0,
               2273.0
             ],
-            "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 1473.15 K",
-            "alpha_s_temperature_below_valid_range": true,
             "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
             "citation_status": "UNCERTIFIED",
             "temperature_range_K": [
@@ -2908,9 +2613,9 @@
             ],
             "uncertainty_flag": "physical_bound_only_no_direct_Na_wall_sticking_measurement",
             "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Na.value",
-            "material_source": "data/materials.yaml::liner_materials.fused_silica_baffles.alpha_s_by_species.Na",
-            "liner_material": "fused_silica_baffles",
-            "segment": "stage_2_to_stage_3",
+            "material_source": "data/materials.yaml::liner_materials.hot_wall_refractory_liner.alpha_s_by_species.Na",
+            "liner_material": "hot_wall_refractory_liner",
+            "segment": "stage_2_to_stage_4_bypass",
             "alpha_s_coefficient_spec": {
               "form": "scalar",
               "value": 1.0,
@@ -2919,54 +2624,8 @@
                 2273.0
               ]
             },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false
-          },
-          "stage_3_to_stage_4": {
-            "species": "Na",
-            "alpha_s": 1.0,
-            "source": "Unsupported corpus-created Sossi interval withdrawn 2026-08-11; alpha_s=1 retained only as the physical HKL capture ceiling. Sossi's separate author-adopted alpha_e=1 is context, not a wall-sticking measurement.",
-            "source_class": "hkl_ideal_upper_bound",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1473.15,
-            "alpha_s_extrapolated": true,
-            "alpha_s_valid_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_temperature_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 1473.15 K",
-            "alpha_s_temperature_below_valid_range": true,
-            "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": [
-              1700,
-              2273
-            ],
-            "envelope": [
-              0.0,
-              1.0
-            ],
-            "uncertainty_flag": "physical_bound_only_no_direct_Na_wall_sticking_measurement",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Na.value",
-            "material_source": "data/materials.yaml::liner_materials.alkali_mg_cyclone_liner.alpha_s_by_species.Na",
-            "liner_material": "alkali_mg_cyclone_liner",
-            "segment": "stage_3_to_stage_4",
-            "alpha_s_coefficient_spec": {
-              "form": "scalar",
-              "value": 1.0,
-              "temperature_range_K": [
-                1700.0,
-                2273.0
-              ]
-            },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false
+            "alpha_s_domain_status": "in_domain",
+            "alpha_s_authoritative_at_temperature": true
           },
           "stage_0": {
             "species": "Na",
@@ -3055,51 +2714,6 @@
             "alpha_s_domain_status": "out_of_domain",
             "alpha_s_authoritative_at_temperature": false,
             "stage_number": 1
-          },
-          "stage_3": {
-            "species": "Na",
-            "alpha_s": 1.0,
-            "source": "Unsupported corpus-created Sossi interval withdrawn 2026-08-11; alpha_s=1 retained only as the physical HKL capture ceiling. Sossi's separate author-adopted alpha_e=1 is context, not a wall-sticking measurement.",
-            "source_class": "hkl_ideal_upper_bound",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1323.15,
-            "alpha_s_extrapolated": true,
-            "alpha_s_valid_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_temperature_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 1323.15 K",
-            "alpha_s_temperature_below_valid_range": true,
-            "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": [
-              1700,
-              2273
-            ],
-            "envelope": [
-              0.0,
-              1.0
-            ],
-            "uncertainty_flag": "physical_bound_only_no_direct_Na_wall_sticking_measurement",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Na.value",
-            "material_source": "data/materials.yaml::stages.3.alpha_s_by_species.Na",
-            "alpha_s_coefficient_spec": {
-              "form": "scalar",
-              "value": 1.0,
-              "temperature_range_K": [
-                1700.0,
-                2273.0
-              ]
-            },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false,
-            "stage_number": 3
           },
           "stage_4": {
             "species": "Na",
@@ -3339,13 +2953,6 @@
                 "alpha_s_temperature_K": 1523.15,
                 "alpha_s_extrapolated": false
               },
-              "3": {
-                "species": "Na",
-                "alpha_s": 1.0,
-                "alpha_s_form": "scalar",
-                "alpha_s_temperature_K": 1323.15,
-                "alpha_s_extrapolated": false
-              },
               "4": {
                 "species": "Na",
                 "alpha_s": 1.0,
@@ -3422,28 +3029,6 @@
             "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default",
             "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Na2",
             "stage_number": 1
-          },
-          "stage_3": {
-            "species": "Na2",
-            "alpha_s": 0.8,
-            "source": "No species-specific wall/deposition sticking coefficient is configured; legacy high-capture fallback retained as status-bearing fouling default.",
-            "source_class": "uncertified_unknown_species_default",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1323.15,
-            "alpha_s_extrapolated": false,
-            "source_url": null,
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": "not_applicable_uncertified",
-            "envelope": [
-              0.0,
-              1.0
-            ],
-            "uncertainty_flag": "no_species_specific_sticking_coefficient",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default",
-            "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Na2",
-            "stage_number": 3
           },
           "stage_4": {
             "species": "Na2",
@@ -3566,13 +3151,6 @@
                 "alpha_s": 0.8,
                 "alpha_s_form": "scalar",
                 "alpha_s_temperature_K": 1523.15,
-                "alpha_s_extrapolated": false
-              },
-              "3": {
-                "species": "Na2",
-                "alpha_s": 0.8,
-                "alpha_s_form": "scalar",
-                "alpha_s_temperature_K": 1323.15,
                 "alpha_s_extrapolated": false
               },
               "4": {
@@ -4744,28 +4322,6 @@
             "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO2_gas",
             "stage_number": 1
           },
-          "stage_3": {
-            "species": "SiO2_gas",
-            "alpha_s": 0.8,
-            "source": "No species-specific wall/deposition sticking coefficient is configured; legacy high-capture fallback retained as status-bearing fouling default.",
-            "source_class": "uncertified_unknown_species_default",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1323.15,
-            "alpha_s_extrapolated": false,
-            "source_url": null,
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": "not_applicable_uncertified",
-            "envelope": [
-              0.0,
-              1.0
-            ],
-            "uncertainty_flag": "no_species_specific_sticking_coefficient",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default",
-            "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO2_gas",
-            "stage_number": 3
-          },
           "stage_4": {
             "species": "SiO2_gas",
             "alpha_s": 0.8,
@@ -4887,13 +4443,6 @@
                 "alpha_s": 0.8,
                 "alpha_s_form": "scalar",
                 "alpha_s_temperature_K": 1523.15,
-                "alpha_s_extrapolated": false
-              },
-              "3": {
-                "species": "SiO2_gas",
-                "alpha_s": 0.8,
-                "alpha_s_form": "scalar",
-                "alpha_s_temperature_K": 1323.15,
                 "alpha_s_extrapolated": false
               },
               "4": {
@@ -5118,13 +4667,6 @@
                 "alpha_s_temperature_K": 1523.15,
                 "alpha_s_extrapolated": false
               },
-              "3": {
-                "species": "TiO",
-                "alpha_s": 0.8,
-                "alpha_s_form": "scalar",
-                "alpha_s_temperature_K": 1323.15,
-                "alpha_s_extrapolated": false
-              },
               "4": {
                 "species": "TiO",
                 "alpha_s": 0.8,
@@ -5137,6 +4679,20 @@
                 "alpha_s": 0.8,
                 "alpha_s_form": "scalar",
                 "alpha_s_temperature_K": 548.15,
+                "alpha_s_extrapolated": false
+              },
+              "6": {
+                "species": "TiO",
+                "alpha_s": 0.8,
+                "alpha_s_form": "scalar",
+                "alpha_s_temperature_K": 398.15,
+                "alpha_s_extrapolated": false
+              },
+              "7": {
+                "species": "TiO",
+                "alpha_s": 0.8,
+                "alpha_s_form": "scalar",
+                "alpha_s_temperature_K": 308.15,
                 "alpha_s_extrapolated": false
               }
             },
@@ -5187,28 +4743,6 @@
             "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default",
             "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.TiO2_gas",
             "stage_number": 1
-          },
-          "stage_3": {
-            "species": "TiO2_gas",
-            "alpha_s": 0.8,
-            "source": "No species-specific wall/deposition sticking coefficient is configured; legacy high-capture fallback retained as status-bearing fouling default.",
-            "source_class": "uncertified_unknown_species_default",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1323.15,
-            "alpha_s_extrapolated": false,
-            "source_url": null,
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": "not_applicable_uncertified",
-            "envelope": [
-              0.0,
-              1.0
-            ],
-            "uncertainty_flag": "no_species_specific_sticking_coefficient",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default",
-            "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.TiO2_gas",
-            "stage_number": 3
           },
           "stage_4": {
             "species": "TiO2_gas",
@@ -5333,13 +4867,6 @@
                 "alpha_s_temperature_K": 1523.15,
                 "alpha_s_extrapolated": false
               },
-              "3": {
-                "species": "TiO2_gas",
-                "alpha_s": 0.8,
-                "alpha_s_form": "scalar",
-                "alpha_s_temperature_K": 1323.15,
-                "alpha_s_extrapolated": false
-              },
               "4": {
                 "species": "TiO2_gas",
                 "alpha_s": 0.8,
@@ -5359,6 +4886,13 @@
                 "alpha_s": 0.8,
                 "alpha_s_form": "scalar",
                 "alpha_s_temperature_K": 398.15,
+                "alpha_s_extrapolated": false
+              },
+              "7": {
+                "species": "TiO2_gas",
+                "alpha_s": 0.8,
+                "alpha_s_form": "scalar",
+                "alpha_s_temperature_K": 308.15,
                 "alpha_s_extrapolated": false
               }
             },
@@ -10044,18 +9578,8 @@
             "reason": "wall_saturation_pressure_out_of_validated_range",
             "status": "extrapolated"
           },
-          "stage_2_to_stage_3": {
-            "temperature_K": 1473.15,
-            "valid_range_K": [
-              679.4,
-              1033.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
-          "stage_3_to_stage_4": {
-            "temperature_K": 1473.15,
+          "stage_2_to_stage_4_bypass": {
+            "temperature_K": 1773.15,
             "valid_range_K": [
               679.4,
               1033.0
@@ -10075,26 +9599,6 @@
             "status": "extrapolated"
           },
           "stage_1_to_stage_2#2": {
-            "temperature_K": 1623.15,
-            "valid_range_K": [
-              679.4,
-              1033.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
-          "stage_2_to_stage_3#2": {
-            "temperature_K": 1623.15,
-            "valid_range_K": [
-              679.4,
-              1033.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
-          "stage_3_to_stage_4#2": {
             "temperature_K": 1623.15,
             "valid_range_K": [
               679.4,
@@ -10124,26 +9628,6 @@
             "reason": "wall_saturation_pressure_out_of_validated_range",
             "status": "extrapolated"
           },
-          "stage_2_to_stage_3#3": {
-            "temperature_K": 1773.15,
-            "valid_range_K": [
-              679.4,
-              1033.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
-          "stage_3_to_stage_4#3": {
-            "temperature_K": 1773.15,
-            "valid_range_K": [
-              679.4,
-              1033.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
           "stage_0_to_stage_1#4": {
             "temperature_K": 1923.15,
             "valid_range_K": [
@@ -10155,26 +9639,6 @@
             "status": "extrapolated"
           },
           "stage_1_to_stage_2#4": {
-            "temperature_K": 1923.15,
-            "valid_range_K": [
-              679.4,
-              1033.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
-          "stage_2_to_stage_3#4": {
-            "temperature_K": 1923.15,
-            "valid_range_K": [
-              679.4,
-              1033.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
-          "stage_3_to_stage_4#4": {
             "temperature_K": 1923.15,
             "valid_range_K": [
               679.4,
@@ -10206,24 +9670,14 @@
             "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1473.150 source_certified_range_K=[701, 1361]",
             "status": "extrapolated"
           },
-          "stage_2_to_stage_3": {
-            "temperature_K": 1473.15,
+          "stage_2_to_stage_4_bypass": {
+            "temperature_K": 1773.15,
             "valid_range_K": [
               701,
               1361
             ],
             "authority_level": "extrapolated",
-            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1473.150 source_certified_range_K=[701, 1361]",
-            "status": "extrapolated"
-          },
-          "stage_3_to_stage_4": {
-            "temperature_K": 1473.15,
-            "valid_range_K": [
-              701,
-              1361
-            ],
-            "authority_level": "extrapolated",
-            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1473.150 source_certified_range_K=[701, 1361]",
+            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1773.150 source_certified_range_K=[701, 1361]",
             "status": "extrapolated"
           },
           "stage_0_to_stage_1#2": {
@@ -10237,26 +9691,6 @@
             "status": "extrapolated"
           },
           "stage_1_to_stage_2#2": {
-            "temperature_K": 1623.15,
-            "valid_range_K": [
-              701,
-              1361
-            ],
-            "authority_level": "extrapolated",
-            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1623.150 source_certified_range_K=[701, 1361]",
-            "status": "extrapolated"
-          },
-          "stage_2_to_stage_3#2": {
-            "temperature_K": 1623.15,
-            "valid_range_K": [
-              701,
-              1361
-            ],
-            "authority_level": "extrapolated",
-            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1623.150 source_certified_range_K=[701, 1361]",
-            "status": "extrapolated"
-          },
-          "stage_3_to_stage_4#2": {
             "temperature_K": 1623.15,
             "valid_range_K": [
               701,
@@ -10286,26 +9720,6 @@
             "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1773.150 source_certified_range_K=[701, 1361]",
             "status": "extrapolated"
           },
-          "stage_2_to_stage_3#3": {
-            "temperature_K": 1773.15,
-            "valid_range_K": [
-              701,
-              1361
-            ],
-            "authority_level": "extrapolated",
-            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1773.150 source_certified_range_K=[701, 1361]",
-            "status": "extrapolated"
-          },
-          "stage_3_to_stage_4#3": {
-            "temperature_K": 1773.15,
-            "valid_range_K": [
-              701,
-              1361
-            ],
-            "authority_level": "extrapolated",
-            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1773.150 source_certified_range_K=[701, 1361]",
-            "status": "extrapolated"
-          },
           "stage_0_to_stage_1#4": {
             "temperature_K": 1923.15,
             "valid_range_K": [
@@ -10317,26 +9731,6 @@
             "status": "extrapolated"
           },
           "stage_1_to_stage_2#4": {
-            "temperature_K": 1923.15,
-            "valid_range_K": [
-              701,
-              1361
-            ],
-            "authority_level": "extrapolated",
-            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1923.150 source_certified_range_K=[701, 1361]",
-            "status": "extrapolated"
-          },
-          "stage_2_to_stage_3#4": {
-            "temperature_K": 1923.15,
-            "valid_range_K": [
-              701,
-              1361
-            ],
-            "authority_level": "extrapolated",
-            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1923.150 source_certified_range_K=[701, 1361]",
-            "status": "extrapolated"
-          },
-          "stage_3_to_stage_4#4": {
             "temperature_K": 1923.15,
             "valid_range_K": [
               701,
@@ -10368,18 +9762,8 @@
             "reason": "wall_saturation_pressure_out_of_validated_range",
             "status": "extrapolated"
           },
-          "stage_2_to_stage_3": {
-            "temperature_K": 1473.15,
-            "valid_range_K": [
-              924.0,
-              1118.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
-          "stage_3_to_stage_4": {
-            "temperature_K": 1473.15,
+          "stage_2_to_stage_4_bypass": {
+            "temperature_K": 1773.15,
             "valid_range_K": [
               924.0,
               1118.0
@@ -10399,26 +9783,6 @@
             "status": "extrapolated"
           },
           "stage_1_to_stage_2#2": {
-            "temperature_K": 1623.15,
-            "valid_range_K": [
-              924.0,
-              1118.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
-          "stage_2_to_stage_3#2": {
-            "temperature_K": 1623.15,
-            "valid_range_K": [
-              924.0,
-              1118.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
-          "stage_3_to_stage_4#2": {
             "temperature_K": 1623.15,
             "valid_range_K": [
               924.0,
@@ -10448,26 +9812,6 @@
             "reason": "wall_saturation_pressure_out_of_validated_range",
             "status": "extrapolated"
           },
-          "stage_2_to_stage_3#3": {
-            "temperature_K": 1773.15,
-            "valid_range_K": [
-              924.0,
-              1118.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
-          "stage_3_to_stage_4#3": {
-            "temperature_K": 1773.15,
-            "valid_range_K": [
-              924.0,
-              1118.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
           "stage_0_to_stage_1#4": {
             "temperature_K": 1923.15,
             "valid_range_K": [
@@ -10479,26 +9823,6 @@
             "status": "extrapolated"
           },
           "stage_1_to_stage_2#4": {
-            "temperature_K": 1923.15,
-            "valid_range_K": [
-              924.0,
-              1118.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
-          "stage_2_to_stage_3#4": {
-            "temperature_K": 1923.15,
-            "valid_range_K": [
-              924.0,
-              1118.0
-            ],
-            "authority_level": "extrapolated",
-            "reason": "wall_saturation_pressure_out_of_validated_range",
-            "status": "extrapolated"
-          },
-          "stage_3_to_stage_4#4": {
             "temperature_K": 1923.15,
             "valid_range_K": [
               924.0,

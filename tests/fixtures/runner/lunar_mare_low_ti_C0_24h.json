@@ -12270,7 +12270,7 @@
         "species": "Fe",
         "terminal_mol": 4.308485482544496,
         "terminal_kg": 0.24060737177269736,
-        "origin_scope": "typed_material_origin",
+        "origin_scope": "mixed_typed_and_unattributed_origin",
         "attribution_method": "tracked"
       },
       {
@@ -12495,11 +12495,13 @@
       "terminal_mol_atoms_by_element": {
         "Na": 2.132575016738274e-25,
         "Cr": 6.462348535570529e-27,
-        "K": 1.0842021724855044e-19,
+        "K": 3.2526065174565133e-19,
         "Al": 4.265150033476549e-25,
         "Mg": 4.236198712037193e-22,
-        "Ti": 1.6543612251060553e-24,
-        "O": 5.169878828456422e-25
+        "Ti": 1.6547651218895285e-24,
+        "O": 9.313859826891023e-25,
+        "Fe": 4.1359030627651384e-25,
+        "Si": 2.067951531382569e-25
       },
       "cumulative_mol_atoms_by_element": {
         "O": 3.082138368765063e-15,
@@ -12510,17 +12512,20 @@
         "K": 1.1926286452874373e-18,
         "Al": 4.265150033476549e-25,
         "Mg": 4.284795573024683e-22,
-        "Ti": 1.6543612251060553e-24
+        "Ti": 1.6547651218895285e-24,
+        "Fe": 4.1359030627651384e-25
       },
       "terminal_mol_atoms_by_account": {
         "terminal.offgas": {
           "Na": 2.132575016738274e-25,
           "Cr": 6.462348535570529e-27,
-          "K": 1.0842021724855044e-19,
+          "K": 3.2526065174565133e-19,
           "Al": 4.265150033476549e-25,
           "Mg": 4.235164736271502e-22,
-          "Ti": 1.6543612251060553e-24,
-          "O": 4.1359030627651375e-25
+          "Ti": 1.6547651218895285e-24,
+          "O": 8.279884061199738e-25,
+          "Fe": 4.1359030627651384e-25,
+          "Si": 2.067951531382569e-25
         },
         "process.overhead_gas": {
           "Mg": 1.0339757656912846e-25,
@@ -14069,7 +14074,7 @@
       "O2_vented_peak_kg_hr": 0.0,
       "O2_vented_peak_status": "complete",
       "note": "observed legacy upstream diagnostics; not thermal-train overflow",
-      "transport_saturation_peak_pct": 3.6213621010001527
+      "transport_saturation_peak_pct": 3.6213621010001558
     },
     "peaks": {
       "cold_o2_kg_hr": 0.0630191809159967,
@@ -37002,7 +37007,7 @@
     },
     "pipe_m_avg_fallback": {
       "engaged": true,
-      "total_count": 41,
+      "total_count": 32,
       "by_hour": [
         {
           "campaign": "C0",
@@ -37018,15 +37023,9 @@
         },
         {
           "campaign": "C0",
-          "hour": 2,
-          "campaign_hour": 2,
-          "count": 1
-        },
-        {
-          "campaign": "C0",
           "hour": 3,
           "campaign_hour": 3,
-          "count": 5
+          "count": 4
         },
         {
           "campaign": "C0",
@@ -37036,21 +37035,9 @@
         },
         {
           "campaign": "C2A_STAGED",
-          "hour": 8,
-          "campaign_hour": 0,
-          "count": 1
-        },
-        {
-          "campaign": "C2A_STAGED",
           "hour": 9,
           "campaign_hour": 1,
-          "count": 4
-        },
-        {
-          "campaign": "C2A_STAGED",
-          "hour": 10,
-          "campaign_hour": 2,
-          "count": 1
+          "count": 3
         },
         {
           "campaign": "C2A_STAGED",
@@ -37066,27 +37053,9 @@
         },
         {
           "campaign": "C2A_STAGED",
-          "hour": 13,
-          "campaign_hour": 5,
-          "count": 1
-        },
-        {
-          "campaign": "C2A_STAGED",
-          "hour": 14,
-          "campaign_hour": 6,
-          "count": 1
-        },
-        {
-          "campaign": "C2A_STAGED",
-          "hour": 15,
-          "campaign_hour": 7,
-          "count": 1
-        },
-        {
-          "campaign": "C2A_STAGED",
           "hour": 16,
           "campaign_hour": 8,
-          "count": 5
+          "count": 4
         },
         {
           "campaign": "C3_NA",
