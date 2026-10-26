@@ -268,6 +268,7 @@ def _number_decimal(text: str) -> Decimal | None:
     token = text.strip().strip("$").strip()
     token = re.sub(r"\\mathrm\s*\{([^{}]*)\}", r"\1", token)
     token = token.replace(r"\,", "").replace("−", "-").replace("–", "-").replace("—", "-")
+    token = re.split(r"\s*(?:±|\+/-)\s*", token, maxsplit=1)[0].strip()
     scientific = re.fullmatch(
         r"([+\-]?\d+(?:\.\d+)?|[+\-]?\.\d+)\s*\\times\s*10\s*\^\s*\{?([+\-]?\d+)\}?",
         token,

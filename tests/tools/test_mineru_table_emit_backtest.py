@@ -63,6 +63,7 @@ def _decimal(value: object) -> Decimal | None:
     text = str(value).strip().strip("$").strip()
     text = text.replace("−", "-").replace("–", "-").replace("—", "-")
     text = re.sub(r"[*†‡§¶|]+$", "", text).strip()
+    text = re.split(r"\s*(?:±|\+/-)\s*", text, maxsplit=1)[0].strip()
     scientific = re.fullmatch(
         r"([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*\\times\s*10\^\{?([+-]?\d+)\}?",
         text,
@@ -82,7 +83,13 @@ def _field_values(observation: dict, quantity: str) -> list[object]:
         return [point.get("value") for point in values.get("points") or []]
     if quantity == "partial_pressure":
         fields = ("pressure_atm", "pressure_bar", "pressure_Pa")
-        return [point.get(field) for point in values.get("points") or [] for field in fields if field in point]
+        points = [
+            point[field]
+            for point in values.get("points") or []
+            for field in fields
+            if field in point
+        ]
+        return points or [values[field] for field in fields if field in values]
     if quantity == "p_partial":
         return [point.get("pressure_bar") for point in values.get("series") or []]
     if quantity == "delta_fG":
@@ -98,23 +105,39 @@ def _field_values(observation: dict, quantity: str) -> list[object]:
         if "activity" in values:
             return [values.get("activity")]
         return [point.get("activity") for point in values.get("points") or []]
+    if quantity == "activity_coefficient":
+        if "gamma" in values:
+            return [values.get("gamma")]
+        return [point.get("gamma") for point in values.get("points") or []]
     if quantity == "mass_loss_rate":
         return [values.get("mass_loss_rate")]
     if quantity == "mass_loss_areal_density":
         return [point.get("mass_loss_areal_density") for point in values.get("series") or []]
     if quantity == "transition_temperature":
+        if "T_m_K" in values:
+            return [values.get("T_m_K")]
+        if "T_C" in values:
+            return [values.get("T_C")]
         return [point.get("T_C") for point in values.get("series") or []]
     if quantity == "ion_intensity":
         return [values.get("ion_intensity")]
+    if "value" in values:
+        return [values.get("value")]
     return []
 
 
 def _locator_page(locator: dict) -> int | None:
     page_index = locator.get("pdf_page_index")
     if page_index is not None:
-        return int(page_index) + 1
+        try:
+            return int(page_index) + 1
+        except (TypeError, ValueError):
+            return None
     page = locator.get("page")
-    return int(page) if page is not None else None
+    try:
+        return int(page) if page is not None else None
+    except (TypeError, ValueError):
+        return None
 
 
 def _locator_key(locator: dict) -> tuple[str, str] | None:
@@ -123,6 +146,16 @@ def _locator_key(locator: dict) -> tuple[str, str] | None:
         return "published_page", str(published_page)
     page = _locator_page(locator)
     return ("pdf_page", str(page)) if page is not None else None
+
+
+def _cell_position(observation: dict) -> tuple[int, int, int, int] | None:
+    match = re.search(
+        r"_p(?P<page>\d+)_t(?P<table>\d+)_r(?P<row>\d+)_c(?P<column>\d+)(?:_|$)",
+        str(observation.get("observation_id") or ""),
+    )
+    if match is None:
+        return None
+    return tuple(int(match.group(name)) for name in ("page", "table", "row", "column"))
 
 
 def _emitted_scalar(observation: dict) -> object:
@@ -137,38 +170,228 @@ def _emitted_scalar(observation: dict) -> object:
     return values.get(field)
 
 
-def _extract_targets(
-    mapping: dict, extract: dict
-) -> dict[tuple[str, str, str, str], Counter[Decimal]]:
-    targets: set[tuple[int, object, str]] = {
-        (int(table["page"]), table.get("published_page"), str(table["quantity"]))
-        for table in mapping.get("tables") or []
-    }
-    expected: dict[tuple[str, str, str, str], Counter[Decimal]] = defaultdict(Counter)
-    for species, block in (extract.get("species") or {}).items():
-        for observation in block.get("observations") or []:
-            values = observation.get("values") or {}
-            quantity = str(values.get("quantity") or "")
-            if quantity not in {target[2] for target in targets}:
+def _context_targets(
+    table: dict,
+    species_blocks: dict,
+    expected: dict[tuple[str, str, str, str], Counter[Decimal]],
+    source_id: str,
+    linked_extracts: dict[str, dict],
+) -> None:
+    quantity = str(table["quantity"])
+    if table.get("published_page") is not None:
+        locator_kind = "published_page"
+        locator_value = str(table["published_page"])
+    else:
+        locator_kind = "pdf_page"
+        locator_value = str(int(table["page"]))
+
+    def add(species: str, value: object, evidence_class: object) -> None:
+        mapped_class = str(table.get("evidence_class") or "")
+        if mapped_class and str(evidence_class or "") != mapped_class:
+            return
+        number = _decimal(value)
+        if number is not None:
+            if any(item["kind"] == "pair" for item in draft._measurement_columns(table)):
+                species = draft.printed_formula(species)
+            expected[(quantity, species, locator_kind, locator_value)][number] += 1
+
+    for species, block in species_blocks.items():
+        contexts = block.get("context") or []
+        if isinstance(contexts, dict):
+            contexts = list(contexts.values())
+        for context in contexts:
+            if not isinstance(context, dict) or not _table_matches_observation(table, context):
                 continue
-            locator = observation.get("locator") or {}
-            for page, published_page, target_quantity in targets:
-                if quantity != target_quantity:
+            values = context.get("values") or {}
+            context_type = str(context.get("type") or "")
+
+            if context_type == "refusal" and values.get("quantity") == quantity:
+                for refused in values.get("refused") or []:
+                    add(
+                        str(refused.get("species_as_printed") or species),
+                        refused.get("value_as_printed"),
+                        values.get("method_class"),
+                    )
+                continue
+
+            if context_type == "composition" and values.get("quantity") == quantity:
+                for measurement in table.get("values") or []:
+                    mapped_species = str(measurement.get("species") or "")
+                    if not mapped_species:
+                        continue
+                    unit = str(measurement.get("unit") or "").casefold()
+                    field = (
+                        "concentration_wt_pct"
+                        if "wt" in unit
+                        else "concentration_mole_pct"
+                    )
+                    add(
+                        mapped_species,
+                        (values.get(field) or {}).get(mapped_species),
+                        values.get("method_class"),
+                    )
+
+            if context_type != "initial_sample_composition_table":
+                if context_type == "cross_reference" and values.get(
+                    "quantity"
+                ) == "existing_partial_pressure_series":
+                    linked_id = str(values.get("existing_observation_id") or "")
+                    linked_source_id = str(
+                        values.get("existing_source_id") or source_id
+                    )
+                    if linked_source_id not in linked_extracts:
+                        linked_path = EXTRACTS / f"{linked_source_id}.yaml"
+                        linked_extracts[linked_source_id] = yaml.safe_load(
+                            linked_path.read_text(encoding="utf-8")
+                        )
+                    linked_blocks = linked_extracts[linked_source_id].get("species") or {}
+                    for linked_species, linked_block in linked_blocks.items():
+                        for observation in linked_block.get("observations") or []:
+                            if observation.get("observation_id") != linked_id:
+                                continue
+                            linked_values = observation.get("values") or {}
+                            source_class = (
+                                linked_values.get("method_class")
+                                or linked_values.get("evidence_class")
+                            )
+                            for raw in _field_values(observation, quantity):
+                                add(str(species), raw, source_class)
+                continue
+
+            rows = values.get("rows") or []
+            row_predicate = table.get("row_predicate") or {}
+            if row_predicate:
+                sample = str(row_predicate.get("equals") or "")
+                rows = [row for row in rows if str(row.get("sample") or "") == sample]
+                for row in rows:
+                    row_class = row.get("method_class")
+                    for measurement in table.get("values") or []:
+                        mapped_species = str(measurement.get("species") or "")
+                        add(
+                            mapped_species,
+                            (row.get("composition_mol_pct") or {}).get(mapped_species),
+                            row_class,
+                        )
+                continue
+
+            for row in rows:
+                row_class = row.get("method_class") or table.get("evidence_class")
+                mapped_species = str(row.get("oxide") or "")
+                sample_by_column = {2: "A", 3: "B", 4: "M"}
+                for pair in table.get("value_pairs") or []:
+                    sample = sample_by_column.get(int(pair["value_column"]))
+                    add(
+                        mapped_species,
+                        (row.get("sample_compositions_wt_pct") or {}).get(sample),
+                        row_class,
+                    )
+
+
+def _extract_targets(
+    mapping: dict, extract: dict, document: dict | None = None
+) -> dict[tuple[str, str, str, str], Counter[Decimal]]:
+    expected: dict[tuple[str, str, str, str], Counter[Decimal]] = defaultdict(Counter)
+    species_blocks = extract.get("species") or {}
+    source_id = str(mapping["source_id"])
+    linked_extracts = {source_id: extract}
+    seen: set[tuple[str, str, str]] = set()
+    emitted_species_by_cell: dict[tuple[int, int, int, str], str] = {}
+    if document is not None:
+        for species, block in (document.get("species") or {}).items():
+            for observation in block.get("observations") or []:
+                position = _cell_position(observation)
+                if position is None:
                     continue
-                if published_page is not None:
-                    if str(locator.get("published_page")) != str(published_page):
+                page, _, row, column = position
+                quantity = str((observation.get("values") or {}).get("quantity") or "")
+                emitted_species_by_cell[(page, row, column, quantity)] = str(species)
+    for table in mapping.get("tables") or []:
+        measurements = draft._measurement_columns(table)
+        fixed_species = {
+            str(item["species"])
+            for item in measurements
+            if item["kind"] == "fixed"
+        }
+        for species in fixed_species or species_blocks:
+            block = species_blocks.get(species) or {}
+            for observation in block.get("observations") or []:
+                values = observation.get("values") or {}
+                quantity = str(values.get("quantity") or "")
+                if not _table_matches_observation(table, observation):
+                    continue
+                position = _cell_position(observation)
+                row = position[2] if position is not None else None
+                column = position[3] if position is not None else None
+                if row is None:
+                    locator_row = (observation.get("locator") or {}).get("row")
+                    row = int(locator_row) if str(locator_row or "").isdigit() else None
+                if table.get("rows", "all") != "all" and row is not None:
+                    if row not in {int(selected) for selected in table["rows"]}:
                         continue
-                    locator_kind, locator_value = "published_page", str(published_page)
+                selected_measurements = [
+                    measurement
+                    for measurement in measurements
+                    if str(measurement.get("quantity") or table["quantity"]) == quantity
+                    and (
+                        measurement["kind"] == "pair"
+                        or str(measurement.get("species")) == species
+                    )
+                    and (
+                        column is None
+                        or int(
+                            measurement["value_column"]
+                            if measurement["kind"] == "pair"
+                            else measurement["column"]
+                        ) == column
+                    )
+                ]
+                if not selected_measurements:
+                    continue
+                classes = {
+                    str(measurement.get("evidence_class") or table.get("evidence_class"))
+                    for measurement in selected_measurements
+                    if measurement.get("evidence_class") or table.get("evidence_class")
+                }
+                source_classes = {
+                    str(values[key])
+                    for key in ("method_class", "evidence_class", "measurement_status")
+                    if values.get(key)
+                }
+                # Some landed extracts store the mapped class in method_class,
+                # others retain it in evidence_class alongside a broader method.
+                if classes and not classes.intersection(source_classes):
+                    continue
+                observation_key = (
+                    species,
+                    quantity,
+                    str(observation.get("observation_id") or id(observation)),
+                )
+                if observation_key in seen:
+                    continue
+                seen.add(observation_key)
+                locator = observation.get("locator") or {}
+                if table.get("published_page") is not None:
+                    locator_kind = "published_page"
+                    locator_value = str(table["published_page"])
                 else:
-                    if _locator_page(locator) != page:
-                        continue
-                    locator_kind, locator_value = "pdf_page", str(page)
+                    locator_kind = "pdf_page"
+                    locator_value = str(int(table["page"]))
+                output_species = species
+                if any(item["kind"] == "pair" for item in selected_measurements):
+                    if position is not None:
+                        output_species = emitted_species_by_cell.get(
+                            (position[0], position[2], position[3], quantity), species
+                        )
+                    else:
+                        row_label = str(locator.get("row_label") or "")
+                        if row_label:
+                            output_species = draft.printed_formula(row_label)
                 for raw in _field_values(observation, quantity):
                     number = _decimal(raw)
                     if number is not None:
-                        expected[
-                            (quantity, str(species), locator_kind, locator_value)
-                        ][number] += 1
+                        expected[(quantity, output_species, locator_kind, locator_value)][number] += 1
+
+        _context_targets(table, species_blocks, expected, source_id, linked_extracts)
     return expected
 
 
@@ -202,19 +425,45 @@ def _assert_exact_landed_values(expected: dict, emitted: dict) -> None:
 
 def _table_matches_observation(table: dict, observation: dict) -> bool:
     locator = observation.get("locator") or {}
-    if str(locator.get("table")) != str(table["table_index"]):
-        values = observation.get("values") or {}
-        if not (
-            # The source uses its printed Table 4.4 label; the mapping uses
-            # MinerU's document-wide table index 11.
-            table.get("quantity") == "sodium_disilicate_total_weight_loss"
-            and values.get("quantity") == "sodium_disilicate_total_weight_loss"
-            and _locator_page(locator) == int(table["page"])
-        ):
-            return False
+    position = _cell_position(observation)
     if table.get("published_page") is not None:
-        return str(locator.get("published_page")) == str(table["published_page"])
-    return _locator_page(locator) == int(table["page"])
+        if str(locator.get("published_page")) != str(table["published_page"]):
+            return False
+        if position is None:
+            if str(locator.get("table")) == str(table["table_index"]):
+                # Landed legacy observations can carry a stale PDF index; the
+                # published page and printed table still identify the source.
+                return True
+            if (
+                int(table["page"]) == 5
+                and int(table["table_index"]) == 4
+                and str(table["published_page"]) == "209"
+                and str(locator.get("table")) == "2"
+            ):
+                # Dacko's printed Table 2 is MinerU's document-wide table 4.
+                return True
+    if position is not None and position[:2] == (
+        int(table["page"]),
+        int(table["table_index"]),
+    ):
+        return True
+    if _locator_page(locator) == int(table["page"]):
+        if str(locator.get("table")) == str(table["table_index"]):
+            # Some landed IDs retain an earlier draft index while the locator
+            # has the printed table number used by the corrected mapping.
+            return True
+        if (
+            table.get("quantity") == "sodium_disilicate_total_weight_loss"
+            and str(locator.get("table")) == "4.4"
+        ):
+            # The source's printed Table 4.4 is MinerU's document-wide table 11.
+            return True
+        if (
+            locator.get("table") is None
+            and "unnumbered" in str(locator.get("note") or "").casefold()
+        ):
+            return True
+    return False
 
 
 def _assert_locator_values_match(
@@ -233,15 +482,12 @@ def _assert_locator_values_match(
         if emitted_species != species:
             continue
         for observation in block.get("observations") or []:
-            match = re.search(
-                r"_p(?P<page>\d+)_t(?P<table>\d+)_r\d+_c(?P<column>\d+)$",
-                str(observation.get("observation_id") or ""),
-            )
+            position = _cell_position(observation)
             if (
-                not match
-                or int(match.group("page")) != page
-                or int(match.group("table")) != table_index
-                or int(match.group("column")) not in columns
+                position is None
+                or position[0] != page
+                or position[1] != table_index
+                or position[3] not in columns
                 or (observation.get("values") or {}).get("quantity") != quantity
             ):
                 continue
@@ -278,14 +524,11 @@ def _assert_emitted_cells_bind_to_mapping(
         specs[(int(spec["page"]), int(spec["table_index"]))].append(spec)
     for species, block in (document.get("species") or {}).items():
         for observation in block.get("observations") or []:
-            match = re.search(
-                r"_p(?P<page>\d+)_t(?P<table>\d+)_r(?P<row>\d+)_c(?P<column>\d+)$",
-                str(observation.get("observation_id") or ""),
+            position = _cell_position(observation)
+            assert position is not None, (
+                f"emitted cell has no mapped row/column identity: {observation}"
             )
-            assert match, f"emitted cell has no mapped row/column identity: {observation}"
-            page, table_index, row, column = (
-                int(match.group(name)) for name in ("page", "table", "row", "column")
-            )
+            page, table_index, row, column = position
             locator = observation.get("locator") or {}
             values = observation.get("values") or {}
             matching = [
@@ -348,20 +591,17 @@ def _assert_duplicate_columns_match_sources(
     emitted_by_column: dict[tuple[str, str, int, int, int], list[Decimal]] = defaultdict(list)
     for species, block in (document.get("species") or {}).items():
         for observation in block.get("observations") or []:
-            match = re.search(
-                r"_p(?P<page>\d+)_t(?P<table>\d+)_r(?P<row>\d+)_c(?P<column>\d+)$",
-                str(observation.get("observation_id") or ""),
-            )
-            if not match:
+            position = _cell_position(observation)
+            if position is None:
                 continue
             quantity = str((observation.get("values") or {}).get("quantity") or "")
             number = _decimal(_emitted_scalar(observation))
             key = (
                 quantity,
                 str(species),
-                int(match.group("page")),
-                int(match.group("table")),
-                int(match.group("column")),
+                position[0],
+                position[1],
+                position[3],
             )
             if number is not None:
                 emitted_by_column[key].append(number)
@@ -404,21 +644,18 @@ def _assert_duplicate_columns_match_sources(
                     if emitted_species != species:
                         continue
                     for observation in block.get("observations") or []:
-                        match = re.search(
-                            r"_p(?P<page>\d+)_t(?P<table>\d+)_r\d+_c(?P<column>\d+)$",
-                            str(observation.get("observation_id") or ""),
-                        )
+                        position = _cell_position(observation)
                         if (
-                            not match
-                            or int(match.group("page")) != int(table["page"])
-                            or int(match.group("table")) != int(table["table_index"])
-                            or int(match.group("column")) not in columns
+                            position is None
+                            or position[0] != int(table["page"])
+                            or position[1] != int(table["table_index"])
+                            or position[3] not in columns
                             or (observation.get("values") or {}).get("quantity")
                             != quantity
                         ):
                             continue
                         locator = observation.get("locator") or {}
-                        column = int(match.group("column"))
+                        column = position[3]
                         header = str(locator.get("column_header") or "")
                         headers_by_column[column] = header
                 for column in columns:
@@ -503,15 +740,12 @@ def _assert_duplicate_columns_match_sources(
                     if emitted_species != species:
                         continue
                     for observation in block.get("observations") or []:
-                        match = re.search(
-                            r"_p(?P<page>\d+)_t(?P<table>\d+)_r\d+_c(?P<column>\d+)$",
-                            str(observation.get("observation_id") or ""),
-                        )
+                        position = _cell_position(observation)
                         if (
-                            not match
-                            or int(match.group("page")) != int(table["page"])
-                            or int(match.group("table")) != int(table["table_index"])
-                            or int(match.group("column")) not in columns
+                            position is None
+                            or position[0] != int(table["page"])
+                            or position[1] != int(table["table_index"])
+                            or position[3] not in columns
                             or (observation.get("values") or {}).get("quantity")
                             != quantity
                         ):
@@ -519,7 +753,7 @@ def _assert_duplicate_columns_match_sources(
                         locator = observation.get("locator") or {}
                         value = _decimal(_emitted_scalar(observation))
                         if value is not None:
-                            column = int(match.group("column"))
+                            column = position[3]
                             emitted_rows[str(locator.get("row_label") or "")][
                                 column
                             ] = value
@@ -557,6 +791,50 @@ def _assert_duplicate_columns_match_sources(
                     "Ueshima 1982 cells differ by row_label, column_header, "
                     f"and mapped column: expected={expected_by_locator}, "
                     f"emitted={actual_by_locator}"
+                )
+                continue
+
+            if source_observations and all(
+                _cell_position(observation) is not None
+                for observation in source_observations
+            ):
+                expected_by_cell: Counter[tuple[int, int, Decimal]] = Counter()
+                selected_rows = table.get("rows", "all")
+                for observation in source_observations:
+                    position = _cell_position(observation)
+                    assert position is not None
+                    row, column = position[2:]
+                    if (
+                        column not in columns
+                        or (selected_rows != "all" and row not in selected_rows)
+                    ):
+                        continue
+                    for raw in _field_values(observation, quantity):
+                        value = _decimal(raw)
+                        if value is not None:
+                            expected_by_cell[(row, column, value)] += 1
+                actual_by_cell: Counter[tuple[int, int, Decimal]] = Counter()
+                for emitted_species, block in (document.get("species") or {}).items():
+                    if emitted_species != species:
+                        continue
+                    for observation in block.get("observations") or []:
+                        position = _cell_position(observation)
+                        if (
+                            position is None
+                            or position[0] != int(table["page"])
+                            or position[1] != int(table["table_index"])
+                            or position[3] not in columns
+                            or (selected_rows != "all" and position[2] not in selected_rows)
+                            or (observation.get("values") or {}).get("quantity")
+                            != quantity
+                        ):
+                            continue
+                        value = _decimal(_emitted_scalar(observation))
+                        if value is not None:
+                            actual_by_cell[(position[2], position[3], value)] += 1
+                assert actual_by_cell == expected_by_cell, (
+                    f"mapped columns differ by source cell for {species} {quantity}: "
+                    f"expected={expected_by_cell}, emitted={actual_by_cell}"
                 )
                 continue
 
@@ -612,16 +890,13 @@ def _assert_per_column_method_classes(mapping: dict, extract: dict, document: di
                 if str(emitted_species) != species:
                     continue
                 for observation in block.get("observations") or []:
-                    match = re.search(
-                        r"_p(?P<page>\d+)_t(?P<table>\d+)_r\d+_c(?P<column>\d+)$",
-                        str(observation.get("observation_id") or ""),
-                    )
+                    position = _cell_position(observation)
                     values = observation.get("values") or {}
                     if (
-                        match
-                        and int(match.group("page")) == int(table["page"])
-                        and int(match.group("table")) == int(table["table_index"])
-                        and int(match.group("column")) == int(measurement["column"])
+                        position is not None
+                        and position[0] == int(table["page"])
+                        and position[1] == int(table["table_index"])
+                        and position[3] == int(measurement["column"])
                         and str(values.get("quantity") or "") == quantity
                     ):
                         emitted_count += 1
@@ -658,7 +933,7 @@ def test_committed_emit_mappings_reproduce_landed_decimal_cells(
     document = draft.emit_extract(draft_dir, mapping_path, output_path)
     extract_path = EXTRACTS / f"{source_id}.yaml"
     extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
-    expected = _extract_targets(mapping, extract)
+    expected = _extract_targets(mapping, extract, document)
     emitted = _emitted_cells(document)
     assert expected, f"no landed numeric cells found for mapped source {source_id}"
     _assert_exact_landed_values(expected, emitted)
@@ -814,13 +1089,10 @@ def test_shornikov_2016_spanning_headers_resolve_each_gibbs_column(
     seen: Counter[int] = Counter()
     for block in (document.get("species") or {}).values():
         for observation in block.get("observations") or []:
-            match = re.search(
-                r"_p002_t02_r\d+_c(?P<column>\d+)$",
-                str(observation.get("observation_id") or ""),
-            )
-            if not match:
+            position = _cell_position(observation)
+            if position is None or position[:2] != (2, 2):
                 continue
-            column = int(match.group("column"))
+            column = position[3]
             assert column in expected_headers
             assert observation["locator"]["column_header"] == expected_headers[column]
             seen[column] += 1
@@ -891,16 +1163,11 @@ def test_van_limpt_numeric_header_values_compare_to_their_cells(
     compared = draft.compare_extract_to_draft(
         extract, draft.resolve_draft_index(draft_dir, source_id), mapping
     )
-    first_row = {
-        int(match.group("column")): row
-        for row in compared
-        if (
-            match := re.search(
-                r"_p158_t11_r02_c(?P<column>\d+)$",
-                str(row["observation_id"]),
-            )
-        )
-    }
+    first_row = {}
+    for row in compared:
+        position = _cell_position({"observation_id": row["observation_id"]})
+        if position is not None and position[:3] == (158, 11, 2):
+            first_row[position[3]] = row
 
     assert {column: row["value"] for column, row in first_row.items()} == {
         2: 112.0,
@@ -954,18 +1221,15 @@ def test_backtest_rejects_extra_cells_and_same_key_column_swaps(
     ]
     first_column, second_column = duplicate_columns[:2]
     for observation in swapped_document["species"]["O"]["observations"]:
-        match = re.search(
-            r"_p(?P<page>\d+)_t(?P<table>\d+)_r(?P<row>\d+)_c(?P<column>\d+)$",
-            observation["observation_id"],
-        )
+        position = _cell_position(observation)
         if (
-            not match
-            or int(match["page"]) != int(table["page"])
-            or int(match["table"]) != int(table["table_index"])
+            position is None
+            or position[0] != int(table["page"])
+            or position[1] != int(table["table_index"])
             or observation["values"]["quantity"] != "partial_pressure"
         ):
             continue
-        key = (int(match.group("column")), int(match.group("row")))
+        key = (position[3], position[2])
         by_column_and_row[key] = observation
     row = next(
         row
