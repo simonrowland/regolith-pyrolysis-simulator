@@ -615,10 +615,14 @@ def _solve_surface_oxygen_balance(
         raise ValueError('oxygen bracket must be finite and increasing')
     pressure_scale = bulk if bulk > 0.0 else 10.0 ** low_log
 
+    evaluated = {}
     def checked(delta):
+        if delta in evaluated:
+            return evaluated[delta]
         result = evaluate(delta)
         if not all(math.isfinite(value) for value in (*result.balance_terms, result.residual)):
             raise OxygenClosureNonconvergence('nonfinite signed oxygen balance')
+        evaluated[delta] = result
         return result
 
     def residual(u):
