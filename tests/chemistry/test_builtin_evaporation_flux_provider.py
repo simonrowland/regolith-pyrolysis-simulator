@@ -56,6 +56,7 @@ from simulator.state import (
     CampaignPhase,
     DecisionType,
 )
+from simulator.vapour_rail.batch import _carrier_numerical_floor
 from tests.chemistry.conftest import _build_sim
 
 
@@ -164,7 +165,9 @@ def _series_resistance_reference_flux(
             * sim.melt.melt_surface_area_m2
             * 3600.0
         )
-        if rate_kg_hr > 1e-12:
+        if rate_kg_hr > _carrier_numerical_floor(
+            species, getattr(sim, '_frozen_evaporation_carriers', None), 1e-12,
+        ):
             flux[species] = rate_kg_hr
     return flux
 
