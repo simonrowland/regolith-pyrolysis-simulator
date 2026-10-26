@@ -14548,6 +14548,313 @@ def test_residue_component_quantity_aliases_keep_printed_values_and_missing_cell
         assert "null" in (missing.reason or "")
 
 
+def test_residue_identity_uses_only_printed_fo2_from_row_or_experiment(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.identity import profile_for
+
+    log_fO2 = {
+        "state": {"tag": "value", "value": "-0.68"},
+        "locator": {
+            "source_path": "raw/sugawara-1999-fixture.pdf",
+            "page": 5,
+            "published_page": 429,
+            "table": "2",
+            "row_label": "m48313",
+            "column_header": "Log fO2",
+        },
+    }
+
+    def migrate_fixture(*, row_fO2: bool, experiment_fO2: bool, label: str):
+        document = deepcopy(FIXTURE_EXTRACT)
+        document["source_id"] = "sugawara-1999-residue-fixture"
+        document["source"]["citation"] = "Sugawara-like synthetic residue row"
+        document["experiments"] = [
+            {
+                "experiment_id": "m48313",
+                "conditions": {"log_fO2": deepcopy(log_fO2)}
+                if experiment_fO2
+                else {},
+            }
+        ]
+        observation = {
+            "observation_id": f"residue-{label}",
+            "experiment": "m48313",
+            "type": "residue_component_composition",
+            "locator": {
+                "source_path": "raw/sugawara-1999-fixture.pdf",
+                "page": 5,
+                "published_page": 429,
+                "table": "2",
+                "row_label": "m48313",
+            },
+            "units": "wt%",
+            "phase": "glass",
+            "values": {
+                "quantity": "residue_component_composition",
+                "method_class": "measured_direct",
+                "FeO_wt_pct": "12.59",
+                "T_C": "1199",
+                "duration_h_as_published": "48",
+                "total_pressure_atm": "1",
+                "composition_wt_pct": {
+                    "SiO2": "43.47",
+                    "Al2O3": "14.43",
+                    "FeO": "20.34",
+                    "MgO": "5.70",
+                    "CaO": "14.11",
+                    "Na2O": "1.95",
+                },
+            },
+        }
+        if row_fO2:
+            observation["point_conditions"] = {
+                "fO2_log": deepcopy(log_fO2),
+            }
+        document["species"] = {"FeO": {"observations": [observation]}}
+        return _migrate_real_extract(
+            tmp_path / label,
+            "sugawara-1999-residue-fixture.yaml",
+            extract_doc=document,
+        )
+
+    expected_pa = Decimal("20892.96130854039483122233736")
+    for label, row_fO2, experiment_fO2 in (
+        ("row", True, False),
+        ("experiment", False, True),
+    ):
+        result = migrate_fixture(
+            row_fO2=row_fO2, experiment_fO2=experiment_fO2, label=label
+        )
+        observation = next(
+            row
+            for row in result.observations.values()
+            if row.source_id == "sugawara-1999-residue-fixture"
+            and row.identity.quantity.is_value
+            and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        )
+        assert observation.identity.fO2_Pa.is_value
+        assert observation.identity.fO2_Pa.value == expected_pa
+        assert observation.identity.temperature_K.value == Decimal("1472.15")
+        printed_condition = observation.point_conditions["fO2_log"]
+        assert printed_condition.state.value == Decimal("-0.68")
+        assert printed_condition.locator.table == "2"
+        assert "fO2_Pa" in profile_for(observation.identity).required
+
+    missing = migrate_fixture(
+        row_fO2=False, experiment_fO2=False, label="unprinted"
+    )
+    observation = next(
+        row
+        for row in missing.observations.values()
+        if row.source_id == "sugawara-1999-residue-fixture"
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    assert observation.identity.fO2_Pa.is_unknown
+    assert observation.identity.temperature_K.value == Decimal("1472.15")
+    outcome = identity_equal(observation.identity, observation.identity)
+    assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "fO2_Pa" in outcome.fields
+
+
+def test_residue_series_resolves_printed_oxygen_once_at_final_identity(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import Quantity
+
+    log_fO2 = {
+        "state": {"tag": "value", "value": "-0.68"},
+        "locator": {"page": 5, "table": "2", "column_header": "Log fO2"},
+    }
+
+    def migrate_series(
+        label: str,
+        *,
+        row_conditions: dict | None = None,
+        experiment_conditions: dict | None = None,
+        unbuffered: bool = False,
+        parent_ratio: bool = False,
+    ):
+        document = deepcopy(FIXTURE_EXTRACT)
+        document["source_id"] = "sugawara-1999-residue-series-fixture"
+        document["source"]["citation"] = "Sugawara-like synthetic residue series"
+        document["experiments"] = [
+            {
+                "experiment_id": "m48313",
+                "conditions": experiment_conditions or {},
+            }
+        ]
+        values = {
+            "quantity": "residue_component_composition",
+            "method_class": "measured_direct",
+            "series": [
+                {
+                    "T_C": "1199",
+                    "t_min": "48",
+                    "run_id": "m48313",
+                    "residue_ppm": "12.59",
+                    "point_conditions": row_conditions or {},
+                }
+            ],
+        }
+        if parent_ratio:
+            values.update(
+                {
+                    "po2_over_pK_as_published": "0.226",
+                    "P_K_atm_as_published": "1e-6",
+                    "oxygen_partial_pressure": {
+                        "value": "9e-7",
+                        "units": "atm",
+                        "locator": {"page": 5, "table": "2"},
+                    },
+                }
+            )
+        if unbuffered:
+            values["fO2_control"] = {"during_run": "none"}
+        document["species"] = {
+            "FeO": {
+                "observations": [
+                    {
+                        "observation_id": f"residue-series-{label}",
+                        "experiment": "m48313",
+                        "type": "residue_component_composition",
+                        "locator": {
+                            "source_path": "raw/sugawara-1999-fixture.pdf",
+                            "page": 5,
+                            "table": "2",
+                        },
+                        "phase": "glass",
+                        "units": "ppm",
+                        "values": values,
+                    }
+                ]
+            }
+        }
+        result = _migrate_real_extract(
+            tmp_path / label,
+            "sugawara-1999-residue-series-fixture.yaml",
+            extract_doc=document,
+        )
+        return next(
+            observation
+            for observation in result.observations.values()
+            if observation.identity.quantity.is_value
+            and observation.identity.quantity.value
+            is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and observation.point_conditions is not None
+            and "time_min" in observation.point_conditions
+        )
+
+    row_log = migrate_series(
+        "row-log", row_conditions={"fO2_log": deepcopy(log_fO2)}
+    )
+    assert row_log.identity.fO2_Pa.value == Decimal(
+        "20892.96130854039483122233736"
+    )
+
+    row_pressure = migrate_series(
+        "row-pressure",
+        row_conditions={
+            "oxygen_partial_pressure": {
+                "value": "0.2",
+                "units": "bar",
+                "locator": {"page": 5, "table": "2"},
+            }
+        },
+    )
+    assert row_pressure.identity.fO2_Pa.value == Decimal("20000")
+
+    inherited_log = migrate_series(
+        "experiment-log",
+        experiment_conditions={"log_fO2": deepcopy(log_fO2)},
+    )
+    assert inherited_log.identity.fO2_Pa.value == Decimal(
+        "20892.96130854039483122233736"
+    )
+
+    atm_log_fO2 = {
+        "state": {"tag": "value", "value": "-13.9"},
+        "units": "log10(atm)",
+        "locator": {"page": 5, "table": "2", "column_header": "Log fO2"},
+    }
+    expected_atm_pa = Decimal("1.275606173500439925962071498E-9")
+    row_atm_log = migrate_series(
+        "row-atm-log", row_conditions={"fO2_log": deepcopy(atm_log_fO2)}
+    )
+    experiment_atm_log = migrate_series(
+        "experiment-atm-log",
+        experiment_conditions={"log_fO2": deepcopy(atm_log_fO2)},
+    )
+    assert row_atm_log.identity.fO2_Pa.value == expected_atm_pa
+    assert experiment_atm_log.identity.fO2_Pa.value == expected_atm_pa
+
+    unbuffered_row_log = migrate_series(
+        "unbuffered-row-log",
+        row_conditions={"fO2_log": deepcopy(log_fO2)},
+        unbuffered=True,
+    )
+    assert unbuffered_row_log.identity.fO2_Pa.value == Decimal(
+        "20892.96130854039483122233736"
+    )
+
+    no_oxygen = migrate_series("no-oxygen")
+    assert no_oxygen.identity.fO2_Pa.is_unknown
+
+    parent_ratio = migrate_series("parent-ratio", parent_ratio=True)
+    assert parent_ratio.identity.fO2_Pa.is_unknown
+    assert "fO2_Pa" not in (parent_ratio.point_conditions or {})
+
+
+def test_residue_identity_rejects_disagreeing_derived_ratio_oxygen(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import Quantity
+
+    document = deepcopy(FIXTURE_EXTRACT)
+    document["source_id"] = "residue-rejected-derived-oxygen-fixture"
+    document["experiments"] = [{"experiment_id": "run-1", "conditions": {}}]
+    document["species"] = {
+        "FeO": {
+            "observations": [
+                {
+                    "observation_id": "residue-derived-ratio",
+                    "experiment": "run-1",
+                    "type": "residue_component_composition",
+                    "locator": {"page": 5, "table": "2"},
+                    "phase": "glass",
+                    "units": "wt%",
+                    "values": {
+                        "quantity": "residue_component_composition",
+                        "method_class": "measured_direct",
+                        "FeO_wt_pct": "12.59",
+                        "T_C": "1199",
+                        "po2_over_pK_as_published": "0.226",
+                        "P_K_atm_as_published": "1e-6",
+                        "oxygen_partial_pressure": {
+                            "value": "9e-7",
+                            "units": "atm",
+                            "locator": {"page": 5, "table": "2"},
+                        },
+                    },
+                }
+            ]
+        }
+    }
+    result = _migrate_real_extract(
+        tmp_path,
+        "residue-rejected-derived-oxygen-fixture.yaml",
+        extract_doc=document,
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    assert observation.identity.fO2_Pa.is_unknown
+
+
 def test_hashimoto_row_left_live_diagnostics_are_final(
     tmp_path: Path,
 ) -> None:

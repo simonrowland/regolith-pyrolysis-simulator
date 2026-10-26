@@ -8778,7 +8778,11 @@ def fill_identity(
                     f"profile {token.value} does not use {name}"
                 )
                 changed = True
-            elif isinstance(state, State) and state.is_value:
+            elif (
+                name not in profile.required
+                and isinstance(state, State)
+                and state.is_value
+            ):
                 payload[name] = State.not_applicable(
                     f"profile {token.value} does not use {name}"
                 )
@@ -12475,11 +12479,20 @@ def _walk_printed_oxygen(
                         if condition_value.kind is ValueKind.POINT
                         else None
                     )
+                units = (
+                    str(condition.get("units") or condition.get("unit") or "")
+                    .strip()
+                    .lower()
+                    if isinstance(condition, Mapping)
+                    else ""
+                )
+                reference_pressure_pa = _OXYGEN_LOG_REFERENCE_PA.get(units)
                 if (
                     buffer_relative
                     or located_condition is None
                     or not isinstance(condition_value, Decimal)
                     or not condition_value.is_finite()
+                    or reference_pressure_pa is None
                     or (
                         isinstance(condition, Mapping)
                         and _oxygen_node_rejected(condition, condition_value)
@@ -12494,7 +12507,7 @@ def _walk_printed_oxygen(
                             locator=located_condition.locator or local,
                             inference=located_condition.inference,
                         ),
-                        _BAR_PA,
+                        reference_pressure_pa,
                     ))
         if name in _PRINTED_LOG_FO2_KEYS or name in _PRINTED_PO2_KEYS:
             if name in _PRINTED_LOG_FO2_KEYS and buffer_relative:
@@ -12745,6 +12758,32 @@ def collect_printed_oxygen(
         ),
         rejected_log_fO2=bool(rejected_logs),
     )
+
+
+def _printed_fO2_identity_state(
+    facts: PrintedOxygenFacts,
+) -> State[Decimal] | None:
+    """Convert a printed oxygen fact to identity fO2_Pa, without defaults."""
+
+    refusal = _rejected_log_fO2_reason(facts)
+    if refusal is not None:
+        return State.unknown(refusal)
+    if facts.log_fO2 is not None and facts.log_fO2.state.is_value:
+        value = facts.log_fO2.state.value
+        if isinstance(value, Decimal):
+            return State.of(
+                _log_fO2_to_pa(value, facts.log_fO2_reference_Pa)
+            )
+    pressure = facts.oxygen_partial_pressure_Pa
+    if pressure is not None and pressure.state.is_value:
+        value = pressure.state.value
+        if (
+            isinstance(value, Value)
+            and value.kind is ValueKind.POINT
+            and value.point is not None
+        ):
+            return State.of(value.point)
+    return None
 
 
 def point_lab_conditions(
@@ -13596,12 +13635,14 @@ class Migrator:
         fallback: Iterable[object] = (),
         *,
         skip_tables: bool = False,
-    ) -> dict[str, Located[Any]] | None:
+    ) -> tuple[dict[str, Located[Any]] | None, PrintedOxygenFacts]:
         ratio_oxygen = collect_author_ratio_oxygen(specific, locator)
         facts = collect_printed_oxygen(specific, locator, skip_tables=skip_tables)
         ratio_payload = _has_author_ratio_oxygen_payload(specific)
         if ratio_oxygen is None and ratio_payload:
-            return point_conditions
+            return point_conditions, replace(
+                facts, oxygen_partial_pressure_Pa=None
+            )
         if (
             ratio_oxygen is None
             and facts.log_fO2 is None
@@ -13612,6 +13653,8 @@ class Migrator:
             ratio_oxygen = collect_author_ratio_oxygen(fallback, locator)
             if ratio_oxygen is None:
                 facts = collect_printed_oxygen(fallback, locator, skip_tables=True)
+                if _has_author_ratio_oxygen_payload(fallback):
+                    facts = replace(facts, oxygen_partial_pressure_Pa=None)
         if ratio_oxygen is not None:
             # The nested oxygen_partial_pressure is Plante's derived
             # congruent-vaporization condition, not a printed pO2 cell.
@@ -13627,8 +13670,8 @@ class Migrator:
                     "fO2_log",
                     Located(State.unknown(refusal), locator=locator),
                 )
-                return merged
-            return point_conditions
+                return merged, facts
+            return point_conditions, facts
         merged = dict(point_conditions or {})
         if facts.log_fO2 is not None and "fO2_log" not in merged:
             merged["fO2_log"] = facts.log_fO2
@@ -13644,7 +13687,7 @@ class Migrator:
             # Per-row derived products span orders of magnitude; never collapse
             # them onto experiment.fO2_control.oxygen_partial_pressure_Pa.
             merged["fO2_Pa"] = ratio_oxygen
-        return merged or None
+        return merged or None, facts
 
     def _experiment_identity_fields(
         self,
@@ -16288,9 +16331,12 @@ class Migrator:
         oxygen_roots: list[object] = []
         if isinstance(values, Mapping):
             oxygen_roots.append(values)
+        observation_conditions = obs.get("point_conditions")
+        if isinstance(observation_conditions, Mapping):
+            oxygen_roots.append({"point_conditions": observation_conditions})
         if isinstance(obs.get("equipment"), Mapping):
             oxygen_roots.append(obs["equipment"])
-        point_conditions = self._merge_printed_oxygen(
+        point_conditions, printed_oxygen = self._merge_printed_oxygen(
             experiment_id,
             point_conditions,
             oxygen_roots,
@@ -16301,6 +16347,12 @@ class Migrator:
             skip_tables=True,
         )
         if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+            printed_fO2 = _printed_fO2_identity_state(printed_oxygen)
+            ident_kwargs["fO2_Pa"] = (
+                printed_fO2
+                if printed_fO2 is not None
+                else State.unknown("no fO2_Pa mapped from source")
+            )
             residue_conditions = dict(point_conditions or {})
             starting_ppm = _as_dec_or_none(values.get("starting_measured_ppm"))
             raw_uncertainty = obs.get("uncertainty")
@@ -18010,7 +18062,7 @@ class Migrator:
         )
         if lab_pc:
             point_conditions = {**(point_conditions or {}), **lab_pc}
-        point_conditions = self._merge_printed_oxygen(
+        point_conditions, printed_oxygen = self._merge_printed_oxygen(
             experiment_id,
             point_conditions,
             (raw_item,) if isinstance(raw_item, Mapping) else (),
@@ -18199,9 +18251,14 @@ class Migrator:
                             "source has no located run duration for this point"
                         )
                     )
-                    log_fO2 = _as_dec_or_none(raw_item.get("log10_fO2"))
-                    if log_fO2 is not None:
-                        oxygen = State.of(_log_fO2_to_pa(log_fO2, _BAR_PA))
+                    printed_fO2 = _printed_fO2_identity_state(printed_oxygen)
+                    if printed_fO2 is not None:
+                        oxygen = printed_fO2
+                    elif identity.fO2_Pa is not None and (
+                        identity.fO2_Pa.is_value
+                        or identity.fO2_Pa.is_not_applicable
+                    ):
+                        oxygen = identity.fO2_Pa
                     elif (
                         isinstance(parent_values, Mapping)
                         and isinstance(parent_values.get("fO2_control"), Mapping)
