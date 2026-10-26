@@ -1,0 +1,313 @@
+schema_version: literature_extract.v1
+source_id: farber-1972-al2o3-suboxides
+source:
+  citation: >-
+    Farber, M., Srivastava, R. D. and Uy, O. M. (1972), "Mass Spectrometric
+    Determination of the Thermodynamic Properties of the Vapour Species from
+    Alumina", Journal of the Chemical Society, Faraday Transactions 1, 68,
+    249–258.
+  year: 1972
+extraction:
+  method: >-
+    Table 2 (PDF p. 5; published p. 253) transcribed from the MinerU HTML table
+    and pdftotext-layout, with the full table layout and each target cell
+    checked against the rendered page. The table has eight temperature rows;
+    this extract retains 2200, 2300, and 2400 K for all seven printed species
+    columns (21 reduced pressure cells and 3 explicitly estimated Al2O3 cells).
+    The six non-estimate columns are absolute partial pressures reduced from
+    chopped KEMS ion intensities using thermochemical data. Al2O3 is parenthesized
+    and marked (est.) in the table, so its values are retained only as estimates.
+    Table 1 relative intensities and the thermochemical reduction provenance are
+    summarized in the observation notes. The source prints no total experiment
+    pressure or oxygen fugacity; neither is supplied here.
+  date: '2026-10-23'
+  worker: codex
+  provenance_path: text/farber-1972-al2o3-suboxides/mineru/p001-p010/out/farber-1972-al2o3-suboxides-p001-p010/vlm/farber-1972-al2o3-suboxides-p001-p010.md
+review_status: draft
+benches:
+  - id: farber-1972-alumina-effusion-cell
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: dual vacuum chamber quadrupole mass spectrometer with alumina effusion cell}
+      locator: {published_page: 250, pdf_page_index: 1, section: Experimental}
+    cell_materials:
+      - state: {tag: value, value: Al2O3}
+        locator: {published_page: 250, pdf_page_index: 1, section: Experimental}
+    geometry:
+      cell_length_m:
+        state: {tag: value, value: 0.0254}
+        locator: {published_page: 250, pdf_page_index: 1, section: Experimental, note: '25.4 mm cell length as printed.'}
+      cell_inside_diameter_m:
+        state: {tag: value, value: 0.0068}
+        locator: {published_page: 250, pdf_page_index: 1, section: Experimental, note: '6.8 mm inside diameter as printed.'}
+      orifice_diameter_m:
+        state: {tag: value, value: 0.000986}
+        locator: {published_page: 250, pdf_page_index: 1, section: Experimental, note: '0.986 mm orifice diameter as printed.'}
+      orifice_channel_length_m:
+        state: {tag: value, value: 0.0066}
+        locator: {published_page: 250, pdf_page_index: 1, section: Experimental, note: '6.6 mm elongated-orifice length as printed.'}
+experiments:
+  - experiment_id: farber-1972-alumina-kems
+    bench_id: farber-1972-alumina-effusion-cell
+    method: knudsen_effusion
+    locator:
+      published_page: 250
+      pdf_page_index: 1
+      section: Experimental
+      note: >-
+        KEMS sampling through a collimated alumina effusion cell. The table's
+        pressure values are thermochemical reductions of measured chopped ion
+        intensities. No total cell pressure or fO2 is stated for the tabulated runs.
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 250, pdf_page_index: 1, section: Experimental, note: 'No total experiment pressure is printed.'}
+      sweep_gas:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 250, pdf_page_index: 1, section: Experimental, note: 'No sweep gas is printed.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+      fO2_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'No oxygen fugacity is printed for the tabulated pressure rows.'}
+    fO2_control:
+      channel: {tag: unknown, reason: not_published}
+      buffer: {state: {tag: unknown, reason: not_published}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'No oxygen fugacity buffer is printed.'}}
+species:
+  Al:
+    observations:
+      - observation_id: farber_1972_al_partial_pressure_table2
+        type: partial_pressure
+        locator: {published_page: 253, pdf_page_index: 4, table: '2'}
+        derivation:
+          relation: >-
+            Partial pressure reduced from chopped KEMS ion intensity with the
+            second-law van't Hoff relation and effusion-weight-loss calibration
+            described on pp. 250–251; Table 2 reports the result in atm.
+          locator: {published_page: 250, pdf_page_index: 1, section: Experimental procedures and methods of calculation}
+          output_unit: atm
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {published_page: 252, pdf_page_index: 3, table: '1', note: 'The raw chopped ion currents and weight-loss calibration inputs are not tabulated as pressure-reduction inputs.'}
+        phase: gas
+        experiment: farber-1972-alumina-kems
+        regime: kems_effusion
+        units: atm as printed
+        values:
+          quantity: partial_pressure
+          gas_species: Al(g)
+          composition_mol: {basis: pure_oxide_system, Al2O3: '1'}
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
+          reduction: >-
+            Table 2 absolute pressure derived from chopped KEMS ion intensity.
+            The paper describes second-law van't Hoff reduction of I*T and
+            simultaneous effusion-weight-loss calibration for Al/O pressure;
+            Table 1 relative intensities and thermochemical functions underpin
+            the species reductions. The paper's own fit is not an input row.
+          points:
+            - {T_K: 2200, pressure_atm: 1.8e-7, point_conditions: {temperature: {state: {tag: value, value: 2200}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2200.'}}}}
+            - {T_K: 2300, pressure_atm: 7.5e-7, point_conditions: {temperature: {state: {tag: value, value: 2300}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2300.'}}}}
+            - {T_K: 2400, pressure_atm: 3.3e-6, point_conditions: {temperature: {state: {tag: value, value: 2400}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2400.'}}}}
+  O:
+    observations:
+      - observation_id: farber_1972_o_atomic_partial_pressure_table2
+        type: partial_pressure
+        locator: {published_page: 253, pdf_page_index: 4, table: '2'}
+        derivation:
+          relation: >-
+            Partial pressure reduced from chopped KEMS ion intensity using the
+            second-law equilibrium treatment for Al2O3(c) = 2Al(g) + 3O(g),
+            described on pp. 250–251; Table 2 reports the result in atm.
+          locator: {published_page: 250, pdf_page_index: 1, section: Experimental procedures and methods of calculation}
+          output_unit: atm
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {published_page: 252, pdf_page_index: 3, table: '1', note: 'The raw chopped ion currents and weight-loss calibration inputs are not tabulated as pressure-reduction inputs.'}
+        phase: gas
+        experiment: farber-1972-alumina-kems
+        regime: kems_effusion
+        units: atm as printed
+        values:
+          quantity: partial_pressure
+          gas_species: O(g)
+          composition_mol: {basis: pure_oxide_system, Al2O3: '1'}
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
+          reduction: >-
+            Table 2 absolute pressure thermochemically reduced from chopped KEMS
+            ion intensities; the oxygen values accompany the Al values from
+            reaction (2), Al2O3(c) = 2Al(g) + 3O(g).
+          points:
+            - {T_K: 2200, pressure_atm: 2.1e-7, point_conditions: {temperature: {state: {tag: value, value: 2200}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2200.'}}}}
+            - {T_K: 2300, pressure_atm: 8.7e-7, point_conditions: {temperature: {state: {tag: value, value: 2300}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2300.'}}}}
+            - {T_K: 2400, pressure_atm: 3.9e-6, point_conditions: {temperature: {state: {tag: value, value: 2400}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2400.'}}}}
+  AlO:
+    observations:
+      - observation_id: farber_1972_alo_partial_pressure_table2
+        type: partial_pressure
+        locator: {published_page: 253, pdf_page_index: 4, table: '2'}
+        derivation:
+          relation: >-
+            Partial pressure reduced from chopped KEMS ion-intensity ratios and
+            thermochemical functions. The authors state on p. 254 that 17
+            kcal/mol for delta-Hf,298(AlO) was used to obtain these pressures.
+          locator: {published_page: 254, pdf_page_index: 5, section: AlO}
+          output_unit: atm
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {published_page: 252, pdf_page_index: 3, table: '1', note: 'The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.'}
+        phase: gas
+        experiment: farber-1972-alumina-kems
+        regime: kems_effusion
+        units: atm as printed
+        values:
+          quantity: partial_pressure
+          gas_species: AlO(g)
+          composition_mol: {basis: pure_oxide_system, Al2O3: '1'}
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
+          reduction: >-
+            Table 2 pressure from KEMS ion-intensity ratios and thermochemical
+            reduction. The authors state that 17 kcal/mol for delta-Hf,298(AlO)
+            was used to obtain these pressures; it is the authors' reduction
+            input, not a stored parent observation.
+          points:
+            - {T_K: 2200, pressure_atm: 3.4e-8, point_conditions: {temperature: {state: {tag: value, value: 2200}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2200.'}}}}
+            - {T_K: 2300, pressure_atm: 1.8e-7, point_conditions: {temperature: {state: {tag: value, value: 2300}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2300.'}}}}
+            - {T_K: 2400, pressure_atm: 1.2e-6, point_conditions: {temperature: {state: {tag: value, value: 2400}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2400.'}}}}
+  Al2O:
+    observations:
+      - observation_id: farber_1972_al2o_partial_pressure_table2
+        type: partial_pressure
+        locator: {published_page: 253, pdf_page_index: 4, table: '2'}
+        derivation:
+          relation: >-
+            The authors derived a third-law Al2O formation enthalpy of
+            -33.2 ± 3.0 kcal/mol from Table 1 intensities, with the AlO
+            cross-section and multiplier-gain relationship, and used it to
+            calculate the Table 2 Al2O pressures in atm.
+          locator: {published_page: 255, pdf_page_index: 6, section: Al2O}
+          output_unit: atm
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {published_page: 252, pdf_page_index: 3, table: '1', note: 'The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.'}
+        phase: gas
+        experiment: farber-1972-alumina-kems
+        regime: kems_effusion
+        units: atm as printed
+        values:
+          quantity: partial_pressure
+          gas_species: Al2O(g)
+          composition_mol: {basis: pure_oxide_system, Al2O3: '1'}
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
+          reduction: Table 2 KEMS/thermochemical partial-pressure reduction.
+          points:
+            - {T_K: 2200, pressure_atm: 7.1e-9, point_conditions: {temperature: {state: {tag: value, value: 2200}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2200.'}}}}
+            - {T_K: 2300, pressure_atm: 4.4e-8, point_conditions: {temperature: {state: {tag: value, value: 2300}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2300.'}}}}
+            - {T_K: 2400, pressure_atm: 3.9e-7, point_conditions: {temperature: {state: {tag: value, value: 2400}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2400.'}}}}
+  Al2O2:
+    observations:
+      - observation_id: farber_1972_al2o2_partial_pressure_table2
+        type: partial_pressure
+        locator: {published_page: 253, pdf_page_index: 4, table: '2'}
+        derivation:
+          relation: >-
+            The authors reduced Table 1 relative intensities with the reaction
+            (10) cross-section and multiplier-gain corrections, obtained a
+            third-law Al2O2 formation enthalpy of -113.6 ± 2.0 kcal/mol, and used it
+            to calculate the Table 2 Al2O2 pressures in atm.
+          locator: {published_page: 256, pdf_page_index: 7, section: Al2O2}
+          output_unit: atm
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {published_page: 252, pdf_page_index: 3, table: '1', note: 'The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.'}
+        phase: gas
+        experiment: farber-1972-alumina-kems
+        regime: kems_effusion
+        units: atm as printed
+        values:
+          quantity: partial_pressure
+          gas_species: Al2O2(g)
+          composition_mol: {basis: pure_oxide_system, Al2O3: '1'}
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
+          reduction: Table 2 KEMS/thermochemical partial-pressure reduction.
+          points:
+            - {T_K: 2200, pressure_atm: 5.4e-10, point_conditions: {temperature: {state: {tag: value, value: 2200}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2200.'}}}}
+            - {T_K: 2300, pressure_atm: 3.6e-9, point_conditions: {temperature: {state: {tag: value, value: 2300}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2300.'}}}}
+            - {T_K: 2400, pressure_atm: 1.7e-8, point_conditions: {temperature: {state: {tag: value, value: 2400}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2400.'}}}}
+  AlO2:
+    observations:
+      - observation_id: farber_1972_alo2_partial_pressure_table2
+        type: partial_pressure
+        locator: {published_page: 253, pdf_page_index: 4, table: '2'}
+        derivation:
+          relation: >-
+            The authors calculated reaction (9) equilibrium constants from
+            Table 1 intensities with cross-section and multiplier-gain
+            corrections, obtained a third-law AlO2 formation enthalpy of
+            -44.3 ± 2.0 kcal/mol, and used it to calculate the Table 2 AlO2
+            pressures in atm.
+          locator: {published_page: 255, pdf_page_index: 6, section: AlO2}
+          output_unit: atm
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {published_page: 252, pdf_page_index: 3, table: '1', note: 'The raw chopped ion currents and calibration inputs are not tabulated as pressure-reduction inputs.'}
+        phase: gas
+        experiment: farber-1972-alumina-kems
+        regime: kems_effusion
+        units: atm as printed
+        values:
+          quantity: partial_pressure
+          gas_species: AlO2(g)
+          composition_mol: {basis: pure_oxide_system, Al2O3: '1'}
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
+          reduction: Table 2 KEMS/thermochemical partial-pressure reduction.
+          points:
+            - {T_K: 2200, pressure_atm: 7.6e-10, point_conditions: {temperature: {state: {tag: value, value: 2200}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2200.'}}}}
+            - {T_K: 2300, pressure_atm: 5.1e-9, point_conditions: {temperature: {state: {tag: value, value: 2300}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2300.'}}}}
+            - {T_K: 2400, pressure_atm: 4.9e-8, point_conditions: {temperature: {state: {tag: value, value: 2400}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2400.'}}}}
+  Al2O3:
+    observations:
+      - observation_id: farber_1972_al2o3_estimated_partial_pressure_table2
+        type: partial_pressure
+        locator: {published_page: 253, pdf_page_index: 4, table: '2'}
+        phase: gas
+        experiment: farber-1972-alumina-kems
+        regime: kems_effusion
+        units: atm as printed
+        values:
+          quantity: partial_pressure
+          gas_species: Al2O3(g)
+          composition_mol: {basis: pure_oxide_system, Al2O3: '1'}
+          method_class: author_estimate
+          evidence_class: author_estimate
+          admission_status: rejected
+          status: typed_refusal
+          reason: The Al2O3 column is explicitly marked estimated and is not measured or reduced evidence.
+          points:
+            - {T_K: 2200, pressure_atm: 3.1e-8, point_conditions: {temperature: {state: {tag: value, value: 2200}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2200.'}}}}
+            - {T_K: 2300, pressure_atm: 2.1e-7, point_conditions: {temperature: {state: {tag: value, value: 2300}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2300.'}}}}
+            - {T_K: 2400, pressure_atm: 1.2e-6, point_conditions: {temperature: {state: {tag: value, value: 2400}, locator: {published_page: 253, pdf_page_index: 4, table: '2', note: 'T/K = 2400.'}}}}
+fidelity_samples:
+  - path: species.Al.observations[farber_1972_al_partial_pressure_table2].values.points[0].pressure_atm
+    value: 1.8e-7
+    note: Table 2, PDF p. 5 / published p. 253, 2200 K Al column; checked against render.
+    locator: {published_page: 253, pdf_page_index: 4, table: '2'}
+  - path: species.O.observations[farber_1972_o_atomic_partial_pressure_table2].values.points[1].pressure_atm
+    value: 8.7e-7
+    note: Table 2, PDF p. 5 / published p. 253, 2300 K O column; checked against render.
+    locator: {published_page: 253, pdf_page_index: 4, table: '2'}
+  - path: species.AlO2.observations[farber_1972_alo2_partial_pressure_table2].values.points[2].pressure_atm
+    value: 4.9e-8
+    note: Table 2, PDF p. 5 / published p. 253, 2400 K AlO2 column; checked against render.
+    locator: {published_page: 253, pdf_page_index: 4, table: '2'}

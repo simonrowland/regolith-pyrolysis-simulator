@@ -33,8 +33,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/melt_activity_models.yaml:218</code> - model_rows.row_id.source: source: {provider: simulator.fe_redox.kress91_ferrous_feo_activity, engine_version: REF-001-kress-carmichael-1991, database_id: builtin, engine_component_ids: [FeO], basis_coefficients: [1], redox_inputs: [FeOt, Fe2O3], evidence_refs: [REF-001]}</li>
-<li><code>engines/builtin/vapor_pressure.py:4530</code> - def dispatch(self, request: IntentRequest) -&gt; IntentResult: &quot;source_reaction_redox_model_id&quot;: &quot;REF-001-kress-carmichael-1991&quot;,</li>
-<li><code>simulator/equilibrium.py:1177</code> - def _sz_below_threshold(species_id: str, p_pa: float, field: str) -&gt; None: else &#x27;REF-001 Kress &amp; Carmichael 1991&#x27;</li>
+<li><code>engines/builtin/vapor_pressure.py:4612</code> - def dispatch(self, request: IntentRequest) -&gt; IntentResult: &quot;source_reaction_redox_model_id&quot;: &quot;REF-001-kress-carmichael-1991&quot;,</li>
+<li><code>simulator/equilibrium.py:1208</code> - def _sz_below_threshold(species_id: str, p_pa: float, field: str) -&gt; None: else &#x27;REF-001 Kress &amp; Carmichael 1991&#x27;</li>
 <li><code>simulator/fe_redox.py:57</code> - def intrinsic_melt_fO2(: # provenance: Kress91 coefficients — REF-001 CMP 108:82-92; ln(fO2) and inverse-T terms.</li>
 <li><code>simulator/fe_redox.py:90</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # source REF-001 defines the Kress91 liquid relation and 1200 C floor.</li>
 <li><code>simulator/fe_redox.py:96</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 liquid relation; below 1200 C calibration floor&#x27;</li>
@@ -171,7 +171,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/species_catalog.yaml:122</code> - id.source: REF-012 and Kanari 2018 per foulant_thermo.yaml.</li>
 <li><code>data/species_catalog.yaml:179</code> - id.source: gate; NIST WebBook REF-012 per foulant_thermo.yaml.</li>
 <li><code>data/vapor_pressures.yaml:1518</code> - families.metals_fe_family.physical_properties.species.Fe.pure_component_antoine.source: source: REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron</li>
-<li><code>simulator/core.py:11760</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
+<li><code>simulator/core.py:11812</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
 </ul>
 </section>
 <section class="entry" id="REF-013">
@@ -197,8 +197,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/literature/INDEX.yaml:671</code> - gaps.type.source_ids: - REF-014</li>
-<li><code>data/literature/INDEX.yaml:7797</code> - source_id.aliases: - REF-014</li>
+<li><code>data/literature/INDEX.yaml:675</code> - gaps.type.source_ids: - REF-014</li>
+<li><code>data/literature/INDEX.yaml:7976</code> - source_id.aliases: - REF-014</li>
 <li><code>data/literature/SOURCE_STATUS.yaml:639</code> - source_id: - source_id: REF-014</li>
 <li><code>data/literature/langmuir_knudsen_flux_validation.yaml:37</code> - measurements.potassium_silicate_vacuum.source.citation_id: citation_id: REF-014</li>
 <li><code>data/literature/observations-v2/langmuir_knudsen_flux_validation.yaml:190</code> - observation_id.experiment_id: experiment_id: 10.1016/j.gca.2005.08.014::REF-014</li>
@@ -211,7 +211,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/works/10.1016_j.gca.2005.08.014.yaml:8</code> - work.source_ids: - REF-014</li>
 <li><code>data/literature/works/10.1016_j.gca.2005.08.014.yaml:39</code> - work.source_files.asset_id: - asset_id: unknown:REF-014</li>
 <li><code>data/literature/works/10.1016_j.gca.2005.08.014.yaml:47</code> - experiment_id: - experiment_id: 10.1016/j.gca.2005.08.014::REF-014</li>
-<li><code>data/literature/works/ALIASES.yaml:247</code> - aliases.REF-014: REF-014: 10.1016/j.gca.2005.08.014</li>
+<li><code>data/literature/works/ALIASES.yaml:249</code> - aliases.REF-014: REF-014: 10.1016/j.gca.2005.08.014</li>
 <li><code>data/vapor_pressures.yaml:916</code> - families.metals_na_family.vaporisation_coefficients.evaporation_alpha.source: - source: REF-014 Fedkin et al. 2006 LPSC 37:#2249, KEMS sealed-chamber</li>
 <li><code>data/vapor_pressures.yaml:1147</code> - families.metals_k_family.vaporisation_coefficients.evaporation_alpha.source: source: REF-014 Fedkin et al. 2006 LPSC 37:#2249 KEMS sealed-chamber intrinsic K alpha_e~0.13;</li>
 </ul>
@@ -236,9 +236,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/battery/migration-queue.yaml:431631</code> - work_id.observation_id.locator.note: note: Costa &amp; Jacobson (2015) NASA NTRS 20150002321; D(SiO+) plot band ~0.01-0.04 class (prior runtime cross-check REF-016)</li>
-<li><code>data/battery/migration-queue.yaml:431641</code> - work_id.observation_id.locator.note: note: Costa &amp; Jacobson (2015) NASA NTRS 20150002321; D(SiO+) plot band ~0.01-0.04 class (prior runtime cross-check REF-016)</li>
-<li><code>data/battery/migration-queue.yaml:431651</code> - work_id.observation_id.locator.note: note: Costa &amp; Jacobson (2015) NASA NTRS 20150002321; D(SiO+) plot band ~0.01-0.04 class (prior runtime cross-check REF-016)</li>
+<li><code>data/battery/migration-queue.yaml:434040</code> - work_id.observation_id.locator.note: note: Costa &amp; Jacobson (2015) NASA NTRS 20150002321; D(SiO+) plot band ~0.01-0.04 class (prior runtime cross-check REF-016)</li>
+<li><code>data/battery/migration-queue.yaml:434050</code> - work_id.observation_id.locator.note: note: Costa &amp; Jacobson (2015) NASA NTRS 20150002321; D(SiO+) plot band ~0.01-0.04 class (prior runtime cross-check REF-016)</li>
+<li><code>data/battery/migration-queue.yaml:434060</code> - work_id.observation_id.locator.note: note: Costa &amp; Jacobson (2015) NASA NTRS 20150002321; D(SiO+) plot band ~0.01-0.04 class (prior runtime cross-check REF-016)</li>
 <li><code>data/literature/SOURCE_STATUS.yaml:650</code> - source_id: - source_id: REF-016</li>
 <li><code>data/literature/extracts-v2/costa-jacobson-2015.yaml:96</code> - observation_id.locator.note: note: Costa &amp; Jacobson (2015) NASA NTRS 20150002321; D(SiO+) plot band ~0.01-0.04 class (prior runtime cross-check REF-016)</li>
 <li><code>data/literature/extracts/costa-jacobson-2015.yaml:21</code> - species.SiO.observation_id.locator.note: runtime cross-check REF-016)</li>
@@ -248,7 +248,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/observations-v2/langmuir_knudsen_flux_validation.yaml:188</code> - observation_id.read_from: read_from: unknown:REF-016</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:61</code> - species.Fe.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:79</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
-<li><code>data/literature/works/ALIASES.yaml:248</code> - aliases.REF-016: REF-016: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab</li>
+<li><code>data/literature/works/ALIASES.yaml:250</code> - aliases.REF-016: REF-016: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab</li>
 <li><code>data/literature/works/a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab.yaml:9</code> - work.source_ids: - REF-016</li>
 <li><code>data/literature/works/a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab.yaml:40</code> - work.source_files.asset_id: - asset_id: unknown:REF-016</li>
 <li><code>data/literature/works/a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab.yaml:47</code> - experiment_id: - experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::REF-016</li>
@@ -307,61 +307,61 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/battery/migration-queue.yaml:127184</code> - work_id.observation_id.locator.note: + JANAF CaO(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:127195</code> - work_id.observation_id.locator.note: + JANAF CaO(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:127206</code> - work_id.observation_id.locator.note: + JANAF CaO(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:127217</code> - work_id.observation_id.locator.note: + JANAF CaO(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:127228</code> - work_id.observation_id.locator.note: + JANAF CaO(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:272911</code> - work_id.observation_id.locator.note: energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto&#x27;</li>
-<li><code>data/battery/migration-queue.yaml:272927</code> - work_id.observation_id.locator.note: energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto&#x27;</li>
-<li><code>data/battery/migration-queue.yaml:272939</code> - work_id.observation_id.locator.note: energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto&#x27;</li>
-<li><code>data/battery/migration-queue.yaml:272965</code> - work_id.observation_id.locator.note: energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto&#x27;</li>
-<li><code>data/battery/migration-queue.yaml:272981</code> - work_id.observation_id.locator.note: energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto&#x27;</li>
-<li><code>data/battery/migration-queue.yaml:272991</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:273002</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:273013</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:273024</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:273035</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:297987</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:297997</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:298007</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:298017</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:298027</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:560614</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review (shared literature</li>
-<li><code>data/battery/migration-queue.yaml:560635</code> - work_id.observation_id.locator.note: note: JANAF MnO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 1 MnO(g) entry as literature pointer only.</li>
-<li><code>data/battery/migration-queue.yaml:560643</code> - work_id.observation_id.locator.note: note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas &amp; Tsvetkov) for Ni–O gas.</li>
-<li><code>data/battery/migration-queue.yaml:560647</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF O(g) and O2(g) Chase 1998 (REF-020) — equilibrium constant for ½ O2 ⇌ O is the measurable free-energy</li>
-<li><code>data/battery/migration-queue.yaml:560661</code> - work_id.observation_id.locator.note: note: JANAF PO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 5 carrier role</li>
-<li><code>data/battery/migration-queue.yaml:560682</code> - work_id.observation_id.locator.note: note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility reviews in Sossi</li>
-<li><code>data/battery/migration-queue.yaml:560687</code> - work_id.observation_id.locator.note: note: &#x27;JANAF Ti(g) Chase 1998 (REF-020) free-energy reconstruction of pure Ti Psat; and/or independent effusion: Edwards,</li>
-<li><code>data/battery/migration-queue.yaml:560923</code> - work_id.observation_id.locator.note: note: JANAF PO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 5 carrier role</li>
-<li><code>data/battery/migration-queue.yaml:560933</code> - work_id.observation_id.locator.note: note: JANAF MnO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 1 MnO(g) entry as literature pointer only.</li>
-<li><code>data/battery/migration-queue.yaml:560937</code> - work_id.observation_id.locator.note: note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas &amp; Tsvetkov) for Ni–O gas.</li>
-<li><code>data/battery/migration-queue.yaml:560947</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review (shared literature</li>
-<li><code>data/battery/migration-queue.yaml:560952</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF O(g) and O2(g) Chase 1998 (REF-020) — equilibrium constant for ½ O2 ⇌ O is the measurable free-energy</li>
-<li><code>data/battery/migration-queue.yaml:560964</code> - work_id.observation_id.locator.note: note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility reviews in Sossi</li>
-<li><code>data/battery/migration-queue.yaml:560995</code> - work_id.observation_id.locator.note: note: &#x27;JANAF Ti(g) Chase 1998 (REF-020) free-energy reconstruction of pure Ti Psat; and/or independent effusion: Edwards,</li>
-<li><code>data/battery/migration-queue.yaml:561031</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review (shared literature</li>
-<li><code>data/battery/migration-queue.yaml:561042</code> - work_id.observation_id.locator.note: note: JANAF MnO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 1 MnO(g) entry as literature pointer only.</li>
-<li><code>data/battery/migration-queue.yaml:561052</code> - work_id.observation_id.locator.note: note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas &amp; Tsvetkov) for Ni–O gas.</li>
-<li><code>data/battery/migration-queue.yaml:561073</code> - work_id.observation_id.locator.note: note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility reviews in Sossi</li>
-<li><code>data/battery/migration-queue.yaml:561094</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF O(g) and O2(g) Chase 1998 (REF-020) — equilibrium constant for ½ O2 ⇌ O is the measurable free-energy</li>
-<li><code>data/battery/migration-queue.yaml:561138</code> - work_id.observation_id.locator.note: note: &#x27;JANAF Ti(g) Chase 1998 (REF-020) free-energy reconstruction of pure Ti Psat; and/or independent effusion: Edwards,</li>
-<li><code>data/battery/migration-queue.yaml:561162</code> - work_id.observation_id.locator.note: note: JANAF PO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 5 carrier role</li>
-<li><code>data/battery/migration-queue.yaml:561241</code> - work_id.observation_id.locator.note: note: JANAF PO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 5 carrier role</li>
-<li><code>data/battery/migration-queue.yaml:561283</code> - work_id.observation_id.locator.note: note: JANAF MnO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 1 MnO(g) entry as literature pointer only.</li>
-<li><code>data/battery/migration-queue.yaml:561287</code> - work_id.observation_id.locator.note: note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas &amp; Tsvetkov) for Ni–O gas.</li>
-<li><code>data/battery/migration-queue.yaml:561297</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review (shared literature</li>
-<li><code>data/battery/migration-queue.yaml:561302</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF O(g) and O2(g) Chase 1998 (REF-020) — equilibrium constant for ½ O2 ⇌ O is the measurable free-energy</li>
-<li><code>data/battery/migration-queue.yaml:561326</code> - work_id.observation_id.locator.note: note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility reviews in Sossi</li>
-<li><code>data/battery/migration-queue.yaml:561337</code> - work_id.observation_id.locator.note: note: &#x27;JANAF Ti(g) Chase 1998 (REF-020) free-energy reconstruction of pure Ti Psat; and/or independent effusion: Edwards,</li>
-<li><code>data/battery/migration-queue.yaml:561647</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review (shared literature</li>
-<li><code>data/battery/migration-queue.yaml:561668</code> - work_id.observation_id.locator.note: note: JANAF MnO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 1 MnO(g) entry as literature pointer only.</li>
-<li><code>data/battery/migration-queue.yaml:561676</code> - work_id.observation_id.locator.note: note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas &amp; Tsvetkov) for Ni–O gas.</li>
-<li><code>data/battery/migration-queue.yaml:561680</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF O(g) and O2(g) Chase 1998 (REF-020) — equilibrium constant for ½ O2 ⇌ O is the measurable free-energy</li>
-<li><code>data/battery/migration-queue.yaml:561694</code> - work_id.observation_id.locator.note: note: JANAF PO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 5 carrier role</li>
-<li><code>data/battery/migration-queue.yaml:561715</code> - work_id.observation_id.locator.note: note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility reviews in Sossi</li>
-<li><code>data/battery/migration-queue.yaml:561720</code> - work_id.observation_id.locator.note: note: &#x27;JANAF Ti(g) Chase 1998 (REF-020) free-energy reconstruction of pure Ti Psat; and/or independent effusion: Edwards,</li>
+<li><code>data/battery/migration-queue.yaml:129881</code> - work_id.observation_id.locator.note: + JANAF CaO(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:129892</code> - work_id.observation_id.locator.note: + JANAF CaO(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:129903</code> - work_id.observation_id.locator.note: + JANAF CaO(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:129914</code> - work_id.observation_id.locator.note: + JANAF CaO(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:129925</code> - work_id.observation_id.locator.note: + JANAF CaO(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:275608</code> - work_id.observation_id.locator.note: energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto&#x27;</li>
+<li><code>data/battery/migration-queue.yaml:275624</code> - work_id.observation_id.locator.note: energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto&#x27;</li>
+<li><code>data/battery/migration-queue.yaml:275636</code> - work_id.observation_id.locator.note: energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto&#x27;</li>
+<li><code>data/battery/migration-queue.yaml:275662</code> - work_id.observation_id.locator.note: energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto&#x27;</li>
+<li><code>data/battery/migration-queue.yaml:275678</code> - work_id.observation_id.locator.note: energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto&#x27;</li>
+<li><code>data/battery/migration-queue.yaml:275688</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
+<li><code>data/battery/migration-queue.yaml:275699</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
+<li><code>data/battery/migration-queue.yaml:275710</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
+<li><code>data/battery/migration-queue.yaml:275721</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
+<li><code>data/battery/migration-queue.yaml:275732</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
+<li><code>data/battery/migration-queue.yaml:300684</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:300694</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:300704</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:300714</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:300724</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:562765</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review (shared literature</li>
+<li><code>data/battery/migration-queue.yaml:562786</code> - work_id.observation_id.locator.note: note: JANAF MnO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 1 MnO(g) entry as literature pointer only.</li>
+<li><code>data/battery/migration-queue.yaml:562794</code> - work_id.observation_id.locator.note: note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas &amp; Tsvetkov) for Ni–O gas.</li>
+<li><code>data/battery/migration-queue.yaml:562798</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF O(g) and O2(g) Chase 1998 (REF-020) — equilibrium constant for ½ O2 ⇌ O is the measurable free-energy</li>
+<li><code>data/battery/migration-queue.yaml:562812</code> - work_id.observation_id.locator.note: note: JANAF PO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 5 carrier role</li>
+<li><code>data/battery/migration-queue.yaml:562833</code> - work_id.observation_id.locator.note: note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility reviews in Sossi</li>
+<li><code>data/battery/migration-queue.yaml:562838</code> - work_id.observation_id.locator.note: note: &#x27;JANAF Ti(g) Chase 1998 (REF-020) free-energy reconstruction of pure Ti Psat; and/or independent effusion: Edwards,</li>
+<li><code>data/battery/migration-queue.yaml:563074</code> - work_id.observation_id.locator.note: note: JANAF PO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 5 carrier role</li>
+<li><code>data/battery/migration-queue.yaml:563084</code> - work_id.observation_id.locator.note: note: JANAF MnO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 1 MnO(g) entry as literature pointer only.</li>
+<li><code>data/battery/migration-queue.yaml:563088</code> - work_id.observation_id.locator.note: note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas &amp; Tsvetkov) for Ni–O gas.</li>
+<li><code>data/battery/migration-queue.yaml:563098</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review (shared literature</li>
+<li><code>data/battery/migration-queue.yaml:563103</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF O(g) and O2(g) Chase 1998 (REF-020) — equilibrium constant for ½ O2 ⇌ O is the measurable free-energy</li>
+<li><code>data/battery/migration-queue.yaml:563115</code> - work_id.observation_id.locator.note: note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility reviews in Sossi</li>
+<li><code>data/battery/migration-queue.yaml:563146</code> - work_id.observation_id.locator.note: note: &#x27;JANAF Ti(g) Chase 1998 (REF-020) free-energy reconstruction of pure Ti Psat; and/or independent effusion: Edwards,</li>
+<li><code>data/battery/migration-queue.yaml:563182</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review (shared literature</li>
+<li><code>data/battery/migration-queue.yaml:563193</code> - work_id.observation_id.locator.note: note: JANAF MnO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 1 MnO(g) entry as literature pointer only.</li>
+<li><code>data/battery/migration-queue.yaml:563203</code> - work_id.observation_id.locator.note: note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas &amp; Tsvetkov) for Ni–O gas.</li>
+<li><code>data/battery/migration-queue.yaml:563224</code> - work_id.observation_id.locator.note: note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility reviews in Sossi</li>
+<li><code>data/battery/migration-queue.yaml:563245</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF O(g) and O2(g) Chase 1998 (REF-020) — equilibrium constant for ½ O2 ⇌ O is the measurable free-energy</li>
+<li><code>data/battery/migration-queue.yaml:563289</code> - work_id.observation_id.locator.note: note: &#x27;JANAF Ti(g) Chase 1998 (REF-020) free-energy reconstruction of pure Ti Psat; and/or independent effusion: Edwards,</li>
+<li><code>data/battery/migration-queue.yaml:563313</code> - work_id.observation_id.locator.note: note: JANAF PO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 5 carrier role</li>
+<li><code>data/battery/migration-queue.yaml:563392</code> - work_id.observation_id.locator.note: note: JANAF PO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 5 carrier role</li>
+<li><code>data/battery/migration-queue.yaml:563434</code> - work_id.observation_id.locator.note: note: JANAF MnO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 1 MnO(g) entry as literature pointer only.</li>
+<li><code>data/battery/migration-queue.yaml:563438</code> - work_id.observation_id.locator.note: note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas &amp; Tsvetkov) for Ni–O gas.</li>
+<li><code>data/battery/migration-queue.yaml:563448</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review (shared literature</li>
+<li><code>data/battery/migration-queue.yaml:563453</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF O(g) and O2(g) Chase 1998 (REF-020) — equilibrium constant for ½ O2 ⇌ O is the measurable free-energy</li>
+<li><code>data/battery/migration-queue.yaml:563477</code> - work_id.observation_id.locator.note: note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility reviews in Sossi</li>
+<li><code>data/battery/migration-queue.yaml:563488</code> - work_id.observation_id.locator.note: note: &#x27;JANAF Ti(g) Chase 1998 (REF-020) free-energy reconstruction of pure Ti Psat; and/or independent effusion: Edwards,</li>
+<li><code>data/battery/migration-queue.yaml:563798</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review (shared literature</li>
+<li><code>data/battery/migration-queue.yaml:563819</code> - work_id.observation_id.locator.note: note: JANAF MnO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 1 MnO(g) entry as literature pointer only.</li>
+<li><code>data/battery/migration-queue.yaml:563827</code> - work_id.observation_id.locator.note: note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas &amp; Tsvetkov) for Ni–O gas.</li>
+<li><code>data/battery/migration-queue.yaml:563831</code> - work_id.observation_id.locator.note: note: &#x27;NIST-JANAF O(g) and O2(g) Chase 1998 (REF-020) — equilibrium constant for ½ O2 ⇌ O is the measurable free-energy</li>
+<li><code>data/battery/migration-queue.yaml:563845</code> - work_id.observation_id.locator.note: note: JANAF PO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 5 carrier role</li>
+<li><code>data/battery/migration-queue.yaml:563866</code> - work_id.observation_id.locator.note: note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility reviews in Sossi</li>
+<li><code>data/battery/migration-queue.yaml:563871</code> - work_id.observation_id.locator.note: note: &#x27;JANAF Ti(g) Chase 1998 (REF-020) free-energy reconstruction of pure Ti Psat; and/or independent effusion: Edwards,</li>
 <li><code>data/flowsheet.yaml:276</code> - blocks.id.sub_boxes.id.species: - {symbol_or_group: CO2-CO, status: conditional, condition_note: &quot;refractory-char burnout &gt;900 °C; char survives C0, burns via melt O2 / reduces FeO per REF-020&quot;, review: {map: &quot;v8&quot;}}</li>
 <li><code>data/foulant_thermo.yaml:74</code> - foulant_dG.FeS_roasting.source: source: &quot;REF-020 E2 sec 2.1 JANAF-class; kinetic-onset tier-2 bracket (DeltaG0 &lt;&lt; 0 @1200-1400 K)&quot;</li>
 <li><code>data/foulant_thermo.yaml:82</code> - foulant_dG.CaS_roasting.source: source: &quot;REF-020 E2 §2.1; kinetic-onset tier-2 bracket&quot;</li>
@@ -369,12 +369,12 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/foulant_thermo.yaml:352</code> - FeS.thermo.source: source: &quot;REF-020 E2 §2.1; foulant-disposition-spec roasting row&quot;</li>
 <li><code>data/foulant_thermo.yaml:373</code> - CaS.thermo.source: source: &quot;REF-020 E2 §2.1; oldhamite disposition&quot;</li>
 <li><code>data/foulant_thermo.yaml:394</code> - NiS.thermo.source: source: &quot;REF-020 E2 §2.1; native Ni oxidation path&quot;</li>
-<li><code>data/literature/INDEX.yaml:4290</code> - source_id.citation: NaCl(l)/NaCl(g)/Na2Cl2(g) Chase 1998 (REF-020).&#x27;</li>
-<li><code>data/literature/INDEX.yaml:13546</code> - source_id.citation: Table 3 CaO(g); + JANAF CaO(g) Chase 1998 (REF-020).</li>
-<li><code>data/literature/INDEX.yaml:13723</code> - source_id.citation: NIST-JANAF MgO(g) Chase 1998 (REF-020).</li>
-<li><code>data/literature/INDEX.yaml:16651</code> - source_id.citation: PO(g)/PO2(g) Chase 1998 free energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto-class</li>
-<li><code>data/literature/INDEX.yaml:18578</code> - source_id.citation: Chase 1998 (REF-020).</li>
-<li><code>data/literature/INDEX.yaml:18868</code> - source_id.citation: Chase 1998 (REF-020) free-energy path as secondary.</li>
+<li><code>data/literature/INDEX.yaml:4294</code> - source_id.citation: NaCl(l)/NaCl(g)/Na2Cl2(g) Chase 1998 (REF-020).&#x27;</li>
+<li><code>data/literature/INDEX.yaml:13784</code> - source_id.citation: Table 3 CaO(g); + JANAF CaO(g) Chase 1998 (REF-020).</li>
+<li><code>data/literature/INDEX.yaml:13961</code> - source_id.citation: NIST-JANAF MgO(g) Chase 1998 (REF-020).</li>
+<li><code>data/literature/INDEX.yaml:16889</code> - source_id.citation: PO(g)/PO2(g) Chase 1998 free energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto-class</li>
+<li><code>data/literature/INDEX.yaml:18816</code> - source_id.citation: Chase 1998 (REF-020).</li>
+<li><code>data/literature/INDEX.yaml:19106</code> - source_id.citation: Chase 1998 (REF-020) free-energy path as secondary.</li>
 <li><code>data/literature/extracts-v2/janaf-4th.yaml:2644</code> - observation_id.locator.note: note: &#x27;NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review (shared literature</li>
 <li><code>data/literature/extracts-v2/janaf-4th.yaml:2854</code> - observation_id.locator.note: note: JANAF MnO(g) Chase 1998 (REF-020); Sossi &amp; Fegley 2018 Table 1 MnO(g) entry as literature pointer only.</li>
 <li><code>data/literature/extracts-v2/janaf-4th.yaml:3018</code> - observation_id.locator.note: note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas &amp; Tsvetkov) for Ni–O gas.</li>
@@ -426,10 +426,10 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:2579</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.name.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(s) and Mn(g) Shomate thermodynamic evaluation;</li>
 <li><code>data/vapor_pressures.yaml:2690</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.name.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation;</li>
 <li><code>engines/builtin/stage0_pretreatment.py:1622</code> - def _dispatch_char_feo_reduction(: (REF-020 NIST-JANAF/Chase 1998), so the reaction is spontaneous</li>
-<li><code>simulator/core.py:844</code> - def _liquidus_status_from_freeze_gate_exception(: # Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO</li>
-<li><code>simulator/runner/__init__.py:3149</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
-<li><code>simulator/runner/__init__.py:3288</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
-<li><code>simulator/runner/__init__.py:3313</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
+<li><code>simulator/core.py:889</code> - def _liquidus_status_from_freeze_gate_exception(: # Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO</li>
+<li><code>simulator/runner/__init__.py:3179</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
+<li><code>simulator/runner/__init__.py:3318</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
+<li><code>simulator/runner/__init__.py:3343</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-021">
@@ -484,8 +484,8 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/stage0_carbon_partition.yaml:51</code> - phase_partitions.ceres_regolith.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:86</code> - lance_oxidation.source: source: &quot;balanced reaction C + O2 -&gt; CO2; REF-024 supplies the residual-char inventory, not the combustion stoichiometry&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:92</code> - burnout_kinetics.labile_chon_unlimited_o2.source: source: &quot;REF-024 sephton_2004_stepped_combustion_temperature_classes&quot;</li>
-<li><code>simulator/core.py:11198</code> - def _oxidized_stage0_products(: The earlier text here cited Sephton (REF-024) as authority for applying</li>
-<li><code>simulator/core.py:11200</code> - def _oxidized_stage0_products(: backwards. REF-024 is the 2004 GCA hydropyrolysis study</li>
+<li><code>simulator/core.py:11250</code> - def _oxidized_stage0_products(: The earlier text here cited Sephton (REF-024) as authority for applying</li>
+<li><code>simulator/core.py:11252</code> - def _oxidized_stage0_products(: backwards. REF-024 is the 2004 GCA hydropyrolysis study</li>
 </ul>
 </section>
 <section class="entry" id="REF-025">
@@ -589,128 +589,128 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/battery/migration-queue.yaml:160651</code> - work_id.observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
-<li><code>data/battery/migration-queue.yaml:160653</code> - work_id.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
-<li><code>data/battery/migration-queue.yaml:160663</code> - work_id.observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
-<li><code>data/battery/migration-queue.yaml:160665</code> - work_id.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
-<li><code>data/battery/migration-queue.yaml:160675</code> - work_id.observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
-<li><code>data/battery/migration-queue.yaml:160677</code> - work_id.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
-<li><code>data/battery/migration-queue.yaml:160687</code> - work_id.observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
-<li><code>data/battery/migration-queue.yaml:160689</code> - work_id.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
-<li><code>data/battery/migration-queue.yaml:272991</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:272993</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
-<li><code>data/battery/migration-queue.yaml:273002</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:273004</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
-<li><code>data/battery/migration-queue.yaml:273013</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:273015</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
-<li><code>data/battery/migration-queue.yaml:273024</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:273026</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
-<li><code>data/battery/migration-queue.yaml:273035</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:273037</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
-<li><code>data/battery/migration-queue.yaml:297987</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:297988</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
-<li><code>data/battery/migration-queue.yaml:297997</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:297998</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
-<li><code>data/battery/migration-queue.yaml:298007</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:298008</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
-<li><code>data/battery/migration-queue.yaml:298017</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:298018</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
-<li><code>data/battery/migration-queue.yaml:298027</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:298028</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
-<li><code>data/battery/migration-queue.yaml:298171</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/battery/migration-queue.yaml:298172</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
-<li><code>data/battery/migration-queue.yaml:298181</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/battery/migration-queue.yaml:298182</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
-<li><code>data/battery/migration-queue.yaml:298191</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/battery/migration-queue.yaml:298192</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
-<li><code>data/battery/migration-queue.yaml:298201</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/battery/migration-queue.yaml:298202</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
-<li><code>data/battery/migration-queue.yaml:298211</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/battery/migration-queue.yaml:298212</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
-<li><code>data/battery/migration-queue.yaml:337985</code> - work_id.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
-<li><code>data/battery/migration-queue.yaml:337987</code> - work_id.observation_id.locator.record: record: REF-032#Zr</li>
-<li><code>data/battery/migration-queue.yaml:337996</code> - work_id.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
-<li><code>data/battery/migration-queue.yaml:337998</code> - work_id.observation_id.locator.record: record: REF-032#Zr</li>
-<li><code>data/battery/migration-queue.yaml:338007</code> - work_id.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
-<li><code>data/battery/migration-queue.yaml:338009</code> - work_id.observation_id.locator.record: record: REF-032#Zr</li>
-<li><code>data/battery/migration-queue.yaml:338018</code> - work_id.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
-<li><code>data/battery/migration-queue.yaml:338020</code> - work_id.observation_id.locator.record: record: REF-032#Zr</li>
-<li><code>data/battery/migration-queue.yaml:366678</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
-<li><code>data/battery/migration-queue.yaml:366680</code> - work_id.observation_id.locator.record: record: REF-032#K</li>
-<li><code>data/battery/migration-queue.yaml:366689</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
-<li><code>data/battery/migration-queue.yaml:366691</code> - work_id.observation_id.locator.record: record: REF-032#K</li>
-<li><code>data/battery/migration-queue.yaml:366700</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
-<li><code>data/battery/migration-queue.yaml:366702</code> - work_id.observation_id.locator.record: record: REF-032#K</li>
-<li><code>data/battery/migration-queue.yaml:366711</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
-<li><code>data/battery/migration-queue.yaml:366713</code> - work_id.observation_id.locator.record: record: REF-032#K</li>
-<li><code>data/battery/migration-queue.yaml:367817</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/battery/migration-queue.yaml:367818</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
-<li><code>data/battery/migration-queue.yaml:367827</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/battery/migration-queue.yaml:367828</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
-<li><code>data/battery/migration-queue.yaml:367837</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/battery/migration-queue.yaml:367838</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
-<li><code>data/battery/migration-queue.yaml:367847</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/battery/migration-queue.yaml:367848</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
-<li><code>data/battery/migration-queue.yaml:367857</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/battery/migration-queue.yaml:367858</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
-<li><code>data/battery/migration-queue.yaml:428658</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
-<li><code>data/battery/migration-queue.yaml:428660</code> - work_id.observation_id.locator.record: record: REF-032#Na</li>
-<li><code>data/battery/migration-queue.yaml:428669</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
-<li><code>data/battery/migration-queue.yaml:428671</code> - work_id.observation_id.locator.record: record: REF-032#Na</li>
-<li><code>data/battery/migration-queue.yaml:428680</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
-<li><code>data/battery/migration-queue.yaml:428682</code> - work_id.observation_id.locator.record: record: REF-032#Na</li>
-<li><code>data/battery/migration-queue.yaml:428691</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
-<li><code>data/battery/migration-queue.yaml:428693</code> - work_id.observation_id.locator.record: record: REF-032#Na</li>
-<li><code>data/battery/migration-queue.yaml:508634</code> - work_id.observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:508635</code> - work_id.observation_id.locator.record: record: REF-032#Th</li>
-<li><code>data/battery/migration-queue.yaml:508645</code> - work_id.observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:508646</code> - work_id.observation_id.locator.record: record: REF-032#Th</li>
-<li><code>data/battery/migration-queue.yaml:508656</code> - work_id.observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:508657</code> - work_id.observation_id.locator.record: record: REF-032#Th</li>
-<li><code>data/battery/migration-queue.yaml:508667</code> - work_id.observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:508668</code> - work_id.observation_id.locator.record: record: REF-032#Th</li>
-<li><code>data/battery/migration-queue.yaml:515582</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:515583</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
-<li><code>data/battery/migration-queue.yaml:515592</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:515593</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
-<li><code>data/battery/migration-queue.yaml:515602</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:515603</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
-<li><code>data/battery/migration-queue.yaml:515612</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:515613</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
-<li><code>data/battery/migration-queue.yaml:515622</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:515623</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
-<li><code>data/battery/migration-queue.yaml:534767</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/battery/migration-queue.yaml:534770</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
-<li><code>data/battery/migration-queue.yaml:534779</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/battery/migration-queue.yaml:534782</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
-<li><code>data/battery/migration-queue.yaml:534791</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/battery/migration-queue.yaml:534794</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
-<li><code>data/battery/migration-queue.yaml:534803</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/battery/migration-queue.yaml:534806</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
-<li><code>data/battery/migration-queue.yaml:534815</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/battery/migration-queue.yaml:534818</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
-<li><code>data/battery/migration-queue.yaml:563293</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:563294</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
-<li><code>data/battery/migration-queue.yaml:563303</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:563304</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
-<li><code>data/battery/migration-queue.yaml:563313</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:563314</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
-<li><code>data/battery/migration-queue.yaml:563323</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:563324</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
-<li><code>data/battery/migration-queue.yaml:563333</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:563334</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
-<li><code>data/literature/INDEX.yaml:18577</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)</li>
-<li><code>data/literature/INDEX.yaml:18635</code> - source_id.citation: citation: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/literature/INDEX.yaml:18692</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g)</li>
-<li><code>data/literature/INDEX.yaml:18752</code> - source_id.citation.Elements: (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).&#x27;</li>
-<li><code>data/literature/INDEX.yaml:18809</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent</li>
-<li><code>data/literature/INDEX.yaml:18867</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g)</li>
-<li><code>data/literature/INDEX.yaml:18926</code> - source_id.citation: REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure</li>
-<li><code>data/literature/INDEX.yaml:18984</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations</li>
-<li><code>data/literature/INDEX.yaml:19042</code> - source_id.citation: citation: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected</li>
-<li><code>data/literature/INDEX.yaml:19100</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g)</li>
-<li><code>data/literature/INDEX.yaml:19159</code> - source_id.citation: Alcock et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/literature/INDEX.yaml:19216</code> - source_id.citation: citation: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)</li>
+<li><code>data/battery/migration-queue.yaml:163348</code> - work_id.observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
+<li><code>data/battery/migration-queue.yaml:163350</code> - work_id.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
+<li><code>data/battery/migration-queue.yaml:163360</code> - work_id.observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
+<li><code>data/battery/migration-queue.yaml:163362</code> - work_id.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
+<li><code>data/battery/migration-queue.yaml:163372</code> - work_id.observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
+<li><code>data/battery/migration-queue.yaml:163374</code> - work_id.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
+<li><code>data/battery/migration-queue.yaml:163384</code> - work_id.observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
+<li><code>data/battery/migration-queue.yaml:163386</code> - work_id.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
+<li><code>data/battery/migration-queue.yaml:275688</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
+<li><code>data/battery/migration-queue.yaml:275690</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
+<li><code>data/battery/migration-queue.yaml:275699</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
+<li><code>data/battery/migration-queue.yaml:275701</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
+<li><code>data/battery/migration-queue.yaml:275710</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
+<li><code>data/battery/migration-queue.yaml:275712</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
+<li><code>data/battery/migration-queue.yaml:275721</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
+<li><code>data/battery/migration-queue.yaml:275723</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
+<li><code>data/battery/migration-queue.yaml:275732</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
+<li><code>data/battery/migration-queue.yaml:275734</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
+<li><code>data/battery/migration-queue.yaml:300684</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:300685</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
+<li><code>data/battery/migration-queue.yaml:300694</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:300695</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
+<li><code>data/battery/migration-queue.yaml:300704</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:300705</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
+<li><code>data/battery/migration-queue.yaml:300714</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:300715</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
+<li><code>data/battery/migration-queue.yaml:300724</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
+<li><code>data/battery/migration-queue.yaml:300725</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
+<li><code>data/battery/migration-queue.yaml:300868</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
+<li><code>data/battery/migration-queue.yaml:300869</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
+<li><code>data/battery/migration-queue.yaml:300878</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
+<li><code>data/battery/migration-queue.yaml:300879</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
+<li><code>data/battery/migration-queue.yaml:300888</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
+<li><code>data/battery/migration-queue.yaml:300889</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
+<li><code>data/battery/migration-queue.yaml:300898</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
+<li><code>data/battery/migration-queue.yaml:300899</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
+<li><code>data/battery/migration-queue.yaml:300908</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
+<li><code>data/battery/migration-queue.yaml:300909</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
+<li><code>data/battery/migration-queue.yaml:340682</code> - work_id.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
+<li><code>data/battery/migration-queue.yaml:340684</code> - work_id.observation_id.locator.record: record: REF-032#Zr</li>
+<li><code>data/battery/migration-queue.yaml:340693</code> - work_id.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
+<li><code>data/battery/migration-queue.yaml:340695</code> - work_id.observation_id.locator.record: record: REF-032#Zr</li>
+<li><code>data/battery/migration-queue.yaml:340704</code> - work_id.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
+<li><code>data/battery/migration-queue.yaml:340706</code> - work_id.observation_id.locator.record: record: REF-032#Zr</li>
+<li><code>data/battery/migration-queue.yaml:340715</code> - work_id.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
+<li><code>data/battery/migration-queue.yaml:340717</code> - work_id.observation_id.locator.record: record: REF-032#Zr</li>
+<li><code>data/battery/migration-queue.yaml:369375</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
+<li><code>data/battery/migration-queue.yaml:369377</code> - work_id.observation_id.locator.record: record: REF-032#K</li>
+<li><code>data/battery/migration-queue.yaml:369386</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
+<li><code>data/battery/migration-queue.yaml:369388</code> - work_id.observation_id.locator.record: record: REF-032#K</li>
+<li><code>data/battery/migration-queue.yaml:369397</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
+<li><code>data/battery/migration-queue.yaml:369399</code> - work_id.observation_id.locator.record: record: REF-032#K</li>
+<li><code>data/battery/migration-queue.yaml:369408</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
+<li><code>data/battery/migration-queue.yaml:369410</code> - work_id.observation_id.locator.record: record: REF-032#K</li>
+<li><code>data/battery/migration-queue.yaml:370514</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
+<li><code>data/battery/migration-queue.yaml:370515</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
+<li><code>data/battery/migration-queue.yaml:370524</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
+<li><code>data/battery/migration-queue.yaml:370525</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
+<li><code>data/battery/migration-queue.yaml:370534</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
+<li><code>data/battery/migration-queue.yaml:370535</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
+<li><code>data/battery/migration-queue.yaml:370544</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
+<li><code>data/battery/migration-queue.yaml:370545</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
+<li><code>data/battery/migration-queue.yaml:370554</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
+<li><code>data/battery/migration-queue.yaml:370555</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
+<li><code>data/battery/migration-queue.yaml:431067</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
+<li><code>data/battery/migration-queue.yaml:431069</code> - work_id.observation_id.locator.record: record: REF-032#Na</li>
+<li><code>data/battery/migration-queue.yaml:431078</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
+<li><code>data/battery/migration-queue.yaml:431080</code> - work_id.observation_id.locator.record: record: REF-032#Na</li>
+<li><code>data/battery/migration-queue.yaml:431089</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
+<li><code>data/battery/migration-queue.yaml:431091</code> - work_id.observation_id.locator.record: record: REF-032#Na</li>
+<li><code>data/battery/migration-queue.yaml:431100</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
+<li><code>data/battery/migration-queue.yaml:431102</code> - work_id.observation_id.locator.record: record: REF-032#Na</li>
+<li><code>data/battery/migration-queue.yaml:511154</code> - work_id.observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:511155</code> - work_id.observation_id.locator.record: record: REF-032#Th</li>
+<li><code>data/battery/migration-queue.yaml:511165</code> - work_id.observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:511166</code> - work_id.observation_id.locator.record: record: REF-032#Th</li>
+<li><code>data/battery/migration-queue.yaml:511176</code> - work_id.observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:511177</code> - work_id.observation_id.locator.record: record: REF-032#Th</li>
+<li><code>data/battery/migration-queue.yaml:511187</code> - work_id.observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:511188</code> - work_id.observation_id.locator.record: record: REF-032#Th</li>
+<li><code>data/battery/migration-queue.yaml:518102</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:518103</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
+<li><code>data/battery/migration-queue.yaml:518112</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:518113</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
+<li><code>data/battery/migration-queue.yaml:518122</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:518123</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
+<li><code>data/battery/migration-queue.yaml:518132</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:518133</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
+<li><code>data/battery/migration-queue.yaml:518142</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:518143</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
+<li><code>data/battery/migration-queue.yaml:536918</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
+<li><code>data/battery/migration-queue.yaml:536921</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
+<li><code>data/battery/migration-queue.yaml:536930</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
+<li><code>data/battery/migration-queue.yaml:536933</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
+<li><code>data/battery/migration-queue.yaml:536942</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
+<li><code>data/battery/migration-queue.yaml:536945</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
+<li><code>data/battery/migration-queue.yaml:536954</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
+<li><code>data/battery/migration-queue.yaml:536957</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
+<li><code>data/battery/migration-queue.yaml:536966</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
+<li><code>data/battery/migration-queue.yaml:536969</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
+<li><code>data/battery/migration-queue.yaml:565444</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:565445</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
+<li><code>data/battery/migration-queue.yaml:565454</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:565455</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
+<li><code>data/battery/migration-queue.yaml:565464</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:565465</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
+<li><code>data/battery/migration-queue.yaml:565474</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:565475</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
+<li><code>data/battery/migration-queue.yaml:565484</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
+<li><code>data/battery/migration-queue.yaml:565485</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
+<li><code>data/literature/INDEX.yaml:18815</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)</li>
+<li><code>data/literature/INDEX.yaml:18873</code> - source_id.citation: citation: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
+<li><code>data/literature/INDEX.yaml:18930</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g)</li>
+<li><code>data/literature/INDEX.yaml:18990</code> - source_id.citation.Elements: (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).&#x27;</li>
+<li><code>data/literature/INDEX.yaml:19047</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent</li>
+<li><code>data/literature/INDEX.yaml:19105</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g)</li>
+<li><code>data/literature/INDEX.yaml:19164</code> - source_id.citation: REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure</li>
+<li><code>data/literature/INDEX.yaml:19222</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations</li>
+<li><code>data/literature/INDEX.yaml:19280</code> - source_id.citation: citation: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected</li>
+<li><code>data/literature/INDEX.yaml:19338</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g)</li>
+<li><code>data/literature/INDEX.yaml:19397</code> - source_id.citation: Alcock et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
+<li><code>data/literature/INDEX.yaml:19454</code> - source_id.citation: citation: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)</li>
 <li><code>data/literature/extracts-v2/ref-032-al.yaml:84</code> - observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
 <li><code>data/literature/extracts-v2/ref-032-al.yaml:85</code> - observation_id.locator.record: record: REF-032#Al</li>
 <li><code>data/literature/extracts-v2/ref-032-bi.yaml:84</code> - observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
@@ -935,8 +935,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/literature/INDEX.yaml:707</code> - gaps.type.source_ids: - REF-040</li>
-<li><code>data/literature/INDEX.yaml:7740</code> - source_id.aliases: - REF-040</li>
+<li><code>data/literature/INDEX.yaml:711</code> - gaps.type.source_ids: - REF-040</li>
+<li><code>data/literature/INDEX.yaml:7919</code> - source_id.aliases: - REF-040</li>
 <li><code>data/literature/SOURCE_STATUS.yaml:661</code> - source_id: - source_id: REF-040</li>
 <li><code>data/literature/langmuir_knudsen_flux_validation.yaml:19</code> - measurements.chromium_solid_langmuir_knudsen.source.citation_id: citation_id: REF-040</li>
 <li><code>data/literature/observations-v2/langmuir_knudsen_flux_validation.yaml:6</code> - observation_id.experiment_id: experiment_id: 10.1063/1.3253096::REF-040</li>
@@ -946,7 +946,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/works/10.1063_1.3253096.yaml:8</code> - work.source_ids: - REF-040</li>
 <li><code>data/literature/works/10.1063_1.3253096.yaml:39</code> - work.source_files.asset_id: - asset_id: unknown:REF-040</li>
 <li><code>data/literature/works/10.1063_1.3253096.yaml:47</code> - experiment_id: - experiment_id: 10.1063/1.3253096::REF-040</li>
-<li><code>data/literature/works/ALIASES.yaml:249</code> - aliases.REF-040: REF-040: 10.1063/1.3253096</li>
+<li><code>data/literature/works/ALIASES.yaml:251</code> - aliases.REF-040: REF-040: 10.1063/1.3253096</li>
 <li><code>data/vapor_pressures.yaml:2521</code> - families.metals_cr_family.vaporisation_coefficients.evaporation_alpha.source: source: REF-040 Pound 1972 J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096,</li>
 <li><code>data/vapor_pressures.yaml:2862</code> - families.metals_mn_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 class basis: owner-ratified monoatomic-class</li>
 <li><code>docs/lab-validation-whitepaper.md:131</code> - 2.3 Evaporation coefficients: principled treatment: | Mn | 1.0 (tier 2 owner-ratified monoatomic-class proxy); envelope 0.5–1.0; liquid-process band 1519–2334.526 K | REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 establish the near-unity clean monoatomic-metal class basis through Fe/Cr and multi-metal free evaporation | Not a Mn-specific or temperature-calibrated measurement. Two independent sweeps found no direct Mn HKL coefficient; Safarian &amp; Engh 2013 full text contains zero Mn value. Medium-high confidence for clean liquid Mn; solid α-Mn remains unmeasured. Melt activity belongs in `P_sat`. | assumption (owner-ratified proxy) |</li>
@@ -1088,28 +1088,28 @@ ul { padding-left: 1.4rem; }</style>
 <blockquote><p>Data on the potassium oxides is limited and of uncertain quality.</p><footer>p. 159, Sec. 2.3c; Source-quality caveat carried into the t-141 uncertainty budget for the honest +1.15..+1.28 dex held-out DeMaria residual.</footer></blockquote>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/battery/migration-queue.yaml:126865</code> - work_id.observation_id.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species tables — independent</li>
-<li><code>data/battery/migration-queue.yaml:126867</code> - work_id.observation_id.locator.record: record: REF-052#K_O_gas</li>
-<li><code>data/battery/migration-queue.yaml:126876</code> - work_id.observation_id.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species tables — independent</li>
-<li><code>data/battery/migration-queue.yaml:126878</code> - work_id.observation_id.locator.record: record: REF-052#K_O_gas</li>
-<li><code>data/battery/migration-queue.yaml:126887</code> - work_id.observation_id.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species tables — independent</li>
-<li><code>data/battery/migration-queue.yaml:126889</code> - work_id.observation_id.locator.record: record: REF-052#K_O_gas</li>
-<li><code>data/battery/migration-queue.yaml:126898</code> - work_id.observation_id.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species tables — independent</li>
-<li><code>data/battery/migration-queue.yaml:126900</code> - work_id.observation_id.locator.record: record: REF-052#K_O_gas</li>
-<li><code>data/battery/migration-queue.yaml:126909</code> - work_id.observation_id.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species tables — independent</li>
-<li><code>data/battery/migration-queue.yaml:126911</code> - work_id.observation_id.locator.record: record: REF-052#K_O_gas</li>
-<li><code>data/battery/migration-queue.yaml:126921</code> - work_id.observation_id.locator.note: Binary Oxides&quot;, J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project REF-052), Table 4 Na–O gas species</li>
-<li><code>data/battery/migration-queue.yaml:126923</code> - work_id.observation_id.locator.record: record: REF-052#Na_O_gas</li>
-<li><code>data/battery/migration-queue.yaml:126933</code> - work_id.observation_id.locator.note: Binary Oxides&quot;, J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project REF-052), Table 4 Na–O gas species</li>
-<li><code>data/battery/migration-queue.yaml:126935</code> - work_id.observation_id.locator.record: record: REF-052#Na_O_gas</li>
-<li><code>data/battery/migration-queue.yaml:126945</code> - work_id.observation_id.locator.note: Binary Oxides&quot;, J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project REF-052), Table 4 Na–O gas species</li>
-<li><code>data/battery/migration-queue.yaml:126947</code> - work_id.observation_id.locator.record: record: REF-052#Na_O_gas</li>
-<li><code>data/battery/migration-queue.yaml:126957</code> - work_id.observation_id.locator.note: Binary Oxides&quot;, J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project REF-052), Table 4 Na–O gas species</li>
-<li><code>data/battery/migration-queue.yaml:126959</code> - work_id.observation_id.locator.record: record: REF-052#Na_O_gas</li>
-<li><code>data/battery/migration-queue.yaml:126969</code> - work_id.observation_id.locator.note: Binary Oxides&quot;, J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project REF-052), Table 4 Na–O gas species</li>
-<li><code>data/battery/migration-queue.yaml:126971</code> - work_id.observation_id.locator.record: record: REF-052#Na_O_gas</li>
-<li><code>data/literature/INDEX.yaml:19276</code> - source_id.citation: citation: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species</li>
-<li><code>data/literature/INDEX.yaml:19338</code> - source_id.citation: REF-052), Table 4 Na–O gas species (NaO, Na2O, Na2O2, …). Independent of pure Na metal Rodebush Antoine.</li>
+<li><code>data/battery/migration-queue.yaml:129562</code> - work_id.observation_id.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species tables — independent</li>
+<li><code>data/battery/migration-queue.yaml:129564</code> - work_id.observation_id.locator.record: record: REF-052#K_O_gas</li>
+<li><code>data/battery/migration-queue.yaml:129573</code> - work_id.observation_id.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species tables — independent</li>
+<li><code>data/battery/migration-queue.yaml:129575</code> - work_id.observation_id.locator.record: record: REF-052#K_O_gas</li>
+<li><code>data/battery/migration-queue.yaml:129584</code> - work_id.observation_id.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species tables — independent</li>
+<li><code>data/battery/migration-queue.yaml:129586</code> - work_id.observation_id.locator.record: record: REF-052#K_O_gas</li>
+<li><code>data/battery/migration-queue.yaml:129595</code> - work_id.observation_id.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species tables — independent</li>
+<li><code>data/battery/migration-queue.yaml:129597</code> - work_id.observation_id.locator.record: record: REF-052#K_O_gas</li>
+<li><code>data/battery/migration-queue.yaml:129606</code> - work_id.observation_id.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species tables — independent</li>
+<li><code>data/battery/migration-queue.yaml:129608</code> - work_id.observation_id.locator.record: record: REF-052#K_O_gas</li>
+<li><code>data/battery/migration-queue.yaml:129618</code> - work_id.observation_id.locator.note: Binary Oxides&quot;, J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project REF-052), Table 4 Na–O gas species</li>
+<li><code>data/battery/migration-queue.yaml:129620</code> - work_id.observation_id.locator.record: record: REF-052#Na_O_gas</li>
+<li><code>data/battery/migration-queue.yaml:129630</code> - work_id.observation_id.locator.note: Binary Oxides&quot;, J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project REF-052), Table 4 Na–O gas species</li>
+<li><code>data/battery/migration-queue.yaml:129632</code> - work_id.observation_id.locator.record: record: REF-052#Na_O_gas</li>
+<li><code>data/battery/migration-queue.yaml:129642</code> - work_id.observation_id.locator.note: Binary Oxides&quot;, J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project REF-052), Table 4 Na–O gas species</li>
+<li><code>data/battery/migration-queue.yaml:129644</code> - work_id.observation_id.locator.record: record: REF-052#Na_O_gas</li>
+<li><code>data/battery/migration-queue.yaml:129654</code> - work_id.observation_id.locator.note: Binary Oxides&quot;, J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project REF-052), Table 4 Na–O gas species</li>
+<li><code>data/battery/migration-queue.yaml:129656</code> - work_id.observation_id.locator.record: record: REF-052#Na_O_gas</li>
+<li><code>data/battery/migration-queue.yaml:129666</code> - work_id.observation_id.locator.note: Binary Oxides&quot;, J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project REF-052), Table 4 Na–O gas species</li>
+<li><code>data/battery/migration-queue.yaml:129668</code> - work_id.observation_id.locator.record: record: REF-052#Na_O_gas</li>
+<li><code>data/literature/INDEX.yaml:19514</code> - source_id.citation: citation: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species</li>
+<li><code>data/literature/INDEX.yaml:19576</code> - source_id.citation: REF-052), Table 4 Na–O gas species (NaO, Na2O, Na2O2, …). Independent of pure Na metal Rodebush Antoine.</li>
 <li><code>data/literature/extracts-v2/ref-052-k-o-gas.yaml:84</code> - observation_id.locator.note: note: Lamoreaux &amp; Hildenbrand (1984) JPCRD 13:151–173, DOI 10.1063/1.555706 (REF-052), K–O gas species tables — independent</li>
 <li><code>data/literature/extracts-v2/ref-052-k-o-gas.yaml:86</code> - observation_id.locator.record: record: REF-052#K_O_gas</li>
 <li><code>data/literature/extracts-v2/ref-052-na-o-gas.yaml:85</code> - observation_id.locator.note: Oxides&quot;, J. Phys. Chem. Ref. Data 13:151–173, DOI 10.1063/1.555706 (project REF-052), Table 4 Na–O gas species (NaO,</li>
@@ -1177,7 +1177,7 @@ ul { padding-left: 1.4rem; }</style>
 <ul>
 <li><code>simulator/accounting/queries.py:120</code> - REE_ENRICHMENT_SOURCE_IDS = (&quot;REF-056&quot;, &quot;REF-057&quot;)</li>
 <li><code>simulator/accounting/queries.py:598</code> - def terminal_ree_enrichment_extent(self) -&gt; dict[str, Any]: REEs are treated as refractory, incompatible lithophiles (REF-056,</li>
-<li><code>simulator/extraction.py:3413</code> - def _c7_ree_enrichment_extent(before: dict, after: dict) -&gt; dict: With REE oxides retained in the refractory residue (REF-056/057),</li>
+<li><code>simulator/extraction.py:3419</code> - def _c7_ree_enrichment_extent(before: dict, after: dict) -&gt; dict: With REE oxides retained in the refractory residue (REF-056/057),</li>
 </ul>
 </section>
 <section class="entry" id="REF-057">
@@ -1201,7 +1201,7 @@ ul { padding-left: 1.4rem; }</style>
 <blockquote><p>1728 K, melting point of Ni; DeltaH = 4.10 kcal/mole.</p><footer>p. 28; Pins the solid-Ni/liquid-Ni segment boundary used by the NiO Ellingham row.</footer></blockquote>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/setpoints.yaml:1486</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
+<li><code>data/setpoints.yaml:1489</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
 <li><code>engines/builtin/electrolysis_step.py:125</code> - &quot;REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668 NiO(s) &quot;</li>
 <li><code>simulator/chemistry/ellingham_thermo.py:80</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # and REF-058 USBM Bulletin 668 for Ni/NiO.</li>
 <li><code>simulator/chemistry/ellingham_thermo.py:320</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # Ni premise: REF-058, Mah &amp; Pankratz, U.S. Bureau of Mines Bulletin 668</li>

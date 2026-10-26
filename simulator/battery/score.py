@@ -178,6 +178,7 @@ from simulator.battery.validate import (
 )
 from simulator.battery.validity import (
     GateOutcome,
+    _calibration_grounded,
     _partial_pressure_observations_by_experiment,
     comparison_method_cell_constant_cancels,
     run_validity_gates,
@@ -1442,8 +1443,6 @@ def _missing_apparatus_fact(
         and allow_unknown_method
     ):
         return "method_unknown"
-    if name == "kems_calibration" and allow_calibration:
-        return "calibration"
     if name == "background_pressure_stated" and not getattr(check, "passed", True):
         return "background_pressure"
     if name == "orifice_knudsen" and not getattr(check, "passed", True):
@@ -1454,6 +1453,10 @@ def _missing_apparatus_fact(
     if name == "background_pressure" and not getattr(check, "passed", True):
         # A stated high or straddling background is an explicit invalid input,
         # not an unverified apparatus fact.
+        return None
+    if name == "in_cell_partial_pressure_sum" and not getattr(check, "passed", True):
+        if detail.get("printed_partial_pressure_sum_Pa") is None:
+            return "in_cell_partial_pressure_sum"
         return None
     if name == "geometry_determinants" and allow_calibration:
         missing = detail.get("missing")
@@ -1490,9 +1493,9 @@ def _unverified_apparatus_notices(
         return ()
     if reference.admission.status is not AdmissionStatus.ADMITTED:
         return ()
-    source_is_kems = bool(reference.source_id and reference.source_id.startswith("kems-"))
     author_reported_pressure = (
-        source_is_kems
+        experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
         and reference.evidence.original_method_class
         in {"measured", "measured_direct", "measured_tabulated"}
     )
@@ -1540,10 +1543,18 @@ def _unverified_apparatus_notices(
         and reference.evidence.class_.is_value
         and reference.evidence.class_.value in MEASURED_EVIDENCE
     )
+    figure_only_partial_pressure = (
+        quantity is Quantity.P_PARTIAL
+        and reference.evidence.class_.is_value
+        and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+    )
     calibration_flagged_partial_pressure = (
         quantity is Quantity.P_PARTIAL
         and reference.evidence.class_.is_value
-        and reference.evidence.class_.value in MEASURED_EVIDENCE
+        and (
+            reference.evidence.class_.value in MEASURED_EVIDENCE
+            or reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        )
         and _has_calibration_not_grounded(gates.checks)
     )
     calibration_flagged_activity = (
@@ -1553,6 +1564,7 @@ def _unverified_apparatus_notices(
     )
     if not (
         measured_pressure
+        or figure_only_partial_pressure
         or comparison_activity
         or unknown_method_activity
         or calibration_flagged_partial_pressure
@@ -1562,7 +1574,7 @@ def _unverified_apparatus_notices(
     allow_calibration = (
         author_reported_pressure or comparison_activity or calibration_flagged_activity
     )
-    missing: set[str] = set()
+    missing: dict[str, Mapping] = {}
     calibration_notice = None
     calibration_reason = None
     for check in gates.checks:
@@ -1574,7 +1586,7 @@ def _unverified_apparatus_notices(
                 (allow_calibration or calibration_flagged_partial_pressure)
                 and _has_calibration_not_grounded((check,))
             ):
-                missing.add("calibration_not_grounded")
+                missing["calibration_not_grounded"] = detail
                 notice_text = detail.get("calibration_notice")
                 if isinstance(notice_text, str):
                     calibration_notice = notice_text
@@ -1589,14 +1601,56 @@ def _unverified_apparatus_notices(
         )
         if fact is None:
             return ()
-        missing.add(fact)
+        missing[fact] = detail
     if not missing:
         return ()
-    return tuple(
-        Notice(
-            kind=NoticeKind.UNVERIFIED_APPARATUS,
-            affected_quantities=(quantity,),
-            reason=(
+    notices: list[Notice] = []
+    for fact in sorted(missing):
+        detail = missing[fact]
+        if fact == "in_cell_partial_pressure_sum":
+            pressure_detail = detail.get("pressure_sum_detail")
+            if isinstance(pressure_detail, Mapping):
+                detail = pressure_detail
+            original_reason = str(
+                detail.get("reason") or "printed in-cell pressure sum is unavailable"
+            )
+            pressure_limit = detail.get("pressure_limit_Pa")
+            limit_basis = detail.get("limit_basis")
+            limit_source = detail.get("limit_source")
+            regime_limit = (
+                f"{pressure_limit} Pa"
+                if pressure_limit is not None
+                else "unavailable"
+            )
+            limit_detail = "; ".join(
+                str(value) for value in (limit_source, limit_basis) if value
+            )
+            if limit_detail:
+                regime_limit += f" ({limit_detail})"
+            notices.append(
+                Notice(
+                    kind=NoticeKind.UNVERIFIED_APPARATUS,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        f"apparatus_unverified:{fact}; original_reason={original_reason}; "
+                        "authority=extrapolated; "
+                        f"regime_limit={regime_limit}"
+                    ),
+                    origin=reference.observation_id,
+                    band=(
+                        f"free-molecular in-cell pressure sum <= {pressure_limit} Pa"
+                        if pressure_limit is not None
+                        else "free-molecular in-cell pressure limit unavailable"
+                    ),
+                    authority=Authority.EXTRAPOLATED,
+                )
+            )
+            continue
+        notices.append(
+            Notice(
+                kind=NoticeKind.UNVERIFIED_APPARATUS,
+                affected_quantities=(quantity,),
+                reason=(
                 "calibration_not_grounded: "
                 f"{calibration_notice or 'Calibration is not grounded.'}"
                 + (
@@ -1611,11 +1665,11 @@ def _unverified_apparatus_notices(
                     if fact == "method_unknown"
                     else f"apparatus_unverified:{fact}"
                 )
-            ),
-            origin=reference.observation_id,
+                ),
+                origin=reference.observation_id,
+            )
         )
-        for fact in sorted(missing)
-    )
+    return tuple(notices)
 
 
 def _flagged_stratum_notices(
@@ -3597,6 +3651,25 @@ def _observation_flagged_strata(
     )
 
 
+def _has_ungrounded_kems_partial_pressure_calibration(
+    observation: Observation,
+    experiment: Experiment | None,
+) -> bool:
+    identity = observation.identity
+    if (
+        experiment is None
+        or not isinstance(identity, Identity)
+        or quantity_token(identity) is not Quantity.P_PARTIAL
+        or not experiment.method.is_value
+        or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
+    ):
+        return False
+    calibration = (
+        None if experiment.apparatus is None else experiment.apparatus.calibration
+    )
+    return not _calibration_grounded(calibration)
+
+
 def _kems_replicate_groups(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
@@ -3611,6 +3684,11 @@ def _kems_replicate_groups(
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
+        experiment = experiments.get(observation.experiment_id)
+        if _has_ungrounded_kems_partial_pressure_calibration(
+            observation, experiment
+        ):
+            continue
         strata = _observation_flagged_strata(
             observation, experiments, point_observations_by_experiment, benches
         )
@@ -3619,7 +3697,6 @@ def _kems_replicate_groups(
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
             continue
-        experiment = experiments.get(observation.experiment_id)
         if (
             experiment is None
             or not experiment.method.is_value
@@ -3678,6 +3755,11 @@ def _derive_kems_partial_pressure_band(
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
+        experiment = experiments.get(observation.experiment_id)
+        if _has_ungrounded_kems_partial_pressure_calibration(
+            observation, experiment
+        ):
+            continue
         strata = _observation_flagged_strata(
             observation, experiments, point_observations_by_experiment, benches
         )
@@ -3686,7 +3768,6 @@ def _derive_kems_partial_pressure_band(
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
             continue
-        experiment = experiments.get(observation.experiment_id)
         if (
             experiment is None
             or not experiment.method.is_value
@@ -4542,9 +4623,6 @@ def _source_band_catalog(
     )
 
     comparison_ids = {row.observation_id for row in comparison_candidates(context)}
-    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
-        context.observations.values()
-    )
     sources: dict[str, dict[str, dict[str, object]]] = defaultdict(dict)
     identities: dict[str, Identity] = {}
     group_keys: dict[str, dict[str, object]] = {}
@@ -4566,21 +4644,10 @@ def _source_band_catalog(
         if (
             not compilation
             and parent.observation_id in comparison_ids
-            and isinstance(identity, Identity)
-            and quantity_token(identity) is Quantity.P_PARTIAL
-            and experiment is not None
-            and experiment.method.is_value
-            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-            and FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
-            in _observation_flagged_strata(
-                parent,
-                context.experiments,
-                point_observations_by_experiment,
-                context.benches,
+            and _has_ungrounded_kems_partial_pressure_calibration(
+                parent, experiment
             )
         ):
-            # d-139: retain uncalibrated KEMS rows for scoring, but exclude
-            # their absolute pressures from the generic scatter population.
             continue
         for cell in _iter_compilation_series_cells(parent, origin):
             if not isinstance(cell.identity, Identity):

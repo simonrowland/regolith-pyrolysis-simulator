@@ -479,6 +479,7 @@ QUANTITY_ALIASES = {
     "delta_fG": Quantity.DELTA_FG,
     "delta_fG_kJ_mol": Quantity.DELTA_FG,
     "delta_fH": Quantity.DELTA_FH,
+    "delta_fH298": Quantity.DELTA_FH,
     "deltafH": Quantity.DELTA_FH,
     "delta_f_H": Quantity.DELTA_FH,
     "negative_enthalpy_change_on_cooling": Quantity.H_MINUS_H298,
@@ -9044,6 +9045,10 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.ENTHALPY_OF_FUSION: (
         "delta_H_fus_kJ_mol-1",
         "delta_H_fusion_kJ_mol",
+        "value_kcal_per_mol",
+        "preferred_estimate",
+        "estimate_from_liquid_glass_Cp_and_Tg",
+        "estimate_from_glass_Cp_only",
         "value",
     ),
     Quantity.ENTROPY_OF_FUSION: (
@@ -9057,6 +9062,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "delta_fH",
         "deltafH",
         "formation_enthalpy",
+        "delta_fH298_kJ_per_mol",
         "delta_f_H_298_15",
         "formation_enthalpy_298_15_K_as_published",
         "value",
