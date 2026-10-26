@@ -44,6 +44,7 @@ from simulator.furnace_materials import (
 from simulator.recipe_errors import MalformedRecipeError
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe import (
+    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
     C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
     c2a_staged_stage_order,
@@ -64,7 +65,6 @@ from simulator.state import (
     clamp_stir_state,
 )
 
-C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
 C2A_STAGED_DEPLETION_YIELD_FLOOR_MOL = 1.0e-12
 C2A_STAGED_GAS_COVER_PN2_SWEEP = 'pn2_sweep'
 C2A_STAGED_GAS_COVER_PO2_HOLD = 'po2_hold'
@@ -167,6 +167,17 @@ class CampaignEndpointRefusal(ValueError):
         self.diagnostic.setdefault('reason_refused', self.reason)
         self.reason = str(self.diagnostic['reason_refused'])
         super().__init__(f'{self.reason}: {self.diagnostic}')
+
+
+class CampaignStopConfigurationRefusal(ValueError):
+    """Required endpoint inputs are absent or unusable; no unlimited fallback."""
+
+    reason = 'campaign_stop_configuration_missing'
+    terminal_refusal = True
+
+    def __init__(self, detail: str):
+        self.diagnostic = {'reason_refused': self.reason, 'detail': detail}
+        super().__init__(detail)
 
 
 class CampaignHoldAcquisitionRefusal(CampaignEndpointRefusal):
@@ -489,6 +500,7 @@ class CampaignManager:
         self._active_post_mg_c2a_overrides: dict | None = None
         self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
         self.last_c4_termination: dict[str, object] | None = None
+        self.last_termination: dict[str, object] | None = None
 
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
@@ -987,9 +999,16 @@ class CampaignManager:
         for key in path:
             label = f"{label}.{key}"
             if not isinstance(value, Mapping) or key not in value:
-                raise ValueError(f'Missing campaign max_hold_hr setpoint: {label}')
+                raise CampaignStopConfigurationRefusal(
+                    f'Missing campaign max_hold_hr setpoint: {label}')
             value = value[key]
-        return self._required_float(value, label)
+        if value is None:
+            raise CampaignStopConfigurationRefusal(
+                f'Missing numeric campaign setpoint: {label}')
+        limit = self._required_float(value, label)
+        if not math.isfinite(limit) or limit <= 0.0:
+            raise CampaignStopConfigurationRefusal(f'{label} must be finite and positive')
+        return limit
 
     def _max_hold_hr(self, campaign: CampaignPhase, *path: str) -> float:
         if not path:
@@ -1016,10 +1035,8 @@ class CampaignManager:
         value = self._campaign_config(CampaignPhase.C6).get(
             'max_target_acquisition_hr'
         )
-        limit = self._required_float(
-            value,
-            'C6.max_target_acquisition_hr',
-        )
+        limit = self._endpoint_float(CampaignPhase.C6, {'max_target_acquisition_hr': value},
+                                     'max_target_acquisition_hr')
         if not math.isfinite(limit) or limit <= 0.0:
             raise ValueError(
                 'C6.max_target_acquisition_hr must be finite and positive'
@@ -1044,7 +1061,8 @@ class CampaignManager:
         value = self._campaign_config(CampaignPhase.C4).get(
             'max_target_acquisition_hr'
         )
-        limit = self._required_float(value, 'C4.max_target_acquisition_hr')
+        limit = self._endpoint_float(CampaignPhase.C4, {'max_target_acquisition_hr': value},
+                                     'max_target_acquisition_hr')
         if not math.isfinite(limit) or limit <= 0.0:
             raise ValueError(
                 'C4.max_target_acquisition_hr must be finite and positive'
@@ -1055,7 +1073,8 @@ class CampaignManager:
         value = self._campaign_config(CampaignPhase.C4).get(
             'max_process_wall_clock_hr'
         )
-        limit = self._required_float(value, 'C4.max_process_wall_clock_hr')
+        limit = self._endpoint_float(CampaignPhase.C4, {'max_process_wall_clock_hr': value},
+                                     'max_process_wall_clock_hr')
         if not math.isfinite(limit) or limit <= 0.0:
             raise ValueError(
                 'C4.max_process_wall_clock_hr must be finite and positive'
@@ -1210,6 +1229,9 @@ class CampaignManager:
                         endpoint: Mapping,
                         key: str) -> float:
         label = f"{self._campaign_config_key(campaign)}.{key}"
+        if endpoint.get(key) is None:
+            raise CampaignStopConfigurationRefusal(
+                f'Missing numeric campaign setpoint: {label}')
         return self._required_float(endpoint.get(key), label)
 
     def _configured_staged_max_hold_hr(self,
@@ -1242,6 +1264,154 @@ class CampaignManager:
         if isinstance(self.last_c2a_staged_gas_control, dict):
             self.last_c2a_staged_gas_control.pop('max_hold_adjustment', None)
         return max_hold_hr
+
+    def _resolve_endpoint(self, campaign: CampaignPhase, record: BatchRecord) -> dict:
+        """Resolve the legacy clocks and aliases once, without changing precedence.
+
+        Scalar aliases replace caps only on the historic _max_hold_hr paths.
+        Elsewhere positive max_hours is an additional wall escape. C4 applies
+        it to acquired window time; C6 applies it to acquisition/wall time.
+        """
+        cfg = self._campaign_config(campaign)
+        ovr = self._campaign_overrides(campaign)
+        resolved = {
+            'overrides': ovr,
+            'yield_target': cfg.get('yield_target', {'mode': 'off'}),
+            'wall_escape_hr': None,
+            'minimum_hr': 0.0,
+            'rate': cfg.get('rate_endpoint', {'mode': 'not_applicable'}),
+        }
+        if campaign not in (CampaignPhase.C0, CampaignPhase.C4, CampaignPhase.C6):
+            if 'max_hours' in ovr:
+                raw = ovr['max_hours']
+                if not is_declared_real_scalar(raw, allow_numeric_str=True):
+                    raise ValueError('max_hours override must be numeric')
+                if float(raw) > 0.0:
+                    resolved['wall_escape_hr'] = float(raw)
+
+        if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
+            path_key = 'A' if record.path == 'A' else 'default'
+            resolved['budget_hr'] = self._configured_max_hold_hr(
+                campaign, campaign.name, path_key)
+            if record.path == 'A_staged':
+                resolved['staged_budget_hr'] = max(1, int(self._float(
+                    ovr.get('staged_duration_h'),
+                    self._configured_max_hold_hr(campaign, campaign.name, 'A_staged'),
+                )))
+        elif campaign == CampaignPhase.C2A_STAGED:
+            resolved['budget_hr'] = self._configured_staged_max_hold_hr(campaign)
+            resolved['stages'] = self._c2a_staged_enabled_stages()
+            resolved['legacy_fraction'] = self._c2a_staged_depletion_flux_decay_fraction()
+            resolved['has_log_slope'] = self._c2a_staged_has_log_slope_depletion(resolved['stages'])
+        elif campaign == CampaignPhase.C5:
+            branch = 'branch_two' if record.branch == 'two' else 'branch_one'
+            resolved['budget_hr'] = self._configured_max_hold_hr(campaign, branch)
+            resolved['rate'] = self._configured_endpoint(campaign, 'endpoint')
+            resolved['default_cap_V'] = self._endpoint_float(
+                campaign, cfg.get(branch, {}), 'max_voltage_V')
+            resolved['threshold_A'] = self._endpoint_float(campaign, resolved['rate'], 'threshold_A')
+            resolved['at_voltage_margin_V'] = self._endpoint_float(campaign, resolved['rate'], 'at_voltage_margin_V')
+            resolved['consecutive_hours'] = int(self._endpoint_float(campaign, resolved['rate'], 'consecutive_hours'))
+        elif campaign == CampaignPhase.C6:
+            resolved['budget_hr'] = self._configured_max_hold_hr(campaign)
+            resolved['acquisition_hr'], resolved['acquisition_source'] = self._c6_target_acquisition_limit()
+            resolved['composition'] = self._configured_endpoint(campaign, 'composition_endpoint')
+            resolved['composition_threshold_wt_pct'] = self._endpoint_float(campaign, resolved['composition'], 'threshold_wt_pct')
+            resolved['minimum_hr'] = self._float(ovr.get('min_hold_hr'), 0.0)
+        elif campaign == CampaignPhase.MRE_BASELINE:
+            resolved['budget_hr'] = self._configured_max_hold_hr(campaign)
+            resolved['rate'] = self._configured_endpoint(campaign, 'soft_endpoint')
+            for field in ('min_voltage_V', 'threshold_A', 'consecutive_hours'):
+                resolved[field] = self._endpoint_float(campaign, resolved['rate'], field)
+        else:
+            resolved['budget_hr'] = self._max_hold_hr(campaign)
+
+        if campaign in (CampaignPhase.C2A, CampaignPhase.C2B, CampaignPhase.C4):
+            soft = self._configured_endpoint(campaign, 'soft_endpoint')
+            resolved['minimum_hr'] = self._float(
+                ovr.get('min_hold_hr'), self._endpoint_float(campaign, soft, 'min_hold_hr'))
+            threshold = self._endpoint_float(campaign, soft, 'threshold_kg_hr')
+            if campaign != CampaignPhase.C4:
+                threshold = self._float(ovr.get('threshold_kg_hr'), threshold)
+            resolved['rate'] = dict(soft, threshold_kg_hr=threshold)
+        if campaign == CampaignPhase.C4:
+            resolved['window_C'] = self._c4_temperature_window()
+            resolved['acquisition_hr'], resolved['acquisition_source'] = self._c4_target_acquisition_limit()
+            resolved['process_hr'], resolved['process_source'] = self._c4_process_wall_clock_limit()
+        return resolved
+
+    @staticmethod
+    def _yield_target_reached(target: Mapping, *, eligible: bool,
+                              inventories: Mapping | None = None) -> bool:
+        """Dormant feed-recovery hook. Inventories are mol, never melt wt%.
+
+        No phase supplies inventories or enables a target until its owner
+        rules on feed attribution (including exclusion of imported reductants).
+        """
+        if not isinstance(target, Mapping):
+            raise CampaignStopConfigurationRefusal('yield_target must be a mapping')
+        mode = target.get('mode')
+        if mode in ('off', 'not_applicable'):
+            return False
+        if mode != 'enabled':
+            raise CampaignStopConfigurationRefusal('yield_target.mode is required')
+        species = target.get('species')
+        denominator = target.get('denominator')
+        quantity = target.get('quantity')
+        threshold = target.get('threshold')
+        if (
+            not isinstance(species, str) or not species
+            or denominator not in ('initial_feed_element_inventory', 'phase_entry_recoverable_inventory')
+            or quantity not in ('extracted', 'captured')
+            or not is_declared_real_scalar(threshold)
+            or not math.isfinite(float(threshold)) or not 0.0 <= float(threshold) <= 1.0
+        ):
+            raise CampaignStopConfigurationRefusal('yield_target requires species, denominator, quantity and fraction threshold')
+        if not eligible:
+            return False
+        if inventories is None:
+            raise CampaignStopConfigurationRefusal('yield_target requires feed-attributed mol inventories')
+        try:
+            denominator_mol = inventories[denominator][species]
+            numerator_mol = inventories[quantity][species]
+        except KeyError as exc:
+            raise CampaignStopConfigurationRefusal('yield_target is missing a declared mol inventory') from exc
+        if not math.isfinite(denominator_mol) or denominator_mol <= 0.0:
+            raise CampaignStopConfigurationRefusal('yield_target denominator must be finite and positive')
+        if not math.isfinite(numerator_mol) or numerator_mol < 0.0:
+            raise CampaignStopConfigurationRefusal('yield_target quantity must be finite and nonnegative')
+        # Both inventories count the same feed-attributed element in mol;
+        # their ratio is dimensionless, zero extraction gives zero recovery.
+        return numerator_mol / denominator_mol >= float(threshold)
+
+    def _finish_endpoint(self, melt: MeltState, predicates: list[dict],
+                         clocks: dict, *, legacy: Mapping | None = None) -> bool:
+        winner = next((item for item in predicates if item['bound']), None)
+        if winner is None:
+            return False
+        self.last_termination = {
+            **(legacy or {}),
+            'campaign': melt.campaign.name,
+            'winning_condition': winner['condition'],
+            'classification': winner['classification'],
+            'incomplete': winner['classification'] in ('time_budget_reached', 'no_signal', 'acquisition_deadline', 'physics_refusal'),
+            'observed': winner['observed'],
+            'threshold': winner['threshold'],
+            'predicates': predicates,
+            'bound_predicates': [item['condition'] for item in predicates if item['bound']],
+            'clocks': clocks,
+        }
+        return True
+
+    def record_physics_refusal(self, melt: MeltState, diagnostic: Mapping) -> None:
+        """Record a provider/physics refusal, including C6's pre-endpoint latch."""
+        self._finish_endpoint(melt, [{
+            'condition': str(diagnostic.get('reason_refused', diagnostic.get('reason', 'physics_refusal'))),
+            'classification': 'physics_refusal', 'bound': True,
+            'observed': dict(diagnostic), 'threshold': 'admissible physics state',
+        }], {'campaign_hour': float(melt.campaign_hour),
+             'completed_campaign_hour': self._completed_campaign_hour_for_endpoint(melt)},
+            legacy=diagnostic)
 
     def _c2a_staged_depletion_flux_decay_fraction(self) -> float:
         cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
@@ -1684,6 +1854,7 @@ class CampaignManager:
 
         Called when starting a new campaign phase.
         """
+        self.last_termination = None
         self._reset_stage_background_gas(melt)
         self._materialized_target_T_C_by_phase.pop(campaign, None)
         materialized_target = self._materialize_target_from_delta(campaign)
@@ -2434,184 +2605,132 @@ class CampaignManager:
         campaign = melt.campaign
         completed_campaign_hour = self._completed_campaign_hour_for_endpoint(melt)
 
-        # Check user-specified max_hours override first. C6 handles this as a
-        # hold-acquisition refusal below so the wall clock cannot claim a
-        # successful reaction without provider dispatch. C0 records the same
-        # stop inside its own branch so the incomplete outcome is not skipped.
-        ovr = self._campaign_overrides(campaign)
-        if campaign not in (
-            CampaignPhase.C4,
-            CampaignPhase.C6,
-            CampaignPhase.C0,
-        ) and 'max_hours' in ovr:
-            raw_max_hours = ovr['max_hours']
-            if not is_declared_real_scalar(
-                raw_max_hours,
-                allow_numeric_str=True,
-            ):
-                raise ValueError("max_hours override must be numeric")
-            max_h = float(raw_max_hours)
-            if max_h > 0 and completed_campaign_hour >= max_h:
-                return True
+        if campaign in (CampaignPhase.IDLE, CampaignPhase.COMPLETE):
+            return False
+        resolved = self._resolve_endpoint(campaign, record)
+        max_hold_hr = resolved['budget_hr']
+        predicates = []
+        clocks = {'campaign_hour': float(melt.campaign_hour),
+                  'completed_campaign_hour': completed_campaign_hour}
+
+        def bind(condition, bound, observed, threshold,
+                 classification='time_budget_reached'):
+            predicates.append({
+                'condition': condition, 'bound': bool(bound),
+                'observed': observed, 'threshold': threshold,
+                'classification': classification,
+            })
+            return bool(bound)
+
+        wall_escape = resolved['wall_escape_hr']
+        wall_bound = False
+        if wall_escape is not None:
+            wall_bound = bind('operator_wall_budget', completed_campaign_hour >= wall_escape,
+                              completed_campaign_hour, wall_escape)
+        # Targets stay disabled until their feed attribution has been ruled on.
+        # The hook must remain inert even before operating-state acquisition.
+        def bind_yield(eligible):
+            target = resolved['yield_target']
+            bind('species_yield_target',
+                 self._yield_target_reached(target, eligible=eligible),
+                 None, target.get('threshold'), 'target_reached')
+
+        self._yield_target_reached(resolved['yield_target'], eligible=False)
+
+        def validate_signal(value, *, name, unit):
+            try:
+                return self._require_finite_nonnegative_depletion_signal(value, name=name, unit=unit)
+            except CampaignEndpointRefusal as exc:
+                self.record_physics_refusal(melt, exc.diagnostic)
+                raise
 
         if campaign == CampaignPhase.C0:
-            from simulator.accounting.stage0_inventory import (
-                STAGE0_RELEASE_KINETICS,
-            )
+            from simulator.accounting.stage0_inventory import STAGE0_RELEASE_KINETICS
 
             prediction = self.c0_exit_prediction
-            prediction_payload = (
-                dict(prediction) if isinstance(prediction, Mapping) else {}
-            )
-            raw_unreleased = (
-                transport_state.get("target_inventory_diagnostic", {})
-                if isinstance(transport_state, Mapping)
-                else {}
-            )
-            unreleased_inventory = (
-                raw_unreleased if isinstance(raw_unreleased, Mapping) else {}
-            )
-
-            # First melt has priority over the computed exit and maximum hold.
-            if self.c0_first_melt_backstop:
-                _target_T, ramp_C_per_hr = self.get_temp_target(
-                    campaign, int(melt.campaign_hour), melt)
+            prediction_payload = dict(prediction) if isinstance(prediction, Mapping) else {}
+            exit_temperature_C = prediction_payload.get('T_exit_C')
+            exit_hour = prediction_payload.get('runtime_exit_campaign_hour',
+                                               prediction_payload.get('runtime_exit_window_hr'))
+            bind('first_melt', self.c0_first_melt_backstop, self.c0_first_melt_backstop, True)
+            bind('remaining_budget', self.c0_remaining_budget_exit is not None,
+                 self.c0_remaining_budget_exit, 'feasible forecast')
+            bind('computed_exit',
+                 exit_temperature_C is not None and exit_hour is not None
+                 and float(melt.temperature_C) >= float(exit_temperature_C)
+                 and completed_campaign_hour >= float(exit_hour),
+                 {'temperature_C': float(melt.temperature_C), 'completed_campaign_hour': completed_campaign_hour},
+                 {'temperature_C': exit_temperature_C, 'completed_campaign_hour': exit_hour})
+            bind('maximum_hold', completed_campaign_hour >= max_hold_hr,
+                 completed_campaign_hour, max_hold_hr)
+            if self._finish_endpoint(melt, predicates, clocks):
+                winner = self.last_termination['winning_condition']
+                raw_unreleased = (transport_state.get('target_inventory_diagnostic', {})
+                                  if isinstance(transport_state, Mapping) else {})
+                _target_T, ramp = self.get_temp_target(campaign, int(melt.campaign_hour), melt)
+                kwargs = ({'remaining_budget_exit': self.c0_remaining_budget_exit}
+                          if winner == 'remaining_budget' else {})
                 self.last_c0_exit = c0_exit_record(
-                    STAGE0_RELEASE_KINETICS,
-                    backstop="first_melt",
-                    ramp_C_per_hr=ramp_C_per_hr,
-                    prediction=prediction_payload,
-                    unreleased_inventory=unreleased_inventory,
-                    forecast_adjustment_notices=(
-                        self.c0_forecast_adjustment_notices
-                    ),
+                    STAGE0_RELEASE_KINETICS, backstop=winner,
+                    ramp_C_per_hr=ramp, prediction=prediction_payload,
+                    unreleased_inventory=raw_unreleased if isinstance(raw_unreleased, Mapping) else {},
+                    forecast_adjustment_notices=self.c0_forecast_adjustment_notices,
+                    **kwargs,
                 )
-                return True
-
-            if self.c0_remaining_budget_exit is not None:
-                _target_T, ramp_C_per_hr = self.get_temp_target(
-                    campaign, int(melt.campaign_hour), melt)
-                self.last_c0_exit = c0_exit_record(
-                    STAGE0_RELEASE_KINETICS,
-                    backstop="remaining_budget",
-                    ramp_C_per_hr=ramp_C_per_hr,
-                    prediction=prediction_payload,
-                    unreleased_inventory=unreleased_inventory,
-                    forecast_adjustment_notices=(
-                        self.c0_forecast_adjustment_notices
-                    ),
-                    remaining_budget_exit=self.c0_remaining_budget_exit,
-                )
-                return True
-
-            if isinstance(prediction, Mapping):
-                exit_temperature_C = prediction.get('T_exit_C')
-                exit_window_hr = prediction.get('runtime_exit_window_hr')
-                exit_campaign_hour = prediction.get(
-                    'runtime_exit_campaign_hour',
-                    exit_window_hr,
-                )
-                if (
-                    exit_temperature_C is not None
-                    and exit_campaign_hour is not None
-                    and float(melt.temperature_C) >= float(exit_temperature_C)
-                    and completed_campaign_hour >= float(exit_campaign_hour)
-                ):
-                    _target_T, ramp_C_per_hr = self.get_temp_target(
-                        campaign, int(melt.campaign_hour), melt)
-                    self.last_c0_exit = c0_exit_record(
-                        STAGE0_RELEASE_KINETICS,
-                        backstop="computed_exit",
-                        ramp_C_per_hr=ramp_C_per_hr,
-                        prediction=prediction_payload,
-                        unreleased_inventory=unreleased_inventory,
-                        forecast_adjustment_notices=(
-                            self.c0_forecast_adjustment_notices
-                        ),
-                    )
-                    return True
-
-            max_hold_hr = self._max_hold_hr(campaign)
-            if completed_campaign_hour >= max_hold_hr:
-                _target_T, ramp_C_per_hr = self.get_temp_target(
-                    campaign, int(melt.campaign_hour), melt)
-                self.last_c0_exit = c0_exit_record(
-                    STAGE0_RELEASE_KINETICS,
-                    backstop="maximum_hold",
-                    ramp_C_per_hr=ramp_C_per_hr,
-                    prediction=prediction_payload,
-                    unreleased_inventory=unreleased_inventory,
-                    forecast_adjustment_notices=(
-                        self.c0_forecast_adjustment_notices
-                    ),
-                )
+                self.last_termination.update(self.last_c0_exit)
                 return True
             return False
 
         elif campaign == CampaignPhase.C0B:
-            max_hold_hr = self._max_hold_hr(campaign)
-            if completed_campaign_hour >= max_hold_hr:
-                return True
+            bind('maximum_hold', completed_campaign_hour >= max_hold_hr,
+                 completed_campaign_hour, max_hold_hr)
 
-        elif campaign == CampaignPhase.C2A:
-            soft = self._configured_endpoint(campaign, 'soft_endpoint')
-            min_hold_hr = self._float(
-                ovr.get('min_hold_hr'),
-                self._endpoint_float(campaign, soft, 'min_hold_hr'),
-            )
-            threshold_kg_hr = self._float(
-                ovr.get('threshold_kg_hr'),
-                self._endpoint_float(campaign, soft, 'threshold_kg_hr'),
-            )
-            max_hold_hr = self._max_hold_hr(campaign)
-            total_rate = float(evap_flux.total_kg_hr)
-            # SC-109: soft depletion requires affirmative high-flux arming
-            # (C4 signal_armed pattern). Continuous sub-threshold / never-
-            # armed flux must not complete as if depletion occurred.
-            signal_armed = self._evap_total_signal_armed(
-                record,
-                CampaignPhase.C2A,
-                threshold_kg_hr,
-                current_rate=total_rate,
-            )
-            if signal_armed and melt.campaign_hour >= min_hold_hr:
-                total_rate = self._require_finite_nonnegative_depletion_signal(
-                    total_rate,
-                    name='C2A.total_kg_hr',
-                    unit='kg/hr',
-                )
-                if total_rate < threshold_kg_hr:
-                    return True
-            if completed_campaign_hour >= max_hold_hr:
-                return True
-
+        elif campaign in (CampaignPhase.C2A, CampaignPhase.C2B):
+            soft = resolved['rate']
+            min_hold_hr = resolved['minimum_hr']
+            threshold_kg_hr = soft['threshold_kg_hr']
+            if campaign == CampaignPhase.C2A:
+                rate = float(evap_flux.total_kg_hr)
+                signal_armed = self._evap_total_signal_armed(
+                    record, campaign, threshold_kg_hr, current_rate=rate)
+                signal_name = 'C2A.total_kg_hr'
+            else:
+                species = str(soft.get('species', ''))
+                if not species:
+                    raise CampaignStopConfigurationRefusal('C2B.soft_endpoint.species is required')
+                rate = float(evap_flux.species_kg_hr.get(species, 0.0))
+                signal_armed = self._evap_species_signal_armed(
+                    record, campaign, species, threshold_kg_hr, current_rate=rate)
+                signal_name = f'C2B.{species}_kg_hr'
+            eligible = signal_armed and melt.campaign_hour >= min_hold_hr
+            if eligible and not wall_bound:
+                rate = validate_signal(
+                    rate, name=signal_name, unit='kg/hr')
+            bind_yield(melt.campaign_hour >= min_hold_hr)
+            clocks.update(minimum_hold_hr=min_hold_hr, signal_armed=signal_armed)
+            bind('rate_floor', eligible and rate < threshold_kg_hr, rate, threshold_kg_hr, 'rate_depleted')
+            bind('maximum_hold', completed_campaign_hour >= max_hold_hr,
+                 completed_campaign_hour, max_hold_hr,
+                 'time_budget_reached' if signal_armed else 'no_signal')
         elif campaign == CampaignPhase.C2A_STAGED:
-            max_hold_hr = self._configured_staged_max_hold_hr(campaign)
-            legacy_fraction = self._c2a_staged_depletion_flux_decay_fraction()
-            stages = self._c2a_staged_enabled_stages()
-            has_log_slope_depletion = self._c2a_staged_has_log_slope_depletion(stages)
+            legacy_fraction = resolved['legacy_fraction']
+            stages = resolved['stages']
+            has_log_slope_depletion = resolved['has_log_slope']
             if legacy_fraction > 0.0 and has_log_slope_depletion:
                 raise ValueError(
                     'C2A_staged.depletion_flux_decay_fraction conflicts with '
                     'per-stage depletion_log_slope_epsilon_per_hr'
                 )
             if legacy_fraction <= 0.0 and not has_log_slope_depletion:
-                if completed_campaign_hour >= max_hold_hr:
+                fixed_duration = bind('fixed_duration', completed_campaign_hour >= max_hold_hr,
+                                      completed_campaign_hour, max_hold_hr)
+                if fixed_duration and not wall_bound:
                     self.last_c2a_staged_termination = {
                         'reason': 'fixed_duration',
                         'campaign_hour': int(melt.campaign_hour),
                     }
-                    return True
-                return False
+                return self._finish_endpoint(melt, predicates, clocks, legacy=self.last_c2a_staged_termination)
 
-            if not stages:
-                if completed_campaign_hour >= max_hold_hr:
-                    self.last_c2a_staged_termination = {
-                        'reason': 'fixed_duration',
-                        'campaign_hour': int(melt.campaign_hour),
-                    }
-                    return True
-                return False
             stage_idx = min(
                 max(0, int(self._c2a_staged_stage_idx)),
                 len(stages) - 1,
@@ -2660,19 +2779,16 @@ class CampaignManager:
                     for species_name, peak in self._c2a_staged_peak_flux_by_species.items()
                     if species_name in species and peak > 0.0
                 }
+                observed_rates = {
+                    species_name: max(0.0, self._float(evap_flux.species_kg_hr.get(species_name, 0.0), 0.0))
+                    for species_name in observed_peaks
+                }
+                thresholds = {species_name: legacy_fraction * peak
+                              for species_name, peak in observed_peaks.items()}
                 depletion_complete = (
                     stage_elapsed_h >= min_hold_h
                     and bool(observed_peaks)
-                    and all(
-                        max(
-                            0.0,
-                            self._float(
-                                evap_flux.species_kg_hr.get(species_name, 0.0),
-                                0.0,
-                            ),
-                        ) <= legacy_fraction * peak
-                        for species_name, peak in observed_peaks.items()
-                    )
+                    and all(observed_rates[name] <= thresholds[name] for name in observed_peaks)
                 )
                 depletion_reason = 'legacy_flux_decay'
             else:
@@ -2680,6 +2796,16 @@ class CampaignManager:
                 depletion_reason = 'duration_cap_timeout'
             stage_timeout = stage_elapsed_h >= duration_h
             final_stage = stage_idx >= len(stages) - 1
+            clocks.update(stage_elapsed_h=stage_elapsed_h, minimum_hold_hr=min_hold_h)
+            if log_slope_epsilon > 0.0:
+                bind(depletion_reason, depletion_complete,
+                     dict(self._c2a_staged_last_log_slope_by_species), log_slope_epsilon, 'rate_depleted')
+            elif legacy_fraction > 0.0:
+                bind(depletion_reason, depletion_complete, observed_rates, thresholds, 'rate_depleted')
+            bind('stage_duration', stage_timeout, stage_elapsed_h, duration_h)
+            bind('maximum_hold', completed_campaign_hour >= max_hold_hr, completed_campaign_hour, max_hold_hr)
+            if wall_bound:
+                return self._finish_endpoint(melt, predicates, clocks)
             if depletion_complete or stage_timeout:
                 reason = depletion_reason if depletion_complete else 'duration_cap_timeout'
                 self.last_c2a_staged_termination = {
@@ -2696,7 +2822,7 @@ class CampaignManager:
                     ),
                 }
                 if final_stage:
-                    return True
+                    return self._finish_endpoint(melt, predicates, clocks, legacy=self.last_c2a_staged_termination)
                 self._c2a_staged_stage_idx = stage_idx + 1
                 self._c2a_staged_stage_start_hour = melt.campaign_hour + 1
                 self._c2a_staged_peak_flux_by_species = {}
@@ -2710,105 +2836,29 @@ class CampaignManager:
                     'stage_idx': stage_idx,
                     'campaign_hour': int(melt.campaign_hour),
                 }
-                return True
+                return self._finish_endpoint(melt, predicates, clocks, legacy=self.last_c2a_staged_termination)
 
-        elif campaign == CampaignPhase.C2B:
-            soft = self._configured_endpoint(campaign, 'soft_endpoint')
-            min_hold_hr = self._float(
-                ovr.get('min_hold_hr'),
-                self._endpoint_float(campaign, soft, 'min_hold_hr'),
-            )
-            threshold_kg_hr = self._float(
-                ovr.get('threshold_kg_hr'),
-                self._endpoint_float(campaign, soft, 'threshold_kg_hr'),
-            )
-            max_hold_hr = self._max_hold_hr(campaign)
-            species = str(soft.get('species', ''))
-            if not species:
-                raise ValueError('C2B.soft_endpoint.species is required')
-            rate = float(evap_flux.species_kg_hr.get(species, 0.0))
-            # SC-109: missing species key / never-above-threshold rate is not
-            # depletion. Require a prior authorized high sample before low-rate
-            # soft completion (C4 signal_armed pattern).
-            signal_armed = self._evap_species_signal_armed(
-                record,
-                CampaignPhase.C2B,
-                species,
-                threshold_kg_hr,
-                current_rate=rate,
-            )
-            if signal_armed and melt.campaign_hour >= min_hold_hr:
-                rate = self._require_finite_nonnegative_depletion_signal(
-                    rate,
-                    name=f'C2B.{species}_kg_hr',
-                    unit='kg/hr',
-                )
-                if rate < threshold_kg_hr:
-                    return True
-            if completed_campaign_hour >= max_hold_hr:
-                return True
-
-        elif campaign == CampaignPhase.C3_K:
-            if record.path == 'A_staged':
-                staged_hours = int(self._float(
-                    self._campaign_overrides(campaign).get('staged_duration_h'),
-                    self._configured_max_hold_hr(campaign, 'C3_K', 'A_staged'),
-                ))
-                if completed_campaign_hour >= max(1, staged_hours):
-                    return True
-            path_key = 'A' if record.path == 'A' else 'default'
-            max_hold_hr = self._configured_max_hold_hr(
-                campaign, 'C3_K', path_key)
-            if completed_campaign_hour >= max_hold_hr:
-                return True
-
-        elif campaign == CampaignPhase.C3_NA:
-            # Autoreview r6 P2 (2026-05-27): the V1c-recipe-retune
-            # migration retargeted ``C2A_STAGED -> C3_NA`` (was
-            # ``C2A_STAGED -> C3_K`` pre-V1c) and the
-            # ``na_shuttle_stage`` override now sets
-            # ``staged_duration_h`` as the cool cleanup endpoint.  The
-            # C3_K branch above honors the override via the
-            # ``record.path == 'A_staged'`` check; this branch did not,
-            # so staged runs (``record.path == 'A_staged'``) fell into
-            # the ``else`` arm of the ternary and ran C3_NA for the
-            # default 35 hours instead of the intended ~3-hour cool
-            # cleanup.  Mirror the C3_K handling so the staged endpoint
-            # is honored at its configured value.
-            if record.path == 'A_staged':
-                staged_hours = int(self._float(
-                    self._campaign_overrides(campaign).get('staged_duration_h'),
-                    self._configured_max_hold_hr(campaign, 'C3_NA', 'A_staged'),
-                ))
-                if completed_campaign_hour >= max(1, staged_hours):
-                    return True
-            path_key = 'A' if record.path == 'A' else 'default'
-            max_hold_hr = self._configured_max_hold_hr(
-                campaign, 'C3_NA', path_key)
-            if completed_campaign_hour >= max_hold_hr:
-                return True
+        elif campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
+            staged_budget = resolved.get('staged_budget_hr')
+            bind('staged_duration', staged_budget is not None and completed_campaign_hour >= staged_budget,
+                 completed_campaign_hour, staged_budget)
+            bind('maximum_hold', completed_campaign_hour >= max_hold_hr,
+                 completed_campaign_hour, max_hold_hr)
 
         elif campaign == CampaignPhase.C4:
-            soft = self._configured_endpoint(campaign, 'soft_endpoint')
-            min_hold_hr = self._float(
-                ovr.get('min_hold_hr'),
-                self._endpoint_float(campaign, soft, 'min_hold_hr'),
-            )
-            threshold_kg_hr = self._endpoint_float(
-                campaign, soft, 'threshold_kg_hr')
-            max_hold_hr = self._max_hold_hr(campaign)
+            soft = resolved['rate']
+            min_hold_hr = resolved['minimum_hr']
+            threshold_kg_hr = soft['threshold_kg_hr']
             species = str(soft.get('species', ''))
             if not species:
-                raise ValueError('C4.soft_endpoint.species is required')
+                raise CampaignStopConfigurationRefusal('C4.soft_endpoint.species is required')
             rate = evap_flux.species_kg_hr.get(species, 0.0)
-            window_low_C, window_high_C = self._c4_temperature_window()
+            window_low_C, window_high_C = resolved['window_C']
             requested_window_C = [window_low_C, window_high_C]
-            acquisition_limit_hr, acquisition_limit_source = (
-                self._c4_target_acquisition_limit()
-            )
-            process_limit_hr, process_limit_source = (
-                self._c4_process_wall_clock_limit()
-            )
+            acquisition_limit_hr = resolved['acquisition_hr']
+            acquisition_limit_source = resolved['acquisition_source']
+            process_limit_hr = resolved['process_hr']
+            process_limit_source = resolved['process_source']
             c4_snapshots = [
                 snapshot
                 for snapshot in record.snapshots
@@ -2846,11 +2896,13 @@ class CampaignManager:
                 # at ~0.35 kg/hr) < 100 h budget, unaffected; a plant held
                 # 100+ hours with no ramp deserves the typed refusal (raise
                 # the setpoints if a feedstock legitimately needs longer).
-                if (
-                    completed_campaign_hour - acquisition_elapsed_hr
-                ) >= (
-                    acquisition_limit_hr + process_limit_hr
-                ):
+                clocks.update(acquisition_opportunity_hr=acquisition_elapsed_hr,
+                              held_hr=completed_campaign_hour - acquisition_elapsed_hr)
+                held_wall_bound = bind('preheat_held_wall', completed_campaign_hour - acquisition_elapsed_hr >= acquisition_limit_hr + process_limit_hr,
+                     completed_campaign_hour - acquisition_elapsed_hr, acquisition_limit_hr + process_limit_hr, 'acquisition_deadline')
+                acquisition_bound = bind('acquisition_deadline', acquisition_elapsed_hr >= acquisition_limit_hr,
+                     acquisition_elapsed_hr, acquisition_limit_hr, 'acquisition_deadline')
+                if held_wall_bound:
                     diagnostic = {
                         'reason_refused': (
                             C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON
@@ -2871,8 +2923,9 @@ class CampaignManager:
                         diagnostic['binding_transport_state'] = dict(
                             transport_state
                         )
+                    self._finish_endpoint(melt, predicates, clocks, legacy=diagnostic)
                     raise CampaignC4EndpointRefusal(diagnostic)
-                if acquisition_elapsed_hr >= acquisition_limit_hr:
+                if acquisition_bound:
                     diagnostic = {
                         'reason_refused': (
                             C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON
@@ -2889,6 +2942,7 @@ class CampaignManager:
                         diagnostic['binding_transport_state'] = dict(
                             transport_state
                         )
+                    self._finish_endpoint(melt, predicates, clocks, legacy=diagnostic)
                     raise CampaignC4EndpointRefusal(diagnostic)
                 return False
 
@@ -2929,17 +2983,23 @@ class CampaignManager:
                 ) > threshold_kg_hr
                 for snapshot in c4_snapshots
             ) or (current_in_window and rate > threshold_kg_hr)
-            if (
-                current_in_window
-                and signal_armed
-                and completed_window_hr >= min_hold_hr
-            ):
-                rate = self._require_finite_nonnegative_depletion_signal(
+            clocks.update(completed_window_hr=completed_window_hr,
+                          process_elapsed_hr=process_elapsed_hr, signal_armed=signal_armed,
+                          minimum_hold_hr=min_hold_hr)
+            eligible = current_in_window and signal_armed and completed_window_hr >= min_hold_hr
+            bind_yield(current_in_window and completed_window_hr >= min_hold_hr)
+            rate_bound = bind('rate_floor', eligible and rate < threshold_kg_hr, float(rate), threshold_kg_hr, 'rate_depleted')
+            hold_bound = bind('maximum_hold', current_in_window and completed_window_hr >= max_hold_hr,
+                 completed_window_hr, max_hold_hr, 'time_budget_reached' if signal_armed else 'no_signal')
+            bind('process_wall', process_elapsed_hr >= process_limit_hr,
+                 process_elapsed_hr, process_limit_hr, 'physics_refusal')
+            if eligible:
+                rate = validate_signal(
                     rate,
                     name=f'C4.{species}_kg_hr',
                     unit='kg/hr',
                 )
-                if rate < threshold_kg_hr:
+                if rate_bound:
                     self.last_c4_termination = {
                         'outcome': 'mg_signal_depleted',
                         'species': species,
@@ -2948,8 +3008,8 @@ class CampaignManager:
                         'completed_window_hr': completed_window_hr,
                         'process_elapsed_hr': process_elapsed_hr,
                     }
-                    return True
-            if current_in_window and completed_window_hr >= max_hold_hr:
+                    return self._finish_endpoint(melt, predicates, clocks, legacy=self.last_c4_termination)
+            if hold_bound:
                 self.last_c4_termination = {
                     'outcome': (
                         'max_hold_signal_not_depleted'
@@ -2962,7 +3022,7 @@ class CampaignManager:
                     'completed_window_hr': completed_window_hr,
                     'process_elapsed_hr': process_elapsed_hr,
                 }
-                return True
+                return self._finish_endpoint(melt, predicates, clocks, legacy=self.last_c4_termination)
 
             if process_elapsed_hr >= process_limit_hr:
                 # Truthful typed outcomes:
@@ -2990,20 +3050,11 @@ class CampaignManager:
                     diagnostic['binding_transport_state'] = dict(
                         transport_state
                     )
+                self._finish_endpoint(melt, predicates, clocks, legacy=diagnostic)
                 raise CampaignC4EndpointRefusal(diagnostic)
 
         elif campaign == CampaignPhase.C5:
-            endpoint = self._configured_endpoint(campaign, 'endpoint')
-            if record.branch == 'two':
-                branch_cfg = self._campaign_config(campaign).get('branch_two', {})
-                default_cap_V = self._float(branch_cfg.get('max_voltage_V'), 1.6)
-                max_hold_hr = self._configured_max_hold_hr(
-                    campaign, 'branch_two')
-            else:
-                branch_cfg = self._campaign_config(campaign).get('branch_one', {})
-                default_cap_V = self._float(branch_cfg.get('max_voltage_V'), 2.5)
-                max_hold_hr = self._configured_max_hold_hr(
-                    campaign, 'branch_one')
+            default_cap_V = resolved['default_cap_V']
             configured_cap_V = (
                 mre_ladder.coerce_mre_decomposition_voltage(
                     getattr(melt, 'mre_max_voltage_V', 0.0)
@@ -3013,22 +3064,10 @@ class CampaignManager:
             voltage_cap_V = (
                 configured_cap_V if configured_cap_V > 0.0 else default_cap_V
             )
-            at_cap_margin_V = self._float(
-                endpoint.get('at_voltage_margin_V'),
-                mre_ladder.C5_DEPLETION_AT_CAP_MARGIN_V,
-            )
-            threshold_A = self._float(
-                endpoint.get('threshold_A'),
-                mre_ladder.C5_DEPLETION_LOW_CURRENT_A,
-            )
-            consecutive_hours = int(
-                self._float(
-                    endpoint.get('consecutive_hours'),
-                    mre_ladder.C5_DEPLETION_CONSECUTIVE_HOURS,
-                )
-            )
-            if getattr(melt, 'mre_c5_ladder_complete', False):
-                return True
+            at_cap_margin_V = resolved['at_voltage_margin_V']
+            threshold_A = resolved['threshold_A']
+            consecutive_hours = resolved['consecutive_hours']
+            ladder_complete = getattr(melt, 'mre_c5_ladder_complete', False)
             # The cell dispatches at the stage cap for every ladder hold, so
             # at-cap alone no longer discriminates; low-current only counts
             # as an endpoint signal on the FINAL declared rung (earlier
@@ -3047,34 +3086,45 @@ class CampaignManager:
                     getattr(melt, 'mre_declared_rung_V', 0.0) or 0.0
                 ),
             )
+            next_low_hours = 0
             if at_cap and signal_armed:
-                current_A = self._require_finite_nonnegative_depletion_signal(
-                    melt.mre_current_A,
-                    name='C5.mre_current_A',
-                    unit='A',
-                )
+                current_A = melt.mre_current_A
+                if not wall_bound and not ladder_complete:
+                    current_A = validate_signal(
+                        current_A,
+                        name='C5.mre_current_A',
+                        unit='A',
+                    )
                 if current_A < threshold_A:
-                    melt.mre_low_current_hours += 1
-                else:
-                    melt.mre_low_current_hours = 0
-            else:
-                melt.mre_low_current_hours = 0
-            if melt.mre_low_current_hours >= consecutive_hours:
-                return True
-            if completed_campaign_hour >= max_hold_hr:
-                return True
+                    next_low_hours = melt.mre_low_current_hours + 1
+            if not wall_bound and not ladder_complete:
+                melt.mre_low_current_hours = next_low_hours
+            bind_yield(at_cap)
+            clocks.update(low_current_hours=next_low_hours, signal_armed=signal_armed, at_cap=at_cap)
+            bind('ladder_complete', ladder_complete, bool(ladder_complete), True, 'rate_depleted')
+            bind('current_floor', next_low_hours >= consecutive_hours,
+                 {'current_A': float(melt.mre_current_A), 'consecutive_hours': next_low_hours},
+                 {'current_A': threshold_A, 'consecutive_hours': consecutive_hours}, 'rate_depleted')
+            bind('maximum_hold', completed_campaign_hour >= max_hold_hr, completed_campaign_hour, max_hold_hr,
+                 'time_budget_reached' if signal_armed else 'no_signal')
 
         elif campaign == CampaignPhase.C6:
             hold_target_C, _ = self.get_temp_target(
                 campaign, melt.campaign_hour, melt)
-            at_hold_target = self.c6_at_hold_target(
-                hold_target_C,
-                melt.temperature_C,
-            )
-            acquisition_limit_hr, limit_source = (
-                self._c6_target_acquisition_limit()
-            )
-            if completed_campaign_hour >= acquisition_limit_hr:
+            try:
+                at_hold_target = self.c6_at_hold_target(hold_target_C, melt.temperature_C)
+            except CampaignHoldTargetRefusal as exc:
+                self.record_physics_refusal(melt, exc.diagnostic)
+                raise
+            acquisition_limit_hr = resolved['acquisition_hr']
+            limit_source = resolved['acquisition_source']
+            clocks['at_hold_target'] = at_hold_target
+            acquisition_bound = completed_campaign_hour >= acquisition_limit_hr
+            bind('acquisition_deadline', acquisition_bound and not at_hold_target,
+                 completed_campaign_hour, acquisition_limit_hr, 'acquisition_deadline')
+            bind('operator_wall_budget', acquisition_bound and at_hold_target
+                 and limit_source == 'operator_override:C6.max_hours', completed_campaign_hour, acquisition_limit_hr)
+            if acquisition_bound:
                 if not at_hold_target:
                     diagnostic = {
                         'reason_refused': C6_HOLD_ACQUISITION_REFUSAL_REASON,
@@ -3088,12 +3138,8 @@ class CampaignManager:
                         diagnostic['binding_transport_state'] = dict(
                             transport_state
                         )
+                    self._finish_endpoint(melt, predicates, clocks, legacy=diagnostic)
                     raise CampaignHoldAcquisitionRefusal(diagnostic)
-                if limit_source == 'operator_override:C6.max_hours':
-                    # The current at-target tick dispatched the provider before
-                    # endpoint evaluation, so the operator wall clock can end
-                    # C6 without misclassifying preheat as reaction hold.
-                    return True
             if not at_hold_target:
                 return False
             completed_hold_hr = 1 + sum(
@@ -3102,36 +3148,28 @@ class CampaignManager:
                 if snapshot.campaign == CampaignPhase.C6
                 and snapshot.c6_at_hold_target
             )
-            composition_endpoint = self._configured_endpoint(
-                campaign, 'composition_endpoint')
-            min_hold_hr = self._float(ovr.get('min_hold_hr'), 0.0)
+            composition_endpoint = resolved['composition']
+            min_hold_hr = resolved['minimum_hr']
             species = composition_endpoint.get('species', [])
             if not isinstance(species, list) or not species:
                 raise ValueError(
                     'C6.composition_endpoint.species must be a list')
-            threshold_wt_pct = self._endpoint_float(
-                campaign, composition_endpoint, 'threshold_wt_pct')
-            max_hold_hr = self._configured_max_hold_hr(campaign)
+            threshold_wt_pct = resolved['composition_threshold_wt_pct']
             comp = melt.composition_wt_pct()
             refractory_pct = sum(comp.get(str(name), 0.0) for name in species)
-            if completed_hold_hr >= min_hold_hr and refractory_pct < threshold_wt_pct:
-                return True
-            if completed_hold_hr >= max_hold_hr:
-                return True
+            bind_yield(completed_hold_hr >= min_hold_hr)
+            clocks.update(completed_hold_hr=completed_hold_hr, minimum_hold_hr=min_hold_hr)
+            bind('composition', completed_hold_hr >= min_hold_hr and refractory_pct < threshold_wt_pct,
+                 refractory_pct, threshold_wt_pct, 'target_reached')
+            bind('maximum_hold', completed_hold_hr >= max_hold_hr, completed_hold_hr, max_hold_hr)
 
         elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
-            max_hold_hr = self._max_hold_hr(campaign)
-            if completed_campaign_hour >= max_hold_hr:
-                return True
+            bind('maximum_hold', completed_campaign_hour >= max_hold_hr, completed_campaign_hour, max_hold_hr)
 
         elif campaign == CampaignPhase.MRE_BASELINE:
-            soft = self._configured_endpoint(campaign, 'soft_endpoint')
-            min_voltage_V = self._endpoint_float(
-                campaign, soft, 'min_voltage_V')
-            threshold_A = self._endpoint_float(campaign, soft, 'threshold_A')
-            consecutive_hours = int(self._endpoint_float(
-                campaign, soft, 'consecutive_hours'))
-            max_hold_hr = self._configured_max_hold_hr(campaign)
+            min_voltage_V = resolved['min_voltage_V']
+            threshold_A = resolved['threshold_A']
+            consecutive_hours = int(resolved['consecutive_hours'])
             # SC-109: low-current consecutive hours require prior peak arming.
             signal_armed = self._mre_current_signal_armed(
                 record,
@@ -3144,15 +3182,20 @@ class CampaignManager:
                 and melt.mre_current_A < threshold_A
                 and signal_armed
             ):
-                melt.mre_low_current_hours += 1
+                next_low_hours = melt.mre_low_current_hours + 1
             else:
-                melt.mre_low_current_hours = 0
-            if melt.mre_low_current_hours >= consecutive_hours:
-                return True
-            if completed_campaign_hour >= max_hold_hr:
-                return True
+                next_low_hours = 0
+            if not wall_bound:
+                melt.mre_low_current_hours = next_low_hours
+            bind_yield(melt.mre_voltage_V >= min_voltage_V)
+            clocks.update(low_current_hours=next_low_hours, signal_armed=signal_armed)
+            bind('current_floor', next_low_hours >= consecutive_hours,
+                 {'current_A': float(melt.mre_current_A), 'consecutive_hours': next_low_hours},
+                 {'current_A': threshold_A, 'consecutive_hours': consecutive_hours}, 'rate_depleted')
+            bind('maximum_hold', completed_campaign_hour >= max_hold_hr, completed_campaign_hour, max_hold_hr,
+                 'time_budget_reached' if signal_armed else 'no_signal')
 
-        return False
+        return self._finish_endpoint(melt, predicates, clocks)
 
     # ------------------------------------------------------------------
     # Campaign transitions
@@ -3271,17 +3314,11 @@ class CampaignManager:
         elif current == CampaignPhase.C4:
             if self.c5_enabled:
                 return CampaignPhase.C5
-            # Canonical no-MRE path: Mg is selectively recovered before the
-            # final high-temperature pyrolysis ramp.  Reuse C2A physics with a
-            # scoped, derived schedule.  The configured band midpoints need
-            # 12 h for the catalogued 1150->1320 C post-shuttle floor at
-            # 15 C/h and 70 h for 1320->1843 C at 7.5 C/h.  The 160 h hard
-            # cap is the conservative slow-band schedule (132 h) plus the
-            # existing 28 h extraction window.  The path marker prevents a C3
-            # loop.
+            # Keep the post-Mg route and scoped-over-recipe precedence intact.
+            final_pass = self._campaign_config(CampaignPhase.C2A).get('post_mg_final_pass', {})
             self._pending_post_mg_c2a_overrides = {
-                'min_hold_hr': 82.0,
-                'max_hours': 160.0,
+                'min_hold_hr': self._endpoint_float(CampaignPhase.C2A, final_pass, 'min_hold_hr'),
+                'max_hours': self._endpoint_float(CampaignPhase.C2A, final_pass, 'max_hold_hr'),
             }
             # Mark A-family paths for the final-pass C2A successor above;
             # path 'B' keeps its operator-chosen record (the marker used to

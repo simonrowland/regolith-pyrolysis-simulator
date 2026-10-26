@@ -16,11 +16,12 @@ from simulator.campaigns import (
     CampaignHoldAcquisitionRefusal,
     CampaignHoldTargetRefusal,
     CampaignManager,
+    CampaignStopConfigurationRefusal,
     c0_exit_record,
     c0_exit_run_notice,
 )
 from simulator.core import PyrolysisSimulator
-from simulator.runner import _attach_c0_exit_notice
+from simulator.runner import _attach_c0_exit_notice, _attach_campaign_endpoint_outcomes
 from simulator.state import (
     BatchRecord,
     CampaignPhase,
@@ -160,6 +161,128 @@ def test_green_rate_minimum_clock_pin(phase, minimum, species):
         assert manager.check_endpoint(melt, _flux(), CondensationTrain(), record) is False
         melt.campaign_hour += 1
     assert manager.check_endpoint(melt, _flux(), CondensationTrain(), record) is True
+
+
+@pytest.mark.parametrize("armed,rate,classification,winner", [
+    (True, 0.01, "rate_depleted", "rate_floor"),
+    (True, 1.0, "time_budget_reached", "maximum_hold"),
+    (False, 0.0, "no_signal", "maximum_hold"),
+])
+def test_endpoint_outcome_records_winner_and_all_bound_predicates(armed, rate, classification, winner):
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(snapshots=[HourSnapshot(
+        campaign=CampaignPhase.C2A, evap_flux=_flux(1.0),
+    )] if armed else [])
+    melt = _melt(CampaignPhase.C2A, 29)
+    assert manager.check_endpoint(melt, _flux(rate), CondensationTrain(), record)
+    outcome = manager.last_termination
+    assert outcome['classification'] == classification
+    assert outcome['winning_condition'] == winner
+    assert outcome['clocks']['completed_campaign_hour'] == 30.0
+    assert 'maximum_hold' in outcome['bound_predicates']
+    assert ('rate_floor' in outcome['bound_predicates']) == (winner == 'rate_floor')
+    assert all({'observed', 'threshold', 'bound'} <= item.keys() for item in outcome['predicates'])
+    assert outcome['observed'] == (rate if winner == 'rate_floor' else 30.0)
+    assert outcome['threshold'] == (0.1 if winner == 'rate_floor' else 30.0)
+
+
+def test_staged_operator_cap_records_concurrent_stage_predicates_without_advancing():
+    manager = CampaignManager(_setpoints())
+    manager.overrides['C2A_STAGED'] = {'max_hours': 4, 'depletion_flux_decay_fraction': 0.1}
+    manager._c2a_staged_peak_flux_by_species = {'Na': 1.0, 'K': 1.0}
+    assert manager.check_endpoint(_melt(CampaignPhase.C2A_STAGED, 3), _flux(), CondensationTrain(), BatchRecord())
+    assert manager.last_termination['bound_predicates'] == [
+        'operator_wall_budget', 'legacy_flux_decay', 'stage_duration',
+    ]
+    assert manager.last_termination['winning_condition'] == 'operator_wall_budget'
+    assert manager._c2a_staged_stage_idx == 0
+
+
+@pytest.mark.parametrize("mode", ["off", "not_applicable"])
+@pytest.mark.parametrize("eligible", [True, False])
+def test_yield_off_is_inert_without_reading_inventories(mode, eligible):
+    assert CampaignManager._yield_target_reached(
+        {'mode': mode, 'species': None, 'denominator': None, 'quantity': None, 'threshold': None},
+        eligible=eligible,
+    ) is False
+
+
+@pytest.mark.parametrize("denominator", ["initial_feed_element_inventory", "phase_entry_recoverable_inventory"])
+@pytest.mark.parametrize("quantity", ["extracted", "captured"])
+def test_yield_hook_uses_declared_mol_inventory_and_acquisition(denominator, quantity):
+    # Synthetic dimensionless recovery check; no campaign target is selected.
+    target = dict(mode='enabled', species='Fe', denominator=denominator, quantity=quantity, threshold=0.5)
+    inventories = {denominator: {'Fe': 10.0}, quantity: {'Fe': 5.0}}
+    assert CampaignManager._yield_target_reached(target, eligible=False) is False
+    assert CampaignManager._yield_target_reached(target, eligible=True, inventories=inventories) is True
+    with pytest.raises(CampaignStopConfigurationRefusal, match='feed-attributed'):
+        CampaignManager._yield_target_reached(target, eligible=True)
+
+
+@pytest.mark.parametrize("phase", [CampaignPhase.C0, CampaignPhase.C2B, CampaignPhase.C7_CA_ALUMINOTHERMIC])
+def test_required_endpoint_budget_missing_is_typed_refusal(phase):
+    manager = CampaignManager(_setpoints())
+    del manager._campaign_config(phase)['max_hold_hr']
+    with pytest.raises(CampaignStopConfigurationRefusal):
+        manager.check_endpoint(_melt(phase, 0), _flux(), CondensationTrain(), BatchRecord())
+
+
+def test_acquisition_outcome_extends_existing_refusal_without_changing_it():
+    manager = CampaignManager(_setpoints())
+    with pytest.raises(CampaignHoldAcquisitionRefusal) as refusal:
+        manager.check_endpoint(_melt(CampaignPhase.C6, 119), _flux(), CondensationTrain(), BatchRecord())
+    assert manager.last_termination['classification'] == 'acquisition_deadline'
+    assert manager.last_termination['observed'] == 120.0
+    assert manager.last_termination['threshold'] == 120.0
+    assert manager.last_termination['reason_refused'] == refusal.value.diagnostic['reason_refused']
+
+
+def test_provider_refusal_uses_the_endpoint_owner_outcome():
+    manager = CampaignManager(_setpoints())
+    manager.record_physics_refusal(_melt(CampaignPhase.C6, 0), {'reason_refused': 'no_joint_window'})
+    assert manager.last_termination['winning_condition'] == 'no_joint_window'
+    assert manager.last_termination['classification'] == 'physics_refusal'
+
+
+def test_run_metadata_projects_campaign_endpoint_history_including_repeated_phases():
+    outcome = {'campaign': 'C2A', 'winning_condition': 'maximum_hold'}
+    execution = SimpleNamespace(session=SimpleNamespace(_step_results=[
+        SimpleNamespace(campaign_summary=None),
+        SimpleNamespace(campaign_summary={'endpoint_outcome': outcome}),
+        SimpleNamespace(campaign_summary={'endpoint_outcome': outcome}),
+    ]))
+    metadata = {}
+    _attach_campaign_endpoint_outcomes(metadata, execution)
+    assert metadata == {'campaign_endpoints': [outcome, outcome]}
+
+
+@pytest.mark.parametrize("phase,overrides,budget", [
+    (CampaignPhase.C2A, {'max_hours': 40, 'hold_time_h': 5, 'duration_h': 3}, 40),
+    (CampaignPhase.C2A, {'max_hours': 0, 'hold_time_h': 5}, 30),
+    (CampaignPhase.C2A, {'hold_time_h': 5, 'duration_h': 3}, 5),
+    (CampaignPhase.C2A, {'duration_h': 3}, 3),
+    (CampaignPhase.C0B, {'max_hours': 10}, 10),
+    (CampaignPhase.C2A_STAGED, {'max_hours': 20}, 9),
+    (CampaignPhase.C3_K, {'max_hours': 40}, 12),
+    (CampaignPhase.C5, {'max_hours': 1000}, 800),
+    (CampaignPhase.MRE_BASELINE, {'max_hours': 200}, 120),
+    (CampaignPhase.C4, {'duration_h': 3}, 3),
+    (CampaignPhase.C6, {'hold_time_h': 1, 'duration_h': 1}, 20),
+])
+def test_endpoint_alias_precedence_retains_green_clocks(phase, overrides, budget):
+    manager = CampaignManager(_setpoints())
+    manager.overrides[phase.name] = overrides
+    temperature = {CampaignPhase.C4: 1600.0, CampaignPhase.C6: 1400.0}.get(phase, 25.0)
+    melt = _melt(phase, 0, temperature_C=temperature)
+    flux = _flux(2.0, Fe=1.0, Mg=1.0)
+    record = BatchRecord(path='A', branch='one')
+    for completed, expected in ((budget - 1, False), (budget, True)):
+        melt.campaign_hour = completed - 1
+        record.snapshots = [HourSnapshot(
+            campaign=phase, temperature_C=temperature, evap_flux=flux,
+            c6_at_hold_target=phase == CampaignPhase.C6,
+        ) for _ in range(completed - 1)]
+        assert manager.check_endpoint(melt, flux, CondensationTrain(), record) is expected
 
 
 def test_t155_delta_materializes_once_at_phase_entry_and_defaults_stay_equal():

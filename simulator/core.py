@@ -15037,6 +15037,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'species_extracted': species_extracted,
             'rump_expectation': rump_expectation,
         }
+        termination = self.campaign_mgr.last_termination
+        if termination and termination.get('campaign') == campaign_name:
+            summary['endpoint_outcome'] = dict(termination)
         if campaign_name == 'C7_CA_ALUMINOTHERMIC':
             summary['c7_product_report'] = dict(
                 getattr(self, '_c7_product_report', {}) or {})

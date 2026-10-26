@@ -10,6 +10,7 @@ from simulator.accounting.ledger import AtomLedger
 from simulator.campaigns import (
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
+    CampaignStopConfigurationRefusal,
 )
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -586,6 +587,19 @@ def test_run_executor_preserves_nonfinite_c6_hold_refusal(monkeypatch):
 
 def _envelope_session() -> object:
     return type("BareSession", (), {"simulator": SimpleNamespace()})()
+
+
+def test_run_executor_preserves_missing_endpoint_configuration_refusal(monkeypatch):
+    refusal = CampaignStopConfigurationRefusal('Missing C2A max_hold_hr')
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise refusal
+
+    monkeypatch.setattr('simulator.run_executor.drive_session', fail_drive_session)
+    execution = RunExecutor().execute_session(_envelope_session(), hours=1)
+    assert execution.status == 'refused'
+    assert execution.reason == refusal.reason
+    assert execution.refusal_diagnostic == refusal.diagnostic
 
 
 def test_run_executor_timeout_envelope_keeps_honest_exception(monkeypatch):

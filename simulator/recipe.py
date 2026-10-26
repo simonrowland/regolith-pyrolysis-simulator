@@ -703,26 +703,16 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C2A_continuous.duration_hr",
-            low=18,
-            high=160,
             units="hr",
-            bounds_source=(
-                "engineering_envelope catalog-grounded dense-alumina ramp "
-                "plus the setpoints C2A extraction window"
-            ),
+            bounds_source="setpoints:campaigns.C2A_continuous.max_hold_hr_recipe_bounds",
             search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_continuous.max_hold_hr",
             "int",
-            low=18,
-            high=160,
             units="hr",
             scale="log",
-            bounds_source=(
-                "engineering_envelope slow ramp to dense-alumina 1843 C plus "
-                "setpoints C2A continuous extraction window"
-            ),
+            bounds_source="setpoints:campaigns.C2A_continuous.max_hold_hr_recipe_bounds",
         ),
         _knob(
             "campaigns.C2A_staged.temp_range_C",
@@ -772,13 +762,8 @@ class RecipeSchema:
         _knob(
             "campaigns.C2A_staged.stages.alkali_early_fe.duration_hr",
             "int",
-            low=1,
-            high=6,
             units="hr",
-            bounds_source=(
-                "engineering_envelope around setpoints.yaml nominal "
-                "campaigns.C2A_staged.stages.alkali_early_fe.duration_h=4"
-            ),
+            bounds_source="setpoints:campaigns.C2A_staged.duration_recipe_bounds.alkali_early_fe",
         ),
         _knob(
             "campaigns.C2A_staged.stages.alkali_early_fe.target_C",
@@ -805,13 +790,8 @@ class RecipeSchema:
         _knob(
             "campaigns.C2A_staged.stages.sio_window.duration_hr",
             "int",
-            low=1,
-            high=6,
             units="hr",
-            bounds_source=(
-                "engineering_envelope around setpoints.yaml nominal "
-                "campaigns.C2A_staged.stages.sio_window.duration_h=3"
-            ),
+            bounds_source="setpoints:campaigns.C2A_staged.duration_recipe_bounds.sio_window",
         ),
         _knob(
             "campaigns.C2A_staged.stages.sio_window.target_C",
@@ -838,13 +818,8 @@ class RecipeSchema:
         _knob(
             "campaigns.C2A_staged.stages.fe_hot_hold.duration_hr",
             "int",
-            low=1,
-            high=4,
             units="hr",
-            bounds_source=(
-                "engineering_envelope around setpoints.yaml nominal "
-                "campaigns.C2A_staged.stages.fe_hot_hold.duration_h=1"
-            ),
+            bounds_source="setpoints:campaigns.C2A_staged.duration_recipe_bounds.fe_hot_hold",
         ),
         _knob(
             "campaigns.C2A_staged.stages.fe_hot_hold.ramp_rate_C_per_hr",
@@ -861,13 +836,8 @@ class RecipeSchema:
         _knob(
             "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_hr",
             "int",
-            low=1,
-            high=3,
             units="hr",
-            bounds_source=(
-                "engineering_envelope around setpoints.yaml nominal "
-                "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_h=1"
-            ),
+            bounds_source="setpoints:campaigns.C2A_staged.duration_recipe_bounds.cool_for_na_shuttle",
         ),
         _knob(
             "campaigns.C2A_staged.stages.cool_for_na_shuttle.target_C",
@@ -903,14 +873,9 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C2A_staged.na_shuttle_stage.duration_hr",
-            low=1,
-            high=6,
             units="hr",
             # Duration sweep around 3 h nominal covers under/over-hold Na shuttle cases.
-            bounds_source=(
-                "engineering_envelope around setpoints.yaml nominal "
-                "campaigns.C2A_staged.na_shuttle_stage.duration_h=3"
-            ),
+            bounds_source="setpoints:campaigns.C2A_staged.duration_recipe_bounds.na_shuttle_stage",
         ),
         _knob(
             "campaigns.C2B.temp_range_C",
@@ -928,11 +893,9 @@ class RecipeSchema:
         _knob(
             "campaigns.C2B.max_hold_hr",
             "int",
-            low=8,
-            high=20,
             units="hr",
             scale="log",
-            bounds_source="engineering_envelope ratified-t155 A2 C2B max hold",
+            bounds_source="setpoints:campaigns.C2B.max_hold_hr_recipe_bounds",
         ),
         _knob(
             "campaigns.C2B.pO2_mbar",
@@ -1040,11 +1003,9 @@ class RecipeSchema:
         _knob(
             "campaigns.C4.max_hold_hr",
             "int",
-            low=6,
-            high=20,
             units="hr",
             scale="log",
-            bounds_source="engineering_envelope ratified-t155 A2 C4 max hold",
+            bounds_source="setpoints:campaigns.C4.max_hold_hr_recipe_bounds",
         ),
         _knob(
             "campaigns.C4.pO2_mbar",
@@ -1140,22 +1101,18 @@ class RecipeSchema:
         _knob(
             "campaigns.C5.max_hold_hr.branch_one",
             "int",
-            low=1,
-            high=800,
             units="hr",
             scale="log",
             guard=C5_GUARD,
-            bounds_source="engineering_envelope ratified-t155 A2 C5 branch one max hold",
+            bounds_source="setpoints:campaigns.C5.max_hold_hr_recipe_bounds.branch_one",
         ),
         _knob(
             "campaigns.C5.max_hold_hr.branch_two",
             "int",
-            low=1,
-            high=800,
             units="hr",
             scale="log",
             guard=C5_GUARD,
-            bounds_source="engineering_envelope ratified-t155 A2 C5 branch two max hold",
+            bounds_source="setpoints:campaigns.C5.max_hold_hr_recipe_bounds.branch_two",
         ),
         _knob(
             "campaigns.C5.branch_two.max_voltage_V",
@@ -1195,11 +1152,9 @@ class RecipeSchema:
         _knob(
             "campaigns.C6.max_hold_hr",
             "int",
-            low=1,
-            high=20,
             units="hr",
             scale="log",
-            bounds_source="engineering_envelope ratified-t155 A2 C6 max hold",
+            bounds_source="setpoints:campaigns.C6.max_hold_hr_recipe_bounds",
         ),
         _knob(
             "campaigns.C6.pO2_mbar",

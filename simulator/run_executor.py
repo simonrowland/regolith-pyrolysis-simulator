@@ -15,6 +15,7 @@ from simulator.backends import requires_stage0_subprocess
 from simulator.campaigns import (
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
+    CampaignStopConfigurationRefusal,
 )
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.cost_ledger import build_cost_rollup_diagnostic
@@ -53,6 +54,7 @@ _ALL_TYPED_PHYSICS_REFUSALS = (
     KnudsenRegimeRefusal,
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
+    CampaignStopConfigurationRefusal,
     EvaporationFluxRefusal,
     MREElectrolysisRefusal,
     *_TYPED_PHYSICS_REFUSALS,
@@ -403,6 +405,7 @@ class RunExecutor:
             KnudsenRegimeRefusal,
             CampaignHoldTargetRefusal,
             CampaignPressureSetpointRefusal,
+            CampaignStopConfigurationRefusal,
             EvaporationFluxRefusal,
             MREElectrolysisRefusal,
         ) as exc:

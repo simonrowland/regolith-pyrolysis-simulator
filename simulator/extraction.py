@@ -3016,6 +3016,9 @@ class ExtractionMixin:
         return recovered_kg
 
     def _record_c6_refusal(self, diagnostic: Mapping[str, Any]) -> None:
+        # Endpoint acquisition refusals already carry their winning clock.
+        if self.campaign_mgr.last_termination is None:
+            self.campaign_mgr.record_physics_refusal(self.melt, diagnostic)
         self._last_c6_refusal_diagnostic = {
             'status': 'refused',
             'reaction_family': 'c6_mg_thermite',

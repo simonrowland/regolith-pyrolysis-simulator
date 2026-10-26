@@ -56,6 +56,14 @@ campaigns:
   # C0 -- Dry Inert Bakeoff & Volatile Recovery
   # --------------------------------------------------------------------------
   C0:
+    rate_endpoint:
+      mode: "not_applicable"
+    yield_target:
+      mode: "not_applicable"
+      species: null
+      denominator: null
+      quantity: null
+      threshold: null
     label: "Dry Inert Bakeoff & Volatile Recovery"
     temp_range_C: [20, 950]
     # Owner d-240's provisional ramp; release curves remain uncertified
@@ -88,6 +96,14 @@ campaigns:
   # C0b -- Standardised P-Cleanup (mild oxidative hold)
   # --------------------------------------------------------------------------
   C0b_p_cleanup:
+    rate_endpoint:
+      mode: "not_applicable"
+    yield_target:
+      mode: "not_applicable"
+      species: null
+      denominator: null
+      quantity: null
+      threshold: null
     label: "Standardised P-Cleanup (Mild Oxidative Hold)"
     activation_condition: >
       default_recommended_for_all_lunar OR P2O5_wt_pct > 0.04
@@ -129,6 +145,12 @@ campaigns:
   #        Replaces deprecated separate C1 + C2A entries.
   # --------------------------------------------------------------------------
   C2A_continuous:
+    yield_target:
+      mode: "off"
+      species: null
+      denominator: null
+      quantity: null
+      threshold: null
     label: "Continuous Adaptive pN2 Ramp -- Na/K + Fe + SiO2 Co-Extraction (Path A)"
     activation_condition: "Path_A AND NOT preserving_CMAS_glass_for_glass_or_ceramics"
     preferred_default: false
@@ -181,6 +203,14 @@ campaigns:
       species_monitored: ["Na", "K", "Fe", "SiO"]
       SiO_target: "target a(SiO2) reduction reached"
     max_hold_hr: 30
+    max_hold_hr_recipe_bounds: [18, 160]
+    post_mg_final_pass:
+      # Catalog ramp: 12 h (1150->1320 C at 15 C/h) + 70 h
+      # (1320->1843 C at 7.5 C/h), rounded conservatively = 82 h.
+      # Slow-band ramp allowance 132 h + extraction window 28 h = 160 h.
+      # Operating budgets in hours, not chemistry completion guarantees.
+      min_hold_hr: 82
+      max_hold_hr: 160
     soft_endpoint:
       type: "total_evaporation_rate_below_after_min_hold"
       min_hold_hr: 18
@@ -200,6 +230,12 @@ campaigns:
       (wicking/centrifugal condensers).
 
   C2A_staged:
+    yield_target:
+      mode: "off"
+      species: null
+      denominator: null
+      quantity: null
+      threshold: null
     label: "Staged pN2 Bakeout -- Alkali / SiO / Fe Hold / Cool Na Cleanup"
     activation_condition: "Path_A_staged AND sequential_product_collection"
     preferred_default: true
@@ -214,6 +250,12 @@ campaigns:
     pO2_bar: "<1e-8"
     flow_regime: "viscous"
     target_species: ["Na", "K", "SiO", "Fe"]
+    duration_recipe_bounds:
+      alkali_early_fe: [1, 6]
+      sio_window: [1, 6]
+      fe_hot_hold: [1, 4]
+      cool_for_na_shuttle: [1, 3]
+      na_shuttle_stage: [1, 6]
     depletion_flux_decay_fraction: 0.0
     operator_knobs:
       hold_temp_C:
@@ -318,6 +360,12 @@ campaigns:
   # C2B -- pO2-Managed Fe Pyrolysis (Path B)
   # --------------------------------------------------------------------------
   C2B:
+    yield_target:
+      mode: "off"
+      species: null
+      denominator: null
+      quantity: null
+      threshold: null
     label: "pO2-Managed Fe Pyrolysis (Path B)"
     activation_condition: "Path_B -- preserving CMAS glass for Material 1 or terminal ceramics"
     temp_range_C: [1320, 1480]
@@ -339,6 +387,7 @@ campaigns:
       threshold: 0.05
       species_monitored: ["Fe"]
     max_hold_hr: 20
+    max_hold_hr_recipe_bounds: [8, 20]
     soft_endpoint:
       type: "species_evaporation_rate_below_after_min_hold"
       species: "Fe"
@@ -355,6 +404,14 @@ campaigns:
   # C3 -- Na/K Metallothermic Polish (Shuttle Cycles)
   # --------------------------------------------------------------------------
   C3:
+    rate_endpoint:
+      mode: "not_applicable"
+    yield_target:
+      mode: "not_applicable"
+      species: null
+      denominator: null
+      quantity: null
+      threshold: null
     label: "Deprecated Na/K Metallothermic Polish"
     JANAF_4th_multiphase_status: >
       K/FeO is refused throughout practical melt temperatures (formal
@@ -421,6 +478,12 @@ campaigns:
   # C4 -- Mg Selective Pyrolysis (Branch Two)
   # --------------------------------------------------------------------------
   C4:
+    yield_target:
+      mode: "off"
+      species: null
+      denominator: null
+      quantity: null
+      threshold: null
     label: "Mg Selective Pyrolysis (Branch Two)"
     temp_range_C: [1580, 1670]
     max_target_acquisition_hr: 60       # 42 h nominal preheat from 1160 C at 10 C/h, plus latent-cooling margin
@@ -493,6 +556,7 @@ campaigns:
       threshold: "background"
       species_monitored: ["Mg"]
     max_hold_hr: 20
+    max_hold_hr_recipe_bounds: [6, 20]
     soft_endpoint:
       type: "species_evaporation_rate_below_after_min_hold"
       species: "Mg"
@@ -510,6 +574,12 @@ campaigns:
   # C5 -- Limited MRE Under O2 Backpressure
   # --------------------------------------------------------------------------
   C5:
+    yield_target:
+      mode: "off"
+      species: null
+      denominator: null
+      quantity: null
+      threshold: null
     label: "Limited MRE Under O2 Backpressure"
     temp_range_C: [1500, 1650]
     dT_dt_C_per_hr: null                 # electrochemical; not ramp-driven
@@ -542,6 +612,9 @@ campaigns:
       threshold_A: 5.0
       consecutive_hours: 3
       at_voltage: "target V setpoint"
+    max_hold_hr_recipe_bounds:
+      branch_one: [1, 800]
+      branch_two: [1, 800]
     max_hold_hr:
       branch_two: 800
       branch_one: 800
@@ -553,6 +626,12 @@ campaigns:
       longevity and energy budget.
 
   mre_baseline:
+    yield_target:
+      mode: "off"
+      species: null
+      denominator: null
+      quantity: null
+      threshold: null
     pO2_mbar_default: 50.0
     p_total_mbar_default: 50.0
     max_hold_hr: 120
@@ -567,6 +646,14 @@ campaigns:
   # C6 -- Mg Thermite Reduction (Separate Solar Furnace)
   # --------------------------------------------------------------------------
   C6:
+    rate_endpoint:
+      mode: "not_applicable"
+    yield_target:
+      mode: "off"
+      species: null
+      denominator: null
+      quantity: null
+      threshold: null
     label: "Mg Thermite Reduction (Separate Solar Furnace)"
     temp_range_C: [1380, 1450]
     default_hold_T_C: 1400
@@ -653,6 +740,7 @@ campaigns:
       criterion: "liquidus exceeds 1700 C (residual SiO2+Al2O3 < 15-20%)"
     max_target_acquisition_hr: 120      # wall-clock refusal; distinct from reaction hold
     max_hold_hr: 20
+    max_hold_hr_recipe_bounds: [1, 20]
     composition_endpoint:
       type: "refractory_oxide_sum_below"
       species: ["SiO2", "Al2O3"]
@@ -670,6 +758,14 @@ campaigns:
   # C7 -- Aluminothermic Ca Recovery (Optional / Default Off)
   # --------------------------------------------------------------------------
   C7:
+    rate_endpoint:
+      mode: "not_applicable"
+    yield_target:
+      mode: "not_applicable"
+      species: null
+      denominator: null
+      quantity: null
+      threshold: null
     label: "Aluminothermic Ca Recovery (Optional)"
     enabled: false
     objective: "ree_enrichment"

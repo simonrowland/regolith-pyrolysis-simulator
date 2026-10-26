@@ -1779,6 +1779,16 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
 
 
+@pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
+def test_endpoint_diagnostics_preserve_runner_golden_physics(scenario, runner_golden_loader):
+    actual, capture, expected_text = runner_golden_loader(scenario)
+    metadata = dict(actual['run_metadata'])
+    metadata.pop('campaign_endpoints', None)
+    projected = {**actual, 'run_metadata': metadata}
+    assert json.dumps(projected, indent=2, allow_nan=False) + '\n' == expected_text
+    assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario['name']]
+
+
 def test_runner_golden_output_ignores_host_binding_receipts(
     tmp_path,
     monkeypatch,

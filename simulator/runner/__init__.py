@@ -1490,6 +1490,7 @@ class PyrolysisRun:
         _attach_composition_projected_liquidus_notice(run_metadata, sim)
         _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
         _attach_c0_exit_notice(run_metadata, sim)
+        _attach_campaign_endpoint_outcomes(run_metadata, execution)
         run_metadata.update(
             canonicalize_fidelity_emission(
                 backend_name=self.backend_name,
@@ -3801,6 +3802,17 @@ def _attach_c0_exit_notice(
         run_metadata["c0_exit"] = _json_safe(notice)
 
 
+def _attach_campaign_endpoint_outcomes(run_metadata: dict[str, Any], execution: Any) -> None:
+    session = getattr(execution, "session", None)
+    outcomes = []
+    for result in getattr(session, "_step_results", ()):
+        summary = getattr(result, "campaign_summary", None)
+        if isinstance(summary, Mapping) and summary.get("endpoint_outcome"):
+            outcomes.append(summary["endpoint_outcome"])
+    if outcomes:
+        run_metadata["campaign_endpoints"] = _json_safe(outcomes)
+
+
 def _engine_commissioning_sentence(notice: Mapping[str, Any]) -> str:
     authority = str(notice.get("authority") or "unspecified")
     pieces: list[str] = []
@@ -5698,6 +5710,7 @@ def _runner_failure_result(
     _attach_composition_projected_liquidus_notice(run_metadata, sim)
     _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
     _attach_c0_exit_notice(run_metadata, sim)
+    _attach_campaign_endpoint_outcomes(run_metadata, execution)
     final_state = (
         _safe_failure_value(
             lambda: _json_safe(_final_state_from_ledger(sim)),
