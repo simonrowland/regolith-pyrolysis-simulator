@@ -4444,6 +4444,180 @@ def test_enthalpy_anchor_correction_matches_janaf_mgo_cp() -> None:
     assert "declared=H(T)-H(298 K)" in notice.reason
 
 
+def _printed_robie_pseudowollastonite_volume_cm3() -> str:
+    """Robie and Waldbaum 1968, B1259, pseudowollastonite molar volume."""
+
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "data"
+        / "literature"
+        / "compilations"
+        / "robie-waldbaum-1968-usgs-b1259"
+        / "records"
+        / "b1259-298k-0302-pseudowollastonite.json"
+    )
+    import json
+
+    document = json.loads(path.read_text(encoding="utf-8"))
+    return str(document["molar_volume"]["as_published"])
+
+
+def _mgo_enthalpy_identity(pressure: State):
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    return replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(298.15 K)"),
+        standard_pressure_Pa=pressure,
+    )
+
+
+def test_unknown_condensed_pressure_uses_robie_molar_volume() -> None:
+    """1 bar assumption. The bound is Robie's 40.08 cm3/mol, 4.008 J/mol per bar.
+
+    That product is not computed in this test. The enthalpy value is not
+    shifted by the bound.
+    """
+
+    printed_cm3 = _printed_robie_pseudowollastonite_volume_cm3()
+    assert printed_cm3 == "40.08"
+    volume_m3 = float(Decimal(printed_cm3) * Decimal("1e-6"))
+    identity = _mgo_enthalpy_identity(State.unknown("source does not state pressure"))
+    seen = []
+
+    class _Props:
+        def __init__(self) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = 1000.0
+            self.Cp_J_K_mol = 37.0
+            self.S_J_K_mol = 26.0
+            self.volume_m3_mol = volume_m3
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, pressure_bar):
+        seen.append((temperature_K, pressure_bar))
+        props = _Props()
+        if abs(temperature_K - 1000.0) < 1e-9:
+            props.H_J_mol = 5000.0
+        return props
+
+    attempt = predict_thermo_attempt(
+        Engine.THERMOENGINE,
+        F.observation("mgo-pressure-robie", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert seen == [(1000.0, 1.0), (298.15, 1.0)]
+    assert attempt.refusal_reason is None
+    assert attempt.value == Decimal("4")
+    pressure_notices = [
+        notice
+        for notice in attempt.notices
+        if "standard-pressure-assumed" in notice.reason
+    ]
+    assert len(pressure_notices) == 1
+    notice = pressure_notices[0]
+    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert notice.authority is Authority.BRIDGE
+    assert notice.band == "1 bar"
+    assert notice.original == Decimal("4.008")
+    assert "term=engine-V" in notice.reason
+    assert "pressure_bar=1" in notice.reason
+
+
+def test_unknown_condensed_pressure_uses_stated_volume_bound() -> None:
+    identity = _mgo_enthalpy_identity(State.unknown("source does not state pressure"))
+
+    class _Props:
+        def __init__(self, enthalpy: float) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = 37.0
+            self.S_J_K_mol = 26.0
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        return _Props(5000.0 if abs(temperature_K - 1000.0) < 1e-9 else 1000.0)
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo-pressure-stated", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert attempt.refusal_reason is None
+    assert attempt.value == Decimal("4")
+    notice = next(notice for notice in attempt.notices if "standard-pressure-assumed" in notice.reason)
+    assert notice.original == Decimal("4")
+    assert "term=stated-V" in notice.reason
+    assert ":P_bar=1:assumed" in attempt.call_evidence
+
+
+def test_stated_pressure_is_not_replaced_with_one_bar() -> None:
+    identity = _mgo_enthalpy_identity(State.of(Decimal("200000")))
+    seen = []
+
+    class _Props:
+        def __init__(self, enthalpy: float) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = 37.0
+            self.S_J_K_mol = 26.0
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, pressure_bar):
+        seen.append(pressure_bar)
+        return _Props(5000.0 if abs(temperature_K - 1000.0) < 1e-9 else 1000.0)
+
+    attempt = predict_thermo_attempt(
+        Engine.THERMOENGINE,
+        F.observation("mgo-pressure-2bar", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert seen == [2.0, 2.0]
+    assert attempt.value == Decimal("4")
+    assert attempt.notices == ()
+
+
+def test_gas_unknown_pressure_still_refuses() -> None:
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.G,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.CP,
+        standard_pressure_Pa=State.unknown("source does not state pressure"),
+    )
+    calls = []
+
+    def pure_phase(*_args):
+        calls.append(_args)
+        raise AssertionError("gas must not be evaluated at an assumed 1 bar")
+
+    attempt = predict_thermo_attempt(
+        Engine.THERMOENGINE,
+        F.observation("mgo-gas-pressure", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert calls == []
+    assert attempt.value is None
+    assert attempt.notices == ()
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "pure-phase-is-crystal-only"
+
+
 def test_enthalpy_anchor_without_h_or_cp_refuses_typed() -> None:
     identity = F.oxide_identity(
         "MgO",

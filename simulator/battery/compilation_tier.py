@@ -166,6 +166,13 @@ _REFERENCE_PHASE_TOKEN = {
     "glass": Phase.GLASS,
 }
 _PA_PER_BAR = Decimal("100000")
+_CONDENSED_PHASES = frozenset(
+    {Phase.CR, Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}
+)
+_ASSUMED_STANDARD_PRESSURE_BAR = 1.0
+# Fallback when the engine does not expose V. Derivation is on
+# ``_pressure_effect_bound_J``.
+_STATED_PRESSURE_EFFECT_BOUND_J_MOL = Decimal("4")
 
 
 def _engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
@@ -1139,6 +1146,43 @@ def _standard_pressure_bar(identity: Identity) -> tuple[float | None, str | None
     return None, "standard-pressure-unknown"
 
 
+def _unknown_standard_pressure(identity: Identity) -> bool:
+    state = identity.standard_pressure_Pa
+    if state is None:
+        return True
+    return isinstance(state, State) and state.is_unknown
+
+
+def _pressure_effect_bound_J(*sources: object) -> tuple[Decimal, str]:
+    """J/mol per bar for assuming 1 bar, and which volume supplied it.
+
+    Premise. A condensed pure-standard row with no stated pressure is
+    still H, Cp, or S of that phase. (dH/dP)_T = V(1 - alpha*T), with
+    alpha = (1/V)(dV/dT)_P. One bar is 1e5 Pa.
+
+    Algebra. The scored value is the engine value at 1 bar. The notice
+    bound is |V| x 1e5 Pa when this engine exposes molar volume, which
+    is V*dP and omits (1 - alpha*T) because these property objects do
+    not carry alpha. Otherwise the bound is the stated 4 J/mol per bar.
+
+    Units. m3/mol x Pa = J/mol. The scored enthalpy stays kJ/mol; this
+    bound is not added to it.
+
+    Sanity. CaSiO3 V is about 4e-5 m3/mol x 1e5 Pa, about 4 J/mol per
+    bar, against printed increments of about 450 kJ/mol.
+    """
+
+    for source in sources:
+        if source is None:
+            continue
+        volume = _finite_number(getattr(source, "volume_m3_mol", None))
+        if volume is None or volume <= 0.0:
+            continue
+        bound = (as_decimal(str(volume)) * _PA_PER_BAR).copy_abs().normalize()
+        return bound, "engine-V"
+    return _STATED_PRESSURE_EFFECT_BOUND_J_MOL, "stated-V"
+
+
 def _poly_name(identity: Identity) -> str | None:
     poly = polymorph_token(identity.species)
     return None if poly is None else poly.value
@@ -1476,7 +1520,15 @@ def _pure_phase_attempt(
             extra={"engine": engine.value, "symbol": symbol},
         )
     pressure_bar, pressure_reason = _standard_pressure_bar(identity)
-    if pressure_bar is None:
+    assumed_pressure = False
+    if (
+        pressure_bar is None
+        and _unknown_standard_pressure(identity)
+        and phase_token(identity.species) in _CONDENSED_PHASES
+    ):
+        pressure_bar = _ASSUMED_STANDARD_PRESSURE_BAR
+        assumed_pressure = True
+    elif pressure_bar is None:
         return _refuse(
             RefusalReason.IDENTITY_UNKNOWN,
             pressure_reason or "standard-pressure-unknown",
@@ -1606,6 +1658,24 @@ def _pure_phase_attempt(
     notices = _unrequested_phase_notices(props, second, quantity, origin, t_ref_props)
     if anchor_notice is not None:
         notices = notices + (anchor_notice,)
+    if assumed_pressure:
+        bound_J, bound_term = _pressure_effect_bound_J(props, second, t_ref_props)
+        call_evidence += ":P_bar=1:assumed"
+        notices = notices + (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason=(
+                    "standard-pressure-assumed: declared=unknown; "
+                    f"pressure_bar=1; bound_J_mol_per_bar={format(bound_J, 'f')}; "
+                    f"authority={Authority.BRIDGE.value}; term={bound_term}"
+                ),
+                origin=origin,
+                band="1 bar",
+                authority=Authority.BRIDGE,
+                original=bound_J,
+            ),
+        )
     return ThermoAttempt(
         value=value,
         unit=QUANTITY_UNITS[quantity],
