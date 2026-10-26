@@ -124,25 +124,31 @@ def test_pure_sio_returns_sio_molar_mass():
 def test_catalog_generated_carrier_uses_formula_registry_molar_mass():
     """A carrier absent from the legacy mass table stays in gas accounting."""
 
-    formula = SimpleNamespace(molar_mass_g_mol=79.865)
+    formula = {"formula": "TiO2"}
+    expected_mass = resolve_species_formula("TiO2").molar_mass_g_per_mol()
     M_avg = _mean_molar_mass_kg_mol(
         {"TiO2_gas": 1.0},
         species_formula_registry={"TiO2_gas": formula},
     )
 
-    assert M_avg == pytest.approx(0.079865)
+    assert M_avg == pytest.approx(expected_mass / 1000.0)
 
 
 def test_catalog_generated_carriers_reach_overhead_partial_pressures():
     """Equal molar carrier flows receive equal overhead partial pressures."""
 
+    ti_molar_mass = resolve_species_formula("TiO2").molar_mass_g_per_mol()
+    cao_molar_mass = resolve_species_formula("CaO").molar_mass_g_per_mol()
     flux = EvaporationFlux(
-        species_kg_hr={"TiO2_gas": 0.079865, "CaO_gas": 0.056077},
-        total_kg_hr=0.135942,
+        species_kg_hr={
+            "TiO2_gas": ti_molar_mass / 1000.0,
+            "CaO_gas": cao_molar_mass / 1000.0,
+        },
+        total_kg_hr=(ti_molar_mass + cao_molar_mass) / 1000.0,
     )
     registry = {
-        "TiO2_gas": SimpleNamespace(molar_mass_g_mol=79.865),
-        "CaO_gas": SimpleNamespace(molar_mass_g_mol=56.077),
+        "TiO2_gas": {"formula": "TiO2"},
+        "CaO_gas": {"formula": "CaO"},
     }
 
     partials = OverheadGasModel.species_partial_pressures(
