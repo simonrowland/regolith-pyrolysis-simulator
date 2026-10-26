@@ -7288,6 +7288,7 @@ def _equilibrate_phase_assemblage(
     pressure_bar: float,
     solute_fugacity_bar: float | None = None,
     solute_fugacity_parameter: str | None = None,
+    handles: Mapping[str, object] | None = None,
 ) -> EquilibriumResult:
     """One melt-backend equilibrate. Tests replace this; it does not default pO2 or P.
 
@@ -7297,32 +7298,43 @@ def _equilibrate_phase_assemblage(
 
     import inspect
 
-    from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
-
-    handle = open_battery_engine(engine.value)
+    # The scorer owns a mutable shared cache; a standalone prediction owns
+    # its temporary handle and closes it below.
+    owns_handle = not isinstance(handles, dict) and (
+        handles is None or handles.get(engine.value) is None
+    )
+    handle = _open_cached_battery_handle(engine, handles)
     backend = getattr(handle, "backend", None)
     if backend is None:
         reason = getattr(handle, "unavailable_reason", None) or "backend unavailable"
         raise RuntimeError(str(reason))
-    kwargs: dict[str, object] = {
-        "temperature_C": temperature_C,
-        "composition_kg": dict(composition_kg),
-        "fO2_log": fO2_log,
-        "pressure_bar": pressure_bar,
-    }
-    if solute_fugacity_bar is not None:
-        if not solute_fugacity_parameter:
-            raise RuntimeError("printed solute fugacity has no parameter name")
-        parameters = inspect.signature(backend.equilibrate).parameters
-        accepts = solute_fugacity_parameter in parameters or any(
-            item.kind is inspect.Parameter.VAR_KEYWORD for item in parameters.values()
-        )
-        if not accepts:
-            raise RuntimeError(
-                f"{type(backend).__name__} does not accept {solute_fugacity_parameter}"
+    try:
+        kwargs: dict[str, object] = {
+            "temperature_C": temperature_C,
+            "composition_kg": dict(composition_kg),
+            "fO2_log": fO2_log,
+            "pressure_bar": pressure_bar,
+        }
+        if solute_fugacity_bar is not None:
+            if not solute_fugacity_parameter:
+                raise RuntimeError("printed solute fugacity has no parameter name")
+            parameters = inspect.signature(backend.equilibrate).parameters
+            accepts = solute_fugacity_parameter in parameters or any(
+                item.kind is inspect.Parameter.VAR_KEYWORD
+                for item in parameters.values()
             )
-        kwargs[solute_fugacity_parameter] = solute_fugacity_bar
-    return backend.equilibrate(**kwargs)
+            if not accepts:
+                raise RuntimeError(
+                    f"{type(backend).__name__} does not accept "
+                    f"{solute_fugacity_parameter}"
+                )
+            kwargs[solute_fugacity_parameter] = solute_fugacity_bar
+        return backend.equilibrate(**kwargs)
+    finally:
+        if owns_handle:
+            close = getattr(backend, "close", None)
+            if callable(close):
+                close()
 
 
 def _phase_role_value(identity: Identity, name: str) -> PhaseRole | None:
@@ -7413,6 +7425,8 @@ def _predict_phase_row(
     identity: Identity,
     channel: str,
     sources: tuple[str, ...],
+    *,
+    handles: Mapping[str, object] | None = None,
 ) -> EnginePrediction:
     """One printed component, or one printed L_X, from an assemblage."""
 
@@ -7566,6 +7580,8 @@ def _predict_phase_row(
         if solute is not None and anion_pa is not None:
             call_kwargs["solute_fugacity_bar"] = float(anion_pa / Decimal("1e5"))
             call_kwargs["solute_fugacity_parameter"] = solute.fugacity_parameter
+        if handles is not None:
+            call_kwargs["handles"] = handles
         result = _equilibrate_phase_assemblage(
             engine,
             temperature_C=float(temperature - Decimal("273.15")),
@@ -7919,7 +7935,9 @@ def predict_with_engine(
             and phase_basis in PHASE_BASIS_TOKENS
         )
     ):
-        return _predict_phase_row(engine, observation, identity, channel, sources)
+        return _predict_phase_row(
+            engine, observation, identity, channel, sources, handles=handles
+        )
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
