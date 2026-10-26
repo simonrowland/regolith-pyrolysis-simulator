@@ -119,6 +119,7 @@ class ValidationIssue:
 
 
 _ADVISORY_REASONS = frozenset({RefusalReason.IDENTITY_INCOMPLETE})
+_OBSERVATION_ISSUE_PATH = re.compile(r"^observation\[(.+?)\](?:\.(.*))?$")
 
 # v2.1 vapour-equilibrium blocking qualifications. Sibling activity is
 # not blocked by a pressure-only floor (quantity-scoped affected_quantities).
@@ -149,6 +150,27 @@ class ValidationReport:
     @property
     def hard_issues(self) -> tuple[ValidationIssue, ...]:
         return tuple(i for i in self.issues if i.reason not in _ADVISORY_REASONS)
+
+    @property
+    def hard_issues_by_observation(self) -> Mapping[str, tuple[ValidationIssue, ...]]:
+        grouped: dict[str, list[ValidationIssue]] = {}
+        for issue in self.hard_issues:
+            location = observation_issue_location(issue.path)
+            if location is not None:
+                grouped.setdefault(location[0], []).append(issue)
+        return {
+            observation_id: tuple(issues)
+            for observation_id, issues in grouped.items()
+        }
+
+
+def observation_issue_location(path: str) -> tuple[str, str] | None:
+    """Return an observation ID and field from a validation issue path."""
+
+    match = _OBSERVATION_ISSUE_PATH.match(path)
+    if match is None:
+        return None
+    return match.group(1), match.group(2) or ""
 
 
 def _issue(path: str, reason: RefusalReason, detail: str) -> ValidationIssue:
