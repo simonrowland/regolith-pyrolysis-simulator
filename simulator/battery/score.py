@@ -11402,10 +11402,39 @@ def load_score_context(
     else:
         works, experiments, observations = load_migrated_store(root, sources=sources)
     benches = load_migrated_benches(root)
+    validation_observations = observations
+    if sources is not None:
+        referenced_ids: set[str] = set()
+        for observation in observations.values():
+            referenced_ids.update(observation.derived_from or ())
+            if observation.derivation is not None:
+                referenced_ids.update(observation.derivation.inputs)
+            if observation.admission.superseded_by is not None:
+                referenced_ids.add(observation.admission.superseded_by)
+        missing_ids = referenced_ids.difference(observations)
+        parent_sources = tuple(
+            sorted(
+                {
+                    observation_id.split("::", 1)[0]
+                    for observation_id in missing_ids
+                    if "::" in observation_id
+                }
+            )
+        )
+        if parent_sources:
+            _, _, stored_parents = load_migrated_store(root, sources=parent_sources)
+            validation_observations = {
+                **observations,
+                **{
+                    observation_id: stored_parents[observation_id]
+                    for observation_id in missing_ids
+                    if observation_id in stored_parents
+                },
+            }
     validation = validate_corpus(
         works,
         experiments,
-        observations,
+        validation_observations,
         benches=benches,
         context_rows=load_migrated_context(root),
     )
