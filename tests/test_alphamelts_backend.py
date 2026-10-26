@@ -6299,6 +6299,38 @@ def test_petthermotools_result_parser_prefers_reported_oxide_activities():
     })
 
 
+def test_sr03_invalid_oxide_activity_notice_preserves_projected_values():
+    """Kill mutation: silently_drop_invalid_oxide_activity_notice."""
+    backend = AlphaMELTSBackend()
+    activities = {
+        'SiO2': 0.42,
+        'Al2O3': float('nan'),
+        'FeO': 0.0,
+        'MgO': float('inf'),
+    }
+
+    result = backend._emit_equilibrium_result(
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        activity_coefficients=activities,
+    )
+
+    assert result.activity_coefficients['SiO2'].hex() == (0.42).hex()
+    assert result.diagnostics['diagnostic_oxide_activities'] == {'SiO2': 0.42}
+    assert result.warnings == [
+        "AlphaMELTS provider omitted nonfinite diagnostic_oxide_activities field "
+        "'Al2O3' for phase liquid: nan",
+        "AlphaMELTS provider omitted nonpositive diagnostic_oxide_activities field "
+        "'FeO' for phase liquid: 0.0",
+        "AlphaMELTS provider omitted nonfinite diagnostic_oxide_activities field "
+        "'MgO' for phase liquid: inf",
+    ]
+
+
 def test_petthermotools_activity_coefficients_are_multiplied_by_mole_fraction():
     backend = AlphaMELTSBackend()
     na2o_mass = resolve_species_formula('Na2O').molar_mass_kg_per_mol()
