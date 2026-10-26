@@ -4270,7 +4270,10 @@ class EvaporationMixin:
             zero = None
             zero_reason = (self._evaporation_carrier_zero_reason(equilibrium, oxygen_bar=0.0)
                            if bulk == 0.0 else None)
-            if bulk == 0.0 and zero_reason and zero_reason != 'frozen_consuming_carriers_at_zero_oxygen':
+            if bulk == 0.0 and zero_reason:
+                # Reuse the verified endpoint hook for admitted mass-action
+                # limits too. The same ledger residual must be exactly zero;
+                # searching pressure decades would only repeat its snapshots.
                 candidate = evaluate(0.0)
                 if candidate.residual == 0.0:
                     zero = candidate
