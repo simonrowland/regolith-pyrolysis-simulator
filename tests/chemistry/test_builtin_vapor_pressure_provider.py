@@ -3702,7 +3702,11 @@ def test_shadow_parity_across_short_simulation_run(
             for species, pressure in legacy_result.vapor_pressures_Pa.items():
                 evaluator = sim.vapour_rail_catalog.evaluator_for_hot_train(
                     species, process_phase='stage0' if sim.melt.campaign.name in {'C0', 'C0B'} else 'hot_train')
-                assert evaluator.pO2_exponent == 0.0
+                assert evaluator.pO2_exponent <= 0.0
+                if evaluator.pO2_exponent < 0.0:
+                    assert evaluator.oxygen_fugacity_channel == 'intrinsic_melt'
+                    assert sim._project_evaporation_overhead_source_mol_hr(
+                        {species: 0.001}, {}).get('O2', 0.0) == 0.0
                 assert pressure > 0.0
             assert sim._last_surface_oxygen_diagnostic['oxygen_flux_mol_m2_s'] == 0.0
             continue

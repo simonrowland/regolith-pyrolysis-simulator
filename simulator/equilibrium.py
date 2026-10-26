@@ -595,22 +595,10 @@ class EquilibriumMixin:
         # SiO suppression reads the headspace reservoir.
         pO2_bar = self._reaction_oxygen_pO2_bar()
         vacuum_floor_bar = self._oxygen_numerical_floor_bar()
-        reservoir = getattr(self.melt, "oxygen_reservoir", None)
-        intrinsic_fO2_value = getattr(
-            reservoir, "melt_intrinsic_fO2_log", None
-        )
-        if intrinsic_fO2_value is None:
-            intrinsic_fO2_value = getattr(self.melt, 'melt_fO2_log', None)
-        if intrinsic_fO2_value is None:
-            current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
-            if callable(current_fO2):
-                intrinsic_fO2_log = float(current_fO2())
-            else:
-                intrinsic_fO2_log = float(getattr(self.melt, 'fO2_log', -9.0))
-        else:
-            intrinsic_fO2_log = float(intrinsic_fO2_value)
-
-        # Match the source owner's retained metal-loss oxygen channel.
+        # Match the kernel's existing publication owner, including the
+        # inventory-supported reduction buffer. Raw reservoir logs can run
+        # below the bar representation; they are not a second vapor input.
+        intrinsic_fO2_log = self._intrinsic_oxygen_publication()['published_intrinsic_fO2_log']
         melt_dissociation_pO2_bar = 10.0 ** intrinsic_fO2_log
         feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
             floor_bar=vacuum_floor_bar,
@@ -1259,8 +1247,8 @@ class EquilibriumMixin:
             # Unit check: K, activity, and reduced fugacities are dimensionless;
             # the gas/condensed pressure rail supplies Pa below. Sanity/limit:
             # fO2 down by 100 raises Mg by 10; fO2 -> infinity suppresses Mg.
-            # Every dissociation denominator uses solved reaction oxygen.
-            # FeO activity separately retains intrinsic Kress91 melt redox;
+            # Retained metal coproduct uses intrinsic melt oxygen.
+            # FeO activity also retains intrinsic Kress91 melt redox;
             # the bulk gas remains the transport/backpressure boundary.
             numerator = K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar
 

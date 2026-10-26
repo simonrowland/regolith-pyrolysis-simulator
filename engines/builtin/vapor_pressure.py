@@ -4164,9 +4164,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 "reference_temperature_K": None,
                 "component_basis": "raoultian_pure_endmember",
             },
-            # Accepted reaction oxygen for source mass action. Intrinsic melt
-            # redox remains the independent logarithmic Fe-activity input below.
-            # Catalog evaluation must preserve this exact solved scalar.
+            # Published intrinsic oxygen for retained metal-loss mass action.
+            # Gas-coupled channels preserve the separate surface scalar below.
             "source_reaction_fO2_bar": (
                 melt_dissociation_pO2_bar
                 if intrinsic_fO2_log_supplied
