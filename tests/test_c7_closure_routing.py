@@ -260,17 +260,17 @@ def test_fixed_state_source_pressure_exponents_at_solved_oxygen():
             trial._frozen_evaporation_carriers = boundary.payload[2]._frozen_evaporation_carriers
             result = trial._get_equilibrium()
             diagnostic = trial._last_vapor_pressure_diagnostic
-            assert diagnostic['source_reaction_fO2_bar'] == oxygen
+            assert diagnostic['source_reaction_fO2_bar'] == 10.0 ** sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
             cases.append((result.vapor_pressures_Pa, diagnostic['activities']))
         assert cases[0][1] == cases[1][1]
-        # Fixed T, activity and inventory: M-O = M(g) + n/2 O2 gives
-        # P_M proportional to pO2**(-n/2). SiO/Fe/Mg release half O2;
-        # single-cation Na/K release quarter O2. Ratios are dimensionless
-        # (bar/bar); equal oxygen must give unity. Depletion is excluded.
+        # SiO's oxygen enters the gas, so its declared half-O2 power
+        # follows the surface. Metal coproduct remains in the melt buffer;
+        # fixed intrinsic potential gives identical metal pressures even
+        # when the gas surface changes. Depletion is excluded here.
         ratio = boundary.reaction_pO2_bar / 1e-9
         assert ratio != 1.0
-        for species, exponent in (('SiO', -.5), ('Fe', -.5), ('Mg', -.5),
-                                  ('Na', -.25), ('K', -.25)):
+        for species, exponent in (('SiO', -.5), ('Fe', 0.0), ('Mg', 0.0),
+                                  ('Na', 0.0), ('K', 0.0)):
             assert cases[1][0][species] / cases[0][0][species] == pytest.approx(
                 ratio ** exponent, rel=1e-12, abs=0.0), species
     finally:

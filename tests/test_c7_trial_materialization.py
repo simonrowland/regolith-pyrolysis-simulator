@@ -98,10 +98,10 @@ def test_accepted_hot_hour_hex():
         # and zero-rate records, rather than storing another 930 kB fixture.
         assert {key: hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
                 for key, value in receipt.items()} == {
-            'flux': '7ccb59e92f653c29e73d4730de9c11d799cdbd9310565c6e977e3565cf833fe3',
-            'oxygen': '384e69e50af06874a8d1ffc9f454ab70e65f9ab363fc0f3551b2bf49bdb4f8ec',
-            'ledger': 'dab2227b6b6848e3810336e0a2d3eb8d8b799c3764633372279549a73f17ed3c',
-            'condensation': '4ca497f10ba0ca1b82cbd1a22cfbf26e074957b2d4a889d17214bf84ae070294',
+            'flux': '0bf5b2dd1d755f025cb8a00f5957bcc025a7bc48d066501c71855fdc4953b4d7',
+            'oxygen': '6a072751e243dd81c78ff63a9f13c52270636a7c7929699a35c9f93e55e834d6',
+            'ledger': '5437fea6ca3e99175a4a1fe0784e6144f7d9bae2c533b83985eeb2b927541ec3',
+            'condensation': 'b8c9bc4eeaac682ec64582dd50235abb6978d7e9c7a861366301d6714b2e795c',
         }
     finally:
         close_test_owned_magemin_backend(sim)
@@ -128,5 +128,37 @@ def test_pressure_trial_freezes_liquidus_and_sweep_boundary(monkeypatch):
                             lambda: pytest.fail('pressure trial repeated sweep balance'))
         assert trial._melt_redox_liquid_fraction_factor(1873.15) == fraction
         assert trial._headspace_transport_pO2_bar_from_ledger(0.0, head_o2_mol=0.0) == bulk
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
+def test_pressure_trial_and_hour_rollback_defer_cold_spot_history(monkeypatch):
+    from types import MappingProxyType
+    import simulator.core as core
+
+    sim = simulation()
+    try:
+        row = MappingProxyType({'cold_spot_pin': {'temperature_C': 25.0}})
+        sim.condensation_model.cold_spot_history.append(row)
+        copy_proxy = core._deepcopy_refusal_mappingproxy
+
+        def copy_frontier_only(value, memo):
+            assert 'cold_spot_pin' not in value, 'snapshot recursively copied committed cold-spot history'
+            return copy_proxy(value, memo)
+
+        monkeypatch.setattr(core, '_deepcopy_refusal_mappingproxy', copy_frontier_only)
+        trial = sim._detached_evaporation_projection()
+        assert trial.condensation_model.cold_spot_history is not sim.condensation_model.cold_spot_history
+        assert trial.condensation_model.cold_spot_history[0] is row
+        trial.condensation_model.cold_spot_history.append({'temperature_C': 99.0})
+        assert len(sim.condensation_model.cold_spot_history) == 1
+        state, _, _ = sim._snapshot_terminal_refusal_hour_state(defer_committed_history=True)
+        history = state['_condensation_model'].cold_spot_history
+        assert isinstance(history, core._RefusalSnapshotHistoryPrefix)
+        monkeypatch.setattr(core, '_deepcopy_refusal_mappingproxy', copy_proxy)
+        core._materialize_refusal_snapshot_history(state)
+        assert state['_condensation_model'].cold_spot_history == [row]
+        assert state['_condensation_model'].cold_spot_history[0] is not row
+        history.release()
     finally:
         close_test_owned_magemin_backend(sim)
