@@ -646,6 +646,7 @@ def test_magemin_over_threshold_projection_remains_battery_refusal():
             "backend_status_reason": REFUSAL_COMPOSITION_PROJECTED,
             PROJECTED_BULK_CLASSIFICATION_KEY: classification,
             "input_composition_projection": {
+                "backend": "MAGEMin",
                 "composition_projected": {
                     "dropped_components": ["MnO"],
                     "dropped_mass_fraction": 0.0101,

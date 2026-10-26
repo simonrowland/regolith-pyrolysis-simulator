@@ -42,6 +42,7 @@ from engines.magemin.domain import MAGEMinDomainGate
 from simulator.composition_projection import (
     PROJECTED_BULK_CLASSIFICATION_KEY,
     PROJECTED_BULK_MAX_DROPPED_WT_PCT,
+    _classify_projected_bulk_from_source,
 )
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
@@ -2249,6 +2250,20 @@ def test_magemin_fake_bridge_receives_pressure_in_gpa(monkeypatch):
     assert captured["T_K"] == pytest.approx(1450.0 + 273.15)
 
 
+def _independent_mn_mol_per_kg(source_mass_fraction: float) -> tuple[float, float]:
+    # Use Mn = 54.938044 and O = 15.999 g/mol, with 0.0005 g/mol oxygen
+    # rounding tolerance, independently of the production species resolver.
+    molar_mass_kg_per_mol = (54.938044 + 15.999) / 1000.0
+    oxygen_rounding_kg_per_mol = 0.0005 / 1000.0
+    expected = source_mass_fraction / molar_mass_kg_per_mol
+    tolerance = (
+        source_mass_fraction
+        * oxygen_rounding_kg_per_mol
+        / (molar_mass_kg_per_mol - oxygen_rounding_kg_per_mol) ** 2
+    )
+    return expected, tolerance
+
+
 def test_magemin_bulk_projection_drop_at_0_99_wt_pct_solves_with_notice(
     monkeypatch,
 ):
@@ -2285,14 +2300,8 @@ def test_magemin_bulk_projection_drop_at_0_99_wt_pct_solves_with_notice(
     component = classification["components"][0]
     assert component["component"] == "MnO"
     assert component["wt_pct"] == pytest.approx(100.0 / 101.0)
-    source_mass_fraction = 1.0 / 101.0
-    mn_molar_mass_kg_per_mol = (54.938044 + 15.999) / 1000.0
-    oxygen_mass_rounding_kg_per_mol = 0.0005 / 1000.0
-    expected_mol_per_kg = source_mass_fraction / mn_molar_mass_kg_per_mol
-    molar_mass_source_tolerance = (
-        source_mass_fraction
-        * oxygen_mass_rounding_kg_per_mol
-        / (mn_molar_mass_kg_per_mol - oxygen_mass_rounding_kg_per_mol) ** 2
+    expected_mol_per_kg, molar_mass_source_tolerance = (
+        _independent_mn_mol_per_kg(1.0 / 101.0)
     )
     assert component["mol"] == pytest.approx(
         expected_mol_per_kg,
@@ -2398,7 +2407,13 @@ def test_magemin_within_threshold_liquidus_returns_ok_with_notice(monkeypatch):
     assert classification["projection_verdict"] == "within_threshold"
     notice = result.diagnostics["composition_projected_notice"]
     assert notice["dropped_components"][0]["component"] == "MnO"
-    assert classification["components"][0]["mol"] > 0.0
+    expected_mol_per_kg, molar_mass_source_tolerance = (
+        _independent_mn_mol_per_kg(0.3 / 100.0)
+    )
+    assert classification["components"][0]["mol"] == pytest.approx(
+        expected_mol_per_kg,
+        abs=molar_mass_source_tolerance,
+    )
 
 
 def test_magemin_bulk_projection_drop_at_1_01_wt_pct_is_refused(
@@ -2477,9 +2492,9 @@ def test_magemin_bulk_projection_mass_fraction_float_hex_pin():
         "MgO": 40.0,
         "P2O5": 10.0,
     })
-    classification = magemin_module._magemin_projection_classification(
-        bulk_projection,
-        species_formula_registry=None,
+    classification = _classify_projected_bulk_from_source(
+        dict(bulk_projection.dropped_wt_pct_by_component),
+        source_sum_wt_pct=bulk_projection.source_sum_wt_pct,
     )
     details = magemin_module._magemin_bulk_projection_details(
         bulk_projection,

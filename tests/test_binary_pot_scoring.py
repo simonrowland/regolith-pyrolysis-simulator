@@ -6,20 +6,24 @@ import copy
 import math
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
 
-from simulator.battery.enums import Engine, Quantity
+from simulator.composition_projection import PROJECTED_BULK_CLASSIFICATION_KEY
+from simulator.battery.enums import Authority, Engine, Quantity
 from simulator.battery.score import cell_notices
 from simulator.yaml_cache import load_cached_safe_yaml
 
 from scripts.calibration_battery import envelope, rail_for
 from simulator.diagnostic_helpers.binary_pot_battery import (
+    AUTHORITY_EXTRAPOLATED,
     REFUSAL_COMPOSITION_PROJECTED,
     EquilibrateCell,
     Po2Request,
     composition_kg_and_mol,
+    engine_flags_from_result,
     load_binary_pots,
 )
 from simulator.diagnostic_helpers.binary_pot_scoring import (
@@ -147,23 +151,27 @@ def test_cell_notices_preserves_projected_component_wt_pct_and_mol() -> None:
             {"component": "MnO", "wt_pct": 0.3, "mol": 0.0423},
         ],
     }
-    cell = type("Cell", (), {
-        "notices": [
-            {
-                "kind": "composition_projected",
-                "reason": "MAGEMin solved projected bulk",
-                "composition_projection_classification": classification,
-                "dropped_components": [
-                    {"component": "MnO", "wt_pct": 0.3, "mol": 0.0423},
-                ],
-            }
-        ]
-    })()
+    result = SimpleNamespace(
+        status="ok",
+        diagnostics={
+            PROJECTED_BULK_CLASSIFICATION_KEY: classification,
+            "input_composition_projection": {
+                "backend": "MAGEMin",
+                "dropped_mass_fraction": 0.003,
+            },
+        },
+        warnings=[],
+    )
+    rows, authority, _ = engine_flags_from_result(result)
+    assert authority == AUTHORITY_EXTRAPOLATED
+    assert rows[0]["authority"] == AUTHORITY_EXTRAPOLATED
+    cell = SimpleNamespace(notices=rows, authority=authority)
 
     notices = cell_notices(Quantity.ACTIVITY, Engine.MAGEMIN, cell)
 
     assert len(notices) == 1
     assert notices[0].kind.value == "composition_projected"
+    assert notices[0].authority is Authority.EXTRAPOLATED
     assert "MnO" in notices[0].reason
     assert "0.3 wt%" in notices[0].reason
     assert "0.0423 mol/kg" in notices[0].reason
