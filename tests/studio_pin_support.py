@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from simulator.runner import build_sio_yield_report
+from simulator.state import CampaignPhase
 
 
 def sio_evolved_baseline(feedstock: str) -> float:
@@ -53,7 +54,20 @@ def sio_pin_values(report: dict) -> dict:
 def capacity_pin_values(snapshot) -> dict:
     # The older carrier pin excludes these three P channels; the head-result
     # tuple pins the full flux separately. Both quantities are kg/hr.
-    p_flux = sum(snapshot.evap_flux.species_kg_hr[species] for species in ("PO", "PO2", "P2"))
+    p_carriers = ("PO", "PO2", "P2")
+    species_kg_hr = snapshot.evap_flux.species_kg_hr
+    if snapshot.campaign == CampaignPhase.C0:
+        assert set(p_carriers).isdisjoint(species_kg_hr), (
+            "C0 retains phosphorus, so its snapshot must omit the stage-0 "
+            "PO/PO2/P2 vapour channels"
+        )
+        p_flux = 0.0
+    else:
+        missing = set(p_carriers).difference(species_kg_hr)
+        assert not missing, (
+            f"P vapour channels are missing outside C0 retention: {sorted(missing)}"
+        )
+        p_flux = sum(species_kg_hr[species] for species in p_carriers)
     return {
         "hour": snapshot.hour,
         "temperature_C": snapshot.temperature_C,

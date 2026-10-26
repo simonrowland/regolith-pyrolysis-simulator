@@ -10,6 +10,7 @@ import sys
 import pytest
 
 from tests.golden_sections import json_bytes, load_json
+from tests.git_history import require_git_history
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = sorted((ROOT / "tests/fixtures/runner").glob("*.json"))
@@ -258,6 +259,7 @@ def test_revision_extra_fixture_is_rejected(tmp_path):
 
     # Create tree objects only: no branch/index changes or commits in this test.
     revision = "6bb8fc08c"
+    require_git_history(ROOT, revision)
     blob = git("hash-object", "-w", "--stdin", raw=b'{"status":"ok"}').strip()
     child = None
     for parent, name in [("tests/fixtures/runner", "extra.json"),
@@ -306,6 +308,7 @@ def test_failed_output_is_not_admitted(move, status):
 
 
 def test_revision_input_and_summary_out(tmp_path):
+    require_git_history(ROOT, "6bb8fc08c")
     rules = tmp_path / "rules.json"
     rules.write_bytes(json_bytes({"offer": "no-move", "classes": {}, "rules": []}))
     output = tmp_path / "manifest.json"
