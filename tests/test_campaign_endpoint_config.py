@@ -277,11 +277,17 @@ def test_provider_refusal_uses_the_endpoint_owner_outcome():
     manager.record_physics_refusal(_melt(CampaignPhase.C6, 0), {'reason_refused': 'no_joint_window'})
     assert manager.last_termination['winning_condition'] == 'no_joint_window'
     assert manager.last_termination['classification'] == 'physics_refusal'
+    metadata = {}
+    _attach_campaign_endpoint_outcomes(metadata, SimpleNamespace(
+        simulator=SimpleNamespace(campaign_mgr=manager),
+        session=SimpleNamespace(_step_results=[]),
+    ))
+    assert metadata['campaign_endpoints'] == [manager.last_termination]
 
 
 def test_run_metadata_projects_campaign_endpoint_history_including_repeated_phases():
     outcome = {'campaign': 'C2A', 'winning_condition': 'maximum_hold'}
-    execution = SimpleNamespace(session=SimpleNamespace(_step_results=[
+    execution = SimpleNamespace(simulator=SimpleNamespace(campaign_mgr=SimpleNamespace(last_termination=outcome)), session=SimpleNamespace(_step_results=[
         SimpleNamespace(campaign_summary=None),
         SimpleNamespace(campaign_summary={'endpoint_outcome': outcome}),
         SimpleNamespace(campaign_summary={'endpoint_outcome': outcome}),

@@ -3809,6 +3809,11 @@ def _attach_campaign_endpoint_outcomes(run_metadata: dict[str, Any], execution: 
         summary = getattr(result, "campaign_summary", None)
         if isinstance(summary, Mapping) and summary.get("endpoint_outcome"):
             outcomes.append(summary["endpoint_outcome"])
+    sim = getattr(execution, "simulator", None)
+    latest = getattr(getattr(sim, "campaign_mgr", None), "last_termination", None)
+    # A propagated typed refusal rolls back the hour before StepResult exists.
+    if latest and (not outcomes or latest != outcomes[-1]):
+        outcomes.append(latest)
     if outcomes:
         run_metadata["campaign_endpoints"] = _json_safe(outcomes)
 
