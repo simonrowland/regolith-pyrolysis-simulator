@@ -515,7 +515,22 @@ def canonical_oxide_activity_map(values: Mapping[str, object] | None) -> dict[st
     oxide activity and is omitted. The first positive value for an oxide wins.
     """
 
+    activities, _notices = _canonical_oxide_activity_map_with_notices(values)
+    return activities
+
+
+def _canonical_oxide_activity_map_with_notices(
+    values: Mapping[str, object] | None,
+) -> tuple[dict[str, float], tuple[str, ...]]:
+    """Project oxide activities and describe values omitted from the map.
+
+    The map remains numerically identical to :func:`canonical_oxide_activity_map`.
+    Notices follow the AlphaMELTS/MAGEMin provider warning convention so a
+    projection can surface an invalid value without changing the activities
+    retained for downstream consumers.
+    """
     activities: dict[str, float] = {}
+    notices: list[str] = []
     for raw_name, raw_value in dict(values or {}).items():
         oxide = canonical_melt_oxide_activity_name(raw_name)
         if oxide is None:
@@ -523,10 +538,21 @@ def canonical_oxide_activity_map(values: Mapping[str, object] | None) -> dict[st
         try:
             value = float(raw_value)
         except (TypeError, ValueError):
+            reason = 'nonnumeric'
+        else:
+            if math.isfinite(value):
+                reason = 'nonpositive' if value <= 0.0 else ''
+            else:
+                reason = 'nonfinite'
+        if reason:
+            notices.append(
+                'AlphaMELTS provider omitted '
+                f'{reason} diagnostic_oxide_activities field '
+                f'{str(raw_name)!r} for phase liquid: {raw_value!r}'
+            )
             continue
-        if value > 0.0 and math.isfinite(value):
-            activities.setdefault(oxide, value)
-    return activities
+        activities.setdefault(oxide, value)
+    return activities, tuple(notices)
 
 
 def melts_endmember_to_parent_oxide_activity(

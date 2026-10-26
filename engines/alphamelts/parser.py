@@ -23,6 +23,7 @@ import re
 import math
 from typing import Any, Dict, Mapping, Optional, Tuple
 
+from engines.alphamelts.domain import _canonical_oxide_activity_map_with_notices
 from engines.alphamelts.result import LiquidusDiagnostics
 from simulator.scalar_boundary import is_declared_real_scalar, is_finite
 
@@ -80,6 +81,13 @@ def project_equilibrium_to_diagnostics(
         )
 
     warnings: Tuple[str, ...] = tuple(getattr(equilibrium_result, 'warnings', ()) or ())
+    raw_activities = dict(
+        getattr(equilibrium_result, 'activity_coefficients', {}) or {}
+    )
+    _oxide_activities, activity_notices = (
+        _canonical_oxide_activity_map_with_notices(raw_activities)
+    )
+    warnings += activity_notices
     # An absent or empty status is the ABSENCE of an answer, not a good one.
     # This seam previously manufactured 'ok' for a statusless result, and no
     # amount of validation further downstream can recover the lost
@@ -119,9 +127,7 @@ def project_equilibrium_to_diagnostics(
     }
     activities = {
         str(k): float(v)
-        for k, v in dict(
-            getattr(equilibrium_result, 'activity_coefficients', {}) or {}
-        ).items()
+        for k, v in raw_activities.items()
         if is_finite(v)
     }
 
