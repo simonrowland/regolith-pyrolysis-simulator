@@ -132,22 +132,17 @@ def _physics_metadata_payload(
         diagnostic["vapor_pressure_numerator_provenance"]
     )
     if exclude_b813_temperature_notices:
-        # b-813 adds temperature_K, valid_range_K, authority_level,
-        # certified_band and reason in new metal/compiled-oxide
-        # extrapolation_notice records. SiO already had a notice; only its
-        # certified_band key is new. Exclude those additions from the green
-        # digest while keeping numeric payload, source labels and prior
-        # provenance pinned.
+        # The merged green base already attaches temperature notices with
+        # their existing authority, reason, status and acquisition fields.
+        # b-813 adds certified_band; project that key out while preserving
+        # every notice field that was already present on green.
         for record in provenance.values():
             notice = record.get("extrapolation_notice")
             if not isinstance(notice, dict):
                 continue
-            if notice.get("reason") == (
-                "oxide_vapor_pressure_out_of_validated_range"
-            ):
-                notice.pop("certified_band", None)
-            elif "temperature_K" in notice and "valid_range_K" in notice:
-                record.pop("extrapolation_notice", None)
+            if not {"temperature_K", "valid_range_K"} <= notice.keys():
+                continue
+            notice.pop("certified_band", None)
     return (
         dict(diagnostic["vapor_pressures_source"]),
         provenance,
