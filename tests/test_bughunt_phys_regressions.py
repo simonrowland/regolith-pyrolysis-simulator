@@ -852,6 +852,13 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     sim._condensation_model = SimpleNamespace(
         operating_history=[committed, {"wall_temperature_C": 25.0}],
     )
+    sim._backend_status_history = ["native"]
+    sim._sulfur_saturation_steps = [committed, {"notice": {"warnings": []}}]
+    sim._target_inventory_by_hour = [committed, {"targets": []}]
+    sim._yield_disposition_ledger_snapshots = {
+        (3, "C2A", 3): committed,
+        (4, "C2A", 4): {"gross_events": []},
+    }
     sim.runtime_state = {"nested": {"temperature_C": 25.0}}
     sim.atom_ledger = FakeLedger()
     sim._chem_registry = object()
@@ -865,7 +872,7 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     assert isinstance(sim.record.snapshots, list)
     assert sim.record.snapshots == [committed]
     assert sim.record.snapshots[0] is committed
-    assert len(created_prefixes) == 2
+    assert len(created_prefixes) == 6
     assert all(prefix._memo == {} for prefix in created_prefixes)
     with pytest.raises(RefusalStateSnapshotError) as direct_snapshot:
         sim._snapshot_terminal_refusal_hour_state()
@@ -903,6 +910,26 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
         operating_history=[operating_prefix, operating_tail],
         last_sticking_alpha_provenance_notice={},
     )
+    sim._backend_status_history = ["native"] * 200
+    sim._sulfur_saturation_steps = [
+        {"hour": hour, "notice": {"warnings": ["extrapolated"]}}
+        for hour in range(200)
+    ]
+    sim._target_inventory_by_hour = [
+        {"hour": hour, "targets": [{"remaining_kg": float(hour)}]}
+        for hour in range(200)
+    ]
+    sim._last_target_inventory_diagnostic = sim._target_inventory_by_hour[-1]
+    sim._yield_disposition_ledger_snapshots = {
+        (hour, "C2A", hour): {"gross_events": [{"species_mol": {"Na": float(hour)}}]}
+        for hour in range(200)
+    }
+    histories_before = copy.deepcopy({
+        field: getattr(sim, field) for field in (
+            "_backend_status_history", "_sulfur_saturation_steps",
+            "_target_inventory_by_hour", "_yield_disposition_ledger_snapshots",
+        )
+    })
     sim.runtime_state = {"nested": {"temperature_C": 25.0}}
     sim.runtime_state["operating_tail"] = operating_tail
     sim.atom_ledger = FakeLedger()
@@ -918,6 +945,13 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
         operating_prefix["pressures"]["Na"] = 888.0
         sim._condensation_model.operating_history[-1]["pressures"]["Na"] = 999.0
         sim._condensation_model.operating_history.append({"pressures": {"Na": 3.0}})
+        sim._backend_status_history.append("refused")
+        sim._sulfur_saturation_steps[-1]["notice"]["warnings"].append("refused")
+        sim._sulfur_saturation_steps.append({"hour": 200})
+        sim._last_target_inventory_diagnostic["targets"][-1]["remaining_kg"] = -1.0
+        sim._target_inventory_by_hour.append({"hour": 200})
+        sim._yield_disposition_ledger_snapshots[(199, "C2A", 199)]["gross_events"].append({})
+        sim._yield_disposition_ledger_snapshots[(200, "C2A", 200)] = {"gross_events": []}
         raise refusal
 
     sim._step_one_hour = refuse_after_mutation
@@ -927,6 +961,10 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
 
     assert raised.value is refusal
     assert sim.runtime_state["nested"] == {"temperature_C": 25.0}
+    for field, expected in histories_before.items():
+        assert getattr(sim, field) == expected
+        assert type(getattr(sim, field)) is type(expected)
+    assert sim._last_target_inventory_diagnostic is sim._target_inventory_by_hour[-1]
     history = sim._condensation_model.operating_history
     assert isinstance(history, list)
     assert history == [{"pressures": {"Na": 1.0}}, {"pressures": {"Na": 2.0}}]
