@@ -63,3 +63,21 @@ def test_signed_closure_property_across_bulk_and_source_scales(bulk, film, stagn
             assert math.copysign(1.0, solved.payload) == math.copysign(1.0, source)
             assert solved.oxygen_flux_mol_m2_s == pytest.approx(source, rel=1e-8, abs=0.0)
             assert abs(solved.residual) <= math.sqrt(math.ulp(1.0)) * math.fsum(map(abs, solved.balance_terms))
+
+
+def test_surface_solve_reuses_each_evaluated_pressure_within_one_solve():
+    from collections import Counter
+
+    calls = []
+    def evaluate(delta):
+        calls.append(delta)
+        return _SurfaceOxygenEvaluation(delta, 0.0, delta, 0.0,
+            {'fixed_forcing': 0.125}, 0.0, 0.0, 0.0, 0.125)
+
+    first = _solve_surface_oxygen_balance(evaluate)
+    assert max(Counter(calls).values()) == 1
+    first_calls = list(calls)
+    calls.clear()
+    second = _solve_surface_oxygen_balance(evaluate)
+    assert calls == first_calls  # Reuse ends with this solve, even for the same callable.
+    assert second == first
