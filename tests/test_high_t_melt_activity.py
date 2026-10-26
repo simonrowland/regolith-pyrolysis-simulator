@@ -114,14 +114,51 @@ def _request(
     )
 
 
-def _physics(result) -> tuple[dict, dict, dict, dict, tuple[str, ...]]:
+def _physics_numeric_payload(result) -> tuple[dict, dict]:
     diagnostic = result.diagnostic
     return (
         dict(diagnostic["vapor_pressures_Pa"]),
         dict(diagnostic["activities"]),
+    )
+
+
+def _physics_metadata_payload(
+    result,
+    *,
+    exclude_b813_temperature_notices: bool = False,
+) -> tuple[dict, dict, tuple[str, ...]]:
+    diagnostic = result.diagnostic
+    provenance = copy.deepcopy(
+        diagnostic["vapor_pressure_numerator_provenance"]
+    )
+    if exclude_b813_temperature_notices:
+        # b-813 adds temperature_K, valid_range_K, authority_level,
+        # certified_band and reason in new metal/compiled-oxide
+        # extrapolation_notice records. SiO already had a notice; only its
+        # certified_band key is new. Exclude those additions from the green
+        # digest while keeping numeric payload, source labels and prior
+        # provenance pinned.
+        for record in provenance.values():
+            notice = record.get("extrapolation_notice")
+            if not isinstance(notice, dict):
+                continue
+            if notice.get("reason") == (
+                "oxide_vapor_pressure_out_of_validated_range"
+            ):
+                notice.pop("certified_band", None)
+            elif "temperature_K" in notice and "valid_range_K" in notice:
+                record.pop("extrapolation_notice", None)
+    return (
         dict(diagnostic["vapor_pressures_source"]),
-        copy.deepcopy(diagnostic["vapor_pressure_numerator_provenance"]),
+        provenance,
         tuple(result.warnings),
+    )
+
+
+def _physics(result) -> tuple[dict, dict, dict, dict, tuple[str, ...]]:
+    return (
+        *_physics_numeric_payload(result),
+        *_physics_metadata_payload(result),
     )
 
 
@@ -354,9 +391,16 @@ def _history_request(composition, temperature_K, hour, previous=None):
 def test_successful_openimcc_physics_is_bit_identical() -> None:
     result = _provider().dispatch(_history_request(BASE_MELT_MOL, 2400.65, 61))
     # Re-measured after merging green a822c275f: d-173 moves the engine pin
-    # from e975edd to e1423d8. JSON round-trips preserve float bits.
+    # from e975edd to e1423d8. Keep the numeric maps separate from metadata;
+    # the historical digest excludes only b-813's new temperature notice
+    # fields so their values remain bit-pinned to green.
+    numeric_payload = _physics_numeric_payload(result)
+    metadata_payload = _physics_metadata_payload(
+        result,
+        exclude_b813_temperature_notices=True,
+    )
     assert hashlib.sha256(
-        json.dumps(_physics(result), sort_keys=True).encode()
+        json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
     ).hexdigest() == "0dbdc3673e0d640898dad7b848278f93322c0b48898050618b21811bd63c7e78"
 
 
@@ -364,8 +408,13 @@ def test_1800_k_pre_switch_physics_pin() -> None:
     result = _provider().dispatch(
         _request(BASE_MELT_MOL, 1800.0, high_t_melt_activity="constant_gamma")
     )
+    numeric_payload = _physics_numeric_payload(result)
+    metadata_payload = _physics_metadata_payload(
+        result,
+        exclude_b813_temperature_notices=True,
+    )
     assert hashlib.sha256(
-        json.dumps(_physics(result), sort_keys=True).encode()
+        json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
     ).hexdigest() == "ccdfb94254defeb15f302b251c93dc46ab420c1a83b43b3a78bd4ceb718c8368"
 
 
