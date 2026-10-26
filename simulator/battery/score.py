@@ -172,6 +172,7 @@ from simulator.battery.validate import (
 )
 from simulator.battery.validity import (
     GateOutcome,
+    _calibration_grounded,
     _partial_pressure_observations_by_experiment,
     comparison_method_cell_constant_cancels,
     run_validity_gates,
@@ -3478,6 +3479,25 @@ def _observation_flagged_strata(
     )
 
 
+def _has_ungrounded_kems_partial_pressure_calibration(
+    observation: Observation,
+    experiment: Experiment | None,
+) -> bool:
+    identity = observation.identity
+    if (
+        experiment is None
+        or not isinstance(identity, Identity)
+        or quantity_token(identity) is not Quantity.P_PARTIAL
+        or not experiment.method.is_value
+        or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
+    ):
+        return False
+    calibration = (
+        None if experiment.apparatus is None else experiment.apparatus.calibration
+    )
+    return not _calibration_grounded(calibration)
+
+
 def _kems_replicate_groups(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
@@ -3492,6 +3512,11 @@ def _kems_replicate_groups(
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
+        experiment = experiments.get(observation.experiment_id)
+        if _has_ungrounded_kems_partial_pressure_calibration(
+            observation, experiment
+        ):
+            continue
         strata = _observation_flagged_strata(
             observation, experiments, point_observations_by_experiment, benches
         )
@@ -3500,7 +3525,6 @@ def _kems_replicate_groups(
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
             continue
-        experiment = experiments.get(observation.experiment_id)
         if (
             experiment is None
             or not experiment.method.is_value
@@ -3559,6 +3583,11 @@ def _derive_kems_partial_pressure_band(
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
+        experiment = experiments.get(observation.experiment_id)
+        if _has_ungrounded_kems_partial_pressure_calibration(
+            observation, experiment
+        ):
+            continue
         strata = _observation_flagged_strata(
             observation, experiments, point_observations_by_experiment, benches
         )
@@ -3567,7 +3596,6 @@ def _derive_kems_partial_pressure_band(
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
             continue
-        experiment = experiments.get(observation.experiment_id)
         if (
             experiment is None
             or not experiment.method.is_value
@@ -4423,9 +4451,6 @@ def _source_band_catalog(
     )
 
     comparison_ids = {row.observation_id for row in comparison_candidates(context)}
-    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
-        context.observations.values()
-    )
     sources: dict[str, dict[str, dict[str, object]]] = defaultdict(dict)
     identities: dict[str, Identity] = {}
     group_keys: dict[str, dict[str, object]] = {}
@@ -4447,21 +4472,10 @@ def _source_band_catalog(
         if (
             not compilation
             and parent.observation_id in comparison_ids
-            and isinstance(identity, Identity)
-            and quantity_token(identity) is Quantity.P_PARTIAL
-            and experiment is not None
-            and experiment.method.is_value
-            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-            and FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
-            in _observation_flagged_strata(
-                parent,
-                context.experiments,
-                point_observations_by_experiment,
-                context.benches,
+            and _has_ungrounded_kems_partial_pressure_calibration(
+                parent, experiment
             )
         ):
-            # d-139: retain uncalibrated KEMS rows for scoring, but exclude
-            # their absolute pressures from the generic scatter population.
             continue
         for cell in _iter_compilation_series_cells(parent, origin):
             if not isinstance(cell.identity, Identity):

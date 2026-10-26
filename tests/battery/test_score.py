@@ -1603,7 +1603,7 @@ def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
 
     uncalibrated_row = replace(
         _uncalibrated_kems_partial_row(
-            uncalibrated_experiment, "uncalibrated-kems-pressure", Decimal("1000")
+            uncalibrated_experiment, "uncalibrated-kems-pressure", Decimal("1")
         ),
         identity=identity,
         source_id="uncalibrated-source",
@@ -1676,6 +1676,130 @@ def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
         uncalibrated_context, {}
     )
     assert uncalibrated_bands == {}
+
+
+@pytest.mark.parametrize(
+    "calibration_path",
+    ("low_kn", "high_background", "not_published", "missing_locator"),
+)
+def test_kems_band_populations_exclude_all_ungrounded_calibrations(
+    calibration_path: str,
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import (
+        _source_band_catalog,
+        derive_kems_partial_pressure_band,
+    )
+
+    calibrated = F.kems_experiment("calibrated-kems")
+    uncalibrated = F.kems_experiment(
+        "ungrounded-kems",
+        kn=Decimal("1") if calibration_path == "low_kn" else Decimal("20"),
+        total_P=(
+            Decimal("0.1")
+            if calibration_path == "high_background"
+            else Decimal("1e-6")
+        ),
+        calibrated=False,
+    )
+    if calibration_path == "not_published":
+        uncalibrated = replace(
+            uncalibrated,
+            apparatus=replace(
+                uncalibrated.apparatus,
+                calibration={
+                    "standard": Located(
+                        State.unknown("not published"), locator=F.loc(page=4)
+                    )
+                },
+            ),
+        )
+    elif calibration_path == "missing_locator":
+        uncalibrated = replace(
+            uncalibrated,
+            apparatus=replace(
+                uncalibrated.apparatus,
+                calibration={"standard": Located(State.of("Ag"))},
+            ),
+        )
+
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+        reaction=None,
+        reference_state=None,
+        reservoir=None,
+    )
+    printed_error = Uncertainty(
+        kind=UncertaintyKind.PRINTED, verbatim="10% pressure error"
+    )
+    calibrated_rows = tuple(
+        replace(
+            F.observation(
+                f"calibrated-kems-{index}",
+                calibrated.experiment_id,
+                identity,
+                Decimal(value),
+                evidence=EvidenceClass.MEASURED_DIRECT,
+                source_id=f"calibrated-kems-{index}",
+            ),
+            uncertainty=printed_error,
+        )
+        for index, value in enumerate(("10", "100"))
+    )
+    uncalibrated_row = replace(
+        F.observation(
+            "ungrounded-kems-row",
+            uncalibrated.experiment_id,
+            identity,
+            Decimal("1000"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="ungrounded-kems-source",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED, verbatim="100% pressure error"
+        ),
+    )
+    experiments = {
+        calibrated.experiment_id: calibrated,
+        uncalibrated.experiment_id: uncalibrated,
+    }
+
+    calibrated_pressure_band = derive_kems_partial_pressure_band(
+        {row.observation_id: row for row in calibrated_rows}, experiments
+    )
+    mixed_pressure_band = derive_kems_partial_pressure_band(
+        {
+            row.observation_id: row
+            for row in (*calibrated_rows, uncalibrated_row)
+        },
+        experiments,
+    )
+    assert calibrated_pressure_band is not None
+
+    work = F.work()
+
+    def context_for(rows):
+        return ScoreContext(
+            works={work.work_id: work},
+            experiments=experiments,
+            observations={row.observation_id: row for row in rows},
+            extract_review={row.source_id: "reviewed" for row in rows},
+            hostname="test",
+            root=tmp_path,
+        )
+
+    calibrated_catalog, _records, _reasons = _source_band_catalog(
+        context_for(calibrated_rows), {}
+    )
+    mixed_catalog, _records, _reasons = _source_band_catalog(
+        context_for((*calibrated_rows, uncalibrated_row)), {}
+    )
+    assert len(calibrated_catalog) == 1
+    assert (
+        mixed_pressure_band == calibrated_pressure_band,
+        mixed_catalog == calibrated_catalog,
+    ) == (True, True), calibration_path
 
 
 def test_uncalibrated_kems_partial_pressure_is_excluded_from_band_population() -> None:
@@ -4199,6 +4323,63 @@ def test_d274_incomplete_printed_pressure_lower_bound_over_limit_still_refuses()
         and "in_cell_partial_pressure_sum" in notice.reason
         for notice in residual.notices
     )
+
+
+@pytest.mark.parametrize("incomplete_coverage", (False, True))
+def test_d274_uncalibrated_partial_pressure_over_limit_refuses(
+    incomplete_coverage: bool,
+) -> None:
+    components = (
+        (("NaO0.5", Decimal("0.5")), ("SiO2", Decimal("0.5")))
+        if incomplete_coverage
+        else (("NaO0.5", Decimal("1")),)
+    )
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=components,
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        _partial_identity(), composition=State.of(composition)
+    )
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=False
+    )
+    reference = F.observation(
+        f"d274-uncalibrated-over-limit-partial-{incomplete_coverage}",
+        experiment.experiment_id,
+        identity,
+        Decimal("11"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    gates = run_validity_gates(
+        experiment, reference, point_observations=(reference,)
+    )
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert gates.passed is False
+    assert pressure_check.passed is False
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+    assert pressure_check.detail[
+        "printed_partial_pressure_lower_bound_Pa"
+        if incomplete_coverage
+        else "printed_partial_pressure_sum_Pa"
+    ] == "11"
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        comparison_ids={reference.observation_id},
+        predict=_partial_prediction,
+        point_observations=(reference,),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
 def test_d274_uncalibrated_kems_psat_missing_sum_keeps_calibration_refusal() -> None:
