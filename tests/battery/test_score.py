@@ -71,6 +71,7 @@ from simulator.battery.records import (
     Execution,
     Located,
     Notice,
+    Observation,
     Residual,
     ResidualNumeric,
     DecisionBand,
@@ -336,6 +337,92 @@ def _partial_identity(*, phase_reason: str | None = None):
             species=Species("Na", State.unknown(phase_reason)),
         )
     return identity
+
+
+def _mathieu_pressure_context() -> tuple[ScoreContext, tuple[Observation, ...]]:
+    from simulator.battery.migrate import Migrator
+
+    root = Path(__file__).parents[2]
+    migrator = Migrator(root=root, index={}, aliases={})
+    migrator._migrate_extract(
+        root / "data/literature/extracts/mathieu-2009-sodium-solubility-thesis.yaml"
+    )
+    migrator.finalize()
+    rows = tuple(
+        sorted(
+            (
+                observation
+                for observation in migrator.result.observations.values()
+                if isinstance(observation.identity, Identity)
+                and quantity_token(observation.identity) is Quantity.P_PARTIAL
+                and observation.identity.species.formula == "Na"
+            ),
+            key=lambda observation: observation.observation_id,
+        )
+    )
+    assert len(rows) == 212
+    admitted = tuple(
+        observation
+        for observation in rows
+        if observation.admission.status is AdmissionStatus.ADMITTED
+    )
+    assert len(admitted) == 63
+    context = ScoreContext(
+        works=migrator.result.works,
+        experiments=migrator.result.experiments,
+        observations=migrator.result.observations,
+        benches=migrator.result.benches,
+        root=root,
+    )
+    return context, admitted
+
+
+def test_unknown_total_pressure_refusal_is_pinned_on_mathieu_row() -> None:
+    context, admitted = _mathieu_pressure_context()
+    reference = admitted[0]
+    prediction = replace(
+        _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+        identity=replace(
+            reference.identity,
+            total_pressure_Pa=State.of(Decimal("0.1")),
+        ),
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert residual.refusal.detail["fields"] == ["total_pressure_Pa"]
+
+
+def test_unknown_total_pressure_refusal_is_pinned_on_non_mathieu_row() -> None:
+    identity = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.unknown("not printed"),
+    )
+    reference = F.observation(
+        "other-source-p-partial-unknown-pressure",
+        "other-source-experiment",
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="other-source",
+    )
+    candidate_identity = replace(
+        reference.identity, total_pressure_Pa=State.of(Decimal("0.1"))
+    )
+
+    outcome = identity_equal(reference.identity, candidate_identity)
+
+    assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert outcome.fields == ("total_pressure_Pa",)
 
 
 def _partial_prediction(engine, observation, **_kwargs):
