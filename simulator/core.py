@@ -14203,7 +14203,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         evap_flux, overhead_flux = self._apply_evaporation_carrier_batch(evap_flux,
             oxygen_uptake_capacity_mol=(uptake_capacity if boundary is not None else None),
             oxygen_release_capacity_mol=(projected.oxygen_release_capacity_mol
-                                         if boundary is not None else None))
+                                         if boundary is not None else None),
+            prepared_route=(projected.route_plan if boundary is not None else None))
         if boundary is not None:
             self._verify_evaporation_projection(predicted_amounts,
                 self._evaporation_signed_amounts(transition_start, buffer_before))

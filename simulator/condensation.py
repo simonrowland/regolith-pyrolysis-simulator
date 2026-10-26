@@ -1518,6 +1518,101 @@ class CondensationRouteResult:
         return (sio_condensed_kg * sio_to_sio2) / feedstock_kg
 
 
+def _condensation_carrier_admission(evap_flux, melt, vapor_pressure_data, *, materialize_authority):
+    from simulator.vapour_rail.instrumentation import (
+        VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+        VAPOUR_CARRIER_AUTHORITY_MISSING,
+        VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+        VAPOUR_CARRIER_AUTHORITY_REFUSED,
+        VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
+        vapour_carrier_authority_status,
+    )
+    from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
+
+    raw_carrier_authority = getattr(
+        evap_flux, 'carrier_authority_by_species', {}
+    )
+    trial = not materialize_authority
+    carrier_authority_by_species = {
+        str(species): (dict(record) if trial else copy.deepcopy(dict(record)))
+        for species, record in (
+            raw_carrier_authority.items()
+            if isinstance(raw_carrier_authority, Mapping)
+            else ()
+        )
+        if isinstance(record, Mapping)
+    }
+    carrier_authority_status_by_species = {
+        species: vapour_carrier_authority_status(
+            record,
+            expected_species_id=species,
+        )
+        for species, record in carrier_authority_by_species.items()
+    }
+    for species in evap_flux.species_kg_hr:
+        carrier_authority_status_by_species.setdefault(
+            str(species), VAPOUR_CARRIER_AUTHORITY_MISSING
+        )
+    non_debiting_carrier_statuses = {
+        VAPOUR_CARRIER_AUTHORITY_REFUSED,
+        VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+    }
+    # One chokepoint: type admission-refusal and flux_dormant as the
+    # refused status the evaporation debit reader already withholds on.
+    non_debiting_reason_by_species: dict[str, str] = {}
+    cleanup_offgas_authorization: dict[str, dict[str, Any]] = {}
+    for species in evap_flux.species_kg_hr:
+        current_status = carrier_authority_status_by_species.get(
+            species, VAPOUR_CARRIER_AUTHORITY_MISSING
+        )
+        promoted, reason = _promote_non_debiting_carrier_status(
+            species,
+            current_status,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        extra = carrier_authority_by_species.get(species, {}).get('extra', {})
+        evidence = extra.get('applicability_evidence', {})
+        campaign = str(getattr(getattr(melt, 'campaign', None), 'name', ''))
+        expected_stage = {'C0': 'stage0_p_carriers', 'C0B': 'c0b_p_cleanup'}.get(campaign)
+        if (
+            reason == REFUSAL_INAPPLICABLE_PREDICATE
+            and current_status in {
+                VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+                VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
+            }
+            and evidence.get('active') is True
+            and evidence.get('predicate') == 'stage0_only'
+            and expected_stage is not None
+            and evidence.get('stage') == expected_stage
+            and evidence.get('process_phase') == 'hot_train'
+            and 'P2O5' in evidence.get('parent_species_ids', ())
+            and not _species_is_flux_dormant(species, vapor_pressure_data=vapor_pressure_data)
+        ):
+            # The source predicate authorizes cleanup evaporation, while
+            # hot-train condensation remains inapplicable. Carry vapor
+            # through the declared offgas route; never promote a refusal.
+            cleanup_offgas_authorization[species] = copy.deepcopy(evidence)
+            promoted, reason = current_status, None
+        carrier_authority_status_by_species[species] = promoted
+        if reason is not None:
+            non_debiting_reason_by_species[species] = reason
+    condensation_authority_by_species: dict[str, dict[str, Any]] = {
+        species: {
+            'status': status,
+            'authoritative_for_condensation': (
+                status == VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE
+            ),
+            **({} if trial else {'carrier_authority': copy.deepcopy(
+                carrier_authority_by_species.get(species, {})
+            )}),
+        }
+        for species, status in sorted(
+            carrier_authority_status_by_species.items()
+        )
+    }
+    return (carrier_authority_by_species, carrier_authority_status_by_species, non_debiting_carrier_statuses, non_debiting_reason_by_species, cleanup_offgas_authorization, condensation_authority_by_species)
+
+
 class _CondensationRoutePhysics:
     def _update_route_surface_temperatures(
         self,
@@ -1951,99 +2046,11 @@ class _CondensationRoutePhysics:
         wall_sticking_alpha_provenance_by_species: dict[str, Any] = {}
         transport_parameter_notice_by_species: dict[str, Any] = {}
         condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
-        from simulator.vapour_rail.instrumentation import (
-            VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
-            VAPOUR_CARRIER_AUTHORITY_MISSING,
-            VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
-            VAPOUR_CARRIER_AUTHORITY_REFUSED,
-            VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
-            merge_vapour_carrier_lineage,
-            vapour_carrier_authority_severity,
-            vapour_carrier_authority_status,
-        )
-        from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
-
-        raw_carrier_authority = getattr(
-            evap_flux, 'carrier_authority_by_species', {}
-        )
         trial = not materialize_authority
-        carrier_authority_by_species = {
-            str(species): (dict(record) if trial else copy.deepcopy(dict(record)))
-            for species, record in (
-                raw_carrier_authority.items()
-                if isinstance(raw_carrier_authority, Mapping)
-                else ()
-            )
-            if isinstance(record, Mapping)
-        }
-        carrier_authority_status_by_species = {
-            species: vapour_carrier_authority_status(
-                record,
-                expected_species_id=species,
-            )
-            for species, record in carrier_authority_by_species.items()
-        }
-        for species in evap_flux.species_kg_hr:
-            carrier_authority_status_by_species.setdefault(
-                str(species), VAPOUR_CARRIER_AUTHORITY_MISSING
-            )
-        non_debiting_carrier_statuses = {
-            VAPOUR_CARRIER_AUTHORITY_REFUSED,
-            VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
-        }
-        # One chokepoint: type admission-refusal and flux_dormant as the
-        # refused status the evaporation debit reader already withholds on.
-        non_debiting_reason_by_species: dict[str, str] = {}
-        cleanup_offgas_authorization: dict[str, dict[str, Any]] = {}
-        for species in evap_flux.species_kg_hr:
-            current_status = carrier_authority_status_by_species.get(
-                species, VAPOUR_CARRIER_AUTHORITY_MISSING
-            )
-            promoted, reason = _promote_non_debiting_carrier_status(
-                species,
-                current_status,
-                vapor_pressure_data=self.vapor_pressure_data,
-            )
-            extra = carrier_authority_by_species.get(species, {}).get('extra', {})
-            evidence = extra.get('applicability_evidence', {})
-            campaign = str(getattr(getattr(melt, 'campaign', None), 'name', ''))
-            expected_stage = {'C0': 'stage0_p_carriers', 'C0B': 'c0b_p_cleanup'}.get(campaign)
-            if (
-                reason == REFUSAL_INAPPLICABLE_PREDICATE
-                and current_status in {
-                    VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
-                    VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
-                }
-                and evidence.get('active') is True
-                and evidence.get('predicate') == 'stage0_only'
-                and expected_stage is not None
-                and evidence.get('stage') == expected_stage
-                and evidence.get('process_phase') == 'hot_train'
-                and 'P2O5' in evidence.get('parent_species_ids', ())
-                and not _species_is_flux_dormant(species, vapor_pressure_data=self.vapor_pressure_data)
-            ):
-                # The source predicate authorizes cleanup evaporation, while
-                # hot-train condensation remains inapplicable. Carry vapor
-                # through the declared offgas route; never promote a refusal.
-                cleanup_offgas_authorization[species] = copy.deepcopy(evidence)
-                promoted, reason = current_status, None
-            carrier_authority_status_by_species[species] = promoted
-            if reason is not None:
-                non_debiting_reason_by_species[species] = reason
-        condensation_authority_by_species: dict[str, dict[str, Any]] = {
-            species: {
-                'status': status,
-                'authoritative_for_condensation': (
-                    status == VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE
-                ),
-                **({} if trial else {'carrier_authority': copy.deepcopy(
-                    carrier_authority_by_species.get(species, {})
-                )}),
-            }
-            for species, status in sorted(
-                carrier_authority_status_by_species.items()
-            )
-        }
+        from simulator.vapour_rail.instrumentation import (
+            VAPOUR_CARRIER_AUTHORITY_MISSING, VAPOUR_CARRIER_AUTHORITY_REFUSED)
+        (carrier_authority_by_species, carrier_authority_status_by_species, non_debiting_carrier_statuses, non_debiting_reason_by_species, cleanup_offgas_authorization, condensation_authority_by_species) = _condensation_carrier_admission(
+            evap_flux, melt, self.vapor_pressure_data, materialize_authority=materialize_authority)
         # VR-11 / B3: stage-local efficiency zeros mint typed pass-through
         # outcomes (no longer silent return 0.0 without a consumer channel).
         efficiency_outcomes_by_species: dict[str, list[dict[str, Any]]] = {}
@@ -3547,9 +3554,19 @@ class CondensationModel(_CondensationRoutePhysics):
             else:
                 data._route_catalog = previous
 
-    def _route(self, evap_flux: EvaporationFlux, melt: MeltState):
-        (antoine_extrapolation_warnings, antoine_extrapolations, carrier_authority_by_species, condensation_authority_by_species, condensation_refusals_by_species, efficiency_outcomes_by_species, knudsen_diagnostic, route_result, transport_parameter_notice_by_species, used_capture_budget_regularizer, wall_deposit_by_species, wall_saturation_pressure_refusals_by_species, wall_sticking_alpha_by_species, wall_sticking_alpha_provenance_by_species, condensed_by_stage_species, carrier_authority_status_by_species, cleanup_offgas_authorization, remaining_by_species, retained_in_source_by_species) = self._route_amounts(
-            evap_flux, melt, materialize_authority=True)
+    def _route(self, evap_flux: EvaporationFlux, melt: MeltState, *, prepared_route=None):
+        (antoine_extrapolation_warnings, antoine_extrapolations, carrier_authority_by_species, condensation_authority_by_species, condensation_refusals_by_species, efficiency_outcomes_by_species, knudsen_diagnostic, route_result, transport_parameter_notice_by_species, used_capture_budget_regularizer, wall_deposit_by_species, wall_saturation_pressure_refusals_by_species, wall_sticking_alpha_by_species, wall_sticking_alpha_provenance_by_species, condensed_by_stage_species, carrier_authority_status_by_species, cleanup_offgas_authorization, remaining_by_species, retained_in_source_by_species) = (self._route_amounts(evap_flux, melt, materialize_authority=True)
+                if prepared_route is None else prepared_route[0])
+        if prepared_route is not None:
+            work = prepared_route[1]
+            from simulator.wall_deposition import _record_wall_pressure_notice
+            for kind, species, segment, record in work.notice_proposals:
+                _record_wall_pressure_notice(self, kind, species, segment, record)
+            for name in ('last_wall_capture_fixed_point_iterations',
+                         'last_wall_deposition_rate_shadow_candidate',
+                         'wall_species_partial_pressures_pa',
+                         'wall_species_partial_pressures_pa_by_segment'):
+                setattr(self, name, getattr(work, name))
         self._enforce_knudsen_regime()
         from simulator.vapour_rail.instrumentation import (
             VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE, VAPOUR_CARRIER_AUTHORITY_MISSING,

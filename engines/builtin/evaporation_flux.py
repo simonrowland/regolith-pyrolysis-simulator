@@ -79,7 +79,6 @@ from simulator.transport_regime import (
     SurfaceFlow,
     _finite_float,
     hertz_knudsen_mass_conductance,
-    series_evaporation_flux,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -336,6 +335,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     extrapolate_continuum: bool = False,
     melt_surface_area_m2: float | None = None,
     surface_flow: SurfaceFlow | None = None,
+    prepared_inputs=None, preparation=None,
 ) -> SeriesEvaporationFlux:
     """Translate operator controls to the shared L1 series owner."""
     from simulator.state import clamp_stir_factor
@@ -346,7 +346,8 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     radial_clamped = clamp_stir_factor(radial)
     ceiling, ceiling_diag = _coerce_frozen_skull_stir_ceiling(cold_skull_envelope)
     applied = min(axial_clamped, ceiling)
-    return series_evaporation_flux(
+    from simulator.transport_regime import _series_evaporation_flux
+    return _series_evaporation_flux(
         species, P_eq_pa, P_bulk_pa, T_surface_K, molar_mass_kg_mol, alpha_i,
         knudsen_number, pipe_diameter_m, overhead_pressure_pa,
         axial_stir_factor, radial_stir_factor, cold_skull_envelope, carrier_gas,
@@ -356,7 +357,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         gas_resistance_enabled=gas_resistance_enabled,
         extrapolate_continuum=extrapolate_continuum,
         melt_surface_area_m2=melt_surface_area_m2,
-        surface_flow=surface_flow,
+        surface_flow=surface_flow, prepared_inputs=prepared_inputs, preparation=preparation,
         stir_diagnostic={
             "axial_stir_applied": applied, "radial_stir_applied": radial_clamped,
             "axial_stir_clamped": _stir_was_clamped(axial, axial_clamped),
@@ -389,10 +390,22 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
+        return self._evaluate_flux(request)
+
+    def _evaluate_flux(self, request, *, prepared_series=None, series_preparation=None,
+                       prepared_alpha=None, alpha_preparation=None):
         # Lazy import: simulator.state pulls in simulator/__init__ which
         # re-enters this module during package init -- see
         # engines/builtin/__init__.py for the cycle description.
         from simulator.state import MOLAR_MASS
+
+        def alpha_for(species, temperature, spec):
+            if prepared_alpha is not None and species in prepared_alpha:
+                return prepared_alpha[species]
+            value = _evaluate_alpha_control(species, temperature, spec)
+            if alpha_preparation is not None:
+                alpha_preparation[species] = value
+            return value
 
         wrong_intent = reject_wrong_intent(
             request, ChemistryIntent.EVAPORATION_FLUX
@@ -642,7 +655,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     species,
                     alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
                 )
-                alpha, _alpha_evaluation = _evaluate_alpha_control(
+                alpha, _alpha_evaluation = alpha_for(
                     species,
                     T_K,
                     alpha_spec,
@@ -889,7 +902,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 species,
                 alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
             )
-            alpha, alpha_evaluation = _evaluate_alpha_control(
+            alpha, alpha_evaluation = alpha_for(
                 species,
                 T_K,
                 alpha_spec,
@@ -907,6 +920,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 T_surface_K=T_K,
                 molar_mass_kg_mol=M_kg_mol,
                 alpha_i=1.0,
+                prepared_inputs=prepared_series, preparation=series_preparation,
                 melt_surface_area_m2=melt_surface_area_m2,
                 surface_flow=controls.get("surface_flow"),
                 knudsen_number=math.inf,
@@ -962,6 +976,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     T_surface_K=T_K,
                     molar_mass_kg_mol=M_kg_mol,
                     alpha_i=alpha,
+                    prepared_inputs=prepared_series, preparation=series_preparation,
                     melt_surface_area_m2=melt_surface_area_m2,
                     surface_flow=controls.get("surface_flow"),
                     pipe_diameter_m=pipe_diameter_m,

@@ -44,7 +44,9 @@ from __future__ import annotations
 
 import math
 import warnings as runtime_warnings
-from simulator.vapour_rail.batch import _carrier_pressure_floor, _oxygen_coproduct_enters_gas
+from simulator.vapour_rail.batch import (
+    _carrier_pressure_floor, _oxygen_coproduct_enters_gas, _source_uses_surface_oxygen,
+)
 
 from collections.abc import Mapping
 from dataclasses import replace
@@ -2677,7 +2679,120 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 runtime_warnings.warn(warning, UserWarning, stacklevel=2)
         return result
 
-    def _evaluate_pressure(self, request: IntentRequest, *, pseudo_fallbacks) -> IntentResult:
+    def _prepare_pressure_inputs(self, request):
+        """Hour-invariant activity and authority operands for the pressure owner."""
+        controls = request.control_inputs or {}
+        T_K = request.temperature_C + 273.15
+        vacuum_floor_bar = resolve_request_vacuum_floor_bar(request)
+        intrinsic_fO2_log = (self._resolve_intrinsic_melt_fO2_log(request)
+                            if controls.get("intrinsic_fO2_log") is not None else None)
+        comp_wt = composition_wt_pct_from_account_view(
+            request.account_view, self.DECLARED_ACCOUNT
+        )
+        from simulator.chemistry.structural_activity import (
+            structural_activity_diagnostic,
+        )
+
+        structural_activity_reference = structural_activity_diagnostic(
+            request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}),
+            temperature_K=T_K,
+        )
+        melt_account_mol = dict(
+            request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
+        )
+        feo_activity_pressure_bar = vacuum_floor_bar
+        if intrinsic_fO2_log is not None:
+            from simulator.fe_redox import (
+                kress91_ferrous_feo_activity,
+                kress91_furnace_activity_pressure_bar,
+            )
+
+            feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
+                floor_bar=vacuum_floor_bar,
+            )
+            below_cap_fe_activity = kress91_ferrous_feo_activity(
+                comp_wt=comp_wt,
+                fO2_log=intrinsic_fO2_log,
+                T_K=T_K,
+                pressure_bar=feo_activity_pressure_bar,
+                floor_bar=vacuum_floor_bar,
+            )
+            below_cap_fe_activity_basis = "kress91_ferrous"
+        else:
+            below_cap_fe_activity = comp_wt.get("FeO", 0.0) / 100.0
+            below_cap_fe_activity_basis = "feo_weight_fraction"
+        high_t_activity_authority = _build_high_t_melt_activity_authority(
+            composition_mol=melt_account_mol,
+            temperature_K=T_K,
+            controls=controls,
+            below_cap_fe_activity=below_cap_fe_activity,
+            below_cap_fe_activity_basis=below_cap_fe_activity_basis,
+        )
+        vapour_activity_authority = (
+            high_t_activity_authority
+            if openimcc_binding_selected_by_inputs(
+                temperature_K=T_K, controls=controls, quantity_class="vapour",
+            ) else None
+        )
+        # An openimcc activity can move a valid carrier below the numerical
+        # output floor; preserve the carrier so predict-and-flag never drops it.
+        retain_high_t_openimcc_carriers = bool(
+            vapour_activity_authority
+            and (
+                vapour_activity_authority.get("provider") == "openimcc"
+                or vapour_activity_authority.get("held_effective_gamma_by_parent")
+            )
+        )
+        feo_activity_diagnostic = None
+        if intrinsic_fO2_log is not None:
+            from simulator.fe_redox import (
+                calphad_ferrous_feo_activity_diagnostic,
+            )
+
+            feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
+                comp_wt=comp_wt,
+                fO2_log=intrinsic_fO2_log,
+                T_K=T_K,
+                pressure_bar=feo_activity_pressure_bar,
+                floor_bar=vacuum_floor_bar,
+            )
+
+        parents = set(melt_account_mol)
+        for group in ('metals', 'oxide_vapors'):
+            parents.update(row.get('parent_oxide', '') for row in self._vapor_pressure_data.get(group, {}).values())
+        parent_activities = {
+            parent: _high_t_activity_for_parent(parent, melt_account_mol, temperature_K=T_K,
+                authority=vapour_activity_authority) for parent in parents}
+        return (comp_wt, structural_activity_reference, melt_account_mol, below_cap_fe_activity, below_cap_fe_activity_basis, high_t_activity_authority, vapour_activity_authority, retain_high_t_openimcc_carriers, feo_activity_diagnostic, parent_activities)
+
+    def _prepare_pressure_rails(self, request, prepared_inputs):
+        from simulator.accounting.formulas import parse_formula
+        from simulator.vapour_rail.catalog import CatalogCompileError
+
+        phase = request.control_inputs.get('process_phase')
+        invariant = set()
+        for group in ('metals', 'oxide_vapors'):
+            for name, data in self._vapor_pressure_data.get(group, {}).items():
+                try:
+                    evaluator = self._vapour_rail_catalog.evaluator_for_hot_train(name, process_phase=phase)
+                except CatalogCompileError:
+                    continue
+                if evaluator is not None and not _source_uses_surface_oxygen(evaluator,
+                        str(data.get('oxygen_destination') or ''),
+                        float(parse_formula(self._vapour_rail_catalog.species[name].formula).elements.get('O', 0.0))):
+                    invariant.add(name)
+        rails = {}
+        self._evaluate_pressure(request, pseudo_fallbacks=[], prepared_inputs=prepared_inputs,
+                                rail_preparation=rails)
+        return {'invariant_species': frozenset(invariant),
+                **{key: (values if key.startswith('reference_') or key == 'transport_observation_species' else
+                         {name: value for name, value in values.items() if name in invariant})
+                   for key, values in rails.items()},
+                'reference_pressures': rails.get('reference_pressures', {}),
+                'reference_evaluations': rails.get('reference_evaluations', {}),
+                'transport_observation_species': frozenset(rails.get('transport_observation_species', ()))}
+
+    def _evaluate_pressure(self, request: IntentRequest, *, pseudo_fallbacks, prepared_inputs=None, prepared_rails=None, rail_preparation=None) -> IntentResult:
         # Lazy import: simulator.state pulls in simulator/__init__ which
         # re-enters this module during package init -- see
         # engines/builtin/__init__.py for the cycle description.
@@ -2688,6 +2803,24 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             channel_linear_mass_action_factor,
             _o2_potential_from_pO2_bar as o2_potential_from_pO2_bar,
         )
+
+        def reference_pressure(log_pressure, *, species, field):
+            key = (species, field)
+            if prepared_rails is not None and key in prepared_rails['reference_pressures']:
+                return prepared_rails['reference_pressures'][key]
+            value = _pow10_pressure_or_raise(log_pressure, species=species, field=field)
+            if rail_preparation is not None:
+                rail_preparation.setdefault('reference_pressures', {})[key] = value
+            return value
+
+        def prepared_reference_evaluation(evaluator, species):
+            if prepared_rails is not None and species in prepared_rails['reference_evaluations']:
+                return prepared_rails['reference_evaluations'][species]
+            value = evaluator.evaluate(T_K, source_activity=1.0,
+                                       pO2_bar=evaluator.pO2_reference_bar)
+            if rail_preparation is not None:
+                rail_preparation.setdefault('reference_evaluations', {})[species] = value
+            return value
 
         wrong_intent = reject_wrong_intent(request, ChemistryIntent.VAPOR_PRESSURE)
         if wrong_intent is not None:
@@ -2736,85 +2869,23 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         # not the gas-film unknown. The ratio is dimensionless; at zero gas
         # pO2 this source stays finite. Gas-funded consuming rails and SiO's
         # gas coproduct still use the surface pressure supplied by C7.
-        comp_wt = composition_wt_pct_from_account_view(
-            request.account_view, self.DECLARED_ACCOUNT
-        )
-        from simulator.chemistry.structural_activity import (
-            structural_activity_diagnostic,
-        )
-
-        structural_activity_reference = structural_activity_diagnostic(
-            request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}),
-            temperature_K=T_K,
-        )
+        (comp_wt, structural_activity_reference, melt_account_mol, below_cap_fe_activity, below_cap_fe_activity_basis, high_t_activity_authority, vapour_activity_authority, retain_high_t_openimcc_carriers, feo_activity_diagnostic, parent_activities) = (
+            prepared_inputs if prepared_inputs is not None else self._prepare_pressure_inputs(request))
+        # Publication below enriches a local authority record, never the frozen hour.
+        high_t_activity_authority = (dict(high_t_activity_authority)
+                                     if high_t_activity_authority is not None else None)
         warnings: list[str] = []
         antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
-        melt_account_mol = dict(
-            request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
-        )
-        feo_activity_pressure_bar = vacuum_floor_bar
-        if intrinsic_fO2_log is not None:
-            from simulator.fe_redox import (
-                kress91_ferrous_feo_activity,
-                kress91_furnace_activity_pressure_bar,
-            )
-
-            feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
-                floor_bar=vacuum_floor_bar,
-            )
-            below_cap_fe_activity = kress91_ferrous_feo_activity(
-                comp_wt=comp_wt,
-                fO2_log=intrinsic_fO2_log,
-                T_K=T_K,
-                pressure_bar=feo_activity_pressure_bar,
-                floor_bar=vacuum_floor_bar,
-            )
-            below_cap_fe_activity_basis = "kress91_ferrous"
-        else:
-            below_cap_fe_activity = comp_wt.get("FeO", 0.0) / 100.0
-            below_cap_fe_activity_basis = "feo_weight_fraction"
-        high_t_activity_authority = _build_high_t_melt_activity_authority(
-            composition_mol=melt_account_mol,
-            temperature_K=T_K,
-            controls=controls,
-            below_cap_fe_activity=below_cap_fe_activity,
-            below_cap_fe_activity_basis=below_cap_fe_activity_basis,
-        )
-        vapour_activity_authority = (
-            high_t_activity_authority
-            if openimcc_binding_selected_by_inputs(
-                temperature_K=T_K, controls=controls, quantity_class="vapour",
-            ) else None
-        )
-        # An openimcc activity can move a valid carrier below the numerical
-        # output floor; preserve the carrier so predict-and-flag never drops it.
-        retain_high_t_openimcc_carriers = bool(
-            vapour_activity_authority
-            and (
-                vapour_activity_authority.get("provider") == "openimcc"
-                or vapour_activity_authority.get("held_effective_gamma_by_parent")
-            )
-        )
         if high_t_activity_authority:
             for notice in high_t_activity_authority.get("notices", ()):
                 warnings.append(
                     f"{notice.get('code', 'high_t_melt_activity_notice')}: "
                     f"{notice.get('message', '')}"
                 )
-        feo_activity_diagnostic = None
-        if intrinsic_fO2_log is not None:
-            from simulator.fe_redox import (
-                calphad_ferrous_feo_activity_diagnostic,
-            )
-
-            feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
-                comp_wt=comp_wt,
-                fO2_log=intrinsic_fO2_log,
-                T_K=T_K,
-                pressure_bar=feo_activity_pressure_bar,
-                floor_bar=vacuum_floor_bar,
-            )
-
+        # At a solved zero endpoint evaluate only the frozen admitted rails.
+        # Their pressure owner takes the mass-action limit without ln(0).
+        zero_carriers = (controls.get('_frozen_carriers')
+                         if transport_pO2_bar == 0.0 else None)
         vapor_pressures: dict[str, float] = {}
         vapor_pressure_sources: dict[str, str] = {}
         vapor_pressure_provenance: dict[str, dict[str, Any]] = {}
@@ -2823,10 +2894,23 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         oxide_vapor_extrapolations: dict[str, dict[str, object]] = {}
         ellingham_extrapolations: dict[str, dict[str, object]] = {}
         vapor_pressure_authority_limits: dict[str, dict[str, Any]] = {}
-        # At a solved zero endpoint evaluate only the frozen admitted rails.
-        # Their pressure owner takes the mass-action limit without ln(0).
-        zero_carriers = (controls.get('_frozen_carriers')
-                         if transport_pO2_bar == 0.0 else None)
+        if prepared_rails is not None:
+            def invariant_values(values):
+                return {name: value for name, value in values.items()
+                        if zero_carriers is None or name in zero_carriers}
+            vapor_pressures.update(invariant_values(prepared_rails["vapor_pressures"]))
+            vapor_pressure_sources.update(invariant_values(prepared_rails["vapor_pressure_sources"]))
+            vapor_pressure_provenance.update({name: dict(value)
+                for name, value in invariant_values(prepared_rails["vapor_pressure_provenance"]).items()})
+            activities.update(invariant_values(prepared_rails["activities"]))
+            metal_extrapolations.update(invariant_values(prepared_rails["metal_extrapolations"]))
+            oxide_vapor_extrapolations.update(invariant_values(prepared_rails["oxide_vapor_extrapolations"]))
+            ellingham_extrapolations.update(invariant_values(prepared_rails["ellingham_extrapolations"]))
+            vapor_pressure_authority_limits.update(invariant_values(prepared_rails["vapor_pressure_authority_limits"]))
+            for species in prepared_rails.get('transport_observation_species', ()):
+                if species in vapor_pressure_provenance:
+                    # Constant raw pressure still observes the current gas coordinate.
+                    vapor_pressure_provenance[species]['pO2_bar'] = transport_pO2_bar
         transport_notice = None
         if transport_pO2_bar != 0.0:
             transport_o2 = o2_potential_from_pO2_bar(
@@ -2846,6 +2930,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
         metals_data = self._vapor_pressure_data.get('metals', {}) or {}
         for species in _ELLINGHAM_THERMO:
+            if prepared_rails is not None and species in prepared_rails["invariant_species"]:
+                continue
             if zero_carriers is not None and species not in zero_carriers:
                 continue
             n_M, n_ox = ellingham_stoichiometry(species)
@@ -2909,11 +2995,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     # This is the declared standard-reaction reference point,
                     # not a live melt evaluation. Make both neutral inputs
                     # explicit so activity/fO2 can never default silently.
-                    compiled_reference_Pa = evaluator.evaluate(
-                        T_K,
-                        source_activity=1.0,
-                        pO2_bar=evaluator.pO2_reference_bar,
-                    ).pressure_pa
+                    compiled_reference_Pa = prepared_reference_evaluation(evaluator, species).pressure_pa
                     coefficient_block = "compiled_reference_pressure_model"
                 if _is_noncertifying_pseudo_vapor_pressure_runtime(
                     species,
@@ -3026,7 +3108,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         P_reference_Pa = compiled_reference_Pa
                     else:
                         log_P = _antoine_log10_pressure(A, B, C, T_K)
-                        P_reference_Pa = _pow10_pressure_or_raise(
+                        P_reference_Pa = reference_pressure(
                             log_P,
                             species=species,
                             field="P_reference_Pa",
@@ -3041,12 +3123,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 retain_analytical_channel = bool(
                     sp_data.get("retain_analytical_pressure_channel", False)
                 )
-                oxide_activity = _high_t_activity_for_parent(
-                    parent_oxide,
-                    melt_account_mol,
-                    temperature_K=T_K,
-                    authority=vapour_activity_authority,
-                )
+                oxide_activity = parent_activities.get(parent_oxide)
                 if oxide_activity is None or oxide_activity.activity <= 0.0 or (
                     not retain_analytical_channel
                     and oxide_activity.activity <= 1e-10
@@ -3191,17 +3268,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                             f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
                         )
                 log_P_liq = _antoine_log10_pressure(A_l, B_l, C_l, T_K)
-                P_reference_Pa = _pow10_pressure_or_raise(
+                P_reference_Pa = reference_pressure(
                     log_P_liq,
                     species=species,
                     field="P_reference_liquid_oxide_standard_reaction_Pa",
                 )
-                oxide_activity = _high_t_activity_for_parent(
-                    parent_oxide,
-                    melt_account_mol,
-                    temperature_K=T_K,
-                    authority=vapour_activity_authority,
-                )
+                oxide_activity = parent_activities.get(parent_oxide)
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
                 if oxide_activity.warning:
@@ -3330,7 +3402,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                                 f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
                             )
                     log_P_gas = _antoine_log10_pressure(A_g, B_g, C_g, T_K)
-                    P_reference_Pa = _pow10_pressure_or_raise(
+                    P_reference_Pa = reference_pressure(
                         log_P_gas,
                         species=species,
                         field="P_reference_gas_rail_standard_reaction_Pa",
@@ -3339,12 +3411,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     P_reference_Pa = float(
                         reconstructed_vapor_limit["pressure_Pa"]
                     )
-                oxide_activity = _high_t_activity_for_parent(
-                    parent_oxide,
-                    melt_account_mol,
-                    temperature_K=T_K,
-                    authority=vapour_activity_authority,
-                )
+                oxide_activity = parent_activities.get(parent_oxide)
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
                 if oxide_activity.warning:
@@ -3446,12 +3513,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             fe_degraded_activity_basis = None
             fe_activity_basis = None
             if parent_oxide == 'FeO':
-                candidate_activity = _high_t_activity_for_parent(
-                    parent_oxide,
-                    melt_account_mol,
-                    temperature_K=T_K,
-                    authority=vapour_activity_authority,
-                )
+                candidate_activity = parent_activities.get(parent_oxide)
                 if (
                     _high_t_fe_activity_selected(vapour_activity_authority)
                     and candidate_activity is not None
@@ -3488,12 +3550,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "(documented degraded public-caller path, uncertified)"
                     )
             else:
-                oxide_activity = _high_t_activity_for_parent(
-                    parent_oxide,
-                    melt_account_mol,
-                    temperature_K=T_K,
-                    authority=vapour_activity_authority,
-                )
+                oxide_activity = parent_activities.get(parent_oxide)
                 if oxide_activity is None:
                     continue
                 # provenance: gamma_alkali_melt_activity
@@ -3724,6 +3781,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         from simulator.vapour_rail.catalog import CatalogCompileError
 
         for name, data in oxide_vapors_data.items():
+            if prepared_rails is not None and name in prepared_rails["invariant_species"]:
+                continue
             if zero_carriers is not None and name not in zero_carriers:
                 continue
             if self._vapour_rail_catalog is not None:
@@ -3782,12 +3841,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 activity_exponent = float(
                     data.get('oxide_activity_exponent', 1.0)
                 )
-                oxide_activity = _high_t_activity_for_parent(
-                    parent_oxide,
-                    melt_account_mol,
-                    temperature_K=T_K,
-                    authority=vapour_activity_authority,
-                )
+                oxide_activity = parent_activities.get(parent_oxide)
                 if oxide_activity is None:
                     continue
                 if data.get("source_activity_basis") == "parent_oxide":
@@ -3901,17 +3955,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # reaction reference, not evaluator defaults. The live point
                 # below uses the physical activity and the evaluator's named
                 # oxygen channel.
-                reference_evaluation = compiled_evaluator.evaluate(
-                    T_K,
-                    source_activity=1.0,
-                    pO2_bar=compiled_evaluator.pO2_reference_bar,
-                )
+                reference_evaluation = prepared_reference_evaluation(compiled_evaluator, name)
                 evaluator_pO2_bar = transport_pO2_bar
-                if (compiled_evaluator.oxygen_fugacity_channel == "intrinsic_melt"
-                        and compiled_evaluator.pO2_exponent < 0.0
-                        and not _oxygen_coproduct_enters_gas(
-                            str(data.get('oxygen_destination') or ''),
-                            float(parse_formula(compiled_species.formula).elements.get('O', 0.0)))):
+                if (compiled_evaluator.pO2_exponent < 0.0 and not _source_uses_surface_oxygen(
+                        compiled_evaluator, str(data.get('oxygen_destination') or ''),
+                        float(parse_formula(compiled_species.formula).elements.get('O', 0.0)))):
                     # The channel declaration alone is insufficient: PO/PO2
                     # carry a gas coproduct despite the legacy intrinsic label.
                     # Only retained coproduct has dn_gas=0 and is independent
@@ -3955,7 +4003,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # At the certified edge the same expression is continuous.
                 # This preserves the trend, not a certified error bound.
                 log_P = _antoine_log10_pressure(A, B, C, T_K)
-                P_reference_Pa = _pow10_pressure_or_raise(
+                P_reference_Pa = reference_pressure(
                     log_P,
                     species=name,
                     field="P_reference_Antoine_Pa",
@@ -4084,6 +4132,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
+                if rail_preparation is not None and not (
+                        compiled_evaluator is not None and parent_oxide == "P2O5"):
+                    rail_preparation.setdefault('transport_observation_species', set()).add(name)
                 if name == "SiO" and oxide_extrapolated:
                     vapor_pressure_provenance[name]["extrapolation_notice"] = dict(
                         oxide_vapor_extrapolations[name]
@@ -4113,6 +4164,21 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "equivalent_parent_oxide_activity"
                     ] = a_ox
                 pseudo_fallbacks.append((name, data))
+
+        if rail_preparation is not None:
+            rail_preparation["vapor_pressures"] = vapor_pressures
+            rail_preparation["vapor_pressure_sources"] = vapor_pressure_sources
+            rail_preparation["vapor_pressure_provenance"] = vapor_pressure_provenance
+            rail_preparation["activities"] = activities
+            rail_preparation["metal_extrapolations"] = metal_extrapolations
+            rail_preparation["oxide_vapor_extrapolations"] = oxide_vapor_extrapolations
+            rail_preparation["ellingham_extrapolations"] = ellingham_extrapolations
+            rail_preparation["vapor_pressure_authority_limits"] = vapor_pressure_authority_limits
+        if prepared_rails is not None:
+            # Flux/depletion order is part of binary64 identity.
+            order = (*_ELLINGHAM_THERMO, *oxide_vapors_data)
+            vapor_pressures = {name: vapor_pressures[name] for name in order
+                               if name in vapor_pressures}
 
         # YAML authority/bracket labels (pressure-neutral; Bug B pattern).
         species_authority: dict[str, dict[str, Any]] = {}

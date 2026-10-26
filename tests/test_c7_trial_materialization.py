@@ -149,7 +149,7 @@ def test_rh03_hour9_seed_and_solved_sio_operands(monkeypatch):
     seeds = []
     accepted = []
 
-    def observe_source(hour, oxygen, equilibrium, diagnostic):
+    def observe_source(hour, oxygen, equilibrium, diagnostic, **kwargs):
         if hour.melt.hour == 8 and hour.frozen_carriers is None:
             seeds.append({
                 'sio2_kg': evaporation._hour_account_kg(hour, hour.accounts_mol, 'process.cleaned_melt')['SiO2'],
@@ -157,7 +157,7 @@ def test_rh03_hour9_seed_and_solved_sio_operands(monkeypatch):
                 'source_pa': equilibrium.vapor_pressures_Pa['SiO'],
                 'bulk_pa': hour.bulk_partials_Pa['SiO'],
             })
-        return calculate(hour, oxygen, equilibrium, diagnostic)
+        return calculate(hour, oxygen, equilibrium, diagnostic, **kwargs)
 
     def observe_solve(owner, *args, **kwargs):
         result = solve(owner, *args, **kwargs)

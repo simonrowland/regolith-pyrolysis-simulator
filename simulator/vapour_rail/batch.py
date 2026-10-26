@@ -27,6 +27,14 @@ def _oxygen_coproduct_enters_gas(oxygen_destination, vapor_oxygen_atoms):
     )
 
 
+def _source_uses_surface_oxygen(evaluator, oxygen_destination, vapor_oxygen_atoms):
+    """Only retained inverse sources use the published intrinsic potential."""
+    return bool(evaluator.pO2_exponent) and not (
+        evaluator.pO2_exponent < 0.0
+        and evaluator.oxygen_fugacity_channel == 'intrinsic_melt'
+        and not _oxygen_coproduct_enters_gas(oxygen_destination, vapor_oxygen_atoms))
+
+
 def _carrier_numerical_floor(species, frozen_carriers, ordinary_floor):
     """Apply numerical admission once, then retain positive fixed-set flows.
 
