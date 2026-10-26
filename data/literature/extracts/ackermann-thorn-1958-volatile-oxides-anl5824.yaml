@@ -1,0 +1,1875 @@
+schema_version: literature_extract.v1
+source_id: ackermann-thorn-1958-volatile-oxides-anl5824
+source:
+  citation: 'Ackermann, R. J. and Thorn, R. J. (January 1958), “Reactions Yielding Volatile Oxides at High Temperatures:
+    Free Energies of Gaseous Al2O, ZrO, ThO, TaO, ZrO2, ThO2, TaO2, UO2 and WO3,” Argonne National Laboratory report
+    ANL-5824.'
+  year: 1958
+  corpus_asset: raw/ackermann-thorn-1958-volatile-oxides-anl5824/ackermann-thorn-1958-volatile-oxides-anl5824.pdf
+extraction:
+  method: MinerU tables were converted with mineru_table_draft.py. Table II's pressure column was emitted from the
+    table draft; merged, non-species-specific, and non-quantity cells were transcribed from MinerU and Tesseract.
+    All numeric cells in the three scanned tables and OCR-flagged equation cells were checked against page renders.
+    Figure-only values were not digitized. The report gives no numeric Langmuir experiment table.
+  date: '2026-10-26'
+  worker: w1026a-ack58
+review_status: draft
+species:
+  Al2O:
+    observations:
+    - observation_id: ackermann_thorn_1958_eq_17_al2o_formation
+      type: gibbs_table
+      locator:
+        page: 18
+        published_page: 16
+        equation: '17'
+      phase: g
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        functions:
+          delta_fG_as_printed: −47200 − 9.27T cal/mole
+        attribution: The authors derive this formation free-energy expression from the reaction and entropy estimates
+          on pp. 15–16; input measurements and reference thermodynamic functions are not stored here.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: source gives a temperature function rather than a single point
+          locator:
+            page: 18
+            equation: '17'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 18
+            equation: '17'
+            note: No experimental total pressure is stated for this standard function.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 18
+            equation: '17'
+            note: No oxygen fugacity is stated for this standard function.
+    context:
+    - observation_id: ackermann_thorn_1958_table_i_al2o3_products
+      type: thermodynamic_equations
+      locator:
+        page: 10
+        published_page: 8
+        table: I
+      units: dimensionless weight ratio as printed
+      values:
+        method_class: measured_direct
+        admission_status: typed_refusal
+        status: typed_refusal
+        quantity_as_printed: weight ratio of oxide to cell metal transported
+        reason: The quantity has no battery schema token; preserve each cell without treating it as pressure or
+          rate.
+        printed_table_body_rows: 8
+        distinct_measurements: 12
+        rows_as_printed:
+        - oxide: Al2O3
+          cell: tungsten
+          T_K: '2544'
+          weight_ratio_as_printed: 1.23 ± 0.01
+          gaseous_products_as_printed: Al2O + Al + (O) + WOx
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2544'
+              locator: &id001
+                page: 10
+                published_page: 8
+                table: I
+                row: '1'
+                row_label: Al2O3
+                column: Tungsten
+                column_header: T (°K)
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: no quantitative starting composition is published
+              locator: *id001
+        - oxide: Al2O3
+          cell: tungsten
+          T_K: '2582'
+          weight_ratio_as_printed: 1.16 ± 0.01
+          gaseous_products_as_printed: Al2O + Al + (O) + WOx
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2582'
+              locator: &id002
+                page: 10
+                published_page: 8
+                table: I
+                row: '2'
+                row_label: Al2O3
+                column: Tungsten
+                column_header: T (°K)
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id002
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id002
+            composition:
+              state:
+                tag: unknown
+                reason: no quantitative starting composition is published
+              locator: *id002
+        - oxide: Al2O3
+          cell: tungsten
+          T_K: '2635'
+          weight_ratio_as_printed: 1.13 ± 0.01
+          gaseous_products_as_printed: Al2O + Al + (O) + WOx
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2635'
+              locator: &id003
+                page: 10
+                published_page: 8
+                table: I
+                row: '3'
+                row_label: Al2O3
+                column: Tungsten
+                column_header: T (°K)
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id003
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id003
+            composition:
+              state:
+                tag: unknown
+                reason: no quantitative starting composition is published
+              locator: *id003
+        - oxide: Al2O3
+          cell: tantalum
+          T_K: '2523'
+          weight_ratio_as_printed: 0.19 ± 0.01
+          gaseous_products_as_printed: Al + TaO + smaller amounts of Al2O and TaO2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2523'
+              locator: &id004
+                page: 10
+                published_page: 8
+                table: I
+                row: '1'
+                row_label: Al2O3
+                column: Tantalum
+                column_header: T (°K)
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id004
+            composition:
+              state:
+                tag: unknown
+                reason: no quantitative starting composition is published
+              locator: *id004
+        - oxide: MgO
+          cell: tungsten
+          T_K: '2045'
+          weight_ratio_as_printed: 0.66 ± 0.01
+          gaseous_products_as_printed: Mg + WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2045'
+              locator: &id005
+                page: 10
+                published_page: 8
+                table: I
+                row: '4'
+                row_label: MgO
+                column: Tungsten
+                column_header: T (°K)
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id005
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id005
+            composition:
+              state:
+                tag: unknown
+                reason: no quantitative starting composition is published
+              locator: *id005
+        - oxide: UO2
+          cell: tungsten
+          T_range_K_as_printed: 1600 to 2500
+          weight_ratio_as_printed: ≥50
+          gaseous_products_as_printed: UO2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: source prints a temperature interval
+              locator: &id006
+                page: 10
+                published_page: 8
+                table: I
+                row: '5'
+                row_label: UO2
+                column: Tungsten
+                column_header: T (°K)
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id006
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id006
+            composition:
+              state:
+                tag: unknown
+                reason: no quantitative starting composition is published
+              locator: *id006
+        - oxide: UO2
+          cell: tantalum
+          T_range_K_as_printed: 2100 to 2500
+          weight_ratio_as_printed: ≥50
+          gaseous_products_as_printed: UO2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: source prints a temperature interval
+              locator: &id007
+                page: 10
+                published_page: 8
+                table: I
+                row: '5'
+                row_label: UO2
+                column: Tantalum
+                column_header: T (°K)
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id007
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id007
+            composition:
+              state:
+                tag: unknown
+                reason: no quantitative starting composition is published
+              locator: *id007
+        - oxide: ThO2
+          cell: tungsten
+          T_K: '2765'
+          weight_ratio_as_printed: ≥50
+          gaseous_products_as_printed: ThO2 + (ThO + O)
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2765'
+              locator: &id008
+                page: 10
+                published_page: 8
+                table: I
+                row: '6'
+                row_label: ThO2
+                column: Tungsten
+                column_header: T (°K)
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id008
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id008
+            composition:
+              state:
+                tag: unknown
+                reason: no quantitative starting composition is published
+              locator: *id008
+        - oxide: ThO2
+          cell: tantalum
+          T_K: '2753'
+          weight_ratio_as_printed: '3.06'
+          gaseous_products_as_printed: ThO + TaO + TaO2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2753'
+              locator: &id009
+                page: 10
+                published_page: 8
+                table: I
+                row: '6'
+                row_label: ThO2
+                column: Tantalum
+                column_header: T (°K)
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id009
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id009
+            composition:
+              state:
+                tag: unknown
+                reason: no quantitative starting composition is published
+              locator: *id009
+        - oxide: BeO
+          cell: tungsten
+          T_K: '2462'
+          weight_ratio_as_printed: '0.92'
+          gaseous_products_as_printed: Be + WOx + (O); perhaps some BeO
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2462'
+              locator: &id010
+                page: 10
+                published_page: 8
+                table: I
+                row: '7'
+                row_label: BeO
+                column: Tungsten
+                column_header: T (°K)
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id010
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id010
+            composition:
+              state:
+                tag: unknown
+                reason: no quantitative starting composition is published
+              locator: *id010
+        - oxide: ZrO2
+          cell: tungsten
+          T_K: '2600'
+          weight_ratio_as_printed: ≥50
+          gaseous_products_as_printed: ZrO2 + ZrO + O
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2600'
+              locator: &id011
+                page: 10
+                published_page: 8
+                table: I
+                row: '8'
+                row_label: ZrO2
+                column: Tungsten
+                column_header: T (°K)
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id011
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id011
+            composition:
+              state:
+                tag: unknown
+                reason: no quantitative starting composition is published
+              locator: *id011
+        - oxide: ZrO2
+          cell: tantalum
+          T_K: '2560'
+          weight_ratio_as_printed: 0.89 ± 0.02
+          gaseous_products_as_printed: ZrO + TaO + TaO2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2560'
+              locator: &id012
+                page: 10
+                published_page: 8
+                table: I
+                row: '8'
+                row_label: ZrO2
+                column: Tantalum
+                column_header: T (°K)
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id012
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id012
+            composition:
+              state:
+                tag: unknown
+                reason: no quantitative starting composition is published
+              locator: *id012
+        uncertainty_note: Widths are printed as ±; confidence level not stated.
+        source_method_as_printed: Cell vaporization was measured independently in an evacuated condenser before
+          and after oxide vaporization; background cell loss was corrected when the loss rate returned to the cell-only
+          rate.
+        cell_orifice_as_printed: No orifice size is given for Table I.
+        temperature_calibration_as_printed: No temperature calibration statement is given for these runs.
+  WO3:
+    observations:
+    - observation_id: ackermann_thorn_1958_wo3_formation_at_2020k
+      type: gibbs_table
+      locator:
+        page: 19
+        published_page: 17
+        equation: '23'
+      phase: g
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2020'
+        delta_fG: '-44287'
+        attribution: The authors combine their WO3 fit with the Mg pressure relation and MgO free energy; those
+          inputs are not all stored in this extract.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2020'
+          locator:
+            page: 19
+            equation: '23'
+            note: The text gives this value at 2020 K.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 19
+            equation: '23'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 19
+            equation: '23'
+    - observation_id: ackermann_thorn_1958_eq_31_wo3_formation
+      type: gibbs_table
+      locator:
+        page: 20
+        published_page: 18
+        equation: '31'
+      phase: g
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        functions:
+          delta_fG_as_printed: −75649 − 1.650T log T + 20.20T + 38 × 10^-5 T^2 cal/mole
+        attribution: Author estimate based on molecular free-energy functions and solid WO3 data. The cited data
+          and assumed molecular parameters are not stored here.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: source gives a temperature function rather than a single point
+          locator:
+            page: 20
+            equation: '31'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 20
+            equation: '31'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 20
+            equation: '31'
+    - observation_id: ackermann_thorn_1958_table_ii_experiment_1
+      type: partial_pressure
+      locator:
+        page: 13
+        published_page: 11
+        pdf_page_index: 12
+        table: II
+        row: '1'
+        row_label: '1'
+        column_header: Pressure of WO3 × 10^6 (atm)
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2005'
+        pressure_atm: '0.000008458'
+        experiment_number_as_printed: '1'
+        composition_mol:
+          basis: pure_oxide_system
+          MgO: '1'
+        pressure_as_printed: '8.458'
+        pressure_scale_as_printed: p(WO3) × 10^6 (atm)
+        negative_log10_pressure_as_printed: '5.0727'
+        10^4_over_T_as_printed: '4.988'
+        weight_loss_of_cell_and_contents_mg_as_printed: '10.4'
+        time_s_as_printed: '1800'
+        cell_material_as_printed: tungsten
+        charge_as_printed: MgO
+        orifice_area_as_printed: 2.88 × 10^-2 cm^2 at the average temperature
+        temperature_measurement_and_calibration_as_printed: Magnesium deposit reflected heat to the cell and raised
+          its temperature; a representative experiment had a probable temperature error of 2.5 degrees. No separate
+          calibration procedure is printed.
+        reduction_assumption_as_printed: The effusion is treated as Mg(g) and WO3(g) using equation (13).
+        attribution: Authors report the WO3 partial pressure after applying equation (13) to the printed mass-loss rate; the mass loss and duration are retained as source data because the schema has no matching input quantities.
+      phase: gas
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: Table II reports the WO3 partial pressure; no total pressure is stated.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: No oxygen fugacity or oxygen partial pressure is stated for the effusion runs.
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2005'
+          locator:
+            page: 13
+            pdf_page_index: 12
+            table: II
+            row_label: '1'
+            column_header: T (°K)
+            published_page: 11
+            row: '1'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: pure_oxide_system
+              amount_basis: mol_inventory
+              components:
+              - - MgO
+                - '1'
+          locator:
+            page: 13
+            published_page: 11
+            pdf_page_index: 12
+            table: II
+            note: The report names MgO and, for runs 6–8, MgO/tungsten powder mixtures without a mixture proportion.
+    - observation_id: ackermann_thorn_1958_table_ii_experiment_2
+      type: partial_pressure
+      locator:
+        page: 13
+        published_page: 11
+        pdf_page_index: 12
+        table: II
+        row: '2'
+        row_label: '2'
+        column_header: Pressure of WO3 × 10^6 (atm)
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1977'
+        pressure_atm: '0.000006091'
+        experiment_number_as_printed: '2'
+        composition_mol:
+          basis: pure_oxide_system
+          MgO: '1'
+        pressure_as_printed: '6.091'
+        pressure_scale_as_printed: p(WO3) × 10^6 (atm)
+        negative_log10_pressure_as_printed: '5.2153'
+        10^4_over_T_as_printed: '5.058'
+        weight_loss_of_cell_and_contents_mg_as_printed: '8.8'
+        time_s_as_printed: '2100'
+        cell_material_as_printed: tungsten
+        charge_as_printed: MgO
+        orifice_area_as_printed: 2.88 × 10^-2 cm^2 at the average temperature
+        temperature_measurement_and_calibration_as_printed: Magnesium deposit reflected heat to the cell and raised
+          its temperature; a representative experiment had a probable temperature error of 2.5 degrees. No separate
+          calibration procedure is printed.
+        reduction_assumption_as_printed: The effusion is treated as Mg(g) and WO3(g) using equation (13).
+        attribution: Authors report the WO3 partial pressure after applying equation (13) to the printed mass-loss rate; the mass loss and duration are retained as source data because the schema has no matching input quantities.
+      phase: gas
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: Table II reports the WO3 partial pressure; no total pressure is stated.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: No oxygen fugacity or oxygen partial pressure is stated for the effusion runs.
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1977'
+          locator:
+            page: 13
+            pdf_page_index: 12
+            table: II
+            row_label: '2'
+            column_header: T (°K)
+            published_page: 11
+            row: '2'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: pure_oxide_system
+              amount_basis: mol_inventory
+              components:
+              - - MgO
+                - '1'
+          locator:
+            page: 13
+            published_page: 11
+            pdf_page_index: 12
+            table: II
+            note: The report names MgO and, for runs 6–8, MgO/tungsten powder mixtures without a mixture proportion.
+    - observation_id: ackermann_thorn_1958_table_ii_experiment_3
+      type: partial_pressure
+      locator:
+        page: 13
+        published_page: 11
+        pdf_page_index: 12
+        table: II
+        row: '3'
+        row_label: '3'
+        column_header: Pressure of WO3 × 10^6 (atm)
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1922'
+        pressure_atm: '0.000002739'
+        experiment_number_as_printed: '3'
+        composition_mol:
+          basis: pure_oxide_system
+          MgO: '1'
+        pressure_as_printed: '2.739'
+        pressure_scale_as_printed: p(WO3) × 10^6 (atm)
+        negative_log10_pressure_as_printed: '5.5624'
+        10^4_over_T_as_printed: '5.203'
+        weight_loss_of_cell_and_contents_mg_as_printed: '8.6'
+        time_s_as_printed: '4500'
+        cell_material_as_printed: tungsten
+        charge_as_printed: MgO
+        orifice_area_as_printed: 2.88 × 10^-2 cm^2 at the average temperature
+        temperature_measurement_and_calibration_as_printed: Magnesium deposit reflected heat to the cell and raised
+          its temperature; a representative experiment had a probable temperature error of 2.5 degrees. No separate
+          calibration procedure is printed.
+        reduction_assumption_as_printed: The effusion is treated as Mg(g) and WO3(g) using equation (13).
+        attribution: Authors report the WO3 partial pressure after applying equation (13) to the printed mass-loss rate; the mass loss and duration are retained as source data because the schema has no matching input quantities.
+      phase: gas
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: Table II reports the WO3 partial pressure; no total pressure is stated.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: No oxygen fugacity or oxygen partial pressure is stated for the effusion runs.
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1922'
+          locator:
+            page: 13
+            pdf_page_index: 12
+            table: II
+            row_label: '3'
+            column_header: T (°K)
+            published_page: 11
+            row: '3'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: pure_oxide_system
+              amount_basis: mol_inventory
+              components:
+              - - MgO
+                - '1'
+          locator:
+            page: 13
+            published_page: 11
+            pdf_page_index: 12
+            table: II
+            note: The report names MgO and, for runs 6–8, MgO/tungsten powder mixtures without a mixture proportion.
+    - observation_id: ackermann_thorn_1958_table_ii_experiment_4
+      type: partial_pressure
+      locator:
+        page: 13
+        published_page: 11
+        pdf_page_index: 12
+        table: II
+        row: '4'
+        row_label: '4'
+        column_header: Pressure of WO3 × 10^6 (atm)
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1925'
+        pressure_atm: '0.000002934'
+        experiment_number_as_printed: '4'
+        composition_mol:
+          basis: pure_oxide_system
+          MgO: '1'
+        pressure_as_printed: '2.934'
+        pressure_scale_as_printed: p(WO3) × 10^6 (atm)
+        negative_log10_pressure_as_printed: '5.5325'
+        10^4_over_T_as_printed: '5.195'
+        weight_loss_of_cell_and_contents_mg_as_printed: '9.7'
+        time_s_as_printed: '4740'
+        cell_material_as_printed: tungsten
+        charge_as_printed: MgO
+        orifice_area_as_printed: 2.88 × 10^-2 cm^2 at the average temperature
+        temperature_measurement_and_calibration_as_printed: Magnesium deposit reflected heat to the cell and raised
+          its temperature; a representative experiment had a probable temperature error of 2.5 degrees. No separate
+          calibration procedure is printed.
+        reduction_assumption_as_printed: The effusion is treated as Mg(g) and WO3(g) using equation (13).
+        attribution: Authors report the WO3 partial pressure after applying equation (13) to the printed mass-loss rate; the mass loss and duration are retained as source data because the schema has no matching input quantities.
+      phase: gas
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: Table II reports the WO3 partial pressure; no total pressure is stated.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: No oxygen fugacity or oxygen partial pressure is stated for the effusion runs.
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1925'
+          locator:
+            page: 13
+            pdf_page_index: 12
+            table: II
+            row_label: '4'
+            column_header: T (°K)
+            published_page: 11
+            row: '4'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: pure_oxide_system
+              amount_basis: mol_inventory
+              components:
+              - - MgO
+                - '1'
+          locator:
+            page: 13
+            published_page: 11
+            pdf_page_index: 12
+            table: II
+            note: The report names MgO and, for runs 6–8, MgO/tungsten powder mixtures without a mixture proportion.
+    - observation_id: ackermann_thorn_1958_table_ii_experiment_5
+      type: partial_pressure
+      locator:
+        page: 13
+        published_page: 11
+        pdf_page_index: 12
+        table: II
+        row: '5'
+        row_label: '5'
+        column_header: Pressure of WO3 × 10^6 (atm)
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1956'
+        pressure_atm: '0.000004980'
+        experiment_number_as_printed: '5'
+        composition_mol:
+          basis: pure_oxide_system
+          MgO: '1'
+        pressure_as_printed: '4.980'
+        pressure_scale_as_printed: p(WO3) × 10^6 (atm)
+        negative_log10_pressure_as_printed: '5.3028'
+        10^4_over_T_as_printed: '5.112'
+        weight_loss_of_cell_and_contents_mg_as_printed: '6.2'
+        time_s_as_printed: '1800'
+        cell_material_as_printed: tungsten
+        charge_as_printed: MgO
+        orifice_area_as_printed: 2.88 × 10^-2 cm^2 at the average temperature
+        temperature_measurement_and_calibration_as_printed: Magnesium deposit reflected heat to the cell and raised
+          its temperature; a representative experiment had a probable temperature error of 2.5 degrees. No separate
+          calibration procedure is printed.
+        reduction_assumption_as_printed: The effusion is treated as Mg(g) and WO3(g) using equation (13).
+        attribution: Authors report the WO3 partial pressure after applying equation (13) to the printed mass-loss rate; the mass loss and duration are retained as source data because the schema has no matching input quantities.
+      phase: gas
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: Table II reports the WO3 partial pressure; no total pressure is stated.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: No oxygen fugacity or oxygen partial pressure is stated for the effusion runs.
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1956'
+          locator:
+            page: 13
+            pdf_page_index: 12
+            table: II
+            row_label: '5'
+            column_header: T (°K)
+            published_page: 11
+            row: '5'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: pure_oxide_system
+              amount_basis: mol_inventory
+              components:
+              - - MgO
+                - '1'
+          locator:
+            page: 13
+            published_page: 11
+            pdf_page_index: 12
+            table: II
+            note: The report names MgO and, for runs 6–8, MgO/tungsten powder mixtures without a mixture proportion.
+    - observation_id: ackermann_thorn_1958_table_ii_experiment_6
+      type: partial_pressure
+      locator:
+        page: 13
+        published_page: 11
+        pdf_page_index: 12
+        table: II
+        row: '6'
+        row_label: '6'
+        column_header: Pressure of WO3 × 10^6 (atm)
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '2019'
+        pressure_atm: '0.00001191'
+        experiment_number_as_printed: '6'
+        pressure_as_printed: '11.91'
+        pressure_scale_as_printed: p(WO3) × 10^6 (atm)
+        negative_log10_pressure_as_printed: '4.9241'
+        10^4_over_T_as_printed: '4.953'
+        weight_loss_of_cell_and_contents_mg_as_printed: '7.3'
+        time_s_as_printed: '900'
+        cell_material_as_printed: tungsten
+        charge_as_printed: MgO and tungsten powder mixture; proportion not stated
+        orifice_area_as_printed: 2.88 × 10^-2 cm^2 at the average temperature
+        temperature_measurement_and_calibration_as_printed: Magnesium deposit reflected heat to the cell and raised
+          its temperature; a representative experiment had a probable temperature error of 2.5 degrees. No separate
+          calibration procedure is printed.
+        reduction_assumption_as_printed: The effusion is treated as Mg(g) and WO3(g) using equation (13).
+        attribution: Authors report the WO3 partial pressure after applying equation (13) to the printed mass-loss rate; the mass loss and duration are retained as source data because the schema has no matching input quantities.
+        mixture_as_printed: MgO and tungsten powders
+      phase: gas
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: Table II reports the WO3 partial pressure; no total pressure is stated.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: No oxygen fugacity or oxygen partial pressure is stated for the effusion runs.
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2019'
+          locator:
+            page: 13
+            pdf_page_index: 12
+            table: II
+            row_label: '6'
+            column_header: T (°K)
+            published_page: 11
+            row: '6'
+        composition:
+          state:
+            tag: unknown
+            reason: no quantitative starting composition is published
+          locator:
+            page: 13
+            published_page: 11
+            pdf_page_index: 12
+            table: II
+            note: The report names MgO and, for runs 6–8, MgO/tungsten powder mixtures without a mixture proportion.
+    - observation_id: ackermann_thorn_1958_table_ii_experiment_7
+      type: partial_pressure
+      locator:
+        page: 13
+        published_page: 11
+        pdf_page_index: 12
+        table: II
+        row: '7'
+        row_label: '7'
+        column_header: Pressure of WO3 × 10^6 (atm)
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1975'
+        pressure_atm: '0.000006311'
+        experiment_number_as_printed: '7'
+        pressure_as_printed: '6.311'
+        pressure_scale_as_printed: p(WO3) × 10^6 (atm)
+        negative_log10_pressure_as_printed: '5.1999'
+        10^4_over_T_as_printed: '5.063'
+        weight_loss_of_cell_and_contents_mg_as_printed: '8.0'
+        time_s_as_printed: '1841'
+        cell_material_as_printed: tungsten
+        charge_as_printed: MgO and tungsten powder mixture; proportion not stated
+        orifice_area_as_printed: 2.88 × 10^-2 cm^2 at the average temperature
+        temperature_measurement_and_calibration_as_printed: Magnesium deposit reflected heat to the cell and raised
+          its temperature; a representative experiment had a probable temperature error of 2.5 degrees. No separate
+          calibration procedure is printed.
+        reduction_assumption_as_printed: The effusion is treated as Mg(g) and WO3(g) using equation (13).
+        attribution: Authors report the WO3 partial pressure after applying equation (13) to the printed mass-loss rate; the mass loss and duration are retained as source data because the schema has no matching input quantities.
+        mixture_as_printed: MgO and tungsten powders
+      phase: gas
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: Table II reports the WO3 partial pressure; no total pressure is stated.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: No oxygen fugacity or oxygen partial pressure is stated for the effusion runs.
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1975'
+          locator:
+            page: 13
+            pdf_page_index: 12
+            table: II
+            row_label: '7'
+            column_header: T (°K)
+            published_page: 11
+            row: '7'
+        composition:
+          state:
+            tag: unknown
+            reason: no quantitative starting composition is published
+          locator:
+            page: 13
+            published_page: 11
+            pdf_page_index: 12
+            table: II
+            note: The report names MgO and, for runs 6–8, MgO/tungsten powder mixtures without a mixture proportion.
+    - observation_id: ackermann_thorn_1958_table_ii_experiment_8
+      type: partial_pressure
+      locator:
+        page: 13
+        published_page: 11
+        pdf_page_index: 12
+        table: II
+        row: '8'
+        row_label: '8'
+        column_header: Pressure of WO3 × 10^6 (atm)
+      units: atm
+      mineru_flags: []
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        T_K: '1996'
+        pressure_atm: '0.000009494'
+        experiment_number_as_printed: '8'
+        pressure_as_printed: '9.494'
+        pressure_scale_as_printed: p(WO3) × 10^6 (atm)
+        negative_log10_pressure_as_printed: '5.0255'
+        10^4_over_T_as_printed: '5.010'
+        weight_loss_of_cell_and_contents_mg_as_printed: '7.8'
+        time_s_as_printed: '1200'
+        cell_material_as_printed: tungsten
+        charge_as_printed: MgO and tungsten powder mixture; proportion not stated
+        orifice_area_as_printed: 2.88 × 10^-2 cm^2 at the average temperature
+        temperature_measurement_and_calibration_as_printed: Magnesium deposit reflected heat to the cell and raised
+          its temperature; a representative experiment had a probable temperature error of 2.5 degrees. No separate
+          calibration procedure is printed.
+        reduction_assumption_as_printed: The effusion is treated as Mg(g) and WO3(g) using equation (13).
+        attribution: Authors report the WO3 partial pressure after applying equation (13) to the printed mass-loss rate; the mass loss and duration are retained as source data because the schema has no matching input quantities.
+        mixture_as_printed: MgO and tungsten powders
+      phase: gas
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: Table II reports the WO3 partial pressure; no total pressure is stated.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            table: II
+            note: No oxygen fugacity or oxygen partial pressure is stated for the effusion runs.
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1996'
+          locator:
+            page: 13
+            pdf_page_index: 12
+            table: II
+            row_label: '8'
+            column_header: T (°K)
+            published_page: 11
+            row: '8'
+        composition:
+          state:
+            tag: unknown
+            reason: no quantitative starting composition is published
+          locator:
+            page: 13
+            published_page: 11
+            pdf_page_index: 12
+            table: II
+            note: The report names MgO and, for runs 6–8, MgO/tungsten powder mixtures without a mixture proportion.
+    - observation_id: ackermann_thorn_1958_eq_23_wo3_pressure_fit
+      type: partial_pressure
+      locator:
+        page: 19
+        published_page: 17
+        equation: '23'
+      derived_from:
+        - ackermann_thorn_1958_table_ii_experiment_1
+        - ackermann_thorn_1958_table_ii_experiment_2
+        - ackermann_thorn_1958_table_ii_experiment_3
+        - ackermann_thorn_1958_table_ii_experiment_4
+        - ackermann_thorn_1958_table_ii_experiment_5
+        - ackermann_thorn_1958_table_ii_experiment_6
+        - ackermann_thorn_1958_table_ii_experiment_7
+        - ackermann_thorn_1958_table_ii_experiment_8
+      derivation:
+        relation: Authors' least-squares fit to the eight Table II WO3 partial-pressure observations.
+        inputs:
+          - ackermann_thorn_1958_table_ii_experiment_1
+          - ackermann_thorn_1958_table_ii_experiment_2
+          - ackermann_thorn_1958_table_ii_experiment_3
+          - ackermann_thorn_1958_table_ii_experiment_4
+          - ackermann_thorn_1958_table_ii_experiment_5
+          - ackermann_thorn_1958_table_ii_experiment_6
+          - ackermann_thorn_1958_table_ii_experiment_7
+          - ackermann_thorn_1958_table_ii_experiment_8
+        locator:
+          page: 19
+          published_page: 17
+          equation: '23'
+      T_range_K: [1922, 2019]
+      phase: gas
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        temperature_range_K: [1922, 2019]
+        pressure_temperature_relation:
+          relation_as_printed: log p_WO3 (atm) = −24760/T + 7.409
+          pressure_unit_as_printed: atm
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The fitted relation spans the Table II temperature range rather than a single point.
+          locator:
+            page: 19
+            equation: '23'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 19
+            equation: '23'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 19
+            equation: '23'
+        composition:
+          state:
+            tag: unknown
+            reason: Fit combines MgO and MgO/tungsten charges without one quantitative composition.
+          locator:
+            page: 19
+            equation: '23'
+
+    context:
+    - observation_id: ackermann_thorn_1958_table_ii_experiment_series
+      type: experiment_series
+      locator:
+        page: 13
+        published_page: 11
+        pdf_page_index: 12
+        table: II
+      units: as printed
+      values:
+        method_class: method_only
+        quantity: WO3 partial pressure by effusion from MgO in a tungsten cell
+        printed_table_body_rows: 8
+        cell_material_as_printed: tungsten
+        orifice_area_as_printed: 2.88 × 10^-2 cm^2 at the average temperature
+        temperature_measurement_and_calibration: Mg deposit reflected heat back to the cell and raised its temperature;
+          a representative probable temperature error was 2.5 degrees. No separate calibration procedure is printed.
+        rate_reduction: Equation (13) derives pressure from the total cell-and-contents weight-loss rate.
+        reduction_locator:
+          page: 17
+          published_page: 15
+          equation: '13'
+        experiments_6_to_8: mixture of MgO and tungsten powders
+        residue_analysis_as_printed: Periclase was identified in all residues; tungsten lines in runs 6–8 and an
+          unidentified phase were also reported.
+        total_pressure_as_printed: not stated
+        langmuir_data: The paper discusses Langmuir's indirect WO3(g) inference on PDF pages 7–8 and equations (1)–(2),
+          but provides no numeric Langmuir experiment rows.
+    - observation_id: ackermann_thorn_1958_eq_16_al2o_reaction
+      type: thermodynamic_equations
+      locator:
+        page: 18
+        published_page: 16
+        equation: '16'
+      units: cal/mole
+      values:
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        quantity_as_printed: standard reaction free energy
+        reason: The schema has no quantity token for this non-formation reaction free energy.
+        reaction_number: '15'
+        reaction_as_printed: 4/3 Al(l) + 1/3 Al2O3(s) → Al2O(g)
+        value_as_printed: ΔF°_15 ≈ 86900 − 35.21T cal/mole
+        heat_of_reaction_at_approximately_1650K_as_printed: 86.9 kcal/mole
+        entropy_estimates_as_printed:
+        - 35.21
+        - 37.82
+        selected_entropy_as_printed: 35.21 eu
+    - observation_id: ackermann_thorn_1958_eq_22_al2o_dissociation
+      type: thermodynamic_equations
+      locator:
+        page: 18
+        published_page: 16
+        equation: '22'
+      units: cal/mole
+      values:
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        quantity_as_printed: standard dissociation reaction free energy
+        reason: The schema has no quantity token for this non-formation reaction free energy.
+        reaction_as_printed: Al2O(g) → 2Al(g) + 1/2 O2(g)
+        value_as_printed: ΔF°_D(Al2O) ≈ 252100 − 2.288T log T − 51.92T cal/mole
+    - observation_id: ackermann_thorn_1958_eq_24_mg_pressure_fit
+      type: thermodynamic_equations
+      locator:
+        page: 19
+        published_page: 17
+        equation: '24'
+      units: log10(atm) and K
+      values:
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        quantity_as_printed: approximate magnesium vapor-pressure fit
+        reason: Preserve as background to the WO3 free-energy calculation, not as a WO3 observation.
+        relation_as_printed: log p_Mg (atm) = −6969/T + 5.013
+        attribution: Approximate relation from Hartmann and Schneider data with absolute entropies.
+  O2:
+    observations: []
+    context:
+    - observation_id: ackermann_thorn_1958_eq_21_oxygen_dissociation
+      type: thermodynamic_equations
+      locator:
+        page: 18
+        published_page: 16
+        equation: '21'
+      units: cal/mole
+      values:
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        quantity_as_printed: standard dissociation reaction free energy
+        reason: The schema has no quantity token for this non-formation reaction free energy.
+        reaction_as_printed: O2(g) → 2O(g)
+        value_as_printed: ΔF°_D(O2) = 121945 − 32.22T cal/mole
+  MgO:
+    observations: []
+    context: []
+  ZrO:
+    observations:
+    - observation_id: ackermann_thorn_1958_eq_34_zro_formation
+      type: gibbs_table
+      locator:
+        page: 21
+        published_page: 19
+        equation: '34'
+      phase: g
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        functions:
+          delta_fG_as_printed: 25320 + 7.588T log T − 45.58T cal/mole
+        attribution: The authors calculate the function from molecular constants and zirconium thermodynamic data
+          cited in the report; those source inputs are not stored here.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: source gives a temperature function rather than a single point
+          locator:
+            page: 21
+            equation: '34'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 21
+            equation: '34'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 21
+            equation: '34'
+  TaO:
+    observations:
+    - observation_id: ackermann_thorn_1958_eq_36_tao_formation
+      type: gibbs_table
+      locator:
+        page: 22
+        published_page: 20
+        equation: '36'
+      phase: g
+      units: cal/mole
+      per: mol_species
+      T_range_K:
+      - 1500
+      - 3000
+      uncertainty:
+        note: The authors state the approximation error is less than ±5%; confidence level not stated.
+        relative_percent_as_printed: less than ±5%
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        functions:
+          delta_fG_as_printed: 43754 − 19.13T cal/mole
+        validity_temperature_range_as_printed: 1500–3000 K
+        attribution: Authors' calculated approximation using cited tantalum and oxygen functions and TaO dissociation
+          energy; source inputs are not stored here.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: source gives a function valid over a range rather than one point
+          locator:
+            page: 22
+            equation: '36'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 22
+            equation: '36'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 22
+            equation: '36'
+  TaO2:
+    observations:
+    - observation_id: ackermann_thorn_1958_eq_38_tao2_formation
+      type: gibbs_table
+      locator:
+        page: 22
+        published_page: 20
+        equation: '38'
+      phase: g
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        functions:
+          delta_fG_as_printed: −6.650T + 0.505T log T + 9.773 × 10^-4 T^2 + 721825/T − 40845 cal/mole
+        attribution: Authors' valence-force-model estimate; the assumed molecular structure and molecular constants
+          are stated in the source, but the external tantalum and oxygen functions are not stored here.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: source gives a temperature function rather than a single point
+          locator:
+            page: 22
+            equation: '38'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 22
+            equation: '38'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 22
+            equation: '38'
+  ThO:
+    observations:
+    - observation_id: ackermann_thorn_1958_tho_formation_at_2500k
+      type: gibbs_table
+      locator:
+        page: 24
+        published_page: 22
+        section: Discussion of Estimated Free Energies
+      phase: g
+      units: kcal/mole
+      per: mol_species
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        quantity_as_printed: formation free-energy lower limit
+        T_K: '2500'
+        value_as_printed: approximately −53 kcal/mole^-1
+        bound_as_printed: ≥ approximately −53 kcal/mole^-1
+        reason: The scalar Gibbs extraction path cannot preserve a one-sided bound; retain this as a typed refusal rather than an exact point.
+        attribution: The authors infer this from Hoch and Johnston's effusion measurements, the TaO function, and
+          Coughlin's ThO2(s) function. They say TaO2 and possibly ThO2 also contribute, so the value is only a lower
+          limit; those inputs are not stored here.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2500'
+          locator:
+            page: 24
+            section: Discussion of Estimated Free Energies
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 24
+            section: Discussion of Estimated Free Energies
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 24
+            section: Discussion of Estimated Free Energies
+  UO:
+    observations:
+    - observation_id: ackermann_thorn_1958_uo_formation_lower_limit_at_2500k
+      type: gibbs_table
+      locator:
+        page: 24
+        published_page: 22
+        section: Discussion of Estimated Free Energies
+      phase: g
+      units: kcal/mole
+      per: mol_species
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        quantity_as_printed: formation free-energy lower limit
+        T_K: '2500'
+        value_as_printed: lower limit of −42 kcal mole^-1
+        bound_as_printed: ≥ −42 kcal mole^-1
+        reason: The scalar Gibbs extraction path cannot preserve a one-sided bound; retain this as a typed refusal rather than an exact point.
+        attribution: The authors infer a lower limit from the UO2–tantalum interaction using P_UO ≤ 0.10 P_UO2.
+          Inputs are not stored here. This is UO(g), not UO2(g).
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2500'
+          locator:
+            page: 24
+            section: Discussion of Estimated Free Energies
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 24
+            section: Discussion of Estimated Free Energies
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 24
+            section: Discussion of Estimated Free Energies
+  ZrO2:
+    observations:
+    - observation_id: ackermann_thorn_1958_eq_46_zro2_g_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 25
+        published_page: 23
+        equation: '46'
+      phase: g
+      units: atm
+      T_range_K:
+      - 2434
+      - 2745
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: The authors obtain this ZrO2(g) relation by subtracting reaction (45) volatility from total measured volatility.
+        pressure_temperature_relation:
+          relation_as_printed: log p_ZrO2 (atm) = −3.57 × 10^4/T + 8.30
+          pressure_unit_as_printed: atm
+        derivation_note: The authors obtain p(ZrO2(g)) above ZrO2(s) by subtracting the volatility from reaction
+          (45) from the total measured volatility.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: source gives a fitted relation over the measurement range
+          locator:
+            page: 25
+            equation: '46'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 25
+            equation: '46'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 25
+            equation: '46'
+    context:
+    - observation_id: ackermann_thorn_1958_table_iii_zro2_total_volatility
+      type: thermodynamic_equations
+      locator:
+        page: 15
+        published_page: 13
+        pdf_page_index: 14
+        table: III
+      units: atm; mass loss mg; time sec; temperature K
+      values:
+        method_class: measured_reduced
+        admission_status: typed_refusal
+        status: typed_refusal
+        quantity_as_printed: total volatility of ZrO2(s), pressure based on assumed ZrO2 molecular weight
+        reason: The aggregate gas is unresolved; pressure cannot be assigned to an individual species.
+        printed_table_body_rows: 4
+        cell_material_as_printed: tungsten
+        temperature_calibration_as_printed: not stated
+        sample_as_printed: ZrO2 containing about 2% hafnium
+        rows_as_printed:
+        - T_K: '2526'
+          weight_loss_mg_as_printed: '1.7'
+          weight_loss_footnote_marker_as_printed: '*'
+          time_s_as_printed: '3600'
+          pressure_as_printed: 1.90 × 10^-6 atm
+          orifice_area_as_printed: 2.54 × 10^-2 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2526'
+              locator: &id013
+                page: 15
+                published_page: 13
+                pdf_page_index: 14
+                table: III
+                row: '1'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id013
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id013
+        - T_K: '2434'
+          weight_loss_mg_as_printed: '1.2'
+          weight_loss_footnote_marker_as_printed: '*'
+          time_s_as_printed: '7200'
+          pressure_as_printed: 6.56 × 10^-7 atm
+          orifice_area_as_printed: 2.54 × 10^-2 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2434'
+              locator: &id014
+                page: 15
+                published_page: 13
+                pdf_page_index: 14
+                table: III
+                row: '2'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id014
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id014
+        - T_K: '2745'
+          weight_loss_mg_as_printed: '13.0'
+          weight_loss_footnote_marker_as_printed: '*'
+          time_s_as_printed: '1800'
+          pressure_as_printed: 3.02 × 10^-5 atm
+          orifice_area_as_printed: 2.54 × 10^-2 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2745'
+              locator: &id015
+                page: 15
+                published_page: 13
+                pdf_page_index: 14
+                table: III
+                row: '3'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id015
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id015
+        - T_K: '2632'
+          weight_loss_mg_as_printed: '11.3'
+          weight_loss_footnote_marker_as_printed: '**'
+          time_s_as_printed: '3600'
+          pressure_as_printed: 9.43 × 10^-6 atm
+          orifice_area_as_printed: 3.46 × 10^-2 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2632'
+              locator: &id016
+                page: 15
+                published_page: 13
+                pdf_page_index: 14
+                table: III
+                row: '4'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id016
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id016
+        molecular_weight_assumption_as_printed: ZrO2
+        pressure_footnote_marker_as_printed: '***'
+        total_pressure_as_printed: not stated
+        fO2_as_printed: not stated
+        cell_background_correction: all weight losses were corrected for small background loss of tungsten
+        figure_only_candidate: Figure 2 plots ZrO and ZrO2 partial-pressure curves; no points digitized.
+    - observation_id: ackermann_thorn_1958_eq_7_zro2_total_volatility_fit
+      type: thermodynamic_equations
+      locator:
+        page: 14
+        published_page: 12
+        equation: '7'
+      units: log10(atm) and K
+      values:
+        method_class: model_derived
+        admission_status: typed_refusal
+        status: typed_refusal
+        quantity_as_printed: aggregate total-volatility pressure relation based on assumed ZrO2 molecular weight
+        reason: The source does not identify this aggregate pressure curve as one gas species.
+        relation_as_printed: log p_z (atm) = −3.61 × 10^4/T + 8.65
+        fit_method_as_printed: least-squares analysis of the four Table III measurements
+  ThO2:
+    observations: []
+    context:
+    - observation_id: ackermann_thorn_1958_tho2_free_energy_gap
+      type: thermodynamic_equations
+      locator:
+        page: 6
+        published_page: 4
+        section: Gaseous Thorium Oxides
+      units: as printed
+      values:
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        quantity_as_printed: free energy of assumed ThO2(g)
+        reason: The report says only an approximate value can be given and cites prior effusion work; it prints
+          no numerical ThO2(g) formation free energy here.
+  UO2:
+    observations: []
+    context:
+    - observation_id: ackermann_thorn_1958_uo2_free_energy_gap
+      type: thermodynamic_equations
+      locator:
+        page: 6
+        published_page: 4
+        section: Gaseous Uranium Oxides
+      units: as printed
+      values:
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        quantity_as_printed: free energy of UO2(g)
+        reason: The report says accurate values for UO2(g) were obtained in a cited 1956 paper but prints no numerical
+          UO2(g) formation free energy here.
+fidelity_samples:
+- species: WO3
+  observation_id: ackermann_thorn_1958_table_ii_experiment_1
+  field: pressure_as_printed
+  value: '8.458'
+  locator:
+    page: 13
+    table: II
+    row: '1'
+- species: WO3
+  observation_id: ackermann_thorn_1958_table_ii_experiment_6
+  field: pressure_as_printed
+  value: '11.91'
+  locator:
+    page: 13
+    table: II
+    row: '6'
+- species: TaO2
+  observation_id: ackermann_thorn_1958_eq_38_tao2_formation
+  field: functions
+  value:
+    delta_fG_as_printed: −6.650T + 0.505T log T + 9.773 × 10^-4 T^2 + 721825/T − 40845 cal/mole
+  locator:
+    page: 22
+    equation: '38'
+- species: Al2O
+  observation_id: ackermann_thorn_1958_eq_17_al2o_formation
+  field: functions
+  value:
+    delta_fG_as_printed: −47200 − 9.27T cal/mole
+  locator:
+    page: 18
+    equation: '17'

@@ -1,0 +1,45 @@
+source_id: ackermann-thorn-1958-volatile-oxides-anl5824
+source:
+  citation: >-
+    Ackermann, R. J. and Thorn, R. J. (1958), “Reactions Yielding Volatile Oxides at High
+    Temperatures: Free Energies of Gaseous Al2O, ZrO, ThO, TaO, ZrO2, ThO2, TaO2, UO2 and WO3,”
+    Argonne National Laboratory report ANL-5824.
+extraction:
+  method: MinerU table draft emission for expressible pressure columns; hand transcription from the two OCR reads for merged or refused fields, with render verification of all numeric cells in scanned tables
+  date: '2026-10-26'
+  worker: w1026a-ack58
+review_status: draft
+# Table I's oxide-to-cell transported weight ratio has no quantity token and has
+# merged cells plus printed uncertainties; its twelve measurement cells are
+# hand-transcribed as typed refusals. Table II is emitted below. Table III's
+# pressure is a total-volatility estimate on a stated molecular-weight
+# assumption, not an individual species pressure; its rows are hand-transcribed
+# as typed refusals.
+tables:
+  - page: 13
+    table_index: 2
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: measured_reduced
+    unit: atm
+    phase: gas
+    rows: all
+    temperature:
+      column: 4
+      unit: K
+    values:
+      - column: 5
+        species: WO3
+        scale_factor:
+          header: 'Pressure of  $WO_3 \times 10^6$  (atm)'
+          exponent: 6
+          direction: quantity_times_factor_equals_cell
+    conditions:
+      - key: total_pressure_Pa
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 13, table: 'II', note: Table II reports the WO3 partial pressure; no total pressure is stated.}
+      - key: fO2_Pa
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 13, table: 'II', note: No oxygen fugacity or oxygen partial pressure is stated for the effusion runs.}
+    render_verified:
+      - {row: 2, column: 5, text: '8.458'}
