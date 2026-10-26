@@ -107,6 +107,7 @@ from simulator.battery.enums import (
 from simulator.battery.records import (
     Composition,
     Reaction,
+    ReactionTerm,
     Species,
     StandardState,
     State,
@@ -638,7 +639,7 @@ def parse_valence_basis(
 @dataclass(frozen=True)
 class Identity:
     quantity: State[Quantity] | Quantity
-    species: Species
+    species: Species | None
     subtype: State[str] | None = None
     per: State[PerBasis] | None = None
     temperature_K: State[Decimal] | None = None
@@ -759,8 +760,39 @@ def profile_for(identity: Identity) -> QuantityProfile:
     def na(*names: str) -> None:
         permitted_na.update(names)
 
-    # Always compared: quantity + species (+ polymorph via species).
-    if q in FORMATION_QUANTITIES:
+    # Reaction K uses its complete stoichiometry instead of a species anchor.
+    if q is Quantity.LOG10_K_REACTION:
+        req("reaction", "temperature_K")
+        reaction_state = identity.reaction
+        reaction = (
+            reaction_state.value
+            if reaction_state is not None
+            and reaction_state.is_value
+            and isinstance(reaction_state.value, Reaction)
+            else None
+        )
+        if reaction is None or any(
+            phase_token(term.species) in {None, Phase.G}
+            for term in reaction.terms
+        ):
+            req("standard_pressure_Pa")
+        else:
+            na("standard_pressure_Pa")
+        na(
+            "per",
+            "formation_elements",
+            "reference_state",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "exposure",
+            "sample_mass_kg",
+            "wall",
+            "reservoir",
+            "subtype",
+        )
+    elif q in FORMATION_QUANTITIES:
         req("per", "temperature_K", "standard_pressure_Pa", "reaction", "formation_elements")
         na(
             "composition",
@@ -1451,6 +1483,47 @@ def _species_axis_compare(
     return outcome
 
 
+def _reaction_constant_state_compare(
+    left: State[Reaction] | None, right: State[Reaction] | None
+) -> IdentityEqualOutcome:
+    if (
+        left is None
+        or right is None
+        or not left.is_value
+        or not right.is_value
+    ):
+        return _state_compare("reaction", left, right, required=True)
+    if not isinstance(left.value, Reaction) or not isinstance(right.value, Reaction):
+        return IdentityEqualOutcome(
+            IdentityEqualKind.INVALID_IDENTITY,
+            ("reaction",),
+            "reaction axis must contain a Reaction",
+        )
+
+    def compare_terms(left_term: object, right_term: object) -> IdentityEqualOutcome:
+        if not isinstance(left_term, ReactionTerm) or not isinstance(
+            right_term, ReactionTerm
+        ):
+            return _mismatch("reaction")
+        if left_term.coefficient != right_term.coefficient:
+            return _mismatch("reaction")
+        species = _species_axis_compare(
+            "reaction", left_term.species, right_term.species
+        )
+        if species.kind is not IdentityEqualKind.EQUAL:
+            return species
+        return _state_compare(
+            "reaction.standard_state",
+            left_term.standard_state,
+            right_term.standard_state,
+            required=True,
+        )
+
+    return _multiset_compare(
+        "reaction", left.value.terms, right.value.terms, compare_terms
+    )
+
+
 def _multiset_compare(
     name: str,
     left: tuple[Any, ...],
@@ -1735,6 +1808,10 @@ def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
 def _reservoir_rule(identity: Identity) -> IdentityEqualOutcome | None:
     if quantity_token(identity) is not Quantity.P_SAT:
         return None
+    if identity.species is None:
+        return IdentityEqualOutcome(
+            IdentityEqualKind.IDENTITY_UNKNOWN, ("species",)
+        )
     reservoir = identity.reservoir
     if reservoir is None or not reservoir.is_value or reservoir.value is None:
         return None
@@ -1803,14 +1880,19 @@ def _identity_equal(
         return IdentityEqualOutcome(
             IdentityEqualKind.IDENTITY_MISMATCH, ("quantity",)
         )
-    species_outcome = _species_equal(
-        left.species,
-        right.species,
-        allow_unknown_phase=allow_unknown_species_phase,
-        allow_unknown_polymorph=allow_unknown_species_polymorph,
-    )
-    if species_outcome.kind is not IdentityEqualKind.EQUAL:
-        return species_outcome
+    if left_q is not Quantity.LOG10_K_REACTION:
+        if left.species is None or right.species is None:
+            return IdentityEqualOutcome(
+                IdentityEqualKind.IDENTITY_UNKNOWN, ("species",)
+            )
+        species_outcome = _species_equal(
+            left.species,
+            right.species,
+            allow_unknown_phase=allow_unknown_species_phase,
+            allow_unknown_polymorph=allow_unknown_species_polymorph,
+        )
+        if species_outcome.kind is not IdentityEqualKind.EQUAL:
+            return species_outcome
 
     profile = _comparison_profile(left, right)
     if knudsen_residue_extent and left_q is Quantity.RESIDUE_COMPONENT_COMPOSITION:
@@ -1866,6 +1948,8 @@ def _identity_equal(
                 )
                 if outcome.kind is not IdentityEqualKind.EQUAL:
                     break
+        elif name == "reaction" and left_q is Quantity.LOG10_K_REACTION:
+            outcome = _reaction_constant_state_compare(left_axis, right_axis)
         else:
             outcome = _state_compare(
                 name,

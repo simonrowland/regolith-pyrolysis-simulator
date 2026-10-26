@@ -507,6 +507,10 @@ def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
     return {"reason": "quantity_not_predicted", "quantity": quantity.value}
 
 
+def _is_quantity_not_predicted(quantity: Quantity | None) -> bool:
+    return quantity is Quantity.LOG10_K_REACTION
+
+
 @dataclass(frozen=True)
 class ScoreContext:
     works: Mapping[str, Work]
@@ -4365,7 +4369,7 @@ def _source_alignment_group_key(
     if not isinstance(identity, Identity):
         return None
     quantity = quantity_token(identity)
-    if quantity is None:
+    if quantity is None or identity.species is None:
         return None
     phase = phase_token(identity.species)
     charge = identity.species.charge
@@ -7849,6 +7853,18 @@ def predict_with_engine(
 
     _require_score_engine(engine)
     identity = observation.identity
+    quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+    if _is_quantity_not_predicted(quantity):
+        return EnginePrediction(
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail=_quantity_not_predicted_detail(quantity),
+            identity=identity,
+        )
     sample_phase_detail = (
         melt_activity_sample_phase_refusal(identity)
         if isinstance(identity, Identity)
@@ -10253,7 +10269,11 @@ def compile_residual(
         reference = fusion_comparison_reference(reference, engine=engine)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-    formula = identity.species.formula if isinstance(identity, Identity) else ""
+    formula = (
+        identity.species.formula
+        if isinstance(identity, Identity) and identity.species is not None
+        else ""
+    )
     rail = rail_for_quantity(quantity, species_formula=formula)
     T = temperature_of(identity) if isinstance(identity, Identity) else None
     key = residual_key(
@@ -10352,6 +10372,14 @@ def compile_residual(
                 quench_state=_residual_quench_state(reference),
             ),
             candidate,
+        )
+
+    if _is_quantity_not_predicted(quantity):
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            _quantity_not_predicted_detail(quantity),
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            exclusions=("status_match_or_mismatch",),
         )
 
     if (
@@ -11515,7 +11543,11 @@ def _refusal_diagnostic_references(context: ScoreContext) -> tuple[Observation, 
             and obs.value.kind is ValueKind.UNAVAILABLE
             and rail_for_quantity(
                 quantity_token(obs.identity),
-                species_formula=obs.identity.species.formula,
+                species_formula=(
+                    obs.identity.species.formula
+                    if obs.identity.species is not None
+                    else None
+                ),
             ) is not None
         )
         if (
@@ -11588,7 +11620,12 @@ def _score_store_with_decisions(
         kept: list[Observation] = []
         for obs in refs:
             quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
-            formula = obs.identity.species.formula if isinstance(obs.identity, Identity) else ""
+            formula = (
+                obs.identity.species.formula
+                if isinstance(obs.identity, Identity)
+                and obs.identity.species is not None
+                else ""
+            )
             if rail_for_quantity(quantity, species_formula=formula) is rail:
                 kept.append(obs)
         refs = kept
@@ -15121,7 +15158,11 @@ def candidate_rail_census(
     for obs in comparison_candidates(context):
         identity = obs.identity
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-        formula = identity.species.formula if isinstance(identity, Identity) else ""
+        formula = (
+            identity.species.formula
+            if isinstance(identity, Identity) and identity.species is not None
+            else ""
+        )
         rail = rail_for_quantity(quantity, species_formula=formula)
         if rail is None:
             reason = no_headline_rail_reason(quantity, species_formula=formula)
@@ -16751,6 +16792,7 @@ class _ScorePayloadAccumulator:
                 formula = (
                     observation.identity.species.formula
                     if isinstance(observation.identity, Identity)
+                    and observation.identity.species is not None
                     else ""
                 )
                 headline_rail = rail_for_quantity(token, species_formula=formula)

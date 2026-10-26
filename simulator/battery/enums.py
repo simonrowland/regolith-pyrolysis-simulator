@@ -66,6 +66,7 @@ class Quantity(StrEnum):
     FUGACITY = "fugacity"
     P_REFERENCE = "p_reference"
     LOG10_KF = "log10_Kf"
+    LOG10_K_REACTION = "log10_K_reaction"
     LOG10_K_STAR = "log10_K_star"
     ACTIVITY = "activity"
     ACTIVITY_COEFFICIENT = "activity_coefficient"
@@ -516,6 +517,17 @@ class ValueKind(StrEnum):
     UNAVAILABLE = "unavailable"
 
 
+class BoundDirection(StrEnum):
+    LOWER = "lower"
+    UPPER = "upper"
+
+
+class BoundInclusivity(StrEnum):
+    INCLUDED = "included"
+    EXCLUDED = "excluded"
+    UNKNOWN = "unknown"
+
+
 class UncertaintyKind(StrEnum):
     PRINTED = "printed"
     DERIVED = "derived"
@@ -546,6 +558,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.FUGACITY: "Pa",
     Quantity.P_REFERENCE: "Pa",
     Quantity.LOG10_KF: "dimensionless",
+    Quantity.LOG10_K_REACTION: "dimensionless",
     Quantity.LOG10_K_STAR: "dimensionless",
     Quantity.ACTIVITY: "dimensionless",
     Quantity.ACTIVITY_COEFFICIENT: "dimensionless",
