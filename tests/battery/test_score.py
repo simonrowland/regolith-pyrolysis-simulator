@@ -425,6 +425,37 @@ def test_unknown_total_pressure_refusal_is_pinned_on_non_mathieu_row() -> None:
     assert outcome.fields == ("total_pressure_Pa",)
 
 
+def test_unknown_total_pressure_refusal_is_pinned_on_non_mathieu_score_row() -> None:
+    experiment = F.kems_experiment()
+    identity = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.unknown("not printed"),
+    )
+    reference = F.observation(
+        "other-source-score-p-partial-unknown-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="other-source",
+    )
+    reference = replace(reference, point_conditions=None)
+    prediction = replace(
+        _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+        identity=replace(
+            identity, total_pressure_Pa=State.of(Decimal("0.1"))
+        ),
+    )
+
+    residual, _candidate = _compile(reference, experiment, prediction)
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert residual.refusal.detail["fields"] == ["total_pressure_Pa"]
+
+
 def _partial_prediction(engine, observation, **_kwargs):
     return EnginePrediction(
         engine=engine,
