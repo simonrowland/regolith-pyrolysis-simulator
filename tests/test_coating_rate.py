@@ -621,7 +621,7 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     assert engagement["total_count"] >= 0
     assert engagement["engaged"] == (engagement["total_count"] > 0)
 
-    # Rebaselined 2026-10-26 for b-813 and b-1028; sha256 c4756d389c417613353a48b60da4d33d5a163390c6592300eb3e4a4b0d546532.
+    # Rebaselined 2026-10-26 for b-813 and b-1028, then for the Stage-3 diverter (d-268/d-287) on studio-3; sha256 f2b1f30214a0ed190d3ecd97f8abc3cb738c59ddf541e1cfeb3d552dee2a0d99.
     # b-1028: 88 flux_dormant and 88 is_flux_dormant_by_epoch true->false,
     # 47 channel-state dormancy->refusal leaves, two refusal notes, counts
     # 5->7 / 2->4. b-813: 611 extrapolation_notice and 21
