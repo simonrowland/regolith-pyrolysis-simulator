@@ -725,3 +725,28 @@ def test_legacy_retained_source_uses_published_intrinsic_buffer():
         assert all(math.isfinite(pressure) for pressure in result.vapor_pressures_Pa.values())
     finally:
         close_test_owned_magemin_backend(sim)
+
+
+def test_oxygenated_producing_carriers_with_gas_coproduct_follow_surface():
+    from simulator.melt_backend.base import EquilibriumResult
+    sim = simulation('lunar_mare_low_ti', 'C0')
+    try:
+        sim.melt.temperature_C = 980.0
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._frozen_evaporation_carriers = frozenset({'PO', 'PO2'})
+        pressures = []
+        for oxygen in (0.009, 0.018):
+            sim._reaction_pO2_bar = oxygen
+            result = EquilibriumResult(temperature_C=980.0, liquid_fraction=1.0)
+            sim._refresh_vapor_pressures_from_kernel(result, include_diagnostic_shadows=False)
+            pressures.append(result.vapor_pressures_Pa)
+        for species in ('PO', 'PO2'):
+            assert sim._project_evaporation_overhead_source_mol_hr({species: 0.001}, {})['O2'] > 0.0
+            evaluator = sim.vapour_rail_catalog.evaluator_for_hot_train(species, process_phase='stage0')
+            assert evaluator.pO2_exponent < 0.0
+            # Fixed activity mass action, with the O2 coproduct actually on
+            # the gas ledger: doubling surface oxygen scales p by 2**e.
+            assert pressures[1][species] / pressures[0][species] == pytest.approx(
+                2.0 ** evaluator.pO2_exponent, rel=1e-12, abs=0.0)
+    finally:
+        close_test_owned_magemin_backend(sim)
