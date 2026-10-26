@@ -273,11 +273,11 @@ def test_isolated_migration_preserves_species_conditions_and_activity_standards(
             assert values["phase_label"] == expected_role.value
             assert observation.identity.phase_role is not None
             assert observation.identity.phase_role.value is expected_role
-            if source_row.get("phase") == "l":
-                assert observation.identity.species.phase.value is Phase.L
-                assert observation.point_conditions["total_pressure_Pa"].state.value == Decimal("101325")
-            else:
+            if source_row.get("phase") != "l":
                 assert observation.identity.species.phase.value is Phase.GLASS
+        if source_row.get("phase") == "l":
+            assert observation.identity.species.phase.value is Phase.L
+            assert observation.point_conditions["total_pressure_Pa"].state.value == Decimal("101325")
             assert observation.point_conditions["sample_id"].state.is_value
         if source_row["type"] == "activity_coefficient":
             assert observation.identity.reference_state is not None
