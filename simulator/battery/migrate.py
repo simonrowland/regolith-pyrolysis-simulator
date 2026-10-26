@@ -12180,11 +12180,20 @@ def _walk_printed_oxygen(
                         if condition_value.kind is ValueKind.POINT
                         else None
                     )
+                units = (
+                    str(condition.get("units") or condition.get("unit") or "")
+                    .strip()
+                    .lower()
+                    if isinstance(condition, Mapping)
+                    else ""
+                )
+                reference_pressure_pa = _OXYGEN_LOG_REFERENCE_PA.get(units)
                 if (
                     buffer_relative
                     or located_condition is None
                     or not isinstance(condition_value, Decimal)
                     or not condition_value.is_finite()
+                    or reference_pressure_pa is None
                     or (
                         isinstance(condition, Mapping)
                         and _oxygen_node_rejected(condition, condition_value)
@@ -12199,7 +12208,7 @@ def _walk_printed_oxygen(
                             locator=located_condition.locator or local,
                             inference=located_condition.inference,
                         ),
-                        _BAR_PA,
+                        reference_pressure_pa,
                     ))
         if name in _PRINTED_LOG_FO2_KEYS or name in _PRINTED_PO2_KEYS:
             if name in _PRINTED_LOG_FO2_KEYS and buffer_relative:
@@ -13332,10 +13341,8 @@ class Migrator:
         facts = collect_printed_oxygen(specific, locator, skip_tables=skip_tables)
         ratio_payload = _has_author_ratio_oxygen_payload(specific)
         if ratio_oxygen is None and ratio_payload:
-            return point_conditions, PrintedOxygenFacts(
-                log_fO2=facts.log_fO2,
-                rejected_log_fO2=facts.rejected_log_fO2,
-                log_fO2_reference_Pa=facts.log_fO2_reference_Pa,
+            return point_conditions, replace(
+                facts, oxygen_partial_pressure_Pa=None
             )
         if (
             ratio_oxygen is None
@@ -13347,6 +13354,8 @@ class Migrator:
             ratio_oxygen = collect_author_ratio_oxygen(fallback, locator)
             if ratio_oxygen is None:
                 facts = collect_printed_oxygen(fallback, locator, skip_tables=True)
+                if _has_author_ratio_oxygen_payload(fallback):
+                    facts = replace(facts, oxygen_partial_pressure_Pa=None)
         if ratio_oxygen is not None:
             # The nested oxygen_partial_pressure is Plante's derived
             # congruent-vaporization condition, not a printed pO2 cell.

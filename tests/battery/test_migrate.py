@@ -14627,6 +14627,7 @@ def test_residue_series_resolves_printed_oxygen_once_at_final_identity(
         row_conditions: dict | None = None,
         experiment_conditions: dict | None = None,
         unbuffered: bool = False,
+        parent_ratio: bool = False,
     ):
         document = deepcopy(FIXTURE_EXTRACT)
         document["source_id"] = "sugawara-1999-residue-series-fixture"
@@ -14650,6 +14651,18 @@ def test_residue_series_resolves_printed_oxygen_once_at_final_identity(
                 }
             ],
         }
+        if parent_ratio:
+            values.update(
+                {
+                    "po2_over_pK_as_published": "0.226",
+                    "P_K_atm_as_published": "1e-6",
+                    "oxygen_partial_pressure": {
+                        "value": "9e-7",
+                        "units": "atm",
+                        "locator": {"page": 5, "table": "2"},
+                    },
+                }
+            )
         if unbuffered:
             values["fO2_control"] = {"during_run": "none"}
         document["species"] = {
@@ -14713,6 +14726,22 @@ def test_residue_series_resolves_printed_oxygen_once_at_final_identity(
         "20892.96130854039483122233736"
     )
 
+    atm_log_fO2 = {
+        "state": {"tag": "value", "value": "-13.9"},
+        "units": "log10(atm)",
+        "locator": {"page": 5, "table": "2", "column_header": "Log fO2"},
+    }
+    expected_atm_pa = Decimal("1.275606173500439925962071498E-9")
+    row_atm_log = migrate_series(
+        "row-atm-log", row_conditions={"fO2_log": deepcopy(atm_log_fO2)}
+    )
+    experiment_atm_log = migrate_series(
+        "experiment-atm-log",
+        experiment_conditions={"log_fO2": deepcopy(atm_log_fO2)},
+    )
+    assert row_atm_log.identity.fO2_Pa.value == expected_atm_pa
+    assert experiment_atm_log.identity.fO2_Pa.value == expected_atm_pa
+
     unbuffered_row_log = migrate_series(
         "unbuffered-row-log",
         row_conditions={"fO2_log": deepcopy(log_fO2)},
@@ -14724,6 +14753,10 @@ def test_residue_series_resolves_printed_oxygen_once_at_final_identity(
 
     no_oxygen = migrate_series("no-oxygen")
     assert no_oxygen.identity.fO2_Pa.is_unknown
+
+    parent_ratio = migrate_series("parent-ratio", parent_ratio=True)
+    assert parent_ratio.identity.fO2_Pa.is_unknown
+    assert "fO2_Pa" not in (parent_ratio.point_conditions or {})
 
 
 def test_residue_identity_rejects_disagreeing_derived_ratio_oxygen(
