@@ -5177,7 +5177,8 @@ def _phase_row_rejection(
     if token in PHASE_COMPOSITION_QUANTITIES:
         basis = str(values.get("basis") or "").strip()
         if basis not in PHASE_BASIS_TOKENS:
-            return "basis is not wt_percent or mole_fraction"
+            accepted = ", ".join(sorted(PHASE_BASIS_TOKENS))
+            return f"basis is not {accepted}"
     if token is Quantity.DISTRIBUTION_RATIO:
         counter = _phase_role_token(values.get("counter_phase_label"))
         if counter is None:
