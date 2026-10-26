@@ -317,3 +317,40 @@ def test_frozen_hour_omits_cold_spot_history_and_rollback_defers_it(monkeypatch)
         history.release()
     finally:
         close_test_owned_magemin_backend(sim)
+
+
+def test_pressure_residual_reuses_hour_invariants(monkeypatch):
+    from engines.builtin import vapor_pressure
+    from simulator.chemistry import langmuir_knudsen
+    from simulator.condensation import _CondensationRoutePhysics
+    from simulator import transport_regime
+
+    sim = simulation()
+    solve = langmuir_knudsen._solve_surface_oxygen_balance
+    route = _CondensationRoutePhysics._route_amounts
+    routes = []
+
+    def observe_route(*args, **kwargs):
+        routes.append(kwargs.get('materialize_authority', True))
+        return route(*args, **kwargs)
+
+    def checked_solve(evaluate, **kwargs):
+        with monkeypatch.context() as guard:
+            guard.setattr(vapor_pressure, '_build_high_t_melt_activity_authority',
+                lambda *a, **k: pytest.fail('residual rebuilt hour activity authority'))
+            guard.setattr(transport_regime, 'surface_gas_film',
+                lambda *a, **k: pytest.fail('residual rebuilt a prepared gas film'))
+            return solve(evaluate, **kwargs)
+
+    monkeypatch.setattr(langmuir_knudsen, '_solve_surface_oxygen_balance', checked_solve)
+    monkeypatch.setattr(_CondensationRoutePhysics, '_route_amounts', observe_route)
+    try:
+        sim.melt.temperature_C = 1600.0
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+        sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        result = sim._solve_evaporative_oxygen_boundary()
+        assert result.reaction_pO2_bar > 0.0
+        assert routes == [True]  # Full route arithmetic only at acceptance.
+    finally:
+        close_test_owned_magemin_backend(sim)
