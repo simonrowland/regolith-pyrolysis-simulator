@@ -8196,6 +8196,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # c777fdbc4): fe3_fe2_ratio 52->65. The full-store census was re-pinned at
     # 8251 in 9e1623bdf; the 14 Bonnand cells (49fddc0e7) bring this combined
     # regeneration to 8265 numeric cells, replacing the stale 3150 family pin.
+    # 18dd798e1 restores the two Fedkin Yu Na/K fit points as observations,
+    # bringing the numeric census from 8265 to 8267.
     assert per_source.get("kress-carmichael-1991-iron-redox-calibration") == {
         "fe3_fe2_ratio": 13
     }
@@ -8203,7 +8205,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 8265, (n_numeric, census, n_unavailable)
+    assert n_numeric == 8267, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
