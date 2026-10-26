@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from simulator.vapour_rail.batch import _carrier_pressure_floor
+from simulator.vapour_rail.batch import _carrier_pressure_floor, _oxygen_coproduct_enters_gas
 
 from collections.abc import Mapping
 from typing import Any
@@ -439,6 +439,7 @@ class EquilibriumMixin:
         from simulator.vapour_rail.channels import (
             REACTION_PLANE_MELT_INTERFACE,
         )
+        from simulator.accounting.formulas import parse_formula
 
         refusal = _internal_analytical_control_refusal(
             self.melt.temperature_C,
@@ -656,6 +657,10 @@ class EquilibriumMixin:
             parent_oxide = sp_data.get('parent_oxide', '')
             if not parent_oxide:
                 continue
+            source_oxygen_bar = (pO2_bar if _oxygen_coproduct_enters_gas(
+                str(sp_data.get('oxygen_destination') or ''),
+                float(parse_formula(str(sp_data.get('formula') or species)).elements.get('O', 0.0)))
+                else melt_dissociation_pO2_bar)
 
             # --- Pressure reference rail ---
             #
@@ -876,7 +881,7 @@ class EquilibriumMixin:
                     )
                     P_effective_Pa = _require_finite_vapor_value(
                         P_effective_Pa
-                        * (melt_dissociation_pO2_bar / pO2_reference_bar)
+                        * (source_oxygen_bar / pO2_reference_bar)
                         ** pO2_exponent,
                         species=species,
                         field="P_effective_pO2",
@@ -969,7 +974,7 @@ class EquilibriumMixin:
                 # envelope-clamped) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=source_oxygen_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -1089,7 +1094,7 @@ class EquilibriumMixin:
                 # envelope-clamped) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=source_oxygen_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -1237,7 +1242,7 @@ class EquilibriumMixin:
             K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
 
             # a_M(row basis) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
-            dissociation_pO2_bar = melt_dissociation_pO2_bar
+            dissociation_pO2_bar = source_oxygen_bar
             # Premise: this fallback solves the melt-supported source pressure;
             # the later surface-flux layer owns overhead species backpressure.
             # For MgO(l) -> Mg(g) + 1/2 O2,

@@ -2720,7 +2720,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             else transport_pO2_bar
         )
         melt_dissociation_pO2_clamped = False
-        # Metal-loss O2 is retained in the melt buffer: dn_gas(O2)=0.
+        # Retained metal-loss O2 has dn_gas(O2)=0.
         # Its p=C(T)*a^n*(fO2/f_ref)^e therefore uses intrinsic melt fO2,
         # not the gas-film unknown. The ratio is dimensionless; at zero gas
         # pO2 this source stays finite. Gas-funded consuming rails and SiO's
@@ -2847,6 +2847,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             parent_oxide = sp_data.get('parent_oxide', '')
             if not parent_oxide:
                 continue
+            # Atomic Ti explicitly releases O2 to the gas; the default
+            # oxygen-free-metal receiver is the buffer. The same receiver
+            # owner drives both the transition and this pressure argument.
+            source_oxygen_bar = (transport_pO2_bar if _oxygen_coproduct_enters_gas(
+                str(sp_data.get('oxygen_destination') or ''),
+                float(parse_formula(str(sp_data.get('formula') or species)).elements.get('O', 0.0)))
+                else melt_dissociation_pO2_bar)
             # A fit range has no diagnostic meaning when its parent oxide is
             # absent; gate presence before selecting or warning about the fit.
             if float(comp_wt.get(parent_oxide, 0.0) or 0.0) <= 0.0:
@@ -3055,7 +3062,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # envelope-clamped, receipted) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=source_oxygen_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -3125,7 +3132,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "pressure_rail": "liquid_oxide_standard_reaction",
                         "P_reference_Antoine_Pa": P_reference_Pa,
                         "P_eq_Pa": P_eq_Pa,
-                        "pO2_bar": melt_dissociation_pO2_bar,
+                        "pO2_bar": source_oxygen_bar,
                         "activity_factor": activity_factor,
                         "oxide_activity_exponent": activity_exponent,
                         "pO2_exponent": pO2_exponent,
@@ -3204,7 +3211,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # envelope-clamped, receipted) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=source_oxygen_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -3251,7 +3258,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "oxide_standard_state": "liquid",
                         "P_reference_Antoine_Pa": P_reference_Pa,
                         "P_eq_Pa": P_eq_Pa,
-                        "pO2_bar": melt_dissociation_pO2_bar,
+                        "pO2_bar": source_oxygen_bar,
                         "activity_factor": activity_factor,
                         "oxide_activity_exponent": activity_exponent,
                         "pO2_exponent": pO2_exponent,
@@ -3347,7 +3354,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # envelope-clamped, receipted) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=source_oxygen_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -3406,7 +3413,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "P_standard_Pa": ELLINGHAM_STANDARD_PRESSURE_PA,
                         "P_reference_Antoine_Pa": P_reference_Pa,
                         "P_eq_Pa": P_eq_Pa,
-                        "pO2_bar": melt_dissociation_pO2_bar,
+                        "pO2_bar": source_oxygen_bar,
                         "activity_factor": activity_factor,
                         "oxide_activity_exponent": activity_exponent,
                         "pO2_exponent": pO2_exponent,
@@ -3530,7 +3537,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="K_decomp",
             )
-            dissociation_pO2_bar = melt_dissociation_pO2_bar
+            dissociation_pO2_bar = source_oxygen_bar
             if parent_oxide != 'FeO':
                 # t-571: the Ellingham O2 denominator is sourced from the
                 # owner-gated O2 channel potential (melt_interface plane).
