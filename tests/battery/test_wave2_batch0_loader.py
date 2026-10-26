@@ -52,6 +52,86 @@ def _migrate_obs(tmp_path: Path, values: dict):
     return row, result
 
 
+def test_series_item_derived_from_stays_on_that_row(tmp_path: Path) -> None:
+    from simulator.battery.stable_ids import series_row_extra
+
+    extract = deepcopy(FIXTURE_EXTRACT)
+    na = extract["species"]["Na"]["observations"]
+
+    def parent(observation_id: str, pressure: float) -> dict:
+        return {
+            "observation_id": observation_id,
+            "type": "psat_series",
+            "locator": {"table": "I", "page": 2},
+            "phase": "gas",
+            "regime": "knudsen_effusion",
+            "units": "atm",
+            "values": {
+                "quantity": "pure_Psat",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+                "T_K": 1100,
+                "pressure_atm": pressure,
+            },
+        }
+
+    row_a = {
+        "run": "a",
+        "T_K": 1400,
+        "pressure_atm": 3,
+        "derived_from": ["parent_a"],
+    }
+    row_b = {
+        "run": "b",
+        "T_K": 1500,
+        "pressure_atm": 4,
+        "derived_from": ["parent_b"],
+    }
+    bare_a = {key: value for key, value in row_a.items() if key != "derived_from"}
+    assert series_row_extra(row_a) == series_row_extra(bare_a)
+    na.extend([parent("parent_a", 1), parent("parent_b", 2)])
+    na.append(
+        {
+            "observation_id": "reduced",
+            "type": "psat_series",
+            "locator": {"table": "II", "page": 4},
+            "phase": "gas",
+            "regime": "knudsen_effusion",
+            "units": "atm",
+            "values": {
+                "quantity": "pure_Psat",
+                "method_class": "directly_reduced_measurement",
+                "admission_status": "admitted",
+                "derived_from": ["parent_a", "parent_b"],
+                "series": [row_a, row_b],
+            },
+        }
+    )
+    result = migrate(_write_min_tree(tmp_path / "tree", extract), write=False)
+    children = {
+        obs.observation_id: obs
+        for obs in result.observations.values()
+        if "reduced" in obs.observation_id
+    }
+    assert len(children) == 2, [
+        (obs.observation_id, obs.derived_from)
+        for obs in result.observations.values()
+    ]
+    bare_b = {key: value for key, value in row_b.items() if key != "derived_from"}
+    by_suffix = {}
+    for obs_id, obs in children.items():
+        if ":row=a:" in obs_id:
+            by_suffix["a"] = obs
+            assert series_row_extra(bare_a) in obs_id
+        else:
+            by_suffix["b"] = obs
+            assert series_row_extra(bare_b) in obs_id
+    assert by_suffix["a"].derived_from == ("fixture-source::parent_a",)
+    assert by_suffix["b"].derived_from == ("fixture-source::parent_b",)
+    assert "fixture-source::parent_a" in result.observations
+    assert "fixture-source::parent_b" in result.observations
+
+
 def test_exploded_row_parent_derived_from_points_at_children(tmp_path: Path) -> None:
     extract = deepcopy(FIXTURE_EXTRACT)
     first = extract["species"]["Na"]["observations"][0]
