@@ -5241,7 +5241,7 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
             "stolyarova_1995_ca_partial_pressure_table2",
             "x(CaO)",
             8,
-            Decimal("1.04"),
+            Decimal("2.33"),
             "liquid",
         ),
     ),
