@@ -42,8 +42,8 @@ def _seeded_output(source: str, seed: str) -> str:
             id="condensation-route-diagnostic-order",
         ),
         pytest.param(
-            """from types import SimpleNamespace\nimport engines.builtin.vapor_pressure as vp\nimport simulator.melt_backend.openimcc_bridge as bridge\nbridge.evaluate_cleaned_melt = lambda **kwargs: SimpleNamespace(single_cation_activities={'SiO2': 1.0, 'MgO': 1.0, 'FeO': 1.0}, bridge=SimpleNamespace(pack_model_id='x', pack_version='x', pack_digest='x'))\nvp._high_t_activity_for_parent = lambda *args, **kwargs: SimpleNamespace(activity_model='openimcc_single_cation_activity', effective_gamma=1.0)\nvp._regular_solution_gamma_fit = lambda observations, temperature: {'fit': True}\nresult = vp._same_composition_temperature_bridge({'SiO2': 1.0, 'MgO': 1.0, 'FeO': 1.0}, 1000.0, (), activity_basis_mol={'SiO2': 1.0, 'MgO': 1.0, 'FeO': 1.0})\nprint(','.join(result['fits']))""",
-            id="vapor-pressure-parent-notice-order-defensive",
+            """from types import SimpleNamespace\nimport engines.builtin.vapor_pressure as vp\nimport simulator.melt_backend.openimcc_bridge as bridge\nbridge.evaluate_cleaned_melt = lambda **kwargs: SimpleNamespace(single_cation_activities={'SiO2': 1.0, 'MgO': 1.0, 'FeO': 1.0}, bridge=SimpleNamespace(pack_model_id='x', pack_version='x', pack_digest='x'))\nvp._high_t_activity_for_parent = lambda *args, **kwargs: SimpleNamespace(activity_model='openimcc_single_cation_activity', effective_gamma=1.0)\nresult = vp._same_composition_temperature_bridge({'SiO2': 1.0, 'MgO': 1.0, 'FeO': 1.0}, 2000.0, (), activity_basis_mol={'SiO2': 1.0, 'MgO': 1.0, 'FeO': 1.0})\nprint(','.join(result['nearest_neighbors']))""",
+            id="vapor-pressure-parent-neighbor-order-defensive",
         ),
         pytest.param(
             """import json\nfrom tests.test_runner_smoke import SCENARIOS, _run_scenario\ns = next(s for s in SCENARIOS if s['name'] == 'lunar_mare_low_ti_C0_24h')\np = _run_scenario(s)\nprint(json.dumps(p, sort_keys=True, separators=(',', ':'), allow_nan=False))""",

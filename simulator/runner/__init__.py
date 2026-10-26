@@ -3809,8 +3809,9 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         item.get("method") == "extrapolated_first_order_ln_gamma"
         for item in items
     )
-    bridged = any(
-        item.get("method") == "same_composition_T_bridge" for item in items
+    nearest_neighbor = any(
+        item.get("method") == "nearest_converged_temperature_neighbor"
+        for item in items
     )
     projected = any(
         item.get("method") == "projected_composition_solve" for item in items
@@ -3822,16 +3823,23 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         item.get("code") == "hold_last_certified_effective_gamma"
         for item in items
     )
+    far_anchor = next(
+        (
+            str(item.get("message"))
+            for item in items
+            if item.get("method") == "nearest_converged_temperature_neighbor"
+            and "schedule-derived" in str(item.get("message", ""))
+        ),
+        None,
+    )
     if projected:
         prediction = "projected-composition extrapolated predictions"
-        if bridged:
-            prediction += ", with a temperature bridge on the projected composition"
-    elif bridged:
-        prediction = "same-composition temperature-bridge predictions"
+        if nearest_neighbor:
+            prediction += ", using the nearest solved temperature neighbour"
+    elif nearest_neighbor:
+        prediction = "nearest same-composition temperature-neighbour predictions"
         if first_order or frozen:
-            prediction += (
-                ", with a capped ln-gamma continuation where the bridge had no points"
-            )
+            prediction += ", with certified-gamma continuation where no neighbour solved"
     elif first_order or frozen:
         prediction = "first-order ln-gamma extrapolated predictions"
         if frozen:
@@ -3840,6 +3848,8 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         prediction = "held effective-gamma/table extrapolated predictions"
     else:
         prediction = "a constant-gamma extrapolated prediction"
+    if far_anchor:
+        prediction += f"; {far_anchor}"
     return (
         f"**High-temperature melt activity**: OpenIMCC refusal `{reason}` "
         f"used {prediction} for "
