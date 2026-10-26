@@ -1287,6 +1287,7 @@ class OverheadGasModel:
                 evap_flux.species_kg_hr,
                 float(vapor_pressure_mbar) * 100.0,
                 species_formula_registry=species_formula_registry,
+                include_zero_flow_species=True,
             )
         except MolarMassUnavailable as exc:
             unresolved_species = list(exc.unresolved_species)

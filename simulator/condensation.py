@@ -6242,6 +6242,7 @@ def _flowing_species_partial_pressures_pa(
     *,
     reported_partial_pressures_mbar: Mapping[str, float] | None = None,
     species_formula_registry: Mapping[str, Any] | None = None,
+    include_zero_flow_species: bool = False,
 ) -> dict[str, float]:
     try:
         if not is_declared_real_scalar(
@@ -6292,7 +6293,9 @@ def _flowing_species_partial_pressures_pa(
                 rate_kg_hr = float(raw_rate_kg_hr)
             except (TypeError, ValueError):
                 continue
-            if not math.isfinite(rate_kg_hr) or rate_kg_hr <= 0.0:
+            if not math.isfinite(rate_kg_hr):
+                continue
+            if rate_kg_hr <= 0.0 and not include_zero_flow_species:
                 continue
             species_id = str(species)
             try:
@@ -6301,13 +6304,15 @@ def _flowing_species_partial_pressures_pa(
                     species_formula_registry,
                 ).molar_mass_g_per_mol()
             except AccountingError:
-                unresolved_species.append(species_id)
+                if rate_kg_hr > 0.0:
+                    unresolved_species.append(species_id)
                 continue
             if not math.isfinite(molar_mass_g_mol) or molar_mass_g_mol <= 0.0:
-                unresolved_species.append(species_id)
+                if rate_kg_hr > 0.0:
+                    unresolved_species.append(species_id)
                 continue
             molar_flow_by_species[str(species)] = (
-                rate_kg_hr / (molar_mass_g_mol / 1000.0)
+                max(0.0, rate_kg_hr) / (molar_mass_g_mol / 1000.0)
             )
         if unresolved_species:
             raise MolarMassUnavailable(
@@ -6318,6 +6323,10 @@ def _flowing_species_partial_pressures_pa(
             )
         total_molar_flow = sum(molar_flow_by_species.values())
         if total_molar_flow <= 0.0:
+            if include_zero_flow_species:
+                return {
+                    species: 0.0 for species in molar_flow_by_species
+                }
             return {}
         partial_pressures_pa = {
             species: molar_flow / total_molar_flow * pressure_pa

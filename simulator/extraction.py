@@ -1181,23 +1181,32 @@ class ExtractionMixin:
             ('process.cleaned_melt',)
         )
         cleaned_melt_mol: dict[str, float] = {}
+        formula_mass_notices: list[dict[str, str]] = []
         for species, kg in cleaned_melt_kg.items():
-            try:
-                molar_mass = resolve_species_formula(
-                    str(species),
-                    getattr(self, 'species_formula_registry', None),
-                ).molar_mass_g_per_mol()
-            except AccountingError:
-                # Diagnostic-only projection: unresolved formulae remain
-                # absent, matching the previous diagnostic's no-mass behavior.
-                continue
             try:
                 kg_value = float(kg)
             except (TypeError, ValueError):
                 continue
             if kg_value <= 0.0:
                 continue
-            cleaned_melt_mol[str(species)] = kg_value * 1000.0 / molar_mass
+            species_id = str(species)
+            try:
+                molar_mass = resolve_species_formula(
+                    species_id,
+                    getattr(self, 'species_formula_registry', None),
+                ).molar_mass_g_per_mol()
+            except AccountingError as exc:
+                formula_mass_notices.append({
+                    'type': 'typed_notice',
+                    'kind': 'c5_ellingham_cleaned_melt_formula_mass_unavailable',
+                    'refusal_category': 'missing_input',
+                    'site': 'c5_ellingham_ladder.cleaned_melt_mol_projection',
+                    'species': species_id,
+                    'reason': str(exc),
+                    'action': 'omit_from_diagnostic_projection',
+                })
+                continue
+            cleaned_melt_mol[species_id] = kg_value * 1000.0 / molar_mass
         rung_species = tuple(str(oxide) for oxide in step_info.get('species', ()) or ())
 
         ladder_steps = []
@@ -1303,7 +1312,7 @@ class ExtractionMixin:
             if not bool(row.get('voltage_authoritative'))
         }
 
-        return {
+        diagnostic = {
             'schema': 'c5_ellingham_ladder_diagnostic_v1',
             'certification': 'diagnostic_uncertified',
             'authority': 'authoritative_ellingham_graph_with_static_fallback',
@@ -1328,6 +1337,9 @@ class ExtractionMixin:
             'non_authoritative_voltage_by_oxide': non_authoritative_voltage_by_oxide,
             'species': species_rows,
         }
+        if formula_mass_notices:
+            diagnostic['formula_mass_notices'] = formula_mass_notices
+        return diagnostic
 
     def _route_mre_gas_products_to_condensation(
         self,
