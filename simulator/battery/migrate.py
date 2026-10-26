@@ -3236,20 +3236,25 @@ def _convert_density_to_kg_per_m3(
     return None, f"unmapped density unit {units!r}"
 
 
-def _convert_evaporation_rate_to_kg_per_s(
-    value: object, units: str | None
+def _convert_rate_to_kg_per_s(
+    value: object, units: str | None, quantity: Quantity
 ) -> tuple[Decimal | None, str | None]:
+    quantity_label = (
+        "mass loss rate"
+        if quantity is Quantity.MASS_LOSS_RATE
+        else "evaporation rate"
+    )
     amount = _as_dec_or_none(value)
     if amount is None:
-        return None, "evaporation rate value is not numeric"
+        return None, f"{quantity_label} value is not numeric"
     if units is None or not str(units).strip():
-        return None, "missing evaporation rate unit"
+        return None, f"missing {quantity_label} unit"
     unit = re.sub(r"\s+", "", str(units).strip().lower())
     unit = unit.removesuffix("asprinted").replace("^", "")
     unit = unit.replace("−", "-").replace("⁻", "-")
     if unit in {"kg/s", "kg_per_s", "kgs-1"}:
         return amount, "identity:kg_per_s"
-    return None, f"unmapped evaporation rate unit {units!r}"
+    return None, f"unmapped {quantity_label} unit {units!r}"
 
 
 def convert_length_to_m(
@@ -9565,8 +9570,8 @@ def _selection_from_explicit_unit_conversion(
 ) -> SourceSelection | None:
     if quantity is Quantity.DENSITY:
         converted, trail = _convert_density_to_kg_per_m3(amount, units)
-    elif quantity is Quantity.EVAPORATION_RATE:
-        converted, trail = _convert_evaporation_rate_to_kg_per_s(amount, units)
+    elif quantity in {Quantity.EVAPORATION_RATE, Quantity.MASS_LOSS_RATE}:
+        converted, trail = _convert_rate_to_kg_per_s(amount, units, quantity)
     else:
         return None
     if converted is None:
@@ -10253,8 +10258,47 @@ def _selection_from_named_field(
     if isinstance(raw_range, (list, tuple)) and len(raw_range) >= 2:
         lo, hi = _as_dec_or_none(raw_range[0]), _as_dec_or_none(raw_range[1])
         if lo is not None and hi is not None:
+            field_name = range_key or "range"
+            if q_token in {
+                Quantity.DENSITY,
+                Quantity.EVAPORATION_RATE,
+                Quantity.MASS_LOSS_RATE,
+            }:
+                source_units = _printed_unit_for_field(payload, field_name) or units
+                lo_selection = _selection_from_explicit_unit_conversion(
+                    lo,
+                    field_name,
+                    q_token,
+                    source_units,
+                    payload,
+                    condition_ranges,
+                )
+                hi_selection = _selection_from_explicit_unit_conversion(
+                    hi,
+                    field_name,
+                    q_token,
+                    source_units,
+                    payload,
+                    condition_ranges,
+                )
+                assert lo_selection is not None and hi_selection is not None
+                if lo_selection.value.kind is not ValueKind.POINT:
+                    return lo_selection
+                if hi_selection.value.kind is not ValueKind.POINT:
+                    return hi_selection
+                assert lo_selection.amount is not None and hi_selection.amount is not None
+                return replace(
+                    _interval_selection(
+                        lo_selection.amount,
+                        hi_selection.amount,
+                        field_name,
+                        payload,
+                        condition_ranges,
+                    ),
+                    unit_trail=lo_selection.unit_trail,
+                )
             return _interval_selection(
-                lo, hi, range_key or "range", payload, condition_ranges
+                lo, hi, field_name, payload, condition_ranges
             )
     return None
 
@@ -17018,15 +17062,35 @@ class Migrator:
                             "locator",
                             "composition_basis",
                         }
-                        has_numeric_value = point_value.available or any(
-                            key not in condition_fields
-                            and not str(key).endswith("_as_printed")
-                            and not (
-                                str(key).startswith("N_")
-                                and raw.get("composition_basis") == "mole_fraction"
+                        raw_range = raw.get("range")
+                        has_numeric_range = (
+                            q_token
+                            in {
+                                Quantity.DENSITY,
+                                Quantity.EVAPORATION_RATE,
+                                Quantity.MASS_LOSS_RATE,
+                            }
+                            and isinstance(raw_range, (list, tuple))
+                            and len(raw_range) >= 2
+                            and all(
+                                _as_dec_or_none(bound) is not None
+                                for bound in raw_range[:2]
                             )
-                            and _numeric_field(raw, str(key)) is not None
-                            for key in raw
+                        )
+                        has_numeric_value = (
+                            point_value.available
+                            or has_numeric_range
+                            or any(
+                                key not in condition_fields
+                                and not str(key).endswith("_as_printed")
+                                and not (
+                                    str(key).startswith("N_")
+                                    and raw.get("composition_basis")
+                                    == "mole_fraction"
+                                )
+                                and _numeric_field(raw, str(key)) is not None
+                                for key in raw
+                            )
                         )
                         if not has_numeric_value:
                             point_locator = (
