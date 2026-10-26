@@ -4191,12 +4191,17 @@ def test_g08_model_derived_keeps_table_destination(tmp_path: Path) -> None:
 
 def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
-    extract["species"]["Na"]["observations"][0]["values"]["method_class"] = "model_derived"
-    extract["species"]["Na"]["observations"][0]["values"].pop("series", None)
+    values = extract["species"]["Na"]["observations"][0]["values"]
+    values["method_class"] = "model_derived"
+    values.pop("series", None)
+    values["pressure_atm"] = 1.0
+    values["admission_status"] = "typed_refusal"
     root = _write_min_tree(tmp_path, extract)
     result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
     assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.admission.status is AdmissionStatus.REJECTED
     assert not obs.derived_from
     assert obs.derivation is None
     report = validate_corpus(
@@ -4213,6 +4218,43 @@ def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -
     assert any(
         "derived_from" in (e.axes or ()) or "derivation" in (e.axes or ())
         for e in result.queue
+    )
+
+
+def test_unavailable_model_derived_value_keeps_supplied_derivation_references(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    values = row["values"]
+    row["type"] = "rate_series"
+    row["units"] = "mol/s/m2 as printed"
+    values.pop("series", None)
+    values.update(
+        {
+            "quantity": "evaporation_rate",
+            "method_class": "model_derived",
+            "evaporation_rate": "4.6e-06",
+            "derivation": {
+                "relation": "explicit source calculation",
+                "inputs": ["pdf:missing-model-output"],
+                "parameters": [],
+                "output_unit": "kg/s",
+            },
+        }
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.UNAVAILABLE
+    assert observation.derivation is not None
+    assert observation.derivation.relation == "explicit source calculation"
+    assert observation.derivation.inputs == ("pdf:missing-model-output",)
+    assert result.validation is not None
+    assert any(
+        issue.path == f"observation[{observation.observation_id}].derivation.inputs"
+        and issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        for issue in result.validation.hard_issues
     )
 
 
@@ -13549,6 +13591,39 @@ def test_shaw_lms1_quoted_density_is_attributed_context(tmp_path: Path) -> None:
     assert row["values"]["attribution"].startswith("Isachenkov et al. 2022")
     assert row["values"]["value_as_published"] == "3.03 g/cm3"
     assert row["values"]["density_kg_m3"] == 3030
+
+
+def test_shaw_hkl_unavailable_points_do_not_require_derivation(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "sublimation-kinetics-2023-minerals.yaml", write=False
+    )
+    parent_ids = (
+        "shaw_2023_table2_fe_hkl_flux",
+        "shaw_2023_table2_na_hkl_flux",
+        "shaw_2023_table2_k_hkl_flux",
+    )
+    points = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            observation.observation_id.startswith(
+                f"sublimation-kinetics-2023-minerals::{parent_id}::"
+            )
+            for parent_id in parent_ids
+        )
+    ]
+    assert len(points) == 21
+    assert all(point.value.kind is ValueKind.UNAVAILABLE for point in points)
+    assert all(point.derivation is None for point in points)
+    derivation_paths = {
+        f"observation[{point.observation_id}].derivation" for point in points
+    }
+    assert result.validation is not None
+    assert not any(
+        issue.path in derivation_paths for issue in result.validation.hard_issues
+    )
 
 
 def test_real_condensed_density_points_are_at_least_100_kg_per_m3(
