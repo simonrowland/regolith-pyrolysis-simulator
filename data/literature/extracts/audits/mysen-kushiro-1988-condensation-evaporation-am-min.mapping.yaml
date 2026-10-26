@@ -21,7 +21,8 @@ tables:
         value_column: 7
     temperature: {column: 2, unit: C}
     attribution: Table 1 reports wt% derived from measured mass loss; starting mass is not tabulated.
-    schema_gap: Printed single-component Ag/Cu material is retained as point-condition composition; the existing identity path does not promote printed_species_formula for mass-loss rows.
+    schema_gap: Identity.composition remains unknown on the three pure-metal rows because pure-metal single-component composition has no supported identity path (pure_oxide_system would mislabel); the printed species formula remains in each point condition.
+    calibration_note: Table 1 reports the rate studies used to calibrate the pressure-correction factor with liquid Cu and Ag (page 3, Experimental methods).
   - page: 4
     table_index: 2
     type: mass_loss

@@ -23,6 +23,18 @@ def test_mysen_kushiro_1988_tables_and_migrated_percent_pins() -> None:
         record for record in species["Mg2SiO4"]["context"]
         if record["observation_id"].endswith("table5_mg2sio4_thermochemical_fits_typed_refused")
     )
+    t3 = next(
+        record for block in species.values() for record in block["context"]
+        if record["observation_id"].endswith("table3_silica_phase_compositions_typed_refused")
+    )
+    t4 = next(
+        record for block in species.values() for record in block["context"]
+        if record["observation_id"].endswith("table4_sio2_si_preliminary_runs_typed_refused")
+    )
+    t6_context = next(
+        record for block in species.values() for record in block["context"]
+        if record["observation_id"].endswith("table6_forsterite_totals_and_atomic_proportions")
+    )
     t5_640 = next(row for row in t5["values"]["rows"] if row["delta_Hv_kJ_mol_as_printed"] == "640")
 
     assert len(t1["values"]["points"]) == 2
@@ -45,6 +57,12 @@ def test_mysen_kushiro_1988_tables_and_migrated_percent_pins() -> None:
     assert t6["values"]["points"][0]["SiO2_wt_pct"] == "41.56"
     assert t6["values"]["points"][0]["P_H2_as_printed"] == "1.8 × 10^-9 bar"
     assert t6["values"]["points"][0]["locator"]["page"] == 9
+    assert len(t3["values"]["sample_conditions"]) == 4
+    assert len(t3["values"]["weight_percent_rows"]) == 5
+    assert len(t3["values"]["atomic_proportion_rows"]) == 4
+    assert len(t4["values"]["rows"]) == 4
+    assert len(t6_context["values"]["analytical_totals"]) == 3
+    assert len(t6_context["values"]["atomic_proportions"]) == 3
     assert t5_640["delta_Hv_as_printed"] == "640 ± 36"
     assert t5_640["delta_Hv_uncertainty_kJ_mol_as_printed"] == "36"
     assert t5_640["secondary_reference_note"].startswith("Costa et al. (2017), Table 4")
@@ -56,7 +74,11 @@ def test_mysen_kushiro_1988_tables_and_migrated_percent_pins() -> None:
         if record["observation_id"].startswith("mysen_kushiro_1988_table5_")
     ) == 8
     assert document["extraction"]["figure_read_candidates"][0]["figure"] == "3"
-    assert document["extraction"]["schema_gaps"][0]["locator"]["table"] == "1"
+    gap = document["extraction"]["schema_gaps"][0]
+    assert gap["locator"]["table"] == "1"
+    assert gap["issue"].endswith("pure_oxide_system would mislabel).")
+    assert "calibrated with liquid Cu and Ag" in gap["calibration_note"]
+    assert gap["calibration_locator"]["page"] == 3
 
     migrator = Migrator(root=REPO_ROOT)
     migrator._migrate_extract(EXTRACT)

@@ -15,8 +15,13 @@ extraction:
     candidate: SiO2 vapor-pressure points
     status: not digitized in this extraction
   schema_gaps:
-  - issue: Table 1 prints the pure Ag and Cu starting species, but the migrator only promotes a one-component composition_mol map to Identity with the pure_oxide_system basis. The printed_species_formula compositions stay in the point conditions.
-    handling: Preserve the printed species formula in each point condition; do not label the metal runs as an oxide system.
+  - issue: Identity.composition is unknown on the three Table 1 Ag/Cu observations because pure-metal single-component composition has no supported identity path (pure_oxide_system would mislabel).
+    handling: Preserve the printed species formula in each point condition and leave Identity.composition unknown with this reason; do not label the metal runs as an oxide system.
+    calibration_note: The authors state that the present system was calibrated with liquid Cu and Ag, and that the rate studies appear in Table 1.
+    calibration_locator:
+      page: 3
+      pdf_page_index: 2
+      section: Experimental methods, pressure correction
     locator:
       page: 3
       pdf_page_index: 2
@@ -3086,7 +3091,7 @@ species:
         page: 6
         pdf_page_index: 5
         table: '3'
-        note: TABLE 3. Chemical compositions, SiO2 system; 10 printed data lines across four analyses.
+        note: TABLE 3. Chemical compositions, SiO2 system; 9 printed data rows across four analyses (5 weight-percent rows and 4 atomic-proportion rows).
       units: wt% and atomic proportions
       candidate_quantities:
       - equilibrium_phase_composition
