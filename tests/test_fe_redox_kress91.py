@@ -78,6 +78,24 @@ def test_legacy_iw_current_outputs_are_bit_identical_at_pinned_temperatures() ->
         assert diagnostic["iw_log"].hex() == expected
 
 
+def test_legacy_iw_nonfinite_outputs_match_green_pins() -> None:
+    """Pin the distinct nonfinite results from origin/work-v064-green."""
+    expected = (
+        (math.nan, "0x0.0p+0", "-0x1.2000000000000p+3"),
+        (math.inf, "0x0.0p+0", "0x1.a47ae147ae148p+2"),
+        (-math.inf, "-0x1.2000000000000p+3", "-0x1.2000000000000p+3"),
+    )
+    for temperature_K, intrinsic_hex, diagnostic_hex in expected:
+        intrinsic = intrinsic_melt_fO2({"FeO": 1.0}, temperature_K)
+        assert intrinsic.hex() == intrinsic_hex
+        diagnostic = PyrolysisSimulator._compute_fe_redox_split_diagnostic(
+            _no_iron_redox_diagnostic_sim(),
+            temperature_K,
+        )
+        assert diagnostic["iw_log"].hex() == diagnostic_hex
+        assert diagnostic["native_fe_saturation"] is True
+
+
 def test_legacy_iw_callers_use_the_shared_owner(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

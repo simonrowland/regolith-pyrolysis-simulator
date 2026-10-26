@@ -23,9 +23,9 @@ def legacy_iw_log10_fO2_bar(
     *,
     vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
-    """Return the legacy IW log-fugacity line, flooring nonpositive T."""
+    """Return the legacy IW line, flooring T unless it is strictly positive."""
     temperature = float(temperature_K)
-    if temperature <= 0.0:
+    if not (temperature > 0.0):
         return math.log10(vacuum_floor_bar)
     return -27215.0 / temperature + 6.57
 
@@ -47,9 +47,13 @@ def intrinsic_melt_fO2(
     alkali = max(0.0, float(composition_wt_pct.get("Na2O", 0.0))) + max(
         0.0, float(composition_wt_pct.get("K2O", 0.0))
     )
-    log_iw = legacy_iw_log10_fO2_bar(
-        temperature,
-        vacuum_floor_bar=vacuum_floor_bar,
+    log_iw = (
+        temperature
+        if math.isnan(temperature)
+        else legacy_iw_log10_fO2_bar(
+            temperature,
+            vacuum_floor_bar=vacuum_floor_bar,
+        )
     )
     redox_offset = 0.0
     if feo > 0.0 and fe2o3 > 0.0:
