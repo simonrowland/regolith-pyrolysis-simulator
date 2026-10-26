@@ -621,10 +621,12 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     assert engagement["total_count"] >= 0
     assert engagement["engaged"] == (engagement["total_count"] > 0)
 
-    # Rebaselined 2026-10-26 for b-1028; sha256 c4756d389c417613353a48b60da4d33d5a163390c6592300eb3e4a4b0d546532.
-    # b-1028 metadata delta: 88 flux_dormant and 88 is_flux_dormant_by_epoch
-    # true->false leaves, 47 channel-state dormancy->refusal leaves, and two
-    # refusal notes (Bi/P2O5_gas); no physical values moved.
+    # Rebaselined 2026-10-26 for b-813 and b-1028; sha256 c4756d389c417613353a48b60da4d33d5a163390c6592300eb3e4a4b0d546532.
+    # b-1028: 88 flux_dormant and 88 is_flux_dormant_by_epoch true->false,
+    # 47 channel-state dormancy->refusal leaves, two refusal notes, counts
+    # 5->7 / 2->4. b-813: 611 extrapolation_notice and 21
+    # extrapolation_notices_by_species blocks (5,565 leaves; 2,472 numeric
+    # diagnostic leaves). No existing physical value moved.
     # Prior cumulative typed diff: 1 d-195, 27,533 d-045, 195,428 d-252, 0 unexplained.
     # C0 exits at h5 instead of h19; the 24 h regenerated trajectory reaches C3_NA and C4.
     # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
