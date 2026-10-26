@@ -2701,6 +2701,7 @@ def test_provider_short_circuits_on_empty_reagent(
 # t-409 review P2 (2026-07-21): measured 1503.4 s vs the 1541 ceiling =
 # 2.4%% headroom; resized to the pyrolysis-track class ceiling at the
 # C4/C6 expectation re-baseline.
+@pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(3600)
 @pytest.mark.live_engine

@@ -441,12 +441,9 @@ class EquilibriumMixin:
         vapor_pressure_authority_limits = {}
         warnings = []
         antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
-        # b-149 instance 3: typed notes on the `_sz_omit` paths in this
-        # method (missing activity, activity-threshold skip, P <= 1e-15 Pa).
-        # Those omissions keep status='ok' with a note. Other continues in
-        # this method (inactive row, missing parent, A<=0, oxide-vapor
-        # outside valid_range_K) omit without a typed silent-zero note.
+        # Typed notes accompany species omissions on this status='ok' path.
         from simulator.silent_zero import (
+            CATEGORY_MARK,
             CATEGORY_PROVEN_ZERO,
             CATEGORY_REFUSE,
             ZeroBecause,
@@ -521,6 +518,21 @@ class EquilibriumMixin:
                     f'proven-small zero)'
                 ),
                 category=CATEGORY_PROVEN_ZERO,
+            )
+
+        def _sz_missing_antoine_intercept(
+            species_id: str,
+            reason: str,
+        ) -> None:
+            _sz_omit(
+                species_id,
+                ZeroBecause.MISSING_COEFFICIENT,
+                field='antoine.A',
+                detail=(
+                    f'{reason}; species omitted from '
+                    'vapor_pressures_Pa while status=ok'
+                ),
+                category=CATEGORY_REFUSE,
             )
 
         pseudo_warning_seen = getattr(
@@ -615,12 +627,42 @@ class EquilibriumMixin:
             n_M, n_ox = ellingham_stoichiometry(species)
             sp_data = metals_data.get(species, {})
             if not sp_data:
+                _sz_omit(
+                    species,
+                    ZeroBecause.MISSING_THERMO,
+                    field='metal_row',
+                    detail=(
+                        'metal species row is missing or empty; species '
+                        'omitted from vapor_pressures_Pa while status=ok'
+                    ),
+                    category=CATEGORY_REFUSE,
+                )
                 continue
             if str(sp_data.get('consumer_status', '')).lower() == 'inactive':
+                _sz_omit(
+                    species,
+                    ZeroBecause.REFUSED_UPSTREAM,
+                    field='consumer_status',
+                    detail=(
+                        "consumer_status='inactive'; species omitted from "
+                        "vapor_pressures_Pa while status=ok"
+                    ),
+                    category=CATEGORY_REFUSE,
+                )
                 continue
 
             parent_oxide = sp_data.get('parent_oxide', '')
             if not parent_oxide:
+                _sz_omit(
+                    species,
+                    ZeroBecause.MISSING_THERMO,
+                    field='parent_oxide',
+                    detail=(
+                        'metal row has no parent_oxide; species omitted from '
+                        'vapor_pressures_Pa while status=ok'
+                    ),
+                    category=CATEGORY_REFUSE,
+                )
                 continue
 
             # --- Pressure reference rail ---
@@ -691,12 +733,20 @@ class EquilibriumMixin:
                     coefficient_block,
                     temperature_K=T_K,
                 ):
-                    warnings.append(
+                    omission_notice = (
                         "non_certifying_vapor_pressure_fallback_omitted: "
                         f"species={species} "
                         f"fit_target={FIT_TARGET_PSEUDO_VAPOROCK} "
                         f"residual_dex={_metadata_value(sp_data, 'residual_dex')} "
                         f"confidence_tier={_metadata_value(sp_data, 'confidence_tier')}"
+                    )
+                    warnings.append(omission_notice)
+                    _sz_omit(
+                        species,
+                        ZeroBecause.REFUSED_UPSTREAM,
+                        field='valid_range_K',
+                        detail=omission_notice,
+                        category=CATEGORY_REFUSE,
                     )
                     continue
                 if bool(sp_data.get("interval_required")):
@@ -715,6 +765,7 @@ class EquilibriumMixin:
                                 species=species,
                                 field="P_reference_Antoine_Pa",
                             )
+                        reason = _antoine_skip_reason_for_refusal(exc)
                         _append_antoine_skip_notice(
                             warnings,
                             antoine_skip_notice_keys,
@@ -722,8 +773,9 @@ class EquilibriumMixin:
                             species=species,
                             site="equilibrium.internal_analytical.metal_antoine",
                             temperature_K=T_K,
-                            reason=_antoine_skip_reason_for_refusal(exc),
+                            reason=reason,
                         )
+                        _sz_missing_antoine_intercept(species, reason)
                         continue
                     if T_K <= 300.0:
                         continue
@@ -763,13 +815,21 @@ class EquilibriumMixin:
                     and len(certified_range) == 2
                     and T_K < float(certified_range[0])
                 ):
-                    warnings.append(
+                    omission_notice = (
                         "metal_vapor_pressure_out_of_source_certified_range: "
                         f"species={species} consumer=legacy_condensed_rail "
                         f"temperature_K={T_K:.3f} "
                         "source_certified_range_K="
                         f"[{float(certified_range[0]):g}, "
                         f"{float(certified_range[1]):g}]"
+                    )
+                    warnings.append(omission_notice)
+                    _sz_omit(
+                        species,
+                        ZeroBecause.REFUSED_UPSTREAM,
+                        field='source_certified_range_K',
+                        detail=omission_notice,
+                        category=CATEGORY_REFUSE,
                     )
                     continue
                 if reconstructed_vapor_limit is None:
@@ -889,6 +949,7 @@ class EquilibriumMixin:
                                 "P_reference_liquid_oxide_standard_reaction_Pa"
                             ),
                         )
+                    reason = _antoine_skip_reason_for_refusal(exc)
                     _append_antoine_skip_notice(
                         warnings,
                         antoine_skip_notice_keys,
@@ -899,8 +960,9 @@ class EquilibriumMixin:
                             "liquid_oxide_antoine"
                         ),
                         temperature_K=T_K,
-                        reason=_antoine_skip_reason_for_refusal(exc),
+                        reason=reason,
                     )
+                    _sz_missing_antoine_intercept(species, reason)
                     continue
                 if T_K <= 300.0:
                     continue
@@ -997,6 +1059,7 @@ class EquilibriumMixin:
                                 "P_reference_gas_rail_standard_reaction_Pa"
                             ),
                         )
+                    reason = _antoine_skip_reason_for_refusal(exc)
                     _append_antoine_skip_notice(
                         warnings,
                         antoine_skip_notice_keys,
@@ -1004,8 +1067,9 @@ class EquilibriumMixin:
                         species=species,
                         site="equilibrium.internal_analytical.gas_rail_antoine",
                         temperature_K=T_K,
-                        reason=_antoine_skip_reason_for_refusal(exc),
+                        reason=reason,
                     )
+                    _sz_missing_antoine_intercept(species, reason)
                     continue
                 if T_K <= 300.0:
                     continue
@@ -1242,6 +1306,17 @@ class EquilibriumMixin:
             numerator = K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar
 
             if numerator <= 0:
+                _sz_omit(
+                    species,
+                    ZeroBecause.PROVEN_BELOW_THRESHOLD,
+                    field='metal_activity_numerator',
+                    detail=(
+                        f'metal activity numerator={numerator!r} <= 0; no '
+                        'positive metal activity is available, so the species '
+                        'is omitted from vapor_pressures_Pa while status=ok'
+                    ),
+                    category=CATEGORY_PROVEN_ZERO,
+                )
                 continue
 
             metal_activity_root = numerator ** (1.0 / n_M)
@@ -1360,6 +1435,7 @@ class EquilibriumMixin:
                         species=str(name),
                         field="P_sat",
                     )
+                reason = _antoine_skip_reason_for_refusal(exc)
                 _append_antoine_skip_notice(
                     warnings,
                     antoine_skip_notice_keys,
@@ -1370,8 +1446,9 @@ class EquilibriumMixin:
                         "oxide_vapor_antoine"
                     ),
                     temperature_K=T_K,
-                    reason=_antoine_skip_reason_for_refusal(exc),
+                    reason=reason,
                 )
+                _sz_missing_antoine_intercept(str(name), reason)
                 continue
             valid = data.get('valid_range_K', [0, 9999])
 
@@ -1383,6 +1460,17 @@ class EquilibriumMixin:
                     field="P_sat",
                 )
             else:
+                _sz_omit(
+                    str(name),
+                    ZeroBecause.OUT_OF_DOMAIN_MARKED,
+                    field='valid_range_K',
+                    detail=(
+                        f'temperature_K={T_K!r} is outside valid_range_K '
+                        f'[{valid[0]!r}, {valid[1]!r}]; species omitted from '
+                        'vapor_pressures_Pa while status=ok'
+                    ),
+                    category=CATEGORY_MARK,
+                )
                 continue
 
             parent_oxide = data.get('parent_oxide', '')
@@ -1484,10 +1572,8 @@ class EquilibriumMixin:
                 consumer='legacy-equilibrium-fallback',
             ),
         }
-        # b-149: merge notes collected on the `_sz_omit` paths. This
-        # completed path sets status='ok'; invalid T/P already returned
-        # out_of_domain above. Oxide-vapor valid_range_K misses remain
-        # un-noted on this path.
+        # This completed path sets status='ok'; invalid T/P already returned
+        # out_of_domain above. Merge every typed omission note into its result.
         if silent_zero_notes:
             merge_notes_into_mapping(_eq_diagnostics, silent_zero_notes)
         return EquilibriumResult(
