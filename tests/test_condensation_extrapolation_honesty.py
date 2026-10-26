@@ -299,21 +299,52 @@ def _rh03_run(hours):
 
 
 @pytest.mark.parametrize("hours", [2, 24])
-def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
+def test_predict_flag_rh03_recipe_completes_with_public_flags(hours, monkeypatch):
+    import copy
+    from simulator.core import PyrolysisSimulator
     from simulator.run_executor import RunExecutor
 
+    diagnostics = []
+    step = PyrolysisSimulator.step
+
+    def observe_step(sim):
+        result = step(sim)
+        diagnostics.append(copy.deepcopy(sim._last_evaporation_flux_diagnostic))
+        return result
+
+    monkeypatch.setattr(PyrolysisSimulator, "step", observe_step)
     run = _rh03_run(hours)
     execution = RunExecutor().execute(run._session_config())
     assert execution.status == "ok", execution.error_message
     assert len(execution.snapshots) == hours
     document = run._build_output(execution)
-    for row in document["per_hour_summary"]:
-        if row["T_C"] == 2200.0:
-            melt_notice = row["vapour_batch_summary"]["metadata"]["extrapolation_notices_by_species"]["SiO"]
-            assert melt_notice["authority_level"] == "extrapolated"
-            assert melt_notice["temperature_K"] == 2473.15
-            assert melt_notice["valid_range_K"] == [1400.0, 2273.15]
+    assert len(diagnostics) == hours
+    aggregate_continuum_notice = []
+    expected_transport = {}
+    for row, diagnostic in zip(document["per_hour_summary"], diagnostics):
+        assert row["T_C"] == 2200.0
+        melt_notice = row["vapour_batch_summary"]["metadata"]["extrapolation_notices_by_species"]["SiO"]
+        assert melt_notice["authority_level"] == "extrapolated"
+        assert melt_notice["temperature_K"] == 2473.15
+        assert melt_notice["valid_range_K"] == [1400.0, 2273.15]
+        # Wall notices persist across hours; compare their full publication
+        # scope with actual aggregate diagnostics over the same prefix.
+        if notice := diagnostic.get("continuum_extrapolation_notice"):
+            aggregate_continuum_notice.append(notice)
+            for species, series in diagnostic["evaporation_series_resistance"].items():
+                if transport_notice := series.get("continuum_extrapolation_notice"):
+                    expected_transport.setdefault(species, []).append(transport_notice)
+            for species, refusal in diagnostic.get("missing_transport_parameters", {}).items():
+                expected_transport.setdefault(species, []).append({
+                    **refusal, "temperature_K": notice["gas_temperature_K"],
+                })
         wall = row["vapour_batch_summary"]["metadata"]["wall_deposit_sticking_authority"]
+        assert ("evaporation_transport_notices_by_species" in wall) == bool(aggregate_continuum_notice)
+        transport = wall.get("evaporation_transport_notices_by_species", {})
+        assert transport.keys() == expected_transport.keys()
+        for species, records in transport.items():
+            assert all(record in expected_transport[species] for record in records.values())
+            assert all(record in records.values() for record in expected_transport[species])
         assert wall["authoritative_for_coating"] is False
         assert wall["wall_saturation_pressure_extrapolations_by_species"]["Mg"]
         refused = wall["wall_saturation_pressure_refusals_by_species"]
@@ -337,19 +368,13 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
     if hours == 24:
         assert not any(record.get("refusal_type") == "DepositionInputRefusal"
                        for records in refused.values() for record in records.values())
-        transport = wall["evaporation_transport_notices_by_species"]
-        assert transport["SiO"]["evaporation"]["authority_level"] == "extrapolated"
-        assert "Kn < 0.01" in transport["SiO"]["evaporation"]["model_domain"]
-        assert transport["Si"]["evaporation"]["authority_level"] == "unavailable"
-        assert transport["Si"]["evaporation"]["refusal_type"] == "EvaporationFluxConfigurationError"
     pareto = document["run_metadata"]["pressure_coating_pareto_diagnostic"]["by_species"]
     assert pareto["Mg"]["authority_level"] == "extrapolated"
     assert pareto["Na"]["status"] == "unavailable"
     assert pareto["Al2"]["status"] == "unavailable"
     assert pareto["SiO"]["vapour_pressure_extrapolation_notice"]["authority_level"] == "extrapolated"
-    if hours == 24:
-        assert pareto["SiO"]["evaporation_transport_notices"] == transport["SiO"]
-        assert pareto["Si"]["evaporation_transport_notices"] == transport["Si"]
+    for species, records in transport.items():
+        assert pareto[species]["evaporation_transport_notices"] == records
 
 
 @pytest.mark.parametrize("all_missing", [False, True], ids=["partial", "all"])
