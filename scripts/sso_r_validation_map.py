@@ -480,6 +480,9 @@ def run_row(
     dose_result = _apply_dose(sim, dose_kg=dose_kg)
 
     sim.melt.campaign = CampaignPhase.C2A_STAGED
+    # This point diagnostic measures contamination of an exposed SiO collector;
+    # it does not execute the campaign's early-alkali diversion trajectory.
+    sim.campaign_mgr.overrides["C2A_staged"] = {"stage3_route": "through"}
     sim.melt.temperature_C = float(temperature_C)
     sim.melt.target_temperature_C = float(temperature_C)
     _configure_gas_state(sim, gas)

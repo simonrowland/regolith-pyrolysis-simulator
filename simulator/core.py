@@ -15387,7 +15387,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 # Roll back quantities, but retain the reason the wall channel refused.
                 if wall_refusals:
-                    self._condensation_model.last_sticking_alpha_provenance_notice[
+                    model = self._condensation_model
+                    if model is None:
+                        model = self.condensation_model
+                    model.last_sticking_alpha_provenance_notice[
                         'wall_saturation_pressure_refusals_by_species'
                     ] = wall_refusals
             elif committed_transition_count:

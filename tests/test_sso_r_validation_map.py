@@ -27,13 +27,16 @@ CONFIGURED_GOLDEN_PATH = Path(
 CONFIGLESS_GOLDEN_PATH = Path(
     "tests/goldens/sso_r_validation_map_lunar_mare_low_ti_configless.json"
 )
-# Confirmed inside pytest on Mac-Studio-256-2 at green pins.
+# Pool/escape anchors confirmed inside pytest on Mac-Studio-256-2 at green pins;
+# the c3 route-dependent receipt is derived below.
 CONFIGURED_OWNER_PN2_ANCHORS = {
     "native_fe_pool_mol": 1572.6800886957762,
     "native_fe_tap_mol": 1570.5846976173568,
     "native_fe_vapor_mol": 2.095391078419451,
     "native_fe_vapor_escape_fraction_of_pool": 0.0013323695603962018,
-    "stage_3_Fe_wt_pct": 0.04224433363512624,
+    # c3: the exposed native-Fe parcel arrives first; the subsequent alkali-rich
+    # SiO parcel is refused, leaving a Fe-only receipt (100 wt%, no SiO2).
+    "stage_3_Fe_wt_pct": 100.0,
     "SiO_provider_pO2_bar": 1e-09,
     "SiO_flux_kg_hr": 0.0279267607515389,
 }
@@ -41,7 +44,7 @@ CONFIGURED_OWNER_PN2_ANCHORS = {
 # come from the gate liquid-fraction path.
 CONFIGLESS_FALLBACK_NOT_CANONICAL = {
     "native_fe_pool_mol": 1576.0114767733974,
-    "stage_3_Fe_wt_pct": 0.0121860033141556,
+    "stage_3_Fe_wt_pct": 100.0,
 }
 
 _SMOKE_FREEZE_GATE_CURVE_RECORDS = []
@@ -632,6 +635,7 @@ def test_owner_pn2_anchor_reports_current_certification_state(
     assert owner["stage_3_Fe_wt_pct"] == pytest.approx(
         expected_stage_3_Fe_wt_pct, rel=0.0, abs=1.0e-15
     )
+    assert owner["stage_3_SiO2_capture_kg"] == 0.0
     assert owner["ferric_divergence_material"] is False
     assert abs(owner["mass_balance_error_pct"]) <= 5e-12
     assert owner["SiO_provider_pO2_bar"] == pytest.approx(

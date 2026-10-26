@@ -1704,7 +1704,7 @@ class CampaignManager:
         if campaign in (CampaignPhase.C3_NA, CampaignPhase.C3_K):
             substage = 'Na_phase' if campaign == CampaignPhase.C3_NA else 'K_phase'
             command = cfg.get(substage, {}).get('stage3_route', command)
-        elif campaign == CampaignPhase.C2A_STAGED:
+        elif campaign == CampaignPhase.C2A_STAGED and 'stages' in cfg:
             stage = self._c2a_staged_active_stage(melt.campaign_hour)
             if stage:
                 substage = self._c2a_staged_stage_label(stage)

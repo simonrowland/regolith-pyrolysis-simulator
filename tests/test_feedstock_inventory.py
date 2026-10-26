@@ -1702,12 +1702,13 @@ def test_credit_line_k_product_route_is_removed_from_vapor_denominator():
         0.0,
     ) > 0.0
 
-    route_result = SimpleNamespace(
+    from simulator.condensation import CondensationRouteResult
+
+    route_result = CondensationRouteResult(
         remaining_by_species={"K": 0.0},
         wall_route_species_order=("K",),
         wall_deposit_fraction_by_species={"K": 0.0},
         wall_deposit_account_fractions_by_species={"K": {}},
-        condensed_for_species=lambda species: 0.01 if species == "K" else 0.0,
         condensed_by_stage_species={4: {"K": 0.01}},
         impurity_by_stage_species={4: {}},
     )
