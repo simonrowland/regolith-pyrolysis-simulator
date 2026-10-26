@@ -739,6 +739,21 @@ class IdentityEqualOutcome:
         return self.kind is IdentityEqualKind.EQUAL
 
 
+def _format_enthalpy_increment_subtype(
+    reference_temperature_K: Decimal,
+    *,
+    reference_phase: str | None = None,
+    reference_polymorph: str | None = None,
+) -> str:
+    temperature_text = format(as_decimal(reference_temperature_K).normalize(), "f")
+    subtype = f"H(T)-H({temperature_text} K)"
+    if reference_phase:
+        subtype += f"; reference phase: {reference_phase}"
+    if reference_polymorph:
+        subtype += f"; reference polymorph: {reference_polymorph}"
+    return subtype
+
+
 def profile_for(identity: Identity) -> QuantityProfile:
     """Closed compared-axis profile for the declared quantity.
 

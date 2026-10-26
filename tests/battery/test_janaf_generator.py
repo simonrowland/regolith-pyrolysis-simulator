@@ -972,6 +972,13 @@ def test_printed_rounding_checks_flag_broken_rows_without_dropping_points() -> N
     healthy_doc = load_table_document(TABLES_DIR / "Al-006.yaml")
     healthy = generator.generate_table(healthy_doc)
     assert healthy.report["transcription_identity_failures"] == []
+    enthalpy_rows = _quantity_observations(healthy, Quantity.H_MINUS_H298)
+    assert enthalpy_rows
+    assert all(
+        observation.identity.subtype is not None
+        and observation.identity.subtype.value == "H(T)-H(298.15 K)"
+        for observation in enthalpy_rows
+    )
     broken_doc = deepcopy(healthy_doc)
     row = next(
         row

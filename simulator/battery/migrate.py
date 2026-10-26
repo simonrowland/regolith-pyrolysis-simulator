@@ -104,11 +104,13 @@ from simulator.battery.identity import (
     PA_PER_ATM_DEC,
     StandardState,
     SweepIdentity,
+    THERMOCHEMICAL_CALORIE_J,
     ValenceBasis,
     WallIdentity,
     atm_to_pa,
     bar_to_pa,
     celsius_to_kelvin,
+    _format_enthalpy_increment_subtype,
     parse_valence_basis,
     _uncompared_axes_for,
     identity_equal,
@@ -3356,6 +3358,24 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "Q_J_per_declared_mol_basis_per_K = Q_cal_per_mol_K × 4.184",
         "J_per_declared_mol_basis_per_K",
         "cal/mol/K",
+    ),
+    "calorie_15C_to_J_exact": (
+        Decimal("4.1855"),
+        "Cp_J_per_declared_mol_basis_per_K = Cp_cal15_per_mol_C × 4.1855",
+        "J_per_declared_mol_basis_per_K",
+        "cal15/mol/C",
+    ),
+    "calorie_15C_to_kJ_exact": (
+        Decimal("0.0041855"),
+        "H_kJ_per_declared_mol_basis = H_cal15_per_mol × 0.0041855",
+        "kJ_per_declared_mol_basis",
+        "cal15/mol",
+    ),
+    "international_table_calorie_to_kJ_exact": (
+        Decimal("0.0041868"),
+        "H_kJ_per_declared_mol_basis = H_cal_IT_per_mol × 0.0041868",
+        "kJ_per_declared_mol_basis",
+        "cal_IT/mol",
     ),
     "thermochemical_kcal_to_kJ_exact": (
         Decimal("4.184"),
@@ -8569,6 +8589,153 @@ def polymorph_from_extract(
     return State.of(str(raw))
 
 
+def _enthalpy_increment_subtype(
+    obs: Mapping[str, Any], values: Mapping[str, Any]
+) -> str | None:
+    """Read a printed H(T)-H(Tref) anchor without inventing one."""
+
+    def normalize_reference_phase(raw: str) -> str:
+        phase = raw.strip().casefold()
+        return {"s": "solid", "l": "liquid"}.get(phase, phase)
+
+    def decimal(raw: object) -> Decimal | None:
+        if raw is None or isinstance(raw, bool):
+            return None
+        try:
+            value = Decimal(str(raw))
+        except (ArithmeticError, TypeError, ValueError):
+            return None
+        return value if value.is_finite() else None
+
+    explicit_temperatures: set[Decimal] = set()
+    reference_phases: set[str] = set()
+    reference_polymorphs: set[str] = set()
+    for payload in (obs, values):
+        reference = decimal(payload.get("reference_temperature_K"))
+        if reference is not None and reference > 0:
+            explicit_temperatures.add(reference)
+        for key, target in (
+            ("reference_phase", reference_phases),
+            ("reference_polymorph", reference_polymorphs),
+        ):
+            raw = payload.get(key)
+            if isinstance(raw, str) and raw.strip():
+                target.add(
+                    normalize_reference_phase(raw)
+                    if key == "reference_phase"
+                    else raw.strip()
+                )
+
+    text_fields = [
+        obs.get("standard_state"),
+        values.get("standard_state"),
+        values.get("temperature_basis"),
+    ]
+    method = values.get("method")
+    if isinstance(method, str):
+        for match in re.finditer(
+            r"reference is (?:the )?([\wα-ωΑ-Ω′' -]+?) at (\d+(?:\.\d+)?)\s*K",
+            method,
+            re.IGNORECASE,
+        ):
+            explicit_temperatures.add(Decimal(match.group(2)))
+            reference_phases.add(normalize_reference_phase(match.group(1)))
+    for raw in text_fields:
+        if not isinstance(raw, str):
+            continue
+        for match in re.finditer(
+            r"(?:relative to|corrected to)\s*(\d+(?:\.\d+)?)\s*K",
+            raw,
+            re.IGNORECASE,
+        ):
+            explicit_temperatures.add(Decimal(match.group(1)))
+
+    zero_anchors: set[Decimal] = set()
+    for series_key in ("series", "points"):
+        series = values.get(series_key)
+        if not isinstance(series, (list, tuple)):
+            continue
+        for point in series:
+            if not isinstance(point, Mapping):
+                continue
+            temperature = decimal(point.get("T_K"))
+            enthalpy = decimal(
+                point.get("enthalpy_increment", point.get("H_minus_H298"))
+            )
+            if temperature is not None and temperature > 0 and enthalpy == 0:
+                zero_anchors.add(temperature)
+
+    labels = [
+        (obs.get("locator") or {}).get("column")
+        if isinstance(obs.get("locator"), Mapping)
+        else None,
+        obs.get("units"),
+        values.get("quantity_as_printed"),
+        values.get("printed_relation"),
+    ]
+    label_temperatures: set[Decimal] = set()
+    for raw in labels:
+        if not isinstance(raw, str):
+            continue
+        label_temperatures.update(
+            Decimal(match.group(1))
+            for match in re.finditer(
+                r"\bH(?:_T|\(T\))\s*[-−]\s*H[_\(]\s*(\d+(?:\.\d+)?)\s*K?",
+                raw,
+            )
+        )
+        for relation in re.finditer(
+            r"\bH\s*\d+(?:\.\d+)?\s*\([^)]*\)\s*(?:minus|[-−])\s*H\s*(\d+(?:\.\d+)?)\s*\(([^)]+)\)",
+            raw,
+            re.IGNORECASE,
+        ):
+            label_temperatures.add(Decimal(relation.group(1)))
+            reference_phases.add(normalize_reference_phase(relation.group(2)))
+
+    if (
+        len(explicit_temperatures) > 1
+        or len(label_temperatures) > 1
+        or len(zero_anchors) > 1
+        or len(reference_phases) > 1
+        or len(reference_polymorphs) > 1
+    ):
+        return None
+    explicit_temperature = next(iter(explicit_temperatures), None)
+    label_temperature = next(iter(label_temperatures), None)
+    zero_anchor = next(iter(zero_anchors), None)
+
+    def label_matches_anchor(label: Decimal, anchor: Decimal) -> bool:
+        return label == anchor or (
+            label == label.to_integral_value() and abs(label - anchor) < Decimal("0.5")
+        )
+
+    if explicit_temperature is not None and zero_anchor is not None:
+        if explicit_temperature != zero_anchor:
+            return None
+    if explicit_temperature is not None and label_temperature is not None:
+        if explicit_temperature != label_temperature and (
+            zero_anchor != explicit_temperature
+            or not label_matches_anchor(label_temperature, zero_anchor)
+        ):
+            return None
+    if label_temperature is not None and zero_anchor is not None:
+        if not label_matches_anchor(label_temperature, zero_anchor):
+            return None
+    temperature = explicit_temperature
+    if temperature is None:
+        temperature = zero_anchor
+    if temperature is None:
+        temperature = label_temperature
+    if temperature is None:
+        return None
+
+    return _format_enthalpy_increment_subtype(
+        temperature,
+        reference_phase=next(iter(reference_phases), None),
+        reference_polymorph=next(iter(reference_polymorphs), None),
+    )
+
+
 def fill_identity(
     quantity: Quantity | State[Quantity],
     species: Species,
@@ -8611,7 +8778,11 @@ def fill_identity(
                     f"profile {token.value} does not use {name}"
                 )
                 changed = True
-            elif isinstance(state, State) and state.is_value:
+            elif (
+                name not in profile.required
+                and isinstance(state, State)
+                and state.is_value
+            ):
                 payload[name] = State.not_applicable(
                     f"profile {token.value} does not use {name}"
                 )
@@ -8934,14 +9105,27 @@ def _printed_unit_for_field(payload: Mapping[str, Any], key: str) -> str | None:
     return None
 
 
+# Keep source-specific calorie conventions distinct from the thermochemical
+# calorie owned by identity.py. An unqualified ``cal`` remains thermochemical.
+INTERNATIONAL_TABLE_CALORIE_J = Decimal("4.1868")
+# NIST IR 85-3133, *Thermometry*, https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nbsir85-3133.pdf,
+# defines the 15-degree calorie as the energy to raise 1 g water from 14.5 °C
+# to 15.5 °C and gives 4.1855 J; this is the conventional value used here.
+# NIST SP 811 lists a later 4.18580 J value.
+CALORIE_15_C_J = Decimal("4.1855")
+
+
 def _convert_compilation_amount(
     amount: Decimal, quantity: Quantity, unit: str | None
 ) -> tuple[Decimal, str] | None:
     """Normalize explicit thermochemical compilation units to ledger units.
 
-    Pankratz and Kelley print the thermochemical calorie (4.184 J exactly),
-    the calorie convention used by their tabulated cal/mol units. The
-    conversion is derived from the printed unit and is never printed evidence.
+    Pankratz and Kelley use the thermochemical calorie (4.184 J exactly);
+    Frandsen prints the 15-degree calorie (4.1855 J). For per-degree units,
+    °C⁻¹ and K⁻¹ are equal because Celsius and kelvin intervals have equal
+    magnitude. A bare ``cal`` retains the existing thermochemical mapping.
+    The conversion is derived from the printed unit and is never printed
+    evidence.
     """
     if unit is None:
         if quantity in {
@@ -8975,6 +9159,15 @@ def _convert_compilation_amount(
     with localcontext() as ctx:
         ctx.prec = 80
         if heat and token in {
+            "cal15mole−1°c−1",
+            "cal15mole−1c−1",
+            "cal15mole−1k−1",
+            "cal15mol−1°c−1",
+            "cal15mol−1c−1",
+            "cal15mol−1k−1",
+        }:
+            return amount * CALORIE_15_C_J, "calorie_15C_to_J_exact"
+        if heat and token in {
             "cal/mol/k",
             "cal/molk",
             "cal/deg-mole",
@@ -8983,7 +9176,10 @@ def _convert_compilation_amount(
             "caldeg^-1gfw^-1",
             "caldeg-1gfw-1",
         }:
-            return amount * Decimal("4.184"), "thermochemical_calorie_to_J_exact"
+            return (
+                amount * THERMOCHEMICAL_CALORIE_J,
+                "thermochemical_calorie_to_J_exact",
+            )
         if heat and (
             token
             in {
@@ -9006,9 +9202,28 @@ def _convert_compilation_amount(
             "kcalgfw^-1",
             "kcalgfw-1",
         }:
-            return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
+            return (
+                amount * THERMOCHEMICAL_CALORIE_J,
+                "thermochemical_kcal_to_kJ_exact",
+            )
+        if energy and token in {
+            "cal15mole−1",
+            "cal15mol−1",
+        }:
+            return (
+                amount * CALORIE_15_C_J / Decimal("1000"),
+                "calorie_15C_to_kJ_exact",
+            )
+        if energy and token in {"calit/mol", "calit/mole", "calitmol^-1"}:
+            return (
+                amount * INTERNATIONAL_TABLE_CALORIE_J / Decimal("1000"),
+                "international_table_calorie_to_kJ_exact",
+            )
         if energy and token in {"cal/mol", "cal/mole", "calgfw^-1", "calgfw-1"}:
-            return amount * Decimal("0.004184"), "thermochemical_cal_to_kJ_exact"
+            return (
+                amount * THERMOCHEMICAL_CALORIE_J / Decimal("1000"),
+                "thermochemical_cal_to_kJ_exact",
+            )
         if energy and token in {"j/mol", "j/mole"}:
             return amount / Decimal("1000"), "J_to_kJ_exact"
         if energy and token in {
@@ -12264,11 +12479,20 @@ def _walk_printed_oxygen(
                         if condition_value.kind is ValueKind.POINT
                         else None
                     )
+                units = (
+                    str(condition.get("units") or condition.get("unit") or "")
+                    .strip()
+                    .lower()
+                    if isinstance(condition, Mapping)
+                    else ""
+                )
+                reference_pressure_pa = _OXYGEN_LOG_REFERENCE_PA.get(units)
                 if (
                     buffer_relative
                     or located_condition is None
                     or not isinstance(condition_value, Decimal)
                     or not condition_value.is_finite()
+                    or reference_pressure_pa is None
                     or (
                         isinstance(condition, Mapping)
                         and _oxygen_node_rejected(condition, condition_value)
@@ -12283,7 +12507,7 @@ def _walk_printed_oxygen(
                             locator=located_condition.locator or local,
                             inference=located_condition.inference,
                         ),
-                        _BAR_PA,
+                        reference_pressure_pa,
                     ))
         if name in _PRINTED_LOG_FO2_KEYS or name in _PRINTED_PO2_KEYS:
             if name in _PRINTED_LOG_FO2_KEYS and buffer_relative:
@@ -12534,6 +12758,32 @@ def collect_printed_oxygen(
         ),
         rejected_log_fO2=bool(rejected_logs),
     )
+
+
+def _printed_fO2_identity_state(
+    facts: PrintedOxygenFacts,
+) -> State[Decimal] | None:
+    """Convert a printed oxygen fact to identity fO2_Pa, without defaults."""
+
+    refusal = _rejected_log_fO2_reason(facts)
+    if refusal is not None:
+        return State.unknown(refusal)
+    if facts.log_fO2 is not None and facts.log_fO2.state.is_value:
+        value = facts.log_fO2.state.value
+        if isinstance(value, Decimal):
+            return State.of(
+                _log_fO2_to_pa(value, facts.log_fO2_reference_Pa)
+            )
+    pressure = facts.oxygen_partial_pressure_Pa
+    if pressure is not None and pressure.state.is_value:
+        value = pressure.state.value
+        if (
+            isinstance(value, Value)
+            and value.kind is ValueKind.POINT
+            and value.point is not None
+        ):
+            return State.of(value.point)
+    return None
 
 
 def point_lab_conditions(
@@ -13385,12 +13635,14 @@ class Migrator:
         fallback: Iterable[object] = (),
         *,
         skip_tables: bool = False,
-    ) -> dict[str, Located[Any]] | None:
+    ) -> tuple[dict[str, Located[Any]] | None, PrintedOxygenFacts]:
         ratio_oxygen = collect_author_ratio_oxygen(specific, locator)
         facts = collect_printed_oxygen(specific, locator, skip_tables=skip_tables)
         ratio_payload = _has_author_ratio_oxygen_payload(specific)
         if ratio_oxygen is None and ratio_payload:
-            return point_conditions
+            return point_conditions, replace(
+                facts, oxygen_partial_pressure_Pa=None
+            )
         if (
             ratio_oxygen is None
             and facts.log_fO2 is None
@@ -13401,6 +13653,8 @@ class Migrator:
             ratio_oxygen = collect_author_ratio_oxygen(fallback, locator)
             if ratio_oxygen is None:
                 facts = collect_printed_oxygen(fallback, locator, skip_tables=True)
+                if _has_author_ratio_oxygen_payload(fallback):
+                    facts = replace(facts, oxygen_partial_pressure_Pa=None)
         if ratio_oxygen is not None:
             # The nested oxygen_partial_pressure is Plante's derived
             # congruent-vaporization condition, not a printed pO2 cell.
@@ -13416,8 +13670,8 @@ class Migrator:
                     "fO2_log",
                     Located(State.unknown(refusal), locator=locator),
                 )
-                return merged
-            return point_conditions
+                return merged, facts
+            return point_conditions, facts
         merged = dict(point_conditions or {})
         if facts.log_fO2 is not None and "fO2_log" not in merged:
             merged["fO2_log"] = facts.log_fO2
@@ -13433,7 +13687,7 @@ class Migrator:
             # Per-row derived products span orders of magnitude; never collapse
             # them onto experiment.fO2_control.oxygen_partial_pressure_Pa.
             merged["fO2_Pa"] = ratio_oxygen
-        return merged or None
+        return merged or None, facts
 
     def _experiment_identity_fields(
         self,
@@ -15672,6 +15926,10 @@ class Migrator:
             and values.get("Delta_f_G_298_kJ_mol") is not None
         ):
             ident_kwargs["temperature_K"] = State.of(Decimal("298.15"))
+        if q_token is Quantity.H_MINUS_H298:
+            subtype = _enthalpy_increment_subtype(obs, values)
+            if subtype is not None:
+                ident_kwargs["subtype"] = State.of(subtype)
         source_reference_state = None
         if q_token in {
             Quantity.ACTIVITY,
@@ -16073,9 +16331,12 @@ class Migrator:
         oxygen_roots: list[object] = []
         if isinstance(values, Mapping):
             oxygen_roots.append(values)
+        observation_conditions = obs.get("point_conditions")
+        if isinstance(observation_conditions, Mapping):
+            oxygen_roots.append({"point_conditions": observation_conditions})
         if isinstance(obs.get("equipment"), Mapping):
             oxygen_roots.append(obs["equipment"])
-        point_conditions = self._merge_printed_oxygen(
+        point_conditions, printed_oxygen = self._merge_printed_oxygen(
             experiment_id,
             point_conditions,
             oxygen_roots,
@@ -16086,6 +16347,12 @@ class Migrator:
             skip_tables=True,
         )
         if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+            printed_fO2 = _printed_fO2_identity_state(printed_oxygen)
+            ident_kwargs["fO2_Pa"] = (
+                printed_fO2
+                if printed_fO2 is not None
+                else State.unknown("no fO2_Pa mapped from source")
+            )
             residue_conditions = dict(point_conditions or {})
             starting_ppm = _as_dec_or_none(values.get("starting_measured_ppm"))
             raw_uncertainty = obs.get("uncertainty")
@@ -17795,7 +18062,7 @@ class Migrator:
         )
         if lab_pc:
             point_conditions = {**(point_conditions or {}), **lab_pc}
-        point_conditions = self._merge_printed_oxygen(
+        point_conditions, printed_oxygen = self._merge_printed_oxygen(
             experiment_id,
             point_conditions,
             (raw_item,) if isinstance(raw_item, Mapping) else (),
@@ -17984,9 +18251,14 @@ class Migrator:
                             "source has no located run duration for this point"
                         )
                     )
-                    log_fO2 = _as_dec_or_none(raw_item.get("log10_fO2"))
-                    if log_fO2 is not None:
-                        oxygen = State.of(_log_fO2_to_pa(log_fO2, _BAR_PA))
+                    printed_fO2 = _printed_fO2_identity_state(printed_oxygen)
+                    if printed_fO2 is not None:
+                        oxygen = printed_fO2
+                    elif identity.fO2_Pa is not None and (
+                        identity.fO2_Pa.is_value
+                        or identity.fO2_Pa.is_not_applicable
+                    ):
+                        oxygen = identity.fO2_Pa
                     elif (
                         isinstance(parent_values, Mapping)
                         and isinstance(parent_values.get("fO2_control"), Mapping)

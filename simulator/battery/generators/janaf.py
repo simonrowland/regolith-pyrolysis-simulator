@@ -29,7 +29,10 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
-from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
+from simulator.battery.identity import (
+    _format_enthalpy_increment_subtype,
+    log10K_from_delta_fG_kJ_mol,
+)
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
 from simulator.battery.polymorph_dictionary import (
     JANAF_CRYSTAL_DICTIONARY,
@@ -1817,7 +1820,9 @@ def _observation(
         )
         known["standard_pressure_Pa"] = State.of(STANDARD_PRESSURE_PA)
         if quantity is Quantity.H_MINUS_H298:
-            known["subtype"] = State.of("H(T)-H(298.15 K)")
+            known["subtype"] = State.of(
+                _format_enthalpy_increment_subtype(Decimal("298.15"))
+            )
         if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
             if formation_basis is None:
                 reason = (
