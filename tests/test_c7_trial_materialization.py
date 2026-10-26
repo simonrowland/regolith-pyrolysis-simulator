@@ -152,6 +152,19 @@ def test_rh03_hour9_seed_and_solved_sio_operands(monkeypatch):
     monkeypatch.setattr(evaporation, '_eligible_surface_evaporation_carriers',
         lambda hour, *args: eligible(hour, *args) if hour.melt.hour >= 8 else frozenset(),
         raising=False)
+    evaluate = evaporation._evaluate_evaporation_hour
+    def guarded_evaluate(excess, hour, **kwargs):
+        if hour.melt.hour != 8:
+            return evaluate(excess, hour, **kwargs)
+        from simulator import transport_regime
+        from simulator.melt_backend import openimcc_bridge
+        with monkeypatch.context() as guard:
+            guard.setattr(openimcc_bridge, '_load_pack',
+                lambda *a, **k: pytest.fail('hour-9 trial called the cached OpenIMCC loader'))
+            guard.setattr(transport_regime, '_default_fan_service_T_C',
+                lambda *a, **k: pytest.fail('hour-9 trial called the cached fan-rating loader'))
+            return evaluate(excess, hour, **kwargs)
+    monkeypatch.setattr(evaporation, '_evaluate_evaporation_hour', guarded_evaluate)
     seeds = []
     accepted = []
 
@@ -257,10 +270,10 @@ def test_accepted_hot_hour_hex():
         # and zero-rate records, rather than storing another 930 kB fixture.
         assert {key: hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
                 for key, value in receipt.items()} == {
-            'flux': '983829bc3acc9417f7a01919c909e57c9d43b96175507991c278f21ec19ca4f0',
-            'oxygen': 'c499e99c3c55d8f5b80b81ef43a3d4c66a406a30f6af88ed5da581531a9ac621',
-            'ledger': '2f921a5f0d0de652266991e06452f535ee310dee71c9aad6bd50700a37cec38f',
-            'condensation': '818048509486826afc3e358592ab5220b196ff0da455d7ecefb80dd702f24673',
+            'flux': '0dff667e8e3cb8d2f4bedf548c6512b0d6ab8f884d5c4fdafc2a4da80b73e376',
+            'oxygen': 'b96930475fa623e4584488e1619aa9d337cf220f3a3c643a36033220be21b3fe',
+            'ledger': 'ec86e7e3680c5634806532364972cd92c4e61bb8f9d2401874852f84e835bfe2',
+            'condensation': 'd082bf2a8e5b5657e722551c46071f42ab32ec02bb6631c5c5a932295001bd53',
         }
     finally:
         close_test_owned_magemin_backend(sim)

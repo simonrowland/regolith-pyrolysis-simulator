@@ -286,12 +286,7 @@ def test_real_controls_alternate_routing_receipt(oxygen, legacy_sweep, quantized
     assert_solved_controls(receipt)
 
 
-@pytest.mark.parametrize("hour", range(1, 25))
-def test_lunar_24_hour_sources_and_oxygen(lunar_trajectory, hour):
-    campaign, receipt = lunar_trajectory
-    row = receipt(hour)
-    assert row['hour'] == hour
-    expected = json.loads(SURFACE_PINS.read_text())['reviewed_hourly_sources'][campaign]['hours'][hour - 1]
+def evolved_source_receipt(row):
     # The reviewed one-hour evolved receipt includes the native Fe parcel.
     # Add native mol * kg/mol once to the ordinary kg/h * 1 h source;
     # all other species already match the reviewed interval quantity.
@@ -299,6 +294,16 @@ def test_lunar_24_hour_sources_and_oxygen(lunar_trajectory, hour):
     evolved = {s: float.fromhex(row['source_kg_hr'][s]) + (
         float.fromhex(row['native_fe_vapor_mol']) * mass if s == 'Fe' else 0.0)
         for s in SPECIES}
+    return evolved
+
+
+@pytest.mark.parametrize("hour", range(1, 25))
+def test_lunar_24_hour_sources_and_oxygen(lunar_trajectory, hour):
+    campaign, receipt = lunar_trajectory
+    row = receipt(hour)
+    assert row['hour'] == hour
+    expected = json.loads(SURFACE_PINS.read_text())['reviewed_hourly_sources'][campaign]['hours'][hour - 1]
+    evolved = evolved_source_receipt(row)
     # The reviewed trajectory used the same sqrt(epsilon) signed-flux
     # acceptance. Compare its source values at that numerical resolution,
     # retaining exact zeros (abs=0); the new delta roots close more tightly.
