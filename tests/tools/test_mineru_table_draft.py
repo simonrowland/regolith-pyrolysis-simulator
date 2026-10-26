@@ -73,6 +73,69 @@ def test_absolute_page_mapping_across_chunks(tmp_path: Path) -> None:
     assert (expanded["origin_row"], expanded["origin_column"]) == ("2", "1")
 
 
+def test_printed_caption_label_wins_over_table_block_ordinal(tmp_path: Path) -> None:
+    source_root = tmp_path / "raw" / "caption-order" / "ocr-mineru" / "p001-p008"
+    source_root.mkdir(parents=True)
+    items = [
+        {
+            "type": "table",
+            "page_idx": 0,
+            "table_caption": [f"Table {label}: caption"],
+            "table_body": "<table><tr><td>1.0</td></tr></table>",
+        }
+        for label in ("II", "4", "1", "5")
+    ]
+    items.extend(
+        [
+            {
+                "type": "text",
+                "page_idx": 0,
+                "text": "TABLE 3. Printed caption appears before block five.",
+            },
+            {
+                "type": "table",
+                "page_idx": 0,
+                "published_page": 410,
+                "table_body": "<table><tr><td>1.0</td></tr></table>",
+            },
+        ]
+    )
+    (source_root / "content_list.json").write_text(
+        json.dumps(items), encoding="utf-8"
+    )
+
+    index_path = draft.convert_source(
+        "caption-order", tmp_path / "draft", corpus_root=tmp_path / "raw"
+    )
+    tables = yaml.safe_load(index_path.read_text(encoding="utf-8"))["tables"]
+    fifth_table = tables[4]
+
+    assert fifth_table["table_key"] == "p001-t05"
+    assert fifth_table["locator"] == {
+        "page": 1,
+        "table": "3",
+        "published_page": 410,
+    }
+    assert "locator_todo" not in fifth_table
+    assert draft._printed_table_label(["TABLE II. Caption text"]) == "II"
+    assert (
+        draft._printed_table_label(["Tableau III.3 : Légende"]) == "III.3"
+    )
+
+
+def test_captionless_table_locator_is_unknown_with_visible_todo(tmp_path: Path) -> None:
+    table = draft._render_table(
+        {"page_idx": 0, "table_body": "<table><tr><td>1.0</td></tr></table>"},
+        block_ordinal=5,
+        source_file=Path("captionless-p001-p008_content_list.json"),
+        chunk_start_page=1,
+        table_dir=tmp_path,
+    )
+
+    assert table["locator"] == {"page": 1, "table": "unknown"}
+    assert "TODO" in table["locator_todo"]
+
+
 def test_each_mechanical_flag_fires_only_on_the_suspect_cell() -> None:
     grid = draft.parse_table_html(
         "<table><tr><th>Sample</th><th>negative values</th><th>Result</th></tr>"
@@ -225,7 +288,7 @@ def test_nazarov_table_2_rowspan_temperature_header_is_not_a_body_row(
     header_count = draft._header_row_count(grid)
     table = draft._render_table(
         {"page_idx": 4, "table_body": html},
-        table_number=2,
+        block_ordinal=2,
         source_file=Path("nazarov-2015-p001-p008_content_list.json"),
         chunk_start_page=1,
         table_dir=tmp_path,
@@ -420,6 +483,7 @@ def test_compare_reads_partial_pressure_atm_strings(tmp_path: Path) -> None:
         {
             "type": "table",
             "page_idx": 3,
+            "table_caption": ["Table 1. First table."],
             "table_body": (
                 "<table><tr><th>T, K</th><th>pMg, atm</th></tr>"
                 "<tr><td>1851</td><td>$4.68 \\times 10^{-7}$</td></tr></table>"
@@ -428,6 +492,7 @@ def test_compare_reads_partial_pressure_atm_strings(tmp_path: Path) -> None:
         {
             "type": "table",
             "page_idx": 3,
+            "table_caption": ["Table 2. Second table."],
             "table_body": (
                 "<table><tr><th>T, K</th><th>pMg, atm</th></tr>"
                 "<tr><td>1914</td><td>$1.25 \\times 10^{-6}$</td></tr></table>"
@@ -464,6 +529,54 @@ def test_compare_reads_partial_pressure_atm_strings(tmp_path: Path) -> None:
     assert result[0]["path"].endswith(".values.points[0].pressure_atm")
     assert result[0]["matched_cell"]["table_key"] == "p004-t02"
     assert result[0]["matched_cell"]["text"] == "$1.25 \\times 10^{-6}$"
+
+
+def test_compare_flags_fake_printed_table_label(tmp_path: Path) -> None:
+    source_root = tmp_path / "raw" / "caption-check" / "ocr-mineru" / "p001-p008"
+    source_root.mkdir(parents=True)
+    (source_root / "content_list.json").write_text(
+        json.dumps(
+            [
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_caption": ["Table 3. Printed table caption."],
+                    "table_body": "<table><tr><td>1.0</td></tr></table>",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    index_path = draft.convert_source(
+        "caption-check", tmp_path / "draft", corpus_root=tmp_path / "raw"
+    )
+    extract = {"tables": [{"page": 1, "locator": {"table": "6"}}]}
+
+    results = draft.compare_extract_to_draft(extract, index_path)
+    locator_errors = [row for row in results if row["status"] == "locator-error"]
+
+    assert len(locator_errors) == 1
+    assert "table label '6'" in locator_errors[0]["locator_issue"]
+    assert "found: 3" in locator_errors[0]["locator_issue"]
+
+
+def test_compare_flags_page_pair_outside_mapping_page_offset(tmp_path: Path) -> None:
+    csv_path = tmp_path / "index.yaml"
+    csv_path.write_text(yaml.safe_dump({"tables": []}), encoding="utf-8")
+    mapping = {
+        "page_offset": 405,
+        "tables": [
+            {"page": 4, "published_page": 409},
+            {"page": 5, "published_page": 410},
+            {"page": 6, "published_page": 999},
+        ]
+    }
+
+    results = draft.compare_extract_to_draft(mapping, csv_path)
+    locator_errors = [row for row in results if row["status"] == "locator-error"]
+
+    assert len(locator_errors) == 1
+    assert "offset +993 contradicts mapped offset +405" in locator_errors[0]["locator_issue"]
 
 
 def test_compare_carries_flags_for_matched_cells(tmp_path: Path) -> None:
