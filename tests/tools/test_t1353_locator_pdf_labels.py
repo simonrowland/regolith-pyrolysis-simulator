@@ -109,6 +109,26 @@ def _pdf_path(source_id, corpus_source_id):
     return None
 
 
+def _required_pdf(source_id, corpus_source_id):
+    pdf = _pdf_path(source_id, corpus_source_id)
+    if pdf is None:
+        pytest.skip(
+            f"corpus source PDF is absent for {source_id or corpus_source_id}"
+        )
+    return pdf
+
+
+def _has_changed_extract_pdfs():
+    for relative in _changed_extract_paths():
+        document = _yaml((ROOT / relative).read_text())
+        if _pdf_path(
+            document.get("source_id"),
+            document.get("source", {}).get("corpus_source_id"),
+        ) is not None:
+            return True
+    return False
+
+
 def _label_pattern(locator):
     kind, label = next((key, locator[key]) for key in ("table", "figure") if key in locator)
     label = str(label).strip().strip("'\"")
@@ -532,6 +552,8 @@ def _assert_label_and_data(locator, locator_path, page_text, caption_page_text=N
 
 
 def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
+    if not _has_changed_extract_pdfs():
+        pytest.skip("corpus source PDFs are absent for the changed locator sweep")
     checked = skipped = justified = 0
     pdftotext_matched = mineru_matched = 0
     failures = []
@@ -688,7 +710,10 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
             continue
         pdf = _pdf_path(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
         for locator_path, locator, measured_values in _required_measured_value_checks(document):
-            if pdf is None or not ("page" in locator and "pdf_page_index" in locator):
+            if pdf is None:
+                skipped += 1
+                continue
+            if not ("page" in locator and "pdf_page_index" in locator):
                 failures.append(f"{relative} {locator_path}: required measured-value page locator is unavailable")
                 continue
             page_number = int(locator["pdf_page_index"]) + 1
@@ -817,8 +842,7 @@ def test_tsuzuki_printed_coefficient_is_checked_as_its_measured_field():
         _numeric_values(row["A_as_printed"], parent_key="A_as_printed", published_only=True)
     )
     assert measured_value == ("(-1.46 ± 0.02) × 10^4",)
-    pdf = _pdf_path(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
-    assert pdf is not None
+    pdf = _required_pdf(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
     assert _label_pattern(observation["locator"]).search(
         _normalize_label_text(_page_text(str(pdf), 7))
     )
@@ -834,6 +858,10 @@ def test_tsuzuki_printed_coefficient_is_checked_as_its_measured_field():
     ),
 )
 def test_measured_value_mutations_fail_the_full_locator_sweep(monkeypatch, relative, wrong_value):
+    document = _yaml((ROOT / relative).read_text())
+    _required_pdf(
+        document.get("source_id"), document.get("source", {}).get("corpus_source_id")
+    )
     original_yaml = _yaml
     calls_for_target = 0
 
@@ -914,8 +942,7 @@ def test_zigo_table_1_prose_mention_does_not_satisfy_data_locator():
     assert locator["page"] == 4
     assert locator["pdf_page_index"] == 3
     assert locator["published_page"] == 174
-    pdf = _pdf_path(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
-    assert pdf is not None
+    pdf = _required_pdf(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
     page_five = _normalize_label_text(_page_text(str(pdf), 5))
     assert _label_pattern(locator).search(page_five), "mutation fixture must include the prose label mention"
     try:
@@ -950,8 +977,7 @@ def test_zigo_equation_and_prose_locators_bind_to_their_physical_pages():
         )
         if equation is not None:
             assert locator["equation"] == equation
-    pdf = _pdf_path(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
-    assert pdf is not None
+    pdf = _required_pdf(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
     page7 = _normalize_label_text(_page_text(str(pdf), 7))
     page8 = _normalize_label_text(_page_text(str(pdf), 8))
     page9 = _normalize_label_text(_page_text(str(pdf), 9))
@@ -986,6 +1012,5 @@ def test_slag_figure_9_uses_caption_page_not_page_7_prose():
     assert locator["page"] == 6
     assert locator["pdf_page_index"] == 5
     assert locator["published_page"] == 17
-    pdf = _pdf_path(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
-    assert pdf is not None
+    pdf = _required_pdf(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
     _assert_label_and_data(locator, locator_path, _normalize_label_text(_page_text(str(pdf), 6)))
