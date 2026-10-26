@@ -621,12 +621,15 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     assert engagement["total_count"] >= 0
     assert engagement["engaged"] == (engagement["total_count"] > 0)
 
-    # Rebaselined 2026-10-25 under d-195 + d-045 + d-252; sha256 ce211012904e18a104573b49a32ca1bd04acd1ef8f98c66da920eab8a6afe39a.
-    # Typed leaf diff: 1 d-195, 27,533 d-045, 195,428 d-252, 0 unexplained.
+    # Rebaselined 2026-10-26 for b-1028; sha256 c4756d389c417613353a48b60da4d33d5a163390c6592300eb3e4a4b0d546532.
+    # b-1028 metadata delta: 88 flux_dormant and 88 is_flux_dormant_by_epoch
+    # true->false leaves, 47 channel-state dormancy->refusal leaves, and two
+    # refusal notes (Bi/P2O5_gas); no physical values moved.
+    # Prior cumulative typed diff: 1 d-195, 27,533 d-045, 195,428 d-252, 0 unexplained.
     # C0 exits at h5 instead of h19; the 24 h regenerated trajectory reaches C3_NA and C4.
     # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "ce211012904e18a104573b49a32ca1bd04acd1ef8f98c66da920eab8a6afe39a"
+        "c4756d389c417613353a48b60da4d33d5a163390c6592300eb3e4a4b0d546532"
     )
 
 
