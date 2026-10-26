@@ -337,7 +337,12 @@ def test_pressure_residual_reuses_hour_invariants(monkeypatch):
     routes = []
 
     def observe_route(*args, **kwargs):
-        routes.append(kwargs.get('materialize_authority', True))
+        materialized = kwargs.get('materialize_authority', True)
+        routes.append(materialized)
+        if not materialized:
+            # The newly eligible CrO2 response must retain its O2-returning
+            # mixture route; other product routing belongs to acceptance.
+            assert args[1].species_kg_hr.get('CrO2', 0.0) > 0.0
         return route(*args, **kwargs)
 
     def checked_solve(evaluate, **kwargs):
@@ -361,6 +366,6 @@ def test_pressure_residual_reuses_hour_invariants(monkeypatch):
         sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
         result = sim._solve_evaporative_oxygen_boundary()
         assert result.reaction_pO2_bar > 0.0
-        assert routes == [True]  # Full route arithmetic only at acceptance.
+        assert routes[-1] is True and routes.count(True) == 1
     finally:
         close_test_owned_magemin_backend(sim)

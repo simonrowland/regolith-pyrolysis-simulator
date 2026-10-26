@@ -1995,6 +1995,43 @@ def _frozen_flux_from_pressure(hour, oxygen, equilibrium, pressure_diagnostic, *
     return _depleted_evaporation_flux(raw, rates, hour.frozen_carriers), diagnostic, raw
 
 
+def _eligible_surface_evaporation_carriers(hour, authority, flux_diagnostic):
+    from simulator.vapour_rail.batch import _source_uses_surface_oxygen
+    from simulator.vapour_rail.catalog import CatalogCompileError
+
+    if hour.phase['physical_zero_reason']:
+        return frozenset()
+    eligible = {species for species, record in authority.items()
+                if record.get('flux', {}).get('kind') == 'eligible'
+                and not record.get('is_refused', False)
+                and record.get('selected_runtime_pressure', {}).get('kind') == 'value'
+                and record['flux'].get('alpha_ref')}
+    _, _, available = _build_evaporation_aux_maps(eligible,
+        vapor_pressure_data=hour.vapor_pressure_data,
+        species_formula_registry=hour.species_formula_registry,
+        cleaned_melt_kg=hour.source_accounts_kg['process.cleaned_melt'],
+        spent_reductant_residue_kg=hour.source_accounts_kg[SPENT_REDUCTANT_RESIDUE_ACCOUNT],
+        composition_kg=hour.phase['composition_kg'])
+    admitted = set()
+    phase = 'stage0' if hour.melt.campaign.name in {'C0', 'C0B'} else 'hot_train'
+    for species in eligible:
+        if (available.get(species, 0.0) <= 0.0
+                or species in flux_diagnostic.get('missing_alpha', {})
+                or species in flux_diagnostic.get('missing_transport_parameters', {})):
+            continue
+        try:
+            evaluator = hour.catalog.evaluator_for_hot_train(species, process_phase=phase)
+        except CatalogCompileError:
+            continue
+        data = (hour.vapor_pressure_data.get('metals', {}).get(species)
+                or hour.vapor_pressure_data.get('oxide_vapors', {}).get(species, {}))
+        if evaluator is not None and _source_uses_surface_oxygen(evaluator,
+                str(data.get('oxygen_destination') or ''),
+                float(resolve_species_formula(species, hour.species_formula_registry).elements.get('O', 0.0))):
+            admitted.add(species)
+    return frozenset(admitted)
+
+
 def _frozen_source(hour, oxygen):
     equilibrium, diagnostic = _frozen_pressure(hour, oxygen)
     flux, flux_diagnostic, raw = _frozen_flux_from_pressure(hour, oxygen, equilibrium, diagnostic)
@@ -5231,8 +5268,13 @@ class EvaporationMixin:
         raw_rates = dict(raw.species_kg_hr)
         raw_rates.update(flux_diagnostic.get('below_threshold_evaporation_flux', {}).get('fluxes_kg_hr', {}))
         amounts, _ = _project_frozen_carrier_batch(hour, flux, oxygen_only=True)[0]
-        return replace(hour, frozen_carriers=frozenset(key.removeprefix('carrier:') for key, value in amounts.items()
-            if key.startswith('carrier:') and value > 0.0), seed_raw_rates=_freeze_catalog_value(raw_rates),
+        seed_carriers = frozenset(key.removeprefix('carrier:') for key, value in amounts.items()
+            if key.startswith('carrier:') and value > 0.0)
+        # A zero seed drive is not an eligibility proof: inverse producers
+        # can exceed frozen carrier backpressure as surface oxygen falls.
+        carriers = seed_carriers | _eligible_surface_evaporation_carriers(
+            hour, raw.carrier_authority_by_species, flux_diagnostic)
+        return replace(hour, frozen_carriers=carriers, seed_raw_rates=_freeze_catalog_value(raw_rates),
             seed_alpha_authority=_freeze_catalog_value(raw.alpha_authority_status_by_species),
             seed_carrier_authority=_freeze_catalog_value(raw.carrier_authority_by_species),
             seed_computed_channels=frozenset(species for species, item in flux_diagnostic.get(
