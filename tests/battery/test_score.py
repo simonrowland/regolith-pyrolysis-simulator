@@ -16031,14 +16031,14 @@ def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> Non
     assert residual.refusal.reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
 
 
+@pytest.mark.parametrize("parent_id", ("parent-source::raw", "parent-source:raw"))
 def test_filtered_score_context_resolves_cross_source_validation_parent(
-    tmp_path: Path,
+    tmp_path: Path, parent_id: str
 ) -> None:
     from simulator.battery.migrate import dump_yaml, to_plain
 
     child_source = "child-source"
     parent_source = "parent-source"
-    parent_id = f"{parent_source}::raw"
     child_id = f"{child_source}::reduced"
     work = replace(F.work(), source_ids=(child_source, parent_source))
     experiment = F.tabulation_experiment()

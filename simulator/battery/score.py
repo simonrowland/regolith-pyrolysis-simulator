@@ -11411,24 +11411,17 @@ def load_score_context(
                 referenced_ids.update(observation.derivation.inputs)
             if observation.admission.superseded_by is not None:
                 referenced_ids.add(observation.admission.superseded_by)
-        missing_ids = referenced_ids.difference(observations)
-        parent_sources = tuple(
-            sorted(
-                {
-                    observation_id.split("::", 1)[0]
-                    for observation_id in missing_ids
-                    if "::" in observation_id
-                }
-            )
+        unresolved_reference_ids = referenced_ids.difference(observations).difference(
+            _asset_ids(works)
         )
-        if parent_sources:
-            _, _, stored_parents = load_migrated_store(root, sources=parent_sources)
+        if unresolved_reference_ids:
+            _, _, all_observations = load_migrated_store(root)
             validation_observations = {
                 **observations,
                 **{
-                    observation_id: stored_parents[observation_id]
-                    for observation_id in missing_ids
-                    if observation_id in stored_parents
+                    observation_id: all_observations[observation_id]
+                    for observation_id in unresolved_reference_ids
+                    if observation_id in all_observations
                 },
             }
     validation = validate_corpus(
