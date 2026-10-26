@@ -2198,6 +2198,59 @@ def _series_evaporation_flux(
         delta = float(pressure_excess_pa)
         if not signed or not math.isfinite(delta):
             raise EvaporationFluxConfigurationError('pressure_excess_pa requires finite signed transport')
+    # A zero seed still prepares invariant films for later inverse-source trials.
+    # Ordinary zero-flow calls retain their transport-free limit.
+    if delta != 0.0 or preparation is not None:
+        if prepared is None:
+            rg, k_mt, diffusion, weight, length = 0.0, 0.0, 0.0, 0.0, 0.0
+            kn = math.inf
+            film = {'geometry': 'free_molecular', 'formula_id': 'HK_open_vacuum',
+                    'domain_flags': [], 'Re': None, 'Sc': None, 'Sh': None,
+                    'Kn_film': None, 'Mach': None}
+            if knudsen_number is not None:
+                try:
+                    kn = float(knudsen_number)
+                except (ValueError, TypeError) as exc:
+                    raise EvaporationFluxConfigurationError('invalid knudsen_number') from exc
+                if math.isnan(kn) or kn < 0:
+                    raise EvaporationFluxConfigurationError('knudsen_number must be non-negative or positive infinity')
+            if gas_resistance_enabled and pressure > 0 and (knudsen_number is None or kn < FREE_MOLECULAR_KNUDSEN_MIN):
+                diffusion = _chapman_enskog_d_ab_m2_s(
+                    species, tg, pressure, carrier=carrier_gas,
+                    species_params=_EVAPORATION_LJ_PROXY_PARAMS.get(species),
+                )
+                if not math.isfinite(diffusion) or diffusion <= 0:
+                    raise EvaporationFluxConfigurationError(
+                        f'missing Chapman-Enskog transport parameters for species={species!r} carrier_gas={carrier_gas!r}'
+                    )
+                film = surface_gas_film(area_m2=melt_surface_area_m2, flow=surface_flow,
+                                        temperature_K=tg, pressure_pa=pressure,
+                                        carrier=carrier_gas, diffusivity_m2_s=diffusion)
+                if film['flow_assumed'] and max(ts, tg) > (
+                    film['geometry_parameters']['impeller_service_T_C'] + CELSIUS_TO_KELVIN_OFFSET
+                ):
+                    film['domain_flags'].append('default fan unqualified above material service T')
+                length = film['length_m']
+                if knudsen_number is None:
+                    kn = film['Kn_geometry']
+            prepared = (k_hk, ri, diffusion, length, kn, film)
+            if preparation is not None:
+                preparation[key] = prepared
+        k_hk, ri, diffusion, length, kn, base_film = prepared
+        if gas_resistance_enabled and kn < FREE_MOLECULAR_KNUDSEN_MIN:
+            still_key = ('still', *key)
+            still_base = (prepared_inputs if prepared_inputs is not None else preparation or {}).get(still_key)
+            if still_base is None:
+                still = surface_gas_film(
+                    area_m2=melt_surface_area_m2,
+                    flow=SurfaceFlow('stagnant_disk', 0.0, 'same-state still-gas comparison',
+                                     'pool', 'stagnant'),
+                    temperature_K=tg, pressure_pa=pressure, carrier=carrier_gas,
+                    diffusivity_m2_s=diffusion,
+                )
+                still_base = still
+                if preparation is not None:
+                    preparation[still_key] = still_base
     if delta == 0.0:
         # Saturation proves zero net evaporation without requiring a transport
         # model, hardware declaration or diffusion row for an inactive species.
@@ -2205,42 +2258,6 @@ def _series_evaporation_flux(
             alpha_intrinsic=alpha, k_hk_kg_s_m2_pa=k_hk, r_interface=ri,
             source_film_length_m=pipe_diameter_m, **stir_diagnostic,
         )
-    if prepared is None:
-        rg, k_mt, diffusion, weight, length = 0.0, 0.0, 0.0, 0.0, 0.0
-        kn = math.inf
-        film = {'geometry': 'free_molecular', 'formula_id': 'HK_open_vacuum',
-                'domain_flags': [], 'Re': None, 'Sc': None, 'Sh': None,
-                'Kn_film': None, 'Mach': None}
-        if knudsen_number is not None:
-            try:
-                kn = float(knudsen_number)
-            except (ValueError, TypeError) as exc:
-                raise EvaporationFluxConfigurationError('invalid knudsen_number') from exc
-            if math.isnan(kn) or kn < 0:
-                raise EvaporationFluxConfigurationError('knudsen_number must be non-negative or positive infinity')
-        if gas_resistance_enabled and pressure > 0 and (knudsen_number is None or kn < FREE_MOLECULAR_KNUDSEN_MIN):
-            diffusion = _chapman_enskog_d_ab_m2_s(
-                species, tg, pressure, carrier=carrier_gas,
-                species_params=_EVAPORATION_LJ_PROXY_PARAMS.get(species),
-            )
-            if not math.isfinite(diffusion) or diffusion <= 0:
-                raise EvaporationFluxConfigurationError(
-                    f'missing Chapman-Enskog transport parameters for species={species!r} carrier_gas={carrier_gas!r}'
-                )
-            film = surface_gas_film(area_m2=melt_surface_area_m2, flow=surface_flow,
-                                    temperature_K=tg, pressure_pa=pressure,
-                                    carrier=carrier_gas, diffusivity_m2_s=diffusion)
-            if film['flow_assumed'] and max(ts, tg) > (
-                film['geometry_parameters']['impeller_service_T_C'] + CELSIUS_TO_KELVIN_OFFSET
-            ):
-                film['domain_flags'].append('default fan unqualified above material service T')
-            length = film['length_m']
-            if knudsen_number is None:
-                kn = film['Kn_geometry']
-        prepared = (k_hk, ri, diffusion, length, kn, film)
-        if preparation is not None:
-            preparation[key] = prepared
-    k_hk, ri, diffusion, length, kn, base_film = prepared
     # Stefan diagnostics belong to this pressure trial, not the frozen film.
     film = {**base_film, 'domain_flags': list(base_film['domain_flags'])}
     rg, k_mt, weight = 0.0, 0.0, 0.0
@@ -2254,19 +2271,6 @@ def _series_evaporation_flux(
     else:
         flux = delta * (1.0 / ri)
     if rg > 0:
-        still_key = ('still', *key)
-        still_base = prepared_inputs.get(still_key) if prepared_inputs is not None else None
-        if still_base is None:
-            still = surface_gas_film(
-                area_m2=melt_surface_area_m2,
-                flow=SurfaceFlow('stagnant_disk', 0.0, 'same-state still-gas comparison',
-                                 'pool', 'stagnant'),
-                temperature_K=tg, pressure_pa=pressure, carrier=carrier_gas,
-                diffusivity_m2_s=diffusion,
-            )
-            still_base = still
-            if preparation is not None:
-                preparation[still_key] = still_base
         still = {**still_base, 'domain_flags': list(still_base['domain_flags'])}
         still_flux, _, _ = _surface_film_series_flux(
             still, diffusion, still['length_m'], tg, mass, ri, delta, bulk, pressure,

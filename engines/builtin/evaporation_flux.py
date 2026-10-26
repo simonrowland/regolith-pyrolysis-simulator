@@ -884,7 +884,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 else 0.0
             )
             delta_p_Pa = max(0.0, P_eq_Pa - P_bulk_Pa)
-            if delta_p_Pa <= 0:
+            prepare_only = delta_p_Pa <= 0
+            if prepare_only and series_preparation is None:
                 continue
             alpha_is_unmeasured = _alpha_is_unmeasured(
                 species, alpha_by_species
@@ -907,7 +908,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 T_K,
                 alpha_spec,
             )
-            if alpha_evaluation:
+            if alpha_evaluation and not prepare_only:
                 alpha_evaluations_by_species[species] = alpha_evaluation
             alpha_authority_status = alpha_evaluation.get(
                 ALPHA_AUTHORITY_STATUS_FIELD
@@ -957,15 +958,16 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 )
                 continue
 
-            if alpha_is_unmeasured and alpha_fallback_permitted:
+            if alpha_is_unmeasured and alpha_fallback_permitted and not prepare_only:
                 unmeasured_alpha_fallback_species.append(species)
 
-            alpha_used_by_species[species] = alpha
+            if not prepare_only:
+                alpha_used_by_species[species] = alpha
             uncertainty_pct = _flux_uncertainty_pct(
                 alpha,
                 alpha_envelope_by_species.get(species),
             )
-            if uncertainty_pct is not None:
+            if uncertainty_pct is not None and not prepare_only:
                 flux_uncertainty_pct[species] = uncertainty_pct
 
             try:
@@ -993,6 +995,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     melt_surface_renewal_source=melt_surface_renewal_source,
                 )
             except EvaporationFluxConfigurationError as exc:
+                if prepare_only:
+                    continue
                 missing_transport_parameters[species] = {
                     "policy": "fail_loud_missing_transport_parameters",
                     "carrier_gas": carrier_gas,
@@ -1001,6 +1005,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     "status": "unavailable",
                     "authority_level": "unavailable",
                 }
+                continue
+            if prepare_only:
+                # Freeze films even for an inverse source inactive at the seed.
+                # Its zero flow is not a published transport evaluation/refusal.
                 continue
             computable_transport_species.add(species)
             J_kg_s_m2 = series_flux.flux_kg_s_m2
