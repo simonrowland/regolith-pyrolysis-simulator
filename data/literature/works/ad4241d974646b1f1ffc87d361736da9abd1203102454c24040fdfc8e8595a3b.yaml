@@ -1,0 +1,134 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b
+  citation: Farber, M., Srivastava, R. D. and Uy, O. M. (1972), "Mass Spectrometric Determination of the Thermodynamic Properties
+    of the Vapour Species from Alumina", Journal of the Chemical Society, Faraday Transactions 1, 68, 249–258.
+  source_ids:
+  - farber-1972-al2o3-suboxides
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:farber-1972-al2o3-suboxides
+      role: pdf
+      path: raw/farber-1972-al2o3-suboxides/farber-1972-al2o3-suboxides.pdf
+      sha256:
+        tag: value
+        value: 0ad9538a63da033dfcf98938fd1c3463978755f4928b9d83b3669bbf327bd140
+    - asset_id: pdftotext:farber-1972-al2o3-suboxides
+      role: pdftotext
+      path: text/farber-1972-al2o3-suboxides
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:farber-1972-al2o3-suboxides
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::experiment::farber-1972-alumina-kems
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 250
+        pdf_page_index: 1
+        section: Experimental
+        note: No total experiment pressure is printed.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 250
+        pdf_page_index: 1
+        section: Experimental
+        note: No sweep gas is printed.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b
+  locator:
+    published_page: 250
+    pdf_page_index: 1
+    section: Experimental
+    note: KEMS sampling through a collimated alumina effusion cell. The table's pressure values are thermochemical reductions
+      of measured chopped ion intensities. No total cell pressure or fO2 is stated for the tabulated runs.
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 253
+        pdf_page_index: 4
+        table: '2'
+        note: No oxygen fugacity buffer is printed.
+  bench_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::bench::farber-1972-alumina-effusion-cell
+benches:
+- id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b::bench::farber-1972-alumina-effusion-cell
+  work_id: ad4241d974646b1f1ffc87d361736da9abd1203102454c24040fdfc8e8595a3b
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: dual vacuum chamber quadrupole mass spectrometer with alumina effusion cell
+    locator:
+      published_page: 250
+      pdf_page_index: 1
+      section: Experimental
+  cell_materials:
+  - state:
+      tag: value
+      value: Al2O3
+    locator:
+      published_page: 250
+      pdf_page_index: 1
+      section: Experimental
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000986'
+          approximate: false
+      locator:
+        published_page: 250
+        pdf_page_index: 1
+        section: Experimental
+        note: 0.986 mm orifice diameter as printed.
+    orifice_channel_length_m:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0066'
+          approximate: false
+      locator:
+        published_page: 250
+        pdf_page_index: 1
+        section: Experimental
+        note: 6.6 mm elongated-orifice length as printed.
+  other_facts: []

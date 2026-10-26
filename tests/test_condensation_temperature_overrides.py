@@ -897,3 +897,140 @@ def test_shipped_setpoints_pass_the_override_guard_unchanged():
     before = dict(model.condensation_temperatures_C)
     model.apply_setpoints_overrides(setpoints)
     assert model.condensation_temperatures_C == before
+
+
+def _collector_sim(setpoints):
+    from simulator.core import PyrolysisSimulator
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    return PyrolysisSimulator(
+        backend, setpoints,
+        {'x': {'label': 'X', 'composition_wt_pct': {'SiO2': 100}}},
+        {'metals': {}, 'oxide_vapors': {}},
+    )
+
+
+def test_default_collector_band_contract_at_startup_reset_and_lazy_init():
+    """Refactor pin from cb13f9f92; species reference temperatures are separate."""
+    from simulator.config import load_config_bundle
+    from simulator.recipe import RecipeSchema
+    from simulator.thermal_train import condensation_stage_windows_K
+
+    setpoints = load_config_bundle().setpoints
+    expected = (
+        (1400, 1600), (1100, 1400), (1100, 1300), (900, 1200),
+        (350, 700), (200, 350), (50, 200), (20, 50),
+    )
+    sim = _collector_sim(setpoints)
+    for reset in (False, True, True):
+        if reset:
+            sim.load_batch('x', mass_kg=1.0)
+        assert tuple(stage.temp_range_C for stage in sim.train.stages) == expected
+        assert tuple(
+            stage.temp_range_C for stage in sim.condensation_model.train.stages
+        ) == expected
+    metals = setpoints['condensation_train']['metals_train']
+    assert tuple(tuple(metals[key]['temp_range_C']) for key in (
+        'stage_0_hot_duct', 'stage_1_fe_condenser', 'stage_2_cr_oxide_harvest',
+        'stage_3_sio_zone', 'stage_4_alkali_mg_cyclone', 'stage_5_vortex_dust_filter',
+    )) == expected[:6]
+    assert condensation_stage_windows_K(setpoints)['K'] == (623.15, 973.15)
+    schema = RecipeSchema(setpoints=setpoints)
+    assert tuple(
+        (schema.spec_for(tuple(
+            f'overhead_headspace.pipe_segment_temperatures_C.segments.{name}.default_C'
+            .split('.')
+        )).low, schema.spec_for(tuple(
+            f'overhead_headspace.pipe_segment_temperatures_C.segments.{name}.default_C'
+            .split('.')
+        )).high)
+        for name in ('stage_4_to_stage_5', 'stage_5_to_stage_6', 'stage_6_to_stage_7')
+    ) == ((200.0, 700.0), (50.0, 350.0), (20.0, 200.0))
+
+
+@pytest.mark.parametrize('initialize_before_reset', [False, True])
+def test_yaml_only_collector_band_reaches_all_consumers(
+    tmp_path, monkeypatch, initialize_before_reset,
+):
+    from simulator.config import load_config_bundle
+    from simulator.recipe import RecipeSchema
+    from simulator.thermal_train import condensation_stage_windows_K
+
+    source = Path(__file__).resolve().parents[1] / 'data' / 'setpoints.yaml'
+    changed = source.read_text().replace(
+        'temp_range_C: [350, 700]', 'temp_range_C: [150, 250]', 1,
+    )
+    assert changed != source.read_text()
+    path = tmp_path / 'setpoints.yaml'
+    path.write_text(changed)
+    setpoints = load_config_bundle(setpoints_path=path).setpoints
+    band = tuple(setpoints['condensation_train']['metals_train'][
+        'stage_4_alkali_mg_cyclone']['temp_range_C'])
+    independent = _collector_sim(load_config_bundle().setpoints)
+    sim = _collector_sim(setpoints)
+    assert sim.train.stages[4].temp_range_C == band
+
+    seen = {'hkl_band': [], 'capture_budget': []}
+    original_band = condensation_module._stage_temp_band_C
+    original_budget = condensation_module._pressure_isolated_stage_efficiency
+
+    def observed_band(stage):
+        result = original_band(stage)
+        if stage.stage_number == 4:
+            seen['hkl_band'].append(result)
+        return result
+
+    def observed_budget(stage, *args, **kwargs):
+        if stage.stage_number == 4:
+            seen['capture_budget'].append(stage.temp_range_C)
+        return original_budget(stage, *args, **kwargs)
+
+    monkeypatch.setattr(condensation_module, '_stage_temp_band_C', observed_band)
+    monkeypatch.setattr(
+        condensation_module, '_pressure_isolated_stage_efficiency', observed_budget,
+    )
+    if initialize_before_reset:
+        assert sim.condensation_model.train is sim.train
+    else:
+        assert sim._condensation_model is None
+        sim.load_batch('x', mass_kg=1.0)
+        assert sim._condensation_model is None
+
+    allocations = []
+    for reset in (False, True):
+        if reset:
+            sim.load_batch('x', mass_kg=1.0)
+        model = sim.condensation_model
+        assert model.train is sim.train
+        assert model.train.stages[4].temp_range_C == band
+        for calls in seen.values():
+            calls.clear()
+        model.configure_operating_conditions(
+            overhead_pressure_mbar=1.0,
+            species_partial_pressures_mbar={'K': 1.0},
+            stage_area_m2_by_stage={str(s.stage_number): 1.0 for s in model.train.stages},
+        )
+        route = model.route(
+            EvaporationFlux(species_kg_hr={'K': 1.0}, total_kg_hr=1.0),
+            MeltState(temperature_C=1650.0),
+        )
+        for consumer, calls in seen.items():
+            assert calls and set(calls) == {band}, consumer
+        allocations.append(route.condensed_by_stage_species)
+        # The YAML experiment must affect capture, beyond reporting the band.
+        assert route.condensed_by_stage_species[4]['K'] != 0.069231258147549
+        assert independent.train.stages[4].temp_range_C == (350, 700)
+        assert independent.condensation_model.train is independent.train
+    assert allocations[0] == allocations[1]
+
+    windows = condensation_stage_windows_K(setpoints)
+    for species in ('Na', 'K', 'Mg'):
+        assert windows[species] == tuple(value + 273.15 for value in band)
+    schema = RecipeSchema(setpoints=setpoints)
+    spec = schema.spec_for(tuple(
+        'overhead_headspace.pipe_segment_temperatures_C.segments.stage_4_to_stage_5.default_C'
+        .split('.')
+    ))
+    assert (spec.low, spec.high) == (sim.train.stages[5].temp_range_C[0], band[1])

@@ -19,6 +19,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+from simulator.config import _load_setpoints_file  # noqa: E402
 from simulator.core import (
     FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
     PyrolysisSimulator,
@@ -152,7 +153,7 @@ def _load_yaml(path: Path) -> dict[str, Any]:
 
 def _load_data() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     return (
-        _load_yaml(REPO_ROOT / "data" / "setpoints.yaml"),
+        _load_setpoints_file(REPO_ROOT / "data" / "setpoints.yaml"),
         _load_yaml(REPO_ROOT / "data" / "feedstocks.yaml"),
         _load_yaml(REPO_ROOT / "data" / "vapor_pressures.yaml"),
     )

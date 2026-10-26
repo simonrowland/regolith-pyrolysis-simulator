@@ -293,7 +293,9 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
             assert sim._current_melt_redox_fO2_log() <= math.log10(
                 sim.melt.p_total_mbar / 1000.0,
             )
-        if sim.melt.campaign == CampaignPhase.C6:
+        # The live campaign may already be the successor after a finishing
+        # hour; the snapshot identifies the campaign that produced the hour.
+        if snapshot.campaign == CampaignPhase.C6:
             for transition in sim.atom_ledger.transitions[transition_count:]:
                 if transition.name == "fe_redox_respeciation":
                     # Following passive exchange, reduction returns O2 to its

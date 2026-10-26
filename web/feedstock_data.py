@@ -8,6 +8,7 @@ from typing import Any
 
 from simulator.feedstock_guard import loadable_feedstocks
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.config import _load_setpoints_file
 
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
@@ -31,6 +32,8 @@ def debug_feedstocks_enabled() -> bool:
 
 def load_yaml(filename: str) -> dict[str, Any]:
     path = DATA_DIR / filename
+    if filename == 'setpoints.yaml':
+        return _load_setpoints_file(path)
     if not path.exists():
         return {}
     with open(path) as f:

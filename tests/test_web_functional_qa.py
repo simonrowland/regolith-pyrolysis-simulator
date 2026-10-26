@@ -23,6 +23,7 @@ from simulator.account_ids import (
 from simulator.accounting.queries import (
     CONDENSATION_TRAIN_ACCOUNT,
     PRODUCT_LEDGER_ACCOUNTS,
+    TERMINAL_ESCAPE_ACCOUNT,
     TERMINAL_RUMP_REFRACTORY_OXIDES,
 )
 from simulator.core import PyrolysisSimulator
@@ -347,35 +348,19 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     # per_oxide_reduced_kg['Cr2O3'] = 0.0 on both before/after legs (after does
     # reduce FeO 0.161 kg once Na inventory is non-zero; still zero Cr).
     #
-    # MECHANISM (artifact-supported; dual-review rewrite):
-    # The before leg's retired Na2O_gas composite base drives an unphysical
-    # cold Na2O boil-off (~4.1 kg/hr at ~175 °C) that drains melt Na2O by ~h96
-    # and bifurcates the later trajectory (Fe tap storm h101–106; Cr leaves
-    # mainly as metal and is fully captured). The after leg retains melt Na2O,
-    # keeps Cr oxidised through the 1800 °C C2A dwell, and evolves CrO vapor.
-    # Capture fractions are LEG-INVARIANT (Cr 100% / CrO 0% both legs —
-    # pressure-isolated per species). CrO has 0% capture by data construction
-    # (no Antoine block, no sticking-α; condensation_reference_at_1mbar_C=2195
-    # is a routing-only proxy — NOT "poorer capture"). Offgas CrO 0.0627 →
-    # 1.06718 mol; Cr-eq offgas 0.00350 → 0.055636 kg. Display-rounded product
-    # Cr 0.07 → 0.06; product/offgas CrO 0.0 → 0.07.
-    # Contract: Cr inventory closes across ceramic + ingot + offgas CrO, not
-    # ceramic+ingot alone. Pins = executed post-rebase probe values; never
-    # hand-pasted. See docs-private/research/2026-08-09-b151-disposition/ and
-    # validation-data/pin-evidence/na2_composite_lh_base_2026-08-09.yaml.
+    # This path closes feed Cr across terminal ceramic, metal product, and
+    # metal-equivalent Cr in terminal offgas. The product story displays the
+    # same inventory by species, rounded to two decimal places.
     rump = completion["terminal_rump_by_species"]
     _CR_MASS_FRACTION_IN_CR2O3 = 2 * 51.9961 / 151.9904  # 2 Cr per Cr2O3
     _CR_MW = 51.9961
     _CRO_MW = 51.9961 + 15.9994  # CrO
-    # Exact offgas CrO mass (kg species) from AtomLedger terminal.offgas;
-    # display-rounded product story uses round(mass, 2) → 0.07.
-    # Pin = executed web-golden value on the post-rebase surface (stable across
-    # repeated -n0 runs of this test; not the instrumented probe path which
-    # differs at ~6e-6 rel). Derivation: project_account_kg("terminal.offgas")
-    # ["CrO"] after the headless full-run path. Cr-eq = Σ n_Cr,i * M_Cr from
-    # Cr/CrO/CrO2/CrO3 offgas species masses.
-    _PINNED_CRO_OFFGAS_KG = 0.07256276804358505
-    _PINNED_CR_OFFGAS_EQ_KG = 0.0556351828
+    # Offgas species masses and their Cr equivalents come from the same live
+    # terminal.offgas projection used by the headless full-run path.
+    _PINNED_CRO_OFFGAS_KG = 0.0
+    # t-1457 d-252 C0 contract: the full-run trajectory shifts the terminal Cr-bearing offgas;
+    # the move enters at 375537bff with the residual Cr2O3 re-pin below (CrO offgas stays 0).
+    _PINNED_CR_OFFGAS_EQ_KG = 9.216286830238766e-06
     cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _CR_MASS_FRACTION_IN_CR2O3
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
@@ -389,10 +374,12 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         + float(offgas_kg.get("CrO2", 0.0) or 0.0) * (_CR_MW / _CRO2_MW)
         + float(offgas_kg.get("CrO3", 0.0) or 0.0) * (_CR_MW / _CRO3_MW)
     )
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.429852312059024, rel=1e-9)
-    assert cr_ingot_kg == pytest.approx(0.06, abs=0.005)
-    # Offgas kg has ~1e-9 relative run-to-run noise on a full multi-hour path;
-    # pin at 1e-6 rel (same class as unit-activity pressure pins).
+    # Cr conserved; the residual moved via run trajectory/end hour (257 -> 188 h across the t-470..d-019 refusal window), not Cr accounting.
+    # t-1457 d-252 C0 contract (200 C/h ramp, 1 mbar dry Ar, computed exit): the full-run trajectory shifts.
+    # Bisected along the golden car: the move enters at 375537bff; every later car item is bit-identical.
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.3280300206015765, rel=1e-9)
+    assert cr_ingot_kg == pytest.approx(0.18, abs=0.005)
+    # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
     assert cr_offgas_eq_kg == pytest.approx(_PINNED_CR_OFFGAS_EQ_KG, rel=1e-6)
     # story payload values are display-rounded (2 dp), so compare loosely.
@@ -400,11 +387,10 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         cr_ingot_kg, abs=0.005
     )
     assert story["escaped_to_vacuum"]["species_kg"].get("CrO", 0.0) == pytest.approx(
-        0.07, abs=0.005
+        0.0, abs=0.005
     )
-    # Inventory closure: ceramic Cr + ingot Cr + offgas Cr-eq closes the
-    # ~2.46 kg lunar Cr feed (AtomLedger total 2.459769). Ceramic+ingot alone
-    # no longer closes after b-151 parks ~0.055 kg Cr in terminal.offgas CrO.
+    # Inventory closure: ceramic Cr + ingot Cr + terminal offgas Cr-eq closes
+    # the ~2.46 kg lunar Cr feed (AtomLedger total 2.459769).
     assert cr_in_rump_kg + cr_ingot_kg + cr_offgas_eq_kg == pytest.approx(
         2.46, abs=0.02
     )
@@ -421,55 +407,73 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     )
 
     stage_collection = sim._stage_collection_kg_by_source
-    assert story["glass"]["species_kg"] == {
-        species: round(sum(
-            mass
-            for (account, stage, routed_species), mass in stage_collection.items()
-            if account == "process.condensation_train"
-            and stage == 3
-            and routed_species == species
-        ), 2)
-        for species in {"SiO", "SiO2"}
-        if any(
-            account == "process.condensation_train"
-            and stage == 3
-            and routed_species == species
-            and mass > 0
-            for (account, stage, routed_species), mass in stage_collection.items()
+    # _product_story_bucket omits positive species that display as 0.00 kg.
+    def _displayed_species_kg(species_kg):
+        displayed_species_kg = {}
+        for species, mass in species_kg.items():
+            if float(mass) <= 0.0:
+                continue
+            displayed_mass = round(mass, 2)
+            if displayed_mass != 0.0:
+                displayed_species_kg[species] = displayed_mass
+        return displayed_species_kg
+
+    def _stage_story_species_kg(stage_number, allowed_species):
+        species_kg = {}
+        for (account, stage, species), mass in stage_collection.items():
+            if (
+                account == CONDENSATION_TRAIN_ACCOUNT
+                and stage == stage_number
+                and species in allowed_species
+                and float(mass) > 0.0
+            ):
+                species_kg[species] = species_kg.get(species, 0.0) + mass
+        return _displayed_species_kg(species_kg)
+
+    assert story["glass"]["species_kg"] == _stage_story_species_kg(
+        3, {"SiO", "SiO2"}
+    )
+    assert story["captured_volatiles"]["species_kg"] == (
+        _stage_story_species_kg(4, {"Na", "K", "Mg"})
+    )
+    escape_species_kg = {}
+    escape_accounts = (
+        TERMINAL_ESCAPE_ACCOUNT,
+        *OXYGEN_VENTED_ACCOUNTS,
+        OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
+    )
+    for account in escape_accounts:
+        account_species_kg = (
+            offgas_kg
+            if account == TERMINAL_ESCAPE_ACCOUNT
+            else sim.atom_ledger.project_account_kg(account)
         )
-    }
-    assert story["captured_volatiles"]["species_kg"] == {
-        species: round(sum(
-            mass
-            for (account, stage, routed_species), mass in stage_collection.items()
-            if account == "process.condensation_train"
-            and stage == 4
-            and routed_species == species
-        ), 2)
-        for species in {"Na", "K", "Mg"}
-        if any(
-            account == "process.condensation_train"
-            and stage == 4
-            and routed_species == species
-            and mass > 0
-            for (account, stage, routed_species), mass in stage_collection.items()
-        )
-    }
-    assert story["escaped_to_vacuum"]["species_kg"] == {
-        species: round(mass, 2)
-        for species, mass in sim.atom_ledger.project_account_kg(
-            "terminal.offgas"
-        ).items()
-        if mass > 0
-    }
+        for species, mass in account_species_kg.items():
+            if float(mass) > 0.0:
+                escape_species_kg[species] = (
+                    escape_species_kg.get(species, 0.0) + mass
+                )
+    assert story["escaped_to_vacuum"]["species_kg"] == (
+        _displayed_species_kg(escape_species_kg)
+    )
+    assert story["escaped_to_vacuum"]["class_total_kg"] == round(
+        sum(escape_species_kg.values()), 2
+    )
     rump = sim._terminal_rump_by_species()
-    assert story["refractory_ceramic"]["species_kg"] == {
-        species: round(mass, 2)
+    assert story["refractory_ceramic"]["species_kg"] == _displayed_species_kg(
+        {
+            species: mass
+            for species, mass in rump.items()
+            if species in TERMINAL_RUMP_REFRACTORY_OXIDES
+        }
+    )
+    terminal_residue_species_kg = {
+        species: mass
         for species, mass in rump.items()
-        if species in TERMINAL_RUMP_REFRACTORY_OXIDES and mass > 0
+        if species not in TERMINAL_RUMP_REFRACTORY_OXIDES
     }
-    assert set(story["terminal_residue"]["species_kg"]) == (
-        set(rump) - TERMINAL_RUMP_REFRACTORY_OXIDES
+    assert set(story["terminal_residue"]["species_kg"]) == set(
+        _displayed_species_kg(terminal_residue_species_kg)
     )
 
     product_class_species = [

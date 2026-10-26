@@ -42,6 +42,12 @@ def _write_minimal_config_bundle(root: Path) -> None:
     )
     for name, filename in REQUIRED_CONFIGS.items():
         content = functional_content if name in FUNCTIONAL_DATA_CONFIGS else "{}\n"
+        if name == 'setpoints':
+            content += yaml.safe_dump({
+                'condensation_train': load_cached_safe_yaml(
+                    (DEFAULT_DATA_DIR / 'setpoints.yaml').read_text()
+                )['condensation_train'],
+            })
         (root / filename).write_text(content)
 
 
@@ -268,6 +274,10 @@ def test_functional_data_yaml_digests_ignore_comments_and_mapping_order(
     path.write_text("# documentation-only note\n" + path.read_text())
     assert load_config_bundle(tmp_path).digests[name] == baseline
 
+    collector_config = (
+        yaml.safe_dump({'condensation_train': load_cached_safe_yaml(path.read_text())['condensation_train']})
+        if name == 'setpoints' else ''
+    )
     path.write_text(
         "nested:\n"
         "  y:\n"
@@ -276,6 +286,7 @@ def test_functional_data_yaml_digests_ignore_comments_and_mapping_order(
         "  z: 3\n"
         "a: 1\n"
         "b: 2\n"
+        + collector_config
     )
     assert load_config_bundle(tmp_path).digests[name] == baseline
 
@@ -323,3 +334,145 @@ def test_load_config_bundle_missing_required_file_raises(tmp_path: Path) -> None
 
     with pytest.raises(FileNotFoundError, match="required config file missing"):
         load_config_bundle(tmp_path)
+
+
+@pytest.mark.parametrize('band', [
+    None, [], [350], [350, 700, 800], '350,700',
+    [True, 700], ['warm', 700], [float('nan'), 700], [350, float('inf')],
+    [-273.15, 0], [700, 350],
+])
+def test_collector_band_resolver_refuses_malformed_supplied_band(band):
+    setpoints = load_config_bundle().setpoints
+    setpoints['condensation_train']['metals_train'][
+        'stage_4_alkali_mg_cyclone']['temp_range_C'] = band
+    with pytest.raises(ValueError, match='stage_4_alkali_mg_cyclone.temp_range_C'):
+        config_module.resolve_collector_bands_C(setpoints)
+
+
+def test_collector_band_resolver_checks_declared_service_ceiling(tmp_path):
+    setpoints = load_config_bundle().setpoints
+    stage = setpoints['condensation_train']['metals_train']['stage_3_sio_zone']
+    stage['temp_range_C'] = [900, stage['max_service_T_C'] + 1]
+    path = tmp_path / 'setpoints.yaml'
+    path.write_text(yaml.safe_dump(setpoints))
+    with pytest.raises(ValueError, match='stage_3_sio_zone.*max_service_T_C'):
+        load_config_bundle(setpoints_path=path)
+
+
+def test_collector_band_defaults_are_yaml_owned_and_detached():
+    from simulator.condensation_routing import COLLECTOR_STAGE_KEY_BY_NUMBER
+    from simulator.state import CondensationTrain
+
+    setpoints = load_config_bundle().setpoints
+    resolved = config_module.resolve_collector_bands_C()
+    assert resolved == {
+        number: tuple(setpoints['condensation_train']['metals_train'][key]['temp_range_C'])
+        for number, key in COLLECTOR_STAGE_KEY_BY_NUMBER.items()
+    }
+    assert config_module.resolve_collector_bands_C({}) == resolved
+    resolved[4] = (1.0, 2.0)
+    assert CondensationTrain.create_default().stages[4].temp_range_C != resolved[4]
+
+
+@pytest.mark.parametrize('missing_path', [
+    ('condensation_train',),
+    ('condensation_train', 'metals_train'),
+    *(
+        ('condensation_train', 'metals_train', key)
+        for key in config_module.COLLECTOR_STAGE_KEY_BY_NUMBER.values()
+    ),
+    ('condensation_train', 'metals_train', 'stage_4_alkali_mg_cyclone', 'temp_range_C'),
+])
+def test_setpoints_file_refuses_missing_collector_input(tmp_path, missing_path):
+    setpoints = load_cached_safe_yaml((DEFAULT_DATA_DIR / 'setpoints.yaml').read_text())
+    parent = setpoints
+    for key in missing_path[:-1]:
+        parent = parent[key]
+    del parent[missing_path[-1]]
+    # A custom filename must be checked by its declared config role, too.
+    path = tmp_path / 'custom-setpoints.yaml'
+    path.write_text(yaml.safe_dump(setpoints))
+    with pytest.raises(ValueError, match=r'\.'.join(missing_path)):
+        load_config_bundle(setpoints_path=path)
+
+
+def test_setpoints_file_refuses_typo_in_collector_stage_key(tmp_path):
+    setpoints = load_cached_safe_yaml((DEFAULT_DATA_DIR / 'setpoints.yaml').read_text())
+    stages = setpoints['condensation_train']['metals_train']
+    stages['stage_4_alkali_mg_cylcone'] = stages.pop('stage_4_alkali_mg_cyclone')
+    path = tmp_path / 'setpoints.yaml'
+    path.write_text(yaml.safe_dump(setpoints))
+    with pytest.raises(ValueError, match='stage_4_alkali_mg_cyclone'):
+        load_config_bundle(setpoints_path=path)
+
+
+@pytest.mark.parametrize('reader', [
+    'strict_file', 'memory_defaults', 'recipe_defaults', 'recipe_ceiling',
+    'runner', 'three_product', 'web_routes', 'web_events', 'web_feedstocks',
+    'profile_mre', 'profile_hold',
+    'selectivity_script', 'profile_script', 'map_script', 'thermal_fixture_script',
+])
+def test_other_setpoints_file_readers_refuse_missing_stage(tmp_path, monkeypatch, reader):
+    import importlib
+
+    setpoints = load_cached_safe_yaml((DEFAULT_DATA_DIR / 'setpoints.yaml').read_text())
+    del setpoints['condensation_train']['metals_train']['stage_4_alkali_mg_cyclone']
+    path = tmp_path / 'setpoints.yaml'
+    path.write_text(yaml.safe_dump(setpoints))
+
+    if reader == 'strict_file':
+        load = lambda: config_module._load_setpoints_file(path)
+    elif reader == 'memory_defaults':
+        monkeypatch.setattr(config_module, 'DEFAULT_DATA_DIR', tmp_path)
+        load = lambda: config_module.resolve_collector_bands_C({})
+    elif reader in ('recipe_defaults', 'recipe_ceiling'):
+        from simulator import recipe
+        monkeypatch.setattr(recipe, 'DEFAULT_DATA_DIR', tmp_path)
+        # Bypass the value cache to exercise the file boundary without leaking
+        # an invalid temporary source into subsequent default-schema tests.
+        load = (
+            recipe._default_setpoints.__wrapped__ if reader == 'recipe_defaults'
+            else recipe._c5_allow_mre_voltage_cap_upper_bound
+        )
+    elif reader == 'runner':
+        from simulator.runner import PyrolysisRun
+        load = PyrolysisRun(
+            feedstock_id='lunar_mare_low_ti', setpoints_path=path,
+        )._load_setpoints
+    elif reader == 'three_product':
+        from simulator.three_product_runner import _load_yaml
+        load = lambda: _load_yaml(tmp_path, 'setpoints.yaml')
+    elif reader.startswith('web_'):
+        name = {'web_routes': 'routes', 'web_events': 'events',
+                'web_feedstocks': 'feedstock_data'}[reader]
+        module = importlib.import_module(f'web.{name}')
+        monkeypatch.setattr(module, 'DATA_DIR', tmp_path)
+        loader = module.load_yaml if name == 'feedstock_data' else module._load_yaml
+        load = lambda: loader('setpoints.yaml')
+    elif reader in ('profile_mre', 'profile_hold'):
+        from simulator.optimize import profiles
+        monkeypatch.setattr(profiles, 'DEFAULT_DATA_DIR', tmp_path)
+        load = (
+            lambda: profiles._canonical_mre_ladder_for_profile('test.yaml')
+        ) if reader == 'profile_mre' else (
+            lambda: profiles._campaign_max_hold_hr_for_profile('test.yaml', 'C4')
+        )
+    else:
+        from types import SimpleNamespace
+        data = tmp_path / 'data'
+        data.mkdir()
+        (data / 'setpoints.yaml').write_text(path.read_text())
+        name, root, entry = {
+            'selectivity_script': ('evaporation_selectivity_map', 'REPO_ROOT', '_build_sim'),
+            'profile_script': ('make_recipe_db_profile', 'REPO_ROOT', '_setpoint_campaign_config'),
+            'map_script': ('sso_r_validation_map', 'REPO_ROOT', '_load_data'),
+            'thermal_fixture_script': ('generate_thermal_train_default_fixture', 'DATA', 'main'),
+        }[reader]
+        module = importlib.import_module(f'scripts.{name}')
+        monkeypatch.setattr(module, root, data if root == 'DATA' else tmp_path)
+        args = (SimpleNamespace(),) if reader == 'selectivity_script' else (
+            ('C4',) if reader == 'profile_script' else ()
+        )
+        load = lambda: getattr(module, entry)(*args)
+    with pytest.raises(ValueError, match='stage_4_alkali_mg_cyclone'):
+        load()

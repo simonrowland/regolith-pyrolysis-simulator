@@ -18,6 +18,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+from simulator.config import _load_setpoints_file  # noqa: E402
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.organics_pyrolysis import (
     apply_organics_source,
@@ -111,7 +112,7 @@ def main() -> int:
     print("=== CI CLOSURE PROOF ===")
     backend = InternalAnalyticalBackend()
     backend.initialize({})
-    setpoints = _load_yaml("setpoints.yaml")
+    setpoints = _load_setpoints_file(ROOT / "data" / "setpoints.yaml")
     kernel_cfg = dict(setpoints.get("chemistry_kernel", {}) or {})
     kernel_cfg["allow_fallback_vapor"] = True
     kernel_cfg["allow_unmeasured_alpha_fallback"] = True

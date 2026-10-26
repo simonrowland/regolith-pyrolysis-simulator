@@ -17,7 +17,7 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.backends import CACHE_TIER_CEILINGS, DEFAULT_CACHE_TIER_CEILING
-from simulator.config import DEFAULT_DATA_DIR
+from simulator.config import DEFAULT_DATA_DIR, _load_setpoints_file
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -922,7 +922,7 @@ def _canonical_mre_ladder_for_profile(source: str | Path) -> list[dict[str, Any]
         data_dir = source_path.parent.parent
     setpoints_path = data_dir / "setpoints.yaml"
     try:
-        loaded = load_cached_safe_yaml(setpoints_path.read_text())
+        loaded = _load_setpoints_file(setpoints_path)
     except OSError as exc:
         raise ProfileValidationError(
             f"{source}: cannot read {setpoints_path} for C5 MRE target validation"
@@ -931,10 +931,10 @@ def _canonical_mre_ladder_for_profile(source: str | Path) -> list[dict[str, Any]
         raise ProfileValidationError(
             f"{source}: invalid {setpoints_path} for C5 MRE target validation"
         ) from exc
-    if not isinstance(loaded, Mapping):
+    except TypeError as exc:
         raise ProfileValidationError(
             f"{source}: {setpoints_path} must be a mapping for C5 MRE target validation"
-        )
+        ) from exc
     return parse_ladder_from_setpoints(dict(loaded))
 
 
@@ -1255,7 +1255,7 @@ def _campaign_max_hold_hr_for_profile(source: str | Path, campaign: str) -> floa
     data_dir = _data_dir_for_profile_source(source)
     setpoints_path = data_dir / "setpoints.yaml"
     try:
-        loaded = load_cached_safe_yaml(setpoints_path.read_text())
+        loaded = _load_setpoints_file(setpoints_path)
     except OSError as exc:
         raise ProfileValidationError(
             f"{source}: cannot read {setpoints_path} for thermal window validation"
@@ -1264,10 +1264,10 @@ def _campaign_max_hold_hr_for_profile(source: str | Path, campaign: str) -> floa
         raise ProfileValidationError(
             f"{source}: invalid {setpoints_path} for thermal window validation"
         ) from exc
-    if not isinstance(loaded, Mapping):
+    except TypeError as exc:
         raise ProfileValidationError(
             f"{source}: {setpoints_path} must be a mapping for thermal window validation"
-        )
+        ) from exc
     campaigns = loaded.get("campaigns")
     if not isinstance(campaigns, Mapping):
         return None

@@ -23,13 +23,70 @@ fidelity_samples:
     note: Table 1 O(g) row, value and uncertainty printed as 249.229 +/- 0.002 kJ/mol
 - species: CH4
   observable: gibbs_table
-  observation_id: burcat_2005_table2_CH4
-  field: bomb_calorimeter_delta_fH298_kJ_per_mol
+  observation_id: burcat_2005_table2_CH4_bomb_calorimeter
+  field: delta_fH298_kJ_per_mol
   value: -74.85
   locator:
     page: 14
     table: '2'
-    note: Table 2 CH4 bomb-calorimeter column
+    note: Table 2 CH4 bomb-calorimeter value
+- species: CH4
+  observable: gibbs_table
+  observation_id: burcat_2005_table2_CH4_flame_calorimeter
+  field: delta_fH298_kJ_per_mol
+  value: -74.48
+  locator:
+    page: 14
+    table: '2'
+    note: Table 2 CH4 flame-calorimeter value
+- species: C2H6
+  observable: gibbs_table
+  observation_id: burcat_2005_table2_C2H6_bomb_calorimeter
+  field: delta_fH298_kJ_per_mol
+  value: -84.68
+  locator: {page: 14, table: '2'}
+- species: C2H6
+  observable: gibbs_table
+  observation_id: burcat_2005_table2_C2H6_flame_calorimeter
+  field: delta_fH298_kJ_per_mol
+  value: -83.85
+  locator: {page: 14, table: '2'}
+- species: C3H8
+  observable: gibbs_table
+  observation_id: burcat_2005_table2_C3H8_bomb_calorimeter
+  field: delta_fH298_kJ_per_mol
+  value: -103.89
+  locator: {page: 14, table: '2'}
+- species: C3H8
+  observable: gibbs_table
+  observation_id: burcat_2005_table2_C3H8_flame_calorimeter
+  field: delta_fH298_kJ_per_mol
+  value: -104.68
+  locator: {page: 14, table: '2'}
+- species: n-C4H10
+  observable: gibbs_table
+  observation_id: burcat_2005_table2_nC4H10_bomb_calorimeter
+  field: delta_fH298_kJ_per_mol
+  value: -127.03
+  locator: {page: 14, table: '2'}
+- species: n-C4H10
+  observable: gibbs_table
+  observation_id: burcat_2005_table2_nC4H10_flame_calorimeter
+  field: delta_fH298_kJ_per_mol
+  value: -125.65
+  locator: {page: 14, table: '2'}
+- species: i-C4H10
+  observable: gibbs_table
+  observation_id: burcat_2005_table2_iC4H10_bomb_calorimeter
+  field: delta_fH298_kJ_per_mol
+  value: -135.60
+  locator: {page: 14, table: '2'}
+- species: i-C4H10
+  observable: gibbs_table
+  observation_id: burcat_2005_table2_iC4H10_flame_calorimeter
+  field: delta_fH298_kJ_per_mol
+  value: -134.18
+  locator: {page: 14, table: '2'}
 - species: OH
   observable: gibbs_table
   observation_id: burcat_2005_table3_OH_radical
@@ -168,54 +225,184 @@ species:
       values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Active Thermochemical Tables v1.25 using C(A)TN v1.048, species_as_printed: NO2(g), delta_fH298_kJ_per_mol: 34.025, uncertainty_kJ_per_mol: 0.085}
   CH4:
     observations:
-    - observation_id: burcat_2005_table2_CH4
+    - observation_id: burcat_2005_table2_CH4_bomb_calorimeter
       type: gibbs_table
       locator: {page: 14, table: '2'}
+      point_conditions:
+        temperature_K: {state: {tag: value, value: 298.15}, locator: {page: 14, table: '2'}}
       phase: gas
       standard_state: standard enthalpy of formation at 298.15 K
       regime: compiled_thermochemistry
       units: kJ/mol
-      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Cohen and Benson (1992), species_as_printed: CH4, bomb_calorimeter_delta_fH298_kJ_per_mol: -74.85, bomb_calorimeter_uncertainty_kJ_per_mol: 0.29, flame_calorimeter_delta_fH298_kJ_per_mol: -74.48, flame_calorimeter_uncertainty_kJ_per_mol: 0.42, semantics: competing_compiled_methods_do_not_average}
+      values:
+        quantity: delta_fH298
+        method_class: compilation_assessed
+        attribution: Cohen and Benson (1992)
+        species_as_printed: CH4
+        calorimeter_as_printed: Bomb Calorimeter
+        delta_fH298_kJ_per_mol: -74.85
+      uncertainty: {kind: printed, value: 0.29, units: kJ/mol, verbatim: '±0.29 kJ/mol', locator: {page: 14, table: '2'}}
+    - observation_id: burcat_2005_table2_CH4_flame_calorimeter
+      type: gibbs_table
+      locator: {page: 14, table: '2'}
+      point_conditions:
+        temperature_K: {state: {tag: value, value: 298.15}, locator: {page: 14, table: '2'}}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values:
+        quantity: delta_fH298
+        method_class: compilation_assessed
+        attribution: Cohen and Benson (1992)
+        species_as_printed: CH4
+        calorimeter_as_printed: Flame Calorimeter
+        delta_fH298_kJ_per_mol: -74.48
+      uncertainty: {kind: printed, value: 0.42, units: kJ/mol, verbatim: '±0.42 kJ/mol', locator: {page: 14, table: '2'}}
   C2H6:
     observations:
-    - observation_id: burcat_2005_table2_C2H6
+    - observation_id: burcat_2005_table2_C2H6_bomb_calorimeter
       type: gibbs_table
       locator: {page: 14, table: '2'}
+      point_conditions:
+        temperature_K: {state: {tag: value, value: 298.15}, locator: {page: 14, table: '2'}}
       phase: gas
       standard_state: standard enthalpy of formation at 298.15 K
       regime: compiled_thermochemistry
       units: kJ/mol
-      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Cohen and Benson (1992), species_as_printed: C2H6, bomb_calorimeter_delta_fH298_kJ_per_mol: -84.68, bomb_calorimeter_uncertainty_kJ_per_mol: 0.50, flame_calorimeter_delta_fH298_kJ_per_mol: -83.85, flame_calorimeter_uncertainty_kJ_per_mol: 0.29, semantics: competing_compiled_methods_do_not_average}
+      values:
+        quantity: delta_fH298
+        method_class: compilation_assessed
+        attribution: Cohen and Benson (1992)
+        species_as_printed: C2H6
+        calorimeter_as_printed: Bomb Calorimeter
+        delta_fH298_kJ_per_mol: -84.68
+      uncertainty: {kind: printed, value: 0.50, units: kJ/mol, verbatim: '±0.50 kJ/mol', locator: {page: 14, table: '2'}}
+    - observation_id: burcat_2005_table2_C2H6_flame_calorimeter
+      type: gibbs_table
+      locator: {page: 14, table: '2'}
+      point_conditions:
+        temperature_K: {state: {tag: value, value: 298.15}, locator: {page: 14, table: '2'}}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values:
+        quantity: delta_fH298
+        method_class: compilation_assessed
+        attribution: Cohen and Benson (1992)
+        species_as_printed: C2H6
+        calorimeter_as_printed: Flame Calorimeter
+        delta_fH298_kJ_per_mol: -83.85
+      uncertainty: {kind: printed, value: 0.29, units: kJ/mol, verbatim: '±0.29 kJ/mol', locator: {page: 14, table: '2'}}
   C3H8:
     observations:
-    - observation_id: burcat_2005_table2_C3H8
+    - observation_id: burcat_2005_table2_C3H8_bomb_calorimeter
       type: gibbs_table
       locator: {page: 14, table: '2'}
+      point_conditions:
+        temperature_K: {state: {tag: value, value: 298.15}, locator: {page: 14, table: '2'}}
       phase: gas
       standard_state: standard enthalpy of formation at 298.15 K
       regime: compiled_thermochemistry
       units: kJ/mol
-      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Cohen and Benson (1992), species_as_printed: C3H8, bomb_calorimeter_delta_fH298_kJ_per_mol: -103.89, bomb_calorimeter_uncertainty_kJ_per_mol: 0.59, flame_calorimeter_delta_fH298_kJ_per_mol: -104.68, flame_calorimeter_uncertainty_kJ_per_mol: 0.50, semantics: competing_compiled_methods_do_not_average}
+      values:
+        quantity: delta_fH298
+        method_class: compilation_assessed
+        attribution: Cohen and Benson (1992)
+        species_as_printed: C3H8
+        calorimeter_as_printed: Bomb Calorimeter
+        delta_fH298_kJ_per_mol: -103.89
+      uncertainty: {kind: printed, value: 0.59, units: kJ/mol, verbatim: '±0.59 kJ/mol', locator: {page: 14, table: '2'}}
+    - observation_id: burcat_2005_table2_C3H8_flame_calorimeter
+      type: gibbs_table
+      locator: {page: 14, table: '2'}
+      point_conditions:
+        temperature_K: {state: {tag: value, value: 298.15}, locator: {page: 14, table: '2'}}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values:
+        quantity: delta_fH298
+        method_class: compilation_assessed
+        attribution: Cohen and Benson (1992)
+        species_as_printed: C3H8
+        calorimeter_as_printed: Flame Calorimeter
+        delta_fH298_kJ_per_mol: -104.68
+      uncertainty: {kind: printed, value: 0.50, units: kJ/mol, verbatim: '±0.50 kJ/mol', locator: {page: 14, table: '2'}}
   n-C4H10:
     observations:
-    - observation_id: burcat_2005_table2_nC4H10
+    - observation_id: burcat_2005_table2_nC4H10_bomb_calorimeter
       type: gibbs_table
       locator: {page: 14, table: '2'}
+      point_conditions:
+        temperature_K: {state: {tag: value, value: 298.15}, locator: {page: 14, table: '2'}}
       phase: gas
       standard_state: standard enthalpy of formation at 298.15 K
       regime: compiled_thermochemistry
       units: kJ/mol
-      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Cohen and Benson (1992), species_as_printed: n-C4H10, bomb_calorimeter_delta_fH298_kJ_per_mol: -127.03, bomb_calorimeter_uncertainty_kJ_per_mol: 0.67, flame_calorimeter_delta_fH298_kJ_per_mol: -125.65, flame_calorimeter_uncertainty_kJ_per_mol: 0.67, semantics: competing_compiled_methods_do_not_average}
+      values:
+        quantity: delta_fH298
+        method_class: compilation_assessed
+        attribution: Cohen and Benson (1992)
+        species_as_printed: n-C4H10
+        calorimeter_as_printed: Bomb Calorimeter
+        delta_fH298_kJ_per_mol: -127.03
+      uncertainty: {kind: printed, value: 0.67, units: kJ/mol, verbatim: '±0.67 kJ/mol', locator: {page: 14, table: '2'}}
+    - observation_id: burcat_2005_table2_nC4H10_flame_calorimeter
+      type: gibbs_table
+      locator: {page: 14, table: '2'}
+      point_conditions:
+        temperature_K: {state: {tag: value, value: 298.15}, locator: {page: 14, table: '2'}}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values:
+        quantity: delta_fH298
+        method_class: compilation_assessed
+        attribution: Cohen and Benson (1992)
+        species_as_printed: n-C4H10
+        calorimeter_as_printed: Flame Calorimeter
+        delta_fH298_kJ_per_mol: -125.65
+      uncertainty: {kind: printed, value: 0.67, units: kJ/mol, verbatim: '±0.67 kJ/mol', locator: {page: 14, table: '2'}}
   i-C4H10:
     observations:
-    - observation_id: burcat_2005_table2_iC4H10
+    - observation_id: burcat_2005_table2_iC4H10_bomb_calorimeter
       type: gibbs_table
       locator: {page: 14, table: '2'}
+      point_conditions:
+        temperature_K: {state: {tag: value, value: 298.15}, locator: {page: 14, table: '2'}}
       phase: gas
       standard_state: standard enthalpy of formation at 298.15 K
       regime: compiled_thermochemistry
       units: kJ/mol
-      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Cohen and Benson (1992), species_as_printed: i-C4H10, bomb_calorimeter_delta_fH298_kJ_per_mol: -135.60, bomb_calorimeter_uncertainty_kJ_per_mol: 0.54, flame_calorimeter_delta_fH298_kJ_per_mol: -134.18, flame_calorimeter_uncertainty_kJ_per_mol: 0.63, semantics: competing_compiled_methods_do_not_average}
+      values:
+        quantity: delta_fH298
+        method_class: compilation_assessed
+        attribution: Cohen and Benson (1992)
+        species_as_printed: i-C4H10
+        calorimeter_as_printed: Bomb Calorimeter
+        delta_fH298_kJ_per_mol: -135.60
+      uncertainty: {kind: printed, value: 0.54, units: kJ/mol, verbatim: '±0.54 kJ/mol', locator: {page: 14, table: '2'}}
+    - observation_id: burcat_2005_table2_iC4H10_flame_calorimeter
+      type: gibbs_table
+      locator: {page: 14, table: '2'}
+      point_conditions:
+        temperature_K: {state: {tag: value, value: 298.15}, locator: {page: 14, table: '2'}}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values:
+        quantity: delta_fH298
+        method_class: compilation_assessed
+        attribution: Cohen and Benson (1992)
+        species_as_printed: i-C4H10
+        calorimeter_as_printed: Flame Calorimeter
+        delta_fH298_kJ_per_mol: -134.18
+      uncertainty: {kind: printed, value: 0.63, units: kJ/mol, verbatim: '±0.63 kJ/mol', locator: {page: 14, table: '2'}}
   OH:
     observations:
     - observation_id: burcat_2005_table3_OH_radical

@@ -45,6 +45,216 @@ observations:
     note: tables=['1', '5']; pages=PDF pp. 4 and 6 / printed pp. 720 and 722
     source_path: text/stebbins-carmichael-weill-1983/pdftotext-layout.txt
   read_from: pdftotext:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_entropy_of_fusion_abstract
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSi3O8_liquid_and_disordered_crystalline_albite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '45.6056'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_entropy_of_fusion_abstract
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: 717
+    section: Abstract
+  read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 717
+        section: Abstract
+  derived_from:
+  - stebbins-carmichael-weill-1983::stebbins_1983_albite_heat_of_fusion_table_7
+  derivation:
+    relation: fusion_entropy_calculated_from_heat_of_fusion_and_fusion_temperature
+    inputs:
+    - stebbins-carmichael-weill-1983::stebbins_1983_albite_heat_of_fusion_table_7
+    parameters: []
+    output_unit: as_published
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_entropy_of_fusion_discussion
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSi3O8_liquid_and_disordered_crystalline_albite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '44.7688'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_entropy_of_fusion_discussion
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: 728
+    section: Discussion
+  read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 728
+        section: Discussion
+  derived_from:
+  - stebbins-carmichael-weill-1983::stebbins_1983_albite_heat_of_fusion_table_7
+  derivation:
+    relation: fusion_entropy_calculated_from_heat_of_fusion_and_fusion_temperature
+    inputs:
+    - stebbins-carmichael-weill-1983::stebbins_1983_albite_heat_of_fusion_table_7
+    parameters: []
+    output_unit: as_published
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_heat_of_fusion_table_7
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
@@ -109,9 +319,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, derived_from,
-      derivation, table_7_heat_of_fusion'
+    kind: point
+    point: '62.76'
     approximate: false
   uncertainty:
     kind: printed
@@ -124,18 +333,31 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_reduced
-    original_method_class: measured_reduced
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_heat_of_fusion_table_7
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: 723
     table: '7'
   read_from: pdf:stebbins-carmichael-weill-1983
   point_conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 723
+        table: '7'
     temperature_K:
       state:
         tag: value
@@ -149,16 +371,11 @@ observations:
   derivation:
     relation: Delta H_f(T) = H_liquid(T) - H_crystal(T), combining the stable-liquid and disordered-crystal heat-content functions
       with heat-of-vitrification and heat-capacity corrections (Equations 3-4).
-    inputs: []
+    inputs:
+    - stebbins-carmichael-weill-1983::stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5
+    - pdf:stebbins-carmichael-weill-1983
     parameters: []
     output_unit: as_published
-    raw_inputs:
-      state:
-        tag: value
-        value: printed_unresolved
-      locator:
-        page: 723
-        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_robie_table_7_fusion_quote
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -184,8 +401,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1373'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile heat_of_fusion does not use standard_pressure_Pa
@@ -223,9 +440,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, estimate_from_glass_Cp_only,
-      locator, derivation'
+    kind: point
+    point: '58.576'
     approximate: false
   uncertainty:
     kind: none
@@ -234,16 +450,36 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: 'Table 7 footnote 3: Robie et al. (1978), adjusted to 1373 K for albite.'
+    attribution: Robie et al. (1978)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_robie_table_7_fusion_quote
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 7 / printed p. 723
     table: '7'
   read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_table_4_fit
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -360,8 +596,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1373'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile heat_of_fusion does not use standard_pressure_Pa
@@ -399,9 +635,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, estimate_from_liquid_glass_Cp_and_Tg,
-      locator, derivation'
+    kind: point
+    point: '64.4336'
     approximate: false
   uncertainty:
     kind: none
@@ -410,16 +645,36 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: 'Table 7 footnote 1: Weill et al. (1980a), adjusted to 1373 K for albite.'
+    attribution: Weill et al. (1980a)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_albite_weill_table_7_fusion_quote
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 7 / printed p. 723
     table: '7'
   read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_calorimetry_measured_table_1
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::calvet-inverse-drop-series
   identity:
@@ -463,7 +718,7 @@ observations:
     note: tables=['1', '7']; pages=PDF pp. 4 and 7 / printed pp. 720 and 723
     source_path: text/stebbins-carmichael-weill-1983/pdftotext-layout.txt
   read_from: pdftotext:stebbins-carmichael-weill-1983
-- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_table_7_fusion_quotes
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_robie_table_7_fusion_quote
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
     quantity:
@@ -487,8 +742,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1830'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile heat_of_fusion does not use standard_pressure_Pa
@@ -526,9 +781,113 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, attribution,
-      derived_from, table_7_heat_of_fusion'
+    kind: point
+    point: '81.1696'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 7 states no uncertainty for the quoted glass-Cp-only estimate.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Robie et al. (1978)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_robie_table_7_fusion_quote
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 7 / printed p. 723
+    table: '7'
+  read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
+    temperature_K:
+      state:
+        tag: value
+        value: '1830'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_table_7_fusion_quotes
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaAl2Si2O8
+      phase:
+        tag: unknown
+        reason: phase string 'CaAl2Si2O8_glass_and_crystalline_anorthite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: anorthite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1830'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '135.5616'
     approximate: false
   uncertainty:
     kind: printed
@@ -539,16 +898,36 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: Weill et al. (1980b); Robie et al. (1978)
+    attribution: Weill et al. (1980b)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_table_7_fusion_quotes
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 7 / printed p. 723
     table: '7'
   read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
+    temperature_K:
+      state:
+        tag: value
+        value: '1830'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_calorimetry_measured_tables_1_3
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
@@ -593,6 +972,111 @@ observations:
     note: tables=['1', '2', '3']; pages=PDF pp. 4-5 / printed pp. 720-721
     source_path: text/stebbins-carmichael-weill-1983/pdftotext-layout.txt
   read_from: pdftotext:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_entropy_of_fusion_discussion
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'CaMgSi2O6_liquid_and_crystalline_diopside' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1665'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '84.5168'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_entropy_of_fusion_discussion
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: 728
+    section: Discussion
+  read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1665'
+      locator:
+        page: 728
+        section: Discussion
+  derived_from:
+  - stebbins-carmichael-weill-1983::stebbins_1983_diopside_heat_of_fusion_table_7
+  derivation:
+    relation: fusion_entropy_calculated_from_heat_of_fusion_and_fusion_temperature
+    inputs:
+    - stebbins-carmichael-weill-1983::stebbins_1983_diopside_heat_of_fusion_table_7
+    parameters: []
+    output_unit: as_published
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_ferrier_table_7_fusion_quote
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -657,9 +1141,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, attribution,
-      value_kcal_per_mol, locator, derivation'
+    kind: point
+    point: '128.4488'
     approximate: false
   uncertainty:
     kind: none
@@ -670,15 +1153,27 @@ observations:
     original_method_class: quoted_attributed
     attribution: Ferrier (1968a)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_ferrier_table_7_fusion_quote
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 7 / printed p. 723
     table: '7'
   read_from: pdf:stebbins-carmichael-weill-1983
   point_conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
     temperature_K:
       state:
         tag: value
@@ -750,9 +1245,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, derived_from,
-      derivation, table_7_heat_of_fusion'
+    kind: point
+    point: '138.072'
     approximate: false
   uncertainty:
     kind: printed
@@ -765,18 +1259,31 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_reduced
-    original_method_class: measured_reduced
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_heat_of_fusion_table_7
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: 723
     table: '7'
   read_from: pdf:stebbins-carmichael-weill-1983
   point_conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 723
+        table: '7'
     temperature_K:
       state:
         tag: value
@@ -790,16 +1297,11 @@ observations:
   derivation:
     relation: Delta H_f(T) = H_liquid(T) - H_crystal(T); the paper combines liquid and crystal heat contents, heat of vitrification,
       and heat-capacity integrations as in Equations 3-4.
-    inputs: []
+    inputs:
+    - stebbins-carmichael-weill-1983::stebbins_1983_diopside_calorimetry_measured_tables_1_3
+    - pdf:stebbins-carmichael-weill-1983
     parameters: []
     output_unit: as_published
-    raw_inputs:
-      state:
-        tag: value
-        value: printed_unresolved
-      locator:
-        page: 723
-        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_robie_table_7_fusion_quote
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -825,8 +1327,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1665'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile heat_of_fusion does not use standard_pressure_Pa
@@ -864,9 +1366,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, estimate_from_glass_Cp_only,
-      locator, derivation'
+    kind: point
+    point: '77.404'
     approximate: false
   uncertainty:
     kind: none
@@ -875,16 +1376,36 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: 'Table 7 footnote 2: Robie et al. (1979).'
+    attribution: Robie et al. (1979)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_robie_table_7_fusion_quote
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 7 / printed p. 723
     table: '7'
   read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
+    temperature_K:
+      state:
+        tag: value
+        value: '1665'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_table_4_fit
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -995,8 +1516,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1665'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile heat_of_fusion does not use standard_pressure_Pa
@@ -1034,9 +1555,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, estimate_from_liquid_glass_Cp_and_Tg,
-      locator, derivation'
+    kind: point
+    point: '142.6744'
     approximate: false
   uncertainty:
     kind: none
@@ -1045,16 +1565,36 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: 'Table 7 footnote 1: Weill et al. (1980a).'
+    attribution: Weill et al. (1980a)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_diopside_weill_table_7_fusion_quote
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 7 / printed p. 723
     table: '7'
   read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
+    temperature_K:
+      state:
+        tag: value
+        value: '1665'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_calorimetry_measured_table_3
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
@@ -1098,6 +1638,117 @@ observations:
     note: tables=['3']; pages=PDF p. 5 / printed p. 721
     source_path: text/stebbins-carmichael-weill-1983/pdftotext-layout.txt
   read_from: pdftotext:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_entropy_of_fusion_discussion
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSiO4_liquid_and_metastable_crystalline_gamma_nepheline' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1750'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '28.0328'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.2'
+      units: cal/mol/K
+      locator:
+        page: 728
+        section: Discussion
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_entropy_of_fusion_discussion
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: 728
+    section: Discussion
+  read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1750'
+      locator:
+        page: 728
+        section: Discussion
+  derived_from:
+  - stebbins-carmichael-weill-1983::stebbins_1983_nepheline_heat_of_fusion_table_7
+  derivation:
+    relation: fusion_enthalpy_divided_by_fusion_temperature
+    inputs:
+    - stebbins-carmichael-weill-1983::stebbins_1983_nepheline_heat_of_fusion_table_7
+    parameters: []
+    output_unit: as_published
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_heat_of_fusion_table_7
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
@@ -1161,9 +1812,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, derived_from,
-      derivation, table_7_heat_of_fusion'
+    kind: point
+    point: '48.9528'
     approximate: false
   uncertainty:
     kind: printed
@@ -1176,18 +1826,31 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_reduced
-    original_method_class: measured_reduced
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_heat_of_fusion_table_7
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: 723
     table: '7'
   read_from: pdf:stebbins-carmichael-weill-1983
   point_conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 723
+        table: '7'
     temperature_K:
       state:
         tag: value
@@ -1201,16 +1864,11 @@ observations:
   derivation:
     relation: Delta H_f(T) = H_liquid(T) - H_crystal(T) at the estimated metastable γ-nepheline temperature; the authors use
       β-nepheline heat of vitrification at 985 K and the reported zero β-to-γ transition enthalpy.
-    inputs: []
+    inputs:
+    - stebbins-carmichael-weill-1983::stebbins_1983_nepheline_calorimetry_measured_table_3
+    - pdf:stebbins-carmichael-weill-1983
     parameters: []
     output_unit: as_published
-    raw_inputs:
-      state:
-        tag: value
-        value: printed_unresolved
-      locator:
-        page: 723
-        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_table_4_fit
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -1335,6 +1993,111 @@ observations:
     note: tables=['3']; pages=PDF p. 5 / printed p. 721
     source_path: text/stebbins-carmichael-weill-1983/pdftotext-layout.txt
   read_from: pdftotext:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_entropy_of_fusion_abstract
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: KAlSi3O8
+      phase:
+        tag: unknown
+        reason: phase string 'KAlSi3O8_liquid_and_crystalline_sanidine' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '39.3296'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_entropy_of_fusion_abstract
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: 717
+    section: Abstract
+  read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 717
+        section: Abstract
+  derived_from:
+  - stebbins-carmichael-weill-1983::stebbins_1983_sanidine_heat_of_fusion_table_7
+  derivation:
+    relation: fusion_entropy_calculated_from_heat_of_fusion_and_fusion_temperature
+    inputs:
+    - stebbins-carmichael-weill-1983::stebbins_1983_sanidine_heat_of_fusion_table_7
+    parameters: []
+    output_unit: as_published
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_heat_of_fusion_table_7
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
@@ -1399,9 +2162,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, derived_from,
-      derivation, table_7_heat_of_fusion'
+    kind: point
+    point: '57.7392'
     approximate: false
   uncertainty:
     kind: printed
@@ -1414,18 +2176,31 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_reduced
-    original_method_class: measured_reduced
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_heat_of_fusion_table_7
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: 723
     table: '7'
   read_from: pdf:stebbins-carmichael-weill-1983
   point_conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 723
+        table: '7'
     temperature_K:
       state:
         tag: value
@@ -1439,16 +2214,11 @@ observations:
   derivation:
     relation: Delta H_f(T) = H_liquid(T) - H_crystal(T) at the hypothetical metastable 1473 K reference; the paper combines
       liquid and crystal heat contents, heat of vitrification, and heat-capacity corrections as in Equations 3-4.
-    inputs: []
+    inputs:
+    - stebbins-carmichael-weill-1983::stebbins_1983_sanidine_calorimetry_measured_table_3
+    - pdf:stebbins-carmichael-weill-1983
     parameters: []
     output_unit: as_published
-    raw_inputs:
-      state:
-        tag: value
-        value: printed_unresolved
-      locator:
-        page: 723
-        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_robie_table_7_fusion_quote
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -1474,8 +2244,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1473'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile heat_of_fusion does not use standard_pressure_Pa
@@ -1513,9 +2283,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, estimate_from_glass_Cp_only,
-      locator, derivation'
+    kind: point
+    point: '49.7896'
     approximate: false
   uncertainty:
     kind: none
@@ -1524,16 +2293,36 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: 'Table 7 footnote 3: Robie et al. (1978).'
+    attribution: Robie et al. (1978)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_robie_table_7_fusion_quote
   source_id: stebbins-carmichael-weill-1983
   locator:
     page: PDF p. 7 / printed p. 723
     table: '7'
   read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    pressure_bar:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_table_4_fit
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:

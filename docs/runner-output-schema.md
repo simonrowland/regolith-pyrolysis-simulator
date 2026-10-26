@@ -47,6 +47,14 @@ campaign-pressure refusals populate that generic field only, while Knudsen
 refusals populate it and the transport-specific
 `knudsen_regime_diagnostic` compatibility field.
 
+`run_metadata.c0_exit.forecast_engine` is optional and records the closed
+engine identity used for a computed C0 exit forecast (`internal-analytical`,
+`alphamelts`, `thermoengine`, or `cached-real`). Older run records without this
+nested field remain valid, and absence carries no meaning. This additive
+run-metadata field does not change the exact top-level runner envelope or the
+artifact envelope, so `RUNNER_SCHEMA_VERSION` remains `1.9.0` and
+`ARTIFACT_SCHEMA_VERSION` remains `0.2.0`.
+
 Run the CLI as:
 
 ```bash
@@ -283,6 +291,11 @@ remain typed environment refusals and never become numerical predictions;
 ordinary programming exceptions propagate as errors. Stable MAGEMin domain
 refusals retain the qualified Kress91 extrapolation without dispatching another
 engine.
+
+The optional `c0_exit` notice records C0 exit bounds and remaining volatile
+inventory. Its `forecast_engine` member appears only when the detached forecast
+has a recognized engine identity; consumers must tolerate older notices that
+omit it.
 
 ```jsonc
 "run_metadata": {
@@ -854,8 +867,11 @@ incident, stuck, re-evaporated, and net continuous flux and has
   appears only when its backing source is populated. Most require a staged /
   diagnostic / real-backend run, but that is **not** a rule you can rely on:
   `fe_redox_split`, `stage_3_capture`, and `condensation_refusals_by_species`
-  are all present on a plain `internal-analytical` C0 run. Consumers must test
-  for presence, not infer it from the backend. Each is whitelisted in
+  are all present on a plain `internal-analytical` C0 run. The
+  `high_t_melt_activity` diagnostic can also appear on an internal-analytical
+  run when a per-hour vapor-pressure dispatch crosses the VapoRock temperature
+  cap. Consumers must test for presence, not infer it from the backend. Each is
+  whitelisted in
   `tests/test_runner_smoke.py::PER_HOUR_OPTIONAL_KEYS`:
   * `p_carrier_bar` / `carrier_identity` -- emitted as a pair when the
     overhead composition carries a finite positive partial pressure for the
@@ -961,7 +977,7 @@ incident, stuck, re-evaporated, and net continuous flux and has
     mirrors the ledger relative tolerance; it is a loud diagnostic tripwire,
     not a fitted chemistry coefficient.
   * `oxygen_reservoir` -- emitted by
-    `_oxygen_reservoir_exchange_observables` for gate diagnostics or a clamped
+    `_oxygen_reservoir_exchange_observables` for gate diagnostics, a clamped
     exchange. `liquid_fraction_gate` records the declared provider and realized
     redox/fraction/evaporation outcomes. Analytical hours carry
     `qualification: analytical_kress91_floor_prediction`. A deterministic
@@ -976,7 +992,14 @@ incident, stuck, re-evaporated, and net continuous flux and has
     `MemoryError` failures remain typed refusals and do not produce an hourly
     floor prediction. Exchange fields retain the ledger-committed O2
     amount, unbacked remainder, direction and clamp status, including `false`
-    when only the gate record caused the diagnostics object to be emitted.
+    when only the gate record caused the diagnostics object to be emitted;
+    clamped-exchange fields come from `HourSnapshot.oxygen_reservoir`.
+  * `high_t_melt_activity` -- emitted when the per-hour vapor-pressure
+    dispatch populates the high-temperature activity authority diagnostic.
+    This JSON-safe `high_t_melt_activity.v1` value is copied from
+    `sim._last_high_t_melt_activity`; it describes that hour's provider,
+    authority, and notices. It is separate from the run-level
+    `high_t_melt_activity_fallback_notice`.
   * `mass_balance_error_category` -- added inline by `build_per_hour_summary`
     when `HourSnapshot.mass_balance_error_category` is a non-empty string; the
     categorical mass-balance-error label for that hour.

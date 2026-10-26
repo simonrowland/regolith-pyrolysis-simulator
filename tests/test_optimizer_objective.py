@@ -1982,6 +1982,9 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     refusal_sim, refusal_missing_by_hour = _sso2_sim_alpha_fallback_disabled(
         hours=3
     )
+    refusal_sim.setpoints.setdefault("chemistry_kernel", {})[
+        "unmeasured_alpha_fallback_species"
+    ] = ["CrO2"]
     refusal_missing = {}
     for hourly in refusal_missing_by_hour:
         refusal_missing.update(hourly)
@@ -2003,6 +2006,44 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
         "engaged_species": [],
         "total_engagement_count": 0,
     }
+
+
+def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
+    from simulator.optimize.sso2_evidence import _unmeasured_alpha_fallback_notice
+
+    generic_sim = SimpleNamespace(
+        setpoints={
+            "chemistry_kernel": {"allow_unmeasured_alpha_fallback": True}
+        },
+        _unmeasured_alpha_fallback_species_engaged=("Al2", "CrO"),
+        _degraded_path_engagement_summary=lambda: {
+            "unmeasured_alpha_evaporation_fallback": {"total_count": 7}
+        },
+    )
+
+    assert _unmeasured_alpha_fallback_notice(generic_sim) == {
+        "severity": "warning",
+        "status": "not_engaged",
+        "policy": "alpha=1.0 prototype fallback",
+        "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
+        "permitted_species": ["CrO2"],
+        "engaged_species": [],
+        "total_engagement_count": 0,
+    }
+
+    scoped_sim = SimpleNamespace(
+        setpoints={
+            "chemistry_kernel": {
+                "unmeasured_alpha_fallback_species": ["CrO2"]
+            }
+        },
+        _unmeasured_alpha_fallback_species_engaged=("CrO",),
+        _degraded_path_engagement_summary=lambda: {
+            "unmeasured_alpha_evaporation_fallback": {"total_count": 1}
+        },
+    )
+    with pytest.raises(RuntimeError, match="escaped its trace-species scope: CrO"):
+        _unmeasured_alpha_fallback_notice(scoped_sim)
 
 
 def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:

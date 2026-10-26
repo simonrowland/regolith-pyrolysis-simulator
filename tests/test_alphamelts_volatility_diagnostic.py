@@ -7,6 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from engines.builtin.vapor_pressure import VaporPressureComputationError
 import simulator.diagnostic_helpers.alphamelts_volatility as volatility_module
 from simulator.alphamelts_reference_pressure import (
     alphamelts_condensed_phase_pressure_bar,
@@ -108,7 +109,7 @@ def _domain_composition() -> dict[str, float]:
     ),
     ids=("metal-site", "oxide-vapor-site"),
 )
-def test_antoine_A_skip_is_reported_in_volatility_diagnostic(
+def test_antoine_A_refusal_or_finite_nonpositive_compute_in_volatility_diagnostic(
     a_value, reason, section, species, parent_oxide, site
 ) -> None:
     coefficients = {"B": 0.0, "C": 0.0}
@@ -134,13 +135,67 @@ def test_antoine_A_skip_is_reported_in_volatility_diagnostic(
         vapor_pressure_data=vapor_data,
     )
 
-    expected = (
-        "antoine_species_skipped: "
-        f"species={species} site={site} reason={reason} "
-        "temperature_K=1773.150"
+    if a_value is None:
+        expected = (
+            "antoine_species_skipped: "
+            f"species={species} site={site} reason={reason} "
+            "temperature_K=1773.150"
+        )
+        assert expected in diagnostic["warnings"]
+        assert species not in diagnostic["grid"][0]["species"]
+        return
+
+    assert species in diagnostic["grid"][0]["species"]
+    resolved = diagnostic["grid"][0]["species"][species]
+    assert resolved["P_reference_Antoine_Pa"] == pytest.approx(0.1)
+    assert not any(
+        warning.startswith(
+            f"antoine_species_skipped: species={species} site={site} "
+        )
+        for warning in diagnostic["warnings"]
     )
-    assert expected in diagnostic["warnings"]
-    assert species not in diagnostic["grid"][0]["species"]
+
+
+@pytest.mark.parametrize(
+    ("a_value", "error_type"),
+    (
+        (float("inf"), VaporPressureComputationError),
+        ("not-a-number", ValueError),
+    ),
+    ids=("nonfinite", "malformed"),
+)
+@pytest.mark.parametrize(
+    ("section", "species", "parent_oxide"),
+    (("metals", "Na", "Na2O"), ("oxide_vapors", "SiO", "SiO2")),
+    ids=("metal-site", "oxide-vapor-site"),
+)
+def test_invalid_antoine_coefficients_raise_in_volatility_diagnostic(
+    a_value, error_type, section, species, parent_oxide
+) -> None:
+    row = {
+        "parent_oxide": parent_oxide,
+        "antoine": {"A": a_value, "B": 0.0, "C": 0.0},
+    }
+    if section == "metals":
+        row["fit_target"] = "pure_component_psat"
+    else:
+        row["valid_range_K"] = [1000.0, 2500.0]
+    vapor_data = {
+        "metals": {species: row} if section == "metals" else {},
+        "oxide_vapors": {species: row} if section == "oxide_vapors" else {},
+    }
+    activities = {"Na2O": 0.25, "SiO2": 0.25}
+
+    with pytest.raises(error_type):
+        alphamelts_activity_volatility_diagnostic(
+            composition_wt_pct=_domain_composition(),
+            pO2_grid_bar=[1e-9],
+            temperature_C=1500.0,
+            activity_source=StubActivitySource(
+                {1.0: activities, 10.0: activities}
+            ),
+            vapor_pressure_data=vapor_data,
+        )
 
 
 def test_default_activity_source_uses_explicit_reference_pressure(monkeypatch):

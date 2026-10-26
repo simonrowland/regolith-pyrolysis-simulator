@@ -108,7 +108,7 @@ import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Tuple
+from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
 from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
@@ -882,8 +882,16 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
     ),
 }
 
+# Decimal shape is the printed gbase/factor. nan/inf must reach the
+# finiteness gate; a decimal-only match dropped those pure-phase tokens
+# before any diagnostic existed. Case follows the engine's own spelling.
+# The sign stays inside the capture. An outer \+? used to eat the factor's
+# leading plus, so the recorded raw token for '+nan' was 'nan'.
+_MAGEMIN_GBASE_TOKEN = r'[+-]?(?:\d+\.\d+|nan|inf)'
 _MAGEMIN_PP_GBASE_RE = re.compile(
-    r'^\s*([A-Za-z0-9_]+):\s+(-?\d+\.\d+)\s+\+?(-?\d+\.\d+)\s*$'
+    rf'^\s*([A-Za-z0-9_]+):\s+({_MAGEMIN_GBASE_TOKEN})\s+'
+    rf'({_MAGEMIN_GBASE_TOKEN})\s*$',
+    re.IGNORECASE,
 )
 _MAGEMIN_SS_BLOCK_RE = re.compile(r'^\s*([a-z][a-z0-9]*):\s*$')
 _MAGEMIN_STATUS_RE = re.compile(
@@ -892,25 +900,113 @@ _MAGEMIN_STATUS_RE = re.compile(
 )
 
 
-def _finite_gbase_token(token: str, *, context: str) -> float:
-    """float() plus a finiteness gate: engine output never carries NaN/inf."""
+@dataclass(frozen=True)
+class _GbaseNonFinite:
+    """One non-finite Verb=1 gbase token, with the raw text the engine printed."""
+
+    phase: str
+    field: str
+    raw_token: str
+    context: str
+
+
+def _nonfinite_gbase_message(context: str, token: str) -> str:
+    return (
+        f'MAGEMin gbase table value for {context} is not finite: '
+        f'{token!r}; refusing engine output'
+    )
+
+
+_UNRELATED_GBASE_NONFINITE_PREFIX = (
+    'ignored non-finite MAGEMin gbase value in an unrequested phase: '
+)
+
+
+def _unrelated_gbase_nonfinite_note(fault: _GbaseNonFinite) -> str:
+    return (
+        f'{_UNRELATED_GBASE_NONFINITE_PREFIX}'
+        f'phase {fault.phase}, field {fault.field}, '
+        f'raw token {fault.raw_token!r}'
+    )
+
+
+def _unrelated_gbase_nonfinite_notes(warnings: Sequence[str]) -> Tuple[str, ...]:
+    """Sentences this parser recorded for a phase the read did not request."""
+    return tuple(
+        item
+        for item in warnings
+        if item.startswith(_UNRELATED_GBASE_NONFINITE_PREFIX)
+    )
+
+
+_UNRELATED_GBASE_FIELDS_RE = re.compile(
+    r'^phase (?P<phase>\S+), field (?P<field>\S+), '
+    r"raw token '(?P<raw>[^']*)'$"
+)
+
+
+def _unrelated_gbase_nonfinite_fields(
+    text: str,
+) -> Optional[Tuple[str, str, str]]:
+    """(phase, field, raw token) from one diagnostic sentence.
+
+    The raw token is the engine's printed spelling, sign included.
+    """
+    if not text.startswith(_UNRELATED_GBASE_NONFINITE_PREFIX):
+        return None
+    match = _UNRELATED_GBASE_FIELDS_RE.match(
+        text[len(_UNRELATED_GBASE_NONFINITE_PREFIX):]
+    )
+    if match is None:
+        return None
+    return match.group('phase'), match.group('field'), match.group('raw')
+
+
+def _read_gbase_token(
+    token: str,
+    *,
+    context: str,
+    phase: str,
+    field: str,
+    nonfinite: Optional[List[_GbaseNonFinite]],
+) -> Optional[float]:
+    """Parse one gbase token.
+
+    An unscoped parse (``nonfinite is None``) refuses any non-finite token.
+    A scoped parse records it and returns None so the caller can keep the
+    rest of the table. ``float()`` ValueError still propagates.
+    """
     value = float(token)
-    if not math.isfinite(value):
-        raise PurePhaseAccessError(
-            f'MAGEMin gbase table value for {context} is not finite: '
-            f'{token!r}; refusing engine output'
+    if math.isfinite(value):
+        return value
+    if nonfinite is None:
+        raise PurePhaseAccessError(_nonfinite_gbase_message(context, token))
+    nonfinite.append(
+        _GbaseNonFinite(
+            phase=phase,
+            field=field,
+            raw_token=token,
+            context=context,
         )
-    return value
+    )
+    return None
 
 
 def _parse_magemin_gbase_tables(
     stdout: str,
+    nonfinite: Optional[List[_GbaseNonFinite]] = None,
 ) -> Tuple[Dict[str, Tuple[float, float]], Dict[str, Dict[str, float]]]:
     """Parse the Verb=1 pre-minimisation gbase table.
 
     Returns ({pp_name: (gbase_kJ_per_mol_formula, factor)},
              {ss_host: {endmember: gbase_kJ_per_mol_formula}}).
     First occurrence wins; the table is printed once before levelling.
+    With ``nonfinite`` omitted, any non-finite token refuses the table.
+    With a list, those tokens are recorded and omitted from the numeric
+    maps so a later selector can refuse only the phase it asked for.
+    A short solution row is still not a complete endmember vector: its
+    finite tokens are kept only when the row also carries a non-finite
+    token that had to be read. An all-finite short row stays dropped.
     """
     pp: Dict[str, Tuple[float, float]] = {}
     ss: Dict[str, Dict[str, float]] = {}
@@ -918,12 +1014,25 @@ def _parse_magemin_gbase_tables(
     for i, line in enumerate(lines):
         m = _MAGEMIN_PP_GBASE_RE.match(line)
         if m:
-            pp.setdefault(m.group(1), (
-                _finite_gbase_token(m.group(2), context=m.group(1)),
-                _finite_gbase_token(
-                    m.group(3), context=f'{m.group(1)} factor'
-                ),
-            ))
+            name = m.group(1)
+            if name in pp:
+                continue
+            gbase = _read_gbase_token(
+                m.group(2),
+                context=name,
+                phase=name,
+                field='gbase',
+                nonfinite=nonfinite,
+            )
+            factor = _read_gbase_token(
+                m.group(3),
+                context=f'{name} factor',
+                phase=name,
+                field='factor',
+                nonfinite=nonfinite,
+            )
+            if gbase is not None and factor is not None:
+                pp[name] = (gbase, factor)
             continue
         m = _MAGEMIN_SS_BLOCK_RE.match(line)
         if (
@@ -932,18 +1041,33 @@ def _parse_magemin_gbase_tables(
             and lines[i + 1].strip().startswith('----')
             and m.group(1) not in ss
         ):
+            host = m.group(1)
             names = lines[i + 2].split()
+            raws = lines[i + 3].split()
+            # zip ignores trailing raw tokens. A short row used to be
+            # skipped before those tokens were read, so a nan on it never
+            # reached the gate. Read the paired tokens first.
+            parsed: Dict[str, float] = {}
+            block_faults: List[_GbaseNonFinite] = []
             try:
-                values = [
-                    _finite_gbase_token(
-                        v, context=f'{m.group(1)}:{name}'
+                for endmember, raw in zip(names, raws):
+                    value = _read_gbase_token(
+                        raw,
+                        context=f'{host}:{endmember}',
+                        phase=host,
+                        field=endmember,
+                        nonfinite=block_faults if nonfinite is not None else None,
                     )
-                    for name, v in zip(names, lines[i + 3].split())
-                ]
+                    if value is not None:
+                        parsed[endmember] = value
             except ValueError:
                 continue
-            if len(names) == len(values):
-                ss[m.group(1)] = dict(zip(names, values))
+            if nonfinite is not None:
+                nonfinite.extend(block_faults)
+            short = len(raws) < len(names)
+            if short and not block_faults:
+                continue
+            ss[host] = parsed
     return pp, ss
 
 
@@ -1001,11 +1125,42 @@ def _check_magemin_solver_status(stdout: str, warnings: List[str]) -> None:
         warnings.append(message)
 
 
+def _gbase_fault_is_requested(
+    spec: _MAGEMinPurePhaseSpec,
+    fault: _GbaseNonFinite,
+) -> bool:
+    """True when the non-finite token is a value of the phase being read."""
+    if spec.host_phase is None:
+        return fault.phase == spec.endmember
+    return fault.phase == spec.host_phase and fault.field == spec.endmember
+
+
 def _magemin_endmember_gbase_kJ(
-    spec: _MAGEMinPurePhaseSpec, stdout: str
+    spec: _MAGEMinPurePhaseSpec,
+    stdout: str,
+    notes: Optional[List[str]] = None,
 ) -> float:
-    """Endmember gbase in kJ per engine formula unit at the probe's (T, P)."""
-    pp_gbase, ss_endmember_gbase = _parse_magemin_gbase_tables(stdout)
+    """Endmember gbase in kJ per engine formula unit at the probe's (T, P).
+
+    A non-finite token on another phase is recorded on ``notes`` and does
+    not refuse this read. The requested phase's own token still refuses
+    with the same text as an unscoped table parse. Mode-vector and SYS
+    totals are not read here.
+    """
+    nonfinite: List[_GbaseNonFinite] = []
+    pp_gbase, ss_endmember_gbase = _parse_magemin_gbase_tables(
+        stdout, nonfinite=nonfinite
+    )
+    for fault in nonfinite:
+        if _gbase_fault_is_requested(spec, fault):
+            raise PurePhaseAccessError(
+                _nonfinite_gbase_message(fault.context, fault.raw_token)
+            )
+    if notes is not None:
+        for fault in nonfinite:
+            message = _unrelated_gbase_nonfinite_note(fault)
+            if message not in notes:
+                notes.append(message)
     if spec.host_phase is None:
         entry = pp_gbase.get(spec.endmember)
         g_kJ = entry[0] if entry is not None else None
@@ -3461,7 +3616,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
             _assert_magemin_bulk_echo(spec.bulk_wt_pct, matlab_text)
             _check_magemin_solver_status(stdout, notes)
-            g_kJ = _magemin_endmember_gbase_kJ(spec, stdout)
+            g_kJ = _magemin_endmember_gbase_kJ(spec, stdout, notes)
             return g_kJ * 1000.0 / spec.formula_divisor, notes
 
         delta = _MAGEMIN_FD_DELTA_K
