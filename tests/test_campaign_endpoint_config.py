@@ -70,6 +70,98 @@ def _flux(total_kg_hr: float = 0.0, **species_kg_hr: float) -> EvaporationFlux:
     )
 
 
+# Tick pins recorded on green 5fd6fe8d3, against the campaign-cap audit.
+# Keep the zero-based campaign_hour distinct from the completed-tick clock.
+@pytest.mark.parametrize(
+    "phase,path,branch,ticks",
+    [
+        (CampaignPhase.C0, "A", "two", 25),
+        (CampaignPhase.C0B, "A", "two", 3),
+        (CampaignPhase.C2A, "A", "two", 30),
+        (CampaignPhase.C2A_STAGED, "A_staged", "two", 9),
+        (CampaignPhase.C2B, "B", "two", 20),
+        (CampaignPhase.C3_K, "A", "two", 12),
+        (CampaignPhase.C3_K, "B", "two", 25),
+        (CampaignPhase.C3_K, "A_staged", "two", 3),
+        (CampaignPhase.C3_NA, "A", "two", 18),
+        (CampaignPhase.C3_NA, "B", "two", 35),
+        (CampaignPhase.C3_NA, "A_staged", "two", 3),
+        (CampaignPhase.C4, "A", "two", 20),
+        (CampaignPhase.C5, "A", "one", 800),
+        (CampaignPhase.C5, "A", "two", 800),
+        (CampaignPhase.C6, "A", "two", 20),
+        (CampaignPhase.C7_CA_ALUMINOTHERMIC, "A", "two", 1),
+        (CampaignPhase.MRE_BASELINE, "A", "two", 120),
+    ],
+)
+def test_green_endpoint_tick_pin_never_depleting_tail(phase, path, branch, ticks):
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(path=path, branch=branch)
+    temperature = {CampaignPhase.C4: 1600.0, CampaignPhase.C6: 1400.0}.get(phase, 25.0)
+    melt = _melt(phase, 0, temperature_C=temperature, voltage_V=2.5)
+    flux = _flux(2.0, Fe=1.0, Mg=1.0)
+    observed = []
+    for hour in range(ticks):
+        melt.campaign_hour = hour
+        observed.append(manager.check_endpoint(melt, flux, CondensationTrain(), record))
+        record.snapshots.append(HourSnapshot(
+            campaign=phase,
+            temperature_C=temperature,
+            evap_flux=flux,
+            mre_current_A=100.0,
+            mre_voltage_V=2.5,
+            c6_at_hold_target=phase == CampaignPhase.C6,
+        ))
+    assert observed == [False] * (ticks - 1) + [True]
+
+
+@pytest.mark.parametrize("path", ["A", "A_staged", "B"])
+def test_green_post_mg_c2a_scope_and_recipe_shadow_pin(path):
+    setpoints = _setpoints()
+    # Green's scoped runtime cap shadows this otherwise-valid recipe cap.
+    setpoints["campaigns"]["C2A_continuous"]["max_hold_hr"] = 40.0
+    manager = CampaignManager(setpoints)
+    record = BatchRecord(path=path)
+    assert manager.get_next_campaign(CampaignPhase.C4, record) == CampaignPhase.C2A
+    melt = _melt(CampaignPhase.C2A, 0)
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+    assert manager._campaign_overrides(CampaignPhase.C2A) == {
+        "min_hold_hr": 82.0, "max_hours": 160.0,
+    }
+    for hour, expected in [(81, False), (82, True)]:
+        melt.campaign_hour = hour
+        record.snapshots = [HourSnapshot(campaign=CampaignPhase.C2A, evap_flux=_flux(1.0))]
+        assert manager.check_endpoint(melt, _flux(0.01), CondensationTrain(), record) is expected
+    for hour, expected in [(158, False), (159, True)]:
+        melt.campaign_hour = hour
+        assert manager.check_endpoint(melt, _flux(1.0), CondensationTrain(), record) is expected
+
+
+@pytest.mark.parametrize("phase,minimum,species", [
+    (CampaignPhase.C2A, 18, None),
+    (CampaignPhase.C2B, 8, "Fe"),
+    (CampaignPhase.C4, 6, "Mg"),
+])
+def test_green_rate_minimum_clock_pin(phase, minimum, species):
+    manager = CampaignManager(_setpoints())
+    temperature = 1600.0 if phase == CampaignPhase.C4 else 25.0
+    high = _flux(1.0, Fe=1.0, Mg=1.0)
+    record = BatchRecord(snapshots=[HourSnapshot(
+        campaign=phase, temperature_C=temperature, evap_flux=high,
+    )])
+    melt = _melt(phase, 0, temperature_C=temperature)
+    # C4 counts acquired snapshots plus the current tick; C2A/B use the index.
+    if phase == CampaignPhase.C4:
+        record.snapshots *= minimum - 2
+        assert manager.check_endpoint(melt, _flux(), CondensationTrain(), record) is False
+        record.snapshots.append(HourSnapshot(campaign=phase, temperature_C=temperature, evap_flux=high))
+    else:
+        melt.campaign_hour = minimum - 1
+        assert manager.check_endpoint(melt, _flux(), CondensationTrain(), record) is False
+        melt.campaign_hour += 1
+    assert manager.check_endpoint(melt, _flux(), CondensationTrain(), record) is True
+
+
 def test_t155_delta_materializes_once_at_phase_entry_and_defaults_stay_equal():
     defaults = _setpoints()
     manager = CampaignManager(copy.deepcopy(defaults))
