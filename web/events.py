@@ -4011,6 +4011,7 @@ def register_events(socketio):
         if setpoints_patch:
             try:
                 setpoints = _deep_merge_setpoints(setpoints, setpoints_patch)
+                CampaignManager._apply_recipe_endpoint_defaults(setpoints, setpoints_patch)
                 c4_max_temp = _c4_setpoint_ceiling_T_C(setpoints)
             except RunnerError as exc:
                 return reject({
