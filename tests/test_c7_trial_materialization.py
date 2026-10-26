@@ -272,6 +272,11 @@ def test_pressure_trial_freezes_liquidus_and_sweep_boundary(monkeypatch):
         hour = sim._prepare_evaporation_hour()
         from dataclasses import replace
         from simulator.evaporation import _frozen_source
+        from simulator.chemistry.kernel import ChemistryIntent
+        continuation = hour.provider_requests[ChemistryIntent.VAPOR_PRESSURE].control_inputs[
+            'high_t_melt_activity_previous']
+        with pytest.raises(TypeError, match='immutable'):
+            continuation['trial_mutation'] = True
         altered = replace(hour, redox={**hour.redox, 'fO2_log': hour.redox['fO2_log'] + 2.0})
         monkeypatch.setattr(sim, '_melt_redox_liquidus_gate_record',
                             lambda **kw: pytest.fail('pressure trial repeated liquidus lookup'))

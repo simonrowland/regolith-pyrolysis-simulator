@@ -117,22 +117,14 @@ class _RefusalSnapshotHistoryPrefix:
         memo.clear()
 
 
-def _materialize_refusal_snapshot_history(
-    state: Mapping[str, Any], *, copy_committed_rows: bool = True,
-) -> None:
-    """Own the history containers; rollback also detaches committed rows.
-
-    Read-only pressure projections share committed rows and retain the
-    snapshot owner's copied mutable tail, then release the rollback memo.
-    """
+def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
+    """Detach committed history rows when an hour must be rolled back."""
     for owner, field in ((state.get('record'), 'snapshots'),
                          (state.get('_condensation_model'), 'operating_history'),
                          (state.get('_condensation_model'), 'cold_spot_history')):
         history = getattr(owner, field, None)
         if isinstance(history, _RefusalSnapshotHistoryPrefix):
-            setattr(owner, field, history.materialize() if copy_committed_rows else list(history))
-            if not copy_committed_rows:
-                history.release()
+            setattr(owner, field, history.materialize())
 
 
 _REFUSAL_MISSING = object()

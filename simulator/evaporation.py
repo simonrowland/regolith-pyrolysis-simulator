@@ -5096,7 +5096,8 @@ class EvaporationMixin:
             requests[intent] = IntentRequest(intent=intent,
                 account_view=ProviderAccountView(accounts={}, species_formula_registry=self.species_formula_registry),
                 temperature_C=temperature, pressure_bar=pressure,
-                control_inputs=kwargs['control_inputs'] if intent == ChemistryIntent.VAPOR_PRESSURE else {})
+                control_inputs=(_freeze_catalog_value(kwargs['control_inputs'])
+                    if intent == ChemistryIntent.VAPOR_PRESSURE else {}))
         reservoir = self.melt.oxygen_reservoir
         T_K = self.melt.temperature_C + 273.15
         redox = dict(fO2_log=self._melt_fO2_reference_state_at_temperature(T_K, gate_authority=authority)[0],
@@ -5148,7 +5149,8 @@ class EvaporationMixin:
                     high_t_melt_activity_previous=dict(diagnostic.get('high_t_melt_activity') or {}),
                     high_t_melt_activity_previous_temperature_K=(
                         None if diagnostic.get('vapor_pressure_zero_reason') else T_K))
-            requests[ChemistryIntent.VAPOR_PRESSURE] = replace(request, control_inputs=continuation)
+            requests[ChemistryIntent.VAPOR_PRESSURE] = replace(request,
+                control_inputs=_freeze_catalog_value(continuation))
             hour = replace(hour, provider_requests=_freeze_catalog_value(requests),
                 equilibrium_inputs=_freeze_catalog_value({item.name: getattr(result, item.name) for item in fields(result)}))
         flux, flux_diagnostic, raw = _frozen_flux_from_pressure(hour, seed_oxygen, result, diagnostic)

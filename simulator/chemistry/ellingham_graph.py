@@ -57,14 +57,12 @@ def _physical_pO2_bar(pO2_bar: float) -> float:
     """Delegate supplied oxygen admission and notices to the O2 owner."""
     from simulator.vapour_rail.channels import validate_physical_pO2_bar
 
-    try:
-        return validate_physical_pO2_bar(pO2_bar)
-    except ValueError as exc:
-        raise EllinghamPressureRefusal(str(exc)) from exc
+    return validate_physical_pO2_bar(_physical_pO2_scalar(pO2_bar))
 
 
 
 def _physical_pO2_scalar(pO2_bar: float) -> float:
+    """Validate supplied oxygen without publishing a trial notice."""
     from simulator.vapour_rail.channels import _validated_physical_pO2_bar
     try:
         return _validated_physical_pO2_bar(pO2_bar)
