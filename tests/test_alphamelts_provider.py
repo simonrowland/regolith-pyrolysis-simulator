@@ -1408,6 +1408,48 @@ def test_parser_sr10_current_filtered_values_are_pinned_without_notice():
     assert diagnostics.backend_warnings == ()
 
 
+def test_parser_sr03_invalid_oxide_activity_omissions_emit_repair_notices():
+    """Kill the mutation that silently drops invalid oxide activities."""
+    legacy = SimpleNamespace(
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        activity_coefficients={
+            'SiO2': 0.42,
+            'Al2O3': float('nan'),
+            'FeO': 0.0,
+            'MgO': float('inf'),
+            'CaO': -0.1,
+            'Na': 0.7,
+        },
+        status='ok',
+        warnings=[],
+    )
+
+    diagnostics = project_equilibrium_to_diagnostics(
+        legacy,
+        mode='subprocess',
+        engine_version='fake-alphamelts subprocess',
+    )
+
+    assert diagnostics.activity_coefficients == {
+        'SiO2': 0.42,
+        'FeO': 0.0,
+        'CaO': -0.1,
+        'Na': 0.7,
+    }
+    assert diagnostics.backend_warnings == (
+        "AlphaMELTS provider omitted nonfinite diagnostic_oxide_activities field "
+        "'Al2O3' for phase liquid: nan",
+        "AlphaMELTS provider omitted nonpositive diagnostic_oxide_activities field "
+        "'FeO' for phase liquid: 0.0",
+        "AlphaMELTS provider omitted nonfinite diagnostic_oxide_activities field "
+        "'MgO' for phase liquid: inf",
+        "AlphaMELTS provider omitted nonpositive diagnostic_oxide_activities field "
+        "'CaO' for phase liquid: -0.1",
+    )
+
+
 def test_parser_sr11_current_path_values_are_pinned_without_notice():
     legacy = SimpleNamespace(
         phases_present=['liquid'],

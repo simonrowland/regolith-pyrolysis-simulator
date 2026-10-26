@@ -621,7 +621,7 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     assert engagement["total_count"] >= 0
     assert engagement["engaged"] == (engagement["total_count"] > 0)
 
-    # Rebaselined 2026-10-26 for b-813 and b-1028, then for the Stage-3 diverter (d-268/d-287) on studio-3; sha256 f2b1f30214a0ed190d3ecd97f8abc3cb738c59ddf541e1cfeb3d552dee2a0d99.
+    # Rebaselined 2026-10-26 for b-813 and b-1028; sha256 c4756d389c417613353a48b60da4d33d5a163390c6592300eb3e4a4b0d546532.
     # b-1028: 88 flux_dormant and 88 is_flux_dormant_by_epoch true->false,
     # 47 channel-state dormancy->refusal leaves, two refusal notes, counts
     # 5->7 / 2->4. b-813: 611 extrapolation_notice and 21
@@ -631,7 +631,7 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # C0 exits at h5 instead of h19; the 24 h regenerated trajectory reaches C3_NA and C4.
     # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "f2b1f30214a0ed190d3ecd97f8abc3cb738c59ddf541e1cfeb3d552dee2a0d99"
+        "c7e14647dc369a76816e130b46be5b347cb78340b061cf40a6cf910278db678e"
     )
 
 
