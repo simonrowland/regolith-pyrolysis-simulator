@@ -750,3 +750,28 @@ def test_oxygenated_producing_carriers_with_gas_coproduct_follow_surface():
                 2.0 ** evaluator.pO2_exponent, rel=1e-12, abs=0.0)
     finally:
         close_test_owned_magemin_backend(sim)
+
+
+def test_atomic_titanium_explicit_gas_coproduct_uses_surface_in_both_paths():
+    from simulator.melt_backend.base import EquilibriumResult
+    sim = simulation()
+    try:
+        sim.melt.temperature_C = 1600.0
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._frozen_evaporation_carriers = frozenset({'Ti'})
+        assert sim.vapor_pressures['metals']['Ti']['oxygen_destination'] == 'process.overhead_gas'
+        assert sim._project_evaporation_overhead_source_mol_hr({'Ti': 0.001}, {})['O2'] > 0.0
+        kernel_pressures, legacy_pressures = [], []
+        for oxygen in (0.009, 0.018):
+            sim._reaction_pO2_bar = oxygen
+            result = EquilibriumResult(temperature_C=1600.0, liquid_fraction=1.0)
+            sim._refresh_vapor_pressures_from_kernel(result, include_diagnostic_shadows=False)
+            kernel_pressures.append(result.vapor_pressures_Pa['Ti'])
+            legacy_pressures.append(sim._internal_analytical_equilibrium().vapor_pressures_Pa['Ti'])
+        # TiO2(l) -> Ti(g) + O2(g): fixed activity and T give
+        # p_Ti*p_O2=constant (both reduced by their standard pressure).
+        # Doubling gas oxygen must halve Ti, even though Ti is oxygen-free.
+        for pressures in (kernel_pressures, legacy_pressures):
+            assert pressures[1] / pressures[0] == pytest.approx(0.5, rel=1e-12, abs=0.0)
+    finally:
+        close_test_owned_magemin_backend(sim)
