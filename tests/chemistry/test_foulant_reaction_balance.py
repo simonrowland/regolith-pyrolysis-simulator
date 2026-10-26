@@ -110,6 +110,18 @@ def _runtime_cation_sulfate_reaction(
     feed_mass = resolve_species_formula(
         sulfate, registry
     ).molar_mass_kg_per_mol()
+
+    def no_c0_bakeout_reservation(
+        _species,
+        _extent_mol,
+        _carbon_per_mol,
+        _molar_c,
+        carbon_mol_remaining,
+    ):
+        # This test isolates reaction stoichiometry. The live C0 runner supplies
+        # the reservation collaborator; this table-only call is outside it.
+        return False, carbon_mol_remaining
+
     runtime = SimpleNamespace(
         species_formula_registry=registry,
         inventory=SimpleNamespace(
@@ -123,6 +135,7 @@ def _runtime_cation_sulfate_reaction(
             core.PyrolysisSimulator._decrease_inventory_species
         ),
         _merge_masses=core.PyrolysisSimulator._merge_masses,
+        _reserve_stage0_bakeout_sulfate_carbon=no_c0_bakeout_reservation,
     )
     specs: list[dict] = []
     core.PyrolysisSimulator._apply_stage0_cation_sulfate_carbon_reactions(

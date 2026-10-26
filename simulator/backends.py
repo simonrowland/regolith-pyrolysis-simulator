@@ -20,9 +20,11 @@ from simulator.backend_names import (  # noqa: F401 - re-exported for callers
     ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME,
     ANALYTICAL_BACKEND_DISPLAY_NAME,
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    CACHED_REAL_BACKEND_NAME,
     IMCC_SF04_BACKEND_NAME,
     IMCC_SF04_EXT_BACKEND_NAME,
     OPENIMCC_BACKEND_NAME,
+    REAL_MELT_BACKEND_NAMES,
     RETIRED_IMCC_BACKEND_NAMES,
     canonical_backend_name,
 )
@@ -83,12 +85,6 @@ def _ineligible_active_backend_message(name: str) -> str:
     )
 
 
-CACHED_REAL_BACKEND_NAME = "cached-real"
-REAL_MELT_BACKEND_NAMES = (
-    "alphamelts",
-    "thermoengine",
-    CACHED_REAL_BACKEND_NAME,
-)
 # Pre-grind sweep: these feedstocks can wedge in-process ThermoEngine;
 # tests guard this overlay by content digest, not grep.
 STAGE0_SUBPROCESS_FEEDSTOCK_IDS = (

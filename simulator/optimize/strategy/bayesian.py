@@ -395,7 +395,8 @@ def _optuna_params_from_seed(
     for spec in specs:
         if schema.is_forbidden(spec.path):
             continue
-        if spec.path in patch.values:
+        is_seeded_value = spec.path in patch.values
+        if is_seeded_value:
             value = patch.values[spec.path]
         else:
             try:
@@ -423,6 +424,15 @@ def _optuna_params_from_seed(
             has_scalar_value = False
         if not has_scalar_value:
             continue
+
+        if not is_seeded_value and spec.kind in {"float", "int"}:
+            # A partial seed inherits production defaults, but Optuna treats
+            # enqueued values as fixed even outside the sampled distribution.
+            # Leave an out-of-range default unsupplied so this knob is sampled
+            # within its declared bounds instead of creating an invalid trial.
+            low, high = _numeric_bounds(spec)
+            if not low <= float(value) <= high:
+                continue
 
         params[".".join(spec.path)] = value
     return params
