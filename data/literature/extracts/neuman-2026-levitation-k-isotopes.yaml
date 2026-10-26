@@ -143145,25 +143145,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_001
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_1_1_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 1–1
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '10'
-              locator: *s1_001
+              locator: *run_1_1_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_001
+                value: 'pure O2'
+              locator: *run_1_1_conditions
             log_fO2:
               state:
                 tag: value
@@ -143180,14 +143178,55 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_1_1_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_1_1_conditions
+            composition:
+              state:
+                tag: value
+                value: &neuman_basalt_starting_composition
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '44.1'
+                  - - TiO2
+                    - '1.92'
+                  - - Cr2O3
+                    - '0.066'
+                  - - Al2O3
+                    - '19.7'
+                  - - FeO
+                    - '10.5'
+                  - - MnO
+                    - '0.227'
+                  - - MgO
+                    - '9.43'
+                  - - CaO
+                    - '9.83'
+                  - - Na2O
+                    - '2.47'
+                  - - K2O
+                    - '1.72'
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 1–1
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_1_1_conditions
         - sample_id: 1-2
           derivation_parameters:
             starting_weight_g_as_printed: '0.01617'
@@ -143205,25 +143244,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_002
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_1_2_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 1–2
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '40'
-              locator: *s1_002
+              locator: *run_1_2_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_002
+                value: 'pure O2'
+              locator: *run_1_2_conditions
             log_fO2:
               state:
                 tag: value
@@ -143240,14 +143277,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_1_2_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_1_2_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 1–2
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_1_2_conditions
         - sample_id: 1-4
           derivation_parameters:
             starting_weight_g_as_printed: '0.01550'
@@ -143265,25 +143320,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_003
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_1_4_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 1–4
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '70'
-              locator: *s1_003
+              locator: *run_1_4_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_003
+                value: 'pure O2'
+              locator: *run_1_4_conditions
             log_fO2:
               state:
                 tag: value
@@ -143300,14 +143353,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_1_4_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_1_4_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 1–4
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_1_4_conditions
         - sample_id: 1-5
           derivation_parameters:
             starting_weight_g_as_printed: '0.01358'
@@ -143325,25 +143396,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_004
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_1_5_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 1–5
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '100'
-              locator: *s1_004
+              locator: *run_1_5_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_004
+                value: 'pure O2'
+              locator: *run_1_5_conditions
             log_fO2:
               state:
                 tag: value
@@ -143360,14 +143429,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_1_5_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_1_5_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 1–5
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_1_5_conditions
         - sample_id: 1-10
           derivation_parameters:
             starting_weight_g_as_printed: '0.01652'
@@ -143385,25 +143472,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_005
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_1_10_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 1–10
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '25'
-              locator: *s1_005
+              locator: *run_1_10_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_005
+                value: 'pure O2'
+              locator: *run_1_10_conditions
             log_fO2:
               state:
                 tag: value
@@ -143420,14 +143505,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_1_10_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_1_10_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 1–10
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_1_10_conditions
         - sample_id: 1-11
           derivation_parameters:
             starting_weight_g_as_printed: '0.01821'
@@ -143445,25 +143548,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_006
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_1_11_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 1–11
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '5'
-              locator: *s1_006
+              locator: *run_1_11_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_006
+                value: 'pure O2'
+              locator: *run_1_11_conditions
             log_fO2:
               state:
                 tag: value
@@ -143480,14 +143581,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_1_11_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '376'
+              locator: *run_1_11_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 1–11
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_1_11_conditions
         - sample_id: 1-12
           derivation_parameters:
             starting_weight_g_as_printed: '0.01759'
@@ -143505,25 +143624,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_007
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_1_12_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 1–12
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '1'
-              locator: *s1_007
+              locator: *run_1_12_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_007
+                value: 'pure O2'
+              locator: *run_1_12_conditions
             log_fO2:
               state:
                 tag: value
@@ -143540,14 +143657,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_1_12_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_1_12_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 1–12
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_1_12_conditions
         - sample_id: 2-1
           derivation_parameters:
             starting_weight_g_as_printed: '0.01853'
@@ -143565,25 +143700,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_008
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_2_1_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 2–1
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '15'
-              locator: *s1_008
+              locator: *run_2_1_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_008
+                value: 'pure O2'
+              locator: *run_2_1_conditions
             log_fO2:
               state:
                 tag: value
@@ -143600,14 +143733,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_2_1_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_2_1_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 2–1
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_2_1_conditions
         - sample_id: 2-2
           derivation_parameters:
             starting_weight_g_as_printed: '0.01497'
@@ -143625,25 +143776,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_009
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_2_2_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 2–2
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '10'
-              locator: *s1_009
+              locator: *run_2_2_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_009
+                value: 'IW + 3'
+              locator: *run_2_2_conditions
             log_fO2:
               state:
                 tag: value
@@ -143660,14 +143809,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+                value: '60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO'
+              locator: *run_2_2_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_2_2_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 2–2
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_2_2_conditions
         - sample_id: 2-3
           derivation_parameters:
             starting_weight_g_as_printed: '0.01824'
@@ -143685,25 +143852,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_010
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_2_3_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 2–3
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '40'
-              locator: *s1_010
+              locator: *run_2_3_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_010
+                value: 'IW + 3'
+              locator: *run_2_3_conditions
             log_fO2:
               state:
                 tag: value
@@ -143720,14 +143885,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+                value: '60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO'
+              locator: *run_2_3_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_2_3_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 2–3
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_2_3_conditions
         - sample_id: 2-4
           derivation_parameters:
             starting_weight_g_as_printed: '0.02032'
@@ -143745,25 +143928,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_011
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_2_4_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 2–4
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '70'
-              locator: *s1_011
+              locator: *run_2_4_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_011
+                value: 'IW + 3'
+              locator: *run_2_4_conditions
             log_fO2:
               state:
                 tag: value
@@ -143780,14 +143961,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+                value: '60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO'
+              locator: *run_2_4_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_2_4_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 2–4
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_2_4_conditions
         - sample_id: 2-5
           derivation_parameters:
             starting_weight_g_as_printed: '0.02086'
@@ -143805,25 +144004,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_012
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_2_5_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 2–5
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '100'
-              locator: *s1_012
+              locator: *run_2_5_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_012
+                value: 'IW + 3'
+              locator: *run_2_5_conditions
             log_fO2:
               state:
                 tag: value
@@ -143840,21 +144037,37 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+                value: '60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO'
+              locator: *run_2_5_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_2_5_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 2–5
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_2_5_conditions
         - sample_id: 2-6
           derivation_parameters:
             starting_weight_g_as_printed: '0.01784'
             ending_weight_g_as_printed: '0.01767'
           material: Basalt
-          T_C: 2000
-          duration_s: '20'
           mass_loss_fraction: '0.009529147982'
           locator:
             source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
@@ -143863,27 +144076,26 @@ species:
           point_conditions:
             temperature_K:
               state:
-                tag: value
-                value: '2273.15'
-              locator: &s1_013
+                tag: unknown
+                reason: No Table 1 run row is printed for sample 2-6; run temperature is unknown.
+              locator: &run_2_6_conditions
                 page: 14
                 pdf_page_index: 13
                 published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
-                row: 2–6
+                source_path: 'supporting/neuman-2026-publisher-mmc2.xlsx'
+                note: 'The article''s Supplementary Materials notice on physical PDF page 14 identifies the publisher MMC2 workbook containing this supplementary table.'
+                table: 'S1'
+                row: '2–6'
             duration_s:
               state:
-                tag: value
-                value: '20'
-              locator: *s1_013
+                tag: unknown
+                reason: No Table 1 run row is printed for sample 2-6; run duration is unknown.
+              locator: *run_2_6_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_013
+                value: 'IW+3'
+              locator: *run_2_6_conditions
             log_fO2:
               state:
                 tag: value
@@ -143897,6 +144109,35 @@ species:
                   fO2 from sample temperature and nominal gas composition.
                 table: S1
                 row: 2–6
+            atmosphere:
+              state:
+                tag: unknown
+                reason: No Table 1 run row is printed for sample 2-6; gas composition is unknown.
+              locator: *run_2_6_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: unknown
+                reason: No Table 1 run row is printed for sample 2-6; gas flow rate is unknown.
+              locator: *run_2_6_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_2_6_conditions
         - sample_id: 2-7
           derivation_parameters:
             starting_weight_g_as_printed: '0.01807'
@@ -143914,25 +144155,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_014
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_2_7_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 2–7
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '20'
-              locator: *s1_014
+              locator: *run_2_7_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_014
+                value: 'IW + 3'
+              locator: *run_2_7_conditions
             log_fO2:
               state:
                 tag: value
@@ -143949,14 +144188,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+                value: '60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO'
+              locator: *run_2_7_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_2_7_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 2–7
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_2_7_conditions
         - sample_id: 2-12
           derivation_parameters:
             starting_weight_g_as_printed: '0.0176'
@@ -143974,25 +144231,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_015
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_2_12_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 2–12
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '1'
-              locator: *s1_015
+              locator: *run_2_12_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_015
+                value: 'IW + 3'
+              locator: *run_2_12_conditions
             log_fO2:
               state:
                 tag: value
@@ -144009,14 +144264,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+                value: '60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO'
+              locator: *run_2_12_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_2_12_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 2–12
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_2_12_conditions
         - sample_id: 2-8
           derivation_parameters:
             starting_weight_g_as_printed: '0.01792'
@@ -144034,25 +144307,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_016
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_2_8_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 2–8
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '5'
-              locator: *s1_016
+              locator: *run_2_8_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_016
+                value: 'IW + 3'
+              locator: *run_2_8_conditions
             log_fO2:
               state:
                 tag: value
@@ -144069,14 +144340,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+                value: '60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO'
+              locator: *run_2_8_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_2_8_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 2–8
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_2_8_conditions
         - sample_id: 2-9
           derivation_parameters:
             starting_weight_g_as_printed: '0.01557'
@@ -144094,25 +144383,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_017
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_2_9_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 2–9
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '15'
-              locator: *s1_017
+              locator: *run_2_9_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_017
+                value: 'IW + 3'
+              locator: *run_2_9_conditions
             log_fO2:
               state:
                 tag: value
@@ -144129,14 +144416,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+                value: '60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO'
+              locator: *run_2_9_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_2_9_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 2–9
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_2_9_conditions
         - sample_id: 2-11
           derivation_parameters:
             starting_weight_g_as_printed: '0.0194'
@@ -144154,25 +144459,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_018
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_2_11_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 2–11
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '20'
-              locator: *s1_018
+              locator: *run_2_11_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_018
+                value: 'IW + 3'
+              locator: *run_2_11_conditions
             log_fO2:
               state:
                 tag: value
@@ -144189,14 +144492,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+                value: '60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO'
+              locator: *run_2_11_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_2_11_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 2–11
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_2_11_conditions
         - sample_id: 3-1
           derivation_parameters:
             starting_weight_g_as_printed: '0.01932'
@@ -144214,25 +144535,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_019
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_3_1_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 3–1
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '10'
-              locator: *s1_019
+              locator: *run_3_1_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_019
+                value: 'IW − 1'
+              locator: *run_3_1_conditions
             log_fO2:
               state:
                 tag: value
@@ -144249,14 +144568,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_3_1_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_3_1_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 3–1
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_3_1_conditions
         - sample_id: 3-2
           derivation_parameters:
             starting_weight_g_as_printed: '0.01983'
@@ -144274,25 +144611,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_020
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_3_2_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 3–2
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '40'
-              locator: *s1_020
+              locator: *run_3_2_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_020
+                value: 'IW − 1'
+              locator: *run_3_2_conditions
             log_fO2:
               state:
                 tag: value
@@ -144309,14 +144644,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_3_2_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_3_2_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 3–2
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_3_2_conditions
         - sample_id: 3-4
           derivation_parameters:
             starting_weight_g_as_printed: '0.01975'
@@ -144334,25 +144687,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_021
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_3_4_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 3–4
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '70'
-              locator: *s1_021
+              locator: *run_3_4_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_021
+                value: 'IW − 1'
+              locator: *run_3_4_conditions
             log_fO2:
               state:
                 tag: value
@@ -144369,14 +144720,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_3_4_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_3_4_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 3–4
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_3_4_conditions
         - sample_id: 3-5
           derivation_parameters:
             starting_weight_g_as_printed: '0.01733'
@@ -144394,25 +144763,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_022
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_3_5_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 3–5
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '100'
-              locator: *s1_022
+              locator: *run_3_5_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_022
+                value: 'IW − 1'
+              locator: *run_3_5_conditions
             log_fO2:
               state:
                 tag: value
@@ -144429,14 +144796,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_3_5_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '374'
+              locator: *run_3_5_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 3–5
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_3_5_conditions
         - sample_id: 3-7
           derivation_parameters:
             starting_weight_g_as_printed: '0.01935'
@@ -144454,25 +144839,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_023
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_3_7_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 3–7
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '5'
-              locator: *s1_023
+              locator: *run_3_7_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_023
+                value: 'IW − 1'
+              locator: *run_3_7_conditions
             log_fO2:
               state:
                 tag: value
@@ -144489,14 +144872,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_3_7_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_3_7_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 3–7
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_3_7_conditions
         - sample_id: 3-8
           derivation_parameters:
             starting_weight_g_as_printed: '0.01964'
@@ -144514,25 +144915,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_024
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_3_8_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 3–8
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '1'
-              locator: *s1_024
+              locator: *run_3_8_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_024
+                value: 'IW − 1'
+              locator: *run_3_8_conditions
             log_fO2:
               state:
                 tag: value
@@ -144549,14 +144948,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_3_8_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_3_8_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 3–8
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_3_8_conditions
         - sample_id: 3-9
           derivation_parameters:
             starting_weight_g_as_printed: '0.02007'
@@ -144574,25 +144991,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_025
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_3_9_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 3–9
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '20'
-              locator: *s1_025
+              locator: *run_3_9_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_025
+                value: 'IW − 1'
+              locator: *run_3_9_conditions
             log_fO2:
               state:
                 tag: value
@@ -144609,14 +145024,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_3_9_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '376'
+              locator: *run_3_9_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 3–9
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_3_9_conditions
         - sample_id: 3-10
           derivation_parameters:
             starting_weight_g_as_printed: '0.01878'
@@ -144634,25 +145067,23 @@ species:
               state:
                 tag: value
                 value: '2273.15'
-              locator: &s1_026
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_3_10_conditions
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
                 row: 3–10
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '20'
-              locator: *s1_026
+              locator: *run_3_10_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_026
+                value: 'IW − 1'
+              locator: *run_3_10_conditions
             log_fO2:
               state:
                 tag: value
@@ -144669,14 +145100,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_3_10_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_3_10_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 3–10
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_3_10_conditions
         - sample_id: 3-12
           derivation_parameters:
             starting_weight_g_as_printed: '0.01782'
@@ -144694,41 +145143,57 @@ species:
               state:
                 tag: value
                 value: '2073.15'
-              locator: &s1_027
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_3_12_conditions
+                page: 4
+                pdf_page_index: 3
+                published_page: 53
+                table: '1'
                 row: 3–12
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '10'
-              locator: *s1_027
+              locator: *run_3_12_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_027
+                value: 'IW − 1'
+              locator: *run_3_12_conditions
             log_fO2:
               state:
                 tag: unknown
                 reason: blank cell; no log fO2 value printed for this row
-              locator: *s1_027
+              locator: *run_3_12_conditions
             atmosphere:
               state:
                 tag: value
-                value: 1.62% 95 vol% Ar + 5 vol% CO2; 98.38% 95 vol% Ar + 5 vol% CO
+                value: '1.62% 95 vol% Ar + 5 vol% CO2; 98.38% 95 vol% Ar + 5 vol% CO'
+              locator: *run_3_12_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_3_12_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 3–12
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_3_12_conditions
         - sample_id: 4-1
           derivation_parameters:
             starting_weight_g_as_printed: '0.01961'
@@ -144746,41 +145211,57 @@ species:
               state:
                 tag: value
                 value: '2073.15'
-              locator: &s1_028
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_4_1_conditions
+                page: 4
+                pdf_page_index: 3
+                published_page: 53
+                table: '1'
                 row: 4–1
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '40'
-              locator: *s1_028
+              locator: *run_4_1_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_028
+                value: 'IW − 1'
+              locator: *run_4_1_conditions
             log_fO2:
               state:
                 tag: unknown
                 reason: blank cell; no log fO2 value printed for this row
-              locator: *s1_028
+              locator: *run_4_1_conditions
             atmosphere:
               state:
                 tag: value
-                value: 1.62% 95 vol% Ar + 5 vol% CO2; 98.38% 95 vol% Ar + 5 vol% CO
+                value: '1.62% 95 vol% Ar + 5 vol% CO2; 98.38% 95 vol% Ar + 5 vol% CO'
+              locator: *run_4_1_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_4_1_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 4–1
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_4_1_conditions
         - sample_id: 4-2
           derivation_parameters:
             starting_weight_g_as_printed: '0.01751'
@@ -144798,41 +145279,57 @@ species:
               state:
                 tag: value
                 value: '2073.15'
-              locator: &s1_029
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_4_2_conditions
+                page: 4
+                pdf_page_index: 3
+                published_page: 53
+                table: '1'
                 row: 4–2
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '70'
-              locator: *s1_029
+              locator: *run_4_2_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_029
+                value: 'IW − 1'
+              locator: *run_4_2_conditions
             log_fO2:
               state:
                 tag: unknown
                 reason: blank cell; no log fO2 value printed for this row
-              locator: *s1_029
+              locator: *run_4_2_conditions
             atmosphere:
               state:
                 tag: value
-                value: 1.62% 95 vol% Ar + 5 vol% CO2; 98.38% 95 vol% Ar + 5 vol% CO
+                value: '1.62% 95 vol% Ar + 5 vol% CO2; 98.38% 95 vol% Ar + 5 vol% CO'
+              locator: *run_4_2_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_4_2_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 4–2
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_4_2_conditions
         - sample_id: 4-4
           derivation_parameters:
             starting_weight_g_as_printed: '0.01706'
@@ -144850,41 +145347,57 @@ species:
               state:
                 tag: value
                 value: '2073.15'
-              locator: &s1_030
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_4_4_conditions
+                page: 4
+                pdf_page_index: 3
+                published_page: 53
+                table: '1'
                 row: 4–4
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '10'
-              locator: *s1_030
+              locator: *run_4_4_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_030
+                value: 'IW + 3'
+              locator: *run_4_4_conditions
             log_fO2:
               state:
                 tag: unknown
                 reason: blank cell; no log fO2 value printed for this row
-              locator: *s1_030
+              locator: *run_4_4_conditions
             atmosphere:
               state:
                 tag: value
-                value: 62.27% 95 vol% Ar + 5 vol% CO2; 37.73% 95 vol% Ar + 5 vol% CO
+                value: '62.27% 95 vol% Ar + 5 vol% CO2; 37.73% 95 vol% Ar + 5 vol% CO'
+              locator: *run_4_4_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_4_4_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 4–4
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_4_4_conditions
         - sample_id: 4-5
           derivation_parameters:
             starting_weight_g_as_printed: '0.0175'
@@ -144902,41 +145415,57 @@ species:
               state:
                 tag: value
                 value: '2073.15'
-              locator: &s1_031
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_4_5_conditions
+                page: 4
+                pdf_page_index: 3
+                published_page: 53
+                table: '1'
                 row: 4–5
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '40'
-              locator: *s1_031
+              locator: *run_4_5_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_031
+                value: 'IW + 3'
+              locator: *run_4_5_conditions
             log_fO2:
               state:
                 tag: unknown
                 reason: blank cell; no log fO2 value printed for this row
-              locator: *s1_031
+              locator: *run_4_5_conditions
             atmosphere:
               state:
                 tag: value
-                value: 62.27% 95 vol% Ar + 5 vol% CO2; 37.73% 95 vol% Ar + 5 vol% CO
+                value: '62.27% 95 vol% Ar + 5 vol% CO2; 37.73% 95 vol% Ar + 5 vol% CO'
+              locator: *run_4_5_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '374'
+              locator: *run_4_5_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 4–5
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_4_5_conditions
         - sample_id: 4-6
           derivation_parameters:
             starting_weight_g_as_printed: '0.02009'
@@ -144954,41 +145483,57 @@ species:
               state:
                 tag: value
                 value: '2073.15'
-              locator: &s1_032
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_4_6_conditions
+                page: 4
+                pdf_page_index: 3
+                published_page: 53
+                table: '1'
                 row: 4–6
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '70'
-              locator: *s1_032
+              locator: *run_4_6_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_032
+                value: 'IW + 3'
+              locator: *run_4_6_conditions
             log_fO2:
               state:
                 tag: unknown
                 reason: blank cell; no log fO2 value printed for this row
-              locator: *s1_032
+              locator: *run_4_6_conditions
             atmosphere:
               state:
                 tag: value
-                value: 62.27% 95 vol% Ar + 5 vol% CO2; 37.73% 95 vol% Ar + 5 vol% CO
+                value: '62.27% 95 vol% Ar + 5 vol% CO2; 37.73% 95 vol% Ar + 5 vol% CO'
+              locator: *run_4_6_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_4_6_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 3
-                pdf_page_index: 2
-                published_page: 52
-                table: '1'
-                row: 4–6
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_4_6_conditions
         - sample_id: 4-7
           derivation_parameters:
             starting_weight_g_as_printed: '0.01945'
@@ -145006,41 +145551,57 @@ species:
               state:
                 tag: value
                 value: '2073.15'
-              locator: &s1_033
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
-                row: 4–7
-            duration_s:
-              state:
-                tag: value
-                value: '10'
-              locator: *s1_033
-            fO2_control:
-              state:
-                tag: value
-                value: pure O2
-              locator: *s1_033
-            log_fO2:
-              state:
-                tag: unknown
-                reason: blank cell; no log fO2 value printed for this row
-              locator: *s1_033
-            atmosphere:
-              state:
-                tag: value
-                value: pure O2
-              locator:
+              locator: &run_4_7_conditions
                 page: 3
                 pdf_page_index: 2
                 published_page: 52
                 table: '1'
                 row: 4–7
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
+            duration_s:
+              state:
+                tag: value
+                value: '10'
+              locator: *run_4_7_conditions
+            fO2_control:
+              state:
+                tag: value
+                value: 'pure O2'
+              locator: *run_4_7_conditions
+            log_fO2:
+              state:
+                tag: unknown
+                reason: blank cell; no log fO2 value printed for this row
+              locator: *run_4_7_conditions
+            atmosphere:
+              state:
+                tag: value
+                value: 'pure O2'
+              locator: *run_4_7_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_4_7_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_4_7_conditions
         - sample_id: 4-8
           derivation_parameters:
             starting_weight_g_as_printed: '0.01883'
@@ -145058,41 +145619,57 @@ species:
               state:
                 tag: value
                 value: '2073.15'
-              locator: &s1_034
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
-                row: 4–8
-            duration_s:
-              state:
-                tag: value
-                value: '40'
-              locator: *s1_034
-            fO2_control:
-              state:
-                tag: value
-                value: pure O2
-              locator: *s1_034
-            log_fO2:
-              state:
-                tag: unknown
-                reason: blank cell; no log fO2 value printed for this row
-              locator: *s1_034
-            atmosphere:
-              state:
-                tag: value
-                value: pure O2
-              locator:
+              locator: &run_4_8_conditions
                 page: 3
                 pdf_page_index: 2
                 published_page: 52
                 table: '1'
                 row: 4–8
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
+            duration_s:
+              state:
+                tag: value
+                value: '40'
+              locator: *run_4_8_conditions
+            fO2_control:
+              state:
+                tag: value
+                value: 'pure O2'
+              locator: *run_4_8_conditions
+            log_fO2:
+              state:
+                tag: unknown
+                reason: blank cell; no log fO2 value printed for this row
+              locator: *run_4_8_conditions
+            atmosphere:
+              state:
+                tag: value
+                value: 'pure O2'
+              locator: *run_4_8_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_4_8_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_4_8_conditions
         - sample_id: 4-9
           derivation_parameters:
             starting_weight_g_as_printed: '0.01742'
@@ -145110,41 +145687,58 @@ species:
               state:
                 tag: value
                 value: '2073.15'
-              locator: &s1_035
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
-                row: 4–9
-            duration_s:
-              state:
-                tag: value
-                value: '70'
-              locator: *s1_035
-            fO2_control:
-              state:
-                tag: value
-                value: pure O2
-              locator: *s1_035
-            log_fO2:
-              state:
-                tag: unknown
-                reason: blank cell; no log fO2 value printed for this row
-              locator: *s1_035
-            atmosphere:
-              state:
-                tag: value
-                value: pure O2
-              locator:
+              locator: &run_4_9_conditions
                 page: 3
                 pdf_page_index: 2
                 published_page: 52
                 table: '1'
                 row: 4–9
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
+            duration_s:
+              state:
+                tag: value
+                value: '70'
+              locator: *run_4_9_conditions
+            fO2_control:
+              state:
+                tag: value
+                value: 'pure O2'
+              locator: *run_4_9_conditions
+            log_fO2:
+              state:
+                tag: unknown
+                reason: blank cell; no log fO2 value printed for this row
+              locator: *run_4_9_conditions
+            atmosphere:
+              state:
+                tag: value
+                value: 'pure O2'
+              locator: *run_4_9_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_4_9_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_basalt_starting_composition
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_4_9_conditions
+
     - observation_id: neuman_2026_supplementary_table_s1_loess_mass_loss_fraction
       experiment: neuman-2026-loess-levitation-evaporation
       type: mass_loss
@@ -145181,25 +145775,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_036
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_5_1_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 5–1
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '5'
-              locator: *s1_036
+              locator: *run_5_1_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_036
+                value: 'pure O2'
+              locator: *run_5_1_conditions
             log_fO2:
               state:
                 tag: value
@@ -145216,14 +145808,55 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_5_1_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_5_1_conditions
+            composition:
+              state:
+                tag: value
+                value: &neuman_loess_starting_composition
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '69.3'
+                  - - TiO2
+                    - '0.906'
+                  - - Cr2O3
+                    - '0.017'
+                  - - Al2O3
+                    - '14.7'
+                  - - FeO
+                    - '5.28'
+                  - - MnO
+                    - '0.149'
+                  - - MgO
+                    - '2.92'
+                  - - CaO
+                    - '1.95'
+                  - - Na2O
+                    - '1.24'
+                  - - K2O
+                    - '3.62'
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 5–1
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_5_1_conditions
         - sample_id: 5-5
           derivation_parameters:
             starting_weight_g_as_printed: '0.01702'
@@ -145241,25 +145874,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_037
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_5_5_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 5–5
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '5'
-              locator: *s1_037
+              locator: *run_5_5_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_037
+                value: 'pure O2'
+              locator: *run_5_5_conditions
             log_fO2:
               state:
                 tag: value
@@ -145276,14 +145907,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_5_5_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_5_5_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 5–5
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_5_5_conditions
         - sample_id: 6-2
           derivation_parameters:
             starting_weight_g_as_printed: '0.01614'
@@ -145301,25 +145950,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_038
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_6_2_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 6–2
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '10'
-              locator: *s1_038
+              locator: *run_6_2_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_038
+                value: 'pure O2'
+              locator: *run_6_2_conditions
             log_fO2:
               state:
                 tag: value
@@ -145336,14 +145983,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_6_2_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_6_2_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 6–2
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_6_2_conditions
         - sample_id: 6-3
           derivation_parameters:
             starting_weight_g_as_printed: '0.01710'
@@ -145361,25 +146026,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_039
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_6_3_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 6–3
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '40'
-              locator: *s1_039
+              locator: *run_6_3_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_039
+                value: 'pure O2'
+              locator: *run_6_3_conditions
             log_fO2:
               state:
                 tag: value
@@ -145396,14 +146059,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_6_3_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_6_3_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 6–3
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_6_3_conditions
         - sample_id: 6-4
           derivation_parameters:
             starting_weight_g_as_printed: '0.01753'
@@ -145421,25 +146102,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_040
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_6_4_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 6–4
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '70'
-              locator: *s1_040
+              locator: *run_6_4_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_040
+                value: 'pure O2'
+              locator: *run_6_4_conditions
             log_fO2:
               state:
                 tag: value
@@ -145456,14 +146135,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_6_4_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_6_4_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 6–4
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_6_4_conditions
         - sample_id: 6-5
           derivation_parameters:
             starting_weight_g_as_printed: '0.01785'
@@ -145481,25 +146178,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_041
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_6_5_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 6–5
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '100'
-              locator: *s1_041
+              locator: *run_6_5_conditions
             fO2_control:
               state:
                 tag: value
-                value: pure O2
-              locator: *s1_041
+                value: 'pure O2'
+              locator: *run_6_5_conditions
             log_fO2:
               state:
                 tag: value
@@ -145516,14 +146211,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: pure O2
+                value: 'pure O2'
+              locator: *run_6_5_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_6_5_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 6–5
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_6_5_conditions
         - sample_id: 6-6
           derivation_parameters:
             starting_weight_g_as_printed: '0.01758'
@@ -145541,25 +146254,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_042
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_6_6_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 6–6
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '10'
-              locator: *s1_042
+              locator: *run_6_6_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_042
+                value: 'IW + 3'
+              locator: *run_6_6_conditions
             log_fO2:
               state:
                 tag: value
@@ -145576,14 +146287,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+                value: '60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO'
+              locator: *run_6_6_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_6_6_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 6–6
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_6_6_conditions
         - sample_id: 6-7
           derivation_parameters:
             starting_weight_g_as_printed: '0.01546'
@@ -145601,25 +146330,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_043
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_6_7_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 6–7
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '40'
-              locator: *s1_043
+              locator: *run_6_7_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_043
+                value: 'IW + 3'
+              locator: *run_6_7_conditions
             log_fO2:
               state:
                 tag: value
@@ -145636,14 +146363,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+                value: '60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO'
+              locator: *run_6_7_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_6_7_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 6–7
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_6_7_conditions
         - sample_id: 6-8
           derivation_parameters:
             starting_weight_g_as_printed: '0.02141'
@@ -145661,25 +146406,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_044
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_6_8_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 6–8
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '70'
-              locator: *s1_044
+              locator: *run_6_8_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW+3
-              locator: *s1_044
+                value: 'IW + 3'
+              locator: *run_6_8_conditions
             log_fO2:
               state:
                 tag: value
@@ -145696,14 +146439,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+                value: '60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO'
+              locator: *run_6_8_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_6_8_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 6–8
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_6_8_conditions
         - sample_id: 5-3
           derivation_parameters:
             starting_weight_g_as_printed: '0.01841'
@@ -145721,25 +146482,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_045
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_5_3_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 5–3
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '10'
-              locator: *s1_045
+              locator: *run_5_3_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_045
+                value: 'IW − 1'
+              locator: *run_5_3_conditions
             log_fO2:
               state:
                 tag: value
@@ -145756,14 +146515,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_5_3_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_5_3_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 5–3
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_5_3_conditions
         - sample_id: 6-10
           derivation_parameters:
             starting_weight_g_as_printed: '0.01700'
@@ -145781,25 +146558,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_046
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_6_10_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 6–10
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '10'
-              locator: *s1_046
+              locator: *run_6_10_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_046
+                value: 'IW − 1'
+              locator: *run_6_10_conditions
             log_fO2:
               state:
                 tag: value
@@ -145816,14 +146591,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_6_10_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_6_10_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 6–10
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_6_10_conditions
         - sample_id: 5-2
           derivation_parameters:
             starting_weight_g_as_printed: '0.01945'
@@ -145841,25 +146634,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_047
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_5_2_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 5–2
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '40'
-              locator: *s1_047
+              locator: *run_5_2_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_047
+                value: 'IW − 1'
+              locator: *run_5_2_conditions
             log_fO2:
               state:
                 tag: value
@@ -145876,14 +146667,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_5_2_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_5_2_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 5–2
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_5_2_conditions
         - sample_id: 5-9
           derivation_parameters:
             starting_weight_g_as_printed: '0.01731'
@@ -145901,25 +146710,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_048
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_5_9_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 5–9
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '70'
-              locator: *s1_048
+              locator: *run_5_9_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_048
+                value: 'IW − 1'
+              locator: *run_5_9_conditions
             log_fO2:
               state:
                 tag: value
@@ -145936,14 +146743,32 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_5_9_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_5_9_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 5–9
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_5_9_conditions
         - sample_id: 5-10
           derivation_parameters:
             starting_weight_g_as_printed: '0.01778'
@@ -145961,25 +146786,23 @@ species:
               state:
                 tag: value
                 value: '2319.15'
-              locator: &s1_049
-                page: 14
-                pdf_page_index: 13
-                published_page: 63
-                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
-                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
-                  MMC2 workbook containing this supplementary table.
-                table: S1
+              locator: &run_5_10_conditions
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
                 row: 5–10
+                note: Printed run condition; sample label links this table row to Supplementary Table S1.
             duration_s:
               state:
                 tag: value
                 value: '100'
-              locator: *s1_049
+              locator: *run_5_10_conditions
             fO2_control:
               state:
                 tag: value
-                value: IW-1
-              locator: *s1_049
+                value: 'IW − 1'
+              locator: *run_5_10_conditions
             log_fO2:
               state:
                 tag: value
@@ -145996,11 +146819,29 @@ species:
             atmosphere:
               state:
                 tag: value
-                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+                value: '1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO'
+              locator: *run_5_10_conditions
+            gas_flow_rate_cm3_min:
+              state:
+                tag: value
+                value: '375'
+              locator: *run_5_10_conditions
+            composition:
+              state:
+                tag: value
+                value: *neuman_loess_starting_composition
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Chamber pressure is not reported.
               locator:
-                page: 6
-                pdf_page_index: 5
-                published_page: 55
-                table: '2'
-                row: 5–10
-                note: Gas proportions cross-referenced by sample id from the main experimental table.
+                page: 2
+                pdf_page_index: 1
+                published_page: 51
+                note: No chamber pressure is reported.
+            partial_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Oxygen partial pressure is not reported.
+              locator: *run_5_10_conditions

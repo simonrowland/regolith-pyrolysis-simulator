@@ -14,7 +14,12 @@ import pytest
 import yaml
 
 from simulator.battery.enums import Quantity
-from simulator.battery.migrate import Migrator, REPO_ROOT, source_files_for
+from simulator.battery.migrate import (
+    Migrator,
+    REPO_ROOT,
+    source_files_for,
+    wt_pct_to_mole_fraction,
+)
 from tests.literature_extract_test_helpers import (
     assert_no_unavailable_observation_values,
     iter_locators,
@@ -72,6 +77,34 @@ TABLE_RENDER = (
     },
 )
 
+# Starting fused-bead averages transcribed from Tables 1 and 2 in the PDF.
+STARTING_COMPOSITIONS = {
+    "basalt": {
+        "SiO2": "44.1",
+        "TiO2": "1.92",
+        "Cr2O3": "0.066",
+        "Al2O3": "19.7",
+        "FeO": "10.5",
+        "MnO": "0.227",
+        "MgO": "9.43",
+        "CaO": "9.83",
+        "Na2O": "2.47",
+        "K2O": "1.72",
+    },
+    "loess": {
+        "SiO2": "69.3",
+        "TiO2": "0.906",
+        "Cr2O3": "0.017",
+        "Al2O3": "14.7",
+        "FeO": "5.28",
+        "MnO": "0.149",
+        "MgO": "2.92",
+        "CaO": "1.95",
+        "Na2O": "1.24",
+        "K2O": "3.62",
+    },
+}
+
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -91,6 +124,31 @@ def _series_row(document: dict, observation_id: str, sample: str) -> dict:
         point
         for point in observation["values"]["series"]
         if point.get("sample_id") == sample
+    )
+
+
+def _mass_loss_point(document: dict, material: str, sample: str) -> dict:
+    observation = _source_observations(document)[
+        f"neuman_2026_supplementary_table_s1_{material}_mass_loss_fraction"
+    ][1]
+    return next(
+        point
+        for point in observation["values"]["points"]
+        if point["sample_id"] == sample
+    )
+
+
+def _assert_starting_composition_link(point: dict, material: str) -> None:
+    composition = point["point_conditions"]["composition"]
+    assert composition["state"]["tag"] == "value"
+    assert composition["state"]["value"]["basis"] == "printed_oxides"
+    assert composition["state"]["value"]["amount_basis"] == "mass_percent"
+    assert {
+        component: str(value)
+        for component, value in composition["state"]["value"]["components"]
+    } == STARTING_COMPOSITIONS[material]
+    assert composition["locator"]["table"] == (
+        "1" if material == "basalt" else "2"
     )
 
 
@@ -313,6 +371,117 @@ def test_printed_loss_summaries_and_registered_supplement_context_are_preserved(
     )
 
 
+def test_mass_loss_points_link_pdf_starting_compositions_and_run_conditions() -> None:
+    document = _document()
+    expected_rows = {
+        ("basalt", "1-1"): {
+            "temperature_C": "2000",
+            "temperature_K": "2273.15",
+            "duration_s": "10",
+            "fO2_control": "pure O2",
+            "atmosphere": "pure O2",
+            "flow": "375",
+            "mass_loss_fraction": "-0.004310344828",
+            "table": "1",
+            "row": "1–1",
+        },
+        ("basalt", "3-5"): {
+            "temperature_C": "2000",
+            "temperature_K": "2273.15",
+            "duration_s": "100",
+            "fO2_control": "IW − 1",
+            "atmosphere": (
+                "1.53% 95 vol% Ar + 5 vol% CO2; "
+                "98.47% 95 vol% Ar + 5 vol% CO"
+            ),
+            "flow": "374",
+            "mass_loss_fraction": "0.053664166186",
+            "table": "1",
+            "row": "3–5",
+        },
+        ("loess", "5-1"): {
+            "temperature_C": "2046",
+            "temperature_K": "2319.15",
+            "duration_s": "5",
+            "fO2_control": "pure O2",
+            "atmosphere": "pure O2",
+            "flow": "375",
+            "mass_loss_fraction": "0.003467062902",
+            "table": "2",
+            "row": "5–1",
+        },
+    }
+    start_locators = {
+        "basalt": next(
+            experiment["sample"]["printed_composition"]["locator"]
+            for experiment in document["experiments"]
+            if experiment["experiment_id"]
+            == "neuman-2026-basalt-levitation-evaporation"
+        ),
+        "loess": next(
+            experiment["sample"]["printed_composition"]["locator"]
+            for experiment in document["experiments"]
+            if experiment["experiment_id"]
+            == "neuman-2026-loess-levitation-evaporation"
+        ),
+    }
+
+    for (material, sample), expected in expected_rows.items():
+        point = _mass_loss_point(document, material, sample)
+        conditions = point["point_conditions"]
+        _assert_starting_composition_link(point, material)
+        assert conditions["composition"]["locator"] == start_locators[material]
+        assert str(point["T_C"]) == expected["temperature_C"]
+        assert str(point["duration_s"]) == expected["duration_s"]
+        assert str(point["mass_loss_fraction"]) == expected["mass_loss_fraction"]
+        assert _printed_condition(point, "temperature_K") == expected[
+            "temperature_K"
+        ]
+        assert _printed_condition(point, "duration_s") == expected["duration_s"]
+        assert _printed_condition(point, "fO2_control") == expected["fO2_control"]
+        assert _printed_condition(point, "atmosphere") == expected["atmosphere"]
+        assert _printed_condition(point, "gas_flow_rate_cm3_min") == expected["flow"]
+        assert conditions["temperature_K"]["locator"]["table"] == expected["table"]
+        assert conditions["temperature_K"]["locator"]["row"] == expected["row"]
+        assert conditions["total_pressure_Pa"]["state"]["tag"] == "unknown"
+        assert conditions["partial_pressure_Pa"]["state"]["tag"] == "unknown"
+
+    all_mass_loss_points = [
+        point
+        for material in ("basalt", "loess")
+        for point in _source_observations(document)[
+            f"neuman_2026_supplementary_table_s1_{material}_mass_loss_fraction"
+        ][1]["values"]["points"]
+    ]
+    assert len(all_mass_loss_points) == 49
+    assert all(
+        point["point_conditions"]["total_pressure_Pa"]["state"]["tag"]
+        == "unknown"
+        and point["point_conditions"]["partial_pressure_Pa"]["state"]["tag"]
+        == "unknown"
+        for point in all_mass_loss_points
+    )
+    unlinked_point = _mass_loss_point(document, "basalt", "2-6")
+    unlinked_run = unlinked_point["point_conditions"]
+    assert unlinked_point["material"] == "Basalt"
+    assert "T_C" not in unlinked_point
+    assert "duration_s" not in unlinked_point
+    _assert_starting_composition_link(unlinked_point, "basalt")
+    assert unlinked_run["temperature_K"]["state"]["tag"] == "unknown"
+    assert unlinked_run["duration_s"]["state"]["tag"] == "unknown"
+    assert unlinked_run["atmosphere"]["state"]["tag"] == "unknown"
+    assert unlinked_run["gas_flow_rate_cm3_min"]["state"]["tag"] == "unknown"
+
+    # This transcribed composition pin fails if a linked point is changed.
+    mutated = copy.deepcopy(document)
+    point = _mass_loss_point(mutated, "basalt", "1-1")
+    point["point_conditions"]["composition"]["state"]["value"]["components"][
+        0
+    ][1] = "44.0"
+    with pytest.raises(AssertionError):
+        _assert_starting_composition_link(point, "basalt")
+
+
 def test_derived_supplementary_mass_loss_rows_migrate_and_pin_values() -> None:
     # INDEX is assembled once per offer; inject this builder-shaped source row.
     index_row = _index_row()
@@ -343,7 +512,8 @@ def test_derived_supplementary_mass_loss_rows_migrate_and_pin_values() -> None:
     assert all(row.value.kind.value == "point" for row in mass_loss)
     assert all(row.evidence.class_.value.value == "measured_reduced" for row in mass_loss)
     assert all(row.derived_from == (f"tables:{SID}",) for row in mass_loss)
-    assert all(row.identity.temperature_K.is_value for row in mass_loss)
+    assert sum(row.identity.temperature_K.is_value for row in mass_loss) == 48
+    assert sum(row.identity.temperature_K.is_unknown for row in mass_loss) == 1
     assert all(row.point_conditions for row in mass_loss)
     derived_points = [
         point
@@ -358,11 +528,63 @@ def test_derived_supplementary_mass_loss_rows_migrate_and_pin_values() -> None:
         <= point.get("derivation_parameters", {}).keys()
         for point in derived_points
     )
-    assert all(
-        row.point_conditions["duration_s"].state.is_value
-        and row.point_conditions["duration_s"].locator is not None
+    assert sum(
+        row.point_conditions["duration_s"].state.is_value for row in mass_loss
+    ) == 48
+    assert sum(
+        row.point_conditions["duration_s"].state.is_unknown for row in mass_loss
+    ) == 1
+    assert all(row.point_conditions["duration_s"].locator is not None for row in mass_loss)
+
+    source_points = {
+        point["sample_id"]: point
+        for observation_id, (_, observation) in _source_observations(document).items()
+        if observation_id.startswith("neuman_2026_supplementary_table_s1_")
+        and observation_id.endswith("mass_loss_fraction")
+        for point in observation["values"]["points"]
+    }
+    migrated_by_sample = {
+        row.locator.note.split("CSV row ", 1)[1].split(";", 1)[0]: row
         for row in mass_loss
-    )
+    }
+    assert set(migrated_by_sample) == set(source_points)
+    for sample, row in migrated_by_sample.items():
+        point = source_points[sample]
+        material = point["material"].lower()
+        conditions = row.point_conditions
+        assert conditions is not None
+        composition = conditions["composition"]
+        assert composition.state.is_value and composition.locator is not None
+        assert composition.state.value.as_map() == wt_pct_to_mole_fraction(
+            STARTING_COMPOSITIONS[material]
+        ).as_map()
+        assert conditions["temperature_K"].locator is not None
+        assert conditions["duration_s"].locator is not None
+        assert conditions["atmosphere"].locator is not None
+        assert conditions["gas_flow_rate_cm3_min"].locator is not None
+        if sample == "2-6":
+            assert row.identity.temperature_K.is_unknown
+            assert conditions["temperature_K"].state.is_unknown
+            assert conditions["duration_s"].state.is_unknown
+        else:
+            assert row.identity.temperature_K.is_value
+            assert row.identity.temperature_K.value == conditions["temperature_K"].state.value
+            assert conditions["duration_s"].state.is_value
+            assert str(conditions["duration_s"].state.value) == str(point["duration_s"])
+        assert (
+            point["point_conditions"]["total_pressure_Pa"]["state"]["tag"]
+            == "unknown"
+        )
+        assert (
+            point["point_conditions"]["partial_pressure_Pa"]["state"]["tag"]
+            == "unknown"
+        )
+        assert row.value.point == Decimal(point["mass_loss_fraction"])
+    assert sum(
+        row.value.point > 0 and row.identity.temperature_K.is_value
+        for row in migrated_by_sample.values()
+    ) == 43
+    assert sum(row.value.point < 0 for row in migrated_by_sample.values()) == 5
 
     pinned = {
         "1-2": "0.023500309215",
