@@ -2439,6 +2439,201 @@ def _repo_point_rows(filename: str) -> list[tuple[dict, dict]]:
     return rows
 
 
+def test_mysen_1985_table2_redox_rows_migrate_with_rendered_values_and_conditions():
+    """Pin the rendered Table 2 cells, row count, lineage, and mapped axes."""
+    filename = "mysen-1985-cmas-redox.yaml"
+    path = EXTRACTS / filename
+    document = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    assert document["source"]["year"] == 1985
+    assert document["source"]["citation"].endswith(
+        "American Mineralogist, 70(3-4), 317-331."
+    )
+    assert vle.check_all_fidelity_samples_match(document, label=filename) == []
+    source_rows = {
+        row["observation_id"]: row
+        for row in document["species"]["Fe"]["observations"]
+    }
+    assert len(source_rows) == 163
+    run_ids = {
+        observation_id.rsplit("_c", 1)[0]
+        for observation_id in source_rows
+        if observation_id.endswith("_c10")
+    }
+    assert len(run_ids) == 88
+    assert sum(observation_id.endswith("_c10") for observation_id in source_rows) == 88
+    assert sum(observation_id.endswith("_c11") for observation_id in source_rows) == 75
+    assert not any(observation_id.endswith("_r39_c11") for observation_id in source_rows)
+
+    rendered_composition_pins = {
+        20: "CASIVF5",
+        21: "CASVF5",
+        25: "CASVIIF5",
+        31: "CASXIIF5",
+        43: "CASIIIF5",
+        48: "CASVF10",
+        60: "MASIIIF5",
+        63: "MASVIIF5",
+        68: "MASXIIF5",
+        70: "MASIIIF5",
+        72: "MASVIIF5",
+        77: "MASXIIF5",
+        81: "MASIXF5",
+    }
+    for run, expected in rendered_composition_pins.items():
+        run_rows = [
+            row for observation_id, row in source_rows.items()
+            if observation_id.endswith(f"_r{run:02d}_c10")
+            or observation_id.endswith(f"_r{run:02d}_c11")
+        ]
+        assert run_rows
+        for row in run_rows:
+            assert row["locator"]["row"] == expected
+            assert row["values"]["sample_as_published"] == expected
+            assert row["values"]["composition_code_as_printed"] == expected
+            assert row["point_conditions"]["printed_composition"]["state"]["value"] == expected
+
+    underlined_rows = {26, 40, 51, 81, 84, 88}
+    annotated_observations = {
+        observation_id
+        for observation_id, row in source_rows.items()
+        if "mossbauer_measurement_temperature_K" in row["values"]
+    }
+    expected_annotated_observations = {
+        observation_id for observation_id in source_rows
+        if int(observation_id.rsplit("_r", 1)[1].split("_c", 1)[0]) in underlined_rows
+    }
+    assert annotated_observations == expected_annotated_observations
+    assert {
+        int(observation_id.rsplit("_r", 1)[1].split("_c", 1)[0])
+        for observation_id in annotated_observations
+    } == underlined_rows
+    for observation_id in annotated_observations:
+        values = source_rows[observation_id]["values"]
+        assert values["mossbauer_measurement_temperature_K"] == "77"
+        assert values["T_C"] != values["mossbauer_measurement_temperature_K"]
+
+    migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    observations = list(migrator.result.observations.values())
+    assert len(observations) == 163
+    assert len(migrator.result.validation.hard_issues) == 0
+    assert sum(row.value.kind.value == "unavailable" for row in observations) == 0
+
+    def migrated(suffix: str):
+        matches = [row for row in observations if row.observation_id.endswith(suffix)]
+        assert len(matches) == 1
+        return matches[0]
+
+    rendered_value_pins = {
+        "_r04_c10": Decimal("0.556"),
+        "_r04_c11": Decimal("0.678"),
+        "_r37_c11": Decimal("5.472"),
+        "_r61_c10": Decimal("0.333"),
+        "_r61_c11": Decimal("1.859"),
+    }
+    for suffix, expected in rendered_value_pins.items():
+        row = migrated(suffix)
+        assert row.value.point == expected
+        assert row.locator.page == 6
+        assert row.locator.published_page == 322
+        assert row.locator.table == "2"
+
+    direct = migrated("_r04_c10")
+    reduced = migrated("_r04_c11")
+    assert direct.evidence.class_.value is battery_migrate.EvidenceClass.MEASURED_DIRECT
+    assert reduced.evidence.class_.value is battery_migrate.EvidenceClass.MEASURED_REDUCED
+    assert direct.identity.valence_basis.value.value_form.value == "fraction"
+    assert reduced.identity.valence_basis.value.value_form.value == "ratio"
+    assert reduced.derived_from == (direct.observation_id,)
+    assert reduced.derivation.relation == (
+        "Fe2+/Fe3+ = (1 - Fe3+/ΣFe)/(Fe3+/ΣFe)"
+    )
+
+    discrepant_implied_values = {
+        "_r04_c11": ("0.799", "beyond table rounding"),
+        "_r31_c11": ("0.53846…", "beyond table rounding"),
+        "_r37_c11": ("5.452", "central values disagree"),
+        "_r46_c11": ("0.460", "beyond table rounding"),
+        "_r55_c11": ("21.727", "central values disagree"),
+        "_r60_c11": ("1.85714…", "beyond table rounding"),
+        "_r61_c11": ("2.003", "beyond table rounding"),
+        "_r62_c11": ("1.041", "beyond table rounding"),
+        "_r64_c11": ("2.049", "beyond table rounding"),
+        "_r65_c11": ("4.556", "central values disagree"),
+        "_r79_c11": ("4.952", "central values disagree"),
+    }
+    for suffix, (implied, classification) in discrepant_implied_values.items():
+        source = next(
+            row for observation_id, row in source_rows.items()
+            if observation_id.endswith(suffix)
+        )
+        note = source["values"]["relation_discrepancy_note"]
+        assert f"implies {implied}" in note
+        assert classification in note
+        assert "published value is retained" in note
+
+    for row in observations:
+        assert row.identity.temperature_K.is_value
+        assert row.identity.fO2_Pa.is_value
+        assert row.identity.total_pressure_Pa.is_value
+        assert row.identity.composition.tag.value == "unknown"
+        assert row.identity.composition.reason == (
+            "composition given only as a code; numeric recipe only in Figure 2 (not digitized)"
+        )
+        assert row.point_conditions["T_C"].state.is_value
+        assert row.point_conditions["fO2_log"].state.is_value
+        source_id = row.observation_id.rsplit("::", 1)[-1]
+        reference_pressure = source_rows[source_id]["point_conditions"]["fO2_log"][
+            "reference_pressure"
+        ]
+        assert (
+            {
+                key: reference_pressure[key]
+                for key in ("value", "units", "basis", "printed")
+            }
+            == {
+                "value": 1,
+                "units": "atm",
+                "basis": "convention",
+                "printed": False,
+            }
+        )
+        assert reference_pressure["locator"]["page"] == 4
+        assert reference_pressure["locator"]["published_page"] == 320
+        assert row.point_conditions["total_pressure_Pa"].state.is_value
+        assert row.point_conditions["printed_composition"].state.is_value
+        assert row.point_conditions["quench_state"].state.value.value == "not_stated"
+
+    identity_pins = {
+        "_r04_c10": ("1898.15", "21169.79304587855506273603333"),
+        "_r37_c10": ("1823.15", "0.101325"),
+        "_r61_c10": ("1923.15", "21169.79304587855506273603333"),
+    }
+    for suffix, (temperature, fugacity) in identity_pins.items():
+        row = migrated(suffix)
+        assert row.identity.temperature_K.value == Decimal(temperature)
+        assert row.identity.fO2_Pa.value == Decimal(fugacity)
+        assert row.identity.total_pressure_Pa.value == Decimal("101325")
+        assert row.identity.composition.tag.value == "unknown"
+
+    abstract_pressure = direct.point_conditions["total_pressure_Pa"].locator
+    assert abstract_pressure.page == 1
+    assert abstract_pressure.published_page == 317
+    assert abstract_pressure.section == "Abstract"
+    quench_statement = direct.point_conditions["quench_state"].locator
+    assert quench_statement.page == 2
+    assert quench_statement.published_page == 318
+    assert quench_statement.section == "Experimental methods"
+    gas_control_statement = direct.point_conditions["fO2_control"].locator
+    assert gas_control_statement.page == 2
+    assert gas_control_statement.published_page == 318
+    assert gas_control_statement.section == "Experimental methods"
+    experiment = next(iter(migrator.result.experiments.values()))
+    assert experiment.pressure_environment.sweep_gas.state.tag.value == "unknown"
+    assert "mixing ratios are not printed" in experiment.pressure_environment.sweep_gas.state.reason
+
+
 def test_sossi_na_inference_and_ceiling_never_recreate_alpha_range():
     """Na's disagreeing inference and adopted ceiling are not measured ranges."""
     doc = load_cached_safe_yaml(

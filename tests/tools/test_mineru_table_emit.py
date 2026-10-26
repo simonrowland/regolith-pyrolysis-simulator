@@ -233,6 +233,32 @@ def test_compare_matches_every_scalar_row_written_by_emit(tmp_path: Path) -> Non
     assert all(row["matched_cell"]["column"] == 2 for row in compared)
 
 
+def test_compare_accepts_glass_phase_for_an_unqualified_value_column(tmp_path: Path) -> None:
+    draft_dir = _convert_html(
+        tmp_path,
+        "<table><tr><th>Composition</th><th>Fe3+/sum-Fe</th></tr>"
+        "<tr><td>CASIF5</td><td>0.556</td></tr></table>",
+    )
+    table = {
+        "page": 1,
+        "table_index": 1,
+        "type": "concentration_series",
+        "quantity": "valence_ratio",
+        "evidence_class": "measured_direct",
+        "unit": "dimensionless",
+        "phase": "glass",
+        "values": [{"column": 2, "species": "Fe"}],
+    }
+    emitted = _emit(tmp_path, draft_dir, _base_mapping(table))
+
+    compared = draft.compare_extract_to_draft(emitted, draft_dir / "index.yaml")
+
+    assert len(compared) == 1
+    assert compared[0]["status"] == "matched"
+    assert compared[0]["matched_cell"]["row"] == 2
+    assert compared[0]["matched_cell"]["column"] == 2
+
+
 def test_happy_path_keeps_verbatim_text_and_skips_dashes(tmp_path: Path) -> None:
     draft_dir = _convert_html(
         tmp_path,

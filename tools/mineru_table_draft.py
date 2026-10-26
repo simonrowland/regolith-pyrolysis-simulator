@@ -859,12 +859,12 @@ def _phase_matches_column(phase: Any, column_header: str) -> bool:
     token = str(phase).strip().casefold()
     if token == "cr":
         token = "solid"
-    if token not in {"gas", "liquid", "solid"}:
+    if token not in {"gas", "liquid", "solid", "glass"}:
         return False
     # A column with no phase qualifier cannot contradict the row phase.
     header_phases = {
         candidate
-        for candidate in ("gas", "liquid", "solid")
+        for candidate in ("gas", "liquid", "solid", "glass")
         if re.search(rf"(?<!\w){candidate}(?!\w)", column_header, re.I)
     }
     return not header_phases or token in header_phases

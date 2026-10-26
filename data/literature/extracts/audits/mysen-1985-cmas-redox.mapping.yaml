@@ -1,0 +1,64 @@
+source_id: mysen-1985-cmas-redox
+source:
+  citation: >-
+    Mysen, B. O., Virgo, D., Neumann, E.-R., and Seifert, F. A. (1985).
+    Redox equilibria and the structural states of ferric and ferrous iron in
+    melts in the system CaO-MgO-Al2O3-SiO2-Fe-O: relationships between redox
+    equilibria, melt structure and liquidus phase equilibria. American Mineralogist, 70(3-4), 317-331.
+extraction:
+  method: MinerU Table 2, with pdftotext comparison and page-render audit
+  date: '2026-10-26'
+  worker: w1026a-mys85
+tables:
+  - page: 6
+    table_index: 2
+    type: concentration_series
+    quantity: valence_ratio
+    unit: dimensionless
+    evidence_class: measured_reduced
+    phase: glass
+    experiment: mysen_1985_table2_runs
+    published_page: 322
+    row_predicate:
+      column: 2
+      matches: '^[0-9]{4}$'
+    temperature:
+      column: 2
+      unit: C
+    values:
+      - column: 10
+        species: Fe
+        quantity: valence_ratio
+        unit: dimensionless
+        evidence_class: measured_direct
+      - column: 11
+        species: Fe
+        quantity: valence_ratio
+        unit: dimensionless
+        evidence_class: measured_reduced
+    conditions:
+      - key: total_pressure_Pa
+        state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 1
+          section: Abstract
+          note: 'The abstract states 1 atm for these data; stored as 101325 Pa.'
+      - key: composition
+        state:
+          tag: unknown
+          reason: composition given only as a code; numeric recipe only in Figure 2 (not digitized)
+        locator:
+          page: 6
+          table: '2'
+          note: Table 2 gives composition codes; the numeric recipes are plotted in Figure 2.
+      - key: quench_state
+        state:
+          tag: value
+          value: not_stated
+        locator:
+          page: 2
+          published_page: 318
+          section: Experimental methods
+          note: Samples were water-quenched; preservation or alteration of iron valence is not stated.
