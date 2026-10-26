@@ -1085,6 +1085,23 @@ def engine_flags_from_result(
             and isinstance(band, Mapping)
         ):
             certified_band = dict(band)
+    from engines.alphamelts.domain import (
+        _ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX,
+    )
+
+    for warning in getattr(result, "warnings", None) or ():
+        if (
+            isinstance(warning, str)
+            and warning.startswith(_ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX)
+            and "diagnostic_oxide_activities field " in warning
+        ):
+            notices.append(
+                {
+                    "kind": NoticeKind.INPUT_OMITTED.value,
+                    "authority": None,
+                    "reason": warning,
+                }
+            )
     return notices, authority, certified_band
 
 
