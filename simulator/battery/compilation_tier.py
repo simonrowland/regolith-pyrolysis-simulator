@@ -52,7 +52,9 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import (
     Identity,
+    PA_PER_BAR_DEC,
     _parse_enthalpy_increment_subtype,
+    assumed_crystal_standard_pressure_Pa,
     identity_equal,
     log10K_from_delta_fG_kJ_mol,
     quantity_token,
@@ -165,11 +167,6 @@ _REFERENCE_PHASE_TOKEN = {
     "g": Phase.G,
     "glass": Phase.GLASS,
 }
-_PA_PER_BAR = Decimal("100000")
-_CONDENSED_PHASES = frozenset(
-    {Phase.CR, Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}
-)
-_ASSUMED_STANDARD_PRESSURE_BAR = 1.0
 # Fallback when the engine does not expose V. Derivation is on
 # ``_pressure_effect_bound_J``.
 _STATED_PRESSURE_EFFECT_BOUND_J_MOL = Decimal("4")
@@ -1023,7 +1020,7 @@ def _ellingham_attempt(
         and pressure_state.value is not None
     ):
         printed_pressure = as_decimal(pressure_state.value)
-        if printed_pressure != _PA_PER_BAR:
+        if printed_pressure != PA_PER_BAR_DEC:
             if printed_pressure <= 0:
                 return _refuse(
                     RefusalReason.IDENTITY_UNKNOWN,
@@ -1091,7 +1088,7 @@ def _ellingham_attempt(
             gibbs += standard_pressure_delta_g_kJ_per_mol(
                 delta_n_g_decimal,
                 temperature_K,
-                _PA_PER_BAR,
+                PA_PER_BAR_DEC,
                 printed_pressure,
             )
     if quantity is Quantity.LOG10_KF:
@@ -1142,15 +1139,8 @@ def _ellingham_attempt(
 def _standard_pressure_bar(identity: Identity) -> tuple[float | None, str | None]:
     state = identity.standard_pressure_Pa
     if isinstance(state, State) and state.is_value and state.value is not None:
-        return float(as_decimal(state.value) / _PA_PER_BAR), None
+        return float(as_decimal(state.value) / PA_PER_BAR_DEC), None
     return None, "standard-pressure-unknown"
-
-
-def _unknown_standard_pressure(identity: Identity) -> bool:
-    state = identity.standard_pressure_Pa
-    if state is None:
-        return True
-    return isinstance(state, State) and state.is_unknown
 
 
 def _pressure_effect_bound_J(*sources: object) -> tuple[Decimal, str]:
@@ -1178,7 +1168,7 @@ def _pressure_effect_bound_J(*sources: object) -> tuple[Decimal, str]:
         volume = _finite_number(getattr(source, "volume_m3_mol", None))
         if volume is None or volume <= 0.0:
             continue
-        bound = (as_decimal(str(volume)) * _PA_PER_BAR).copy_abs().normalize()
+        bound = (as_decimal(str(volume)) * PA_PER_BAR_DEC).copy_abs().normalize()
         return bound, "engine-V"
     return _STATED_PRESSURE_EFFECT_BOUND_J_MOL, "stated-V"
 
@@ -1224,6 +1214,9 @@ def _pure_phase_rows(engine: Engine) -> tuple[tuple[str, str, str | None], ...] 
 
 
 def _resolve_symbol(engine: Engine, identity: Identity) -> tuple[str | None, str]:
+    # Liquid and glass are in enums.CONDENSED_PHASES, but these engines are
+    # crystal-only. This refusal runs before the 1 bar assumption, so liquid
+    # and glass are not evaluated at an assumed pressure.
     if phase_token(identity.species) is not Phase.CR:
         return None, "pure-phase-is-crystal-only"
     rows = _pure_phase_rows(engine)
@@ -1520,14 +1513,10 @@ def _pure_phase_attempt(
             extra={"engine": engine.value, "symbol": symbol},
         )
     pressure_bar, pressure_reason = _standard_pressure_bar(identity)
-    assumed_pressure = False
-    if (
-        pressure_bar is None
-        and _unknown_standard_pressure(identity)
-        and phase_token(identity.species) in _CONDENSED_PHASES
-    ):
-        pressure_bar = _ASSUMED_STANDARD_PRESSURE_BAR
-        assumed_pressure = True
+    assumed_Pa = assumed_crystal_standard_pressure_Pa(identity)
+    assumed_pressure = pressure_bar is None and assumed_Pa is not None
+    if assumed_pressure:
+        pressure_bar = float(assumed_Pa / PA_PER_BAR_DEC)
     elif pressure_bar is None:
         return _refuse(
             RefusalReason.IDENTITY_UNKNOWN,

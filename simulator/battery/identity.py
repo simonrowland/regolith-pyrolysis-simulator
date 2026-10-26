@@ -60,6 +60,10 @@ Ambiguity resolutions:
 - Standard pressure is compared only where the quantity needs it. 1 bar
   and 100000 Pa are equal *after* ``bar_to_pa``; they are not guessed
   from a bare ``1``. 1 atm (101325 Pa) stays distinct from 0.1 MPa.
+  A crystal pure-standard H, Cp, or S row that leaves the axis unstated
+  compares as 1 bar (``assumed_crystal_standard_pressure_Pa``). Gas,
+  liquid, glass, and every quantity where pressure is an input still
+  treat that hole as unknown.
 - Decimal comparison is numeric (``Decimal.__eq__``), so ``1e5`` equals
   ``100000``. 1643 K does not equal 1643.15 K; no rounding band.
 - ``canonicalize_with_recorded_conversion`` applies only the unit helpers
@@ -843,6 +847,10 @@ def profile_for(identity: Identity) -> QuantityProfile:
         )
     elif q in PURE_STANDARD_THERMO:
         req("per", "temperature_K", "standard_pressure_Pa")
+        # The axis stays required. identity_equal fills an unstated crystal
+        # pressure with assumed_crystal_standard_pressure_Pa before comparing,
+        # so census and compile_residual see the same 1 bar the attempt uses.
+        # Gas, liquid, glass, and a stated pressure are not filled.
         if q is Quantity.H_MINUS_H298:
             req("subtype")  # reference T lives in subtype
         else:
@@ -1337,6 +1345,32 @@ def quantity_token(identity: Identity) -> Quantity | None:
         return q
     if isinstance(q, State) and q.is_value:
         return q.value
+    return None
+
+
+def assumed_crystal_standard_pressure_Pa(identity: Identity) -> Decimal | None:
+    """1 bar when a crystal pure-standard H, Cp, or S leaves pressure unstated.
+
+    This is the only owner of that assumption. ``identity_equal`` and the
+    pure-phase attempt both call it, so a census and a residual keep the
+    value and the notice the attempt already records.
+
+    Gas, liquid, and glass return None. Liquid and glass are in
+    ``CONDENSED_PHASES``, but the pure-phase engines are crystal-only and
+    refuse them before any 1 bar call. A stated pressure, including a
+    stated pressure other than 1 bar, also returns None: the caller
+    compares or passes that pressure through. Formation and vapour
+    quantities are not in ``PURE_STANDARD_THERMO``, so an unstated
+    pressure there stays unknown.
+    """
+
+    if quantity_token(identity) not in PURE_STANDARD_THERMO:
+        return None
+    if phase_token(identity.species) is not Phase.CR:
+        return None
+    state = identity.standard_pressure_Pa
+    if state is None or (isinstance(state, State) and state.is_unknown):
+        return PA_PER_BAR_DEC
     return None
 
 
@@ -1887,6 +1921,13 @@ def _identity_equal(
             continue
         left_axis = _axis_state(left, name)
         right_axis = _axis_state(right, name)
+        if name == "standard_pressure_Pa":
+            left_assumed = assumed_crystal_standard_pressure_Pa(left)
+            right_assumed = assumed_crystal_standard_pressure_Pa(right)
+            if left_assumed is not None:
+                left_axis = State.of(left_assumed)
+            if right_assumed is not None:
+                right_axis = State.of(right_assumed)
         if (
             name == "exposure"
             and left_axis is not None

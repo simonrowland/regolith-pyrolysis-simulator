@@ -28,6 +28,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    IdentityEqualKind,
     NoticeKind,
     PerBasis,
     Phase,
@@ -40,7 +41,11 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import (
+    assumed_crystal_standard_pressure_Pa,
+    bar_to_pa,
+    identity_equal,
     log10K_from_delta_fG_kJ_mol,
+    quantity_token,
     standard_pressure_delta_g_kJ_per_mol,
 )
 from simulator.battery.records import (
@@ -4616,6 +4621,182 @@ def test_gas_unknown_pressure_still_refuses() -> None:
     assert attempt.notices == ()
     assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
     assert attempt.refusal_detail["reason"] == "pure-phase-is-crystal-only"
+
+
+def test_unstated_crystal_pressure_scores_on_census_and_residual(monkeypatch) -> None:
+    """The 1 bar rule has one owner, so census and compile_residual keep the attempt.
+
+    The printed value and the engine value are both 4 kJ/mol. The V·dP
+    bound stays on the notice. ``bar_to_pa("1")`` is the stated-pressure
+    converter, not a second copy of the assumption.
+    """
+
+    from simulator.battery import compilation_tier
+    from simulator.battery.compilation_tier import _prediction_from_attempt
+    from simulator.battery.score import compile_residual
+
+    unknown = replace(
+        _pure_phase_identity(Quantity.H_MINUS_H298),
+        standard_pressure_Pa=State.unknown("source does not state pressure"),
+        subtype=State.of("H(T)-H(298.15 K)"),
+    )
+    one_bar = replace(unknown, standard_pressure_Pa=State.of(bar_to_pa("1")))
+    two_bar = replace(unknown, standard_pressure_Pa=State.of(bar_to_pa("2")))
+    assert assumed_crystal_standard_pressure_Pa(unknown) == bar_to_pa("1")
+    assert assumed_crystal_standard_pressure_Pa(one_bar) is None
+    assert identity_equal(unknown, unknown).kind is IdentityEqualKind.EQUAL
+    assert identity_equal(unknown, one_bar).kind is IdentityEqualKind.EQUAL
+    mismatch = identity_equal(unknown, two_bar)
+    assert mismatch.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert mismatch.fields == ("standard_pressure_Pa",)
+    missing = replace(unknown, standard_pressure_Pa=None)
+    assert identity_equal(missing, one_bar).kind is IdentityEqualKind.EQUAL
+    for quantity in (Quantity.CP, Quantity.S):
+        row = replace(
+            _pure_phase_identity(quantity),
+            standard_pressure_Pa=State.unknown("source does not state pressure"),
+        )
+        assert assumed_crystal_standard_pressure_Pa(row) == bar_to_pa("1")
+        assert identity_equal(row, row).kind is IdentityEqualKind.EQUAL
+
+    observation = F.observation(
+        "mgo-h-unknown-pressure",
+        "exp-1",
+        unknown,
+        Decimal("4"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    calls = []
+
+    class _Props:
+        def __init__(self, enthalpy: float) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = 37.0
+            self.S_J_K_mol = 26.0
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, pressure_bar):
+        calls.append((temperature_K, pressure_bar))
+        enthalpy = 1000.0 if abs(temperature_K - 298.15) < 1e-6 else 5000.0
+        return _Props(enthalpy)
+
+    attempt = predict_thermo_attempt(
+        Engine.THERMOENGINE,
+        observation,
+        pure_phase=pure_phase,
+    )
+    assert calls == [(1000.0, 1.0), (298.15, 1.0)]
+    assert attempt.refusal_reason is None
+    assert attempt.value == Decimal("4")
+    assert any("standard-pressure-assumed" in notice.reason for notice in attempt.notices)
+
+    calls.clear()
+    monkeypatch.setattr(compilation_tier, "default_pure_phase", pure_phase)
+    result = compilation_tier.compilation_tier_census(
+        _context(observation),
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=True,
+        audit_compile_residual=False,
+    )
+    row = next(
+        item for item in result["rows"] if item["quantity"] == Quantity.H_MINUS_H298.value
+    )
+    assert row["numeric"] > 0
+    assert calls == [(1000.0, 1.0), (298.15, 1.0)]
+    assert "identity_unknown:identity_equal" not in row["refused"]
+
+    prediction = _prediction_from_attempt(Engine.THERMOENGINE, observation, attempt)
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.THERMOENGINE,
+        context=_context(observation),
+        comparison_ids=set(),
+        predict=lambda _engine, _obs, **_kwargs: prediction,
+    )
+    assert residual.refusal is None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.numeric.value == Decimal("0")
+    assert any(
+        "standard-pressure-assumed" in notice.reason for notice in residual.notices
+    )
+
+
+def test_liquid_glass_and_formation_unknown_pressure_stay_unknown() -> None:
+    """Liquid and glass are condensed, and the engines still refuse them first."""
+
+    calls = []
+
+    def pure_phase(*_args):
+        calls.append(_args)
+        raise AssertionError("liquid and glass are not evaluated at an assumed 1 bar")
+
+    for phase in (Phase.L, Phase.GLASS):
+        identity = _pure_standard_identity(
+            F.oxide_identity(
+                "MgO",
+                phase,
+                T_K=Decimal("1000"),
+                per=PerBasis.MOL_SPECIES,
+                metal_formula="Mg",
+            ),
+            Quantity.CP,
+        )
+        identity = replace(
+            identity,
+            standard_pressure_Pa=State.unknown("source does not state pressure"),
+        )
+        assert assumed_crystal_standard_pressure_Pa(identity) is None
+        outcome = identity_equal(identity, identity)
+        assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+        assert "standard_pressure_Pa" in outcome.fields
+        attempt = predict_thermo_attempt(
+            Engine.THERMOENGINE,
+            F.observation(f"mgo-{phase.value}-pressure", "exp-1", identity, Decimal("4")),
+            pure_phase=pure_phase,
+        )
+        assert attempt.value is None
+        assert attempt.notices == ()
+        assert attempt.refusal_detail["reason"] == "pure-phase-is-crystal-only"
+    assert calls == []
+
+    gas = replace(
+        _pure_standard_identity(
+            F.oxide_identity(
+                "MgO",
+                Phase.G,
+                T_K=Decimal("1000"),
+                per=PerBasis.MOL_SPECIES,
+                metal_formula="Mg",
+            ),
+            Quantity.CP,
+        ),
+        standard_pressure_Pa=State.unknown("source does not state pressure"),
+    )
+    gas_equal = identity_equal(gas, gas)
+    assert assumed_crystal_standard_pressure_Pa(gas) is None
+    assert gas_equal.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "standard_pressure_Pa" in gas_equal.fields
+
+    formation = replace(
+        F.oxide_identity(
+            "MgO",
+            Phase.CR,
+            T_K=Decimal("1000"),
+            per=PerBasis.MOL_SPECIES,
+            metal_formula="Mg",
+            polymorph=Polymorph.PERICLASE.value,
+        ),
+        standard_pressure_Pa=State.unknown("source does not state pressure"),
+    )
+    assert quantity_token(formation) is Quantity.DELTA_FG
+    assert assumed_crystal_standard_pressure_Pa(formation) is None
+    formed = identity_equal(formation, formation)
+    assert formed.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "standard_pressure_Pa" in formed.fields
 
 
 def test_enthalpy_anchor_without_h_or_cp_refuses_typed() -> None:
