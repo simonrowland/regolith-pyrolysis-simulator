@@ -3346,3 +3346,38 @@ def test_plante_1979_one_k2si2o5_charge_not_eight_series_experiments() -> None:
     assert _identity_composition_components(first) != _identity_composition_components(
         later
     )
+@pytest.mark.parametrize(
+    "components",
+    [
+        {"SiO2": "60", "MgO": "40"},
+        [["SiO2", "60"], ["MgO", "40"]],
+    ],
+    ids=["mapping", "pairs"],
+)
+def test_mass_percent_parser_behavior_is_pinned(components) -> None:
+    payload = {
+        "amount_basis": "mass_percent",
+        "components": components,
+    }
+    assert migrate_module._mass_percent_components(payload) == {
+        "SiO2": Decimal("60"),
+        "MgO": Decimal("40"),
+    }
+    assert migrate_module._mass_percent_components(
+        {**payload, "components": [["SiO2", "60"], ["SiO2", "40"]]}
+    ) is None
+    assert migrate_module._mass_percent_components(
+        {**payload, "components": [["Unsupported oxide", "60"]]}
+    ) is None
+
+
+def test_mass_percent_conversion_behavior_is_pinned() -> None:
+    payload = {
+        "amount_basis": "mass_percent",
+        "components": [["SiO2", "45"], ["MgO", "45"]],
+    }
+    composition = migrate_module._composition_from_plain(payload)
+    assert composition.as_map() == migrate_module.wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("45"), "MgO": Decimal("45")}
+    ).as_map()
+
