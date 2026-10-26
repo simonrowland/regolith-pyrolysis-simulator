@@ -12974,14 +12974,17 @@
     "shadow_outcome": "missing_keys",
     "silent_zero": {
       "schema": "silent_zero.v1",
-      "count": 10,
+      "count": 49,
       "counts_by_reason": {
+        "missing_coefficient": 32,
+        "missing_thermo": 5,
+        "out_of_domain_marked": 1,
         "proven_below_threshold": 9,
-        "refused_upstream": 1
+        "refused_upstream": 2
       },
       "counts_by_doctrine_category": {
-        "1": 1,
-        "2": 0,
+        "1": 39,
+        "2": 1,
         "3": 9
       },
       "notes": [
@@ -13010,6 +13013,14 @@
           "detail": "a_FeO_authoritative=4.0514175347894366e-11 <= 1e-10; species omitted by the 1e-10 activity skip (computed authoritative FeO activity, not missing input; skip is not a 1e-15 Pa pressure proof)"
         },
         {
+          "zero_because": "missing_thermo",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Ni",
+          "field": "metal_row",
+          "detail": "metal species row is missing or empty; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
           "zero_because": "proven_below_threshold",
           "site": "equilibrium.internal_analytical",
           "doctrine_category": 3,
@@ -13024,6 +13035,14 @@
           "species": "Cr",
           "field": "oxide_activity",
           "detail": "oxide activity <= 1e-10; species omitted by the activity skip used on this path. That cutoff is an activity filter, not derived from the 1e-15 Pa vapor-pressure omit"
+        },
+        {
+          "zero_because": "refused_upstream",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Mg",
+          "field": "source_certified_range_K",
+          "detail": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=legacy_condensed_rail temperature_K=418.150 source_certified_range_K=[701, 1361]"
         },
         {
           "zero_because": "proven_below_threshold",
@@ -13056,6 +13075,302 @@
           "species": "Si",
           "field": "P_effective_Pa",
           "detail": "P_effective_Pa=1.51183692289511e-144 <= 1e-15 Pa; key omitted from vapor_pressures_Pa while status=ok (distinguishable proven-small zero)"
+        },
+        {
+          "zero_because": "missing_thermo",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Zr",
+          "field": "metal_row",
+          "detail": "metal species row is missing or empty; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_thermo",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Rb",
+          "field": "metal_row",
+          "detail": "metal species row is missing or empty; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_thermo",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Cs",
+          "field": "metal_row",
+          "detail": "metal species row is missing or empty; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_thermo",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "P",
+          "field": "metal_row",
+          "detail": "metal species row is missing or empty; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "TiO",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "TiO2_gas",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "CaO_gas",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "AlO",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Al2O",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Al2",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Al2O2",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Al2O3_gas",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "AlO2",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Ca2",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "CrO",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "out_of_domain_marked",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 2,
+          "species": "SiO",
+          "field": "valid_range_K",
+          "detail": "temperature_K=418.15 is outside valid_range_K [1400.0, 2273.15]; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "CrO2",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "CrO3",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "PO",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "PO2",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "P4O6",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "P4O10",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "P2",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "P4",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "K2",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "K2O_gas",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Mg2",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "MgO_gas",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Na2",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Na2O_gas",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Si2",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "Si3",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "SiO2_gas",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "FeO_association_gas",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "NiO_gas",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "MnO_gas",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
+        },
+        {
+          "zero_because": "missing_coefficient",
+          "site": "equilibrium.internal_analytical",
+          "doctrine_category": 1,
+          "species": "CoO_gas",
+          "field": "antoine.A",
+          "detail": "missing_antoine_A; species omitted from vapor_pressures_Pa while status=ok"
         },
         {
           "zero_because": "refused_upstream",
