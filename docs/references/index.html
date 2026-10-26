@@ -171,7 +171,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/species_catalog.yaml:122</code> - id.source: REF-012 and Kanari 2018 per foulant_thermo.yaml.</li>
 <li><code>data/species_catalog.yaml:179</code> - id.source: gate; NIST WebBook REF-012 per foulant_thermo.yaml.</li>
 <li><code>data/vapor_pressures.yaml:1518</code> - families.metals_fe_family.physical_properties.species.Fe.pure_component_antoine.source: source: REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron</li>
-<li><code>simulator/core.py:11974</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
+<li><code>simulator/core.py:11980</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
 </ul>
 </section>
 <section class="entry" id="REF-013">
@@ -184,7 +184,7 @@ ul { padding-left: 1.4rem; }</style>
 <ul>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:130</code> - species.K.source: source: &quot;REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:155</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
-<li><code>data/setpoints.yaml:396</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
+<li><code>data/setpoints.yaml:410</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
 <li><code>data/vapor_pressures.yaml:5065</code> - families.foulant_vapor_nacl_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal</li>
 <li><code>data/vapor_pressures.yaml:5164</code> - families.foulant_vapor_kcl_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal</li>
 </ul>
@@ -295,7 +295,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:130</code> - species.K.source: source: &quot;REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.&quot;</li>
-<li><code>data/setpoints.yaml:396</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
+<li><code>data/setpoints.yaml:410</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
 <li><code>simulator/mre_ladder.py:32</code> - # provenance: Na2O/K2O legacy rungs -- REF-019 Table 2 plus REF-050/REF-051</li>
 </ul>
 </section>
@@ -427,9 +427,9 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:2690</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.name.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation;</li>
 <li><code>engines/builtin/stage0_pretreatment.py:1637</code> - def _dispatch_char_feo_reduction(: (REF-020 NIST-JANAF/Chase 1998), so the reaction is spontaneous</li>
 <li><code>simulator/core.py:920</code> - def _liquidus_status_from_freeze_gate_exception(: # Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO</li>
-<li><code>simulator/runner/__init__.py:3184</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
-<li><code>simulator/runner/__init__.py:3323</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
-<li><code>simulator/runner/__init__.py:3348</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
+<li><code>simulator/runner/__init__.py:3185</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
+<li><code>simulator/runner/__init__.py:3324</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
+<li><code>simulator/runner/__init__.py:3349</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-021">
@@ -484,8 +484,8 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/stage0_carbon_partition.yaml:51</code> - phase_partitions.ceres_regolith.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:86</code> - lance_oxidation.source: source: &quot;balanced reaction C + O2 -&gt; CO2; REF-024 supplies the residual-char inventory, not the combustion stoichiometry&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:92</code> - burnout_kinetics.labile_chon_unlimited_o2.source: source: &quot;REF-024 sephton_2004_stepped_combustion_temperature_classes&quot;</li>
-<li><code>simulator/core.py:11412</code> - def _oxidized_stage0_products(: The earlier text here cited Sephton (REF-024) as authority for applying</li>
-<li><code>simulator/core.py:11414</code> - def _oxidized_stage0_products(: backwards. REF-024 is the 2004 GCA hydropyrolysis study</li>
+<li><code>simulator/core.py:11418</code> - def _oxidized_stage0_products(: The earlier text here cited Sephton (REF-024) as authority for applying</li>
+<li><code>simulator/core.py:11420</code> - def _oxidized_stage0_products(: backwards. REF-024 is the 2004 GCA hydropyrolysis study</li>
 </ul>
 </section>
 <section class="entry" id="REF-025">
@@ -1064,7 +1064,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/setpoints.yaml:396</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
+<li><code>data/setpoints.yaml:410</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
 <li><code>simulator/mre_ladder.py:32</code> - # provenance: Na2O/K2O legacy rungs -- REF-019 Table 2 plus REF-050/REF-051</li>
 </ul>
 </section>
@@ -1201,7 +1201,7 @@ ul { padding-left: 1.4rem; }</style>
 <blockquote><p>1728 K, melting point of Ni; DeltaH = 4.10 kcal/mole.</p><footer>p. 28; Pins the solid-Ni/liquid-Ni segment boundary used by the NiO Ellingham row.</footer></blockquote>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/setpoints.yaml:1489</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
+<li><code>data/setpoints.yaml:1520</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
 <li><code>engines/builtin/electrolysis_step.py:125</code> - &quot;REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668 NiO(s) &quot;</li>
 <li><code>simulator/chemistry/ellingham_thermo.py:80</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # and REF-058 USBM Bulletin 668 for Ni/NiO.</li>
 <li><code>simulator/chemistry/ellingham_thermo.py:320</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # Ni premise: REF-058, Mah &amp; Pankratz, U.S. Bureau of Mines Bulletin 668</li>

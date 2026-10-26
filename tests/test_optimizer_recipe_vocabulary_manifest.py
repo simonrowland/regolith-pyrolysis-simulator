@@ -35,10 +35,13 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     # dimensions and derived digests.
     # d-268 chunk 3 adds explicit route commands; four existing staged intervals
     # expose the diverter to search. Receiver accounting remains a later chunk.
+    # Round 9's bounds-provenance fix prefixes the Stage-3 route and purity
+    # bounds_source leaves with engineering_envelope; only the payload digest
+    # changes in addition to those provenance leaves.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "d35c97cc003f47f4aa7e2d7f1fcfd7eb860330d3003b03c7ba8309285718c6c0"
+        "1e5a2744f588169c04235c24934eb3919e95f8b45d522e39a774d6370bffd2f7"
     )
-    assert digest == "c48fcc639c138598b568b51b86d21bf4d409ff5341d6acaf0a594470375b59e3"
+    assert digest == "7809437dccf06b376e7a3b3dd446a6ae200ea6baa5bcd8d9db07d92e30a1d93d"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
