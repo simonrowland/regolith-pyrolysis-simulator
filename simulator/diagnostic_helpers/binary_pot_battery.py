@@ -3464,7 +3464,8 @@ def _crash_cell_from_returncode(
         status, refusal, engine_reason = (
             "refusal",
             REFUSAL_ENGINE_CRASH,
-            f"{sig_name} (returncode {returncode})",
+            f"{sig_name} (returncode {returncode})"
+            + (f": {stderr[-4000:]}" if stderr else ""),
         )
         engine_status = REFUSAL_ENGINE_CRASH
         exit_signal = sig
