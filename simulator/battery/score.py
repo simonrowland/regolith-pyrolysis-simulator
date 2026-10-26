@@ -4770,6 +4770,8 @@ def qualification_battery_notice(
 def _row_out_of_certified_band(kind: str, row: Mapping[str, object]) -> bool:
     """Engine rows that are an out-of-band flag, not a new notice kind."""
 
+    if kind == NoticeKind.COMPOSITION_PROJECTED.value:
+        return False
     if kind in {"melts_domain_gate", "out_of_certified_band"}:
         return True
     if str(row.get("authority") or "") == "extrapolated":
@@ -4959,6 +4961,11 @@ def cell_notices(
                         None
                         if mass_fraction is None
                         else as_decimal(mass_fraction)
+                    ),
+                    authority=(
+                        Authority.EXTRAPOLATED
+                        if row.get("authority") == AUTHORITY_EXTRAPOLATED
+                        else None
                     ),
                 )
             )
