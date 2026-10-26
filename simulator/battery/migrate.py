@@ -1140,7 +1140,9 @@ def _derivation_from_plain(
     return derivation
 
 
-def _mass_percent_pairs(payload: object) -> list[tuple[str, Decimal]] | None:
+def _percent_pairs(
+    payload: object, amount_basis: AmountBasis
+) -> list[tuple[str, Decimal]] | None:
     if not isinstance(payload, Mapping):
         return None
     body: object = payload
@@ -1154,7 +1156,7 @@ def _mass_percent_pairs(payload: object) -> list[tuple[str, Decimal]] | None:
     basis = body.get("amount_basis")
     if isinstance(basis, AmountBasis):
         basis = basis.value
-    if str(basis or "") != AmountBasis.MASS_PERCENT.value:
+    if str(basis or "") != amount_basis.value:
         return None
     components = body.get("components")
     if isinstance(components, Mapping):
@@ -1175,14 +1177,24 @@ def _mass_percent_pairs(payload: object) -> list[tuple[str, Decimal]] | None:
     return result or None
 
 
-def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
-    pairs = _mass_percent_pairs(payload)
+def _mass_percent_pairs(payload: object) -> list[tuple[str, Decimal]] | None:
+    return _percent_pairs(payload, AmountBasis.MASS_PERCENT)
+
+
+def _percent_components(
+    payload: object, amount_basis: AmountBasis
+) -> dict[str, Decimal] | None:
+    pairs = _percent_pairs(payload, amount_basis)
     if pairs is None:
         return None
     names = [name for name, _amount in pairs]
     if len(set(names)) != len(names) or any(name not in _COMPOSITION_COMPONENTS for name in names):
         return None
     return dict(pairs)
+
+
+def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
+    return _percent_components(payload, AmountBasis.MASS_PERCENT)
 
 
 def _mass_percent_printed_from_plain(
