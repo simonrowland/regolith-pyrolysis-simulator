@@ -1467,6 +1467,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- Campaign manager ---
         from simulator.campaigns import CampaignManager
         self.campaign_mgr = CampaignManager(setpoints)
+        self.campaign_mgr.apply_collection_route(self.melt, self.train)
 
         # --- Subsystem models (lazy imports to avoid circular deps) ---
         self._condensation_model = None
@@ -1505,6 +1506,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     @property
     def condensation_model(self):
+        self.campaign_mgr.apply_collection_route(self.melt, self.train)
         if self._condensation_model is None:
             from simulator.condensation import CondensationModel
             # 0.5.4.1 review-cluster-C (P2 #1, 2026-05-28):
@@ -1530,6 +1532,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._condensation_model.configure_lab_geometry(
                     self.lab_geometry
                 )
+        # Include all retained vapor, including parcels absent from fresh flux.
+        self._condensation_model.retained_vapor_mol = dict(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas'))
+        self._condensation_model.retained_supply_projection = copy.deepcopy(
+            self.atom_ledger.last_physical_mol_projection)
         return self._condensation_model
 
     @property
@@ -1690,8 +1697,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Reset condensation train
         self.train = CondensationTrain.create_default(self.setpoints)
+        self.campaign_mgr.apply_collection_route(self.melt, self.train)
         if self._condensation_model is not None:
             self._condensation_model.train = self.train
+            self._condensation_model.last_stage3_route_diagnostic = {}
+            self._condensation_model.cold_spot_history[:] = [
+                item for item in self._condensation_model.cold_spot_history
+                if 'stage3_route' not in item]
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}
@@ -3503,7 +3515,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         live_overhead_o2_mol = max(
             0.0,
             float(
-                self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                     OXYGEN_SPECIES,
                     0.0,
                 )
@@ -4261,13 +4273,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         incoming_sweep_pO2 = max(0.0, float(self.melt.pO2_mbar) / 1000.0)
         residual_o2_mol = max(0.0, float(head_o2_mol))
         if self._overhead_headspace_enabled() and residual_o2_mol > 0.0:
-            holdup_mol = {
-                species: max(0.0, float(mol))
-                for species, mol in self.atom_ledger.mol_by_account(
-                    'process.overhead_gas'
-                ).items()
-                if max(0.0, float(mol)) > 0.0
-            }
+            holdup_mol = self._overhead_holdup_mol()
             total_mol = sum(holdup_mol.values())
             total_kg = 0.0
             holdup_kg: Dict[str, float] = {}
@@ -4349,7 +4355,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
     ) -> OxygenReservoirState:
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -5597,7 +5603,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f'got {reference_T_K!r}'
                 )
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -5664,7 +5670,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -6714,7 +6720,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -6873,7 +6879,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             candidate_fO2_log=candidate_fO2_log,
         )
         post_head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -13117,6 +13123,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Configure atmosphere and targets from setpoints
         self.campaign_mgr.configure_campaign(self.melt, campaign)
+        self.campaign_mgr.apply_collection_route(self.melt, self.train)
         self.melt.validate_melt_pressures()
         self._configure_overhead_headspace(
             campaign,
@@ -15367,7 +15374,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(type(exc), 'terminal_refusal', False)
             )
             if terminal_refusal:
-                wall_refusals = self.condensation_model.last_sticking_alpha_provenance_notice.get(
+                wall_refusals = getattr(
+                    self._condensation_model, 'last_sticking_alpha_provenance_notice', {},
+                ).get(
                     'wall_saturation_pressure_refusals_by_species'
                 )
                 _materialize_refusal_snapshot_history(terminal_refusal_state)
@@ -15378,7 +15387,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 # Roll back quantities, but retain the reason the wall channel refused.
                 if wall_refusals:
-                    self.condensation_model.last_sticking_alpha_provenance_notice[
+                    model = self._condensation_model
+                    if model is None:
+                        model = self.condensation_model
+                    model.last_sticking_alpha_provenance_notice[
                         'wall_saturation_pressure_refusals_by_species'
                     ] = wall_refusals
             elif committed_transition_count:

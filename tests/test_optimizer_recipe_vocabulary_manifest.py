@@ -33,10 +33,15 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     # C3 leaves C0.temp_range_C and the C2A early-ramp path in the full
     # allowlist but disables both for search; this changes conditional subspace
     # dimensions and derived digests.
+    # d-268 chunk 3 adds explicit route commands; four existing staged intervals
+    # expose the diverter to search. Receiver accounting remains a later chunk.
+    # Round 9's bounds-provenance fix prefixes the Stage-3 route and purity
+    # bounds_source leaves with engineering_envelope; only the payload digest
+    # changes in addition to those provenance leaves.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "d9712e60baa51f93b8ad62fb4317697ab9fdda5d24f38bdea14f47d06661e811"
+        "1e5a2744f588169c04235c24934eb3919e95f8b45d522e39a774d6370bffd2f7"
     )
-    assert digest == "afa70b858622d530fd2050d744827dbfd1ff58484edaf01f98a6b2438c558eb7"
+    assert digest == "7809437dccf06b376e7a3b3dd446a6ae200ea6baa5bcd8d9db07d92e30a1d93d"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
@@ -51,4 +56,4 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
         for path in paths
         for prefix in forbidden_future_prefixes
     )
-    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [59, 65]
+    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [63, 69]

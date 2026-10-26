@@ -886,6 +886,39 @@ def _refusal_step_sim() -> PyrolysisSimulator:
     return sim
 
 
+@pytest.mark.parametrize("preexisting_model", [False, True])
+def test_terminal_refusal_preserves_wall_evidence_after_lazy_model_rollback(
+    monkeypatch, preexisting_model,
+) -> None:
+    sim = _refusal_step_sim()
+    if not preexisting_model:
+        sim._condensation_model = None
+
+    def model(self):
+        if self._condensation_model is None:
+            self._condensation_model = SimpleNamespace(
+                operating_history=[], last_sticking_alpha_provenance_notice={})
+        return self._condensation_model
+
+    monkeypatch.setattr(PyrolysisSimulator, "condensation_model", property(model))
+    evidence = {"Fe": {"reason": "outside_certified_range"}}
+    refusal = EvaporationFluxRefusal("terminal", {"reason": "wall-pressure"})
+
+    def refuse():
+        sim.condensation_model.last_sticking_alpha_provenance_notice[
+            "wall_saturation_pressure_refusals_by_species"] = evidence
+        sim.melt.hour += 1
+        raise refusal
+
+    sim._step_one_hour = refuse
+    with pytest.raises(EvaporationFluxRefusal) as raised:
+        sim.step()
+    assert raised.value is refusal
+    assert sim.melt.hour == 4
+    assert sim.condensation_model.last_sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_refusals_by_species"] == evidence
+
+
 def test_successful_step_shares_committed_yield_disposition_rows() -> None:
     class CommittedRow:
         deepcopy_count = 0

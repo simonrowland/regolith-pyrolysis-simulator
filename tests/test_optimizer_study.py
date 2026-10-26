@@ -6581,6 +6581,14 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
             str(out_dir),
             "--seed",
             "7",
+            # c3 adds four substage route dimensions. Keep this C0 artifact
+            # smoke test on its original sampler subspace and shipped routes.
+            *[
+                argument
+                for spec in RecipeSchema().search_allowlist
+                if spec.path[-1] == "stage3_route"
+                for argument in ("--pin", ".".join(spec.path))
+            ],
         ],
         text=True,
         capture_output=True,
@@ -6589,7 +6597,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     )
     assert good.returncode == 0, good.stderr
     assert (out_dir / "pareto.json").exists()
-    assert (out_dir / "winner.recipe.yaml").exists()
+    assert (out_dir / "winner.recipe.yaml").exists(), good.stdout + good.stderr
     status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
     assert status["status"] == "SUCCEEDED"
     assert status["success"] is True

@@ -97,7 +97,7 @@ SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
         # d-252 / physics seq 923: computed C0 exit advances the 24 h run.
         "flux_maps_sha256": "6f6b8e6f2137ffb369ec3079cd7305324325713cad87be2e6d609fe9911b6267",
-        "ledger_sha256": "fabe87d7c89cd5622ab3b77734e2ef1f307f3b7af48e5175723c14d93a4dea3e",
+        "ledger_sha256": "7a9f7563abd01542bcf892aa7c5109faef4a0d9f6eb7b5831248518177e77669",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",

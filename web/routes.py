@@ -31,7 +31,7 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.cost_parameters import RECIPE_COST_PARAMETERS_KEY
-from simulator.campaigns import CampaignManager
+from simulator.campaigns import CampaignManager, parse_campaign_override_value
 from simulator.config import _load_setpoints_file
 from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
@@ -3571,12 +3571,21 @@ def _recipe_runtime_overrides_from_controls(
                 raise BadRequest(
                     f'controls.runtime_campaign_overrides.{campaign_name} field is required'
                 )
-            value = _recipe_non_negative_number(
-                raw_value,
-                f'controls.runtime_campaign_overrides.{campaign_name}.{field_name}',
-            )
-            if value is not None:
-                clean_fields[field_name] = value
+            if raw_value in (None, ''):
+                continue
+            label = f'controls.runtime_campaign_overrides.{campaign_name}.{field_name}'
+            try:
+                value = parse_campaign_override_value(field_name, raw_value, label)
+            except (TypeError, ValueError) as exc:
+                message = str(exc)
+                if message.startswith(f'{field_name} '):
+                    raise BadRequest(
+                        f'{label}{message[len(field_name):]}'
+                    ) from exc
+                raise BadRequest(f'{label} must be a finite non-negative number') from exc
+            if isinstance(value, float):
+                value = _recipe_non_negative_number(value, label)
+            clean_fields[field_name] = value
         if clean_fields:
             overrides[campaign_name] = clean_fields
     return overrides
