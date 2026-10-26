@@ -16,15 +16,18 @@ import yaml
 
 BASE = "28af098ed04b8ca99f569381a2f38330cb66d7cd"
 ROOT = Path(__file__).resolve().parents[2]
+_REPO_ANCESTORS = tuple(ROOT.parents)
+_CORPUS_ROOT_CANDIDATES = (
+    os.environ.get("REGOLITH_CORPUS_ROOT"),
+    str(Path.home() / "Repos/regolith-corpus"),
+    *(str(parent / "regolith-corpus") for parent in _REPO_ANCESTORS),
+    str(Path.home() / "Repos/.regolith-main-review/corpus-main"),
+    *(str(parent / ".regolith-main-review/corpus-main") for parent in _REPO_ANCESTORS),
+)
 CORPUS_ROOTS = tuple(
     Path(corpus_root) / "raw"
-    for corpus_root in dict.fromkeys(
-        (
-            os.environ.get("REGOLITH_CORPUS_ROOT"),
-            str(Path.home() / "Repos/regolith-corpus"),
-        )
-    )
-    if corpus_root
+    for corpus_root in dict.fromkeys(_CORPUS_ROOT_CANDIDATES)
+    if corpus_root and (Path(corpus_root) / "raw").is_dir()
 )
 MINERU_TEXT_ROOT = Path.home() / "Repos/.regolith-main-review/corpus-main/text"
 TOUCHED_EXTRACTS = (
