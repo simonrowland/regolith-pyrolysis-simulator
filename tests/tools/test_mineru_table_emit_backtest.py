@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import csv
 import re
 from collections import Counter, defaultdict
 from decimal import Decimal, InvalidOperation
@@ -288,23 +289,13 @@ def _context_targets(
 
 
 def _extract_targets(
-    mapping: dict, extract: dict, document: dict | None = None
+    mapping: dict, extract: dict
 ) -> dict[tuple[str, str, str, str], Counter[Decimal]]:
     expected: dict[tuple[str, str, str, str], Counter[Decimal]] = defaultdict(Counter)
     species_blocks = extract.get("species") or {}
     source_id = str(mapping["source_id"])
     linked_extracts = {source_id: extract}
     seen: set[tuple[str, str, str]] = set()
-    emitted_species_by_cell: dict[tuple[int, int, int, str], str] = {}
-    if document is not None:
-        for species, block in (document.get("species") or {}).items():
-            for observation in block.get("observations") or []:
-                position = _cell_position(observation)
-                if position is None:
-                    continue
-                page, _, row, column = position
-                quantity = str((observation.get("values") or {}).get("quantity") or "")
-                emitted_species_by_cell[(page, row, column, quantity)] = str(species)
     for table in mapping.get("tables") or []:
         measurements = draft._measurement_columns(table)
         fixed_species = {
@@ -378,14 +369,9 @@ def _extract_targets(
                     locator_value = str(int(table["page"]))
                 output_species = species
                 if any(item["kind"] == "pair" for item in selected_measurements):
-                    if position is not None:
-                        output_species = emitted_species_by_cell.get(
-                            (position[0], position[2], position[3], quantity), species
-                        )
-                    else:
-                        row_label = str(locator.get("row_label") or "")
-                        if row_label:
-                            output_species = draft.printed_formula(row_label)
+                    row_label = str(locator.get("row_label") or "")
+                    if row_label:
+                        output_species = draft.printed_formula(row_label)
                 for raw in _field_values(observation, quantity):
                     number = _decimal(raw)
                     if number is not None:
@@ -512,6 +498,23 @@ def _assert_emitted_cells_bind_to_mapping(
 ) -> None:
     index_path = draft.resolve_draft_index(draft_dir, mapping["source_id"])
     index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    source_cells: dict[tuple[int, int, int, int], str] = {}
+    for table in index["tables"]:
+        page = int(table["pdf_page"])
+        table_index = int(str(table["table_key"]).rsplit("-t", 1)[1])
+        csv_path = index_path.parent / table["csv"]
+        with csv_path.open(encoding="utf-8", newline="") as stream:
+            for cell in csv.DictReader(stream):
+                if (
+                    not cell["origin_row"]
+                    or not cell["origin_column"]
+                    or int(cell["row"]) != int(cell["origin_row"])
+                    or int(cell["column"]) != int(cell["origin_column"])
+                ):
+                    continue
+                source_cells[
+                    (page, table_index, int(cell["row"]), int(cell["column"]))
+                ] = cell["text"]
     headers = {
         (int(table["pdf_page"]), int(table["source_table_number"])): {
             int(column["column"]): str(column["header"])
@@ -557,6 +560,23 @@ def _assert_emitted_cells_bind_to_mapping(
                 )
             ]
             assert matching, f"emitted cell is outside its mapping: {observation['observation_id']}"
+            for spec, item in matching:
+                if item["kind"] != "pair":
+                    continue
+                source_row_label = source_cells.get(
+                    (page, table_index, row, int(item["species_column"]))
+                )
+                assert source_row_label is not None, (
+                    f"pair cell has no source row label: {observation['observation_id']}"
+                )
+                assert locator.get("row_label") == source_row_label.strip(), (
+                    f"emitted row label differs from draft source cell for "
+                    f"{observation['observation_id']}"
+                )
+                assert draft.printed_formula(source_row_label) == species, (
+                    f"emitted species differs from draft source row label for "
+                    f"{observation['observation_id']}"
+                )
             assert locator.get("column_header", "") == headers[(page, table_index)].get(
                 column, ""
             )
@@ -933,7 +953,7 @@ def test_committed_emit_mappings_reproduce_landed_decimal_cells(
     document = draft.emit_extract(draft_dir, mapping_path, output_path)
     extract_path = EXTRACTS / f"{source_id}.yaml"
     extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
-    expected = _extract_targets(mapping, extract, document)
+    expected = _extract_targets(mapping, extract)
     emitted = _emitted_cells(document)
     assert expected, f"no landed numeric cells found for mapped source {source_id}"
     _assert_exact_landed_values(expected, emitted)
