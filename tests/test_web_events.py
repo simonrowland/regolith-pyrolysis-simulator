@@ -2488,6 +2488,42 @@ def test_web_start_event_defaults_c4_temp_from_setpoints(monkeypatch):
             _clear_simulation_state(sid)
 
 
+@pytest.mark.parametrize("cap,expected", [(None, 160), (30, 30), (120, 120)])
+def test_loaded_recipe_cap_reaches_post_mg_endpoint_owner(monkeypatch, cap, expected):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+    patch = {} if cap is None else {
+        "campaigns": {"C2A_continuous": {"max_hold_hr": cap}},
+    }
+    try:
+        client.emit("start_simulation", {
+            "backend": "internal-analytical",
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000,
+            "speed": 0,
+            "setpoints_patch": patch,
+        })
+        statuses = [
+            event["args"][0] for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["status"] == "started"
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        state, _ = _current_simulation_state(new_sids.pop())
+        sim = state["session"].simulator
+        manager = sim.campaign_mgr
+        assert manager.get_next_campaign(CampaignPhase.C4, sim.record) == CampaignPhase.C2A
+        manager.configure_campaign(sim.melt, CampaignPhase.C2A)
+        assert manager._max_hold_hr(CampaignPhase.C2A) == expected
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
 def test_loaded_recipe_start_applies_patch_and_runtime_overrides(monkeypatch):
     captured_tasks = []
 
