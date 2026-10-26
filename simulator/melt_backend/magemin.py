@@ -351,9 +351,16 @@ class _MAGEMinModeVectorMassDeficit(RuntimeError):
 class _MAGEMinEngineCallError(RuntimeError):
     """An exception raised by a MAGEMin engine call, with its source type."""
 
-    def __init__(self, exception_type: str, message: str) -> None:
+    def __init__(
+        self,
+        exception_type: str,
+        message: str,
+        *,
+        failure_disposition: Optional[str] = None,
+    ) -> None:
         self.exception_type = exception_type
         self.engine_message = message
+        self.failure_disposition = failure_disposition
         super().__init__(f'{exception_type}: {message}')
 
 
@@ -1516,6 +1523,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_failure_exception': exc.exception_type,
                 'backend_failure_message': exc.engine_message,
             })
+            if exc.failure_disposition is not None:
+                failure_diagnostics['backend_failure_disposition'] = (
+                    exc.failure_disposition
+                )
             if isinstance(exc, _MAGEMinDeclaredInputError):
                 failure_diagnostics['reason'] = 'invalid_input'
             return EquilibriumResult(
@@ -2798,6 +2809,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 subprocess_exc.exception_type,
                 f'{message}; subprocess retry failed: '
                 f'{subprocess_exc.engine_message}',
+                failure_disposition=subprocess_exc.failure_disposition,
             ) from subprocess_exc
         warnings_out = tuple(raw.get('buffer_warnings') or ())
         return {**raw, 'buffer_warnings': (message, *warnings_out)}
@@ -2961,6 +2973,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     raise _MAGEMinEngineCallError(
                         type(exc).__name__,
                         f'MAGEMin binary could not be executed: {exc}',
+                        failure_disposition='environment_os_error',
                     ) from exc
 
         if completed.returncode != 0:

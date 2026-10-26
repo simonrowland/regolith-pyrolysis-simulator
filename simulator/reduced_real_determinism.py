@@ -2691,7 +2691,7 @@ def gate_curve_provider_diagnostic_reasons(
     reasons = []
     for field in (
         "backend_status_reason", "backend_failure_reason_code", "reason", "reason_refused",
-        "backend_failure_exception",
+        "backend_failure_exception", "backend_failure_disposition",
     ):
         value = reason_value(diagnostic.get(field))
         if value is not None and value.strip():
@@ -2727,6 +2727,8 @@ def gate_curve_provider_outcome_for_status(
 
     normalized_status = str(status).strip().lower()
     reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
+    if "environment_os_error" in reasons:
+        return GateCurveProviderOutcome.FAILED
     if any(reason in {
         "missing_input", "invalid_input", "invalid_fo2_log",
         "invalid_pressure_bar", "non_finite_composition",
