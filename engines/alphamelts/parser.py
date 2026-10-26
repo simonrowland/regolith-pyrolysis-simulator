@@ -87,7 +87,7 @@ def project_equilibrium_to_diagnostics(
     _oxide_activities, activity_notices = (
         _canonical_oxide_activity_map_with_notices(raw_activities)
     )
-    warnings += activity_notices
+    warnings += tuple(notice for notice in activity_notices if notice not in warnings)
     # An absent or empty status is the ABSENCE of an answer, not a good one.
     # This seam previously manufactured 'ok' for a statusless result, and no
     # amount of validation further downstream can recover the lost

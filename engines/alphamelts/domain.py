@@ -478,6 +478,7 @@ MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS: Dict[str, Tuple[str, ...]] = {
 MELTS_PARENT_OXIDE_NOT_ENDMEMBER = (
     'typed-refusal:melts_endmember_not_parent_oxide'
 )
+_ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX = 'AlphaMELTS provider omitted'
 
 
 def canonical_melt_oxide_activity_name(name: object) -> str | None:
@@ -546,7 +547,7 @@ def _canonical_oxide_activity_map_with_notices(
                 reason = 'nonfinite'
         if reason:
             notices.append(
-                'AlphaMELTS provider omitted '
+                f'{_ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX} '
                 f'{reason} diagnostic_oxide_activities field '
                 f'{str(raw_name)!r} for phase liquid: {raw_value!r}'
             )

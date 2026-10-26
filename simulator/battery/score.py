@@ -651,6 +651,22 @@ def match_reported_species(
     *,
     oxide_activity: bool = False,
 ) -> tuple[str, float] | None:
+    """Match one reported species, ignoring repair notices."""
+
+    matched, _repair_notices = _match_reported_species_with_notices(
+        formula,
+        reported,
+        oxide_activity=oxide_activity,
+    )
+    return matched
+
+
+def _match_reported_species_with_notices(
+    formula: str,
+    reported: Mapping[str, float],
+    *,
+    oxide_activity: bool = False,
+) -> tuple[tuple[str, float] | None, tuple[str, ...]]:
     """Closed-formula match. Oxide activity never accepts a raw element label.
 
     ``oxide_activity`` compares a parent-oxide formula to the canonical oxide
@@ -667,15 +683,25 @@ def match_reported_species(
 
     target = parse_species_formula(formula)
     if target is None:
-        return None
+        return None, ()
     if oxide_activity and _is_raw_element_label(formula):
-        return None
+        return None, ()
+    oxide_activities: Mapping[str, float] = {}
+    repair_notices: tuple[str, ...] = ()
+    if oxide_activity:
+        from engines.alphamelts.domain import (
+            _canonical_oxide_activity_map_with_notices,
+        )
+
+        oxide_activities, repair_notices = (
+            _canonical_oxide_activity_map_with_notices(reported)
+        )
     for name, value in reported.items():
         if oxide_activity and _is_raw_element_label(str(name)):
             continue
         parsed = parse_species_formula(str(name))
         if parsed == target:
-            return str(name), float(value)
+            return (str(name), float(value)), repair_notices
     if not oxide_activity:
         suffix = _GAS_PHASE_SUFFIX
         for name, value in reported.items():
@@ -684,15 +710,14 @@ def match_reported_species(
                 continue
             stem = text[: -len(suffix)]
             if parse_species_formula(stem) == target:
-                return text, float(value)
-        return None
-    from engines.alphamelts.domain import canonical_oxide_activity_map
+                return (text, float(value)), ()
+        return None, ()
 
-    for name, value in canonical_oxide_activity_map(reported).items():
+    for name, value in oxide_activities.items():
         parsed = parse_species_formula(name)
         if parsed == target:
-            return str(name), float(value)
-    return None
+            return (str(name), float(value)), repair_notices
+    return None, repair_notices
 
 
 def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -> Rail | None:
@@ -9316,11 +9341,24 @@ def predict_with_engine(
         )
         magnitude = value
     else:
-        matched = match_reported_species(
+        matched, activity_repair_warnings = _match_reported_species_with_notices(
             compared,
             reported,
             oxide_activity=quantity in MELT_ACTIVITY_QUANTITIES,
         )
+        if activity_repair_warnings:
+            notices = union_notices(
+                notices,
+                tuple(
+                    Notice(
+                        kind=NoticeKind.INPUT_OMITTED,
+                        affected_quantities=(quantity,),
+                        reason=warning,
+                        origin=f"engine:{engine.value}",
+                    )
+                    for warning in activity_repair_warnings
+                ),
+            )
         if matched is not None:
             _name, magnitude = matched
     if magnitude is None:
