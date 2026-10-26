@@ -101,6 +101,8 @@ from simulator.alpha_kinetics import (
     AlphaSpecError,
     parse_alpha_value,
 )
+from simulator.accounting.exceptions import AccountingError
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
@@ -6239,6 +6241,7 @@ def _flowing_species_partial_pressures_pa(
     total_pressure_pa: float,
     *,
     reported_partial_pressures_mbar: Mapping[str, float] | None = None,
+    species_formula_registry: Mapping[str, Any] | None = None,
 ) -> dict[str, float]:
     try:
         if not is_declared_real_scalar(
@@ -6278,10 +6281,8 @@ def _flowing_species_partial_pressures_pa(
             )
     else:
         molar_flow_by_species: dict[str, float] = {}
+        unresolved_species: list[str] = []
         for species, raw_rate_kg_hr in species_kg_hr.items():
-            molar_mass_g_mol = MOLAR_MASS.get(species)
-            if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
-                continue
             try:
                 if not is_declared_real_scalar(
                     raw_rate_kg_hr,
@@ -6293,8 +6294,27 @@ def _flowing_species_partial_pressures_pa(
                 continue
             if not math.isfinite(rate_kg_hr) or rate_kg_hr <= 0.0:
                 continue
+            species_id = str(species)
+            try:
+                molar_mass_g_mol = resolve_species_formula(
+                    species_id,
+                    species_formula_registry,
+                ).molar_mass_g_per_mol()
+            except AccountingError:
+                unresolved_species.append(species_id)
+                continue
+            if not math.isfinite(molar_mass_g_mol) or molar_mass_g_mol <= 0.0:
+                unresolved_species.append(species_id)
+                continue
             molar_flow_by_species[str(species)] = (
                 rate_kg_hr / (molar_mass_g_mol / 1000.0)
+            )
+        if unresolved_species:
+            raise MolarMassUnavailable(
+                'wall partial-pressure normalization is unavailable because '
+                'one or more carrier formulas have no usable molar mass',
+                species=unresolved_species[0],
+                unresolved_species=tuple(unresolved_species),
             )
         total_molar_flow = sum(molar_flow_by_species.values())
         if total_molar_flow <= 0.0:
@@ -6469,7 +6489,18 @@ def _segment_species_partial_pressures_pa(
 
 
 class MolarMassUnavailable(ValueError):
-    """No usable molar mass, so the HKL impingement flux has no honest input."""
+    """A required carrier or HKL molar mass cannot be resolved honestly."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        species: str | None = None,
+        unresolved_species: tuple[str, ...] = (),
+    ) -> None:
+        self.species = species
+        self.unresolved_species = tuple(unresolved_species)
+        super().__init__(message)
 
 
 def _molecular_mass_kg_per_molecule(

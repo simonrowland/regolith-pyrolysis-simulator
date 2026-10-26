@@ -26,6 +26,8 @@ from simulator.account_ids import (
 from simulator.accounting.queries import AccountingQueries
 from simulator.accounting.queries import REE_ENRICHMENT_SOURCE_IDS, REE_OXIDE_SPECIES
 from simulator.chemistry.melt_activity import melt_oxide_activity
+from simulator.accounting.exceptions import AccountingError
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.condensation_routing import (
     PRODUCT_DESTINATIONS,
     product_stage_number,
@@ -1180,8 +1182,14 @@ class ExtractionMixin:
         )
         cleaned_melt_mol: dict[str, float] = {}
         for species, kg in cleaned_melt_kg.items():
-            molar_mass = MOLAR_MASS.get(str(species))
-            if molar_mass is None:
+            try:
+                molar_mass = resolve_species_formula(
+                    str(species),
+                    getattr(self, 'species_formula_registry', None),
+                ).molar_mass_g_per_mol()
+            except AccountingError:
+                # Diagnostic-only projection: unresolved formulae remain
+                # absent, matching the previous diagnostic's no-mass behavior.
                 continue
             try:
                 kg_value = float(kg)

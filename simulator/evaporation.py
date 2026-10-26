@@ -1683,14 +1683,34 @@ class EvaporationMixin:
         wt_pct: Mapping[str, float],
     ) -> dict[str, float]:
         account_mol: dict[str, float] = {}
+        unresolved_species: list[tuple[str, str]] = []
         for species, wt in wt_pct.items():
-            molar_mass = MOLAR_MASS.get(str(species))
-            if molar_mass is None or molar_mass <= 0.0:
-                continue
             value = self._optional_float(wt)
             if value is None or value <= 0.0:
                 continue
-            account_mol[str(species)] = value / molar_mass
+            species_id = str(species)
+            try:
+                molar_mass = resolve_species_formula(
+                    species_id,
+                    getattr(self, 'species_formula_registry', None),
+                ).molar_mass_g_per_mol()
+            except AccountingError as exc:
+                unresolved_species.append((species_id, str(exc)))
+                continue
+            account_mol[species_id] = value / molar_mass
+        if unresolved_species:
+            from simulator.reduced_real_determinism import record_repair_notice
+
+            for species_id, reason in unresolved_species:
+                record_repair_notice(self, {
+                    'type': 'typed_notice',
+                    'kind': 'freeze_gate_cation_molar_mass_unavailable',
+                    'site': 'freeze_gate_cation_mole_fractions',
+                    'species': species_id,
+                    'reason': reason,
+                    'action': 'refuse_fraction_set',
+                })
+            return {}
         return single_cation_mole_fractions(account_mol)
 
     def _bulk_single_cation_mole_fractions(

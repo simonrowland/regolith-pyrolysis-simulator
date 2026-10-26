@@ -86,6 +86,8 @@ from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
 )
 from simulator.chemistry.melt_activity import melt_oxide_activity
+from simulator.accounting.exceptions import AccountingError
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.feedstock_composition import iron_oxide_values
 from simulator.core import (
     MOLAR_MASS, OXIDE_TO_METAL, FARADAY, GAS_CONSTANT, MeltState,
@@ -120,12 +122,14 @@ MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL = "electrolysis_control_out_of_domain"
 MRE_INVALID_CONTROL_REFUSAL = "invalid_electrolysis_control"
 MRE_RAW_MARGIN_REFUSAL = "non_authoritative_fallback_raw_margin_nonpositive"
 MRE_PRODUCT_PHASE_MISMATCH_REFUSAL = "mre_product_phase_mismatch_refused"
+MRE_MOLAR_MASS_UNAVAILABLE_REFUSAL = "mre_oxide_formula_unavailable"
 MRE_TERMINAL_PHYSICS_REFUSAL_REASONS = frozenset({
     MRE_INVALID_CONTROL_REFUSAL,
     MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
     MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
+    MRE_MOLAR_MASS_UNAVAILABLE_REFUSAL,
 })
 MRE_ACTIVITY_FLOOR = 1.0e-30
 MRE_SELECTIVITY_EXPONENT_CAP = 3.0
@@ -420,17 +424,33 @@ def melt_account_mol_from_kg(
     composition_kg: Mapping[str, float],
 ) -> dict[str, float]:
     account_mol: dict[str, float] = {}
+    unresolved_species: list[str] = []
     for oxide, kg in composition_kg.items():
-        molar_mass = MOLAR_MASS.get(str(oxide))
-        if molar_mass is None:
-            continue
         try:
             kg_value = float(kg)
         except (TypeError, ValueError):
             continue
         if kg_value <= 0.0:
             continue
-        account_mol[str(oxide)] = kg_value * 1000.0 / molar_mass
+        oxide_id = str(oxide)
+        try:
+            molar_mass_g_mol = resolve_species_formula(
+                oxide_id
+            ).molar_mass_g_per_mol()
+        except AccountingError:
+            unresolved_species.append(oxide_id)
+            continue
+        account_mol[oxide_id] = kg_value * 1000.0 / molar_mass_g_mol
+    if unresolved_species:
+        raise MREElectrolysisRefusal(
+            MRE_MOLAR_MASS_UNAVAILABLE_REFUSAL,
+            {
+                "status": "refused",
+                "reason_refused": MRE_MOLAR_MASS_UNAVAILABLE_REFUSAL,
+                "refusal_category": "missing_input",
+                "unresolved_species": sorted(unresolved_species),
+            },
+        )
     return account_mol
 
 

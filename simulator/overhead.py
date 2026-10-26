@@ -53,6 +53,8 @@ import math
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Optional
 
+from simulator.accounting.exceptions import AccountingError
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.environment import (
     controlled_background_partial_pressure,
     cover_gas_partial_pressures,
@@ -67,7 +69,11 @@ from simulator.state import (
 )
 # Single-source the pipe-temperature default from condensation (canonical
 # pipe-defaults home; cycle-safe — condensation doesn't import overhead) [BUG-052].
-from simulator.condensation import DEFAULT_PIPE_TEMPERATURE_C  # °C — default pipe/liner temperature
+from simulator.condensation import (
+    DEFAULT_PIPE_TEMPERATURE_C,
+    MolarMassUnavailable,
+    _flowing_species_partial_pressures_pa,
+)
 from engines.builtin.overhead_bleed import (
     EffectiveTransportCapacity,
     controlled_flow_capacity,
@@ -88,6 +94,9 @@ O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0  # kg/mol — O2 molar mass; g/mol -> 
 # → SiO mid → O2 late) — that's a factor-of-2 in conductance, so
 # the live mixture is the canonical source going forward.
 DEFAULT_PIPE_M_AVG_KG_MOL = 0.040  # kg/mol — fallback mole-weighted pipe gas molar mass
+CARRIER_SPECIES_FORMULA_UNAVAILABLE_REFUSAL = (
+    "carrier_species_formula_unavailable"
+)
 # DERIVATION: premise — steady isothermal ideal-gas flow keeps molar flow
 # constant while local volumetric flow varies as 1/P. Integrating circular
 # Poiseuille along the pipe gives pV throughput
@@ -383,13 +392,12 @@ def _mean_molar_mass_kg_mol(
 
     Returns:
         Mean molar mass in kg/mol, or the documented fallback when
-        the mixture is empty / unresolvable. There is no fixed numeric
-        domain: any finite positive molar mass resolved from ``MOLAR_MASS``
-        or ``species_formula_registry`` is eligible. For sanity, pure He
-        returns 0.004002602 kg/mol, while a registered 300 g/mol species
-        returns 0.300 kg/mol. Species unresolved by both sources are skipped
-        rather than contaminating the denominator. The result is always
-        finite and positive.
+        the mixture has no positive species. There is no fixed numeric
+        domain: any finite positive molar mass resolved by the accounting
+        formula owner is eligible. For sanity, pure He returns 0.004002602
+        kg/mol, while a registered 300 g/mol species returns 0.300 kg/mol.
+        A positive species with no resolvable formula refuses the mixture
+        with its species id instead of being removed from the denominator.
     """
     if not species_kg:
         if fallback_engagement_recorder is not None:
@@ -397,6 +405,7 @@ def _mean_molar_mass_kg_mol(
         return DEFAULT_PIPE_M_AVG_KG_MOL
     total_kg = 0.0  # kg — summed species mass
     total_mol = 0.0  # mol — summed species amount
+    unresolved_species: list[str] = []
     for species, kg in species_kg.items():  # kg — species mass or mass-rate basis
         try:
             mass = float(kg)  # kg — finite species mass contribution
@@ -408,12 +417,15 @@ def _mean_molar_mass_kg_mol(
             species, species_formula_registry
         )
         if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
-            # Unknown species — skip rather than poison the mean.
-            # The fallback covers the "all unknown" degenerate case
-            # via total_mol == 0 below.
+            unresolved_species.append(str(species))
             continue
         total_kg += mass
         total_mol += mass / (molar_mass_g_mol / 1000.0)  # mol — g/mol -> kg/mol
+    if unresolved_species:
+        raise _carrier_formula_refusal(
+            unresolved_species,
+            site="overhead.mean_pipe_molar_mass",
+        )
     if total_mol <= 0.0 or total_kg <= 0.0:
         if fallback_engagement_recorder is not None:
             fallback_engagement_recorder()
@@ -425,23 +437,36 @@ def _species_molar_mass_g_mol(
     species: str,
     species_formula_registry: Optional[Mapping[str, Any]] = None,
 ) -> float | None:
-    """Resolve legacy or catalog-generated gas molar mass in g/mol."""
-
-    value = MOLAR_MASS.get(species)
-    if value is None and species_formula_registry:
-        formula = species_formula_registry.get(species)
-        if formula is not None:
-            if isinstance(formula, Mapping):
-                value = formula.get("molar_mass_g_mol")
-            else:
-                value = getattr(formula, "molar_mass_g_mol", None)
-    if value is None:
-        return None
+    """Resolve gas molar mass in g/mol through the accounting formula owner."""
     try:
-        numeric = float(value)
-    except (TypeError, ValueError):
+        numeric = resolve_species_formula(
+            species,
+            species_formula_registry,
+        ).molar_mass_g_per_mol()
+    except AccountingError:
         return None
     return numeric if math.isfinite(numeric) and numeric > 0.0 else None
+
+
+def _carrier_formula_refusal(
+    unresolved_species: list[str],
+    *,
+    site: str,
+) -> Exception:
+    """Build the existing typed evaporation refusal for unresolved carriers."""
+    from simulator.evaporation import EvaporationFluxRefusal
+
+    species = sorted(set(unresolved_species))
+    return EvaporationFluxRefusal(
+        CARRIER_SPECIES_FORMULA_UNAVAILABLE_REFUSAL,
+        {
+            "status": "refused",
+            "reason_refused": CARRIER_SPECIES_FORMULA_UNAVAILABLE_REFUSAL,
+            "refusal_category": "missing_input",
+            "site": site,
+            "unresolved_species": species,
+        },
+    )
 
 
 class OverheadGasModel:
@@ -1257,35 +1282,23 @@ class OverheadGasModel:
         total_evap_kg_hr = max(0.0, float(evap_flux.total_kg_hr))
         if total_evap_kg_hr <= 0.0:
             return {}
-        molar_flow_by_species: dict[str, float] = {}
-        for species, rate in evap_flux.species_kg_hr.items():
-            # Premise: gas mole fraction is n_i/sum(n), with
-            # n_dot_i=m_dot_i/M_i.  Catalog-generated carrier ids therefore
-            # must resolve M_i through the same formula registry as the ledger,
-            # not disappear when absent from the legacy constant. Units:
-            # (kg/hr)/(kg/mol)=mol/hr; p_i=y_i*P remains mbar. Sanity: legacy
-            # species still resolve from MOLAR_MASS, while pure TiO gives y=1.
-            molar_mass_g_mol = _species_molar_mass_g_mol(
-                species, species_formula_registry
+        try:
+            partial_pressures_pa = _flowing_species_partial_pressures_pa(
+                evap_flux.species_kg_hr,
+                float(vapor_pressure_mbar) * 100.0,
+                species_formula_registry=species_formula_registry,
             )
-            if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
-                continue
-            molar_flow_by_species[species] = max(0.0, float(rate)) / (
-                molar_mass_g_mol / 1000.0
-            )
-        total_molar_flow = sum(molar_flow_by_species.values())
-        # F-316: y_i = n_dot_i / sum(n_dot), p_i = y_i P_vapor. Mass rates
-        # become mol/hr through kg/(kg/mol); unknown-only mixtures retain the
-        # legacy mass-fraction fallback instead of losing pressure entirely.
-        if total_molar_flow > 0.0:
-            return {
-                species: molar_flow / total_molar_flow * vapor_pressure_mbar
-                for species, molar_flow in molar_flow_by_species.items()
-            }
+        except MolarMassUnavailable as exc:
+            unresolved_species = list(exc.unresolved_species)
+            if not unresolved_species and exc.species:
+                unresolved_species.append(exc.species)
+            raise _carrier_formula_refusal(
+                unresolved_species,
+                site="overhead.species_partial_pressures",
+            ) from exc
         return {
-            species: max(0.0, float(rate)) / total_evap_kg_hr
-            * vapor_pressure_mbar
-            for species, rate in evap_flux.species_kg_hr.items()
+            species: partial_pressure_pa / 100.0
+            for species, partial_pressure_pa in partial_pressures_pa.items()
         }
 
     def _update_finite_headspace(self, gas: OverheadGas, melt: MeltState,
