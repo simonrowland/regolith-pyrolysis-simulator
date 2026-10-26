@@ -754,6 +754,40 @@ def _format_enthalpy_increment_subtype(
     return subtype
 
 
+_ENTHALPY_INCREMENT_SUBTYPE_RE = re.compile(
+    r"^H\(T\)-H\((?P<temperature>\d+(?:\.\d+)?) K\)"
+    r"(?:; reference phase: (?P<phase>[^;]+))?"
+    r"(?:; reference polymorph: (?P<polymorph>[^;]+))?$"
+)
+
+
+def _parse_enthalpy_increment_subtype(
+    subtype: str,
+) -> tuple[Decimal, str | None, str | None] | None:
+    """Invert ``_format_enthalpy_increment_subtype``.
+
+    Returns the declared reference temperature, phase, and polymorph.
+    None when the sentence is not one the formatter writes: the anchor
+    is then unknown, not a nearby default.
+    """
+
+    if not isinstance(subtype, str):
+        return None
+    match = _ENTHALPY_INCREMENT_SUBTYPE_RE.fullmatch(subtype)
+    if match is None:
+        return None
+    temperature = as_decimal(match.group("temperature"))
+    if not temperature.is_finite() or temperature <= 0:
+        return None
+    phase = match.group("phase")
+    polymorph = match.group("polymorph")
+    return (
+        temperature,
+        None if phase is None else phase.strip(),
+        None if polymorph is None else polymorph.strip(),
+    )
+
+
 def profile_for(identity: Identity) -> QuantityProfile:
     """Closed compared-axis profile for the declared quantity.
 

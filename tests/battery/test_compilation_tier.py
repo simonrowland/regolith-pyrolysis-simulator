@@ -7,9 +7,11 @@ log10 Kf = 0.092. The Ellingham segment at that temperature is
 
 from __future__ import annotations
 
+import re
 from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
+from pathlib import Path
 
 import pytest
 
@@ -4203,9 +4205,9 @@ def test_pure_phase_refuses_non_298_enthalpy_anchor_before_engine_call() -> None
     assert calls == []
 
 
-# Injected engine enthalpies, J/mol. Only the 298.15 K string is scored
-# today; the other temperatures are here so a later outcome change is a
-# diff of the expected table, not of this fixture.
+# Injected engine enthalpies, J/mol, keyed by the call temperature.
+# 298.15 K is the engine anchor. The expected table pins the scored
+# increment, including the H(298.15)−H(T_ref) correction.
 _ANCHOR_GOLDEN_H_J = {
     298.0: 987.0,
     298.15: 1000.0,
@@ -4215,46 +4217,65 @@ _ANCHOR_GOLDEN_H_J = {
 
 
 @pytest.mark.parametrize(
-    ("subtype", "reason", "value", "calls"),
+    ("subtype", "reason", "value", "calls", "correction_J"),
     [
-        ("H(T)-H(298.15 K)", None, "4", [1000.0, 298.15]),
+        ("H(T)-H(298.15 K)", None, "4", [1000.0, 298.15], None),
         (
             "H(T)-H(298.15 K); reference phase: solid",
-            "pure-phase-enthalpy-anchor-mismatch",
             None,
-            [],
+            "4",
+            [1000.0, 298.15],
+            None,
         ),
         (
             "H(T)-H(298.15 K); reference phase: glass",
             "pure-phase-enthalpy-anchor-mismatch",
             None,
             [],
+            None,
         ),
-        ("H(T)-H(298 K)", "pure-phase-enthalpy-anchor-mismatch", None, []),
+        ("H(T)-H(298 K)", None, "4.013", [1000.0, 298.15, 298.0], "13"),
         (
             "H(T)-H(298 K); reference phase: solid",
-            "pure-phase-enthalpy-anchor-mismatch",
             None,
-            [],
+            "4.013",
+            [1000.0, 298.15, 298.0],
+            "13",
         ),
         (
             "H(T)-H(298 K); reference phase: liquid",
             "pure-phase-enthalpy-anchor-mismatch",
             None,
             [],
+            None,
         ),
-        ("H(T)-H(299.15 K)", "pure-phase-enthalpy-anchor-mismatch", None, []),
-        ("H(T)-H(296.15 K)", "pure-phase-enthalpy-anchor-mismatch", None, []),
+        (
+            "H(T)-H(299.15 K)",
+            None,
+            "3.9",
+            [1000.0, 298.15, 299.15],
+            "-100",
+        ),
+        (
+            "H(T)-H(296.15 K)",
+            "pure-phase-enthalpy-anchor-outside-1k",
+            None,
+            [],
+            None,
+        ),
         (
             "apparent enthalpy, stable-phase anchor",
             "pure-phase-enthalpy-anchor-mismatch",
             None,
             [],
+            None,
         ),
     ],
 )
-def test_h_minus_h298_anchor_scoring_golden(subtype, reason, value, calls) -> None:
-    """Pin the current pure-phase H(T)-H(T_ref) scoring outcome."""
+def test_h_minus_h298_anchor_scoring_golden(
+    subtype, reason, value, calls, correction_J
+) -> None:
+    """Pin pure-phase H(T)-H(T_ref) scoring, including the anchor correction."""
 
     identity = F.oxide_identity(
         "MgO",
@@ -4290,15 +4311,178 @@ def test_h_minus_h298_anchor_scoring_golden(subtype, reason, value, calls) -> No
         pure_phase=pure_phase,
     )
     assert seen == calls
-    assert [notice.kind for notice in attempt.notices] == []
     if reason is None:
         assert attempt.refusal_reason is None
         assert attempt.value == Decimal(value)
         assert attempt.authority is Authority.BRIDGE
+        if correction_J is None:
+            assert attempt.notices == ()
+        else:
+            assert len(attempt.notices) == 1
+            notice = attempt.notices[0]
+            assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            assert notice.authority is Authority.BRIDGE
+            assert notice.band == "298.15 K"
+            assert notice.original == Decimal(correction_J)
+            assert f"declared={subtype}" in notice.reason
+            assert f"correction_J_mol={correction_J}" in notice.reason
+            assert "authority=bridge" in notice.reason
+            assert "term=engine-H" in notice.reason
     else:
         assert attempt.value is None
+        assert attempt.notices == ()
         assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
         assert attempt.refusal_detail["reason"] == reason
+
+
+def test_two_kelvin_enthalpy_anchor_still_refuses_typed() -> None:
+    """A 2 K anchor is outside the Cp·ΔT extension and stays a typed refusal."""
+
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(296.15 K)"),
+    )
+    calls = []
+
+    def pure_phase(*_args):
+        calls.append(_args)
+        raise AssertionError("a 2 K anchor must refuse before the engine call")
+
+    attempt = predict_thermo_attempt(
+        Engine.THERMOENGINE,
+        F.observation("mgo-anchor-2k", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert calls == []
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "pure-phase-enthalpy-anchor-outside-1k"
+    assert attempt.refusal_detail["abs_offset_K"] == "2"
+
+
+def _printed_janaf_mgo_cp_298_15() -> Decimal:
+    """JANAF Mg-008 crystal MgO Cp printed at 298.15 K, J/(mol·K)."""
+
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "data"
+        / "literature"
+        / "observations-v2"
+        / "compilations-janaf"
+        / "janaf-Mg.yaml"
+    )
+    text = path.read_text(encoding="utf-8")
+    marker = "observation_id: nist-janaf-4th:Mg-008:cp:phase-window:whole\n"
+    start = text.index(marker)
+    end = text.index("\n- observation_id:", start + len(marker))
+    pairs = re.findall(r"\n    - - '([^']+)'\n      - '([^']+)'", text[start:end])
+    return Decimal(dict(pairs)["298.15"])
+
+
+def test_enthalpy_anchor_correction_matches_janaf_mgo_cp() -> None:
+    """298 K anchor uses the engine Cp when that engine has no H at T_ref.
+
+    The expected joules are the printed JANAF MgO Cp(298.15 K) times the
+    0.15 K gap, 5.5659 J/mol. That product is not computed in this test.
+    """
+
+    printed_cp = _printed_janaf_mgo_cp_298_15()
+    assert printed_cp == Decimal("37.106")
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(298 K)"),
+    )
+
+    class _Props:
+        def __init__(self, enthalpy, heat_capacity) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = heat_capacity
+            self.S_J_K_mol = 26.95
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        if abs(temperature_K - 298.0) < 1e-9:
+            return _Props(None, None)
+        if abs(temperature_K - 298.15) < 1e-9:
+            return _Props(1000.0, float(printed_cp))
+        return _Props(5000.0, None)
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo-janaf-cp-anchor", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert attempt.refusal_reason is None
+    assert attempt.value == Decimal("4.0055659")
+    assert len(attempt.notices) == 1
+    notice = attempt.notices[0]
+    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert notice.original == Decimal("5.5659")
+    assert notice.authority is Authority.BRIDGE
+    assert "term=engine-Cp" in notice.reason
+    assert "authority=bridge" in notice.reason
+    assert "declared=H(T)-H(298 K)" in notice.reason
+
+
+def test_enthalpy_anchor_without_h_or_cp_refuses_typed() -> None:
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(298 K)"),
+    )
+
+    class _Props:
+        def __init__(self, enthalpy) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = None
+            self.S_J_K_mol = None
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        if abs(temperature_K - 298.0) < 1e-9:
+            return _Props(None)
+        if abs(temperature_K - 298.15) < 1e-9:
+            return _Props(1000.0)
+        return _Props(5000.0)
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo-anchor-no-cp", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "pure-phase-enthalpy-anchor-no-H-or-Cp"
 
 
 def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> None:
