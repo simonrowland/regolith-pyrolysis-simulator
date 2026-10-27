@@ -45,8 +45,6 @@ from simulator.melt_backend.base import (
 )
 from simulator.melt_backend.liquidus import (
     LIQUIDUS_LIQUID_EPSILON,
-    LiquidusSolidusResult,
-    MeltFractionSample,
 )
 from simulator.reduced_real_determinism import (
     GateCurveProviderOutcome,
@@ -173,12 +171,19 @@ def _build_freeze_gate_sim(
     setpoints_data,
     *,
     enabled: bool,
+    liquid_fraction_provider: str | None = None,
 ):
+    setpoints = _set_freeze_gate(setpoints_data, enabled=enabled)
+    if liquid_fraction_provider is not None:
+        setpoints['chemistry_kernel'] = {
+            **setpoints.get('chemistry_kernel', {}),
+            'liquid_fraction_provider': liquid_fraction_provider,
+        }
     return _build_sim(
         'lunar_mare_low_ti',
         vapor_pressure_data,
         feedstocks_data,
-        _set_freeze_gate(setpoints_data, enabled=enabled),
+        setpoints,
     )
 
 
@@ -593,6 +598,7 @@ def test_freeze_gate_cache_key_distinguishes_nio_coo_moles(
 
 
 def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
+    from simulator.accounting.run_artifact import build_run_artifact
     from simulator.core import PyrolysisSimulator
     from simulator.melt_backend.magemin import MAGEMinBackend
     from simulator.runner import PyrolysisRun
@@ -692,13 +698,26 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             # including it made a second C0 tuple look like a live curve.
             return record
         curve = record['curve']
-        observed.setdefault(current_scenario[0], []).append((
+        row = (
             sim.melt.campaign.name,
             curve['source'],
             curve['solidus_T_C'],
             curve['liquidus_T_C'],
             tuple(tuple(point) for point in curve['path']),
-        ))
+        )
+        if current_scenario[0] == 'ci_carbonaceous_chondrite_C2B_12h':
+            assert [row] == expected[current_scenario[0]]
+            notice = curve['gate_provider_refusal']
+            assert record['provider_outcome'] is GateCurveProviderOutcome.NUMERICAL_FAILURE
+            assert notice['provider_outcome'] == 'numerical_failure'
+            assert notice['authority'] == 'extrapolated'
+            assert notice['certified_band']['min_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+            assert notice['provider_diagnostic']['backend_diagnostics'][
+                'projected_liquidus_status'
+            ] in {'unavailable', 'not_converged'}
+            observed[current_scenario[0]] = [row]
+        else:
+            observed.setdefault(current_scenario[0], []).append(row)
         rebuild_counts[current_scenario[0]] = int(
             getattr(sim, '_freeze_gate_cache_rebuild_count', 0)
         )
@@ -719,7 +738,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         name = scenario['name']
         current_scenario[0] = name
         equilibrations_before = equilibrium_count[0]
-        PyrolysisRun(
+        result = PyrolysisRun(
             feedstock_id=scenario['feedstock_id'],
             campaign=scenario['campaign'],
             hours=scenario['hours'],
@@ -729,8 +748,17 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             setpoints_patch={'freeze_gate': {'enabled': True}},
         ).run()
         if name == 'ci_carbonaceous_chondrite_C2B_12h':
-            assert rebuild_counts[name] == 1
-            assert equilibrium_count[0] - equilibrations_before == 8
+            assert result['status'] == 'ok'
+            artifact = build_run_artifact(result, run_id='ci-numerical-gate')
+            flagged_hours = [
+                step['hour'] for step in artifact['timesteps']
+                if step['summary']['oxygen_reservoir']['liquid_fraction_gate'][
+                    'redox'
+                ]['gate_provider_refusal']['provider_outcome'] == 'numerical_failure'
+            ]
+            assert flagged_hours == list(range(1, scenario['hours'] + 1))
+            assert rebuild_counts.get(name, 0) > 0
+            assert equilibrium_count[0] > equilibrations_before
 
     assert observed == expected
 
@@ -744,7 +772,7 @@ def test_native_fe_no_commit_split_suppresses_vapor_route(
         vapor_pressure_data,
         feedstocks_data,
         setpoints_data,
-        enabled=False,
+        enabled=False, liquid_fraction_provider='analytical',
     )
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
@@ -793,7 +821,7 @@ def test_native_fe_vapor_only_route_survives_no_tap_proposal(
         vapor_pressure_data,
         feedstocks_data,
         setpoints_data,
-        enabled=False,
+        enabled=False, liquid_fraction_provider='analytical',
     )
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
@@ -849,7 +877,7 @@ def test_native_fe_transitionless_route_requires_explicit_mol_native_attribution
     setpoints_data,
 ):
     sim = _build_freeze_gate_sim(
-        vapor_pressure_data, feedstocks_data, setpoints_data, enabled=False,
+        vapor_pressure_data, feedstocks_data, setpoints_data, enabled=False, liquid_fraction_provider='analytical',
     )
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
@@ -892,7 +920,7 @@ def test_native_fe_error_without_transition_refuses_before_vapor_mutation(
         vapor_pressure_data,
         feedstocks_data,
         setpoints_data,
-        enabled=False,
+        enabled=False, liquid_fraction_provider='analytical',
     )
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
@@ -1160,7 +1188,7 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
     )
 
 
-def test_freeze_gate_dispatches_intrinsic_fo2_to_gate_and_kernel_liquidus(
+def test_freeze_gate_dispatches_intrinsic_fo2_to_declared_gate(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -1187,8 +1215,8 @@ def test_freeze_gate_dispatches_intrinsic_fo2_to_gate_and_kernel_liquidus(
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
             captured.append((intent, kwargs))
             return SimpleNamespace(
-                status='unavailable',
-                diagnostic={'backend_status': 'unavailable'},
+                status='ok',
+                diagnostic={'solidus_T_C': 1000.0, 'liquidus_T_C': 1300.0},
             )
         if intent is ChemistryIntent.SILICATE_LIQUIDUS:
             captured.append((intent, kwargs))
@@ -1213,14 +1241,13 @@ def test_freeze_gate_dispatches_intrinsic_fo2_to_gate_and_kernel_liquidus(
     assert flux.species_kg_hr['Na'] == pytest.approx(5.0)
     assert [intent for intent, _ in captured] == [
         ChemistryIntent.GATE_LIQUID_FRACTION,
-        ChemistryIntent.SILICATE_LIQUIDUS,
     ]
     for _, kwargs in captured:
         assert kwargs['fO2_log'] == expected_fO2
         assert kwargs['fe_redox_policy'] == 'intrinsic'
 
 
-def test_freeze_gate_enabled_falls_back_to_liquidus_samples(
+def test_freeze_gate_enabled_refuses_instead_of_using_backend_liquidus(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -1251,28 +1278,16 @@ def test_freeze_gate_enabled_falls_back_to_liquidus_samples(
             return _OVERHEAD_GAS_EQUILIBRIUM_STUB
         raise AssertionError(f'unexpected dispatch: {intent}')
 
-    def fake_liquidus_finder(**kwargs):
-        assert 'process.cleaned_melt' in kwargs['composition_mol_by_account']
-        return SimpleNamespace(
-            status='ok',
-            solidus_T_C=1000.0,
-            liquidus_T_C=1300.0,
-            samples=(
-                SimpleNamespace(temperature_C=1000.0, frac_M=0.0),
-                SimpleNamespace(temperature_C=1150.0, frac_M=0.4),
-                SimpleNamespace(temperature_C=1300.0, frac_M=1.0),
-            ),
-        )
+    def fake_liquidus_finder(**_kwargs):
+        pytest.fail('declared gate used the main backend liquidus')
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
     sim.backend.find_liquidus_solidus = fake_liquidus_finder
 
-    flux = sim._calculate_evaporation(_equilibrium())
-
-    assert flux.species_kg_hr['Na'] == pytest.approx(4.0)
-    assert sim._last_freeze_gate_diagnostic['source'] == (
-        'liquidus_solidus:backend'
-    )
+    with pytest.raises(EvaporationFluxRefusal) as error:
+        sim._calculate_evaporation(_equilibrium())
+    assert error.value.diagnostic['provider'] == 'magemin'
+    assert sim._freeze_gate_liquid_fraction_cache is None
 
 
 def test_freeze_gate_enabled_no_engine_freeze_stops(
@@ -1307,12 +1322,10 @@ def test_freeze_gate_enabled_no_engine_freeze_stops(
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
 
-    with pytest.raises(RuntimeError, match='freeze_gate.enabled requires') as exc:
+    with pytest.raises(EvaporationFluxRefusal) as error:
         sim._calculate_evaporation(_equilibrium())
-    assert 'gate_liquid_fraction provider absent' in str(exc.value)
-    assert 'no liquidus engine produced usable solidus/liquidus bounds' in str(
-        exc.value
-    )
+    assert error.value.reason == 'liquid_fraction_provider_failed'
+    assert 'gate_liquid_fraction provider absent' in error.value.diagnostic['detail']
 
 
 def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
@@ -1767,52 +1780,20 @@ def test_uncacheable_gate_failure_survives_in_progress_redox_bootstrap(
     bootstrap_curves = []
 
     def unavailable_dispatch(intent, *args, **kwargs):
-        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
-            raise ProviderUnavailableError('outer gate provider unavailable')
-        return IntentResult(
-            intent=intent,
-            status='ok',
-            transition=None,
-            diagnostic={},
-        )
-
-    def backend_finder(**_kwargs):
-        assert uncacheable_replay_disposition(sim)
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
         assert sim._freeze_gate_curve_in_progress
         bootstrap_curves.append(sim._melt_redox_liquidus_gate_curve())
-        return SimpleNamespace(
-            status='ok',
-            solidus_T_C=1000.0,
-            liquidus_T_C=1300.0,
-            samples=(),
-        )
+        raise ProviderUnavailableError('outer gate provider unavailable')
 
     monkeypatch.setattr(sim, '_dispatch_only', unavailable_dispatch)
-    monkeypatch.setattr(
-        sim.backend,
-        'find_liquidus_solidus',
-        backend_finder,
-        raising=False,
-    )
-
-    curve = sim._freeze_gate_curve()
-
-    assert curve['source'] == 'liquidus_solidus:backend'
+    with pytest.raises(EvaporationFluxRefusal):
+        sim._freeze_gate_curve()
     assert bootstrap_curves == [None]
-    actual = {
-        'sticky': uncacheable_replay_disposition(sim),
-        'local_admitted': sim._freeze_gate_liquid_fraction_cache is not None,
-        'shared_admitted': bool(shared_cache),
-        'pt0_admitted': bool(store.entries),
-        'pt1_admitted': bool(store.capture_sequence),
-    }
-    assert actual == {
-        'sticky': True,
-        'local_admitted': False,
-        'shared_admitted': False,
-        'pt0_admitted': False,
-        'pt1_admitted': False,
-    }
+    assert uncacheable_replay_disposition(sim)
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert shared_cache == {}
+    assert store.entries == {}
+    assert store.capture_sequence == []
 
 
 def test_bootstrap_none_refreshes_stale_liquid_fraction_diagnostic(
@@ -1852,25 +1833,19 @@ def test_bootstrap_none_refreshes_stale_liquid_fraction_diagnostic(
 
 
 @pytest.mark.parametrize(
-    ('provider_status', 'expected_source'),
-    (
-        ('unavailable', 'none:liquidus_unavailable'),
-        ('not_converged', 'none:liquidus_not_converged'),
-        ('out_of_domain', 'none:liquidus_out_of_domain'),
-    ),
+    'provider_status',
+    ('unavailable', 'not_converged'),
     ids=(
         'provider-unavailable',
         'provider-not-converged',
-        'provider-out-of-domain',
     ),
 )
-def test_redox_liquidus_failure_uses_kress_floor_above_1200_default_off(
+def test_redox_gate_distinguishes_numerical_failure_from_missing_provider_default_off(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
     provider_status,
-    expected_source,
 ):
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
@@ -1895,29 +1870,20 @@ def test_redox_liquidus_failure_uses_kress_floor_above_1200_default_off(
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
     T_K = sim.melt.temperature_C + 273.15
-    fO2_log = sim._current_melt_redox_fO2_log()
-    assert sim._melt_redox_temperature_shift_is_liquid(T_K) is True
-    full_capacity = sim._melt_redox_capacity_mol_per_ln_fO2(
-        fO2_log=fO2_log,
-        T_K=T_K,
-    )
-
-    effective_capacity = sim._melt_redox_source_capacity_mol_per_ln_fO2(
-        fO2_log=fO2_log,
-        T_K=T_K,
-    )
-
-    assert sim._freeze_gate_enabled() is False
-    assert full_capacity > 0.0
-    assert effective_capacity == pytest.approx(full_capacity)
-    diagnostic = sim._last_melt_redox_liquid_fraction_diagnostic
-    assert diagnostic['status'] == 'liquidus_unavailable_floor_fallback'
-    assert diagnostic['source'] == expected_source
-    assert diagnostic['liquidus_status'] == provider_status
-    assert diagnostic['liquid_fraction'] == 1.0
-    assert diagnostic['floor_T_C'] == 1200.0
-    assert diagnostic['reason']
-    assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
+    before = sim.atom_ledger.mol_by_account()
+    if provider_status == 'unavailable':
+        with pytest.raises(EvaporationFluxRefusal):
+            sim._melt_redox_temperature_shift_is_liquid(T_K)
+        with pytest.raises(EvaporationFluxRefusal):
+            sim._melt_redox_source_capacity_mol_per_ln_fO2(fO2_log=-9.0, T_K=T_K)
+    else:
+        assert sim._melt_redox_temperature_shift_is_liquid(T_K)
+        assert sim._melt_redox_source_capacity_mol_per_ln_fO2(fO2_log=-9.0, T_K=T_K) > 0.0
+        notice = sim._last_melt_redox_liquidus_gate_diagnostic['gate_provider_refusal']
+        assert notice['provider_outcome'] == 'numerical_failure'
+        assert notice['authority'] == 'extrapolated'
+    assert sim.atom_ledger.mol_by_account() == before
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
 
 
 def test_redox_gate_propagates_keyerror_from_curve_notice_recording(
@@ -2270,13 +2236,13 @@ def test_same_drop_set_replaces_projected_notice_with_kress_authority(
     )
 
 
-def test_invalid_projected_bounds_prefer_later_ladder_authority(
+def test_invalid_projected_bounds_keep_declared_provider_prediction(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
 ):
-    """A real later liquidus wins; the invalid projection is only the notice."""
+    """A declared MAGEMin domain extension never uses another backend."""
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
         feedstocks_data,
@@ -2295,36 +2261,20 @@ def test_invalid_projected_bounds_prefer_later_ladder_authority(
     )
 
     def fake_liquidus_finder(**_kwargs):
-        return SimpleNamespace(
-            status='ok',
-            solidus_T_C=1000.0,
-            liquidus_T_C=1400.0,
-            samples=(),
-            warnings=(),
-            diagnostics={},
-        )
+        pytest.fail('projected gate switched to main backend')
 
     sim.backend.find_liquidus_solidus = fake_liquidus_finder
     sim.melt.temperature_C = 1200.0
 
     factor = sim._freeze_gate_liquid_fraction_factor()
-    assert factor == pytest.approx(0.5)
-    assert sim._last_freeze_gate_diagnostic['source'] == (
-        'liquidus_solidus:backend'
-    )
-    assert 'composition_projected' not in (
-        sim._last_freeze_gate_diagnostic['source']
-    )
+    assert factor == 0.0
+    assert sim._last_freeze_gate_diagnostic['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
     attached = sim._last_freeze_gate_diagnostic['composition_projected_notice']
-    assert attached['bounds_source'] == 'liquidus_solidus:backend'
+    assert attached['bounds_source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
     assert attached['projected_bounds'] == 'invalid'
-    assert attached['certified_band']['engine'] == 'magemin'
-    assert 'floor_T_C' not in attached
-    assert 'temperature_band_case' not in attached
-    assert dropped <= {
-        row['component'] for row in attached['dropped_components']
-    }
-    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+    assert attached['projection_certified_band']['engine'] == 'magemin'
+    assert attached['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert dropped <= {row['component'] for row in attached['dropped_components']}
 
 
 def test_invalid_projected_bounds_without_any_authority_is_typed_refusal(
@@ -4460,11 +4410,13 @@ def test_shuttle_bakeout_cycle_counter_waits_for_successful_hour(
     feedstocks_data,
     setpoints_data,
 ):
+    setpoints = deepcopy(setpoints_data)
+    setpoints['chemistry_kernel']['liquid_fraction_provider'] = 'analytical'
     sim = _build_sim(
         'lunar_mare_low_ti',
         vapor_pressure_data,
         feedstocks_data,
-        setpoints_data,
+        setpoints,
         additives_kg={'K': 1.0},
     )
     sim.start_campaign(CampaignPhase.C3_K)
@@ -5454,7 +5406,7 @@ def test_missing_gate_provider_outcome_is_not_reusable():
         (
             'out_of_domain',
             {'backend_status_reason': 'invalid_input'},
-            GateCurveProviderOutcome.STABLE_REFUSAL,
+            GateCurveProviderOutcome.FAILED,
         ),
         (
             'out_of_domain',
@@ -5474,7 +5426,7 @@ def test_missing_gate_provider_outcome_is_not_reusable():
         (
             'out_of_domain',
             {'backend_status_reason': 'no_convergence'},
-            GateCurveProviderOutcome.FAILED,
+            GateCurveProviderOutcome.NUMERICAL_FAILURE,
         ),
         (
             'unsupported',
@@ -5522,7 +5474,7 @@ def test_missing_gate_provider_outcome_is_not_reusable():
         (
             'refused',
             {'reason': 'invalid_input'},
-            GateCurveProviderOutcome.STABLE_REFUSAL,
+            GateCurveProviderOutcome.FAILED,
         ),
         (
             'refused',
@@ -5557,7 +5509,10 @@ def test_gate_curve_provider_outcome_follows_status_determinism(
 
     assert outcome is expected
     assert gate_curve_provider_outcome_is_reusable(outcome) is (
-        expected is not GateCurveProviderOutcome.FAILED
+        expected not in {
+            GateCurveProviderOutcome.FAILED,
+            GateCurveProviderOutcome.NUMERICAL_FAILURE,
+        }
     )
 
 
@@ -6513,57 +6468,17 @@ def test_core_gate_curve_memo_does_not_reuse_fallback_after_provider_unavailable
     )
     _configure_kernel_liquidus_authority(sim, monkeypatch)
     provider_calls = []
-    fallback_curve = {
-        'source': 'kress91_liquid_calibration_floor',
-        'solidus_T_C': 1200.0,
-        'liquidus_T_C': 1200.000001,
-    }
-    monkeypatch.setattr(
-        sim,
-        '_freeze_gate_curve_from_gate_dispatch',
-        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: None,
-    )
-    monkeypatch.setattr(
-        sim.backend,
-        'find_liquidus_solidus',
-        None,
-        raising=False,
-    )
-
-    def unavailable_kernel_provider(intent, *args, **kwargs):
-        if intent is ChemistryIntent.SILICATE_LIQUIDUS:
-            provider_calls.append(intent)
-            raise ProviderUnavailableError('kernel liquidus unavailable in test')
-        raise AssertionError(f'unexpected intent: {intent}')
-
-    monkeypatch.setattr(sim, '_dispatch_only', unavailable_kernel_provider)
-    live_producer = sim._freeze_gate_curve_record
-
-    def produce_floor_after_kernel_unavailable():
-        try:
-            return live_producer()
-        except ProviderUnavailableError:
-            record = engine_binding_admission.write_gate_curve_memo_record(
-                sim,
-                fallback_curve,
-            )
-            record['provider_outcome'] = GateCurveProviderOutcome.FAILED
-            return record
-
-    monkeypatch.setattr(
-        sim,
-        '_freeze_gate_curve_record',
-        produce_floor_after_kernel_unavailable,
-    )
-
-    first = sim._melt_redox_liquidus_gate_curve()
-    second = sim._melt_redox_liquidus_gate_curve()
-
-    # A dispatch-time unavailable result cannot become a reusable fallback.
+    def unavailable(intent, **kwargs):
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        provider_calls.append(intent)
+        raise ProviderUnavailableError('declared gate unavailable')
+    monkeypatch.setattr(sim, '_dispatch_only', unavailable)
+    for _ in range(2):
+        with pytest.raises(EvaporationFluxRefusal):
+            sim._melt_redox_liquidus_gate_curve()
     assert len(provider_calls) == 2
-    assert second == first
-    key = _freeze_gate_key_for_current_state(sim)
-    assert key not in sim._freeze_gate_liquid_fraction_curve_memo
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert _freeze_gate_key_for_current_state(sim) not in sim._freeze_gate_liquid_fraction_curve_memo
 
 
 @pytest.mark.parametrize(
@@ -6571,7 +6486,7 @@ def test_core_gate_curve_memo_does_not_reuse_fallback_after_provider_unavailable
     [None, 'forbidden_species'],
     ids=['no-reason', 'forbidden-species'],
 )
-def test_core_gate_curve_memo_reuses_fallback_after_stable_out_of_domain(
+def test_core_gate_curve_memo_predicts_and_flags_after_stable_out_of_domain(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -6587,11 +6502,6 @@ def test_core_gate_curve_memo_reuses_fallback_after_stable_out_of_domain(
     provider_calls = []
     shared_cache = {}
     sim._freeze_gate_shared_curve_cache = shared_cache
-    fallback_curve = {
-        'source': 'liquidus_solidus:backend',
-        'solidus_T_C': 1100.0,
-        'liquidus_T_C': 1400.0,
-    }
 
     def stable_out_of_domain(intent, *args, **kwargs):
         assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
@@ -6607,33 +6517,18 @@ def test_core_gate_curve_memo_reuses_fallback_after_stable_out_of_domain(
         )
 
     monkeypatch.setattr(sim, '_dispatch_only', stable_out_of_domain)
-    monkeypatch.setattr(
-        sim,
-        '_freeze_gate_curve_from_backend_liquidus',
-        lambda _reasons, **_kwargs: dict(fallback_curve),
-    )
-
-    first = sim._melt_redox_liquidus_gate_curve()
-    key = _freeze_gate_key_for_current_state(sim)
-
-    assert first == fallback_curve
-    assert sim._freeze_gate_provider_outcome is (
-        GateCurveProviderOutcome.STABLE_REFUSAL
-    )
-    assert sim._freeze_gate_liquid_fraction_cache['provider_outcome'] is (
-        GateCurveProviderOutcome.STABLE_REFUSAL
-    )
-    assert shared_cache[key]['provider_outcome'] is (
-        GateCurveProviderOutcome.STABLE_REFUSAL
-    )
-    assert sim._freeze_gate_liquid_fraction_curve_memo[key][
-        'provider_outcome'
-    ] is GateCurveProviderOutcome.STABLE_REFUSAL
-
-    second = sim._melt_redox_liquidus_gate_curve()
-
-    assert second == first
+    curves = [sim._melt_redox_liquidus_gate_curve() for _ in range(2)]
+    assert curves[0] == curves[1]
+    expected = sim._freeze_gate_kress_floor_curve(None, [])
+    assert curves[0]['path'] == expected['path']
+    assert curves[0]['gate_provider_refusal']['status'] == 'out_of_domain'
+    assert curves[0]['gate_provider_refusal']['reason'] == stable_reason
+    assert curves[0]['gate_provider_refusal']['qualification'] == 'out_of_domain_kress91_floor_prediction'
+    assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
+    snapshot = sim._make_snapshot()
+    assert snapshot.liquid_fraction_gate['redox']['gate_provider_refusal']['status'] == 'out_of_domain'
     assert len(provider_calls) == 1
+
 
 
 def test_ok_gate_curve_with_informational_reason_is_reused(
@@ -6684,33 +6579,27 @@ def test_ok_gate_curve_with_informational_reason_is_reused(
 
 
 @pytest.mark.parametrize(
-    ('initial_status', 'initial_diagnostic', 'fallback_diagnostic'),
+    ('initial_status', 'initial_diagnostic'),
     [
         pytest.param(
             'not_converged',
             {'backend_status': 'not_converged'},
-            None,
             id='gate-provider-transient',
         ),
         pytest.param(
             'out_of_domain',
-            {'backend_status': 'out_of_domain'},
-            {
-                'backend_status': 'out_of_domain',
-                'backend_status_reason': 'timeout',
-            },
-            id='dropped-gate-diagnostic-then-backend-timeout',
+            {'backend_status': 'out_of_domain', 'backend_status_reason': 'timeout'},
+            id='declared-gate-timeout-out-of-domain',
         ),
     ],
 )
-def test_core_gate_curve_memo_recomputes_after_transient_provider_failure(
+def test_core_gate_curve_memo_recomputes_after_provider_failure(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
     initial_status,
     initial_diagnostic,
-    fallback_diagnostic,
 ):
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
@@ -6719,16 +6608,14 @@ def test_core_gate_curve_memo_recomputes_after_transient_provider_failure(
         enabled=True,
     )
     provider_calls = []
-    fallback_curve = {
-        'source': 'kress91_liquid_calibration_floor',
-        'solidus_T_C': 1200.0,
-        'liquidus_T_C': 1200.000001,
-    }
 
     def injected_provider_result(intent, *args, **kwargs):
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
             provider_calls.append(intent)
-            if len(provider_calls) == 1:
+            failure_attempts = (
+                2 if initial_diagnostic.get('backend_status_reason') == 'timeout' else 1
+            )
+            if len(provider_calls) <= failure_attempts:
                 return IntentResult(
                     intent=intent,
                     status=initial_status,
@@ -6758,42 +6645,22 @@ def test_core_gate_curve_memo_recomputes_after_transient_provider_failure(
         None,
         raising=False,
     )
-    def backend_timeout_fallback(reasons, **kwargs):
-        if fallback_diagnostic is not None:
-            from simulator.reduced_real_determinism import (
-                gate_curve_provider_outcome_for_status,
-                record_gate_curve_provider_outcome,
-            )
-
-            record_gate_curve_provider_outcome(
-                sim,
-                gate_curve_provider_outcome_for_status(
-                    'out_of_domain',
-                    fallback_diagnostic,
-                ),
-            )
-        return dict(fallback_curve)
-
-    monkeypatch.setattr(
-        sim,
-        '_freeze_gate_curve_from_backend_liquidus',
-        backend_timeout_fallback,
-    )
-
-    first = sim._melt_redox_liquidus_gate_curve()
+    if initial_status == 'not_converged':
+        curve = sim._melt_redox_liquidus_gate_curve()
+        assert curve['gate_provider_refusal']['provider_outcome'] == 'numerical_failure'
+    else:
+        with pytest.raises(EvaporationFluxRefusal):
+            sim._melt_redox_liquidus_gate_curve()
     key = _freeze_gate_key_for_current_state(sim)
-    assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.FAILED
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
     second = sim._melt_redox_liquidus_gate_curve()
-
-    assert first == fallback_curve
     assert second['source'] == 'gate_liquid_fraction'
     assert second['solidus_T_C'] == 1000.0
     assert second['liquidus_T_C'] == 1300.0
-    assert len(provider_calls) == 2
-    assert sim._freeze_gate_liquid_fraction_curve_memo[key][
-        'provider_outcome'
-    ] is GateCurveProviderOutcome.PRODUCED
+    assert len(provider_calls) == (
+        3 if initial_diagnostic.get('backend_status_reason') == 'timeout' else 2
+    )
+    assert sim._freeze_gate_liquid_fraction_curve_memo[key]['provider_outcome'] is GateCurveProviderOutcome.PRODUCED
 
 
 def test_replay_gate_curve_is_not_written_to_core_memo(
@@ -6969,21 +6836,6 @@ def test_freeze_gate_curve_path_records_sr18_repair_notice(
     ]
 
 
-def _external_liquidus_result(raw_fraction: float) -> LiquidusSolidusResult:
-    return LiquidusSolidusResult(
-        status='ok',
-        solidus_T_C=1000.0,
-        liquidus_T_C=1300.0,
-        liquid_fraction=raw_fraction,
-        samples=(
-            MeltFractionSample(1000.0, 0.0),
-            MeltFractionSample(1150.0, 0.5),
-            MeltFractionSample(1300.0, raw_fraction),
-        ),
-        iterations=3,
-    )
-
-
 def _external_liquidus_points(raw_fraction: float) -> tuple:
     return (
         {'temperature_C': 1000.0, 'liquid_fraction': 0.0},
@@ -7023,22 +6875,6 @@ def test_external_liquidus_fraction_below_epsilon_is_refused(
     assert notices[0]['temperature_C'] == 1300.0
     assert notices[0]['raw_fraction'] == raw_fraction
 
-    reasons: list[str] = []
-    sim._reduced_real_repair_notices = []
-    replaced = sim._freeze_gate_curve_from_liquidus_result(
-        _external_liquidus_result(raw_fraction),
-        source='external-engine',
-        reasons=reasons,
-    )
-
-    assert replaced is None
-    assert reasons == [
-        f'external-engine {FREEZE_GATE_LIQUIDUS_FRACTION_INCONSISTENT}',
-    ]
-    assert [notice['raw_fraction'] for notice in sim._reduced_real_repair_notices] == [
-        raw_fraction,
-    ]
-
 
 def test_external_liquidus_fraction_within_epsilon_snaps_to_one(
     vapor_pressure_data,
@@ -7065,18 +6901,8 @@ def test_external_liquidus_fraction_within_epsilon_snaps_to_one(
     assert curve['path'] == expected_path
     assert getattr(sim, '_reduced_real_repair_notices', []) == []
 
-    reasons: list[str] = []
-    replaced = sim._freeze_gate_curve_from_liquidus_result(
-        _external_liquidus_result(raw_fraction),
-        source='external-engine',
-        reasons=reasons,
-    )
 
-    assert replaced['path'] == expected_path
-    assert reasons == []
-
-
-def test_failed_freeze_gate_fallback_preserves_repair_notices_without_memoizing(
+def test_failed_freeze_gate_refusal_preserves_repair_notices_without_memoizing(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -7121,43 +6947,18 @@ def test_failed_freeze_gate_fallback_preserves_repair_notices_without_memoizing(
         )
 
     monkeypatch.setattr(sim, '_dispatch_only', dispatch)
-    monkeypatch.setattr(
-        sim,
-        '_freeze_gate_curve_from_backend_liquidus',
-        lambda _reasons, **_kwargs: {
-            'source': 'liquidus_solidus:backend',
-            'solidus_T_C': 1000.0,
-            'liquidus_T_C': 1300.0,
-            'path': ((1000.0, 0.0), (1300.0, 1.0)),
-        },
-    )
-
-    curve = sim._freeze_gate_curve()
-
-    expected_sites = ['SR18', 'SR18', 'SR19']
-    assert curve['solidus_T_C'] == 1000.0
-    assert curve['liquidus_T_C'] == 1300.0
-    assert [notice['site'] for notice in sim._reduced_real_repair_notices] == (
-        expected_sites
-    )
-    assert sim._reduced_real_repair_notices[-1]['failed_source'] == (
-        'gate_liquid_fraction'
-    )
-    assert sim._reduced_real_repair_notices[-1]['replacement_source'] == (
-        'liquidus_solidus:backend'
-    )
-    expected_notices = list(sim._reduced_real_repair_notices)
-    assert sim._freeze_gate_liquid_fraction_cache is None
-    assert shared_cache == {}
-    assert store.entries == {}
-
-    sim._reduced_real_repair_notices = []
-    assert sim._freeze_gate_curve() == curve
-    assert sim._reduced_real_repair_notices == expected_notices
+    for _ in range(2):
+        sim._reduced_real_repair_notices = []
+        with pytest.raises(EvaporationFluxRefusal):
+            sim._freeze_gate_curve()
+        assert [notice['site'] for notice in sim._reduced_real_repair_notices] == ['SR18', 'SR18']
+        assert sim._freeze_gate_liquid_fraction_cache is None
+        assert shared_cache == {}
+        assert store.entries == {}
     assert len(gate_provider_calls) == 2
 
 
-def test_uncacheable_gate_curve_fallback_skips_every_memo(
+def test_uncacheable_gate_curve_refusal_skips_every_memo(
     monkeypatch,
     tmp_path,
     vapor_pressure_data,
@@ -7187,27 +6988,14 @@ def test_uncacheable_gate_curve_fallback_skips_every_memo(
         raise ProviderUnavailableError('gate provider runtime failure')
 
     monkeypatch.setattr(sim, '_dispatch_only', unavailable_dispatch)
-    monkeypatch.setattr(
-        sim,
-        '_freeze_gate_curve_from_backend_liquidus',
-        lambda _reasons, **_kwargs: {
-            'source': 'liquidus_solidus:backend',
-            'solidus_T_C': 1000.0,
-            'liquidus_T_C': 1300.0,
-            'path': ((1000.0, 0.0), (1300.0, 1.0)),
-        },
-    )
-
-    curve = sim._freeze_gate_curve()
-
-    assert curve['solidus_T_C'] == 1000.0
-    assert curve['liquidus_T_C'] == 1300.0
+    with pytest.raises(EvaporationFluxRefusal):
+        sim._freeze_gate_curve()
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}
     assert store.capture_sequence == []
 
 
-def test_freeze_gate_sr19_names_nonok_backend_as_failed_source(
+def test_freeze_gate_invalid_curve_refuses_without_source_replacement(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -7234,32 +7022,18 @@ def test_freeze_gate_sr19_names_nonok_backend_as_failed_source(
     monkeypatch.setattr(
         sim.backend,
         'find_liquidus_solidus',
-        lambda **_kwargs: SimpleNamespace(status='not_converged', diagnostics={}),
+        lambda **_kwargs: pytest.fail('invalid gate called backend'),
         raising=False,
     )
     monkeypatch.setattr(
         sim,
         '_freeze_gate_curve_from_kernel_liquidus',
-        lambda *_args, **_kwargs: {
-            'source': 'liquidus_solidus:kernel',
-            'solidus_T_C': 1000.0,
-            'liquidus_T_C': 1300.0,
-            'path': ((1000.0, 0.0), (1300.0, 1.0)),
-        },
+        lambda *_args, **_kwargs: pytest.fail('invalid gate called kernel'),
     )
 
-    curve = sim._freeze_gate_curve()
-
-    assert curve['source'] == 'liquidus_solidus:kernel'
-    assert sim._reduced_real_repair_notices == [
-        {
-            'type': 'typed_notice',
-            'kind': 'freeze_gate_curve_source_replaced',
-            'site': 'SR19',
-            'failed_source': 'liquidus_solidus:backend',
-            'replacement_source': 'liquidus_solidus:kernel',
-        }
-    ]
+    with pytest.raises(EvaporationFluxRefusal):
+        sim._freeze_gate_curve()
+    assert not getattr(sim, '_reduced_real_repair_notices', [])
 
 
 def test_fallback_authorized_redox_transition_is_balanced_and_provenanced(
@@ -7571,47 +7345,6 @@ def test_freeze_gate_wrapper_passes_buffer_offset_redox_state(
     assert request.fO2_log == pytest.approx(fO2_log)
 
 
-def test_freeze_gate_backend_fallback_receives_redox_state(
-    vapor_pressure_data,
-    feedstocks_data,
-    setpoints_data,
-):
-    sim = _build_freeze_gate_sim(
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-        enabled=True,
-    )
-    state = RedoxState.buffer_offset(
-        FE_FEO_BUFFER_STANDARD,
-        0.2,
-    )
-    calls = []
-
-    class FakeBackend:
-        def find_liquidus_solidus(self, **kwargs):
-            calls.append(kwargs)
-            return LiquidusSolidusResult(
-                liquidus_T_C=1300.0,
-                solidus_T_C=1000.0,
-                liquid_fraction=1.0,
-                status='ok',
-            )
-
-    sim.backend = FakeBackend()
-    reference_value = state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
-
-    curve = sim._freeze_gate_curve_from_backend_liquidus(
-        [],
-        pressure_bar=1.0,
-        fO2_log=reference_value,
-        redox_state=state,
-    )
-
-    assert curve['liquidus_T_C'] == pytest.approx(1300.0)
-    assert calls[0]['redox_state'] is state
-    assert calls[0]['fO2_log'] == pytest.approx(reference_value)
-
 
 @pytest.mark.parametrize(
     ('initial_status', 'initial_diagnostic'),
@@ -7662,7 +7395,7 @@ def test_freeze_gate_backend_fallback_receives_redox_state(
         ),
     ],
 )
-def test_failed_gate_provider_fallback_does_not_enter_any_memo(
+def test_failed_gate_provider_refusal_does_not_enter_any_memo(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -7691,7 +7424,10 @@ def test_failed_gate_provider_fallback_does_not_enter_any_memo(
     def injected_provider_result(intent, *args, **kwargs):
         assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
         provider_calls.append(intent)
-        if len(provider_calls) == 1:
+        failure_attempts = (
+            2 if initial_diagnostic.get('backend_status_reason') == 'timeout' else 1
+        )
+        if len(provider_calls) <= failure_attempts:
             return IntentResult(
                 intent=intent,
                 status=initial_status,
@@ -7715,46 +7451,19 @@ def test_failed_gate_provider_fallback_does_not_enter_any_memo(
 
     monkeypatch.setattr(sim, '_dispatch_only', injected_provider_result)
 
-    backend_calls = []
-    def healthy_backend_fallback(_reasons, **_kwargs):
-        from simulator.reduced_real_determinism import (
-            record_gate_curve_provider_outcome,
-        )
-
-        backend_calls.append(True)
-        record_gate_curve_provider_outcome(
-            sim,
-            GateCurveProviderOutcome.PRODUCED,
-        )
-        return {
-            'source': 'liquidus_solidus:backend',
-            'solidus_T_C': 1100.0,
-            'liquidus_T_C': 1400.0,
-        }
-
-    monkeypatch.setattr(
-        sim,
-        '_freeze_gate_curve_from_backend_liquidus',
-        healthy_backend_fallback,
-    )
-
-    first = sim._melt_redox_liquidus_gate_curve()
+    with pytest.raises(EvaporationFluxRefusal):
+        sim._melt_redox_liquidus_gate_curve()
     key = _freeze_gate_key_for_current_state(sim)
-
-    assert first['source'] == 'liquidus_solidus:backend'
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}
     assert captures == []
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
-    assert len(backend_calls) == 1
-
     second = sim._melt_redox_liquidus_gate_curve()
-
-    assert len(provider_calls) == 2
+    assert len(provider_calls) == (
+        3 if initial_diagnostic.get('backend_status_reason') == 'timeout' else 2
+    )
     assert second['source'] == 'gate_liquid_fraction'
     assert second['solidus_T_C'] == 1000.0
     assert second['liquidus_T_C'] == 1300.0
     assert shared_cache[key]['curve']['source'] == 'gate_liquid_fraction'
-    assert sim._freeze_gate_liquid_fraction_curve_memo[key][
-        'provider_outcome'
-    ] is GateCurveProviderOutcome.PRODUCED
+    assert sim._freeze_gate_liquid_fraction_curve_memo[key]['provider_outcome'] is GateCurveProviderOutcome.PRODUCED

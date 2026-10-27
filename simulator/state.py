@@ -1280,6 +1280,8 @@ class HourSnapshot:
     # expectation is that values converge to zero within ~1-2 ticks
     # for a stable campaign. M2 historical-audit closure (2026-05-28).
 
+    liquid_fraction_gate: Dict[str, Any] = field(default_factory=dict)
+
 
 @dataclass
 class DecisionPoint:
@@ -1341,3 +1343,4 @@ class BatchRecord:
     # Status
     completed: bool = False
     total_hours: int = 0
+    liquid_fraction_provider: str = ''

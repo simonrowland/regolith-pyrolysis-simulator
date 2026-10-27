@@ -273,6 +273,25 @@ it does not introduce a new schema version.
 
 ## Run metadata
 
+`chemistry_kernel.liquid_fraction_provider` declares the liquidus/liquid-fraction
+gate independently of the main melt backend. Accepted values are `magemin`
+(default) and `analytical`, supplied in setpoints or `PyrolysisRun.chemistry_kernel`.
+The choice is resolved before hour 1 and recorded below. Unavailable declared
+MAGEMin produces a typed missing-input refusal at startup. Analytical gating
+uses the existing Kress91 floor prediction and qualifies every gated hour.
+Deterministic numerical MAGEMin failures produce the Kress91 calibration-floor
+prediction with `provider_outcome: "numerical_failure"`,
+`qualification: "numerical_failure_kress91_floor_prediction"`, and
+`authority: "extrapolated"`. The notice preserves the nested provider and
+projected-solve diagnostics, warnings, and certified temperature/composition
+band; the failed solver's bounds do not determine the prediction. Numerical
+failures are excluded from local, shared, and persistent memo admission.
+Launch-time `OSError`, `subprocess.SubprocessError`, and `MemoryError` failures
+remain typed environment refusals and never become numerical predictions;
+ordinary programming exceptions propagate as errors. Stable MAGEMin domain
+refusals retain the qualified Kress91 extrapolation without dispatching another
+engine.
+
 The optional `c0_exit` notice records C0 exit bounds and remaining volatile
 inventory. Its `forecast_engine` member appears only when the detached forecast
 has a recognized engine identity; consumers must tolerate older notices that
@@ -290,6 +309,7 @@ omit it.
   "additives_kg":    {"C": 30.0},            // additive species -> kg
   "track":           "pyrolysis",            // or "mre_baseline"
   "backend":         "internal-analytical",  // canonical melt backend name (`stub` remains an accepted input alias)
+  "liquid_fraction_provider": "magemin",     // declared gate: "magemin" or "analytical"
   "started_at_utc":  "2026-05-15T00:00:00Z", // ISO8601 UTC
   "engines_used": {
     "active": {                               // flat intent -> authoritative provider_id
@@ -767,11 +787,17 @@ mole, energy, pressure, or partition arithmetic.
         "warning": true
       }
     },
-    "oxygen_reservoir": {                   // optional; present when an O2 exchange is clamped
+    "oxygen_reservoir": {                   // present for a gate record or clamped O2 exchange
       "exchange_o2_mol": 0.000001,          // ledger-committed exchange amount, mol O2
       "exchange_unbacked_o2_mol": 0.001594225928215942, // requested remainder, mol O2
       "exchange_direction": "melt_to_headspace",
-      "exchange_clamped": true
+      "exchange_clamped": true,
+      "liquid_fraction_gate": {
+        "provider": "magemin",
+        "redox": {...},                     // realized source, bounds, status and domain qualification
+        "liquid_fraction": {...},           // realized fraction and its qualification
+        "evaporation": {...}                // evaporation gate outcome, empty when disabled
+      }
     }
   },
   ...
@@ -951,9 +977,23 @@ incident, stuck, re-evaporated, and net continuous flux and has
     mirrors the ledger relative tolerance; it is a loud diagnostic tripwire,
     not a fitted chemistry coefficient.
   * `oxygen_reservoir` -- emitted by
-    `_oxygen_reservoir_exchange_observables` when the snapshot reports a
-    clamped exchange; carries the ledger-committed O2 amount, unbacked O2
-    remainder, direction, and clamp status from `HourSnapshot.oxygen_reservoir`.
+    `_oxygen_reservoir_exchange_observables` for gate diagnostics, a clamped
+    exchange. `liquid_fraction_gate` records the declared provider and realized
+    redox/fraction/evaporation outcomes. Analytical hours carry
+    `qualification: analytical_kress91_floor_prediction`. A deterministic
+    numerical MAGEMin failure carries `gate_provider_refusal` with
+    `provider_outcome: numerical_failure`,
+    `numerical_failure_kress91_floor_prediction`, extrapolated authority, the
+    nested provider/projected-solve diagnostics, warnings, and the certified
+    band. These numerical failures do not enter gate-curve memo admission. A
+    stable MAGEMin domain extension carries the same refusal detail with
+    `out_of_domain_kress91_floor_prediction`; both predictions survive cache
+    replay. Launch-time `OSError`, `subprocess.SubprocessError`, and
+    `MemoryError` failures remain typed refusals and do not produce an hourly
+    floor prediction. Exchange fields retain the ledger-committed O2
+    amount, unbacked remainder, direction and clamp status, including `false`
+    when only the gate record caused the diagnostics object to be emitted;
+    clamped-exchange fields come from `HourSnapshot.oxygen_reservoir`.
   * `high_t_melt_activity` -- emitted when the per-hour vapor-pressure
     dispatch populates the high-temperature activity authority diagnostic.
     This JSON-safe `high_t_melt_activity.v1` value is copied from
