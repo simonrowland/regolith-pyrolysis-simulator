@@ -9,7 +9,7 @@ import json
 import re
 import time
 from collections import Counter, defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal, InvalidOperation
 from fractions import Fraction
 from functools import lru_cache
@@ -351,6 +351,17 @@ def _numeric_payload(token: str) -> str:
     text = token.strip()
     text = _TRAILING_JUNK_RE.sub("", text)
     return text.strip()
+
+
+def _published_cell_value(cell: object) -> tuple[Decimal, Decimal] | None:
+    published = _as_published_cell(cell)
+    if published is None or published[1]:
+        return None
+    value = _published_decimal(_numeric_payload(published[0]))
+    if value is None:
+        return None
+    half_place = Decimal("0.5").scaleb(value.as_tuple().exponent)
+    return value, half_place
 
 
 def _iter_raw_numeric_tokens(record: Mapping[str, Any]) -> list[RawToken]:
@@ -1435,28 +1446,16 @@ def _element_reference_species_for_transition_entropy(
         return None
     pair: list[tuple[int, Decimal, Decimal, Decimal, Decimal]] = []
 
-    def cell_value(
-        row: Mapping[str, Any], column: str
-    ) -> tuple[Decimal, Decimal] | None:
-        cell = _as_published_cell(row.get(column))
-        if cell is None or cell[1]:
-            return None
-        value = _published_decimal(_numeric_payload(cell[0]))
-        if value is None:
-            return None
-        half_place = Decimal("0.5").scaleb(value.as_tuple().exponent)
-        return value, half_place
-
     for row_index, row in enumerate(rows):
         if not isinstance(row, Mapping) or row.get("kind") != "data":
             continue
-        row_temperature = cell_value(row, "temperature")
+        row_temperature = _published_cell_value(row.get("temperature"))
         if row_temperature is None or row_temperature[0] != temperature:
             continue
-        entropy = cell_value(row, "entropy")
+        entropy = _published_cell_value(row.get("entropy"))
         if entropy is None:
             continue
-        enthalpy = cell_value(row, "H_minus_H298")
+        enthalpy = _published_cell_value(row.get("H_minus_H298"))
         if enthalpy is None:
             return None
         pair.append(
@@ -1507,7 +1506,6 @@ def _element_reference_species_for_transition_entropy(
     ):
         return None
 
-    assert gas_s > condensed_s
     if token.row_index == gas[0]:
         selected_phase, selected_polymorph = gas_phase, gas_polymorph
     else:
@@ -1519,6 +1517,76 @@ def _element_reference_species_for_transition_entropy(
     )
     atom_count = counts[symbol]
     return make_species(formula, selected_phase, polymorph_state, charge=0), atom_count
+
+
+def _element_reference_state_gas_entropy_is_consistent(
+    record: Mapping[str, Any],
+    token: RawToken,
+    formula: str,
+    symbol: str,
+    temperature: Decimal,
+    gas_atoms_per_formula: Fraction,
+) -> bool:
+    if token.row_index is None:
+        return False
+    rows = record.get("rows")
+    if not isinstance(rows, list) or token.row_index >= len(rows):
+        return False
+    target_row = rows[token.row_index]
+    if not isinstance(target_row, Mapping):
+        return False
+    target_temperature = _published_cell_value(target_row.get("temperature"))
+    target_entropy = _published_cell_value(target_row.get("entropy"))
+    if (
+        target_temperature is None
+        or target_temperature[0] != temperature
+        or target_entropy is None
+    ):
+        return False
+
+    def per_atom(value: Decimal, atoms: Fraction) -> Decimal:
+        return value * Decimal(atoms.denominator) / Decimal(atoms.numerator)
+
+    gas_entropy_per_atom = per_atom(target_entropy[0], gas_atoms_per_formula)
+    same_temperature_condensed: list[Decimal] = []
+    earlier_condensed: list[Decimal] = []
+    for row_index, row in enumerate(rows):
+        if not isinstance(row, Mapping) or row.get("kind") != "data":
+            continue
+        row_temperature = _published_cell_value(row.get("temperature"))
+        row_entropy = _published_cell_value(row.get("entropy"))
+        if (
+            row_temperature is None
+            or row_entropy is None
+            or row_temperature[0] > temperature
+            or row_index == token.row_index
+        ):
+            continue
+        reference = _element_reference_species(symbol, row_temperature[0])
+        if reference is None:
+            transition_token = replace(
+                token, row_index=row_index, column="entropy"
+            )
+            reference = _element_reference_species_for_transition_entropy(
+                record, transition_token, formula, row_temperature[0]
+            )
+        if reference is None:
+            continue
+        condensed_species, atoms_per_formula = reference
+        if phase_token(condensed_species) not in {Phase.CR, Phase.L}:
+            continue
+        entropy_per_atom = per_atom(row_entropy[0], atoms_per_formula)
+        if row_temperature[0] == temperature:
+            same_temperature_condensed.append(entropy_per_atom)
+        else:
+            earlier_condensed.append(entropy_per_atom)
+
+    # Stable-phase S increases with temperature (Cp/T > 0), and these phase
+    # transitions add entropy. Without a same-temperature condensed row, the
+    # highest earlier condensed S is a conservative consistency floor.
+    # Normalize per atom so formula changes such as P to P2 compare.
+    condensed_candidates = same_temperature_condensed or earlier_condensed
+    return not condensed_candidates or gas_entropy_per_atom > max(condensed_candidates)
 
 
 def _is_element_reference_state_record_id(record_id: str, formula: str) -> bool:
@@ -1666,15 +1734,28 @@ def _observation(
     if _is_element_reference_state_record_id(record_id, formula):
         counts = _parse_counts(formula)
         symbol = next(iter(counts)) if counts is not None and len(counts) == 1 else None
-        reference = (
-            None
-            if symbol is None
-            else _element_reference_species(symbol, temperature)
-        )
-        if reference is None:
-            reference = _element_reference_species_for_transition_entropy(
-                record, token, formula, temperature
-            )
+        if symbol is None:
+            reference = None
+        else:
+            reference = _element_reference_species(symbol, temperature)
+            if reference is None:
+                reference = _element_reference_species_for_transition_entropy(
+                    record, token, formula, temperature
+                )
+            if reference is not None:
+                reference_species, atoms_per_formula = reference
+                if (
+                    phase_token(reference_species) is Phase.G
+                    and not _element_reference_state_gas_entropy_is_consistent(
+                        record,
+                        token,
+                        formula,
+                        symbol,
+                        temperature,
+                        atoms_per_formula,
+                    )
+                ):
+                    reference = None
         if reference is None:
             unresolved = (
                 "B1259 elemental reference-state identity is unresolved at "
