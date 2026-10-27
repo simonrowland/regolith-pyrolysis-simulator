@@ -1675,7 +1675,10 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
         strata.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
-    if NoticeKind.OUT_OF_CERTIFIED_BAND.value in kinds:
+    if (
+        NoticeKind.OUT_OF_CERTIFIED_BAND.value in kinds
+        or NoticeKind.COMPOSITION_PROJECTED.value in kinds
+    ):
         strata.append(FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND)
     if NoticeKind.OUT_OF_GAMMA_DOMAIN.value in kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
