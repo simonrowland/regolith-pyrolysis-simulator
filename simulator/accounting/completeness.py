@@ -278,8 +278,83 @@ def evaporation_quantity_unavailability(
             "reason": (
                 f"{species}: {refusal['refusal_type']}: {refusal['reason']}"
             ),
+            "species": species,
+            "parent_oxide": parent_oxide,
+            "account": "process.cleaned_melt",
         }
     return None
+
+
+def product_class_availability(
+    sim: Any,
+    target_species: str | tuple[str, ...],
+    available_parts_kg: Mapping[str, Any],
+    *,
+    snapshots: Any = None,
+) -> dict[str, Any]:
+    """Return a numeric available total and any overlapping transport refusal."""
+    refusal = evaporation_quantity_unavailability(
+        sim, target_species, snapshots=snapshots
+    )
+    parts = {
+        str(name): float(value)
+        for name, value in available_parts_kg.items()
+        if value is not None
+    }
+    total_kg = sum(parts.values())
+    excluded: list[dict[str, Any]] = []
+    if refusal is not None:
+        upper_bound_kg: float | str = "unbounded"
+        parent_oxide = refusal.get("parent_oxide")
+        ledger = getattr(sim, "atom_ledger", None)
+        atom_moles_by_account = getattr(ledger, "atom_moles_by_account", None)
+        registry = getattr(sim, "species_formula_registry", {})
+        if parent_oxide and callable(atom_moles_by_account):
+            try:
+                parent_elements = set(
+                    resolve_species_formula(str(parent_oxide), registry).elements
+                ) - {"O"}
+                if len(parent_elements) == 1:
+                    element = next(iter(parent_elements))
+                    # The ledger's atom-mole accessor projects the remaining
+                    # parent inventory in process.cleaned_melt. Convert those
+                    # atoms to kg of parent element; this is the maximum that
+                    # evaporation could have moved in the recorded window.
+                    mol = float(
+                        atom_moles_by_account("process.cleaned_melt").get(
+                            element, 0.0
+                        )
+                    )
+                    bound = mol * float(MOLAR_MASS[element]) / 1000.0
+                    if math.isfinite(bound) and bound > 0.0:
+                        upper_bound_kg = bound
+            except (AccountingError, KeyError, TypeError, ValueError):
+                pass
+        excluded.append({
+            "species": str(refusal.get("species") or "unknown"),
+            "account": str(refusal.get("account") or "unknown"),
+            "reason": str(refusal.get("reason") or "transport refusal"),
+            "upper_bound_kg": upper_bound_kg,
+        })
+    # Keep the old all-or-nothing result in this consolidation step. The
+    # behavior change that retains computable parts is a separate commit.
+    status = "unavailable" if refusal is not None else "available"
+    return {
+        "class_total_kg": None if refusal is not None else total_kg,
+        "status": status,
+        "excluded": excluded,
+        "reason": excluded[0]["reason"] if excluded else "",
+        "flag": (
+            dict(refusal) if refusal is not None else None
+        ) or (
+            None if status == "available" else {
+                "status": status,
+                "authority": "unavailable",
+                "reason": excluded[0]["reason"] if excluded else "",
+                "excluded": excluded,
+            }
+        ),
+    }
 
 
 def extraction_completeness_by_target(

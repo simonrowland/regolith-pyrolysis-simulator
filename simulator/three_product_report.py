@@ -38,7 +38,7 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
-from simulator.accounting.completeness import evaporation_quantity_unavailability
+from simulator.accounting.completeness import product_class_availability
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.queries import (
     AccountingQueries,
@@ -497,18 +497,27 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
          ('class_total_kg',), ('kg_by_species',)),
     )
     for name, targets, quantities, species_maps in affected_buckets:
-        flag = evaporation_quantity_unavailability(sim, targets)
-        if flag:
-            bucket = result[name]
-            bucket['flag'] = flag
-            for key in quantities:
-                bucket[key] = None
-            for key in species_maps:
-                bucket[key] = {
-                    species: kg
-                    for species, kg in bucket[key].items()
-                    if evaporation_quantity_unavailability(sim, species) is None
-                }
+        bucket = result[name]
+        availability = product_class_availability(
+            sim,
+            targets,
+            {key: bucket.get(key) for key in quantities},
+        )
+        if availability['status'] != 'available':
+            bucket['status'] = availability['status']
+            bucket['excluded'] = availability['excluded']
+            bucket['flag'] = availability['flag']
+            if availability['status'] == 'unavailable':
+                for key in quantities:
+                    bucket[key] = None
+                for key in species_maps:
+                    bucket[key] = {
+                        species: kg
+                        for species, kg in bucket[key].items()
+                        if product_class_availability(
+                            sim, (species,), {species: kg}
+                        )['status'] == 'available'
+                    }
     if result['oxygen']['class_total_kg'] is None:
         for name, key in (
             ('oxygen', 'partition_kg'),
@@ -516,15 +525,23 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         ):
             result[name][key] = dict.fromkeys(oxygen_partition)
     if early_tap_mode:
-        flag = evaporation_quantity_unavailability(sim, METAL_PRODUCT_SPECIES)
-        if flag:
-            for name, fields in (
-                ('industrial_mixed_glass', ('class_total_kg', 'mixed_melt_residual_kg')),
-                ('glass', ('class_total_kg', 'industrial_mixed_glass_kg')),
-            ):
-                result[name]['flag'] = flag
-                for key in fields:
-                    result[name][key] = None
+        for name, fields in (
+            ('industrial_mixed_glass', ('class_total_kg', 'mixed_melt_residual_kg')),
+            ('glass', ('class_total_kg', 'industrial_mixed_glass_kg')),
+        ):
+            bucket = result[name]
+            availability = product_class_availability(
+                sim,
+                METAL_PRODUCT_SPECIES,
+                {key: bucket.get(key) for key in fields},
+            )
+            if availability['status'] != 'available':
+                bucket['status'] = availability['status']
+                bucket['excluded'] = availability['excluded']
+                bucket['flag'] = availability['flag']
+                if availability['status'] == 'unavailable':
+                    for key in fields:
+                        bucket[key] = None
     return result
 
 
