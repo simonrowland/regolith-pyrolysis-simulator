@@ -217,10 +217,12 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 3, published_page: 195, pdf_page_index: 2, table: I}
         T_range_K: [1506, 1780]
-        phase: crystalline_pseudowollastonite_alpha_wollastonite
-        condensed_form: {polymorph: alpha}
-        polymorph_notes: 'The authors identify the solid as α-wollastonite (pseudowollastonite); no more specific pseudowollastonite enum token exists.'
-        standard_state: 'Cooling enthalpy from each stated T to 298 K; values are per mole of CaSiO3.'
+        phase: cr
+        condensed_form: {polymorph: pseudowollastonite}
+        polymorph_notes: 'The authors identify the solid as α-wollastonite (pseudowollastonite).'
+        standard_state: 'Cooling enthalpy from each stated T to 298 K; values are per mole of CaSiO3. Table I prints this column as the enthalpy increment; Eq. (1) adds the 298 K solution heat to make Hrel.'
+        reference_temperature_K: 298
+        per: mol_species
         units: 'T in K; enthalpy in kJ mol−1 CaSiO3'
         values:
           quantity: negative_enthalpy_change_on_cooling
@@ -242,7 +244,7 @@ species:
         locator: {page: 4, published_page: 196, pdf_page_index: 3, table: II}
         T_range_K: [298, 298]
         phase: crystalline_pseudowollastonite_alpha_wollastonite
-        condensed_form: {polymorph: alpha}
+        condensed_form: {polymorph: pseudowollastonite}
         polymorph_notes: 'The authors identify the solid as α-wollastonite (pseudowollastonite).'
         standard_state: 'Heat of solution in concentrated HF:HNO3 (2:1) at 298 K; per mole of CaSiO3.'
         units: 'T in K; enthalpy in kJ mol−1 CaSiO3'
@@ -269,9 +271,9 @@ species:
         locator: {page: 3, published_page: 195, pdf_page_index: 2, table: I}
         T_range_K: [1506, 1780]
         phase: crystalline_pseudowollastonite_alpha_wollastonite
-        condensed_form: {polymorph: alpha}
+        condensed_form: {polymorph: pseudowollastonite}
         polymorph_notes: 'The authors identify the solid as α-wollastonite (pseudowollastonite).'
-        standard_state: 'Relative enthalpy Hrel defined by Eq. (1), from T to the 298 K reference.'
+        standard_state: 'Relative enthalpy Hrel defined by Eq. (1), from T to the 298 K reference. Hrel is the cooling increment plus the 298 K solution heat, not H(T)-H(298 K).'
         units: 'T in K; Hrel in kJ mol−1 CaSiO3'
         values:
           quantity: relative_enthalpy
@@ -295,7 +297,7 @@ species:
         locator: {page: 3, published_page: 195, pdf_page_index: 2, equation: '3', table: I}
         T_range_K: [1506, 1780]
         phase: crystalline_pseudowollastonite_alpha_wollastonite
-        condensed_form: {polymorph: alpha}
+        condensed_form: {polymorph: pseudowollastonite}
         units: 'T in K; enthalpy in kJ mol−1 CaSiO3'
         values:
           quantity: fitted_enthalpy_of_cooling
@@ -321,7 +323,7 @@ species:
         locator: {page: 4, published_page: 196, pdf_page_index: 3, equation: '6', table: I}
         T_range_K: [1506, 1780]
         phase: crystalline_pseudowollastonite_alpha_wollastonite
-        condensed_form: {polymorph: alpha}
+        condensed_form: {polymorph: pseudowollastonite}
         standard_state: 'Relative enthalpy Hrel defined at 298 K by Eq. (1).'
         units: 'T in K; Hrel in kJ mol−1 CaSiO3'
         values:
@@ -347,7 +349,7 @@ species:
         locator: {page: 4, published_page: 196, pdf_page_index: 3, equation: '4'}
         T_range_K: [1506, 1780]
         phase: crystalline_pseudowollastonite_alpha_wollastonite
-        condensed_form: {polymorph: alpha}
+        condensed_form: {polymorph: pseudowollastonite}
         units: 'T in K; molar heat capacity in kJ mol−1 K−1 CaSiO3'
         values:
           quantity: molar_heat_capacity
@@ -369,8 +371,9 @@ species:
         standard_state: 'Cooling enthalpy from each stated T to 298 K; values are per mole of CaSiO3.'
         units: 'T in K; enthalpy in kJ mol−1 CaSiO3'
         values:
-          quantity: negative_enthalpy_change_on_cooling
+          quantity: sample_dependent_enthalpy_change_on_cooling
           method_class: measured_direct
+          note: 'Printed pp. 194-195: melt ΔHcool depends on the structure of the glass formed on cooling in the drop calorimeter, so the drop is not liquid H(T)-H(298 K).'
           table_csv: tables/adamkovicova-1980-casio3-heat-of-fusion/t3.csv
           sign_convention: 'Table III explicitly prints −ΔHcool as positive values.'
           points:
@@ -408,7 +411,7 @@ species:
         locator: {page: 4, published_page: 196, pdf_page_index: 3, table: III}
         T_range_K: [1829, 1961]
         phase: CaSiO3_melt
-        standard_state: 'Relative enthalpy Hrel defined by Eq. (1), from T to the 298 K reference.'
+        standard_state: 'Relative enthalpy Hrel defined by Eq. (1), from T to the 298 K reference. Hrel is the cooling increment plus the solution heat of that sample, not liquid H(T)-H(298 K).'
         units: 'T in K; Hrel in kJ mol−1 CaSiO3'
         values:
           quantity: relative_enthalpy
@@ -454,10 +457,11 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 6, published_page: 198, pdf_page_index: 5, section: Discussion, equation: '7'}
         T_range_K: [1829, 1961]
-        phase: CaSiO3_melt
+        phase: l
+        per: mol_species
         units: 'kJ mol−1 K−1 CaSiO3'
         values:
-          quantity: molar_heat_capacity
+          quantity: cp
           method_class: measured_reduced
           value_kJ_mol-1_K-1: 1.4985e-1
           as_printed: 'C_CS,m,φ = 1.4985 × 10^−1 kJ mol−1 K−1; constant within the framework of errors over 1829–1961 K.'
@@ -574,10 +578,11 @@ species:
       - observation_id: adamkovicova_1980_prior_melt_heat_capacity_0_15073_quote
         type: heat_capacity_and_heat_content_series
         locator: {page: 6, published_page: 198, pdf_page_index: 5, section: Discussion}
-        phase: CaSiO3_melt
+        phase: l
+        per: mol_species
         units: kJ mol−1 K−1 CaSiO3
         values:
-          quantity: molar_heat_capacity
+          quantity: cp
           method_class: quoted_attributed
           attribution: 'Barin, Knacke and Kubaschewski (1977), Thermochemical Properties of Inorganic Substances, Supplement, pp. 116–117, cited as [4].'
           value_kJ_mol-1_K-1: 1.5073e-1
@@ -587,10 +592,11 @@ species:
       - observation_id: adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote
         type: heat_capacity_and_heat_content_series
         locator: {page: 6, published_page: 198, pdf_page_index: 5, section: Discussion}
-        phase: CaSiO3_melt
+        phase: l
+        per: mol_species
         units: kJ mol−1 K−1 CaSiO3
         values:
-          quantity: molar_heat_capacity
+          quantity: cp
           method_class: quoted_attributed
           attribution: 'Barin, Knacke and Kubaschewski (1977), Thermochemical Properties of Inorganic Substances, Supplement, pp. 116–117, cited as [4].'
           value_kJ_mol-1_K-1: 1.4654e-1
