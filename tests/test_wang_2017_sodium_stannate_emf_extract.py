@@ -55,7 +55,7 @@ def test_html_tables_and_equation_fits_match_independent_transcription():
     assert formation["values"]["delta_fG_slope_as_printed"] == "0.2221"
     assert formation["values"]["uncertainty_as_printed"] == "± 7.54"
     assert formation["values"]["equation_10_cell_reaction_relation"] == "ΔG° = −nE⁰F = −nEF"
-    assert formation["values"]["equation_11_relation_as_printed"] == "ΔG° = 2Δ_fG°(NaCrO2) + Δ_fG°(SnO2) − Δ_fG°(Cr2O3) − Δ_fG°(Na2SnO3)"
+    assert formation["values"]["equation_11_relation_as_printed"] == "ΔG° = 2ΔG°(NaCrO2) + ΔG°(SnO2) − ΔG°(Cr2O3) − ΔG°(Na2SnO3)"
     assert formation["values"]["method_class"] == "quoted_attributed"
     assert formation["values"]["printed_uncertainty_note"] == "confidence level not stated"
 
