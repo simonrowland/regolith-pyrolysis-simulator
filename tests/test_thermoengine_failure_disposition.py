@@ -373,7 +373,8 @@ def test_thermoengine_phases_without_convergence_are_not_ok(
         pressure_bar=1.0,
     )
 
-    assert result.status != 'ok'
+    assert result.status == 'not_converged'
+    assert result.diagnostics['authoritative_for_solved_conditions'] is False
 
 
 def test_thermoengine_solves_intrinsic_fo2_without_an_input_or_redox_mode(
