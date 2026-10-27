@@ -1560,6 +1560,7 @@ class PyrolysisRun:
             lambda: _json_safe(
                 {
                     **build_cost_rollup_diagnostic(
+                        sim=sim,
                         cost_ledger=sim.cost_ledger,
                         per_hour=execution.per_hour,
                         products_kg=sim.product_ledger(),
