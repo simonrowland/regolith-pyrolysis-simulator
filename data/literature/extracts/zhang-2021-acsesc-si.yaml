@@ -10,47 +10,123 @@ source:
   year: 2021
 extraction:
   method: >-
-    Scope audit of the supplied pdftotext-layout text, MinerU page extracts,
-    and table inventory. No numerical values were transcribed because this
-    supplement contains no printed Na(g)/Na vapour pressure or Na-specific
-    evaporation flux.
+    SI Table S1 transcribed from born-digital pdftotext; row and column
+    assignments checked against the page render. Whole-sample loss percentages
+    are reduced from the printed before/after weights. No Na partial pressure
+    or Na-specific flux is inferred.
   date: '2026-10-27'
   worker: w1027naA-zhang-2021-acsesc-si
   provenance_path: text/zhang-2021-acsesc-si/pdftotext-layout.txt
 review_status: draft
+schema_gaps:
+- Table S1 prints initial/final sample weights but has no standalone quantity token for the mass measurements; retained as a measured-direct typed refusal, with reduced bulk loss rows linked to it.
+fidelity_samples:
+- path: species.unknown.observations[zhang_si_table_s1_published_weights].values.runs[0].mass_before_mg
+  value: 40.4
+  locator: {page: 9, table: 'S1', row: Bas1400C0m1}
+- path: species.unknown.observations[zhang_si_table_s1_published_weights].values.runs[2].mass_after_mg
+  value: 54.3
+  locator: {page: 9, table: 'S1', row: Bas1400C15m}
+- path: species.unknown.observations[zhang_si_table_s1_published_weights].values.runs[10].mass_before_mg
+  value: 69.2
+  locator: {page: 9, table: 'S1', row: Bas1200C10h}
 scope_assessment:
   document_type: supporting information for experimental and theoretical study of alkali evaporation from basaltic melt
   requested_measurements: measured Na(g)/Na vapour pressure or Na-specific evaporation flux
   measured_direct_observations: 0
+  measured_reduced_bulk_mass_loss_points: 12
   absent_from_source:
   - printed Na(g)/Na vapour pressure
   - printed Na-specific evaporation flux
   - species-resolved evaporation mass balance
-  evidence:
-  - locator: {page: 9, table: 'S1'}
-    finding: >-
-      Sample residue physical properties include weight before and after each
-      run. This is whole-sample mass change, not a Na-specific flux; the table
-      does not resolve the lost mass by species.
-  - locator: {page: 10, figure: 'S6'}
-    finding: >-
-      Na, K, and Rb concentration profiles are plotted normalized to central
-      sample concentrations; the values are figure-only and are not flux or
-      vapour-pressure measurements.
-  - locator: {page: 11, table: 'S2'}
-    finding: >-
-      EPMA residue oxide concentrations and SIMS K-isotope results; these are
-      not vapour pressure or flux measurements.
-  - locator: {page: 44, table: 'S11'}
-    finding: >-
-      EPMA residue oxide concentrations and SIMS K-isotope results; these are
-      not vapour pressure or flux measurements.
   figure_read_candidates:
   - Fig. S6 and Figs. S7–S15: elemental concentration profiles in residues; figure values are out of scope for this wave.
-  unresolved_scope_question: >-
-    Whether whole-sample mass change in Table S1 is intended as input to a
-    separately derived Na flux. It is not Na-resolved in this supplement, so
-    no elemental flux has been inferred here.
+  note: >-
+    Table S1 mass loss is whole-sample and multi-element; it is not assigned to
+    Na. The main article's Table 1 per-run oxide summary is partially present in
+    kems-006-zhang-2021. The 488 spot-level EPMA rows in Tables S2–S11 remain
+    pending a scope ruling on whether to add the raw spots alongside that
+    existing per-run summary.
 species:
-  Na:
-    observations: []
+  unknown:
+    observations:
+    - observation_id: zhang_si_table_s1_published_weights
+      type: mass_loss
+      method: free_evaporation
+      locator: {page: 9, table: 'S1', note: 'Printed before/after weights for 12 experimental aliquots.'}
+      phase: l
+      units: mg
+      values:
+        quantity: untyped_sample_mass_measurements
+        method_class: measured_direct
+        runs:
+        - sample: Bas1400C0m1
+          mass_before_mg: 40.4
+          mass_after_mg: 40.2
+          locator: {page: 9, table: 'S1', row: Bas1400C0m1}
+        - sample: Bas1400C0m2
+          mass_before_mg: 44.6
+          mass_after_mg: 44.3
+          locator: {page: 9, table: 'S1', row: Bas1400C0m2}
+        - sample: Bas1400C15m
+          mass_before_mg: 56.5
+          mass_after_mg: 54.3
+          locator: {page: 9, table: 'S1', row: Bas1400C15m}
+        - sample: Bas1400C30m
+          mass_before_mg: 59.0
+          mass_after_mg: 56.1
+          locator: {page: 9, table: 'S1', row: Bas1400C30m}
+        - sample: Bas1400C60m
+          mass_before_mg: 40.9
+          mass_after_mg: 38.1
+          locator: {page: 9, table: 'S1', row: Bas1400C60m}
+        - sample: Bas1400C90m
+          mass_before_mg: 25.9
+          mass_after_mg: 24.0
+          locator: {page: 9, table: 'S1', row: Bas1400C90m}
+        - sample: Bas1200C0h1
+          mass_before_mg: 17.2
+          mass_after_mg: 17.2
+          locator: {page: 9, table: 'S1', row: Bas1200C0h1}
+        - sample: Bas1200C0h2
+          mass_before_mg: 48.8
+          mass_after_mg: 48.8
+          locator: {page: 9, table: 'S1', row: Bas1200C0h2}
+        - sample: Bas1200C1h
+          mass_before_mg: 45.4
+          mass_after_mg: 45.0
+          locator: {page: 9, table: 'S1', row: Bas1200C1h}
+        - sample: Bas1200C4h
+          mass_before_mg: 45.7
+          mass_after_mg: 44.9
+          locator: {page: 9, table: 'S1', row: Bas1200C4h}
+        - sample: Bas1200C10h
+          mass_before_mg: 69.2
+          mass_after_mg: 67.1
+          locator: {page: 9, table: 'S1', row: Bas1200C10h}
+        - sample: Bas1200C40h
+          mass_before_mg: 34.3
+          mass_after_mg: 32.4
+          locator: {page: 9, table: 'S1', row: Bas1200C40h}
+    - observation_id: zhang_si_table_s1_bas1400c0m1_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator: {page: 9, table: 'S1', row: Bas1400C0m1}
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C: {state: {tag: value, value: 1400}, locator: {page: 71, table: '1', row: Bas1400C0m1}}
+        composition: {state: {tag: value, value: {Na2O: 2.27, MgO: 7.09, CaO: 11.21, TiO2: 1.79, SiO2: 45.94, Al2O3: 16.00, FeO: 10.67, K2O: 2.49, Rb2O: 1.86}}, locator: {page: 71, table: '1', row: Initial glass}}
+        total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.1', approximate: true}}, locator: {page: 71, section: '2.2 Vacuum evaporation experiments', note: 'About 10^-6 mbar; conversion only'}}
+        fO2_Pa: {state: {tag: unknown, reason: not_published_for_vacuum_run}, locator: {page: 71, section: '2.2 Vacuum evaporation experiments'}}
+      values: {quantity: mass_loss_fraction, method_class: measured_reduced, T_C: 1400, sample: Bas1400C0m1, duration_min_as_published: 0, mass_loss_wt_pct: 0.495, starting_glass_wt_pct: {Na2O: 2.27, MgO: 7.09, CaO: 11.21, TiO2: 1.79, SiO2: 45.94, Al2O3: 16.00, FeO: 10.67, K2O: 2.49, Rb2O: 1.86}, derivation: {relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg, inputs: [zhang_si_table_s1_published_weights], note: Whole-sample difference; not species-resolved.}}
+    - observation_id: zhang_si_table_s1_bas1400c0m2_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator: {page: 9, table: 'S1', row: Bas1400C0m2}
+      phase: l
+      units: '%'
+      point_conditions: {temperature_C: {state: {tag: value, value: 1400}, locator: {page: 71, table: '1', row: Bas1400C0m2}}, composition: {state: {tag: value, value: {Na2O: 2.27, MgO: 7.09, CaO: 11.21, TiO2: 1.79, SiO2: 45.94, Al2O3: 16.00, FeO: 10.67, K2O: 2.49, Rb2O: 1.86}}, locator: {page: 71, table: '1', row: Initial glass}}, total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.1', approximate: true}}, locator: {page: 71, section: '2.2 Vacuum evaporation experiments', note: 'About 10^-6 mbar; conversion only'}}, fO2_Pa: {state: {tag: unknown, reason: not_published_for_vacuum_run}, locator: {page: 71, section: '2.2 Vacuum evaporation experiments'}}}
+      values: {quantity: mass_loss_fraction, method_class: measured_reduced, T_C: 1400, sample: Bas1400C0m2, duration_min_as_published: 0, mass_loss_wt_pct: 0.673, starting_glass_wt_pct: {Na2O: 2.27, MgO: 7.09, CaO: 11.21, TiO2: 1.79, SiO2: 45.94, Al2O3: 16.00, FeO: 10.67, K2O: 2.49, Rb2O: 1.86}, derivation: {relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg, inputs: [zhang_si_table_s1_published_weights], note: Whole-sample difference; not species-resolved.}}
