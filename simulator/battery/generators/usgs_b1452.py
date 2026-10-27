@@ -91,8 +91,17 @@ B1452_RECORD_POLYMORPHS = {
     f"{SOURCE_ID}-0275": Polymorph.ARAGONITE,
     # Printed pp. 405–406 split KAlSiO4 into low and high kaliophillite.
     f"{SOURCE_ID}-0379": Polymorph.KALIOPHILLITE_LOW,
+    # Printed p. 405 gives the high form from 810 to 1800 K.
+    f"{SOURCE_ID}-0379-phase-02": Polymorph.KALIOPHILLITE_HIGH,
     f"{SOURCE_ID}-0380": Polymorph.KALIOPHILLITE_LOW,
     f"{SOURCE_ID}-0380-phase-02": Polymorph.KALIOPHILLITE_HIGH,
+}
+B1452_ROW_POLYMORPHS = {
+    # Printed p. 28 summary's 298.15 K value matches the low-form interval on p. 405.
+    (
+        f"{SOURCE_ID}-0003",
+        "KALIOPHILLITE $KAlSiO_{4}$",
+    ): Polymorph.KALIOPHILLITE_LOW,
 }
 
 # Page-header units. Captured units_as_published on B1452 are OCR-destroyed
@@ -1345,6 +1354,9 @@ def _phase_state(
     record: Mapping[str, Any], *, name: str | None = None, row_index: int | None = None
 ) -> tuple[State[Phase], State[Polymorph]]:
     record_id = str(record.get("record_id") or "")
+    row_polymorph = B1452_ROW_POLYMORPHS.get((record_id, name or ""))
+    if row_polymorph is not None:
+        return State.of(Phase.CR), State.of(row_polymorph)
     if record_id in B1452_RECORD_POLYMORPHS:
         return State.of(Phase.CR), State.of(B1452_RECORD_POLYMORPHS[record_id])
     kind = _table_kind(record)

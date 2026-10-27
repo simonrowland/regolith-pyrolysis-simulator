@@ -742,6 +742,7 @@ def test_b1452_record_owned_polymorphs_refuse_the_single_wrong_engine_phase() ->
         ("robie-hemingway-fisher-1978-usgs-b1452-0274", "298.15", Polymorph.ARAGONITE),
         ("robie-hemingway-fisher-1978-usgs-b1452-0275", "298.15", Polymorph.ARAGONITE),
         ("robie-hemingway-fisher-1978-usgs-b1452-0379", "298.15", Polymorph.KALIOPHILLITE_LOW),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0379-phase-02", "900", Polymorph.KALIOPHILLITE_HIGH),
         ("robie-hemingway-fisher-1978-usgs-b1452-0380", "298.15", Polymorph.KALIOPHILLITE_LOW),
         ("robie-hemingway-fisher-1978-usgs-b1452-0380-phase-02", "900", Polymorph.KALIOPHILLITE_HIGH),
     )
@@ -752,11 +753,34 @@ def test_b1452_record_owned_polymorphs_refuse_the_single_wrong_engine_phase() ->
         )
         assert observations
         assert all(obs.identity.species.polymorph.value is expected for obs in observations)
+        if record_id.endswith("0379-phase-02"):
+            assert observations[0].value.point == Decimal("303.87")
         assert all(
             _resolve_symbol(Engine.THERMOENGINE, obs.identity)
             == (None, "pure-phase-polymorph-unresolved")
             for obs in observations
         )
+
+
+def test_b1452_kaliophillite_298k_summary_is_the_printed_low_form() -> None:
+    from simulator.battery.compilation_tier import _resolve_symbol
+    from simulator.battery.enums import Engine
+
+    observations = _observations_for(
+        _generation(TABLE_298K),
+        Quantity.S,
+        temperature="298.15",
+        formula="KAlSiO4",
+        name="KALIOPHILLITE $KAlSiO_{4}$",
+    )
+    assert len(observations) == 1
+    observation = observations[0]
+    assert observation.value.point == Decimal("133.26")
+    assert observation.identity.species.polymorph.value is Polymorph.KALIOPHILLITE_LOW
+    assert _resolve_symbol(Engine.THERMOENGINE, observation.identity) == (
+        None,
+        "pure-phase-polymorph-unresolved",
+    )
 
 
 def test_b1452_anorthite_glass_uses_the_glass_phase_and_cannot_bind_anorthite() -> None:
