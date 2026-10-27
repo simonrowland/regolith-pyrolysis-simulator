@@ -4519,8 +4519,15 @@ def _silica_objective_evidence(
         else None
     )
     report_flag = bucket.get("flag") if isinstance(bucket, Mapping) else None
+    availability_flag = (
+        bucket.get("availability_flag") if isinstance(bucket, Mapping) else None
+    )
     if isinstance(report_flag, Mapping):
         payload["certification_flag"] = dict(report_flag)
+    if isinstance(availability_flag, Mapping):
+        payload["availability_flag"] = dict(availability_flag)
+        payload["excluded"] = list(bucket.get("excluded", ()))
+    effective_flag = availability_flag or report_flag
 
     capture_kg: float | None = None
     if isinstance(bucket, Mapping) and bucket.get("stage_3_capture_kg") is not None:
@@ -4534,19 +4541,30 @@ def _silica_objective_evidence(
         payload["notes"] = ("Pure silica glass product quantity is unavailable",)
         return payload
 
-    qualified_kg = product_kg if report_flag is None else 0.0
+    partial = (
+        isinstance(effective_flag, Mapping)
+        and effective_flag.get("status") == "partial"
+    )
+    qualified_kg = (
+        product_kg
+        if report_flag is None or (partial and not isinstance(availability_flag, Mapping))
+        else 0.0
+    )
     unqualified_kg = max((capture_kg or 0.0) - product_kg, 0.0)
     payload["stage_3_capture_kg"] = capture_kg
     payload["qualified_product_kg"] = qualified_kg
     payload["unqualified_capture_kg"] = unqualified_kg
+    if partial:
+        payload["value_status"] = "partial"
+        payload["total_basis"] = "lower_bound"
     if unqualified_kg > 0.0:
         payload["flag"] = _SILICA_UNQUALIFIED_FLAG
         payload["notes"] = (
             f"{unqualified_kg:g} kg Stage-3 silica capture is not product: "
             f"{_SILICA_UNQUALIFIED_REASON}",
         )
-    elif isinstance(report_flag, Mapping):
-        reason = report_flag.get("reason") or "certification flag emitted"
+    elif isinstance(effective_flag, Mapping):
+        reason = effective_flag.get("reason") or "certification flag emitted"
         payload["notes"] = (
             f"{product_kg:g} kg pure silica glass is a flagged product: {reason}",
         )
@@ -4573,9 +4591,9 @@ def _metric_value(
     if metric in {"O2_kg", "o2_kg", "oxygen_kg"}:
         return _nested_float(product_classes, ("metals_plus_O2", "O2_kg"))
     if metric == "oxygen_stored_kg":
-        return _oxygen_partition_value(sim, "stored")
+        return _oxygen_partition_value(product_classes, "stored")
     if metric == "oxygen_vented_kg":
-        return _oxygen_partition_value(sim, "vented")
+        return _oxygen_partition_value(product_classes, "vented")
     if metric in ENERGY_ELECTRICAL_PLUS_EVAPORATION_ALIASES:
         return (
             _sim_float(
@@ -4942,27 +4960,8 @@ def _nested_float(root: Mapping[str, Any], path: tuple[str, ...]) -> float:
     return _finite_float(node, ".".join(path))
 
 
-def _oxygen_partition_value(sim: Any, key: str) -> float:
-    refusal = evaporation_quantity_unavailability(sim, "O2")
-    if refusal:
-        raise ObjectiveComputationError(
-            f"oxygen_{key}_kg is unavailable: {refusal['reason']}"
-        )
-    partition_method = getattr(sim, "_oxygen_terminal_partition_kg", None)
-    if callable(partition_method):
-        partition = partition_method()
-        if not isinstance(partition, Mapping):
-            raise ObjectiveComputationError("oxygen terminal partition is not a mapping")
-        if key not in partition or partition[key] is None:
-            raise ObjectiveComputationError(
-                f"oxygen terminal partition missing {key!r}"
-            )
-        return _finite_float(partition[key], f"oxygen_partition[{key!r}]")
-    record = getattr(sim, "record", None)
-    if record is not None:
-        attr = "oxygen_stored_kg" if key == "stored" else "oxygen_vented_kg"
-        return _required_attr_float(record, attr)
-    raise ObjectiveComputationError("oxygen terminal partition unavailable")
+def _oxygen_partition_value(product_classes: Mapping[str, Any], key: str) -> float:
+    return _nested_float(product_classes, ("oxygen", "partition_kg", key))
 
 
 def _sim_float(sim: Any, sim_attr: str, record_attr: str) -> float:

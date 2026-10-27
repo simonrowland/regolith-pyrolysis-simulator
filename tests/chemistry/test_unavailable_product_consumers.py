@@ -6,7 +6,8 @@ from simulator.chemistry.kernel import ChemistryIntent
 from simulator.condensation import _LENNARD_JONES_PARAMS
 from simulator.cost_energy import is_unavailable_quantity
 from simulator.cost_ledger import build_cost_rollup_diagnostic
-from simulator.optimize.objective import ObjectiveComputationError, _metric_value
+from simulator.accounting.completeness import product_class_availability
+from simulator.optimize.objective import _metric_value
 from simulator.optimize.physics import (
     PhysicsConstraintSet,
     ThresholdSpec,
@@ -73,20 +74,48 @@ def two_hour_run(request, vapor_pressure_data, feedstocks_data, setpoints_data):
     return sim
 
 
-def test_oxygen_partitions_inherit_unavailable_product_total(two_hour_run, monkeypatch):
+def test_oxygen_partitions_inherit_partial_product_flag(two_hour_run, monkeypatch):
     monkeypatch.setattr(
         two_hour_run,
         "_oxygen_terminal_partition_kg",
         lambda: {"stored": 1.0, "total": 1.0},
     )
     products = classify_products(two_hour_run)
-    assert products["oxygen"]["class_total_kg"] is None
-    for bucket, key in (
-        ("oxygen", "partition_kg"),
-        ("metals_plus_O2", "O2_partition_kg"),
-    ):
-        assert products[bucket][key] == {"stored": None, "total": None}
+    assert products["oxygen"]["class_total_kg"] == 1.0
+    assert products["oxygen"]["status"] == "partial"
+    assert products["oxygen"]["excluded"] == products["oxygen"]["flag"]["excluded"]
+    assert products["oxygen"]["partition_kg"] == {"stored": 1.0, "total": 1.0}
+    metals_partition = products["metals_plus_O2"]["O2_partition_kg"]
+    assert all(value is not None for value in metals_partition.values())
+    for bucket in ("oxygen", "metals_plus_O2"):
+        assert products[bucket]["status"] == "partial"
         assert "EvaporationFluxConfigurationError" in products[bucket]["flag"]["reason"]
+
+
+def test_real_si_refusal_keeps_product_classes_numeric_and_partial(two_hour_run):
+    products = classify_products(two_hour_run)
+    for name in (
+        "metals_plus_O2",
+        "ingots_metals",
+        "pure_silica_glass",
+        "glass",
+        "refractory_ceramic_rump",
+        "captured_volatiles",
+    ):
+        bucket = products[name]
+        assert bucket["status"] == "partial"
+        assert isinstance(bucket.get("class_total_kg"), (int, float))
+        assert len(bucket["excluded"]) == 1
+        assert bucket["excluded"][0]["species"] == "Si"
+        assert bucket["excluded"][0]["upper_bound_kg"] != 0
+
+
+def test_product_class_with_only_refused_parts_is_unavailable(two_hour_run):
+    unavailable = product_class_availability(
+        two_hour_run, ("SiO",), {}
+    )
+    assert unavailable["status"] == "unavailable"
+    assert unavailable["class_total_kg"] is None
 
 
 def test_extraction_gate_does_not_use_partial_products(two_hour_run):
@@ -110,7 +139,7 @@ def test_extraction_gate_does_not_use_partial_products(two_hour_run):
     assert not margin.authoritative
 
 
-def test_cost_allocation_refuses_partial_product_denominator(two_hour_run):
+def test_cost_allocations_keep_numeric_mass_and_partial_flag(two_hour_run):
     diagnostic = build_cost_rollup_diagnostic(
         cost_ledger=two_hour_run.cost_ledger,
         per_hour=tuple({"T_C": 1500.0} for _ in two_hour_run.record.snapshots),
@@ -118,17 +147,56 @@ def test_cost_allocation_refuses_partial_product_denominator(two_hour_run):
         snapshots=tuple(two_hour_run.record.snapshots),
     )
     run_input = diagnostic["run_input_cost"]
-    assert run_input["allocation_status"] == "incomplete_unavailable_products"
-    assert "EvaporationFluxConfigurationError" in run_input["unavailable_reason"]
+    assert run_input["allocation_status"] == "partial_by_available_product_mass"
+    assert len(run_input["excluded_products"]) == 1
+    assert run_input["excluded_products"][0]["species"] == "Si"
     assert isinstance(run_input["owner_ratify_money_projection"], float)
     assert diagnostic["product_costs"]
+    assert len(diagnostic["product_costs"]) == 21
     for entry in diagnostic["product_costs"].values():
-        assert is_unavailable_quantity(entry["owner_ratify_money_projection"])
-        assert is_unavailable_quantity(entry["accumulated_cost"])
+        assert entry["status"] == "partial"
+        assert len(entry["excluded"]) == 1
+        assert not is_unavailable_quantity(entry["owner_ratify_money_projection"])
+        assert not is_unavailable_quantity(entry["accumulated_cost"])
+
+
+def test_product_class_availability_reports_ledger_bound_and_unbounded():
+    class Ledger:
+        def atom_moles_by_account(self, account):
+            assert account == "process.cleaned_melt"
+            return {"Si": 2.0}
+
+    class Sim:
+        _last_evaporation_flux_diagnostic = {
+            "missing_transport_parameters": {
+                "Si": {
+                    "policy": "fail_loud_missing_transport_parameters",
+                    "refusal_type": "EvaporationFluxConfigurationError",
+                    "reason": "missing row",
+                    "parent_oxide": "SiO2",
+                }
+            }
+        }
+        species_formula_registry = {}
+        atom_ledger = Ledger()
+
+    bounded = product_class_availability(Sim(), ("SiO",), {"computed": 3.0})
+    assert bounded["status"] == "partial"
+    assert bounded["class_total_kg"] == 3.0
+    assert bounded["excluded"][0]["upper_bound_kg"] == pytest.approx(0.05617)
+
+    class NoLedger:
+        _last_evaporation_flux_diagnostic = Sim._last_evaporation_flux_diagnostic
+        species_formula_registry = {}
+
+    unbounded = product_class_availability(
+        NoLedger(), ("SiO",), {"computed": 3.0}
+    )
+    assert unbounded["excluded"][0]["upper_bound_kg"] == "unbounded"
 
 
 @pytest.mark.parametrize("metric", ("oxygen_stored_kg", "oxygen_vented_kg"))
-def test_oxygen_objectives_refuse_unavailable_partitions(
+def test_oxygen_objectives_use_available_partial_partitions(
     two_hour_run, monkeypatch, metric
 ):
     monkeypatch.setattr(
@@ -136,8 +204,6 @@ def test_oxygen_objectives_refuse_unavailable_partitions(
         "_oxygen_terminal_partition_kg",
         lambda: {"stored": 1.0, "vented": 1.0, "total": 2.0},
     )
-    with pytest.raises(
-        ObjectiveComputationError,
-        match="EvaporationFluxConfigurationError",
-    ):
-        _metric_value(metric, two_hour_run, {}, classify_products(two_hour_run))
+    assert _metric_value(
+        metric, two_hour_run, {}, classify_products(two_hour_run)
+    ) == 1.0

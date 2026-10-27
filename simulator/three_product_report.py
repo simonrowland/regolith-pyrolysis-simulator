@@ -476,37 +476,77 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'total_kg': unclassified_total,
         },
     }
-    affected_buckets = (
+    glass_targets = tuple(dict.fromkeys((
+        *PURE_SILICA_GLASS_SPECIES,
+        *(METAL_PRODUCT_SPECIES if early_tap_mode else ()),
+    )))
+    rump_targets = tuple(dict.fromkeys((
+        *METAL_PRODUCT_SPECIES,
+        *TERMINAL_RUMP_REFRACTORY_OXIDES,
+        *TERMINAL_RUMP_SILICATE_RESIDUAL,
+        *TERMINAL_RUMP_UNEXTRACTED_METALS,
+    )))
+    affected_buckets = [
         ('metals_plus_O2', (*METAL_PRODUCT_SPECIES, 'O2'),
          ('class_total_kg', 'metals_total_kg', 'O2_kg'), ('metals_kg',)),
-        ('ingots_metals', METAL_PRODUCT_SPECIES, ('class_total_kg',), ('species_kg',)),
+        ('ingots_metals', METAL_PRODUCT_SPECIES,
+         ('class_total_kg',), ('species_kg',)),
         ('oxygen', ('O2',), ('class_total_kg', 'O2_kg'), ()),
         ('pure_silica_glass', PURE_SILICA_GLASS_SPECIES,
          ('class_total_kg', 'stage_3_capture_kg'), ('stage_3_kg_by_species',)),
-        ('glass', PURE_SILICA_GLASS_SPECIES,
-         ('class_total_kg', 'pure_silica_glass_kg'), ('species_kg',)),
-        ('refractory_ceramic_rump', METAL_PRODUCT_SPECIES,
-         ('rump_total_kg',), ('rump_kg_by_species',)),
-        ('refractory_ceramic_rump', tuple(TERMINAL_RUMP_REFRACTORY_OXIDES),
-         ('class_total_kg', 'rump_refractory_oxides_kg'), ()),
-        ('refractory_ceramic_rump', tuple(TERMINAL_RUMP_SILICATE_RESIDUAL),
-         ('rump_silicate_residual_kg',), ()),
-        ('refractory_ceramic_rump', tuple(TERMINAL_RUMP_UNEXTRACTED_METALS),
-         ('rump_unextracted_metals_kg',), ()),
+        ('glass', glass_targets,
+         ('class_total_kg', 'pure_silica_glass_kg',
+          'industrial_mixed_glass_kg'), ('species_kg',)),
+        ('refractory_ceramic_rump', rump_targets,
+         ('class_total_kg', 'rump_total_kg', 'rump_silicate_residual_kg',
+          'rump_unextracted_metals_kg'), ('rump_kg_by_species',)),
         ('captured_volatiles', METAL_PRODUCT_SPECIES,
          ('class_total_kg',), ('kg_by_species',)),
-    )
+    ]
+    if early_tap_mode:
+        affected_buckets.append((
+            'industrial_mixed_glass',
+            METAL_PRODUCT_SPECIES,
+            ('class_total_kg',),
+            (),
+        ))
     for name, targets, quantities, species_maps in affected_buckets:
         bucket = result[name]
+        available_parts = {key: bucket.get(key) for key in quantities}
+        if not any(value is not None for value in available_parts.values()):
+            for map_key in species_maps:
+                values = bucket.get(map_key)
+                if isinstance(values, Mapping):
+                    available_parts.update({
+                        f'{map_key}:{species}': value
+                        for species, value in values.items()
+                    })
+        if (
+            name == 'refractory_ceramic_rump'
+            and available_parts.get('class_total_kg') is None
+            and available_parts.get('rump_total_kg') is not None
+        ):
+            available_parts = {
+                'rump_total_kg': available_parts['rump_total_kg']
+            }
         availability = product_class_availability(
             sim,
             targets,
-            {key: bucket.get(key) for key in quantities},
+            available_parts,
         )
         if availability['status'] != 'available':
+            if (
+                availability['status'] == 'partial'
+                and bucket.get('class_total_kg') is None
+                and name != 'refractory_ceramic_rump'
+            ):
+                bucket['class_total_kg'] = availability['class_total_kg']
             bucket['status'] = availability['status']
             bucket['excluded'] = availability['excluded']
-            bucket['flag'] = availability['flag']
+            if isinstance(bucket.get('flag'), Mapping):
+                bucket['availability_flag'] = availability['flag']
+            else:
+                bucket['flag'] = availability['flag']
             if availability['status'] == 'unavailable':
                 for key in quantities:
                     bucket[key] = None
@@ -524,24 +564,6 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             ('metals_plus_O2', 'O2_partition_kg'),
         ):
             result[name][key] = dict.fromkeys(oxygen_partition)
-    if early_tap_mode:
-        for name, fields in (
-            ('industrial_mixed_glass', ('class_total_kg', 'mixed_melt_residual_kg')),
-            ('glass', ('class_total_kg', 'industrial_mixed_glass_kg')),
-        ):
-            bucket = result[name]
-            availability = product_class_availability(
-                sim,
-                METAL_PRODUCT_SPECIES,
-                {key: bucket.get(key) for key in fields},
-            )
-            if availability['status'] != 'available':
-                bucket['status'] = availability['status']
-                bucket['excluded'] = availability['excluded']
-                bucket['flag'] = availability['flag']
-                if availability['status'] == 'unavailable':
-                    for key in fields:
-                        bucket[key] = None
     return result
 
 

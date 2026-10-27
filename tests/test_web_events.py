@@ -63,6 +63,39 @@ def test_product_story_bucket_omits_species_rounded_to_zero() -> None:
     assert bucket["class_total_kg"] == 0.0
 
 
+def test_product_story_keeps_partial_flag_with_numeric_total():
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    excluded = [{
+        "species": "Si",
+        "account": "process.cleaned_melt",
+        "reason": "missing LJ row",
+        "upper_bound_kg": "unbounded",
+    }]
+    story = web_events._product_story_payload(
+        sim,
+        terminal_rump_by_species={},
+        classification={
+            "ingots_metals": {
+                "status": "partial",
+                "excluded": excluded,
+                "flag": {"status": "partial", "reason": "missing LJ row"},
+            }
+        },
+        account_kg={},
+        extracted_projection={
+            "metal_ingots": {"Fe": 1.0},
+            "glass": {},
+            "captured_volatiles": {},
+            "off_spec_condensate": {},
+            "oxygen": {"O2": 0.0},
+            "oxygen_partition": {"stored": 0.0, "vented": 0.0},
+        },
+    )
+    assert story["metal_ingots"]["class_total_kg"] == 1.0
+    assert story["metal_ingots"]["status"] == "partial"
+    assert story["metal_ingots"]["excluded"] == excluded
+
+
 def _identified_socket_client(app):
     http_client = app.test_client()
     assert http_client.get("/").status_code == 200

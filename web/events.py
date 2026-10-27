@@ -2862,13 +2862,19 @@ def _product_story_payload(
         source = classification.get(source_name)
         if not isinstance(source, Mapping):
             continue
+        availability_flag = source.get('availability_flag')
         flag = source.get('flag')
-        if not isinstance(flag, Mapping):
+        if not isinstance(availability_flag, Mapping) and not isinstance(flag, Mapping):
             continue
-        story[name]['flag'] = dict(flag)
-        story[name]['status'] = flag.get('status')
+        if isinstance(flag, Mapping):
+            story[name]['flag'] = dict(flag)
+        if isinstance(availability_flag, Mapping):
+            story[name]['availability_flag'] = dict(availability_flag)
+        story[name]['status'] = source.get('status') or (
+            availability_flag or flag
+        ).get('status')
         story[name]['excluded'] = list(source.get('excluded', ()))
-        if flag.get('status') == 'unavailable':
+        if story[name]['status'] == 'unavailable':
             story[name]['class_total_kg'] = None
     if story['oxygen'].get('class_total_kg') is None:
         story['oxygen']['partition_kg'] = dict.fromkeys(
@@ -2876,12 +2882,12 @@ def _product_story_payload(
         )
     rump = classification.get('refractory_ceramic_rump')
     if isinstance(rump, Mapping):
-        rump_flag = rump.get('flag')
+        rump_flag = rump.get('availability_flag') or rump.get('flag')
         if (
             isinstance(rump_flag, Mapping)
             and rump_flag.get('status') in {'partial', 'unavailable'}
         ):
-            story['terminal_residue']['flag'] = dict(rump_flag)
+            story['terminal_residue']['availability_flag'] = dict(rump_flag)
             story['terminal_residue']['status'] = rump_flag.get('status')
             story['terminal_residue']['excluded'] = list(rump.get('excluded', ()))
             for field, source_field in (
