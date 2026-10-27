@@ -478,7 +478,11 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 ),
                 'authoritative_for_solved_conditions': True,
             })
-            status = 'ok' if payload.phases_present else 'not_converged'
+            status = (
+                'ok'
+                if payload.solver_converged and payload.phases_present
+                else 'not_converged'
+            )
             vaporock_envelope_diagnostics = {}
             if solved_fO2_log is None:
                 vapor_pressures = {}
