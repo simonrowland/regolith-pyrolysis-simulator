@@ -1223,7 +1223,10 @@ def validate_observation(
                         "derived observation requires derived_from",
                     )
                 )
-            if observation.derivation is None:
+            if (
+                observation.derivation is None
+                and observation.value.kind is not ValueKind.UNAVAILABLE
+            ):
                 issues.append(
                     _issue(
                         f"{path}.derivation",
