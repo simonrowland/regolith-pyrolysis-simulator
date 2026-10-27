@@ -10,6 +10,11 @@ from typing import Any, Mapping
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import parse_formula, resolve_species_formula
 from simulator.account_ids import METAL_BOTTOM_POOL_ACCOUNT, METAL_FLOAT_LAYER_ACCOUNT
+from simulator.accounting.queries import (
+    TERMINAL_RUMP_REFRACTORY_OXIDES,
+    TERMINAL_RUMP_SILICATE_RESIDUAL,
+    TERMINAL_RUMP_UNEXTRACTED_METALS,
+)
 from simulator.state import MOLAR_MASS
 
 _EPS = 1.0e-12
@@ -54,6 +59,52 @@ TARGET_YIELD_PROVENANCE_RULE = (
     "feedstock_clean_excluding_unspent_reagents_credit_lines_and_external_additives"
 )
 _TARGET_YIELD_DENOMINATOR_ACCOUNT = "process.cleaned_melt"
+
+METAL_PRODUCT_SPECIES: tuple[str, ...] = (
+    "Na", "K", "Fe", "Mg", "Si", "Ti", "Al", "Ca",
+    "Cr", "Mn", "Ni", "Co",
+)
+O2_PRODUCT_SPECIES: tuple[str, ...] = ("O2",)
+PURE_SILICA_GLASS_SPECIES: tuple[str, ...] = ("SiO", "SiO2")
+
+_PRODUCT_CLASS_TARGETS: Mapping[str, tuple[str, ...]] = MappingProxyType({
+    "metals_plus_O2": (*METAL_PRODUCT_SPECIES, *O2_PRODUCT_SPECIES),
+    "ingots_metals": METAL_PRODUCT_SPECIES,
+    "oxygen": O2_PRODUCT_SPECIES,
+    "pure_silica_glass": PURE_SILICA_GLASS_SPECIES,
+    "glass": PURE_SILICA_GLASS_SPECIES,
+    "industrial_mixed_glass": METAL_PRODUCT_SPECIES,
+    "refractory_ceramic_rump": tuple(dict.fromkeys((
+        *METAL_PRODUCT_SPECIES,
+        *TERMINAL_RUMP_REFRACTORY_OXIDES,
+        *TERMINAL_RUMP_SILICATE_RESIDUAL,
+        *TERMINAL_RUMP_UNEXTRACTED_METALS,
+    ))),
+    "captured_volatiles": METAL_PRODUCT_SPECIES,
+})
+
+
+def product_class_target_species(
+    class_name: str | None = None,
+    *,
+    early_tap_mode: bool = False,
+) -> tuple[str, ...]:
+    """Return declared product targets for one class or all classes."""
+    if class_name is None:
+        targets = _PRODUCT_CLASS_TARGETS.values()
+    elif class_name == "glass" and early_tap_mode:
+        return tuple(dict.fromkeys((
+            *PURE_SILICA_GLASS_SPECIES,
+            *METAL_PRODUCT_SPECIES,
+        )))
+    else:
+        try:
+            return _PRODUCT_CLASS_TARGETS[str(class_name)]
+        except KeyError as exc:
+            raise ValueError(f"unknown product class {class_name!r}") from exc
+    return tuple(dict.fromkeys(
+        species for class_targets in targets for species in class_targets
+    ))
 
 DEFAULT_RESIDUAL_SPECIES_BY_TARGET: Mapping[str, tuple[str, ...]] = MappingProxyType({
     # VR-11: residual maps stay product-executable only. Refusal-only vapour
@@ -189,10 +240,28 @@ def evaporation_quantity_unavailability(
     snapshots: Any = None,
 ) -> dict[str, Any] | None:
     """Return a typed refusal when missing transport overlaps a quantity."""
+    matches = evaporation_quantity_unavailabilities(
+        sim, target_species, snapshots=snapshots
+    )
+    return matches[0] if matches else None
 
-    refusals: dict[str, dict[str, str]] = {}
 
-    def record_refusal(species: Any, record: Any) -> None:
+def evaporation_quantity_unavailabilities(
+    sim: Any,
+    target_species: str | tuple[str, ...] | None,
+    *,
+    snapshots: Any = None,
+) -> list[dict[str, Any]]:
+    """Return all missing-transport refusals that overlap a quantity."""
+
+    refusals: dict[str, dict[str, Any]] = {}
+
+    def record_refusal(
+        species: Any,
+        record: Any,
+        *,
+        snapshot_hour: int | None = None,
+    ) -> None:
         if not isinstance(record, Mapping):
             return
         extra = record.get("extra")
@@ -215,11 +284,15 @@ def evaporation_quantity_unavailability(
             or "transport parameters are unavailable"
         )
         parent_oxide = record.get("parent_oxide") or extra.get("parent_oxide")
-        refusals[str(species)] = {
+        refusal = refusals.setdefault(str(species), {
             "refusal_type": str(refusal_type),
             "reason": str(reason),
             "parent_oxide": str(parent_oxide) if parent_oxide else "",
-        }
+        })
+        if snapshot_hour is not None:
+            prior_hour = refusal.get("_window_start_hour")
+            if prior_hour is None or snapshot_hour < prior_hour:
+                refusal["_window_start_hour"] = snapshot_hour
 
     diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
     missing = diagnostic.get("missing_transport_parameters", {})
@@ -235,7 +308,16 @@ def evaporation_quantity_unavailability(
         channels = getattr(flux, "carrier_authority_by_species", {}) or {}
         if isinstance(channels, Mapping):
             for species, record in channels.items():
-                record_refusal(species, record)
+                raw_hour = getattr(snapshot, "hour", None)
+                try:
+                    snapshot_hour = None if raw_hour is None else int(raw_hour)
+                except (TypeError, ValueError):
+                    snapshot_hour = None
+                record_refusal(
+                    species,
+                    record,
+                    snapshot_hour=snapshot_hour,
+                )
 
     target_elements: set[str] | None = None
     registry = getattr(sim, "species_formula_registry", {})
@@ -254,9 +336,8 @@ def evaporation_quantity_unavailability(
             except (AccountingError, ValueError):
                 continue
             target_elements.update(atoms if len(atoms) == 1 else atoms - {"O"})
-    for species, refusal in sorted(
-        refusals.items()
-    ):
+    matches = []
+    for species, refusal in sorted(refusals.items()):
         try:
             affected = set(resolve_species_formula(species, registry).elements)
         except (AccountingError, ValueError):
@@ -271,7 +352,7 @@ def evaporation_quantity_unavailability(
                 pass
         if target_elements is not None and not target_elements & affected:
             continue
-        return {
+        matches.append({
             "status": "unavailable",
             "authority": "unavailable",
             "band": None,
@@ -281,8 +362,68 @@ def evaporation_quantity_unavailability(
             "species": species,
             "parent_oxide": parent_oxide,
             "account": "process.cleaned_melt",
-        }
-    return None
+            "_window_start_hour": refusal.get("_window_start_hour"),
+        })
+    return matches
+
+
+def _refusal_parent_inventory_upper_bound_kg(
+    sim: Any,
+    refusal: Mapping[str, Any],
+) -> float | str:
+    """Bound refused parent mass from the last ledger state before its window."""
+    window_start_hour = refusal.get("_window_start_hour")
+    if window_start_hour is None:
+        return "unbounded"
+    rows = getattr(sim, "_yield_disposition_ledger_snapshots", {})
+    if not isinstance(rows, Mapping):
+        return "unbounded"
+    prior_rows: list[tuple[int, Mapping[str, Any]]] = []
+    for row in rows.values():
+        if not isinstance(row, Mapping):
+            continue
+        try:
+            hour = int(row.get("hour"))
+        except (TypeError, ValueError):
+            continue
+        if hour < int(window_start_hour):
+            prior_rows.append((hour, row))
+    if not prior_rows:
+        return "unbounded"
+
+    parent_oxide = refusal.get("parent_oxide")
+    registry = getattr(sim, "species_formula_registry", {})
+    if not parent_oxide:
+        return "unbounded"
+    try:
+        parent_elements = set(
+            resolve_species_formula(str(parent_oxide), registry).elements
+        ) - {"O"}
+    except (AccountingError, ValueError):
+        return "unbounded"
+    if len(parent_elements) != 1:
+        return "unbounded"
+    element = next(iter(parent_elements))
+
+    _, row = max(prior_rows, key=lambda item: item[0])
+    by_account = row.get("parent_inventory_atom_moles_by_account", {})
+    if not isinstance(by_account, Mapping):
+        return "unbounded"
+    cleaned_melt = by_account.get("process.cleaned_melt", {})
+    if not isinstance(cleaned_melt, Mapping):
+        return "unbounded"
+    try:
+        mol_atoms = float(cleaned_melt[element])
+        # The prior committed row is the tick-start ledger state for the first
+        # refusal snapshot. Its cleaned-melt parent-element inventory is the
+        # most that evaporation could move during this refused window; convert
+        # that ledger-accessor mol-atom value to kg of the parent element.
+        bound = mol_atoms * float(MOLAR_MASS[element]) / 1000.0
+    except (KeyError, TypeError, ValueError):
+        return "unbounded"
+    if not math.isfinite(bound) or bound <= 0.0:
+        return "unbounded"
+    return bound
 
 
 def product_class_availability(
@@ -290,68 +431,59 @@ def product_class_availability(
     target_species: str | tuple[str, ...],
     available_parts_kg: Mapping[str, Any],
     *,
+    has_computed_part: bool,
     snapshots: Any = None,
 ) -> dict[str, Any]:
-    """Return a numeric available total and any overlapping transport refusal."""
-    refusal = evaporation_quantity_unavailability(
+    """Return numeric computable mass and any overlapping transport refusal."""
+    refusals = evaporation_quantity_unavailabilities(
         sim, target_species, snapshots=snapshots
     )
-    parts = {
-        str(name): float(value)
-        for name, value in available_parts_kg.items()
-        if value is not None
-    }
+    parts = (
+        {
+            str(name): float(value)
+            for name, value in available_parts_kg.items()
+            if value is not None
+        }
+        if has_computed_part
+        else {}
+    )
     total_kg = sum(parts.values())
     excluded: list[dict[str, Any]] = []
-    if refusal is not None:
-        upper_bound_kg: float | str = "unbounded"
-        parent_oxide = refusal.get("parent_oxide")
-        ledger = getattr(sim, "atom_ledger", None)
-        atom_moles_by_account = getattr(ledger, "atom_moles_by_account", None)
-        registry = getattr(sim, "species_formula_registry", {})
-        if parent_oxide and callable(atom_moles_by_account):
-            try:
-                parent_elements = set(
-                    resolve_species_formula(str(parent_oxide), registry).elements
-                ) - {"O"}
-                if len(parent_elements) == 1:
-                    element = next(iter(parent_elements))
-                    # The ledger's atom-mole accessor projects the remaining
-                    # parent inventory in process.cleaned_melt. Convert those
-                    # atoms to kg of parent element; this is the maximum that
-                    # evaporation could have moved in the recorded window.
-                    mol = float(
-                        atom_moles_by_account("process.cleaned_melt").get(
-                            element, 0.0
-                        )
-                    )
-                    bound = mol * float(MOLAR_MASS[element]) / 1000.0
-                    if math.isfinite(bound) and bound > 0.0:
-                        upper_bound_kg = bound
-            except (AccountingError, KeyError, TypeError, ValueError):
-                pass
-        excluded.append({
-            "species": str(refusal.get("species") or "unknown"),
-            "account": str(refusal.get("account") or "unknown"),
-            "reason": str(refusal.get("reason") or "transport refusal"),
-            "upper_bound_kg": upper_bound_kg,
-        })
-    # Keep the old all-or-nothing result in this consolidation step. The
-    # behavior change that retains computable parts is a separate commit.
-    status = "unavailable" if refusal is not None else "available"
+    if refusals:
+        for refusal in refusals:
+            upper_bound_kg = _refusal_parent_inventory_upper_bound_kg(
+                sim, refusal
+            )
+            excluded.append({
+                "species": str(refusal.get("species") or "unknown"),
+                "account": str(refusal.get("account") or "unknown"),
+                "reason": str(refusal.get("reason") or "transport refusal"),
+                "upper_bound_kg": upper_bound_kg,
+            })
+    status = (
+        "available" if not refusals
+        else "partial" if has_computed_part
+        else "unavailable"
+    )
     return {
-        "class_total_kg": None if refusal is not None else total_kg,
+        "class_total_kg": (
+            total_kg if has_computed_part or not refusals else None
+        ),
         "status": status,
         "excluded": excluded,
-        "reason": excluded[0]["reason"] if excluded else "",
+        "reason": "; ".join(item["reason"] for item in excluded),
         "flag": (
-            dict(refusal) if refusal is not None else None
-        ) or (
             None if status == "available" else {
+                **{
+                    key: value
+                    for key, value in (refusals[0] if refusals else {}).items()
+                    if not key.startswith("_")
+                },
                 "status": status,
                 "authority": "unavailable",
-                "reason": excluded[0]["reason"] if excluded else "",
+                "reason": "; ".join(item["reason"] for item in excluded),
                 "excluded": excluded,
+                **({"total_basis": "lower_bound"} if status == "partial" else {}),
             }
         ),
     }

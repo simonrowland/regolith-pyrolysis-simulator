@@ -12,7 +12,10 @@ from typing import Any, Callable
 from simulator.accounting.exceptions import OriginUnresolvedError
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.lots import allocate_pool_withdrawal
-from simulator.accounting.queries import TERMINAL_RUMP_REFRACTORY_OXIDES
+from simulator.accounting.queries import (
+    STAGE0_MELT_REDOX_ACCOUNT,
+    TERMINAL_RUMP_REFRACTORY_OXIDES,
+)
 
 
 YIELD_DISPOSITION_SCHEMA_VERSION = "5.0"
@@ -117,6 +120,12 @@ def capture_ledger_snapshot(sim: Any, snapshot: Any) -> None:
         int(getattr(snapshot, "campaign_hour", 0)),
     )
     balances = ledger.mol_by_account()
+    atom_moles_by_account = getattr(ledger, "atom_moles_by_account", None)
+    parent_inventory_atom_moles = (
+        atom_moles_by_account(STAGE0_MELT_REDOX_ACCOUNT)
+        if callable(atom_moles_by_account)
+        else {}
+    )
     origin_balances = ledger.origin_atom_moles_by_account()
     origin_unattributed = ledger.unresolved_origin_atom_moles_by_account()
     origin_methods = ledger.origin_attribution_methods_by_account()
@@ -128,6 +137,11 @@ def capture_ledger_snapshot(sim: Any, snapshot: Any) -> None:
         "ledger": {
             _CONDENSATION_ACCOUNT: copy.deepcopy(
                 balances.get(_CONDENSATION_ACCOUNT, {})
+            )
+        },
+        "parent_inventory_atom_moles_by_account": {
+            STAGE0_MELT_REDOX_ACCOUNT: copy.deepcopy(
+                parent_inventory_atom_moles
             )
         },
         "material_origin_atom_moles_by_account": {

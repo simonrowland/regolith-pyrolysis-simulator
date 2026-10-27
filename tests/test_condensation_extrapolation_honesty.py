@@ -179,6 +179,80 @@ def test_lunar_c0_24h_mass_and_oxygen_closure():
     assert abs(partition["total"] - partition["stored"] - partition["vented"] - partition["captured"]) / max(partition["total"], 1e-300) * 100.0 <= 5e-12
 
 
+@pytest.mark.xdist_group("serial")
+def test_b858_lunar_c0_si_transport_refusal_keeps_computed_products_partial(
+    monkeypatch,
+):
+    from simulator.runner import PyrolysisRun
+    from simulator.run_executor import RunExecutor
+    from simulator.cost_ledger import build_cost_rollup_diagnostic
+    from simulator.cost_energy import is_unavailable_quantity
+    from simulator.three_product_report import classify_products
+
+    # Removing the Si transport row drives the production evaporation refusal
+    # path used by b-858; the runner and ledger still compute other products.
+    monkeypatch.delitem(condensation._LENNARD_JONES_PARAMS, "Si", raising=False)
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C0", hours=24,
+        additives_kg={}, allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    execution = RunExecutor().execute(run._session_config())
+    assert execution.status == "ok", execution.error_message
+    assert len(execution.snapshots) == 24
+
+    sim = execution.session.simulator
+    products = classify_products(sim)
+    for name in (
+        "metals_plus_O2",
+        "ingots_metals",
+        "refractory_ceramic_rump",
+        "captured_volatiles",
+    ):
+        product = products[name]
+        assert product["status"] == "partial"
+        assert isinstance(product["class_total_kg"], (int, float))
+        assert math.isfinite(product["class_total_kg"])
+        assert len(product["excluded"]) == 1
+        exclusion = product["excluded"][0]
+        assert exclusion["species"] == "Si"
+        assert exclusion["account"] == "process.cleaned_melt"
+        assert "EvaporationFluxConfigurationError" in exclusion["reason"]
+
+    for product in products.values():
+        if product.get("status") != "partial":
+            continue
+        assert isinstance(product["class_total_kg"], (int, float))
+        assert math.isfinite(product["class_total_kg"])
+        assert [item["species"] for item in product["excluded"]] == ["Si"]
+
+    rump = products["refractory_ceramic_rump"]
+    assert rump["rump_total_kg"] == pytest.approx(999.0)
+    assert rump["rump_silicate_residual_kg"] == pytest.approx(457.0)
+
+    diagnostic = build_cost_rollup_diagnostic(
+        sim=sim,
+        cost_ledger=sim.cost_ledger,
+        per_hour=execution.per_hour,
+        products_kg=sim.product_ledger(),
+        snapshots=tuple(sim.record.snapshots),
+    )
+    allocations = diagnostic["product_costs"]
+    assert len(allocations) == 21
+    for allocation in allocations.values():
+        assert allocation["status"] == "partial"
+        assert isinstance(allocation["quantity_kg"], (int, float))
+        assert math.isfinite(allocation["quantity_kg"])
+        assert isinstance(allocation["owner_ratify_money_projection"], float)
+        assert not is_unavailable_quantity(
+            allocation["owner_ratify_money_projection"]
+        )
+        assert not is_unavailable_quantity(allocation["accumulated_cost"])
+        assert len(allocation["excluded"]) == 1
+        assert allocation["excluded"][0]["species"] == "Si"
+        assert allocation["excluded"] == products["metals_plus_O2"]["excluded"]
+
+
 def test_predict_flag_wall_certified_value_retains_bits():
     notices = {}
     pressure = condensation._antoine_psat_pa("Mg", 1000.0, antoine_extrapolations=notices)

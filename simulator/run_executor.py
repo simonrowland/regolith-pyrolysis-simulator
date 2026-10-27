@@ -455,6 +455,7 @@ class RunExecutor:
             all_snapshots = tuple(getattr(sim.record, "snapshots", ()))
             snapshots = all_snapshots[snapshot_start:]
             sim.record.cost_rollup = build_cost_rollup_diagnostic(
+                sim=sim,
                 cost_ledger=sim.cost_ledger,
                 per_hour=tuple(per_hour),
                 products_kg=sim.product_ledger(),

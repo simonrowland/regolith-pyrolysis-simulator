@@ -60,6 +60,9 @@ def test_campaign_snapshot_captures_only_condensation_origin_state() -> None:
 
     snapshot = ledger_snapshots_from_sim(sim)[0]
     assert set(snapshot["ledger"]) == {"process.condensation_train"}
+    assert snapshot["parent_inventory_atom_moles_by_account"][
+        "process.cleaned_melt"
+    ] == ledger.atom_moles_by_account("process.cleaned_melt")
     assert set(snapshot["material_origin_atom_moles_by_account"]) == {
         "process.condensation_train"
     }

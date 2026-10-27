@@ -11,7 +11,10 @@ from types import MappingProxyType
 from typing import Any
 
 from simulator.account_ids import METAL_PHASE_ACCOUNTS
-from simulator.accounting.completeness import product_class_availability
+from simulator.accounting.completeness import (
+    product_class_availability,
+    product_class_target_species,
+)
 from simulator.accounting.ledger import LedgerTransition
 from simulator.accounting.queries import is_reagent_bookkeeping_product
 from simulator.cost_energy import (
@@ -868,6 +871,7 @@ class CostLedger:
 
 def build_cost_rollup_diagnostic(
     *,
+    sim: Any | None = None,
     cost_ledger: CostLedger,
     per_hour: tuple[dict[str, Any], ...],
     products_kg: Mapping[str, float],
@@ -876,6 +880,7 @@ def build_cost_rollup_diagnostic(
 ) -> dict[str, Any]:
     try:
         return _build_cost_rollup_diagnostic(
+            sim=sim,
             cost_ledger=cost_ledger,
             per_hour=per_hour,
             products_kg=products_kg,
@@ -905,6 +910,7 @@ def build_cost_rollup_diagnostic(
 
 def _build_cost_rollup_diagnostic(
     *,
+    sim: Any | None = None,
     cost_ledger: CostLedger,
     per_hour: tuple[dict[str, Any], ...],
     products_kg: Mapping[str, float],
@@ -947,9 +953,10 @@ def _build_cost_rollup_diagnostic(
         product_allocation_input = furnace_input + auxiliary_electrical_input
     product_inputs = _cost_allocation_product_inputs(products_kg)
     product_availability = product_class_availability(
-        None,
-        tuple(_normalize_output_key(key)[1] for key in product_inputs),
+        sim,
+        product_class_target_species(),
         {str(key): value for key, value in product_inputs.items()},
+        has_computed_part=bool(product_inputs),
         snapshots=snapshots,
     )
     product_unavailable = (
