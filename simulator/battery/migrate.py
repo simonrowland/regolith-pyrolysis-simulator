@@ -1671,13 +1671,7 @@ def _composition_from_plain(payload: object) -> Composition:
         wt = _mass_percent_components(payload)
         if wt is not None:
             return replace(wt_pct_to_mole_fraction(wt), **metadata)
-        return Composition(
-            basis=str(payload.get("basis") or "as_published"),
-            components=pairs,
-            amount_basis=AmountBasis.MASS_PERCENT,
-            **metadata,
-        )
-    if amount_basis is AmountBasis.MOLE_PERCENT:
+    elif amount_basis is AmountBasis.MOLE_PERCENT:
         mole_percent = _mole_percent_components(payload)
         if mole_percent is None:
             raise ValueError(
@@ -1696,6 +1690,15 @@ def _composition_from_plain(payload: object) -> Composition:
             **metadata,
         )
     pairs = tuple((str(k), as_decimal(v)) for k, v in components)
+    if amount_basis is AmountBasis.MASS_PERCENT:
+        # Parsed but not convertible: keep the printed mass-percent pairs.
+        # A row that is not a pair raises ValueError from the unpack above.
+        return Composition(
+            basis=str(payload.get("basis") or "as_published"),
+            components=pairs,
+            amount_basis=AmountBasis.MASS_PERCENT,
+            **metadata,
+        )
     return Composition(
         basis=str(payload.get("basis") or "unknown"),
         components=pairs,
