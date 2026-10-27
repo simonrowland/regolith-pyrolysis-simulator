@@ -879,6 +879,58 @@ def _log10_bar_maps_equivalent(
     return True
 
 
+# A negative MELTS liquid endmember mole is outside the simplex. The
+# status stays the existing not_converged refusal; this token is the
+# detail string, not a new public enum value.
+_MELTS_OUT_OF_SIMPLEX_TOKEN = 'melts_liquid_endmember_out_of_simplex'
+
+
+def _melts_liquid_out_of_simplex_detail(system: Any) -> Optional[str]:
+    """Name each negative MELTS liquid endmember mole, or None.
+
+    ``set_melt_comp`` projects the oxide weight vector onto the MELTS
+    endmember basis. A negative mole is outside that simplex.
+    LiquidMelts logs ``x[i]`` whenever ``x[i] != 0``, so the speciation
+    call would be NaN for every present-oxide gas row, and clipping the
+    mole to 0 feeds the fabricated zero-mole branch for an oxide that
+    is present. Exact zero already drops out inside LiquidMelts and is
+    not this refusal. Systems without ``mol_liq`` (test fakes) are not
+    this check.
+    """
+    moles = getattr(system, 'mol_liq', None)
+    if moles is None:
+        return None
+    ravel = getattr(moles, 'ravel', None)
+    flat = ravel() if callable(ravel) else moles
+    values: list[float] = []
+    try:
+        for item in flat:
+            values.append(float(item))
+    except (TypeError, ValueError):
+        return None
+    negative = [
+        (index, mole)
+        for index, mole in enumerate(values)
+        if mole < 0.0
+    ]
+    if not negative:
+        return None
+    phase = getattr(system, 'liq_phs', None)
+    names = (
+        getattr(phase, 'endmember_names', None)
+        if phase is not None else None
+    )
+    name_list = list(names) if names is not None else []
+    parts: list[str] = []
+    for index, mole in negative:
+        if index < len(name_list):
+            name = str(name_list[index])
+        else:
+            name = f'index{index}'
+        parts.append(f'{name}={mole:.6g}')
+    return _MELTS_OUT_OF_SIMPLEX_TOKEN + ': ' + ', '.join(parts)
+
+
 def _call_system_eval_gas_abundances(
     system: Any,
     *,
@@ -894,6 +946,15 @@ def _call_system_eval_gas_abundances(
         set_melt_comp = getattr(system, 'set_melt_comp')
         eval_gas_abundances = getattr(system, 'eval_gas_abundances')
         set_melt_comp(composition)
+    except Exception as exc:
+        raise VapoRockCallError(exc) from exc
+    # Refuse before speciation. The stored endmember vector is the
+    # projection of the stated composition; do not rewrite it.
+    detail = _melts_liquid_out_of_simplex_detail(system)
+    if detail is not None:
+        _token, _separator, mole_text = detail.partition(': ')
+        raise VapoRockCallError(_MELTS_OUT_OF_SIMPLEX_TOKEN, mole_text)
+    try:
         # Installed System.eval_gas_abundances(T, logfO2, P=1e-10, ...) uses P
         # in _calc_liquid_chempot. This helper calls (T, logfO2) only, so
         # upstream stays at its default. Passing P is a golden-affecting
@@ -2001,6 +2062,28 @@ class VapoRockBackend(MeltBackend):
             # VapoRock is present but the call did not produce a usable result.
             external_type = exc.external_exception
             external_message = exc.external_message
+            if external_type == _MELTS_OUT_OF_SIMPLEX_TOKEN:
+                # Same not_converged refusal as a hollow table. The
+                # detail names the endmember; no partial pressure is
+                # returned. This is not an engine crash.
+                detail = f'{external_type}: {external_message}'
+                self._last_error = detail
+                diagnostics = dict(projection_diagnostics)
+                diagnostics['detail'] = detail
+                diagnostics['finite_prediction'] = False
+                result = EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=fO2_log,
+                    liquid_fraction=liquid_fraction,
+                    phase_assemblage_available=False,
+                    status='not_converged',
+                    warnings=[*prior_warnings, detail],
+                    vapor_pressures_Pa={},
+                    diagnostics=diagnostics,
+                )
+                setattr(result, 'vaporock_full_speciation_Pa', {})
+                return result
             message = (
                 f'VapoRock equilibrate failed: {external_type}: '
                 f'{external_message}'

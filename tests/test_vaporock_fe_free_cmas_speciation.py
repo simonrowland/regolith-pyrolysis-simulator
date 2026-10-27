@@ -1,14 +1,15 @@
-"""VapoRock speciation for an Fe-free CMAS melt must stay finite.
+"""VapoRock refuses a CMAS melt outside the MELTS endmember simplex.
 
-Mathieu 2009 admitted row 1 is CaO-rich and Fe-free. Its MELTS endmember
-projection drives the dependent SiO2 mole negative. LiquidMelts then
-evaluates log(x) of that negative mole, and the NaN spreads through every
-present-oxide gas row (22 NaN, 16 -inf). Absent Fe, Ti, K and Cr on an
-in-simplex melt do not do this: they are the -inf inventory mask.
+Mathieu 2009 admitted row 1 is CaO-rich and Fe-free. Its MELTS projection
+drives the dependent SiO2 endmember mole negative (CaSiO3 + Mg2SiO4 +
+Na2SiO3 oversubscribe Si). That is outside the liquid simplex. Absent
+Fe, Ti, K and Cr are not the cause: an in-simplex Fe-free melt stays
+finite, and those absent oxides are the -inf inventory mask.
 
-The Fe-bearing pin is the installed engine's log10(bar) table for an
-in-simplex composition, recorded before the drop-out fix. That table must
-stay bit-identical.
+The adapter refuses before speciation. Status stays not_converged. The
+detail string names the endmember and its mole. No partial pressure is
+returned. The Fe-bearing pin is the installed engine's log10(bar) table
+for an in-simplex composition and must stay bit-identical.
 """
 
 from __future__ import annotations
@@ -29,6 +30,15 @@ MATHIEU_ROW1_WT_PCT = {
     "MgO": 5.06,
     "Na2O": 4.5,
 }
+# In-simplex Fe-free control from the t1539 review. Every MELTS
+# endmember mole is non-negative.
+FE_FREE_IN_SIMPLEX_WT_PCT = {
+    "SiO2": 70.0,
+    "Al2O3": 15.0,
+    "CaO": 8.0,
+    "MgO": 5.0,
+    "Na2O": 2.0,
+}
 # In-simplex control: every MELTS endmember mole is non-negative.
 FE_BEARING_CONTROL_WT_PCT = {
     "SiO2": 50.0,
@@ -44,8 +54,9 @@ T_K = 1673.15
 LOG10_FO2 = math.log10(2.11e-6)
 T_C = T_K - 273.15
 
-# Installed VapoRock (pin 0159678 + patches 0001 and 0002) before the
-# non-positive endmember drop-out. log10(partial pressure / bar).
+# Installed VapoRock (pin 0159678 + patches 0001 and 0002).
+# log10(partial pressure / bar). An in-simplex composition, so the
+# out-of-simplex refusal does not apply.
 FE_BEARING_CONTROL_LOG10_BAR = {
     "O(g)": -7.3133208026195,
     "O2(g)": -5.675717544702314,
@@ -123,9 +134,16 @@ def test_fe_bearing_control_speciation_matches_pre_fix_pin(vaporock_system):
             assert actual == expected
 
 
-def test_mathieu_row1_fe_free_cmas_speciation_is_finite(vaporock_system):
-    """Present-oxide rows are finite; absent-oxide rows stay -inf."""
-    column = _log10_bar(vaporock_system, MATHIEU_ROW1_WT_PCT)
+def test_in_simplex_fe_free_cmas_speciation_is_finite(vaporock_system):
+    """An Fe-free melt inside the simplex still has finite gas rows."""
+    from simulator.melt_backend.vaporock import (
+        _melts_liquid_out_of_simplex_detail,
+    )
+
+    column = _log10_bar(vaporock_system, FE_FREE_IN_SIMPLEX_WT_PCT)
+    assert _melts_liquid_out_of_simplex_detail(vaporock_system) is None
+    moles = np.asarray(vaporock_system.mol_liq, dtype=float).ravel()
+    assert np.all(moles >= 0.0)
     values = column.to_numpy(dtype=float)
     assert values.size == 38
     assert int(np.isnan(values).sum()) == 0
@@ -133,16 +151,7 @@ def test_mathieu_row1_fe_free_cmas_speciation_is_finite(vaporock_system):
     assert int(np.isneginf(values).sum()) == 16
     assert math.isfinite(float(column["Na(g)"]))
     assert math.isfinite(float(column["SiO(g)"]))
-    assert math.isclose(
-        float(column["O2(g)"]), LOG10_FO2, rel_tol=0.0, abs_tol=1e-12
-    )
-    for species in ("Fe(g)", "K(g)", "Ti(g)", "Cr(g)", "Mn(g)"):
-        actual = float(column[species])
-        assert math.isinf(actual) and actual < 0.0
 
-
-def test_mathieu_row1_adapter_returns_finite_partial_pressures():
-    """The adapter must surface the engine rows, not replace NaN with a fill."""
     from simulator.engine_local_config import setup_thermoengine_dylib_path
     from simulator.melt_backend.vaporock import VapoRockBackend
 
@@ -151,14 +160,50 @@ def test_mathieu_row1_adapter_returns_finite_partial_pressures():
     assert backend.initialize({})
     result = backend.equilibrate(
         T_C,
-        composition_kg=dict(MATHIEU_ROW1_WT_PCT),
+        composition_kg=dict(FE_FREE_IN_SIMPLEX_WT_PCT),
         fO2_log=LOG10_FO2,
         pressure_bar=1e-6,
     )
     speciation = result.vaporock_full_speciation_Pa
     assert result.status == "non_authoritative"
     assert math.isfinite(speciation["Na"]) and speciation["Na"] > 0.0
-    assert math.isfinite(speciation["SiO"]) and speciation["SiO"] > 0.0
-    # Absent Fe is the inventory mask (0 Pa), not a clamped NaN.
-    assert speciation["Fe"] == 0.0
-    assert all(math.isfinite(value) for value in speciation.values())
+    assert not any(
+        "melts_liquid_endmember_out_of_simplex" in warning
+        for warning in result.warnings
+    )
+
+
+def test_mathieu_row1_adapter_refuses_out_of_simplex():
+    """Row 1 is a typed not_converged refusal, not a finite pressure."""
+    from simulator.engine_local_config import setup_thermoengine_dylib_path
+    from simulator.melt_backend.vaporock import (
+        VapoRockBackend,
+        _melts_liquid_out_of_simplex_detail,
+    )
+
+    setup_thermoengine_dylib_path()
+    import vaporock
+
+    system = vaporock.System()
+    system.set_melt_comp(dict(MATHIEU_ROW1_WT_PCT))
+    detail = _melts_liquid_out_of_simplex_detail(system)
+    assert detail is not None
+    assert detail.startswith("melts_liquid_endmember_out_of_simplex: ")
+    sio2_text = detail.split("SiO2=", 1)[1].split(",", 1)[0]
+    assert float(sio2_text) < 0.0
+
+    backend = VapoRockBackend()
+    assert backend.initialize({})
+    result = backend.equilibrate(
+        T_C,
+        composition_kg=dict(MATHIEU_ROW1_WT_PCT),
+        fO2_log=LOG10_FO2,
+        pressure_bar=1e-6,
+    )
+    speciation = getattr(result, "vaporock_full_speciation_Pa", {})
+    assert result.status == "not_converged"
+    assert result.vapor_pressures_Pa == {}
+    assert speciation == {}
+    assert detail in result.warnings
+    assert result.diagnostics.get("detail") == detail
+    assert "Na" not in speciation
