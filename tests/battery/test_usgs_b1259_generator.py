@@ -408,6 +408,11 @@ def test_calcium_reference_state_gas_entropy_below_condensed_floor_stays_unknown
         ):
             row["entropy"]["as_published"] = "24.000"
             row["entropy"]["value"] = 24.0
+            # Keep the Planck identity: 24.000 - 1000*49.829/1800
+            # is -3.682777..., which prints as -3.683 at the table's
+            # three-decimal precision.
+            row["gibbs_function"]["as_published"] = "-3.683"
+            row["gibbs_function"]["value"] = -3.683
 
     generated = generator.generate_record(record)
     entropy = _observations_for(
