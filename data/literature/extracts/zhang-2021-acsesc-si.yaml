@@ -1,0 +1,56 @@
+schema_version: literature_extract.v1
+source_id: zhang-2021-acsesc-si
+source:
+  citation: >-
+    Zhang, Z., Nie, N. X., Mendybaev, R. A., Liu, M.-C., Hu, J. J., Hopp, T.,
+    Alp, E. E., Lavina, B., Bullock, E. S., McKeegan, K. D. & Dauphas, N.
+    (2021), Supporting Information for “Loss and isotopic fractionation of
+    alkali elements during diffusion-limited evaporation from molten silicate:
+    theory and experiments”, ACS Earth and Space Chemistry 5, 755–784.
+  year: 2021
+extraction:
+  method: >-
+    Scope audit of the supplied pdftotext-layout text, MinerU page extracts,
+    and table inventory. No numerical values were transcribed because this
+    supplement contains no printed Na(g)/Na vapour pressure or Na-specific
+    evaporation flux.
+  date: '2026-10-27'
+  worker: w1027naA-zhang-2021-acsesc-si
+  provenance_path: text/zhang-2021-acsesc-si/pdftotext-layout.txt
+review_status: draft
+scope_assessment:
+  document_type: supporting information for experimental and theoretical study of alkali evaporation from basaltic melt
+  requested_measurements: measured Na(g)/Na vapour pressure or Na-specific evaporation flux
+  measured_direct_observations: 0
+  absent_from_source:
+  - printed Na(g)/Na vapour pressure
+  - printed Na-specific evaporation flux
+  - species-resolved evaporation mass balance
+  evidence:
+  - locator: {page: 9, table: 'S1'}
+    finding: >-
+      Sample residue physical properties include weight before and after each
+      run. This is whole-sample mass change, not a Na-specific flux; the table
+      does not resolve the lost mass by species.
+  - locator: {page: 10, figure: 'S6'}
+    finding: >-
+      Na, K, and Rb concentration profiles are plotted normalized to central
+      sample concentrations; the values are figure-only and are not flux or
+      vapour-pressure measurements.
+  - locator: {page: 11, table: 'S2'}
+    finding: >-
+      EPMA residue oxide concentrations and SIMS K-isotope results; these are
+      not vapour pressure or flux measurements.
+  - locator: {page: 44, table: 'S11'}
+    finding: >-
+      EPMA residue oxide concentrations and SIMS K-isotope results; these are
+      not vapour pressure or flux measurements.
+  figure_read_candidates:
+  - Fig. S6 and Figs. S7–S15: elemental concentration profiles in residues; figure values are out of scope for this wave.
+  unresolved_scope_question: >-
+    Whether whole-sample mass change in Table S1 is intended as input to a
+    separately derived Na flux. It is not Na-resolved in this supplement, so
+    no elemental flux has been inferred here.
+species:
+  Na:
+    observations: []
