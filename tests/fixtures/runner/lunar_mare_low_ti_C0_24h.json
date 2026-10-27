@@ -442,6 +442,513 @@
       "sulfates_routed_to": "melt_or_C0b",
       "forecast_engine": "internal-analytical"
     },
+    "campaign_endpoints": [
+      {
+        "campaign": "C0",
+        "winning_condition": "computed_exit",
+        "classification": "time_budget_reached",
+        "incomplete": true,
+        "observed": {
+          "temperature_C": 950.0,
+          "completed_campaign_hour": 5.0
+        },
+        "threshold": {
+          "temperature_C": 950.0,
+          "completed_campaign_hour": 5.0
+        },
+        "predicates": [
+          {
+            "condition": "first_melt",
+            "bound": false,
+            "observed": false,
+            "threshold": true,
+            "classification": "time_budget_reached"
+          },
+          {
+            "condition": "remaining_budget",
+            "bound": false,
+            "observed": null,
+            "threshold": "feasible forecast",
+            "classification": "time_budget_reached"
+          },
+          {
+            "condition": "computed_exit",
+            "bound": true,
+            "observed": {
+              "temperature_C": 950.0,
+              "completed_campaign_hour": 5.0
+            },
+            "threshold": {
+              "temperature_C": 950.0,
+              "completed_campaign_hour": 5.0
+            },
+            "classification": "time_budget_reached"
+          },
+          {
+            "condition": "maximum_hold",
+            "bound": false,
+            "observed": 5.0,
+            "threshold": 25.0,
+            "classification": "time_budget_reached"
+          }
+        ],
+        "bound_predicates": [
+          "computed_exit"
+        ],
+        "clocks": {
+          "campaign_hour": 4.0,
+          "completed_campaign_hour": 5.0
+        },
+        "outcome": "incomplete",
+        "backstop": "computed_exit",
+        "kinetics": "temperature_resolved_equilibrium_hk_upper_bound",
+        "release_curves": "uncertified (t-1417)",
+        "ticket": "t-1417",
+        "authority": "extrapolated",
+        "message": "C0 gas is fiat-ledgered at load and release curves are uncertified (t-1417); any computed T_exit is a liquid-law extrapolation with unknown real-engine phase state; authority level extrapolated.",
+        "ramp_C_per_hr": 200.0,
+        "ramp_authority": "owner_fiat",
+        "ramp_model_bounded": false,
+        "T_exit_C": 950.0,
+        "T_exit_reached_hr": 4.625,
+        "t_evac_hr": 0.0,
+        "M_C0_gas_kg": 0.0,
+        "C_evac_kg_hr": 4.794586132051477,
+        "C_evac_temperature_C": 950.0,
+        "requested_exit_window_hr": 4.625,
+        "runtime_exit_window_hr": 5.0,
+        "hold_used_for_budget_hr": 5.0,
+        "evacuation_max_hold_hr": 25.0,
+        "evacuation_bound_unmet": false,
+        "evacuation_bound_unmet_hr": 0.0,
+        "evacuation_unreleased_gas_mass_kg": 0.0,
+        "evacuation_unreleased_gas_inventory_kg": {},
+        "Na_plus_K_to_train_kg": 0.00012467266905146954,
+        "Na_plus_K_feed_mass_kg": 3.900744138110062,
+        "Na_plus_K_feed_loss_fraction": 3.19612526834109e-05,
+        "alkali_retention_budget_fraction": 0.001,
+        "budget_authority": "owner:d-244",
+        "budget_provenance": "owner d-244, purity limit",
+        "cover": {
+          "carrier_gas": "Ar",
+          "p_total_mbar": 1.0,
+          "pO2_mbar": 0.0
+        },
+        "liquid_fraction": null,
+        "phase_state": "unknown; analytical liquid-law extrapolated",
+        "phase_state_ticket": "t-1460",
+        "prediction_status": "ok",
+        "T_exit_resolution_C": 1.0,
+        "evacuation_bound_backstop_fired": false,
+        "unreleased_inventory_at_exit": {
+          "targets": [
+            {
+              "key": "H2O",
+              "remaining_kg": 0.0,
+              "remaining_fraction": null,
+              "status": "zero_denominator"
+            },
+            {
+              "key": "CO2",
+              "remaining_kg": 0.0,
+              "remaining_fraction": null,
+              "status": "zero_denominator"
+            },
+            {
+              "key": "S2",
+              "remaining_kg": 0.0,
+              "remaining_fraction": 0.0,
+              "status": "ok"
+            },
+            {
+              "key": "CHNOPS",
+              "remaining_kg": 0.0,
+              "remaining_fraction": 0.0,
+              "status": "deferred_semantic_split"
+            }
+          ]
+        },
+        "sulfates_routed_to": "melt_or_C0b",
+        "forecast_engine": "internal-analytical"
+      },
+      {
+        "campaign": "C0B",
+        "winning_condition": "maximum_hold",
+        "classification": "time_budget_reached",
+        "incomplete": true,
+        "observed": 3.0,
+        "threshold": 3.0,
+        "predicates": [
+          {
+            "condition": "maximum_hold",
+            "bound": true,
+            "observed": 3.0,
+            "threshold": 3.0,
+            "classification": "time_budget_reached"
+          }
+        ],
+        "bound_predicates": [
+          "maximum_hold"
+        ],
+        "clocks": {
+          "campaign_hour": 2.0,
+          "completed_campaign_hour": 3.0
+        }
+      },
+      {
+        "reason": "duration_cap_timeout",
+        "stage": "cool_for_na_shuttle",
+        "stage_idx": 3,
+        "campaign_hour": 8,
+        "stage_elapsed_h": 1,
+        "cumulative_yield_mol_by_species": {},
+        "log_slope_per_hr_by_species": {},
+        "campaign": "C2A_STAGED",
+        "winning_condition": "stage_duration",
+        "classification": "time_budget_reached",
+        "incomplete": true,
+        "observed": 1,
+        "threshold": 1,
+        "predicates": [
+          {
+            "condition": "species_yield_target",
+            "bound": false,
+            "observed": null,
+            "threshold": null,
+            "classification": "target_reached"
+          },
+          {
+            "condition": "stage_duration",
+            "bound": true,
+            "observed": 1,
+            "threshold": 1,
+            "classification": "time_budget_reached"
+          },
+          {
+            "condition": "maximum_hold",
+            "bound": true,
+            "observed": 9.0,
+            "threshold": 9.0,
+            "classification": "time_budget_reached"
+          }
+        ],
+        "bound_predicates": [
+          "stage_duration",
+          "maximum_hold"
+        ],
+        "clocks": {
+          "campaign_hour": 8.0,
+          "completed_campaign_hour": 9.0,
+          "stage_elapsed_h": 1,
+          "minimum_hold_hr": 1.0
+        },
+        "stage_endpoints": [
+          {
+            "reason": "duration_cap_timeout",
+            "stage": "alkali_early_fe",
+            "stage_idx": 0,
+            "campaign_hour": 3,
+            "stage_elapsed_h": 4,
+            "cumulative_yield_mol_by_species": {},
+            "log_slope_per_hr_by_species": {},
+            "campaign": "C2A_STAGED",
+            "winning_condition": "stage_duration",
+            "classification": "time_budget_reached",
+            "incomplete": true,
+            "observed": 4,
+            "threshold": 4,
+            "predicates": [
+              {
+                "condition": "species_yield_target",
+                "bound": false,
+                "observed": null,
+                "threshold": null,
+                "classification": "target_reached"
+              },
+              {
+                "condition": "stage_duration",
+                "bound": true,
+                "observed": 4,
+                "threshold": 4,
+                "classification": "time_budget_reached"
+              },
+              {
+                "condition": "maximum_hold",
+                "bound": false,
+                "observed": 4.0,
+                "threshold": 9.0,
+                "classification": "time_budget_reached"
+              }
+            ],
+            "bound_predicates": [
+              "stage_duration"
+            ],
+            "clocks": {
+              "campaign_hour": 3.0,
+              "completed_campaign_hour": 4.0,
+              "stage_elapsed_h": 4,
+              "minimum_hold_hr": 1.0
+            }
+          },
+          {
+            "reason": "duration_cap_timeout",
+            "stage": "sio_window",
+            "stage_idx": 1,
+            "campaign_hour": 6,
+            "stage_elapsed_h": 3,
+            "cumulative_yield_mol_by_species": {},
+            "log_slope_per_hr_by_species": {},
+            "campaign": "C2A_STAGED",
+            "winning_condition": "stage_duration",
+            "classification": "time_budget_reached",
+            "incomplete": true,
+            "observed": 3,
+            "threshold": 3,
+            "predicates": [
+              {
+                "condition": "species_yield_target",
+                "bound": false,
+                "observed": null,
+                "threshold": null,
+                "classification": "target_reached"
+              },
+              {
+                "condition": "stage_duration",
+                "bound": true,
+                "observed": 3,
+                "threshold": 3,
+                "classification": "time_budget_reached"
+              },
+              {
+                "condition": "maximum_hold",
+                "bound": false,
+                "observed": 7.0,
+                "threshold": 9.0,
+                "classification": "time_budget_reached"
+              }
+            ],
+            "bound_predicates": [
+              "stage_duration"
+            ],
+            "clocks": {
+              "campaign_hour": 6.0,
+              "completed_campaign_hour": 7.0,
+              "stage_elapsed_h": 3,
+              "minimum_hold_hr": 1.0
+            }
+          },
+          {
+            "reason": "duration_cap_timeout",
+            "stage": "fe_hot_hold",
+            "stage_idx": 2,
+            "campaign_hour": 7,
+            "stage_elapsed_h": 1,
+            "cumulative_yield_mol_by_species": {},
+            "log_slope_per_hr_by_species": {},
+            "campaign": "C2A_STAGED",
+            "winning_condition": "stage_duration",
+            "classification": "time_budget_reached",
+            "incomplete": true,
+            "observed": 1,
+            "threshold": 1,
+            "predicates": [
+              {
+                "condition": "species_yield_target",
+                "bound": false,
+                "observed": {
+                  "status": "available",
+                  "reason": null,
+                  "species": [
+                    "Fe"
+                  ],
+                  "denominator": "initial_feed_element_inventory",
+                  "denominator_mol": 2359.0201344591915,
+                  "feed_denominator_mol": 2359.0201344591915,
+                  "entry_denominator_mol": 2359.0201344585657,
+                  "captured_mol": 0.0549154719522816,
+                  "extracted_mol": 4.619037864706268,
+                  "captured_fraction": 2.3278933125711133e-05,
+                  "extracted_fraction": 0.0019580324038926396,
+                  "captured_vs_feed": 2.3278933125711133e-05,
+                  "extracted_vs_feed": 0.0019580324038926396,
+                  "captured_vs_entry": 2.3278933104734318e-05,
+                  "extracted_vs_entry": 0.0019580324036278752,
+                  "threshold": 0.86,
+                  "shortfall": 0.8599767210668743,
+                  "wrong_stage_mol": 0.31043414748198894,
+                  "capture_by_element": {
+                    "Fe": {
+                      "status": "available",
+                      "captured_mol": 0.0549154719522816,
+                      "wrong_stage_mol": 0.31043414748198894,
+                      "reason": null,
+                      "diagnostic": {}
+                    }
+                  },
+                  "losses_mol": {
+                    "terminal.offgas": {
+                      "Fe": 4.253688245271998
+                    }
+                  },
+                  "extracted_accounts": [
+                    "process.condensation_train",
+                    "process.overhead_gas",
+                    "terminal.drain_tap_material",
+                    "terminal.offgas"
+                  ]
+                },
+                "threshold": 0.86,
+                "classification": "target_reached"
+              },
+              {
+                "condition": "stage_duration",
+                "bound": true,
+                "observed": 1,
+                "threshold": 1,
+                "classification": "time_budget_reached"
+              },
+              {
+                "condition": "maximum_hold",
+                "bound": false,
+                "observed": 8.0,
+                "threshold": 9.0,
+                "classification": "time_budget_reached"
+              }
+            ],
+            "bound_predicates": [
+              "stage_duration"
+            ],
+            "clocks": {
+              "campaign_hour": 7.0,
+              "completed_campaign_hour": 8.0,
+              "stage_elapsed_h": 1,
+              "minimum_hold_hr": 1.0
+            },
+            "yield_target": {
+              "status": "available",
+              "reason": null,
+              "species": [
+                "Fe"
+              ],
+              "denominator": "initial_feed_element_inventory",
+              "denominator_mol": 2359.0201344591915,
+              "feed_denominator_mol": 2359.0201344591915,
+              "entry_denominator_mol": 2359.0201344585657,
+              "captured_mol": 0.0549154719522816,
+              "extracted_mol": 4.619037864706268,
+              "captured_fraction": 2.3278933125711133e-05,
+              "extracted_fraction": 0.0019580324038926396,
+              "captured_vs_feed": 2.3278933125711133e-05,
+              "extracted_vs_feed": 0.0019580324038926396,
+              "captured_vs_entry": 2.3278933104734318e-05,
+              "extracted_vs_entry": 0.0019580324036278752,
+              "threshold": 0.86,
+              "shortfall": 0.8599767210668743,
+              "wrong_stage_mol": 0.31043414748198894,
+              "capture_by_element": {
+                "Fe": {
+                  "status": "available",
+                  "captured_mol": 0.0549154719522816,
+                  "wrong_stage_mol": 0.31043414748198894,
+                  "reason": null,
+                  "diagnostic": {}
+                }
+              },
+              "losses_mol": {
+                "terminal.offgas": {
+                  "Fe": 4.253688245271998
+                }
+              },
+              "extracted_accounts": [
+                "process.condensation_train",
+                "process.overhead_gas",
+                "terminal.drain_tap_material",
+                "terminal.offgas"
+              ]
+            }
+          },
+          {
+            "reason": "duration_cap_timeout",
+            "stage": "cool_for_na_shuttle",
+            "stage_idx": 3,
+            "campaign_hour": 8,
+            "stage_elapsed_h": 1,
+            "cumulative_yield_mol_by_species": {},
+            "log_slope_per_hr_by_species": {},
+            "campaign": "C2A_STAGED",
+            "winning_condition": "stage_duration",
+            "classification": "time_budget_reached",
+            "incomplete": true,
+            "observed": 1,
+            "threshold": 1,
+            "predicates": [
+              {
+                "condition": "species_yield_target",
+                "bound": false,
+                "observed": null,
+                "threshold": null,
+                "classification": "target_reached"
+              },
+              {
+                "condition": "stage_duration",
+                "bound": true,
+                "observed": 1,
+                "threshold": 1,
+                "classification": "time_budget_reached"
+              },
+              {
+                "condition": "maximum_hold",
+                "bound": true,
+                "observed": 9.0,
+                "threshold": 9.0,
+                "classification": "time_budget_reached"
+              }
+            ],
+            "bound_predicates": [
+              "stage_duration",
+              "maximum_hold"
+            ],
+            "clocks": {
+              "campaign_hour": 8.0,
+              "completed_campaign_hour": 9.0,
+              "stage_elapsed_h": 1,
+              "minimum_hold_hr": 1.0
+            }
+          }
+        ]
+      },
+      {
+        "campaign": "C3_NA",
+        "winning_condition": "staged_duration",
+        "classification": "time_budget_reached",
+        "incomplete": true,
+        "observed": 3.0,
+        "threshold": 3,
+        "predicates": [
+          {
+            "condition": "staged_duration",
+            "bound": true,
+            "observed": 3.0,
+            "threshold": 3,
+            "classification": "time_budget_reached"
+          },
+          {
+            "condition": "maximum_hold",
+            "bound": false,
+            "observed": 3.0,
+            "threshold": 35.0,
+            "classification": "time_budget_reached"
+          }
+        ],
+        "bound_predicates": [
+          "staged_duration"
+        ],
+        "clocks": {
+          "campaign_hour": 2.0,
+          "completed_campaign_hour": 3.0
+        }
+      }
+    ],
     "evidence_class": "internal-analytical",
     "runtime_status": "unavailable",
     "degradation_reason": "unavailable",
