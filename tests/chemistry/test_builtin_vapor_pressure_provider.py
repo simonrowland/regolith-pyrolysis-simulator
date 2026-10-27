@@ -2800,6 +2800,66 @@ def test_ca2_compiled_oxide_extrapolation_keeps_source_reason_and_certified_band
     ] == notice
 
 
+def test_compiled_source_activity_floor_is_reported_without_changing_pressure(
+    vapor_pressure_data, monkeypatch
+):
+    activity = 1.0e-322
+
+    def with_activity(*args, **kwargs):
+        from simulator.chemistry.melt_activity import MeltOxideActivity
+
+        parent = args[0]
+        return MeltOxideActivity(
+            parent_oxide=parent,
+            single_cation_component=parent,
+            gamma=1.0,
+            x_single_cation=activity,
+            activity=activity,
+            citation="test activity injection",
+        )
+
+    monkeypatch.setattr(
+        vapor_pressure_module, "_high_t_activity_for_parent", with_activity
+    )
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = _request_for_oxide_at_T_K("CaO", 1900.0)
+    request = replace(
+        request,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"SiO2": 1.0, "CaO": 0.1}},
+            species_formula_registry={},
+        ),
+    )
+    result = provider.dispatch(request)
+    diagnostic = result.diagnostic
+    assert result.status == "ok"
+    notice = diagnostic["extrapolated_beyond_valid_range_K"]["Ca2"]
+    assert notice == {
+        "authority_level": "extrapolated",
+        "reason": "source_activity_floored",
+        "original_activity": activity,
+        "floor": 1.0e-300,
+    }
+    assert diagnostic["vapor_pressure_numerator_provenance"]["Ca2"][
+        "extrapolation_notice"
+    ] == notice
+    evaluator = provider._vapour_rail_catalog.evaluator_for_hot_train(
+        "Ca2", process_phase=None
+    )
+    expected = evaluator.evaluate(
+        1900.0, source_activity=1.0e-300, pO2_bar=1.0e-9
+    ).pressure_pa
+    assert diagnostic["vapor_pressures_Pa"]["Ca2"] == expected
+    activity = 2.0e-300
+    above = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
+        request
+    )
+    assert "Ca2" not in above.diagnostic["extrapolated_beyond_valid_range_K"]
+    assert "extrapolation_notice" not in above.diagnostic[
+        "vapor_pressure_numerator_provenance"
+        ]["Ca2"]
+
+
 def test_sio_extrapolation_notice_reaches_public_numeric_answer(vapor_pressure_data):
     import json
     from simulator.vapour_rail.batch import (

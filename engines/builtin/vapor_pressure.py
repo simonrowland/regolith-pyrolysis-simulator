@@ -4312,8 +4312,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
                         f"{T_K:.2f} K"
                     )
+            source_activity_floor_notice = None
             if compiled_evaluator is not None:
                 assert compiled_species is not None
+                if parent_oxide and reported_activity < 1.0e-300:
+                    source_activity_floor_notice = {
+                        "authority_level": "extrapolated",
+                        "reason": "source_activity_floored",
+                        "original_activity": float(reported_activity),
+                        "floor": 1.0e-300,
+                    }
                 try:
                     domain_transition = declared_domain_transition(
                         compiled_species, T_K
@@ -4537,6 +4545,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
+                if source_activity_floor_notice is not None:
+                    vapor_pressure_provenance[name]["extrapolation_notice"] = (
+                        source_activity_floor_notice
+                    )
+                    oxide_vapor_extrapolations[name] = source_activity_floor_notice
                 oxygen_notice = (
                     evaluation.extrapolation_notice
                     if compiled_evaluator is not None
