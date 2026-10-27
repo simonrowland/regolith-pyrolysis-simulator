@@ -278,4 +278,7 @@ def test_default_classification_values_preserve_pre_change_digest():
     digest = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    assert digest == "772f0f439134828e15d32621b4ecea084d26f30c3d5c7b0dacfb5a01b80dd38c"
+    # b-956: the only payload change is the zero-valued oxygen partition keys
+    # restored under oxygen.partition_kg and metals_plus_O2.O2_partition_kg
+    # (26 keys, all 0.0); no other value moves.
+    assert digest == "885792310e20c0894390a6e0de79eb9c7dded7910e3e7bf7658c51c7a0c9eeaf"
