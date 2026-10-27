@@ -111,3 +111,15 @@ def test_reconciliation_roundoff_uses_moved_mass_after_near_total_withdrawal():
     assert abs(ledger.project_account_kg(ACCOUNT)['Na'] - retained) < 4 * math.ulp(1000.)
     result = _projection(ledger, {(ACCOUNT, 4, 'Na'): retained}).captured_feed_atoms('Na', 4)
     assert result.status == 'available'
+
+
+def test_initial_native_feed_metal_is_recovery_but_not_melt_extraction():
+    ledger = AtomLedger()
+    ledger.load_external_mol('terminal.drain_tap_material', {'Fe': 20}, material_origin='feedstock')
+    ledger.load_external_mol('process.cleaned_melt', {'Fe': 10}, material_origin='feedstock')
+    ledger.move('thermal', 'process.cleaned_melt', ACCOUNT, {'Fe': _kg('Fe', 2)})
+    inventory = _projection(ledger, {(ACCOUNT, 1, 'Fe'): _kg('Fe', 2)}).inventory(['Fe'], 1)
+    assert inventory['extracted']['Fe'] == pytest.approx(2)
+    assert inventory['captured']['Fe'] == pytest.approx(2)
+    assert inventory['initial_feed_element_inventory']['Fe'] == pytest.approx(30)
+    assert inventory['preexisting_feed_products_mol']['Fe'] == pytest.approx(20)

@@ -108,14 +108,26 @@ class CampaignYieldProjection:
         losses = {account: {element: row.get(element, {}).get("feedstock", 0.0) for element in elements}
                   for account, row in origins.items()
                   if account.startswith("process.wall_deposit") or account in ("terminal.offgas", "vent")}
-        extracted_accounts = [account for account in origins
-                              if account in EXTRACTED_ACCOUNTS or account.startswith("process.wall_deposit")]
+        all_accounts = set(origins) | {lot.account for lot in self.ledger.external_loads}
+        extracted_accounts = sorted(account for account in all_accounts
+                                    if account in EXTRACTED_ACCOUNTS or account.startswith("process.wall_deposit"))
+        # Native metal and Stage-0 products may be loaded directly into a
+        # product account before melting. They are feed recovery, not atoms
+        # leaving the melt. Net extracted mol = current destination feed mol
+        # minus direct feed-input mol in those same accounts. Internal moves
+        # cannot change the direct-input baseline; imported lots have no feed
+        # atoms. With no thermal transfer the two terms cancel to zero.
+        preexisting = {element: math.fsum(
+            lot.origin_atom_moles.get('feedstock', {}).get(element, 0.0)
+            for lot in self.ledger.external_loads if lot.account in extracted_accounts
+        ) for element in elements}
         return {
             "initial_feed_element_inventory": {element: feed.get(element, 0.0) for element in elements},
             "melt": {element: self.melt_feed_atoms().get(element, 0.0) for element in elements},
             "captured": {element: result.captured_mol for element, result in captures.items()},
-            "extracted": {element: math.fsum(origins[account].get(element, {}).get("feedstock", 0.0)
-                                             for account in extracted_accounts) for element in elements},
+            "extracted": {element: math.fsum(origins.get(account, {}).get(element, {}).get("feedstock", 0.0)
+                                             for account in extracted_accounts) - preexisting[element] for element in elements},
+            "preexisting_feed_products_mol": preexisting,
             "capture": {element: asdict(result) for element, result in captures.items()},
             "losses": losses,
             "extracted_accounts": extracted_accounts,
