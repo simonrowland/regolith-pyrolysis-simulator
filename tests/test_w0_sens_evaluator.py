@@ -508,6 +508,72 @@ def test_build_prefix_resolution_guard(tmp_path, monkeypatch) -> None:
         worker.assert_build_prefix_resolves(str(tmp_path / "absent"))
 
 
+def test_patched_transport_loads_library_from_build_prefix(tmp_path, monkeypatch) -> None:
+    import engines.alphamelts.thermoengine as thermoengine_module
+    import simulator.engine_local_config as engine_local_config
+    from simulator.engine_local_config import (
+        EngineLocalConfig,
+        EnginePaths,
+        load_engine_lock,
+        thermoengine_artifact_names,
+        write_config,
+    )
+
+    prefix = tmp_path / "patched-prefix"
+    configured = tmp_path / "configured-lib"
+    prefix.mkdir()
+    configured.mkdir()
+    artifact_names = thermoengine_artifact_names(load_engine_lock())
+    for directory in (prefix, configured):
+        for name in artifact_names:
+            (directory / name).write_bytes(b"synthetic native library")
+    phaseobjc_name = next(
+        Path(name).name
+        for name in artifact_names
+        if Path(name).name.startswith("libphaseobjc.")
+    )
+    monkeypatch.setattr(
+        "simulator.engine_local_config.config_path",
+        lambda: tmp_path / "engines.local.toml",
+    )
+    write_config(
+        EngineLocalConfig(
+            paths=EnginePaths(thermoengine_dylib_dir=configured),
+            identities={},
+        )
+    )
+    monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", str(prefix))
+
+    loaded_paths = []
+    monkeypatch.setattr(
+        engine_local_config.ctypes,
+        "CDLL",
+        lambda path: loaded_paths.append(str(path)),
+    )
+    monkeypatch.setattr(
+        worker.ctypes.util,
+        "find_library",
+        lambda _name: str(prefix / phaseobjc_name),
+    )
+
+    class FakeTransport:
+        def __init__(self, **_kwargs):
+            self._initialized = False
+
+        def _initialize_in_process(self):
+            thermoengine_module._load_thermoengine_phaseobjc_library()
+            self._initialized = True
+
+    monkeypatch.setattr(thermoengine_module, "ThermoEngineTransport", FakeTransport)
+
+    transport = worker._patched_build_transport(prefix)
+
+    expected_library = prefix / phaseobjc_name
+    assert transport._initialized
+    assert loaded_paths == [str(expected_library)]
+    assert worker.assert_build_prefix_resolves(str(prefix)) == prefix.resolve()
+
+
 def test_live_substitution_guard() -> None:
     names = [SYNTH_PARAM, "W(SYNTH-A   ,SYNTH-C)"]
     slot, readback = worker._assert_substitution_live(

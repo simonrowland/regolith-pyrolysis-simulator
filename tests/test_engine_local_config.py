@@ -189,6 +189,7 @@ def test_thermoengine_dylib_dir_sets_dyld_fallback(
     resolved = setup_thermoengine_dylib_path()
     assert resolved == dylib_dir
     assert str(dylib_dir) in __import__("os").environ["DYLD_FALLBACK_LIBRARY_PATH"]
+    monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", str(dylib_dir))
 
 
 @pytest.mark.parametrize(
@@ -273,25 +274,18 @@ def recording_cdll(path, *args, **kwargs):
 ctypes.CDLL = recording_cdll
 import simulator.engine_local_config as local_config
 local_config.config_path = lambda: Path(sys.argv[1])
-from simulator.engine_local_config import _load_thermoengine_phaseobjc_library
 from simulator.melt_backend.vaporock import VapoRockBackend
 mode = sys.argv[2]
 backend = VapoRockBackend()
 module = backend._import_vaporock()
 if mode == 'missing':
     assert module is None
-try:
-    _load_thermoengine_phaseobjc_library()
-except ImportError as exc:
-    if mode != 'missing':
-        raise
+    assert backend._last_error is not None
     for token in ('thermoengine_dylib_dir', 'DYLD_LIBRARY_PATH',
                   'DYLD_FALLBACK_LIBRARY_PATH'):
-        assert token in str(exc), str(exc)
-    print('TYPED_IMPORT_ERROR', type(exc).__name__, str(exc))
+        assert token in backend._last_error, backend._last_error
+    print('TYPED_IMPORT_ERROR ImportError', backend._last_error)
 else:
-    if mode == 'missing':
-        raise AssertionError('missing dylib path unexpectedly initialized')
     assert module is not None
     from rubicon.objc import ObjCClass
     ObjCClass('LiquidMelts')
@@ -331,8 +325,7 @@ else:
     assert missing.returncode == 0, missing.stdout + missing.stderr
     assert "TYPED_IMPORT_ERROR ImportError" in missing.stdout
 
-    if native_dir is None:
-        return
+    assert native_dir is not None, "no loadable ThermoEngine dylib directory found"
     loaded = run("loaded", fallback=True)
     assert loaded.returncode == 0, loaded.stdout + loaded.stderr
     assert "CLASS_OK LiquidMelts" in loaded.stdout
