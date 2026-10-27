@@ -2149,6 +2149,15 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     f'status={projected.status}'
                 ),
             ]
+        elif notice is not None and result.status != 'ok':
+            # At or below the shared threshold, equilibrate() has already
+            # sent the projected bulk to MAGEMin. Preserve that failed solve
+            # under the same fields used by the over-threshold retry path so
+            # provider diagnostics keep its typed status and cause.
+            diagnostics['projected_liquidus_status'] = result.status
+            diagnostics['projected_liquidus_diagnostics'] = dict(
+                result.diagnostics or {}
+            )
         return LiquidusSolidusResult(
             liquidus_T_C=result.liquidus_T_C,
             liquidus_T_K=result.liquidus_T_K,
@@ -3364,7 +3373,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             component for component, value in source.items()
             if component not in order_set and value > 0.0
         )
-        if 'S' in dropped:
+        if db in {'ig', 'igad'} and 'S' in dropped:
             raise MeltCompositionError(
                 f'{OutOfDomainReason.FORBIDDEN_SPECIES.value}: S'
             )
