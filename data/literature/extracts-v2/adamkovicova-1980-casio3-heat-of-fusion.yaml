@@ -120,26 +120,67 @@ observations:
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'molar_heat_capacity'
+      tag: value
+      value: cp
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
     temperature_K:
       tag: unknown
       reason: source T_range_K [1829, 1961]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'molar_heat_capacity'; refusing to pick a number
+    kind: point
+    point: '149.85'
     approximate: false
   uncertainty:
     kind: printed
@@ -151,9 +192,14 @@ observations:
       value: measured_reduced
     original_method_class: measured_reduced
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_heat_capacity_stated
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 198
@@ -762,23 +808,67 @@ observations:
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'molar_heat_capacity'
+      tag: value
+      value: cp
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'molar_heat_capacity'; refusing to pick a number
+    kind: point
+    point: '146.54'
     approximate: false
   uncertainty:
     kind: printed
@@ -792,9 +882,14 @@ observations:
     attribution: Barin, Knacke and Kubaschewski (1977), Thermochemical Properties of Inorganic Substances, Supplement, pp.
       116–117, cited as [4].
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 198
@@ -805,23 +900,67 @@ observations:
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'molar_heat_capacity'
+      tag: value
+      value: cp
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'molar_heat_capacity'; refusing to pick a number
+    kind: point
+    point: '150.73'
     approximate: false
   uncertainty:
     kind: printed
@@ -835,9 +974,14 @@ observations:
     attribution: Barin, Knacke and Kubaschewski (1977), Thermochemical Properties of Inorganic Substances, Supplement, pp.
       116–117, cited as [4].
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_15073_quote
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 198
@@ -857,7 +1001,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -921,7 +1065,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -972,7 +1116,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -1035,20 +1179,20 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298 K)
     per:
-      tag: unknown
-      reason: no per mapped from source
+      tag: value
+      value: mol_species
     temperature_K:
       tag: value
       value: '1506'
@@ -1152,20 +1296,20 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298 K)
     per:
-      tag: unknown
-      reason: no per mapped from source
+      tag: value
+      value: mol_species
     temperature_K:
       tag: value
       value: '1576'
@@ -1269,20 +1413,20 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298 K)
     per:
-      tag: unknown
-      reason: no per mapped from source
+      tag: value
+      value: mol_species
     temperature_K:
       tag: value
       value: '1630'
@@ -1386,20 +1530,20 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298 K)
     per:
-      tag: unknown
-      reason: no per mapped from source
+      tag: value
+      value: mol_species
     temperature_K:
       tag: value
       value: '1678'
@@ -1503,20 +1647,20 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298 K)
     per:
-      tag: unknown
-      reason: no per mapped from source
+      tag: value
+      value: mol_species
     temperature_K:
       tag: value
       value: '1730'
@@ -1620,20 +1764,20 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
     subtype:
-      tag: unknown
-      reason: no subtype mapped from source
+      tag: value
+      value: H(T)-H(298 K)
     per:
-      tag: unknown
-      reason: no per mapped from source
+      tag: value
+      value: mol_species
     temperature_K:
       tag: value
       value: '1780'
@@ -1741,7 +1885,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -1825,7 +1969,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -1909,7 +2053,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -1993,7 +2137,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -2077,7 +2221,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -2161,7 +2305,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -2245,7 +2389,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -2300,7 +2444,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -2355,7 +2499,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -2410,7 +2554,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -2465,7 +2609,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -2520,7 +2664,7 @@ observations:
         reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
       polymorph:
         tag: value
-        value: alpha
+        value: pseudowollastonite
       charge:
         tag: value
         value: 0
@@ -2566,8 +2710,8 @@ observations:
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
   identity:
     quantity:
-      tag: value
-      value: H_minus_H298
+      tag: unknown
+      reason: unsupported quantity 'sample_dependent_enthalpy_change_on_cooling'
     species:
       formula: CaSiO3
       phase:
@@ -2580,54 +2724,12 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: unknown
-      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1829'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
   value:
-    kind: point
-    point: '217.1'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2658,34 +2760,12 @@ observations:
         page: 196
         pdf_page_index: 4
         table: III
-  derivation:
-    relation: negative_cooling_enthalpy_to_H_minus_H298
-    inputs:
-    - pdf:adamkovicova-1980-casio3-heat-of-fusion
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '217.1'
-        locator:
-          page: 196
-          pdf_page_index: 4
-          table: III
-    - - factor
-      - state:
-          tag: value
-          value: '1'
-        locator:
-          page: 196
-          pdf_page_index: 4
-          table: III
-    output_unit: kJ/mol
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
   identity:
     quantity:
-      tag: value
-      value: H_minus_H298
+      tag: unknown
+      reason: unsupported quantity 'sample_dependent_enthalpy_change_on_cooling'
     species:
       formula: CaSiO3
       phase:
@@ -2698,54 +2778,12 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: unknown
-      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1848'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
   value:
-    kind: point
-    point: '219.9'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2776,34 +2814,12 @@ observations:
         page: 196
         pdf_page_index: 4
         table: III
-  derivation:
-    relation: negative_cooling_enthalpy_to_H_minus_H298
-    inputs:
-    - pdf:adamkovicova-1980-casio3-heat-of-fusion
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '219.9'
-        locator:
-          page: 196
-          pdf_page_index: 4
-          table: III
-    - - factor
-      - state:
-          tag: value
-          value: '1'
-        locator:
-          page: 196
-          pdf_page_index: 4
-          table: III
-    output_unit: kJ/mol
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
   identity:
     quantity:
-      tag: value
-      value: H_minus_H298
+      tag: unknown
+      reason: unsupported quantity 'sample_dependent_enthalpy_change_on_cooling'
     species:
       formula: CaSiO3
       phase:
@@ -2816,54 +2832,12 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: unknown
-      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1859'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
   value:
-    kind: point
-    point: '222.2'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2894,34 +2868,12 @@ observations:
         page: 196
         pdf_page_index: 4
         table: III
-  derivation:
-    relation: negative_cooling_enthalpy_to_H_minus_H298
-    inputs:
-    - pdf:adamkovicova-1980-casio3-heat-of-fusion
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '222.2'
-        locator:
-          page: 196
-          pdf_page_index: 4
-          table: III
-    - - factor
-      - state:
-          tag: value
-          value: '1'
-        locator:
-          page: 196
-          pdf_page_index: 4
-          table: III
-    output_unit: kJ/mol
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
   identity:
     quantity:
-      tag: value
-      value: H_minus_H298
+      tag: unknown
+      reason: unsupported quantity 'sample_dependent_enthalpy_change_on_cooling'
     species:
       formula: CaSiO3
       phase:
@@ -2934,54 +2886,12 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: unknown
-      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1915'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
   value:
-    kind: point
-    point: '230.5'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -3012,34 +2922,12 @@ observations:
         page: 196
         pdf_page_index: 4
         table: III
-  derivation:
-    relation: negative_cooling_enthalpy_to_H_minus_H298
-    inputs:
-    - pdf:adamkovicova-1980-casio3-heat-of-fusion
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '230.5'
-        locator:
-          page: 196
-          pdf_page_index: 4
-          table: III
-    - - factor
-      - state:
-          tag: value
-          value: '1'
-        locator:
-          page: 196
-          pdf_page_index: 4
-          table: III
-    output_unit: kJ/mol
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
   identity:
     quantity:
-      tag: value
-      value: H_minus_H298
+      tag: unknown
+      reason: unsupported quantity 'sample_dependent_enthalpy_change_on_cooling'
     species:
       formula: CaSiO3
       phase:
@@ -3052,54 +2940,12 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: unknown
-      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1961'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
   value:
-    kind: point
-    point: '238.9'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -3130,28 +2976,6 @@ observations:
         page: 196
         pdf_page_index: 4
         table: III
-  derivation:
-    relation: negative_cooling_enthalpy_to_H_minus_H298
-    inputs:
-    - pdf:adamkovicova-1980-casio3-heat-of-fusion
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '238.9'
-        locator:
-          page: 196
-          pdf_page_index: 4
-          table: III
-    - - factor
-      - state:
-          tag: value
-          value: '1'
-        locator:
-          page: 196
-          pdf_page_index: 4
-          table: III
-    output_unit: kJ/mol
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1829:h=cf370c06c383
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
