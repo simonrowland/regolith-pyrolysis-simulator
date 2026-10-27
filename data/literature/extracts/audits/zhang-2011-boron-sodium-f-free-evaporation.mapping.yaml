@@ -12,7 +12,7 @@ tables:
     caption: Chemical compositions of the designed slag specimens (mass%).
     required_columns: [Brand, CaO, SiO2, Al2O3, Na2O, B2O3, TiO2]
     mapping: species.slag.context[zhang_2011_designed_slag_compositions_table1].values.table_1_rows[].composition_wt_pct
-    printed_body_rows: 6
+    printed_body_rows: 5
     printed_numeric_cells: 30
     render_verified: true
     render_reason: Table cells absent from pdftotext; hand-transcribed and every numeric cell checked against page render.
@@ -21,7 +21,7 @@ tables:
     caption: Chemical compositions of post-measured slag (mass%).
     required_columns: [Brand, CaO, SiO2, Al2O3, Na2O, B2O3, TiO2]
     mapping: species.slag.context[zhang_2011_analyzed_slag_compositions_table2].values.table_2_rows[].composition_wt_pct and per-row identity composition for Table 6
-    printed_body_rows: 6
+    printed_body_rows: 5
     printed_numeric_cells: 30
     render_verified: true
     render_reason: Table cells absent from pdftotext; hand-transcribed and every numeric cell checked against page render.
@@ -62,8 +62,8 @@ tables:
     render_verified: true
     render_reason: Table cells absent from pdftotext; hand-transcribed and every numeric cell checked against page render.
 expected_table_counts:
-  table_1_body_rows: 6
-  table_2_body_rows: 6
+  table_1_body_rows: 5
+  table_2_body_rows: 5
   table_3_body_rows: 4
   table_4_body_rows: 2
   table_5_body_rows: 2
@@ -77,6 +77,8 @@ table_tool_status:
   printed_numeric_cells_audited: 99
   audit_result: all_matches
 migrator_identity_gap:
-  location: simulator/battery/migrate.py:16645-16654
-  behavior: projected_oxide_map overwrites an explicit point_conditions.composition and uses the observation locator, p8/table6.
-  expected_after_fix: keep each explicit point_conditions.composition at p2/table2 and project that printed composition into identity.composition for all nine Table 6 rows; total pressure and fO2 remain unknown.
+  current_unknown_fill: simulator/battery/migrate.py:16287-16309
+  behavior: mass_loss_rate identity filling does not copy the explicit point_conditions.composition into identity.composition.
+  conditional_locator_overwrite: simulator/battery/migrate.py:16645-16654
+  overwrite_condition: when projected_oxide_map exists without composition_located, the branch replaces point_conditions.composition using the observation locator; this extract has no projected row oxide map.
+  expected_after_fix: copy the existing p2/table2 point composition into identity.composition for all nine Table 6 rows; keep total pressure and fO2 unknown.

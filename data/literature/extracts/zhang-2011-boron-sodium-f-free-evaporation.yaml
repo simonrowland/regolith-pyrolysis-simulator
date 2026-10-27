@@ -349,7 +349,7 @@ species:
           furnace: SETARAM TGA 92
           crucible: platinum; sample suspended by platinum wire in even-temperature zone
           sample_charge_geometry: liquid slag surface to crucible end distance is L in the model; no numerical L or crucible dimensions are stated
-          premelt_charge_mass_g: 50
+          xrf_analysis_aliquot_mass_g: 50
           premelt_schedule: dried 4 h at 200 C; heated to 1400 C at 5 C/min
           test_atmosphere: argon
           reaction_tube_evacuation_min: 5
@@ -409,6 +409,7 @@ species:
       - observation_id: zhang_2011_apparent_activation_energy_figure9
         type: model_comparison
         locator: {page: 4, figure: '9'}
+        units: kJ/mol
         values:
           quantity: apparent_activation_energy_comparison
           evidence_class: quoted_attributed
