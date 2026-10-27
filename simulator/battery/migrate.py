@@ -6371,6 +6371,13 @@ class CompilationColumnSeries:
     cell_uncertainties: tuple[Decimal | None, ...] = ()
 
 
+_PANKRATZ_H298_REFERENCE_K = {
+    "pankratz-1984-usbm-b677": Decimal("298.15"),
+    "pankratz-1987-usbm-b689": Decimal("298.15"),
+    "pankratz-1994-usbm-b696": Decimal("298.15"),
+}
+
+
 def _normalize_compilation_column_label(label: str) -> str:
     """Collapse published heading spellings (LaTeX / unicode) to a map key."""
 
@@ -19073,6 +19080,7 @@ class Migrator:
         evidence: Evidence,
         temperature_K: Decimal | State[Decimal] | None = None,
         standard_pressure_Pa: Decimal | None = None,
+        subtype: str | None = None,
         uncertainty: Uncertainty | None = None,
         method: State[MethodToken] | None = None,
         equipment: object = None,
@@ -19091,6 +19099,8 @@ class Migrator:
             ident_kwargs["temperature_K"] = State.of(temperature_K)
         if standard_pressure_Pa is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(standard_pressure_Pa)
+        if subtype is not None:
+            ident_kwargs["subtype"] = State.of(subtype)
         if per is not None:
             ident_kwargs["per"] = per if isinstance(per, State) else State.of(per)
         if reaction is not None:
@@ -20075,8 +20085,20 @@ class Migrator:
                     )
             # One observation per declared mapped series; never first-numeric-cell.
             read_from = choose_read_from(work, locator)
+            reference_temperature = _PANKRATZ_H298_REFERENCE_K.get(source_id)
             for index, series in enumerate(column_series):
                 suffix = _compilation_series_obs_suffix(series)
+                if (
+                    series.quantity is Quantity.H_MINUS_H298
+                    and reference_temperature is not None
+                ):
+                    enthalpy_subtype = _format_enthalpy_increment_subtype(
+                        reference_temperature
+                    )
+                    enthalpy_per = PerBasis.MOL_SPECIES
+                else:
+                    enthalpy_subtype = None
+                    enthalpy_per = None
                 self._generic_obs(
                     work=work,
                     source_id=source_id,
@@ -20089,6 +20111,8 @@ class Migrator:
                     evidence=evidence,
                     temperature_K=series.temperature_K,
                     standard_pressure_Pa=p_std,
+                    subtype=enthalpy_subtype,
+                    per=enthalpy_per,
                     method=State.of(MethodToken.TABULATION),
                     derivation=_compilation_conversion_derivation(
                         series.unit_trail,
