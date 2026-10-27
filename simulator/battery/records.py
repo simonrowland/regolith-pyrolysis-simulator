@@ -32,6 +32,8 @@ from simulator.battery.enums import (
     AmountBasis,
     AssetRole,
     Authority,
+    BoundDirection,
+    BoundInclusivity,
     BenchAbsenceReason,
     BenchIdentityBasis,
     CellMaterial,
@@ -335,6 +337,7 @@ def charge_value(species: Species) -> int | None:
 class ReactionTerm:
     species: Species
     coefficient: Fraction
+    standard_state: State[StandardState] | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "coefficient", as_fraction(self.coefficient))
@@ -537,7 +540,12 @@ def _is_source_internally_inconsistent(
 _VALUE_PAYLOAD = {
     ValueKind.POINT: ("point",),
     ValueKind.SERIES: ("series",),
-    ValueKind.BOUND: ("bound_operator", "bound_value"),
+    ValueKind.BOUND: (
+        "bound_operator",
+        "bound_value",
+        "bound_direction",
+        "bound_inclusivity",
+    ),
     ValueKind.INTERVAL: ("interval_low", "interval_high"),
     ValueKind.ORDERING: ("ordering",),
     ValueKind.CATEGORICAL: ("categorical",),
@@ -562,6 +570,23 @@ _NUMERIC_VALUE_KINDS = frozenset(
     }
 )
 
+_BOUND_OPERATOR_SEMANTICS = {
+    ">": (BoundDirection.LOWER, BoundInclusivity.EXCLUDED),
+    ">=": (BoundDirection.LOWER, BoundInclusivity.INCLUDED),
+    "≥": (BoundDirection.LOWER, BoundInclusivity.INCLUDED),
+    "<": (BoundDirection.UPPER, BoundInclusivity.EXCLUDED),
+    "<=": (BoundDirection.UPPER, BoundInclusivity.INCLUDED),
+    "≤": (BoundDirection.UPPER, BoundInclusivity.INCLUDED),
+}
+
+
+def _bound_operator_semantics(
+    operator: str | None,
+) -> tuple[BoundDirection, BoundInclusivity] | None:
+    """Typed meaning of comparator bounds, shared by record and source readers."""
+
+    return _BOUND_OPERATOR_SEMANTICS.get(operator) if operator is not None else None
+
 
 def _require_finite(name: str, value: Decimal) -> None:
     if not value.is_finite():
@@ -577,6 +602,8 @@ class Value:
     series: tuple[tuple[Decimal, Decimal], ...] | None = None
     bound_operator: str | None = None
     bound_value: Decimal | None = None
+    bound_direction: BoundDirection | None = None
+    bound_inclusivity: BoundInclusivity | None = None
     interval_low: Decimal | None = None
     interval_high: Decimal | None = None
     ordering: tuple[str, ...] | None = None
@@ -614,8 +641,41 @@ class Value:
                 _require_finite("Value.series value", val)
             object.__setattr__(self, "series", series)
         elif kind is ValueKind.BOUND:
-            if self.bound_operator is None or self.bound_value is None:
-                raise ValueError("Value.bound requires operator and value")
+            if self.bound_operator is None and self.bound_direction is None:
+                raise ValueError("Value.bound requires operator or direction")
+            if self.bound_direction is not None:
+                object.__setattr__(
+                    self, "bound_direction", BoundDirection(self.bound_direction)
+                )
+                if self.bound_inclusivity is None:
+                    raise ValueError(
+                        "direction-only Value.bound requires inclusivity"
+                    )
+            if self.bound_inclusivity is not None:
+                object.__setattr__(
+                    self,
+                    "bound_inclusivity",
+                    BoundInclusivity(self.bound_inclusivity),
+                )
+                if self.bound_direction is None:
+                    raise ValueError(
+                        "Value.bound inclusivity requires direction"
+                    )
+            operator_semantics = _bound_operator_semantics(self.bound_operator)
+            if self.bound_direction is not None and self.bound_operator is not None:
+                if operator_semantics is None:
+                    raise ValueError(
+                        "Value.bound operator is unsupported with direction metadata"
+                    )
+                if operator_semantics != (
+                    self.bound_direction,
+                    self.bound_inclusivity,
+                ):
+                    raise ValueError(
+                        "Value.bound operator conflicts with direction or inclusivity"
+                    )
+            if self.bound_value is None:
+                raise ValueError("Value.bound requires value")
             bound = as_decimal(self.bound_value)
             _require_finite("Value.bound_value", bound)
             object.__setattr__(self, "bound_value", bound)

@@ -69,6 +69,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import (
     Identity,
+    bar_to_pa,
     identity_equal,
     profile_for,
     quantity_token,
@@ -83,6 +84,7 @@ from simulator.battery.records import (
     Reaction,
     Residual,
     Species,
+    StandardState,
     SourceMethodUncertainty,
     State,
     SweepGas,
@@ -570,7 +572,18 @@ def _check_identity(
     *,
     source_id: str | None = None,
 ) -> None:
-    _check_species(f"{path}.species", identity.species, issues)
+    q = quantity_token(identity)
+    if identity.species is None:
+        if q is not Quantity.LOG10_K_REACTION:
+            issues.append(
+                _issue(
+                    f"{path}.species",
+                    RefusalReason.IDENTITY_INCOMPLETE,
+                    "species anchor is required for this quantity",
+                )
+            )
+    else:
+        _check_species(f"{path}.species", identity.species, issues)
     profile_outcome = validate_quantity_profile(identity)
     if profile_outcome.kind is IdentityEqualKind.INVALID_IDENTITY:
         issues.append(
@@ -616,6 +629,77 @@ def _check_identity(
             )
         for i, term in enumerate(identity.reaction.value.terms):
             _check_species(f"{path}.reaction.terms[{i}].species", term.species, issues)
+            if q is not Quantity.LOG10_K_REACTION:
+                continue
+            term_path = f"{path}.reaction.terms[{i}]"
+            if phase_token(term.species) is None:
+                issues.append(
+                    _issue(
+                        f"{term_path}.species.phase",
+                        RefusalReason.IDENTITY_INCOMPLETE,
+                        "reaction K term phase is unknown",
+                    )
+                )
+            state = term.standard_state
+            if state is None or not state.is_value or state.value is None:
+                issues.append(
+                    _issue(
+                        f"{term_path}.standard_state",
+                        RefusalReason.IDENTITY_INCOMPLETE,
+                        "reaction K term requires a resolved standard state",
+                    )
+                )
+                continue
+            standard = state.value
+            if not isinstance(standard, StandardState):
+                issues.append(
+                    _issue(
+                        f"{term_path}.standard_state",
+                        RefusalReason.INVALID_IDENTITY,
+                        "reaction K term standard_state must contain a StandardState",
+                    )
+                )
+                continue
+            standard_phase = phase_token(standard.endmember)
+            term_phase = phase_token(term.species)
+            if standard.endmember.formula != term.species.formula:
+                issues.append(
+                    _issue(
+                        f"{term_path}.standard_state.endmember",
+                        RefusalReason.INVALID_IDENTITY,
+                        "term standard-state endmember formula must match the reaction species",
+                    )
+                )
+            elif standard_phase is None:
+                issues.append(
+                    _issue(
+                        f"{term_path}.standard_state.endmember.phase",
+                        RefusalReason.IDENTITY_INCOMPLETE,
+                        "term standard-state endmember phase is unknown",
+                    )
+                )
+            elif term_phase is not None and standard_phase is not term_phase:
+                issues.append(
+                    _issue(
+                        f"{term_path}.standard_state.endmember.phase",
+                        RefusalReason.INVALID_IDENTITY,
+                        "term standard-state phase must match the reaction species phase",
+                    )
+                )
+            if (
+                standard.reference_pressure_bar is not None
+                and identity.standard_pressure_Pa is not None
+                and identity.standard_pressure_Pa.is_value
+                and identity.standard_pressure_Pa.value
+                != bar_to_pa(standard.reference_pressure_bar)
+            ):
+                issues.append(
+                    _issue(
+                        f"{term_path}.standard_state.reference_pressure_bar",
+                        RefusalReason.INVALID_IDENTITY,
+                        "term standard-state pressure conflicts with reaction standard_pressure_Pa",
+                    )
+                )
     if (
         identity.formation_elements is not None
         and identity.formation_elements.is_value
@@ -648,7 +732,7 @@ def _check_identity(
         )
     if identity.reservoir is not None and identity.reservoir.is_value and identity.reservoir.value is not None:
         _check_species(f"{path}.reservoir", identity.reservoir.value, issues)
-        if quantity_token(identity) is Quantity.P_SAT:
+        if quantity_token(identity) is Quantity.P_SAT and identity.species is not None:
             src = identity.reservoir.value
             if src.formula != identity.species.formula:
                 issues.append(

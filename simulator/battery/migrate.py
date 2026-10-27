@@ -66,6 +66,8 @@ from simulator.battery.enums import (
     AmountBasis,
     AssetRole,
     Authority,
+    BoundDirection,
+    BoundInclusivity,
     EvidenceClass,
     ExperimentKind,
     FUSION_QUANTITIES,
@@ -162,6 +164,7 @@ from simulator.battery.records import (
     Uncertainty,
     Value,
     Work,
+    _bound_operator_semantics,
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
     as_decimal,
@@ -480,6 +483,7 @@ QUANTITY_ALIASES = {
     "negative_enthalpy_change_on_cooling": Quantity.H_MINUS_H298,
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
+    "reaction_equilibrium_constant": Quantity.LOG10_K_REACTION,
     "log10_K_star_equilibrium_fit": Quantity.LOG10_K_STAR,
     "activity": Quantity.ACTIVITY,
     "raoultian_activity": Quantity.ACTIVITY,
@@ -766,6 +770,18 @@ def _provenance_from_extract(
         if isinstance(candidate, Mapping):
             selected = dict(candidate)
             break
+    if quantity is Quantity.LOG10_K_REACTION:
+        for name in (
+            "reaction_as_printed",
+            "standard_state_as_published",
+            "log_base_as_published",
+            "units_as_published",
+            "qualifier_as_published",
+        ):
+            value = values.get(name, obs.get(name))
+            if value is not None:
+                selected = dict(selected or {})
+                selected.setdefault(name, value)
     method_text = " ".join(
         str(values[key])
         for key in ("method", "experimental_method", "method_as_printed")
@@ -1585,6 +1601,13 @@ def _reaction_from_plain(payload: object) -> Reaction:
             ReactionTerm(
                 species=_species_from_plain(item["species"]),
                 coefficient=item["coefficient"],
+                standard_state=(
+                    None
+                    if item.get("standard_state") is None
+                    else _state_from_plain(
+                        item["standard_state"], _standard_state_from_plain
+                    )
+                ),
             )
         )
     return Reaction(terms=tuple(terms))
@@ -1689,7 +1712,11 @@ def _identity_from_plain(payload: object) -> Identity:
     assert isinstance(payload, Mapping)
     kwargs: dict[str, Any] = {
         "quantity": _state_from_plain(payload["quantity"], lambda v: Quantity(str(v))),
-        "species": _species_from_plain(payload["species"]),
+        "species": (
+            None
+            if payload.get("species") is None
+            else _species_from_plain(payload["species"])
+        ),
     }
     if payload.get("valence_basis") is not None:
         kwargs["valence_basis"] = _state_from_plain(
@@ -1864,6 +1891,12 @@ def _value_from_plain(payload: object) -> Value:
         kwargs["bound_operator"] = str(payload["bound_operator"])
     if payload.get("bound_value") is not None:
         kwargs["bound_value"] = as_decimal(payload["bound_value"])
+    if payload.get("bound_direction") is not None:
+        kwargs["bound_direction"] = BoundDirection(str(payload["bound_direction"]))
+    if payload.get("bound_inclusivity") is not None:
+        kwargs["bound_inclusivity"] = BoundInclusivity(
+            str(payload["bound_inclusivity"])
+        )
     if payload.get("interval_low") is not None:
         kwargs["interval_low"] = as_decimal(payload["interval_low"])
     if payload.get("interval_high") is not None:
@@ -8738,7 +8771,7 @@ def _enthalpy_increment_subtype(
 
 def fill_identity(
     quantity: Quantity | State[Quantity],
-    species: Species,
+    species: Species | None,
     **known: Any,
 ) -> Identity:
     """Fill required/uncompared axes as unknown and permitted axes as N/A.
@@ -8911,6 +8944,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "log10_formation_equilibrium_constant",
         "value",
     ),
+    Quantity.LOG10_K_REACTION: ("log10_K_reaction", "value"),
     Quantity.LOG10_K_STAR: (
         "log10_K_star",
         "value",
@@ -9979,6 +10013,167 @@ def _selection_from_named_field(
         return None
     if q_token is Quantity.FE3_FE2_RATIO:
         return _fe3_fe2_ratio_selection(payload, condition_ranges)
+    if q_token is Quantity.LOG10_K_REACTION:
+        for key in QUANTITY_SOURCE_FIELDS[q_token]:
+            if key not in payload:
+                continue
+            base_raw = payload.get("log_base_as_published")
+            base_token = (
+                ""
+                if base_raw in (None, "")
+                else str(base_raw).strip().casefold()
+            )
+            base_is_log10 = base_token in {
+                "10",
+                "10.0",
+                "base10",
+                "base 10",
+                "base-10",
+                "common",
+                "common log",
+                "common logarithm",
+                "log10",
+            }
+            encoding_reason = None
+            if base_token and not base_is_log10:
+                encoding_reason = (
+                    "printed reaction equilibrium constant has unsupported "
+                    f"log base {base_raw!r}"
+                )
+            printed_units = _printed_unit_for_field(payload, key) or units
+            unit_token = (
+                ""
+                if printed_units in (None, "")
+                else str(printed_units).strip().casefold()
+            )
+            compact_units = re.sub(r"[\s_]", "", unit_token).replace("₁₀", "10")
+            units_are_log10 = compact_units in {
+                "log10k",
+                "log10(k)",
+                "log10keq",
+                "log10(keq)",
+                "commonlogk",
+                "commonlogarithmk",
+                "commonlogarithmofk",
+            }
+            dimensionless_units = unit_token in {
+                "1",
+                "dimensionless",
+                "unitless",
+                "",
+            }
+            if unit_token and not units_are_log10 and not dimensionless_units:
+                encoding_reason = (
+                    f"printed reaction equilibrium constant units {printed_units!r} "
+                    "do not establish log10 K"
+                )
+            establishes_log10 = (
+                key == "log10_K_reaction" or base_is_log10 or units_are_log10
+            )
+            if not establishes_log10:
+                encoding_reason = (
+                    "printed reaction equilibrium constant does not establish base-10 log K"
+                )
+            if encoding_reason is not None:
+                return _unavailable_selection(
+                    encoding_reason,
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                )
+            amount = _numeric_field(payload, key)
+            if amount is None:
+                return _unavailable_selection(
+                    f"{key} is not a numeric log10 reaction equilibrium constant",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                )
+            operator_raw = payload.get("bound_operator")
+            operator = (
+                str(operator_raw).strip()
+                if operator_raw not in (None, "")
+                else None
+            )
+            operator_metadata = _bound_operator_semantics(operator)
+            qualifier_direction = None
+            qualifier = payload.get("qualifier_as_published")
+            if isinstance(qualifier, str):
+                normalized_qualifier = qualifier.strip().casefold().rstrip(".")
+                if normalized_qualifier in {"min", "minimum"}:
+                    qualifier_direction = BoundDirection.LOWER
+                elif normalized_qualifier in {"max", "maximum"}:
+                    qualifier_direction = BoundDirection.UPPER
+            direction_raw = payload.get("bound_direction")
+            if direction_raw is None:
+                direction_raw = qualifier_direction or (
+                    operator_metadata[0] if operator_metadata is not None else None
+                )
+            if operator is not None and operator_metadata is None:
+                return _unavailable_selection(
+                    "log10 reaction equilibrium bound has an unsupported comparator",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                )
+            if direction_raw is not None:
+                try:
+                    direction = BoundDirection(direction_raw)
+                    explicit_inclusivity = payload.get("bound_inclusivity")
+                    inclusivity = (
+                        BoundInclusivity(explicit_inclusivity)
+                        if explicit_inclusivity is not None
+                        else (
+                            operator_metadata[1]
+                            if operator_metadata is not None
+                            else BoundInclusivity.UNKNOWN
+                        )
+                    )
+                except (TypeError, ValueError):
+                    return _unavailable_selection(
+                        "log10 reaction equilibrium bound has an invalid direction or inclusivity",
+                        condition_ranges=condition_ranges,
+                        unused_ancillary=_unused_ancillary(payload, key),
+                        field_name=key,
+                    )
+                if (
+                    qualifier_direction is not None
+                    and qualifier_direction is not direction
+                ):
+                    return _unavailable_selection(
+                        "log10 reaction equilibrium bound direction conflicts with its printed qualifier",
+                        condition_ranges=condition_ranges,
+                        unused_ancillary=_unused_ancillary(payload, key),
+                        field_name=key,
+                    )
+                bound_payload = {
+                    "kind": ValueKind.BOUND.value,
+                    "bound_value": amount,
+                    "bound_direction": direction.value,
+                    "bound_inclusivity": inclusivity.value,
+                }
+                if operator is not None:
+                    bound_payload["bound_operator"] = operator
+                try:
+                    value = _value_from_plain(bound_payload)
+                except (TypeError, ValueError) as exc:
+                    return _unavailable_selection(
+                        f"log10 reaction equilibrium bound is inconsistent: {exc}",
+                        condition_ranges=condition_ranges,
+                        unused_ancillary=_unused_ancillary(payload, key),
+                        field_name=key,
+                    )
+            else:
+                return _point_selection(
+                    amount, key, "identity:log10", payload, condition_ranges
+                )
+            return SourceSelection(
+                value=value,
+                field_name=key,
+                unit_trail="identity:log10",
+                unused_ancillary=_unused_ancillary(payload, key),
+                condition_ranges=condition_ranges,
+            )
     for key in QUANTITY_SOURCE_FIELDS.get(q_token, ()):
         if key not in payload:
             continue
@@ -14121,7 +14316,8 @@ class Migrator:
         self._count(source_key).observations_out += 1
         if source_row_index is not None:
             self._obs_row_index[oid] = source_row_index
-        poly = observation.identity.species.polymorph
+        species = observation.identity.species
+        poly = None if species is None else species.polymorph
         if poly is not None and poly.is_unknown:
             from simulator.battery.polymorph_dictionary import (
                 unrecognised_polymorph_reason,
@@ -14854,8 +15050,9 @@ class Migrator:
             ).oxygen_partial_pressure_Pa
             if (
                 source is None or source.source_id != source_id
-                or source.identity.species.formula not in {"O", "O2"}
                 or _quantity_token(source.identity.quantity) is not Quantity.P_PARTIAL
+                or source.identity.species is None
+                or source.identity.species.formula not in {"O", "O2"}
                 or point is None or point != printed
             ):
                 self.result.registry_issues.append(ValidationIssue(
@@ -15514,7 +15711,16 @@ class Migrator:
                 observation_id=obs_id,
             )
 
-        p_sel = select_declared_source(AXIS_STANDARD_PRESSURE_PA, None, values)
+        standard_pressure_values = values
+        if q_token is Quantity.LOG10_K_REACTION:
+            standard_pressure_values = {
+                key: values[key]
+                for key in ("reference_pressure_Pa", "standard_pressure_Pa")
+                if key in values
+            }
+        p_sel = select_declared_source(
+            AXIS_STANDARD_PRESSURE_PA, None, standard_pressure_values
+        )
         p_std = p_sel.amount if p_sel.available else None
         if p_std is not None:
             measured.gibbs_reference_pressures += 1
@@ -15795,6 +16001,21 @@ class Migrator:
                 q_token = None
             else:
                 ident_kwargs["valence_basis"] = State.of(valence_basis)
+        if q_token is Quantity.LOG10_K_REACTION:
+            identity_payload = obs.get("identity")
+            raw_reaction = values.get("reaction", obs.get("reaction"))
+            if raw_reaction is None and isinstance(identity_payload, Mapping):
+                raw_reaction = identity_payload.get("reaction")
+            try:
+                ident_kwargs["reaction"] = (
+                    State.of(_reaction_from_plain(raw_reaction))
+                    if isinstance(raw_reaction, Mapping)
+                    else State.unknown("source does not provide a structured reaction")
+                )
+            except (KeyError, TypeError, ValueError) as exc:
+                ident_kwargs["reaction"] = State.unknown(
+                    f"source structured reaction is invalid: {exc}"
+                )
         value, exploded, value_sel = empty_value_from_payload(
             values, obs_type, obs.get("units"), quantity=quantity
         )
@@ -16437,7 +16658,7 @@ class Migrator:
         identity_for_profile = (
             Identity(
                 quantity=State.of(q_token),
-                species=species,
+                species=None if q_token is Quantity.LOG10_K_REACTION else species,
                 **ident_kwargs,
             )
             if isinstance(q_token, Quantity)
@@ -16473,7 +16694,11 @@ class Migrator:
             for item in experiment_provenance
             if any(item.startswith(f"identity.{name}=") for name in inherited_identity_fields)
         )
-        identity = fill_identity(quantity, species, **ident_kwargs)
+        identity = fill_identity(
+            quantity,
+            None if q_token is Quantity.LOG10_K_REACTION else species,
+            **ident_kwargs,
+        )
         partial_total_condition = _partial_pressure_point_condition(
             ident_kwargs, locator
         )
@@ -20333,6 +20558,9 @@ class Migrator:
 
         def measurement_key(observation_id: str) -> tuple[object, ...] | None:
             observation = observations[observation_id]
+            species = observation.identity.species
+            if species is None:
+                return None
             temperature = observation.identity.temperature_K
             if temperature is None or not temperature.is_value:
                 return None
@@ -20341,7 +20569,7 @@ class Migrator:
             row_key = row_match.group(1) if row_match is not None else None
             return (
                 temperature.value,
-                observation.identity.species.formula,
+                species.formula,
                 time_min.state.value
                 if time_min is not None and time_min.state.is_value
                 else None,
