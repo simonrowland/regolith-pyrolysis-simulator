@@ -2724,8 +2724,8 @@ def _product_story_payload(
     account_kg=None,
     extracted_projection=None,
 ):
-    # Keep web's stage-provenance mapping; the shared classifier supplies only
-    # unavailable flags for these existing product totals.
+    # Keep web's stage-provenance mapping; the shared classifier owns refusal
+    # status and excluded quantities for these existing product totals.
     if classification is None:
         classification = classify_products(sim)
     if account_kg is None:
@@ -2863,10 +2863,13 @@ def _product_story_payload(
         if not isinstance(source, Mapping):
             continue
         flag = source.get('flag')
-        if not isinstance(flag, Mapping) or flag.get('status') != 'unavailable':
+        if not isinstance(flag, Mapping):
             continue
-        story[name]['class_total_kg'] = None
         story[name]['flag'] = dict(flag)
+        story[name]['status'] = flag.get('status')
+        story[name]['excluded'] = list(source.get('excluded', ()))
+        if flag.get('status') == 'unavailable':
+            story[name]['class_total_kg'] = None
     if story['oxygen'].get('class_total_kg') is None:
         story['oxygen']['partition_kg'] = dict.fromkeys(
             story['oxygen']['partition_kg']
@@ -2876,16 +2879,19 @@ def _product_story_payload(
         rump_flag = rump.get('flag')
         if (
             isinstance(rump_flag, Mapping)
-            and rump_flag.get('status') == 'unavailable'
+            and rump_flag.get('status') in {'partial', 'unavailable'}
         ):
+            story['terminal_residue']['flag'] = dict(rump_flag)
+            story['terminal_residue']['status'] = rump_flag.get('status')
+            story['terminal_residue']['excluded'] = list(rump.get('excluded', ()))
             for field, source_field in (
                 ('silicate_residual_kg', 'rump_silicate_residual_kg'),
                 ('unextracted_metals_kg', 'rump_unextracted_metals_kg'),
             ):
                 if source_field in rump and rump[source_field] is None:
-                    story['terminal_residue'][field] = None
-                    story['terminal_residue']['class_total_kg'] = None
-                    story['terminal_residue']['flag'] = dict(rump_flag)
+                    if rump_flag.get('status') == 'unavailable':
+                        story['terminal_residue'][field] = None
+                        story['terminal_residue']['class_total_kg'] = None
     return story
 
 
