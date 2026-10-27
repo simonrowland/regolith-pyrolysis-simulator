@@ -38,6 +38,36 @@ tables:
       AlSi8Mg8Na5: {SiO2: '71.02', Al2O3: '15.87', MgO: '8.30', Na2O: '4.45'}
       AlSi8Mg8Na7: {SiO2: '68.64', Al2O3: '16.70', MgO: '7.25', Na2O: '7.37'}
     blank_cells: remain unreported; they are not converted to zero.
+extract_mapping:
+  table_values:
+    - table: '1'
+      role: incomplete boiler-slag composition retained verbatim for the typed refusal; totals 92.9 mass percent.
+    - table: '2'
+      role: exact model-sorbent compositions bound to prose activity observations.
+      activity_observations:
+        - {species: Na2O, row: AlSi8Na1, activity_as_published: 'about 5 × 10^-14'}
+        - {species: Na2O, row: AlSi8Mg8Na1, activity_as_published: 'about 2 × 10^-13'}
+      printed_body_rows: 14
+  emit_tool: 'The seat version of mineru_table_draft.py supports convert and compare; it has no emit command. Composition mapping was transcribed from the generated table draft and manually assembled into the extract.'
+  compare_output: 'matched=0 no-match=0 mismatch=0 presence-only=0 locator-error=0 unverifiable=0 total=0'
+  compare_note: 'Neither table contains an activity value; the admitted numeric activities are printed in prose. Table composition cells are checked by the cell audit above.'
+full_cell_audit:
+  table_1:
+    - 'PDF p. 2 / Table 1 / header SiO2 through P2O5; all eight cells agree between MinerU and pdftotext, with row and column placement checked against the 200-dpi render.'
+    - 'PDF p. 2 / Table 1 / sole composition row: 36.2, 27.0, 14.4, 9.1, 2.5, 2.1, 1.2, 0.4; MinerU and pdftotext agree on all digits; render confirms order.'
+  table_2:
+    - 'PDF p. 2 / Table 2 / header and all 14 sorbent names; render confirms row order and six columns.'
+    - 'PDF p. 2 / Table 2 / all 49 nonblank numeric cells; MinerU and pdftotext agree on digits; render confirms cell assignments. Blank cells remain unreported.'
+  prose_values:
+    - 'PDF p. 2 / printed p. 2594 / experimental setup, apparatus vacuum, KEMS cross sections, and pure-silver calibration statement; pdftotext agrees with the 200-dpi render.'
+    - 'PDF p. 3 / printed p. 2595 / Eq. 2, Eq. 3 and assumptions; pdftotext agrees with the 200-dpi render.'
+    - 'PDF p. 3 / printed p. 2595 / untreated and additive-group Na2O/K2O activities at 1400 °C; values and grouping checked against render; grouped slag summaries are typed-refused.'
+    - 'PDF p. 4 / printed p. 2596 / about 0.6 Pa, 0.3 Pa and 50% reduction; text agrees with render; gas species is not printed, so values are typed-refused.'
+    - 'PDF p. 5 / printed p. 2597 / 5 × 10^-14 and 2 × 10^-13 at 1400 °C; text agrees with render; bound to Table 2 rows AlSi8Na1 and AlSi8Mg8Na1.'
+    - 'PDF p. 5 / printed p. 2597 / about 2-times comparison; text agrees with render; retained typed-refused because it has no absolute values, one composition, or a specific temperature.'
+    - 'PDF p. 5 / printed p. 2597 / kinetic caveat: AlSi8Na1 partly molten and AlSi8Na05 almost unmolten; checked against render; the low-Na caveat is preserved in the audit, not promoted to an equilibrium measurement.'
+  render_pages: [2, 3, 4, 5]
+  render_resolution_dpi: 200
 prose_numeric_candidates:
   - page: 3
     values: ['3e-10', '2e-10', '6e-11', '2.5e-12', '1.2e-12', '5e-13']
@@ -54,6 +84,9 @@ prose_numeric_candidates:
   - page: 5
     values: ['about 3 orders of magnitude', '2.5 orders of magnitude']
     note: Relative Na2O and K2O activities of model sorbents against slag additives; no absolute values printed.
+  - page: 5
+    values: ['nearly the same', 'same range']
+    note: Relative Na2O activity statements for AlSi8Na1 versus AlSi8Na3K3 and AlSi8Mg4Na03 versus AlSi8Na1; no pointwise values are printed.
 figure_read_candidates:
   - 'Figures 3 and 4: boiler-slag Na2O and K2O activity curves.'
   - 'Figures 5-9: calculated Fig. 5 excluded; measured model-sorbent activity curves in Figs. 6-9 are not digitized.'
