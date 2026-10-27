@@ -1,0 +1,30 @@
+source_id: kim-2004-na2o-float-glass-emf
+source_order:
+  - MinerU table draft and markdown
+  - pdftotext-layout
+  - rendered page only for the full-cell and row/column audit
+tables:
+  p002-t01:
+    printed_locator: {page: 2, table: '1'}
+    caption: The composition of the molten float glass
+    rows: 9
+    columns: {1: component, 2: content_m_o}
+    destination: species.Na2O.context[kim_2004_table1_float_glass_composition].values.rows_as_printed
+    render_audit: all 9 component/value row assignments and digits confirmed on 200 dpi page render
+    qa_disagreement: MinerU QA reported numeric agreement 0.846 and two normalized numeric mismatches; render and exact text layer agree on all nine printed values
+  p003-t02:
+    printed_locator: {page: 3, table: '2'}
+    caption: Activities of Na2O in sodium silicate melt
+    rows: 9
+    columns: {1: temperature_K, 2: measurement_1_EMF_mV, 3: measurement_1_activity, 4: measurement_2_EMF_mV, 5: measurement_2_activity}
+    destination: species.Na2O.observations[kim_2004_table2_silicate_*]
+    render_audit: all 9 temperature and populated EMF/activity cells and their measurement-series columns confirmed on 200 dpi page render
+    qa_numeric_agreement: 1.0
+  p004-t03:
+    printed_locator: {page: 4, table: '3'}
+    caption: Activities of Na2O in molten float glass
+    rows: 8
+    columns: {1: temperature_K, 2: measurement_1_elevating_EMF_mV, 3: measurement_1_elevating_activity, 4: measurement_1_lowering_EMF_mV, 5: measurement_1_lowering_activity, 6: measurement_2_EMF_mV, 7: measurement_2_activity}
+    destination: species.Na2O.observations[kim_2004_table3_glass_*]
+    render_audit: all 8 temperature and populated EMF/activity cells and their measurement-series columns confirmed on 200 dpi page render
+    qa_numeric_agreement: 1.0
