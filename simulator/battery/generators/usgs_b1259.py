@@ -42,7 +42,10 @@ from simulator.battery.identity import (
     log10K_from_delta_fG_kJ_mol,
 )
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
-from simulator.battery.polymorph_dictionary import resolve_printed_name_polymorph
+from simulator.battery.polymorph_dictionary import (
+    resolve_printed_name_polymorph,
+    unrecognised_polymorph_state,
+)
 from simulator.battery.stable_ids import tabulated_cell_suffix
 from simulator.battery.records import (
     Admission,
@@ -1352,6 +1355,16 @@ def _phase_state(record: Mapping[str, Any]) -> tuple[State[Phase], State[Polymor
         named = _polymorph_from_text(name_text)
         if named.is_value:
             polymorph = named
+    explicit_polymorph = next(
+        (
+            str(correction.get("printed_token"))
+            for correction in (record.get("corrections") or ())
+            if correction.get("field") == "polymorph"
+        ),
+        None,
+    )
+    if explicit_polymorph:
+        polymorph = unrecognised_polymorph_state(explicit_polymorph)
     return phase, polymorph
 
 

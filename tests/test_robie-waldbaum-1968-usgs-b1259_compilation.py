@@ -77,6 +77,42 @@ IMAGE_VERIFIED_NONMONOTONE_GIBBS = (
     "112.22",
 )
 
+ENGINE_CARRIED_FORMULA_PINS = (
+    ("b1259-298k-0122-corundum", "Al2O3", "A1 2°3", 22),
+    ("b1259-298k-0147-hematite", "Fe2O3", "Fe 2°3", 23),
+    ("b1259-298k-0182-a-quartz", "SiO2", "Si02", 24),
+    ("b1259-298k-0184-o-cristobalite", "SiO2", "Si02", 24),
+    ("b1259-298k-0185-o-tridymite", "SiO2", "Si°2", 24),
+    ("b1259-298k-0193-rutile", "TiO2", "Ti0 2", 24),
+    ("b1259-298k-0203-chromite", "FeCr2O4", "FeCr204", 25),
+    ("b1259-298k-0207-spinel", "MgAl2O4", "MgAl204", 25),
+    ("b1259-298k-0239-magnesite", "MgCO3", "MgC0 3", 27),
+    ("b1259-298k-0281-kyanite", "Al2SiO5", "A1 2 Si°5", 29),
+    ("b1259-298k-0282-andalusite", "Al2SiO5", "Al 2 Si0 5", 29),
+    ("b1259-298k-0283-sillimanite", "Al2SiO5", "A12 Si°5", 29),
+    ("b1259-298k-0288-gehlenite", "Ca2Al2SiO7", "Ca 2 Al2 Si0 7", 29),
+    ("b1259-298k-0293-akermanite", "Ca2MgSi2O7", "Ca 2 MgSi20 7", 29),
+    ("b1259-298k-0295-fayalite", "Fe2SiO4", "Fe 2 Si04", 29),
+    ("b1259-298k-0301-wollastonite", "CaSiO3", "CaSiOj", 29),
+    ("b1259-298k-0310-anorthite", "CaAl2Si2O8", "CaAl2 Si20 8", 30),
+    ("b1259-ht-0068-corundum", "Al2O3", "Al O", 99),
+    ("b1259-ht-0086-hematite", "Fe2O3", "Fe 2 0 3", 117),
+    ("b1259-ht-0112-quartz", "SiO2", "Si0 2", 143),
+    ("b1259-ht-0113-cristobalite", "SiO2", "SiO", 144),
+    ("b1259-ht-0114-tridymite", "SiO2", "SiO_", 145),
+    ("b1259-ht-0129-chromite", "FeCr2O4", "FeCr.O,", 160),
+    ("b1259-ht-0133-spinel", "MgAl2O4", "MgAl2 0 4", 164),
+    ("b1259-ht-0159-magnesite", "MgCO3", "MgCO", 190),
+    ("b1259-ht-0177-kyanite", "Al2SiO5", "Al 2 Si0 5", 208),
+    ("b1259-ht-0178-andalusite", "Al2SiO5", "Al 2 Si0 5", 209),
+    ("b1259-ht-0179-sillimanite", "Al2SiO5", "Al Si0 5", 210),
+    ("b1259-ht-0183-gehlenite", "Ca2Al2SiO7", "Ca 2 Al Si0 7", 214),
+    ("b1259-ht-0186-akermanite", "Ca2MgSi2O7", "Ca 2 MgSi 20 7", 217),
+    ("b1259-ht-0188-fayalite", "Fe2SiO4", "Fe 2 Si0 4", 219),
+    ("b1259-ht-0193-wollastonite", "CaSiO3", "CaSi0 3", 224),
+    ("b1259-ht-0201-anorthite", "CaAl2Si2O8", "CaAl Si_0 0", 232),
+)
+
 
 @pytest.fixture(scope="module")
 def corpus():
@@ -198,23 +234,21 @@ def test_engine_carried_formulas_match_image_verified_pages(corpus):
         for correction in manifest["corrections"]
     }
 
-    for (pdf_page, name), (record_id, raw, printed) in loader.IMAGE_VERIFIED_298K_FORMULAS.items():
+    for record_id, printed, raw, pdf_page in ENGINE_CARRIED_FORMULA_PINS:
         record = by_id[record_id]
-        assert (record["pdf_page"], record["name_as_published"]) == (pdf_page, name)
+        assert record["pdf_page"] == pdf_page
         assert record["formula_as_published"] == printed
         assert record["formula"] == printed
         assert parse_species_formula(record["formula"]) is not None
-        correction_id = (
-            f"b1259-p{record['pdf_page']}-formula_as_published-298k-"
-            f"{record_id.removeprefix('b1259-298k-')}"
-        )
         correction = next(
             item
             for item in record["corrections"]
-            if item["correction_id"] == correction_id
+            if item["field"] == "formula_as_published"
+            and item["printed_token"] == printed
         )
-        assert correction == corrections[correction_id]
+        assert correction == corrections[correction["correction_id"]]
         assert correction["layout_as_extracted"] == raw
+        assert correction["pdf_page"] == pdf_page
 
     engine_carried_ht_pages = {
         99, 117, 143, 144, 145, 160, 164, 190,

@@ -173,6 +173,12 @@ IMAGE_VERIFIED_298K_FORMULAS = {
     (29, "Wollastonite"): ("b1259-298k-0301-wollastonite", "CaSiOj", "CaSiO3"),
     (30, "Anorthite"): ("b1259-298k-0310-anorthite", "CaAl2 Si20 8", "CaAl2Si2O8"),
 }
+IMAGE_VERIFIED_298K_POLYMORPHS = {
+    (30, "Hexagonal Anorthite"): (
+        "b1259-298k-0311-hexagonal-anorthite",
+        "hexagonal",
+    ),
+}
 IMAGE_VERIFIED_CELLS = {
     47: [(700, 2, "H_minus_H298", "2.808")],
     50: [(1700, 1, "delta_f_H", ".000")],
@@ -1923,6 +1929,26 @@ def _apply_298k_image_verified_formula(record: dict) -> None:
     )
 
 
+def _apply_298k_image_verified_polymorph(record: dict) -> None:
+    correction = IMAGE_VERIFIED_298K_POLYMORPHS.get(
+        (record.get("pdf_page"), record.get("name_as_published"))
+    )
+    if correction is None:
+        return
+    record_id, printed = correction
+    record.setdefault("corrections", []).append(
+        {
+            "correction_id": f"b1259-p{record['pdf_page']}-polymorph-298k-{record_id.removeprefix('b1259-298k-')}",
+            "record_id": record_id,
+            "pdf_page": record["pdf_page"],
+            "field": "polymorph",
+            "layout_as_extracted": "",
+            "printed_token": printed,
+            "evidence": f"PDF page {record['pdf_page']} image visibly prints the qualifier {printed!r}",
+        }
+    )
+
+
 def _apply_298k_image_verified_cells(record: dict) -> None:
     for field in ("gram_formula_weight", "entropy", "molar_volume", "delta_f_H", "delta_f_G", "log_Kf"):
         cell = record.get(field) or {}
@@ -2116,6 +2142,7 @@ def parse_298k_pages(pages: dict[int, str]) -> list[dict]:
                     "_seq": seq,
                 }
             _apply_298k_image_verified_formula(record)
+            _apply_298k_image_verified_polymorph(record)
             _apply_298k_image_verified_identity(record)
             _apply_298k_image_verified_cells(record)
             records.append(record)
