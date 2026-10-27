@@ -107,6 +107,7 @@ APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
     {"cached_interpolated", "cached_physics_bucket"}
 )
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
+GATE_CURVE_NOTICE_KEYS = ('composition_projected_notice', 'gate_provider_refusal')
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
@@ -2677,28 +2678,58 @@ class GateCurveProviderOutcome(str, Enum):
     NO_PROVIDER = "no_provider"
     PRODUCED = "produced"
     STABLE_REFUSAL = "stable_refusal"
+    NUMERICAL_FAILURE = "numerical_failure"
     FAILED = "failed"
 
 
 _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS = frozenset({
     "engine_crash",
-    "engine_worker_timeout",
     "engine_worker_unavailable",
     "missing_binary",
-    "negative_convergence_evidence",
-    "no_convergence",
     "nonzero_exit",
     "parse_empty_output",
-    "phase_mass_incomplete",
-    "smoke_equilibrium_timeout",
     "subprocess_died",
     "subprocess_fe_free_absolute_fo2_crash",
     "system_output_missing",
     "thermoengine_adapter_unavailable",
-    "timeout",
-    "warm_call_equilibrium_timeout",
     "worker_pool_error",
+    "engineworkerdied",
+    "engineworkerunavailable",
+    "engineworkerpoollifecycleerror",
+    "mageminprocessexit",
+    "filenotfounderror",
+    "permissionerror",
+    "oserror",
 })
+
+
+def gate_curve_provider_diagnostic_reasons(
+    diagnostic: Mapping[str, Any] | None,
+) -> tuple[str, ...]:
+    """Read reason codes through both provider and projected-solve wrappers."""
+    from engines.domain_reason import reason_value
+
+    if not isinstance(diagnostic, Mapping):
+        return ()
+    reasons = []
+    for field in (
+        "backend_status_reason", "backend_failure_reason_code", "reason", "reason_refused",
+        "backend_failure_exception", "backend_failure_disposition",
+    ):
+        value = reason_value(diagnostic.get(field))
+        if value is not None and value.strip():
+            reasons.append(value.strip().lower())
+    for field in ("backend_diagnostics", "projected_liquidus_diagnostics"):
+        reasons.extend(gate_curve_provider_diagnostic_reasons(diagnostic.get(field)))
+    return tuple(reasons)
+
+
+def gate_curve_provider_timed_out(diagnostic: Mapping[str, Any] | None) -> bool:
+    return any(
+        "timeout" in reason
+        or reason in {"aggregate_budget_exceeded", "mageminaggregatebudgetexceeded"}
+        for reason in gate_curve_provider_diagnostic_reasons(diagnostic)
+    )
 
 
 def gate_curve_provider_outcome_for_status(
@@ -2718,30 +2749,56 @@ def gate_curve_provider_outcome_for_status(
     )
 
     normalized_status = str(status).strip().lower()
-    reasons: list[str] = []
-    if isinstance(diagnostic, Mapping):
-        for field in (
-            "backend_status_reason",
-            "backend_failure_reason_code",
-            "reason",
-            "reason_refused",
-        ):
-            value = reason_value(diagnostic.get(field))
-            if value is not None and value.strip():
-                reasons.append(value.strip().lower())
+    reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
+    if "environment" in reasons:
+        return GateCurveProviderOutcome.FAILED
+    if any(reason in {
+        "missing_input", "invalid_input", "invalid_fo2_log",
+        "invalid_pressure_bar", "non_finite_composition",
+    } for reason in reasons):
+        return GateCurveProviderOutcome.FAILED
+    numerical_reasons = {
+        "not_converged", "engine_not_converged", "negative_convergence_evidence",
+        "no_convergence", "phase_mass_incomplete",
+    }
     transient_reasons = {
         reason_value(reason).lower()
         for reason in TRANSIENT_OUT_OF_DOMAIN_REASONS
     } | _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS
+    if gate_curve_provider_timed_out(diagnostic) or any(
+        reason in transient_reasons - numerical_reasons for reason in reasons
+    ):
+        return GateCurveProviderOutcome.FAILED
+    nested_outcomes = []
+    if isinstance(diagnostic, Mapping):
+        backend = diagnostic.get("backend_diagnostics")
+        if isinstance(backend, Mapping):
+            nested_outcomes.append(gate_curve_provider_outcome_for_status(
+                backend.get("backend_status") or status, backend,
+            ))
+        # A projected solve ran on a valid bulk. Its unavailable result is
+        # numerical unless the preserved reason identifies an environment failure.
+        projected_status = diagnostic.get("projected_liquidus_status")
+        if projected_status is not None:
+            nested_outcomes.append(
+                GateCurveProviderOutcome.NUMERICAL_FAILURE
+                if projected_status == "unavailable"
+                else gate_curve_provider_outcome_for_status(
+                    projected_status, diagnostic.get("projected_liquidus_diagnostics"),
+                )
+            )
     stable_reasons = {
         reason_value(reason).lower()
         for reason in STABLE_OUT_OF_DOMAIN_REASONS
     }
-    if any(
-        reason in transient_reasons
-        for reason in reasons
-    ):
+    if GateCurveProviderOutcome.FAILED in nested_outcomes:
         return GateCurveProviderOutcome.FAILED
+    if (
+        GateCurveProviderOutcome.NUMERICAL_FAILURE in nested_outcomes
+        or normalized_status == "not_converged"
+        or any(reason in numerical_reasons for reason in reasons)
+    ):
+        return GateCurveProviderOutcome.NUMERICAL_FAILURE
     if normalized_status == "ok":
         return GateCurveProviderOutcome.PRODUCED
     if normalized_status in {"out_of_domain", "unsupported", "refused"}:
@@ -3770,9 +3827,10 @@ def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
             for point in tuple(curve.get("path") or ())
         ],
     }
-    notice = curve.get("composition_projected_notice")
-    if isinstance(notice, Mapping):
-        payload["composition_projected_notice"] = _json_ready(notice)
+    for notice_key in GATE_CURVE_NOTICE_KEYS:
+        notice = curve.get(notice_key)
+        if isinstance(notice, Mapping):
+            payload[notice_key] = _json_ready(notice)
     return payload
 
 
@@ -3786,9 +3844,10 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
             for point in payload.get("path", ())
         ),
     }
-    notice = payload.get("composition_projected_notice")
-    if isinstance(notice, Mapping):
-        curve["composition_projected_notice"] = dict(notice)
+    for notice_key in GATE_CURVE_NOTICE_KEYS:
+        notice = payload.get(notice_key)
+        if isinstance(notice, Mapping):
+            curve[notice_key] = dict(notice)
     return curve
 
 
@@ -3860,6 +3919,8 @@ def _gate_provider_role_for_key(sim: Any) -> str:
         is not None
     ):
         return "authoritative"
+    if getattr(sim, '_liquid_fraction_provider', None) == 'magemin':
+        return "fallback"
     authorized_name = _cached_real_authorized_backend_name(sim)
     if (
         _is_alphamelts_authorized_name(authorized_name)

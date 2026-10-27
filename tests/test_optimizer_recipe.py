@@ -113,8 +113,11 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # 2584074346931c132b487ffb6ce56511d26f76805d63bcfa14eb996d1fe5ea57.
     # The combined t-1457 C0 contract and b154 Stage-6/7 bands produce the
     # resolved digest below.
+    # b-1043: the resolved-setpoints leaf chemistry_kernel.liquid_fraction_provider
+    # is now "magemin". Removing only that leaf recovers 911f820f...;
+    # EvalSpec's matching gate-input leaf is pinned separately below.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "911f820f280e2141010189a727b3a8dcbce5c65826a1960f25f9d26465926b4a"
+        "b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
@@ -707,7 +710,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # coating_max_upstream_wall_deposit_fraction_per_campaign = 5e-4. Removing
     # that one threshold from the default constraint payload restores
     # f6d1c88b.... recipe_id is unchanged. The key carries no run result.
-    assert cache_key(spec) == "368ca7f8131d3652aea965f3106bad89afeab89a35478a660eeb0c61fd8fc6d4"
+    # b-1043: canonical EvalSpec adds chemistry_kernel.liquid_fraction_provider
+    # = "magemin". Removing only this input leaf recovers 368ca7f8...;
+    # the resolved-setpoints leaf above is the other changed pin, not key material.
+    assert cache_key(spec) == "121793938a461ee049568da3161697a0e791e3d3597e673ab61b14847faecb23"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

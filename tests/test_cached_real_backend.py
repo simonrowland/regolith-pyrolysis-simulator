@@ -540,6 +540,7 @@ def _build_cached_real_sim(
     normalized = normalize_cached_real_config(cache_config)
     sim.configure_pt0_determinism_store(build_cached_real_store(normalized))
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    register_synthetic_gate_curve_producer(sim)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     return sim
 
@@ -563,6 +564,7 @@ def _build_direct_real_sim(backend, *, db_path: Path | None = None):
         PT0DeterminismStore("capture", db_path=db_path)
     )
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    register_synthetic_gate_curve_producer(sim)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     return sim
 
@@ -1851,9 +1853,9 @@ def _provider_id(provider: Any) -> str | None:
     return str(provider.capability_profile().provider_id)
 
 
-def _authoritative_gate_curve() -> dict[str, Any]:
+def _magemin_gate_curve() -> dict[str, Any]:
     return {
-        "source": "gate_liquid_fraction",
+        "source": "gate_liquid_fraction:fallback:magemin-shadow",
         "solidus_T_C": 1210.0,
         "liquidus_T_C": 1320.0,
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
@@ -1954,7 +1956,7 @@ def test_cached_real_equilibrium_key_uses_alphamelts_provider_identity(
     assert live_key["namespace_id"] == replay_key["namespace_id"]
 
 
-def test_cached_real_gate_curve_key_uses_alphamelts_authoritative_provenance(
+def test_cached_real_gate_curve_key_uses_declared_provider_provenance(
     tmp_path: Path,
 ) -> None:
     live_config = _cache_config(
@@ -2009,11 +2011,11 @@ def test_cached_real_gate_curve_key_uses_alphamelts_authoritative_provenance(
     assert live_key["namespace_id"] == replay_key["namespace_id"]
 
 
-def test_cached_real_authoritative_gate_curve_live_fill_replay_hits(
+def test_cached_real_declared_gate_curve_live_fill_replay_hits(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    _install_gate_curve_binding_receipt(tmp_path, monkeypatch, "alphamelts")
+    _install_gate_curve_binding_receipt(tmp_path, monkeypatch, "magemin")
     db_path = tmp_path / "cached-real.db"
     live_config = _cache_config(
         db_path,
@@ -2032,7 +2034,7 @@ def test_cached_real_authoritative_gate_curve_live_fill_replay_hits(
         cache_config=live_config,
     )
     fO2_log = live_sim._compute_intrinsic_melt_fO2()
-    curve = _authoritative_gate_curve()
+    curve = _magemin_gate_curve()
 
     seed_gate_curve_memo_record(live_sim, curve)
     live_sim._pt0_store().capture_gate_curve(
@@ -2066,7 +2068,8 @@ def test_cached_real_authoritative_gate_curve_live_fill_replay_hits(
     replay_key = replay_sim._pt0_store().replay_sequence[-1]["key"]
 
     assert replay_key == live_key
-    assert live_key["namespace_id"] == "alphamelts:freeze-gate-curve"
+    # The synthetic gate backend has no real-engine authority.
+    assert live_key["namespace_id"] == "internal-analytical:freeze-gate-curve"
     assert "provider_selection" not in replay_key
     assert replay_sim._pt0_store().last_cache_state == "cached_exact"
     assert replay_sim._pt0_store().summary()["misses"] == 0
@@ -2082,7 +2085,7 @@ def test_cached_real_skips_direct_alphamelts_unavailable_equilibrium_cache(
     )
     direct_result = direct_sim._get_equilibrium()
     fO2_log = direct_sim._compute_intrinsic_melt_fO2()
-    curve = _authoritative_gate_curve()
+    curve = _magemin_gate_curve()
     direct_sim._pt0_store().capture_gate_curve(
         direct_sim,
         fO2_log=fO2_log,
@@ -2112,7 +2115,7 @@ def test_direct_alphamelts_fallback_gate_curve_replay_exact_hits(
     )
     register_synthetic_gate_curve_producer(direct_sim)
     fallback_curve = {
-        **_authoritative_gate_curve(),
+        **_magemin_gate_curve(),
         "source": "gate_liquid_fraction:fallback:magemin-shadow",
     }
 
@@ -2149,18 +2152,18 @@ def test_cached_real_direct_alphamelts_gate_curve_engine_change_is_key_neutral(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     db_path = tmp_path / "cached-real.db"
-    _install_gate_curve_binding_receipt(tmp_path, monkeypatch, "alphamelts")
+    _install_gate_curve_binding_receipt(tmp_path, monkeypatch, "magemin")
     direct_backend = AlphaMELTSBackend()
     assert direct_backend.initialize({})
     from simulator.engine_binding_admission import publish_live_backend_admission
 
     publish_live_backend_admission(direct_backend)
     direct_sim = _build_direct_real_sim(direct_backend, db_path=db_path)
-    seed_gate_curve_memo_record(direct_sim, _authoritative_gate_curve())
+    seed_gate_curve_memo_record(direct_sim, _magemin_gate_curve())
     direct_sim._pt0_store().capture_gate_curve(
         direct_sim,
         fO2_log=direct_sim._compute_intrinsic_melt_fO2(),
-        curve=_authoritative_gate_curve(),
+        curve=_magemin_gate_curve(),
     )
     direct_gate_key = direct_sim._pt0_store().capture_sequence[-1]["key"]
 
@@ -2169,8 +2172,6 @@ def test_cached_real_direct_alphamelts_gate_curve_engine_change_is_key_neutral(
         "fail-loud",
         name="alphamelts",
         version="alphamelts-test 2.0.0",
-        model=direct_gate_key["model"]["model"],
-        mode=direct_gate_key["model"]["mode"],
     )
     replay_backend = resolve_backend(
         "cached-real",
@@ -2188,7 +2189,7 @@ def test_cached_real_direct_alphamelts_gate_curve_engine_change_is_key_neutral(
     )
     replay_key = replay_sim._pt0_store().replay_sequence[-1]["key"]
 
-    assert replayed == _authoritative_gate_curve()
+    assert replayed == _magemin_gate_curve()
     assert replay_key == direct_gate_key
     assert replay_sim._pt0_store().summary()["misses"] == 0
 
@@ -2210,7 +2211,7 @@ def test_cached_real_refuses_authoritative_gate_cache_for_fallback_curve(
     )
     sim = _build_cached_real_sim(backend=backend, cache_config=cache_config)
     curve = {
-        **_authoritative_gate_curve(),
+        **_magemin_gate_curve(),
         "source": "gate_liquid_fraction:fallback:magemin-shadow",
     }
 

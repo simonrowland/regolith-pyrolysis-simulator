@@ -141,6 +141,93 @@
         "temperature_C": 225.0
       },
       "oxygen_kg": 0.0,
+      "oxygen_reservoir": {
+        "exchange_clamped": false,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "liquid_fraction_gate": {
+          "evaporation": {},
+          "liquid_fraction": {
+            "composition_projected_notice": {
+              "authority": "extrapolated",
+              "certified_band": {
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ],
+                "database": "ig",
+                "engine": "magemin"
+              },
+              "dropped_components": [
+                {
+                  "component": "MnO",
+                  "mass_fraction": 0.0020586721564590836
+                },
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.0010293360782295418
+                }
+              ],
+              "kind": "composition_projected",
+              "reason": "composition_projected"
+            },
+            "liquid_fraction": 0.0,
+            "liquidus_T_C": 1370.3125,
+            "solidus_T_C": 918.75,
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "status": "ok"
+          },
+          "provider": "magemin",
+          "redox": {
+            "composition_projected_notice": {
+              "authority": "extrapolated",
+              "certified_band": {
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ],
+                "database": "ig",
+                "engine": "magemin"
+              },
+              "dropped_components": [
+                {
+                  "component": "MnO",
+                  "mass_fraction": 0.0020586721564590836
+                },
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.0010293360782295418
+                }
+              ],
+              "kind": "composition_projected",
+              "reason": "composition_projected"
+            },
+            "liquidus_T_C": 1370.3125,
+            "solidus_T_C": 918.75,
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "status": "ok"
+          }
+        }
+      },
       "pO2_mbar": 9.0,
       "p_total_mbar": 9.0,
       "payload_version": 4,
@@ -212,6 +299,93 @@
         "mass_balance_pct": 1.1368683772161604e-14,
         "mre_current_A": 0.0,
         "mre_voltage_V": 0.0,
+        "oxygen_reservoir": {
+          "exchange_clamped": false,
+          "exchange_direction": "none:no_melt_redox_capacity",
+          "exchange_o2_mol": 0.0,
+          "exchange_unbacked_o2_mol": 0.0,
+          "liquid_fraction_gate": {
+            "evaporation": {},
+            "liquid_fraction": {
+              "composition_projected_notice": {
+                "authority": "extrapolated",
+                "certified_band": {
+                  "bulk_components": [
+                    "SiO2",
+                    "Al2O3",
+                    "CaO",
+                    "MgO",
+                    "FeOt",
+                    "K2O",
+                    "Na2O",
+                    "TiO2",
+                    "O",
+                    "Cr2O3",
+                    "H2O"
+                  ],
+                  "database": "ig",
+                  "engine": "magemin"
+                },
+                "dropped_components": [
+                  {
+                    "component": "MnO",
+                    "mass_fraction": 0.0020586721564590836
+                  },
+                  {
+                    "component": "P2O5",
+                    "mass_fraction": 0.0010293360782295418
+                  }
+                ],
+                "kind": "composition_projected",
+                "reason": "composition_projected"
+              },
+              "liquid_fraction": 0.0,
+              "liquidus_T_C": 1370.3125,
+              "solidus_T_C": 918.75,
+              "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+              "status": "ok"
+            },
+            "provider": "magemin",
+            "redox": {
+              "composition_projected_notice": {
+                "authority": "extrapolated",
+                "certified_band": {
+                  "bulk_components": [
+                    "SiO2",
+                    "Al2O3",
+                    "CaO",
+                    "MgO",
+                    "FeOt",
+                    "K2O",
+                    "Na2O",
+                    "TiO2",
+                    "O",
+                    "Cr2O3",
+                    "H2O"
+                  ],
+                  "database": "ig",
+                  "engine": "magemin"
+                },
+                "dropped_components": [
+                  {
+                    "component": "MnO",
+                    "mass_fraction": 0.0020586721564590836
+                  },
+                  {
+                    "component": "P2O5",
+                    "mass_fraction": 0.0010293360782295418
+                  }
+                ],
+                "kind": "composition_projected",
+                "reason": "composition_projected"
+              },
+              "liquidus_T_C": 1370.3125,
+              "solidus_T_C": 918.75,
+              "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+              "status": "ok"
+            }
+          }
+        },
         "pO2_bar": 0.0,
         "redox_source_breakdown": {
           "applied_terms_mol_o2_equiv_by_label": {},
@@ -613,6 +787,93 @@
       "mass_balance_pct": 1.1368683772161604e-14,
       "mre_current_A": 0.0,
       "mre_voltage_V": 0.0,
+      "oxygen_reservoir": {
+        "exchange_clamped": false,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "liquid_fraction_gate": {
+          "evaporation": {},
+          "liquid_fraction": {
+            "composition_projected_notice": {
+              "authority": "extrapolated",
+              "certified_band": {
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ],
+                "database": "ig",
+                "engine": "magemin"
+              },
+              "dropped_components": [
+                {
+                  "component": "MnO",
+                  "mass_fraction": 0.0020586721564590836
+                },
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.0010293360782295418
+                }
+              ],
+              "kind": "composition_projected",
+              "reason": "composition_projected"
+            },
+            "liquid_fraction": 0.0,
+            "liquidus_T_C": 1370.3125,
+            "solidus_T_C": 918.75,
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "status": "ok"
+          },
+          "provider": "magemin",
+          "redox": {
+            "composition_projected_notice": {
+              "authority": "extrapolated",
+              "certified_band": {
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ],
+                "database": "ig",
+                "engine": "magemin"
+              },
+              "dropped_components": [
+                {
+                  "component": "MnO",
+                  "mass_fraction": 0.0020586721564590836
+                },
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.0010293360782295418
+                }
+              ],
+              "kind": "composition_projected",
+              "reason": "composition_projected"
+            },
+            "liquidus_T_C": 1370.3125,
+            "solidus_T_C": 918.75,
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "status": "ok"
+          }
+        }
+      },
       "pO2_bar": 0.0,
       "redox_source_breakdown": {
         "applied_terms_mol_o2_equiv_by_label": {},
@@ -875,6 +1136,93 @@
         "temperature_C": 255.0
       },
       "oxygen_kg": 0.0,
+      "oxygen_reservoir": {
+        "exchange_clamped": false,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "liquid_fraction_gate": {
+          "evaporation": {},
+          "liquid_fraction": {
+            "composition_projected_notice": {
+              "authority": "extrapolated",
+              "certified_band": {
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ],
+                "database": "ig",
+                "engine": "magemin"
+              },
+              "dropped_components": [
+                {
+                  "component": "MnO",
+                  "mass_fraction": 0.0020586721564590836
+                },
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.0010293360782295418
+                }
+              ],
+              "kind": "composition_projected",
+              "reason": "composition_projected"
+            },
+            "liquid_fraction": 0.0,
+            "liquidus_T_C": 1370.3125,
+            "solidus_T_C": 918.75,
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "status": "ok"
+          },
+          "provider": "magemin",
+          "redox": {
+            "composition_projected_notice": {
+              "authority": "extrapolated",
+              "certified_band": {
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ],
+                "database": "ig",
+                "engine": "magemin"
+              },
+              "dropped_components": [
+                {
+                  "component": "MnO",
+                  "mass_fraction": 0.0020586721564590836
+                },
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.0010293360782295418
+                }
+              ],
+              "kind": "composition_projected",
+              "reason": "composition_projected"
+            },
+            "liquidus_T_C": 1370.3125,
+            "solidus_T_C": 918.75,
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "status": "ok"
+          }
+        }
+      },
       "pO2_mbar": 9.0,
       "p_total_mbar": 9.0,
       "payload_version": 4,
@@ -946,6 +1294,93 @@
         "mass_balance_pct": 1.1368683772161604e-14,
         "mre_current_A": 0.0,
         "mre_voltage_V": 0.0,
+        "oxygen_reservoir": {
+          "exchange_clamped": false,
+          "exchange_direction": "none:no_melt_redox_capacity",
+          "exchange_o2_mol": 0.0,
+          "exchange_unbacked_o2_mol": 0.0,
+          "liquid_fraction_gate": {
+            "evaporation": {},
+            "liquid_fraction": {
+              "composition_projected_notice": {
+                "authority": "extrapolated",
+                "certified_band": {
+                  "bulk_components": [
+                    "SiO2",
+                    "Al2O3",
+                    "CaO",
+                    "MgO",
+                    "FeOt",
+                    "K2O",
+                    "Na2O",
+                    "TiO2",
+                    "O",
+                    "Cr2O3",
+                    "H2O"
+                  ],
+                  "database": "ig",
+                  "engine": "magemin"
+                },
+                "dropped_components": [
+                  {
+                    "component": "MnO",
+                    "mass_fraction": 0.0020586721564590836
+                  },
+                  {
+                    "component": "P2O5",
+                    "mass_fraction": 0.0010293360782295418
+                  }
+                ],
+                "kind": "composition_projected",
+                "reason": "composition_projected"
+              },
+              "liquid_fraction": 0.0,
+              "liquidus_T_C": 1370.3125,
+              "solidus_T_C": 918.75,
+              "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+              "status": "ok"
+            },
+            "provider": "magemin",
+            "redox": {
+              "composition_projected_notice": {
+                "authority": "extrapolated",
+                "certified_band": {
+                  "bulk_components": [
+                    "SiO2",
+                    "Al2O3",
+                    "CaO",
+                    "MgO",
+                    "FeOt",
+                    "K2O",
+                    "Na2O",
+                    "TiO2",
+                    "O",
+                    "Cr2O3",
+                    "H2O"
+                  ],
+                  "database": "ig",
+                  "engine": "magemin"
+                },
+                "dropped_components": [
+                  {
+                    "component": "MnO",
+                    "mass_fraction": 0.0020586721564590836
+                  },
+                  {
+                    "component": "P2O5",
+                    "mass_fraction": 0.0010293360782295418
+                  }
+                ],
+                "kind": "composition_projected",
+                "reason": "composition_projected"
+              },
+              "liquidus_T_C": 1370.3125,
+              "solidus_T_C": 918.75,
+              "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+              "status": "ok"
+            }
+          }
+        },
         "pO2_bar": 0.009000000000000001,
         "redox_source_breakdown": {
           "applied_terms_mol_o2_equiv_by_label": {},
@@ -1347,6 +1782,93 @@
       "mass_balance_pct": 1.1368683772161604e-14,
       "mre_current_A": 0.0,
       "mre_voltage_V": 0.0,
+      "oxygen_reservoir": {
+        "exchange_clamped": false,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "liquid_fraction_gate": {
+          "evaporation": {},
+          "liquid_fraction": {
+            "composition_projected_notice": {
+              "authority": "extrapolated",
+              "certified_band": {
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ],
+                "database": "ig",
+                "engine": "magemin"
+              },
+              "dropped_components": [
+                {
+                  "component": "MnO",
+                  "mass_fraction": 0.0020586721564590836
+                },
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.0010293360782295418
+                }
+              ],
+              "kind": "composition_projected",
+              "reason": "composition_projected"
+            },
+            "liquid_fraction": 0.0,
+            "liquidus_T_C": 1370.3125,
+            "solidus_T_C": 918.75,
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "status": "ok"
+          },
+          "provider": "magemin",
+          "redox": {
+            "composition_projected_notice": {
+              "authority": "extrapolated",
+              "certified_band": {
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ],
+                "database": "ig",
+                "engine": "magemin"
+              },
+              "dropped_components": [
+                {
+                  "component": "MnO",
+                  "mass_fraction": 0.0020586721564590836
+                },
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.0010293360782295418
+                }
+              ],
+              "kind": "composition_projected",
+              "reason": "composition_projected"
+            },
+            "liquidus_T_C": 1370.3125,
+            "solidus_T_C": 918.75,
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "status": "ok"
+          }
+        }
+      },
       "pO2_bar": 0.009000000000000001,
       "redox_source_breakdown": {
         "applied_terms_mol_o2_equiv_by_label": {},

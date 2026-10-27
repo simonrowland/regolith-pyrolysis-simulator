@@ -25,6 +25,8 @@ def _repo_setpoints() -> dict:
 
 
 def _sim(setpoints: dict) -> PyrolysisSimulator:
+    setpoints = deepcopy(setpoints)
+    setpoints.setdefault("chemistry_kernel", {})["liquid_fraction_provider"] = "analytical"
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
