@@ -41,6 +41,8 @@ from engines.builtin.vapor_pressure import (
     require_antoine_source_certified_temperature,
 )
 from simulator.equilibrium import EquilibriumMixin
+from simulator.physical_constants import GAS_CONSTANT
+from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.ledger import AtomLedger
 from simulator.chemistry.ellingham_thermo import (
@@ -1715,7 +1717,7 @@ def test_mg_gas_standard_pressure_rises_with_temperature(
 def test_na_standard_reaction_term_reconstructs_liquid_nao05_source_rows(
     vapor_pressure_data,
 ):
-    """K-style live recon: L&H NaO0.5 source rows reconstruct with recon_err ≈ 0."""
+    """Live Antoine stays inside the declared JANAF liquid-grid residual."""
 
     row = vapor_pressure_data["metals"]["Na"]
     coeff = row["antoine"]
@@ -1723,8 +1725,10 @@ def test_na_standard_reaction_term_reconstructs_liquid_nao05_source_rows(
 
     assert row["fit_target"] == "standard_reaction_term"
     assert reaction["formula"] == "NaO0.5(l) -> Na(g) + 0.25 O2(g)"
-    assert "Lamoreaux & Hildenbrand 1984 Tables 2/4" in reaction["basis"]
-    assert "10.1063/1.555706" in reaction["basis"]
+    assert "Na-013" in reaction["basis"]
+    assert "Na-005" in reaction["basis"]
+    assert "O-029" in reaction["basis"]
+    assert "1 bar" in reaction["basis"]
     assert row["oxide_activity_exponent"] == pytest.approx(1.0)
     assert row["pO2_exponent"] == pytest.approx(-0.25)
     assert "declared_compensation" not in row
@@ -1733,28 +1737,21 @@ def test_na_standard_reaction_term_reconstructs_liquid_nao05_source_rows(
     assert row["shadow_bracket"]["status"] == "status_bearing_non_authoritative"
     assert row["shadow_bracket"]["full_vaporock_Pa"] == pytest.approx(0.002032)
 
+    declared = reaction["fit_residual_dex"]["max_abs"]
+    assert declared == pytest.approx(0.001721, abs=1e-6)
     for source_row in reaction["source_table_values"]:
         temperature_K = source_row["T_K"]
         fit_log10_p_pa = coeff["A"] - coeff["B"] / (
             temperature_K + coeff["C"]
         )
-        assert fit_log10_p_pa == pytest.approx(
-            source_row["fit_log10_P_Na_ref_Pa"],
-            abs=1e-6,
-        )
-        assert fit_log10_p_pa == pytest.approx(
-            source_row["log10_P_Na_ref_Pa"],
-            abs=0.001,
+        assert abs(fit_log10_p_pa - source_row["log10_P_Na_ref_Pa"]) <= (
+            declared + 1e-9
         )
 
-    assert reaction["fit_residual_dex"]["max_abs"] == pytest.approx(
-        0.000118,
-        abs=1e-6,
-    )
     heldout = reaction["heldout_demaria_comparison"]
     anchor = next(r for r in heldout if r["sample"] == "12022" and r["T_K"] == 1429.0)
     assert anchor["residual_dex_model_minus_demaria"] == pytest.approx(
-        -0.3527,
+        -0.4803,
         abs=1e-3,
     )
     assert all(r.get("partial_melt") is True for r in heldout)
@@ -1763,14 +1760,14 @@ def test_na_standard_reaction_term_reconstructs_liquid_nao05_source_rows(
 def test_na_coherent_pair_and_constant_gamma_golden(
     vapor_pressure_data,
 ):
-    """t-383 coherent pair: L&H standard_reaction_term + constant table gamma."""
+    """JANAF standard_reaction_term; gamma stays the unfitted 1e-3 anchor."""
 
     na_row = vapor_pressure_data["metals"]["Na"]
     assert na_row["authority_class"] == "uncertified"
     assert na_row["fit_target"] == "standard_reaction_term"
     assert na_row["pseudo_antoine_status"] == "inactive_provenance_only"
     assert na_row["coherent_pair"]["standard"] == (
-        "lamoreaux_hildenbrand_1984_liquid_nao0_5"
+        "nist_janaf_4th_na013_na014_liquid_nao0_5"
     )
     assert na_row["shadow_bracket"]["full_vaporock_Pa"] == pytest.approx(0.002032)
 
@@ -1795,11 +1792,11 @@ def test_na_coherent_pair_and_constant_gamma_golden(
     assert result.status == "ok"
     diagnostic = result.diagnostic or {}
 
-    # Golden tooth: constant table gamma on L&H Pref (P UP vs retired Chase).
+    # Gamma unchanged. JANAF Pref is below the retired L&H Pref, so this
+    # cell drops below the retired Chase pin 0.02684167312949837.
     p_na = diagnostic["vapor_pressures_Pa"]["Na"]
-    assert p_na == pytest.approx(0.035201224843865266, rel=1e-9)
-    # Sign story: UP vs retired Chase pin 0.02684167312949837 (+0.118 dex).
-    assert p_na > 0.02684167312949837
+    assert p_na == pytest.approx(0.0262428383991461, rel=1e-9)
+    assert p_na < 0.02684167312949837
 
     provenance = diagnostic["vapor_pressure_numerator_provenance"]["Na"]
     assert provenance["authority_class"] == "uncertified"
@@ -1825,10 +1822,11 @@ def test_na_coherent_pair_and_constant_gamma_golden(
 def test_demaria_1971_na_heldout_per_sample_residuals(
     vapor_pressure_data,
 ):
-    """Per-sample DeMaria binding; residuals reported inside pre-registered σ at anchor.
+    """Per-sample DeMaria binding. Residuals are reported, never fitted away.
 
     The misbound 1538 K / flat-1396-K-pO2 / 3.2e-2 Pa cross-sample gap pin is
-    deleted (t-383 Step 2/3). Residuals are never fitted away (ADR-001).
+    deleted (t-383 Step 2/3). After the JANAF re-ground the 1429 K anchor
+    residual is outside the 0.30 dex digitization sigma (ADR-001).
     """
 
     account = _wt_pct_to_mol_account(_DEMARIA_12022_WT_PCT)
@@ -1854,9 +1852,10 @@ def test_demaria_1971_na_heldout_per_sample_residuals(
     # Extract line_anchor_1429K for 12022 circles (upper line).
     measured_p_na = 7.93e-2
     residual_dex = math.log10(p_na / measured_p_na)
-    # Pre-registered digitization σ = 0.30 dex/pt; anchor residual near that band.
-    assert residual_dex == pytest.approx(-0.3527, abs=0.01)
-    assert abs(residual_dex) < 0.40
+    # Pre-registered digitization σ = 0.30 dex/pt. The JANAF reaction term
+    # moves this anchor to about -0.48 dex. That miss is reported, not closed.
+    assert residual_dex == pytest.approx(-0.480262, abs=0.001)
+    assert abs(residual_dex) > 0.40
     # fO2 slope −0.25 preserved (monatomic ν).
     p_floor = 1e-9
     request_floor = IntentRequest(
@@ -1877,6 +1876,114 @@ def test_demaria_1971_na_heldout_per_sample_residuals(
     ]["Na"]
     slope = math.log10(p_na_floor / p_na) / math.log10(p_floor / pO2_bar)
     assert slope == pytest.approx(-0.25, abs=1e-6)
+
+
+# Printed NIST-JANAF ΔfG(Na2O, liquid) kJ/mol. Na(g) and O2 are the element
+# references (ΔfG = 0), so ΔG° of Na2O(l) = 2 Na(g) + 1/2 O2 is -ΔfG.
+# 1400 K is Na-013 supercooled liquid. 1500 K is the printed Na-013 source
+# line, signed to match Na-014. 1600-2300 K are Na-014 liquid.
+_JANAF_NA2O_LIQUID_FORMATION_KJ = (
+    (1400.0, -192.041),
+    (1500.0, -167.596),
+    (1600.0, -143.448),
+    (1700.0, -119.580),
+    (1800.0, -95.974),
+    (1900.0, -72.614),
+    (2000.0, -49.488),
+    (2100.0, -26.582),
+    (2200.0, -3.886),
+    (2300.0, 18.611),
+)
+
+
+def _janaf_na2o_liquid_formation_kJ(temperature_K: float) -> float:
+    """Linear in T between adjacent printed nodes. Same rule as the JANAF loader."""
+
+    nodes = _JANAF_NA2O_LIQUID_FORMATION_KJ
+    for (low_T, low_g), (high_T, high_g) in zip(nodes, nodes[1:]):
+        if low_T <= temperature_K <= high_T:
+            fraction = (temperature_K - low_T) / (high_T - low_T)
+            return low_g + fraction * (high_g - low_g)
+    raise AssertionError(f"temperature {temperature_K} is outside the pinned nodes")
+
+
+def test_na_janaf_reaction_gibbs_on_1400_to_2300_K_grid():
+    """Production unit-activity Pref matches JANAF ΔG° on the fit grid.
+
+    Full reaction Na2O(l) = 2 Na(g) + 1/2 O2. K_half = p_Na/1e5 Pa at
+    a_NaO0.5 = 1 and pO2 = 1 bar, and ΔG_full = 2 (-R T ln K_half).
+    1523 K and 1673 K are linear between the printed 100 K nodes.
+    """
+
+    payload = yaml.safe_load(
+        (Path(__file__).resolve().parents[2] / "data" / "vapor_pressures.yaml").read_text()
+    )
+    evaluator = compile_vapour_rail_catalog(payload).species["Na"].evaluator
+    # 0.16 kJ/mol sits just above the worst grid residual (0.152 kJ at
+    # 2300 K) and far inside the retired 11 kJ / 17 kJ gaps. A +0.01
+    # shift in A moves this ΔG by about 0.7 kJ near 1523 K.
+    temperatures_K = tuple(
+        node[0] for node in _JANAF_NA2O_LIQUID_FORMATION_KJ
+    ) + (1523.0, 1673.0)
+    for temperature_K in temperatures_K:
+        pressure_pa = evaluator.evaluate(
+            temperature_K,
+            source_activity=1.0,
+            pO2_bar=1.0,
+        ).pressure_pa
+        k_half = pressure_pa / 100_000.0
+        dg_full_kJ = 2.0 * (-GAS_CONSTANT * temperature_K * math.log(k_half)) / 1000.0
+        janaf_kJ = -_janaf_na2o_liquid_formation_kJ(temperature_K)
+        assert dg_full_kJ == pytest.approx(janaf_kJ, abs=0.16)
+
+
+def test_na_temperature_outside_janaf_band_is_predict_and_flag(
+    vapor_pressure_data,
+):
+    """Out-of-band Na still returns a pressure and attaches the extrapolation notice."""
+
+    account = _wt_pct_to_mol_account(
+        {"SiO2": 50.0, "Al2O3": 15.0, "CaO": 20.0, "MgO": 10.0, "Na2O": 5.0}
+    )
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+
+    def dispatch(temperature_K: float):
+        return provider.dispatch(
+            IntentRequest(
+                intent=ChemistryIntent.VAPOR_PRESSURE,
+                account_view=ProviderAccountView(
+                    accounts={"process.cleaned_melt": account},
+                    species_formula_registry={},
+                ),
+                temperature_C=temperature_K - 273.15,
+                pressure_bar=1e-6,
+                control_inputs={"pO2_bar": 1e-8, "intrinsic_fO2_log": -8.0},
+            )
+        )
+
+    for temperature_K in (1396.0, 2350.0):
+        result = dispatch(temperature_K)
+        assert result.status == "ok"
+        diagnostic = result.diagnostic or {}
+        assert diagnostic["vapor_pressures_Pa"]["Na"] > 0.0
+        assert "extrapolated_beyond_valid_range_K" in diagnostic[
+            "vapor_pressures_source"
+        ]["Na"]
+        notice = diagnostic["extrapolated_beyond_valid_range_K"]["Na"]
+        assert notice["authority_level"] == "extrapolated"
+        assert notice["reason"] == "metal_vapor_pressure_out_of_validated_range"
+        assert notice["valid_range_K"] == (1400.0, 2300.0)
+        assert diagnostic["vapor_pressure_numerator_provenance"]["Na"][
+            "extrapolation_notice"
+        ]["authority_level"] == "extrapolated"
+
+    inside = dispatch(1673.0)
+    assert inside.status == "ok"
+    inside_diagnostic = inside.diagnostic or {}
+    assert "Na" not in inside_diagnostic["extrapolated_beyond_valid_range_K"]
+    assert "extrapolated_beyond_valid_range_K" not in inside_diagnostic[
+        "vapor_pressures_source"
+    ]["Na"]
 
 
 def test_sio_authority_class_emitted_with_authoritative_source_label(

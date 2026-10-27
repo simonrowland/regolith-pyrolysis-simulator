@@ -155,7 +155,7 @@ def test_alphamelts_activity_diagnostic_antoine_reference_pins(
     )
 
     for species, expected_hex in (
-        ("Na", "0x1.0fc0c6cbb52d4p+14"),
+        ("Na", "0x1.effaaa0194920p+12"),
         ("K", "0x1.59f4771222726p+16"),
         ("Mg", "0x1.f42edd8a229dap+20"),
         ("SiO", "0x1.67e4168316334p+1"),
