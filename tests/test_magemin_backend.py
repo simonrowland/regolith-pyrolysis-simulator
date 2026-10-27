@@ -2482,6 +2482,12 @@ def test_magemin_elemental_sulfur_is_not_a_projected_oxide_drop(monkeypatch):
     )
     assert PROJECTED_BULK_CLASSIFICATION_KEY not in result.diagnostics
 
+    with pytest.raises(MeltCompositionError, match="forbidden_species: S"):
+        backend._build_db_bulk_projection(
+            {"SiO2": 50.0, "MgO": 49.93, "S": 0.07},
+            database="igad",
+        )
+
 
 def test_magemin_bulk_projection_mass_fraction_float_hex_pin():
     import simulator.melt_backend.magemin as magemin_module

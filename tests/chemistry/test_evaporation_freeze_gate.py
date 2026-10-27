@@ -1939,6 +1939,9 @@ def _lunar_composition_projected_diagnostic(sim):
         _magemin_bulk_projection_details,
         composition_projected_liquidus_notice,
     )
+    from simulator.composition_projection import (
+        _classify_projected_bulk_from_source,
+    )
 
     kg = sim.atom_ledger.kg_by_account('process.cleaned_melt')
     inert = set(getattr(sim.inventory, 'inert_melt_components_kg', {}) or {})
@@ -1956,7 +1959,11 @@ def _lunar_composition_projected_diagnostic(sim):
         for name, mass in oxide_kg.items()
     }
     projection = MAGEMinBackend()._build_db_bulk_projection(wt_pct)
-    details = _magemin_bulk_projection_details(projection)
+    classification = _classify_projected_bulk_from_source(
+        dict(projection.dropped_wt_pct_by_component),
+        source_sum_wt_pct=projection.source_sum_wt_pct,
+    )
+    details = _magemin_bulk_projection_details(projection, classification)
     diagnostic = {
         'backend_status': 'out_of_domain',
         'backend_status_reason': 'composition_projected',
