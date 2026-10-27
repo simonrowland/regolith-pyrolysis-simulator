@@ -86,3 +86,14 @@ def test_roundoff_allowed_but_real_missing_stage_mass_is_unavailable():
     assert good.captured_feed_atoms("Fe", 1).status == "available"
     bad = _projection(ledger, {(ACCOUNT, 1, "Fe"): mass * 0.99})
     assert bad.captured_feed_atoms("Fe", 1).reason == "stage_projection_unreconciled"
+
+
+def test_melt_resident_spent_residue_is_entry_inventory_not_extracted():
+    ledger = AtomLedger()
+    ledger.load_external_mol('process.cleaned_melt', {'Na': 3}, material_origin='feedstock')
+    ledger.move('spent', 'process.cleaned_melt', 'process.spent_reductant_residue', {'Na': _kg('Na', 1)})
+    ledger.load_external_mol('process.spent_reductant_residue', {'Na': 5}, material_origin='reagent')
+    inventory = _projection(ledger, {}).inventory(['Na'], 4)
+    assert inventory['melt']['Na'] == pytest.approx(3)
+    assert inventory['extracted']['Na'] == 0
+    assert inventory['initial_feed_element_inventory']['Na'] == pytest.approx(3)

@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass, field
 import math
 import sys
 
+from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.accounting.formulas import resolve_species_formula
 
 
@@ -16,7 +17,7 @@ EXTRACTED_ACCOUNTS = frozenset({
     CONDENSER_ACCOUNT, "process.condensation_retained_holdup",
     "process.overhead_gas", "process.metal_phase",
     "process.metal_phase_bottom_pool", "process.metal_phase_float_layer",
-    "process.reagent_inventory", "process.spent_reductant_residue",
+    "process.reagent_inventory",
     "terminal.drain_tap_material", "terminal.chromium_condensed_oxide_stored",
     "terminal.offgas", "vent",
 })
@@ -40,8 +41,14 @@ class CampaignYieldProjection:
         return self.sim.atom_ledger
 
     def melt_feed_atoms(self):
-        return {element: origins.get("feedstock", 0.0) for element, origins in
-                self.ledger.origin_atom_moles_by_account().get("process.cleaned_melt", {}).items()}
+        origins = self.ledger.origin_atom_moles_by_account()
+        # Spent Na2O is melt-resident (the MRE owner moves it into the cleaned
+        # account when treating it). Moving oxide into that bookkeeping bin
+        # is not extraction, and its feed atoms remain in the entry inventory.
+        accounts = [origins.get(account, {}) for account in
+                    ("process.cleaned_melt", SPENT_REDUCTANT_RESIDUE_ACCOUNT)]
+        return {element: math.fsum(row.get(element, {}).get("feedstock", 0.0) for row in accounts)
+                for element in set().union(*(row.keys() for row in accounts))}
 
     def captured_feed_atoms(self, element: str, stage: int) -> CapturedFeedAtoms:
         ledger_mass = self.ledger.project_account_kg(CONDENSER_ACCOUNT)
