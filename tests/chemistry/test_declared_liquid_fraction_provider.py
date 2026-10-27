@@ -667,3 +667,116 @@ def test_optimizer_resolves_gate_declared_in_loaded_setpoints(monkeypatch):
     )
     assert config.setpoints['chemistry_kernel']['liquid_fraction_provider'] == 'analytical'
     assert spec.chemistry_kernel['liquid_fraction_provider'] == 'analytical'
+
+
+@pytest.mark.parametrize('failure', ['numerical', 'projected_numerical', 'aggregate_timeout', 'warm_timeout'])
+@pytest.mark.parametrize('prior_good', [False, True])
+def test_declared_gate_holds_only_a_prior_good_curve_and_retries_next_hour(
+    monkeypatch, failure, prior_good,
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from tests.binding_admission_fixtures import register_synthetic_gate_curve_producer
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    register_synthetic_gate_curve_producer(sim)
+    shared = {}
+    sim._freeze_gate_shared_curve_cache = shared
+    phase = {'good': prior_good, 'liquidus': 1300.0}
+    calls = []
+    composition = {'SiO2': 50.0, 'MgO': 50.0}
+    monkeypatch.setattr(sim.melt, 'composition_wt_pct', lambda: dict(composition))
+
+    def dispatch(intent, **kwargs):
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        calls.append(sim.melt.hour)
+        if phase['good']:
+            return SimpleNamespace(status='ok', diagnostic={
+                'solidus_T_C': 1000.0, 'liquidus_T_C': phase['liquidus'],
+            }, warnings=())
+        if failure == 'warm_timeout':
+            raise EngineWorkerTimeout('magemin', 15.0, phase='liquidus')
+        if failure == 'numerical':
+            return SimpleNamespace(status='not_converged', diagnostic={
+                'backend_status_reason': 'no_convergence',
+            }, warnings=('non-monotone frac_M(T)',))
+        return SimpleNamespace(status='out_of_domain', diagnostic={
+            'backend_status_reason': 'composition_projected',
+            'backend_diagnostics': {
+                'projected_liquidus_status': 'not_converged',
+                'projected_liquidus_diagnostics': {
+                    'reason': ('aggregate_budget_exceeded'
+                               if failure == 'aggregate_timeout' else 'no_convergence'),
+                },
+            },
+        }, warnings=('injected declared-provider failure',))
+
+    monkeypatch.setattr(sim, '_dispatch_only', dispatch)
+    sim.melt.hour = 7
+    sim.melt.temperature_C = 1500.0
+    timed_out = failure.endswith('timeout')
+    if not prior_good:
+        with pytest.raises(EvaporationFluxRefusal) as error:
+            sim._melt_redox_liquidus_gate_curve()
+        if timed_out:
+            assert error.value.diagnostic['backend_failure_disposition'] == 'environment'
+        assert sim._freeze_gate_liquid_fraction_cache is None
+        assert sim._freeze_gate_liquid_fraction_curve_memo == {}
+        assert shared == {}
+        return
+
+    good = sim._melt_redox_liquidus_gate_curve()
+    memo_keys = set(sim._freeze_gate_liquid_fraction_curve_memo)
+    shared_keys = set(shared)
+    phase['good'] = False
+    sim.melt.hour = 8
+    sim.melt.p_total_mbar += 100.0
+    composition.update(SiO2=40.0, MgO=60.0)
+    store = PT0DeterminismStore('capture')
+    sim.configure_pt0_determinism_store(store)
+    held = sim._melt_redox_liquidus_gate_curve()
+    notice = held['gate_provider_refusal']
+    assert held['source'] == good['source']
+    assert held['liquidus_T_C'] == good['liquidus_T_C']
+    assert notice['provider'] == 'magemin'
+    assert notice['authority'] == 'extrapolated (held)'
+    assert notice['failure_hour'] == 8
+    assert notice['failure_temperature_C'] == 1500.0
+    assert notice['computed_hour'] == 7
+    assert notice['composition_distance_wt_pct'] == 20.0
+    assert notice['provider_diagnostic']
+    if timed_out:
+        assert notice['backend_failure_disposition'] == 'environment'
+    else:
+        assert notice['warnings']
+        assert notice['outcome'] == 'numerical_failure'
+    assert set(sim._freeze_gate_liquid_fraction_curve_memo) == memo_keys
+    assert set(shared) == shared_keys
+    assert store.capture_sequence == []
+    assert sim._freeze_gate_liquid_fraction_cache is None or (
+        'gate_provider_refusal' not in sim._freeze_gate_liquid_fraction_cache['curve']
+    )
+    assert sim._make_snapshot().liquid_fraction_gate['redox']['gate_provider_refusal'] == notice
+    call_count = len(calls)
+    assert sim._melt_redox_liquidus_gate_curve() == held
+    assert len(calls) == call_count
+
+    sim.melt.hour = 9
+    again = sim._melt_redox_liquidus_gate_curve()
+    assert len(calls) == call_count + (2 if timed_out else 1)
+    assert again['gate_provider_refusal']['failure_hour'] == 9
+    assert again['gate_provider_refusal']['computed_hour'] == 7
+    assert set(sim._freeze_gate_liquid_fraction_curve_memo) == memo_keys
+    assert set(shared) == shared_keys
+    assert store.capture_sequence == []
+
+    sim.melt.hour = 10
+    phase.update(good=True, liquidus=1500.0)
+    recovered = sim._melt_redox_liquidus_gate_curve()
+    assert recovered['liquidus_T_C'] == 1500.0
+    assert 'gate_provider_refusal' not in recovered
+    sim.melt.hour = 11
+    sim.melt.p_total_mbar += 100.0
+    phase['good'] = False
+    held = sim._melt_redox_liquidus_gate_curve()
+    assert held['liquidus_T_C'] == 1500.0
+    assert held['gate_provider_refusal']['computed_hour'] == 10
