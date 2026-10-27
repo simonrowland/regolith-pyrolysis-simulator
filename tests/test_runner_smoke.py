@@ -1782,10 +1782,17 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
 def test_endpoint_diagnostics_preserve_runner_golden_physics(scenario, runner_golden_loader):
     actual, capture, expected_text = runner_golden_loader(scenario)
-    metadata = dict(actual['run_metadata'])
-    metadata.pop('campaign_endpoints', None)
-    projected = {**actual, 'run_metadata': metadata}
-    assert json.dumps(projected, indent=2, allow_nan=False) + '\n' == expected_text
+    actual_metadata = dict(actual['run_metadata'])
+    actual_metadata.pop('campaign_endpoints', None)
+    projected = {**actual, 'run_metadata': actual_metadata}
+
+    expected = json.loads(expected_text)
+    expected_metadata = dict(expected['run_metadata'])
+    expected_metadata.pop('campaign_endpoints', None)
+    expected = {**expected, 'run_metadata': expected_metadata}
+    assert json.dumps(projected, indent=2, allow_nan=False) + '\n' == (
+        json.dumps(expected, indent=2, allow_nan=False) + '\n'
+    )
     assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario['name']]
 
 

@@ -26,6 +26,7 @@ from typing import Dict, List, Literal, Optional, Tuple, TypedDict
 from simulator import mre_ladder
 from simulator.accounting import UnknownSpeciesError, resolve_species_formula
 from simulator.backend_names import C0_FORECAST_ENGINE_NAMES
+from simulator.config import DEFAULT_DATA_DIR, _load_setpoints_file
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LAB_SCHEDULE_PO2_SETPOINT_KEY,
@@ -3446,10 +3447,23 @@ class CampaignManager:
                 return CampaignPhase.C5
             # The selected recipe cap has already resolved this data default.
             final_pass = self._campaign_config(CampaignPhase.C2A).get('post_mg_final_pass', {})
-            self._pending_post_mg_c2a_overrides = {
-                'min_hold_hr': self._endpoint_float(CampaignPhase.C2A, final_pass, 'min_hold_hr'),
-                'max_hours': self._endpoint_float(CampaignPhase.C2A, final_pass, 'max_hold_hr'),
+            minimum_hr = final_pass.get('min_hold_hr')
+            if minimum_hr is None:
+                # Older in-memory campaign dictionaries omit this optional
+                # minimum; retain the shipped YAML default while the hard cap
+                # remains required when the C2A endpoint resolves its budget.
+                defaults = _load_setpoints_file(DEFAULT_DATA_DIR / 'setpoints.yaml')
+                minimum_hr = defaults['campaigns']['C2A_continuous'][
+                    'post_mg_final_pass'
+                ]['min_hold_hr']
+            pending_overrides = {
+                'min_hold_hr': self._required_float(
+                    minimum_hr, 'C2A_continuous.min_hold_hr'),
             }
+            if final_pass.get('max_hold_hr') is not None:
+                pending_overrides['max_hours'] = self._endpoint_float(
+                    CampaignPhase.C2A, final_pass, 'max_hold_hr')
+            self._pending_post_mg_c2a_overrides = pending_overrides
             # Mark A-family paths for the final-pass C2A successor above;
             # path 'B' keeps its operator-chosen record (the marker used to
             # clobber it, corrupting the reported path).

@@ -734,6 +734,128 @@
       "campaign": "C0",
       "duration_h": 1,
       "end_mass_kg": 998.8,
+      "endpoint_outcome": {
+        "C_evac_kg_hr": 4.794582587158566,
+        "C_evac_temperature_C": 950.0,
+        "M_C0_gas_kg": 0.0,
+        "Na_plus_K_feed_loss_fraction": 6.3923327179535005e-06,
+        "Na_plus_K_feed_mass_kg": 3.900744138110062,
+        "Na_plus_K_to_train_kg": 2.493485437840628e-05,
+        "T_exit_C": 950.0,
+        "T_exit_reached_hr": 4.625,
+        "T_exit_resolution_C": 1.0,
+        "alkali_retention_budget_fraction": 0.001,
+        "authority": "extrapolated",
+        "backstop": "maximum_hold",
+        "bound_predicates": [
+          "maximum_hold"
+        ],
+        "budget_authority": "owner:d-244",
+        "budget_provenance": "owner d-244, purity limit",
+        "campaign": "C0",
+        "classification": "time_budget_reached",
+        "clocks": {
+          "campaign_hour": 0.0,
+          "completed_campaign_hour": 1.0
+        },
+        "cover": {
+          "carrier_gas": "Ar",
+          "pO2_mbar": 0.0,
+          "p_total_mbar": 1.0
+        },
+        "evacuation_bound_backstop_fired": false,
+        "evacuation_bound_unmet": false,
+        "evacuation_bound_unmet_hr": 0.0,
+        "evacuation_max_hold_hr": 1.0,
+        "evacuation_unreleased_gas_inventory_kg": {},
+        "evacuation_unreleased_gas_mass_kg": 0.0,
+        "forecast_engine": "internal-analytical",
+        "hold_used_for_budget_hr": 1.0,
+        "incomplete": true,
+        "kinetics": "temperature_resolved_equilibrium_hk_upper_bound",
+        "liquid_fraction": null,
+        "message": "C0 gas is fiat-ledgered at load and release curves are uncertified (t-1417); any computed T_exit is a liquid-law extrapolation with unknown real-engine phase state; authority level extrapolated.",
+        "observed": 1.0,
+        "outcome": "incomplete",
+        "phase_state": "unknown; analytical liquid-law extrapolated",
+        "phase_state_ticket": "t-1460",
+        "predicates": [
+          {
+            "bound": false,
+            "classification": "time_budget_reached",
+            "condition": "first_melt",
+            "observed": false,
+            "threshold": true
+          },
+          {
+            "bound": false,
+            "classification": "time_budget_reached",
+            "condition": "remaining_budget",
+            "observed": null,
+            "threshold": "feasible forecast"
+          },
+          {
+            "bound": false,
+            "classification": "time_budget_reached",
+            "condition": "computed_exit",
+            "observed": {
+              "completed_campaign_hour": 1.0,
+              "temperature_C": 225.0
+            },
+            "threshold": {
+              "completed_campaign_hour": 5.0,
+              "temperature_C": 950.0
+            }
+          },
+          {
+            "bound": true,
+            "classification": "time_budget_reached",
+            "condition": "maximum_hold",
+            "observed": 1.0,
+            "threshold": 1.0
+          }
+        ],
+        "prediction_status": "ok",
+        "ramp_C_per_hr": 200.0,
+        "ramp_authority": "owner_fiat",
+        "ramp_model_bounded": false,
+        "release_curves": "uncertified (t-1417)",
+        "requested_exit_window_hr": 4.625,
+        "runtime_exit_window_hr": 5.0,
+        "sulfates_routed_to": "melt_or_C0b",
+        "t_evac_hr": 0.0,
+        "threshold": 1.0,
+        "ticket": "t-1417",
+        "unreleased_inventory_at_exit": {
+          "targets": [
+            {
+              "key": "H2O",
+              "remaining_fraction": null,
+              "remaining_kg": 0.0,
+              "status": "zero_denominator"
+            },
+            {
+              "key": "CO2",
+              "remaining_fraction": null,
+              "remaining_kg": 0.0,
+              "status": "zero_denominator"
+            },
+            {
+              "key": "S2",
+              "remaining_fraction": 0.0,
+              "remaining_kg": 0.0,
+              "status": "ok"
+            },
+            {
+              "key": "CHNOPS",
+              "remaining_fraction": 0.0,
+              "remaining_kg": 0.0,
+              "status": "deferred_semantic_split"
+            }
+          ]
+        },
+        "winning_condition": "maximum_hold"
+      },
       "energy_electrical_plus_evaporation_kWh": 0.0,
       "energy_scope": "electrical_plus_known_evaporation_enthalpy",
       "furnace_heat_status": "partial",
@@ -1395,6 +1517,38 @@
       "campaign": "C0B",
       "duration_h": 1,
       "end_mass_kg": 998.8,
+      "endpoint_outcome": {
+        "bound_predicates": [
+          "operator_wall_budget",
+          "maximum_hold"
+        ],
+        "campaign": "C0B",
+        "classification": "time_budget_reached",
+        "clocks": {
+          "campaign_hour": 0.0,
+          "completed_campaign_hour": 1.0
+        },
+        "incomplete": true,
+        "observed": 1.0,
+        "predicates": [
+          {
+            "bound": true,
+            "classification": "time_budget_reached",
+            "condition": "operator_wall_budget",
+            "observed": 1.0,
+            "threshold": 1.0
+          },
+          {
+            "bound": true,
+            "classification": "time_budget_reached",
+            "condition": "maximum_hold",
+            "observed": 1.0,
+            "threshold": 1.0
+          }
+        ],
+        "threshold": 1.0,
+        "winning_condition": "operator_wall_budget"
+      },
       "energy_electrical_plus_evaporation_kWh": 0.0,
       "energy_scope": "electrical_plus_known_evaporation_enthalpy",
       "furnace_heat_status": "partial",
