@@ -5676,8 +5676,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'oxygen reservoir redox source terms require finite positive T_K; '
                 f'got {temperature_K!r}'
             )
-        gate_authority = self._resolved_melt_redox_gate_authority(
-            gate_authority
+        # An exhausted melt has zero redox capacity and no liquidus to query.
+        has_cleaned_melt = self.atom_ledger.total_mol_by_account(
+            'process.cleaned_melt'
+        ) > 0.0
+        gate_authority = (
+            self._resolved_melt_redox_gate_authority(gate_authority)
+            if has_cleaned_melt else None
         )
         self._re_reference_melt_fO2_to_temperature(
             T_K,
@@ -5696,7 +5701,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             fO2_log=base_fO2_log,
             T_K=T_K,
             gate_authority=gate_authority,
-        )
+        ) if has_cleaned_melt else 0.0
         reservoir = self.melt.oxygen_reservoir
         existing_direction = str(getattr(reservoir, 'exchange_direction', '') or '')
         reservoir.melt_intrinsic_fO2_log = base_fO2_log
