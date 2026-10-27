@@ -15070,8 +15070,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         C6 thermite/window refusal is campaign-scoped: boilrump continues the
         configured batch sequence, so it must not latch the session as
-        non-resumable for later campaigns. C4 acquisition/window refusal is
-        the non-resumable terminal latch (no AUTO_APPLY into C6).
+        non-resumable for later campaigns. Invalid C4 endpoint input is
+        the non-resumable terminal latch. Operating-window exhaustion is
+        recorded by CampaignManager and advances the sequence.
         """
         return bool(self._c4_campaign_refused)
 
@@ -15097,7 +15098,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'status': 'refused',
             'reaction_family': 'c4_mg_selective_pyrolysis',
             'hour': int(self.melt.hour),
-            'campaign_hour': int(self.melt.campaign_hour),
+            'campaign_hour': self.melt.campaign_hour,
             'campaign': campaign.name,
             'temperature_C': float(self.melt.temperature_C),
             'diagnostic': dict(diagnostic),

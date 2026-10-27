@@ -82,12 +82,12 @@ C6_HOLD_ACQUISITION_REFUSAL_REASON = 'c6_hold_target_not_acquired'
 CAMPAIGN_DEPLETION_SIGNAL_INVALID_REFUSAL_REASON = (
     'campaign_depletion_signal_invalid'
 )
-C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON = 'c4_target_window_not_acquired'
-C4_PROCESS_WINDOW_LOST_REFUSAL_REASON = 'c4_process_window_lost'
-C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
+C4_TARGET_WINDOW_ACQUISITION_END_REASON = 'c4_target_window_not_acquired'
+C4_PROCESS_WINDOW_LOST_END_REASON = 'c4_process_window_lost'
+C4_PROCESS_WALL_CLOCK_EXHAUSTED_END_REASON = (
     'c4_process_wall_clock_exhausted'
 )
-C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
+C4_PREHEAT_WALL_CLOCK_EXHAUSTED_END_REASON = (
     'c4_preheat_wall_clock_exhausted'
 )
 
@@ -187,7 +187,7 @@ class CampaignHoldAcquisitionRefusal(CampaignEndpointRefusal):
 
 
 class CampaignC4EndpointRefusal(CampaignEndpointRefusal):
-    """Typed refusal when C4 cannot acquire or retain its process window."""
+    """Typed refusal for invalid C4 endpoint observations."""
 
 
 @lru_cache(maxsize=None)
@@ -2713,7 +2713,7 @@ class CampaignManager:
           hold, else max_hold
         - C3_K / C3_NA: path-dependent duration
         - C4: in-window armed species kg/hr below configured threshold
-          after min window hours, else max_hold or a typed window refusal
+          after min window hours, else max_hold or an incomplete operating-window outcome
         - C5: ladder complete, or armed current below configured
           threshold_A for consecutive_hours on the final rung, else
           max_hold
@@ -2727,6 +2727,17 @@ class CampaignManager:
         Returns True if the campaign should end.
         """
         campaign = melt.campaign
+        if campaign == CampaignPhase.C4:
+            for label, values in (
+                ("clock", [melt.campaign_hour]),
+                ("temperature", [melt.temperature_C] + [snapshot.temperature_C
+                    for snapshot in record.snapshots if snapshot.campaign == campaign]),
+            ):
+                if any(not is_declared_real_scalar(value) or not math.isfinite(float(value))
+                       or (label == "clock" and float(value) < 0) for value in values):
+                    raise CampaignC4EndpointRefusal({
+                        "reason_refused": f"c4_{label}_invalid", "observed": values,
+                    })
         completed_campaign_hour = self._completed_campaign_hour_for_endpoint(melt)
 
         if campaign in (CampaignPhase.IDLE, CampaignPhase.COMPLETE):
@@ -3022,14 +3033,13 @@ class CampaignManager:
                 # inverse of the liveness hole the clock fixed.
                 # Premise: held hours = wall hours − opportunity hours; a
                 # finite holdup drain contributes finitely, a permanent hold
-                # grows without bound. Algebra: refuse when held ≥
+                # grows without bound. Algebra: end when held ≥
                 # acquisition_limit + process_limit (both setpoint-sourced;
                 # a flat wall-hours cap is WRONG — the honest CI Pref_GF path
                 # acquires near wall hour 120-135 and would trip it).
                 # Unit: hours. Sanity: CI path holds ~50-90 h (17 kg holdup
                 # at ~0.35 kg/hr) < 100 h budget, unaffected; a plant held
-                # 100+ hours with no ramp deserves the typed refusal (raise
-                # the setpoints if a feedstock legitimately needs longer).
+                # 100+ hours with no ramp ends C4 with its target unacquired.
                 clocks.update(acquisition_opportunity_hr=acquisition_elapsed_hr,
                               held_hr=completed_campaign_hour - acquisition_elapsed_hr)
                 held_wall_bound = bind('preheat_held_wall', completed_campaign_hour - acquisition_elapsed_hr >= acquisition_limit_hr + process_limit_hr,
@@ -3038,10 +3048,10 @@ class CampaignManager:
                      acquisition_elapsed_hr, acquisition_limit_hr, 'acquisition_deadline')
                 if held_wall_bound or acquisition_bound:
                     diagnostic = {
-                        'reason_refused': (
-                            C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON
+                        'outcome': (
+                            C4_PREHEAT_WALL_CLOCK_EXHAUSTED_END_REASON
                             if held_wall_bound
-                            else C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON
+                            else C4_TARGET_WINDOW_ACQUISITION_END_REASON
                         ),
                         'requested_window_C': requested_window_C,
                         'temperature_C': float(melt.temperature_C),
@@ -3059,8 +3069,11 @@ class CampaignManager:
                         )
                     if transport_state is not None:
                         diagnostic['binding_transport_state'] = dict(transport_state)
-                    self._finish_endpoint(melt, predicates, clocks, legacy=diagnostic)
-                    raise CampaignC4EndpointRefusal(diagnostic)
+                    diagnostic['remaining_melt_Mg'] = (
+                        yield_projection.melt_element_inventory('Mg')
+                        if yield_projection is not None else None)
+                    self.last_c4_termination = diagnostic
+                    return self._finish_endpoint(melt, predicates, clocks, legacy=diagnostic)
                 return False
 
             current_in_window = (
@@ -3109,7 +3122,7 @@ class CampaignManager:
             hold_bound = bind('maximum_hold', current_in_window and completed_window_hr >= max_hold_hr,
                  completed_window_hr, max_hold_hr, 'time_budget_reached' if signal_armed else 'no_signal')
             bind('process_wall', process_elapsed_hr >= process_limit_hr,
-                 process_elapsed_hr, process_limit_hr, 'physics_refusal')
+                 process_elapsed_hr, process_limit_hr, 'time_budget_reached')
             if eligible:
                 rate = validate_signal(
                     rate,
@@ -3142,18 +3155,18 @@ class CampaignManager:
                 return self._finish_endpoint(melt, predicates, clocks, legacy=self.last_c4_termination)
 
             if process_elapsed_hr >= process_limit_hr:
-                # Truthful typed outcomes:
+                # Exhausting an acquired process window ends C4 incompletely:
                 # - still in-window at the process ceiling → wall-clock
                 #   exhaustion (operator max_hold can exceed this ceiling via
                 #   max_hours override; the process wall is the hard cap)
                 # - acquired then left the window → process window lost
-                reason_refused = (
-                    C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON
+                outcome = (
+                    C4_PROCESS_WALL_CLOCK_EXHAUSTED_END_REASON
                     if current_in_window
-                    else C4_PROCESS_WINDOW_LOST_REFUSAL_REASON
+                    else C4_PROCESS_WINDOW_LOST_END_REASON
                 )
                 diagnostic = {
-                    'reason_refused': reason_refused,
+                    'outcome': outcome,
                     'requested_window_C': requested_window_C,
                     'temperature_C': float(melt.temperature_C),
                     'elapsed_hours': process_elapsed_hr,
@@ -3167,8 +3180,11 @@ class CampaignManager:
                     diagnostic['binding_transport_state'] = dict(
                         transport_state
                     )
-                self._finish_endpoint(melt, predicates, clocks, legacy=diagnostic)
-                raise CampaignC4EndpointRefusal(diagnostic)
+                diagnostic['remaining_melt_Mg'] = (
+                    yield_projection.melt_element_inventory('Mg')
+                    if yield_projection is not None else None)
+                self.last_c4_termination = diagnostic
+                return self._finish_endpoint(melt, predicates, clocks, legacy=diagnostic)
 
         elif campaign == CampaignPhase.C5:
             default_cap_V = resolved['default_cap_V']
@@ -3427,7 +3443,9 @@ class CampaignManager:
         elif current == CampaignPhase.C4:
             if self.c5_enabled:
                 return CampaignPhase.C5
-            # The selected recipe cap has already resolved this data default.
+            # This is also the no-Mg-extracted successor: the final pass boils
+            # what remains, including Mg when C4 never acquired its window.
+            # Its scope is a recipe budget, not a claim that C4 succeeded.
             final_pass = self._campaign_config(CampaignPhase.C2A).get('post_mg_final_pass', {})
             self._pending_post_mg_c2a_overrides = {
                 'min_hold_hr': self._endpoint_float(CampaignPhase.C2A, final_pass, 'min_hold_hr'),

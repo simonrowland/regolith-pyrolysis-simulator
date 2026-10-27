@@ -348,31 +348,14 @@ def _assert_staged_route_extent(sim, post_mg_c2a_hold_limit: dict) -> None:
         if snapshot.campaign == CampaignPhase.C4
     ]
     assert c4_snapshots
-    c4_refusal = dict(sim._last_c4_refusal_diagnostic or {})
-    c4_diagnostic = dict(c4_refusal.get("diagnostic") or {})
+    assert not sim.campaign_endpoint_refused()
+    assert not sim._last_c4_refusal_diagnostic
     c4_termination = dict(campaign_mgr.last_c4_termination or {})
-    if sim.campaign_endpoint_refused():
-        c4_end_reason = c4_diagnostic.get("reason_refused")
-    else:
-        assert c4_termination
-        c4_end_reason = c4_termination["outcome"]
+    assert c4_termination
+    c4_end_reason = c4_termination["outcome"]
     acquisition_limit_hr, _ = campaign_mgr._c4_target_acquisition_limit()
     process_limit_hr, _ = campaign_mgr._c4_process_wall_clock_limit()
 
-    if c4_end_reason == "c4_preheat_wall_clock_exhausted":
-        assert sim.campaign_endpoint_refused()
-        assert c4_refusal["status"] == "refused"
-        assert c4_refusal["campaign"] == CampaignPhase.C4.name
-        assert staged_route == fixed_route
-        c4_hours = campaign_hours[CampaignPhase.C4]
-        assert c4_hours == c4_diagnostic["completed_campaign_hour"]
-        assert c4_hours - c4_diagnostic["acquisition_opportunity_hr"] == pytest.approx(
-            acquisition_limit_hr + process_limit_hr
-        )
-        return
-
-    assert not sim.campaign_endpoint_refused()
-    assert not c4_refusal
     assert sim.is_complete()
     completed_route = [
         *fixed_route,
@@ -383,28 +366,36 @@ def _assert_staged_route_extent(sim, post_mg_c2a_hold_limit: dict) -> None:
 
     c4_termination = dict(campaign_mgr.last_c4_termination or {})
     assert c4_termination["outcome"] == c4_end_reason
-    completed_window_hr = float(c4_termination["completed_window_hr"])
-    assert 0 < completed_window_hr <= campaign_mgr._max_hold_hr(CampaignPhase.C4)
+    if c4_end_reason == "c4_preheat_wall_clock_exhausted":
+        c4_hours = campaign_hours[CampaignPhase.C4]
+        assert c4_hours == c4_termination["completed_campaign_hour"]
+        assert c4_hours - c4_termination["acquisition_opportunity_hr"] == pytest.approx(
+            acquisition_limit_hr + process_limit_hr
+        )
+        assert c4_termination["remaining_melt_Mg"]["mol"] > 0
+    else:
+        completed_window_hr = float(c4_termination["completed_window_hr"])
+        assert 0 < completed_window_hr <= campaign_mgr._max_hold_hr(CampaignPhase.C4)
 
-    c4_window_low_C, _ = campaign_mgr._c4_temperature_window()
-    c4_acquired_index = next(
-        (
-            index
-            for index, snapshot in enumerate(c4_snapshots)
-            if float(snapshot.temperature_C) >= c4_window_low_C
-        ),
-        None,
-    )
-    assert c4_acquired_index is not None
-    c4_acquisition_hours = campaign_mgr._c4_acquisition_opportunity_hr(
-        completed_campaign_hour=float(c4_acquired_index + 1),
-        c4_snapshots=c4_snapshots[:c4_acquired_index],
-        transport_state=None,
-        current_acquired=True,
-    )
-    c4_process_hours = len(c4_snapshots) - c4_acquired_index
-    assert 0 < c4_acquisition_hours <= acquisition_limit_hr
-    assert 0 < c4_process_hours <= process_limit_hr
+        c4_window_low_C, _ = campaign_mgr._c4_temperature_window()
+        c4_acquired_index = next(
+            (
+                index
+                for index, snapshot in enumerate(c4_snapshots)
+                if float(snapshot.temperature_C) >= c4_window_low_C
+            ),
+            None,
+        )
+        assert c4_acquired_index is not None
+        c4_acquisition_hours = campaign_mgr._c4_acquisition_opportunity_hr(
+            completed_campaign_hour=float(c4_acquired_index + 1),
+            c4_snapshots=c4_snapshots[:c4_acquired_index],
+            transport_state=None,
+            current_acquired=True,
+        )
+        c4_process_hours = len(c4_snapshots) - c4_acquired_index
+        assert 0 < c4_acquisition_hours <= acquisition_limit_hr
+        assert 0 < c4_process_hours <= process_limit_hr
     assert CampaignPhase.C2A in post_mg_c2a_hold_limit
     assert 0 < campaign_hours[CampaignPhase.C2A] <= post_mg_c2a_hold_limit[
         CampaignPhase.C2A
