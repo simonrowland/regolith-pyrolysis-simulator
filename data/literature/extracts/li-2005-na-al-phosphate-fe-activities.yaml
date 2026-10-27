@@ -6829,8 +6829,8 @@ species:
         inferred: false
         note: The authors state the standard state is stoichiometric liquid FeO.
         locator:
-          page: 5
-          published_page: 16
+          page: 6
+          published_page: 17
           equation: 21, 22
           note: Standard-state sentence following Eqs. (21) and (22).
       units: dimensionless activity coefficient
@@ -8515,8 +8515,8 @@ species:
         inferred: false
         note: The authors state the standard state is stoichiometric liquid FeO.
         locator:
-          page: 5
-          published_page: 16
+          page: 6
+          published_page: 17
           equation: 21, 22
           note: Standard-state sentence following Eqs. (21) and (22).
       units: dimensionless activity coefficient
@@ -12310,13 +12310,16 @@ species:
               formula: FeO1.5
               phase:
                 tag: value
-                value: s
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: source identifies solid FeO1.5 but does not specify a polymorph
             component_basis: FeO1.5
         inferred: false
         note: The authors state the standard state is solid FeO1.5.
         locator:
-          page: 5
-          published_page: 16
+          page: 6
+          published_page: 17
           equation: 21, 22
           note: Standard-state sentence following Eqs. (21) and (22).
       units: dimensionless activity coefficient
@@ -13287,13 +13290,16 @@ species:
               formula: FeO1.5
               phase:
                 tag: value
-                value: s
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: source identifies solid FeO1.5 but does not specify a polymorph
             component_basis: FeO1.5
         inferred: false
         note: The authors state the standard state is solid FeO1.5.
         locator:
-          page: 5
-          published_page: 16
+          page: 6
+          published_page: 17
           equation: 21, 22
           note: Standard-state sentence following Eqs. (21) and (22).
       units: dimensionless activity coefficient
@@ -14475,7 +14481,7 @@ species:
   Fe:
     observations:
     - observation_id: li_2005_table_1_row_1-1_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -14581,7 +14587,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/10
     - observation_id: li_2005_table_1_row_1-2_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -14687,7 +14693,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/10
     - observation_id: li_2005_table_1_row_1-3_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -14793,7 +14799,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/10
     - observation_id: li_2005_table_1_row_1-4_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -14899,7 +14905,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/10
     - observation_id: li_2005_table_1_row_1-5_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -15005,7 +15011,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/10
     - observation_id: li_2005_table_1_row_1-6_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -15111,7 +15117,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/10
     - observation_id: li_2005_table_1_row_1-7_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -15217,7 +15223,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/10
     - observation_id: li_2005_table_1_row_1-8_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -15323,7 +15329,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/10
     - observation_id: li_2005_table_1_row_1-9_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -15429,7 +15435,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/10
     - observation_id: li_2005_table_1_row_1-10_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -15535,7 +15541,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/10
     - observation_id: li_2005_table_1_row_1-11_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -15641,7 +15647,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/10
     - observation_id: li_2005_table_2_row_2-1_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -15744,7 +15750,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-2_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -15847,7 +15853,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-3_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -15950,7 +15956,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-4_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -16053,7 +16059,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-5_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -16159,7 +16165,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-6_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -16265,7 +16271,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-7_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -16368,7 +16374,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-8_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -16474,7 +16480,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-9_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -16580,7 +16586,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-10_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -16686,7 +16692,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-11_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -16792,7 +16798,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-12_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -16898,7 +16904,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-13_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -17004,7 +17010,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-14_fe3plus_fe2plus_ratio
-      type: valence_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -17673,7 +17679,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/10
     - observation_id: li_2005_table_1_row_1-1_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -17773,7 +17779,7 @@ species:
         P2O5_mass_percent_as_published: '1.39'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.196'
     - observation_id: li_2005_table_1_row_1-2_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -17873,7 +17879,7 @@ species:
         P2O5_mass_percent_as_published: '1.80'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.221'
     - observation_id: li_2005_table_1_row_1-3_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -17973,7 +17979,7 @@ species:
         P2O5_mass_percent_as_published: '1.48'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.187'
     - observation_id: li_2005_table_1_row_1-4_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -18073,7 +18079,7 @@ species:
         P2O5_mass_percent_as_published: '1.70'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.198'
     - observation_id: li_2005_table_1_row_1-5_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -18173,7 +18179,7 @@ species:
         P2O5_mass_percent_as_published: '0.943'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.185'
     - observation_id: li_2005_table_1_row_1-6_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -18273,7 +18279,7 @@ species:
         P2O5_mass_percent_as_published: '0.903'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.153'
     - observation_id: li_2005_table_1_row_1-7_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -18373,7 +18379,7 @@ species:
         P2O5_mass_percent_as_published: '0.928'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.123'
     - observation_id: li_2005_table_1_row_1-8_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -18473,7 +18479,7 @@ species:
         P2O5_mass_percent_as_published: '1.01'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.168'
     - observation_id: li_2005_table_1_row_1-9_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -18573,7 +18579,7 @@ species:
         P2O5_mass_percent_as_published: '0.945'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.193'
     - observation_id: li_2005_table_1_row_1-10_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -18673,7 +18679,7 @@ species:
         P2O5_mass_percent_as_published: '0.942'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.145'
     - observation_id: li_2005_table_1_row_1-11_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -18773,7 +18779,7 @@ species:
         P2O5_mass_percent_as_published: '0.930'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.157'
     - observation_id: li_2005_table_1_row_1-1_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -18878,7 +18884,7 @@ species:
           L_P_as_published: '247'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.196'
     - observation_id: li_2005_table_1_row_1-2_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -18983,7 +18989,7 @@ species:
           L_P_as_published: '224'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.221'
     - observation_id: li_2005_table_1_row_1-3_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -19088,7 +19094,7 @@ species:
           L_P_as_published: '211'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.187'
     - observation_id: li_2005_table_1_row_1-4_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -19193,7 +19199,7 @@ species:
           L_P_as_published: '202'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.198'
     - observation_id: li_2005_table_1_row_1-5_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -19298,7 +19304,7 @@ species:
           L_P_as_published: '84.8'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.185'
     - observation_id: li_2005_table_1_row_1-6_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -19403,7 +19409,7 @@ species:
           L_P_as_published: '64.7'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.153'
     - observation_id: li_2005_table_1_row_1-7_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -19508,7 +19514,7 @@ species:
           L_P_as_published: '52.1'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.123'
     - observation_id: li_2005_table_1_row_1-8_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -19613,7 +19619,7 @@ species:
           L_P_as_published: '49.0'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.168'
     - observation_id: li_2005_table_1_row_1-9_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -19718,7 +19724,7 @@ species:
           L_P_as_published: '44.9'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.193'
     - observation_id: li_2005_table_1_row_1-10_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -19823,7 +19829,7 @@ species:
           L_P_as_published: '43.0'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.145'
     - observation_id: li_2005_table_1_row_1-11_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_1_equilibration
       locator:
         page: 3
@@ -20637,7 +20643,7 @@ species:
             note: Table caption prints oxygen partial pressure
         gas_ratio_as_published: CO2/CO = 1/18
     - observation_id: li_2005_table_2_row_2-1_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -20734,7 +20740,7 @@ species:
         P2O5_mass_percent_as_published: '1.77'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.197'
     - observation_id: li_2005_table_2_row_2-2_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -20831,7 +20837,7 @@ species:
         P2O5_mass_percent_as_published: '1.46'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.267'
     - observation_id: li_2005_table_2_row_2-3_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -20928,7 +20934,7 @@ species:
         P2O5_mass_percent_as_published: '1.68'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.232'
     - observation_id: li_2005_table_2_row_2-4_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -21025,7 +21031,7 @@ species:
         P2O5_mass_percent_as_published: '2.02'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.250'
     - observation_id: li_2005_table_2_row_2-5_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -21125,7 +21131,7 @@ species:
         P2O5_mass_percent_as_published: '1.56'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.192'
     - observation_id: li_2005_table_2_row_2-6_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -21225,7 +21231,7 @@ species:
         P2O5_mass_percent_as_published: '1.66'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.192'
     - observation_id: li_2005_table_2_row_2-7_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -21322,7 +21328,7 @@ species:
         P2O5_mass_percent_as_published: '2.14'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.237'
     - observation_id: li_2005_table_2_row_2-8_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -21422,7 +21428,7 @@ species:
         P2O5_mass_percent_as_published: '1.79'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.260'
     - observation_id: li_2005_table_2_row_2-9_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -21522,7 +21528,7 @@ species:
         P2O5_mass_percent_as_published: '1.98'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.192'
     - observation_id: li_2005_table_2_row_2-10_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -21622,7 +21628,7 @@ species:
         P2O5_mass_percent_as_published: '1.98'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.195'
     - observation_id: li_2005_table_2_row_2-11_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -21722,7 +21728,7 @@ species:
         P2O5_mass_percent_as_published: '1.89'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.249'
     - observation_id: li_2005_table_2_row_2-12_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -21822,7 +21828,7 @@ species:
         P2O5_mass_percent_as_published: '1.47'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.355'
     - observation_id: li_2005_table_2_row_2-13_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -21922,7 +21928,7 @@ species:
         P2O5_mass_percent_as_published: '1.53'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.366'
     - observation_id: li_2005_table_2_row_2-14_phosphorus_distribution_ratio
-      type: distribution_ratio
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -22022,7 +22028,7 @@ species:
         P2O5_mass_percent_as_published: '1.53'
         Fe3_plus_to_Fe2_plus_ratio_as_published: '0.289'
     - observation_id: li_2005_table_2_row_2-1_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -22124,7 +22130,7 @@ species:
           L_P_as_published: '629'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.197'
     - observation_id: li_2005_table_2_row_2-2_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -22226,7 +22232,7 @@ species:
           L_P_as_published: '554'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.267'
     - observation_id: li_2005_table_2_row_2-3_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -22328,7 +22334,7 @@ species:
           L_P_as_published: '538'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.232'
     - observation_id: li_2005_table_2_row_2-4_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -22430,7 +22436,7 @@ species:
           L_P_as_published: '493'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.250'
     - observation_id: li_2005_table_2_row_2-5_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -22535,7 +22541,7 @@ species:
           L_P_as_published: '459'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.192'
     - observation_id: li_2005_table_2_row_2-6_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -22640,7 +22646,7 @@ species:
           L_P_as_published: '425'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.192'
     - observation_id: li_2005_table_2_row_2-7_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -22742,7 +22748,7 @@ species:
           L_P_as_published: '422'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.237'
     - observation_id: li_2005_table_2_row_2-8_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -22847,7 +22853,7 @@ species:
           L_P_as_published: '416'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.260'
     - observation_id: li_2005_table_2_row_2-9_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -22952,7 +22958,7 @@ species:
           L_P_as_published: '391'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.192'
     - observation_id: li_2005_table_2_row_2-10_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -23057,7 +23063,7 @@ species:
           L_P_as_published: '389'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.195'
     - observation_id: li_2005_table_2_row_2-11_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -23162,7 +23168,7 @@ species:
           L_P_as_published: '313'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.249'
     - observation_id: li_2005_table_2_row_2-12_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -23267,7 +23273,7 @@ species:
           L_P_as_published: '263'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.355'
     - observation_id: li_2005_table_2_row_2-13_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
@@ -23372,7 +23378,7 @@ species:
           L_P_as_published: '217'
           Fe3_plus_to_Fe2_plus_ratio_as_published: '0.366'
     - observation_id: li_2005_table_2_row_2-14_phosphate_capacity_typed_refusal
-      type: phosphate_capacity
+      type: composition_series
       experiment: li_2005_table_2_equilibration
       locator:
         page: 3
