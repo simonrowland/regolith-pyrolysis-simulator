@@ -363,6 +363,98 @@ def test_pure_silica_objective_uses_route_classified_product_not_raw_capture() -
     ) == pytest.approx(4.5)
 
 
+def test_partial_silica_objective_evidence_keeps_exclusions_and_lower_bound() -> None:
+    from simulator.optimize.objective import _silica_objective_evidence
+
+    excluded = [{
+        "species": "Si",
+        "account": "process.cleaned_melt",
+        "reason": "Si: EvaporationFluxConfigurationError: missing LJ row",
+        "upper_bound_kg": "unbounded",
+    }]
+    availability_flag = {
+        "status": "partial",
+        "authority": "unavailable",
+        "reason": excluded[0]["reason"],
+        "excluded": excluded,
+        "total_basis": "lower_bound",
+    }
+    evidence = _silica_objective_evidence(
+        {
+            "pure_silica_glass": {
+                "stage_3_capture_kg": 4.5,
+                "class_total_kg": 4.5,
+                "status": "partial",
+                "availability_flag": availability_flag,
+                "excluded": excluded,
+            }
+        },
+        4.5,
+    )
+
+    assert evidence["value_status"] == "partial"
+    assert evidence["total_basis"] == "lower_bound"
+    assert evidence["availability_flag"] == availability_flag
+    assert evidence["excluded"] == excluded
+
+
+def test_partial_rump_objective_evidence_keeps_exclusions_and_lower_bound() -> None:
+    from simulator.optimize.objective import (
+        _product_class_objective_evidence,
+    )
+
+    excluded = [{
+        "species": "Si",
+        "account": "process.cleaned_melt",
+        "reason": "missing LJ row",
+        "upper_bound_kg": "unbounded",
+    }]
+    flag = {"status": "partial", "reason": "missing LJ row"}
+    evidence = _product_class_objective_evidence(
+        "refractory_ceramic_rump_kg",
+        {
+            "refractory_ceramic_rump": {
+                "status": "partial",
+                "availability_flag": flag,
+                "excluded": excluded,
+            }
+        },
+    )
+
+    assert evidence["value_status"] == "partial"
+    assert evidence["availability_flag"] == flag
+    assert evidence["excluded"] == excluded
+    assert evidence["total_basis"] == "lower_bound"
+
+
+def test_partial_metal_objective_evidence_keeps_exclusions_and_lower_bound() -> None:
+    from simulator.optimize.objective import _product_class_objective_evidence
+
+    excluded = [{
+        "species": "Si",
+        "account": "process.cleaned_melt",
+        "reason": "missing LJ row",
+        "upper_bound_kg": "unbounded",
+    }]
+    flag = {"status": "partial", "reason": "missing LJ row"}
+    evidence = _product_class_objective_evidence(
+        "metals_total_kg",
+        {
+            "metals_plus_O2": {
+                "status": "partial",
+                "availability_flag": flag,
+                "excluded": excluded,
+            }
+        },
+    )
+
+    assert evidence["source_class_path"] == "metals_plus_O2"
+    assert evidence["value_status"] == "partial"
+    assert evidence["availability_flag"] == flag
+    assert evidence["excluded"] == excluded
+    assert evidence["total_basis"] == "lower_bound"
+
+
 def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:
     sim = SimpleNamespace(
         energy_electrical_plus_evaporation_cumulative_kWh=18.0,

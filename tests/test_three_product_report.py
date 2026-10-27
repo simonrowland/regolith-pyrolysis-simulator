@@ -189,6 +189,39 @@ def test_silica_glass_zero_when_stage_3_missing():
     assert result['pure_silica_glass']['stage_3_kg_by_species'] == {}
 
 
+def test_glass_aggregate_keeps_computed_zero_when_capture_is_unqualified():
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[None, None, None, SimpleNamespace(
+            collected_kg={'SiO2': 4.5},
+        )]),
+        record=SimpleNamespace(snapshots=[]),
+        _last_evaporation_flux_diagnostic={
+            'missing_transport_parameters': {
+                'Si': {
+                    'policy': 'fail_loud_missing_transport_parameters',
+                    'refusal_type': 'EvaporationFluxConfigurationError',
+                    'reason': 'missing Si transport row',
+                    'parent_oxide': 'SiO2',
+                },
+            },
+        },
+    )
+
+    result = classify_products(sim)
+
+    silica = result['pure_silica_glass']
+    assert silica['stage_3_capture_kg'] == 4.5
+    assert silica['class_total_kg'] == 0.0
+    assert silica['status'] == 'partial'
+    glass = result['glass']
+    assert glass['class_total_kg'] == 0.0
+    assert glass['pure_silica_glass_kg'] == 0.0
+    assert glass['species_kg'] == {}
+    assert glass['status'] == 'partial'
+    assert glass['excluded'] == silica['excluded']
+
+
 @pytest.mark.parametrize(
     ('events', 'verdict', 'outcome'),
     [
@@ -200,7 +233,7 @@ def test_silica_glass_zero_when_stage_3_missing():
             'status_bearing_non_authoritative',
             'flagged_product',
         ),
-        (['hold', 'release'], 'missing', 'unavailable'),
+        (['hold', 'release'], 'missing', 'uncertified_numeric_product'),
         (['hold', 'incidental'], 'authoritative', 'non_product'),
         (['incidental', 'hold', 'release'], 'authoritative', 'non_product'),
         (['hold', 'release', 'incidental'], 'authoritative', 'non_product'),
@@ -256,12 +289,10 @@ def test_silica_product_separates_executed_switch_from_evidence_certification(
         'non_product': 0.0,
         'authoritative_product': captured_kg,
         'flagged_product': captured_kg,
-        'unavailable': None,
+        'uncertified_numeric_product': captured_kg,
     }[outcome]
-    expected_capture_kg = None if outcome == 'unavailable' else captured_kg
-    expected_species = (
-        {} if outcome == 'unavailable' else {'SiO2': captured_kg}
-    )
+    expected_capture_kg = captured_kg
+    expected_species = {'SiO2': captured_kg}
     assert silica['stage_3_capture_kg'] == expected_capture_kg
     assert silica['stage_3_kg_by_species'] == expected_species
     assert silica['class_total_kg'] == expected_product_kg
@@ -278,10 +309,8 @@ def test_silica_product_separates_executed_switch_from_evidence_certification(
             'band': [1400.0, 2200.0],
             'reason': 'outside certified SiO source band',
         }
-    elif outcome == 'unavailable':
+    elif outcome == 'uncertified_numeric_product':
         assert silica['flag']['status'] == 'unavailable'
-        assert silica['flag']['authority'] == 'missing'
-        assert silica['flag']['reason'] == 'missing SiO carrier evidence'
     else:
         assert 'flag' not in silica
 

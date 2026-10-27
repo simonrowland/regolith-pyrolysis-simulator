@@ -2604,6 +2604,7 @@ def _completion_payload(sim):
     extracted_product_kg = _extracted_product_kg(
         extracted_product_projection
     )
+    classification: Mapping[str, Any] = {}
     try:
         classification = classify_products(sim)
         product_story = _product_story_payload(
@@ -2618,6 +2619,18 @@ def _completion_payload(sim):
         _safe_log(f'Product story unavailable; raw completion retained: {exc}')
         product_story = None
         product_story_status = 'unavailable'
+    ceramic_panel = ceramic_rump_payload(refractory_rump_composition_wt_pct)
+    rump_class = classification.get('refractory_ceramic_rump')
+    if isinstance(rump_class, Mapping):
+        rump_status = rump_class.get('status')
+        if rump_status in {'partial', 'unavailable'}:
+            ceramic_panel['product_class_status'] = rump_status
+            availability_flag = (
+                rump_class.get('availability_flag') or rump_class.get('flag')
+            )
+            if isinstance(availability_flag, Mapping):
+                ceramic_panel['availability_flag'] = dict(availability_flag)
+            ceramic_panel['excluded'] = list(rump_class.get('excluded', ()))
     payload = {
         'total_hours': sim.melt.hour,
         'energy_electrical_plus_evaporation_kWh': (
@@ -2657,9 +2670,7 @@ def _completion_payload(sim):
         'terminal_residual_buckets': sim._terminal_residual_buckets(),
         'terminal_rump_composition_wt_pct': terminal_rump_composition_wt_pct,
         'terminal_rump_by_class': terminal_rump_by_class,
-        'ceramic_rump_panel': ceramic_rump_payload(
-            refractory_rump_composition_wt_pct
-        ),
+        'ceramic_rump_panel': ceramic_panel,
         'glass_panel': industrial_glass_payload(
             industrial_glass_view,
             pO2_mbar=max(float(sim.melt.pO2_mbar), 0.0),
@@ -2724,8 +2735,8 @@ def _product_story_payload(
     account_kg=None,
     extracted_projection=None,
 ):
-    # Keep web's stage-provenance mapping; the shared classifier supplies only
-    # unavailable flags for these existing product totals.
+    # Keep web's stage-provenance mapping; the shared classifier owns refusal
+    # status and excluded quantities for these existing product totals.
     if classification is None:
         classification = classify_products(sim)
     if account_kg is None:
@@ -2862,30 +2873,42 @@ def _product_story_payload(
         source = classification.get(source_name)
         if not isinstance(source, Mapping):
             continue
+        availability_flag = source.get('availability_flag')
         flag = source.get('flag')
-        if not isinstance(flag, Mapping) or flag.get('status') != 'unavailable':
+        if not isinstance(availability_flag, Mapping) and not isinstance(flag, Mapping):
             continue
-        story[name]['class_total_kg'] = None
-        story[name]['flag'] = dict(flag)
+        if isinstance(flag, Mapping):
+            story[name]['flag'] = dict(flag)
+        if isinstance(availability_flag, Mapping):
+            story[name]['availability_flag'] = dict(availability_flag)
+        story[name]['status'] = source.get('status') or (
+            availability_flag or flag
+        ).get('status')
+        story[name]['excluded'] = list(source.get('excluded', ()))
+        if story[name]['status'] == 'unavailable':
+            story[name]['class_total_kg'] = None
     if story['oxygen'].get('class_total_kg') is None:
         story['oxygen']['partition_kg'] = dict.fromkeys(
             story['oxygen']['partition_kg']
         )
     rump = classification.get('refractory_ceramic_rump')
     if isinstance(rump, Mapping):
-        rump_flag = rump.get('flag')
+        rump_flag = rump.get('availability_flag') or rump.get('flag')
         if (
             isinstance(rump_flag, Mapping)
-            and rump_flag.get('status') == 'unavailable'
+            and rump_flag.get('status') in {'partial', 'unavailable'}
         ):
+            story['terminal_residue']['availability_flag'] = dict(rump_flag)
+            story['terminal_residue']['status'] = rump_flag.get('status')
+            story['terminal_residue']['excluded'] = list(rump.get('excluded', ()))
             for field, source_field in (
                 ('silicate_residual_kg', 'rump_silicate_residual_kg'),
                 ('unextracted_metals_kg', 'rump_unextracted_metals_kg'),
             ):
                 if source_field in rump and rump[source_field] is None:
-                    story['terminal_residue'][field] = None
-                    story['terminal_residue']['class_total_kg'] = None
-                    story['terminal_residue']['flag'] = dict(rump_flag)
+                    if rump_flag.get('status') == 'unavailable':
+                        story['terminal_residue'][field] = None
+                        story['terminal_residue']['class_total_kg'] = None
     return story
 
 
