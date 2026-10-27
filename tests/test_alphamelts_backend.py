@@ -987,6 +987,7 @@ def test_thermoengine_liquidus_scan_records_absolute_sample_targets(monkeypatch)
                 liquid_fraction=liquid_fraction,
                 liquid_composition_wt_pct={'SiO2': 100.0},
                 solved_fO2_log=float(fO2_log),
+                solver_converged=True,
             )
 
     backend._thermoengine_transport = FakeTransport()
@@ -1051,6 +1052,7 @@ def test_thermoengine_liquidus_scan_evaluates_buffer_offset_per_sample():
                 liquid_fraction=liquid_fraction,
                 liquid_composition_wt_pct={'SiO2': 100.0},
                 solved_fO2_log=target,
+                solver_converged=True,
             )
 
     backend._thermoengine_transport = FakeTransport()
@@ -1117,6 +1119,7 @@ def test_thermoengine_liquidus_state_receives_kelvin_for_each_sample():
                 liquid_fraction=liquid_fraction,
                 liquid_composition_wt_pct={'SiO2': 100.0},
                 solved_fO2_log=target,
+                solver_converged=True,
             )
 
     backend._thermoengine_transport = FakeTransport()
@@ -5100,6 +5103,7 @@ def test_thermoengine_backend_keeps_transport_after_nonfinite_field():
                 activity_coefficients={'SiO2': 0.4},
                 solved_fO2_log=None,
                 solved_fO2_reason='undefined_zero_ferric_liquid',
+                solver_converged=True,
             )
 
         def close(self):
@@ -5161,6 +5165,7 @@ def test_thermoengine_backend_keeps_transport_after_fo2_undefined():
                 activity_coefficients={'SiO2': 0.4},
                 solved_fO2_log=None,
                 solved_fO2_reason='undefined_zero_ferric_liquid',
+                solver_converged=True,
             )
 
         def close(self):
@@ -5224,6 +5229,7 @@ def test_thermoengine_backend_keeps_transport_after_fo2_omitted():
                 activity_coefficients={'SiO2': 0.4},
                 solved_fO2_log=None,
                 solved_fO2_reason='undefined_zero_ferric_liquid',
+                solver_converged=True,
             )
 
         def close(self):
@@ -5940,6 +5946,7 @@ def test_thermoengine_health_smoke_requires_solved_absolute_fo2(
                 phases_present=('Liquid',),
                 phase_masses_kg={'Liquid': 1.0},
                 solved_fO2_log=solved_fO2_log,
+                solver_converged=True,
             )
 
     def fake_run(args, **kwargs):
@@ -7145,6 +7152,7 @@ def test_thermoengine_backend_respawns_worker_after_nonfinite_field():
         activity_coefficients={'SiO2': 0.4},
         solved_fO2_log=None,
         solved_fO2_reason='undefined_zero_ferric_liquid',
+        solver_converged=True,
     )
 
     class RespawnWorker:
@@ -8004,6 +8012,7 @@ def test_alphamelts_thermoengine_default_is_intrinsic_closed(monkeypatch):
                 liquid_composition_wt_pct={'SiO2': 100.0},
                 solved_fO2_log=-8.25,
                 phase_universe_size=54,
+                solver_converged=True,
             )
 
     backend._thermoengine_transport = FakeTransport()
@@ -8090,6 +8099,7 @@ def test_thermoengine_standalone_shadow_parity_with_frozen_legacy_oracle(
                 activity_coefficients={'SiO2': 0.5},
                 fe_redox_split={'FeO_wt_pct': 9.0, 'Fe2O3_wt_pct': 1.0},
                 warnings=('frozen oracle warning',),
+                solver_converged=True,
             )
 
         def close(self):
@@ -8460,6 +8470,7 @@ def test_thermoengine_backend_keeps_fe_free_activity_payload_when_fo2_undefined(
                 activity_coefficients={'SiO2': 0.4},
                 solved_fO2_log=None,
                 solved_fO2_reason='undefined_zero_ferric_liquid',
+                solver_converged=True,
             )
 
         def close(self):
@@ -8504,6 +8515,7 @@ def test_thermoengine_backend_rejects_untyped_missing_intrinsic_fo2():
                 activity_coefficients={'SiO2': 0.4},
                 solved_fO2_log=None,
                 solved_fO2_reason=None,
+                solver_converged=True,
             )
 
         def close(self):
@@ -9098,6 +9110,7 @@ def test_thermoengine_missing_activity_is_typed_vapor_refusal_not_raise():
                 activity_coefficients={'SiO2': 0.4},
                 solved_fO2_log=-9.0,
                 phase_universe_size=54,
+                solver_converged=True,
             )
 
     backend._thermoengine_transport = FakeTransport()
@@ -9732,6 +9745,7 @@ def test_alphamelts_accepts_applied_thermoengine_absolute_fo2(monkeypatch):
                 liquid_fraction=1.0,
                 liquid_composition_wt_pct={'SiO2': 100.0},
                 solved_fO2_log=-3.0004,
+                solver_converged=True,
             )
 
     backend._thermoengine_transport = FakeTransport()
@@ -10759,6 +10773,7 @@ def test_thermoengine_callsite_wires_vaporock_source_and_solved_liquid(monkeypat
                 activity_coefficients={'Na2O': 0.1},
                 fe_redox_split={},
                 solved_fO2_log=fO2_log,
+                solver_converged=True,
             )
 
     backend = ThermoEngineBackend()
@@ -10806,6 +10821,7 @@ def test_thermoengine_vaporock_empty_fallback_marks_vapor_facet_degraded():
                 activity_coefficients={'Na2O': 0.2},
                 fe_redox_split={},
                 solved_fO2_log=fO2_log,
+                solver_converged=True,
             )
 
     backend = ThermoEngineBackend()
@@ -10888,6 +10904,7 @@ def test_thermoengine_vaporock_unavailable_marks_not_attempted_without_churn():
                 activity_coefficients={'Na2O': 0.2},
                 fe_redox_split={},
                 solved_fO2_log=fO2_log,
+                solver_converged=True,
             )
 
     backend = ThermoEngineBackend()

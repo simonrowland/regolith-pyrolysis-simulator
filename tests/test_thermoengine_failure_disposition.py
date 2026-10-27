@@ -313,6 +313,7 @@ def test_thermoengine_commissioning_notice_does_not_retype_to_refusal(
                 liquid_composition_wt_pct=dict(kwargs['comp_wt']),
                 activity_coefficients={'SiO2': 0.4},
                 solved_fO2_log=kwargs['fO2_log'],
+                solver_converged=True,
             )
 
         def close(self):
@@ -394,6 +395,7 @@ def test_thermoengine_solves_intrinsic_fo2_without_an_input_or_redox_mode(
                 liquid_composition_wt_pct=dict(kwargs['comp_wt']),
                 activity_coefficients={'SiO2': 0.4},
                 solved_fO2_log=-8.25,
+                solver_converged=True,
             )
 
     backend._thermoengine_transport = FakeTransport()
