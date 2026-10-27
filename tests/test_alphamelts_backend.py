@@ -8939,15 +8939,13 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
     table = vapor_pressure_legacy_view(_load_data('vapor_pressures.yaml'))['metals']
-    # 2026-08-08 t-383: Na's runtime Antoine is the L&H liquid-NaO0.5
-    # standard-reaction reference (fit_target=standard_reaction_term), so the
-    # legacy bridge evaluates activity^1 x P_ref(T) x (pO2/pO2_ref)^-0.25 —
-    # the coherent-pair algebra — not the pure-component sidecar x activity
-    # this test previously pinned (they coincided only under the retired
-    # pseudo/backsolve row). SIGN/unit check: P_ref(1873.15 K)=1.739e4 Pa,
-    # x2 activity, x(1e-9)^-0.25=10^2.25 => ~6.19e6 Pa.
+    # Na's runtime Antoine is the JANAF liquid-NaO0.5 standard-reaction
+    # reference (fit_target=standard_reaction_term), so the legacy bridge
+    # evaluates activity^1 x P_ref(T) x (pO2/pO2_ref)^-0.25 — not the
+    # pure-component sidecar. SIGN/unit check: P_ref(1873.15 K)=7935.67 Pa,
+    # x2 activity, x(1e-9)^-0.25=10^2.25 => 2.822e6 Pa.
     na_row = table['Na']
-    p_reference_na = float.fromhex("0x1.0fc0c6cbb52d4p+14")
+    p_reference_na = float.fromhex("0x1.effaaa0194920p+12")
     expected_na = (
         2.0
         * p_reference_na
@@ -8956,7 +8954,7 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
     )
 
     assert set(pressures) == {'Na', 'K'}
-    assert pressures['Na'].hex() == '0x1.798a909525fabp+22'
+    assert pressures['Na'].hex() == '0x1.5886f3c32dec1p+21'
     assert pressures['K'].hex() == '0x1.e0a0e8f4fbaebp+23'
     assert pressures['Na'] == pytest.approx(expected_na)
     assert pressures['K'] > 0.0
@@ -9008,7 +9006,7 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
     # legacy AlphaMELTS bridge covers only its original Antoine/activity surface.
     assert required == set(pressures)
     assert all(pressures[species] > 0.0 for species in required)
-    assert pressures['Na'].hex() == '0x1.27fb918b2b0aep+8'
+    assert pressures['Na'].hex() == '0x1.0e19b87b284dep+7'
     assert pressures['K'].hex() == '0x1.19c380c94a644p+14'
     from simulator.chemistry.ellingham_graph import effective_equilibrium_pressure_Pa
 

@@ -101,11 +101,11 @@ iron–wüstite oxygen fugacity per Kress & Carmichael 1991). That is the
 `pseudo_psat_backsolved_from_vaporock` path. It is honestly a model-to-model fit, not a measurement:
 the residual metadata records about 0.418 dex for Fe, and every such row is
 UNCERTIFIED. Fe's residual pseudo Antoine is dormant. Sodium no longer uses that path for the live
-high-T rail (t-383, 2026-08-08): Na is a liquid-NaO0.5 `standard_reaction_term` assembled from
-Lamoreaux & Hildenbrand 1984 Tables 2/4 (dual-extracted; minimax residual 1.18e-4 dex), paired with
-constant table `gamma_NaO0.5=1e-3` coherent by provenance in the L&H frame; the VapoRock-backsolved
-pseudo Antoine and the prior Chase gas-standard compensating-errors surface are inactive provenance
-only. Silicon monoxide no longer uses the pseudo path either: as of the vapor package (`3a85f59`),
+high-T rail (t-1545): Na is a liquid-NaO0.5 `standard_reaction_term` fit to NIST-JANAF 4th
+liquid Na2O (Na-013/Na-014, Na-005, O-029; max |residual| 0.001721 dex on 1400–2300 K), with
+constant table `gamma_NaO0.5=1e-3` left unfitted. The Lamoreaux & Hildenbrand 1984 fit, the
+VapoRock-backsolved pseudo Antoine, and the prior Chase gas-standard compensating-errors surface
+are inactive provenance only. Silicon monoxide no longer uses the pseudo path either: as of the vapor package (`3a85f59`),
 SiO is a `standard_reaction_term` with a composition-independent JANAF/ThermoEngine reaction block
 and mass-action pO₂ scaling. Potassium also uses a `standard_reaction_term` on the same L&H basis.
 Where a usable `pure_component_antoine` sidecar exists, the runtime selector prefers it over any

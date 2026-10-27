@@ -577,31 +577,34 @@ families:
           electrons_per_atom: 1
           parent_oxide: Na2O
           authority_class: uncertified
-          # t-383 (2026-08-08): coherent L&H liquid-NaO0.5 standard + table gamma.
-          # declared_compensation Alternative-B surface retired; TE-μ0 full-VapoRock
-          # route demoted to status-bearing shadow bracket (ADR-001 class retirement).
-          residual_dex: 0.000118
-          confidence_tier: uncertified_liquid_nao0_5_lamoreaux_hildenbrand
+          # t-1545: NIST-JANAF liquid-Na2O standard_reaction_term. Table gamma stays
+          # the Sossi 1e-3 anchor and is not re-fitted. t-383 retired the
+          # declared_compensation Alternative-B surface; TE-μ0 full-VapoRock
+          # route stays a status-bearing shadow bracket (ADR-001 class retirement).
+          residual_dex: 0.001721
+          confidence_tier: uncertified_liquid_nao0_5_janaf_4th
           gamma_domain_K:
           - 1673.0
           - 1673.0
           gamma_authority: Fixed gamma_NaO0.5=1e-3 certified only at the 1673 K Sossi
-            anchor in the Lamoreaux & Hildenbrand liquid-NaO0.5 frame. Stored residual_dex
-            0.000118 is a rounded evidence snapshot; landed A/B/C give max |res| =
-            1.189126e-4 dex on the 1405-1600 K source grid. Runtime consumes the
-            coefficients, not this snapshot. Gamma temperature extrapolation dominates
-            uncertainty and is UNCERTIFIED outside (1673,1673) K. Certifying callers must
-            treat out-of-domain gamma as authority-limited (DRIFT-HIGH). Do not retune
-            A/B/C to recover 1.18e-4, and do not assert the snapshot equals the live fit.
+            anchor. t-1545 did not re-fit gamma onto the JANAF standard; the anchor was
+            defined against the Lamoreaux & Hildenbrand K and that frame no longer matches
+            the reaction term. Stored residual_dex 0.001721 is the rounded max |log10 P
+            fit − JANAF| on the 1400-2300 K liquid grid (live max 0.00172055 at 2300 K).
+            Runtime consumes the coefficients, not this snapshot. Gamma temperature
+            extrapolation dominates uncertainty and is UNCERTIFIED outside (1673,1673) K.
+            Certifying callers must treat out-of-domain gamma as authority-limited
+            (DRIFT-HIGH). Do not retune A/B/C or gamma to close DeMaria or Mathieu residuals.
           coherent_pair:
-            standard: lamoreaux_hildenbrand_1984_liquid_nao0_5
+            standard: nist_janaf_4th_na013_na014_liquid_nao0_5
             gamma: 0.001
-            gamma_frame: L&H liquid-NaO0.5 Raoultian (Sossi 2019 magnitude, coherent by
-              provenance -- Sossi gamma is defined against L&H K)
+            gamma_frame: Sossi 2019 magnitude 1e-3 on the NaO0.5 Raoultian basis. Not
+              re-fitted to the NIST-JANAF liquid-Na2O standard (t-1545). The anchor was
+              defined against the Lamoreaux & Hildenbrand K; that coherence claim is retired.
             T_K_gamma_anchor: 1673.0
-            note: 't-383 lands Pref + keeps table gamma=1e-3; does NOT re-fit gamma to
-              DeMaria or enghar (ADR-001; framework §4.3.B/§6.2). Dual-attribution trap
-              closed: pair moves together off the Chase+gamma compensating-errors surface.'
+            note: 't-383 kept table gamma=1e-3 and did not re-fit it to DeMaria or enghar
+              (ADR-001; framework §4.3.B/§6.2). t-1545 replaces the reaction term only.
+              Gamma stays the cited point anchor.'
           shadow_bracket:
             T_K: 1429.0
             condition: investigation 2026-07-20-na-investigation stated DeMaria-class input
@@ -642,89 +645,129 @@ families:
                 remaining oxides renormalized to 100 wt%
               fit_objective: bounded minimax absolute log10 residual; |C| <= 1000 K
               status: inactive_provenance_only
-              note: Does not drive runtime high-T Na rail; active path is L&H
-                standard_reaction_term + melt gamma (t-383). Pseudo Antoine retained
+              note: Does not drive runtime high-T Na rail; active path is the
+                NIST-JANAF liquid-Na2O standard_reaction_term + melt gamma
+                (t-1545; t-383 retired this pseudo row). Pseudo Antoine retained
                 provenance-only.
           reaction:
             formula: NaO0.5(l) -> Na(g) + 0.25 O2(g)
             exponent_oxide: 1.0
             exponent_pO2: -0.25
-            basis: Lamoreaux & Hildenbrand 1984 Tables 2/4 liquid Na2O Gibbs-energy-function/enthalpy
-              assembly, DOI 10.1063/1.555706; halved to liquid NaO0.5 Raoultian standard reaction;
-              DeMaria 1971 retained only as held-out validation
+            basis: NIST-JANAF 4th edition liquid Na2O formation Gibbs (Na-013 liquid,
+              including the tabulated supercooled branch; Na-014 stable-phase where it
+              matches the liquid), Na(g) Na-005, O2(g) O-029; 1 bar standard; halved to
+              the liquid NaO0.5 Raoultian standard reaction. DeMaria 1971 is held-out
+              validation only. Lamoreaux & Hildenbrand 1984 Tables 2/4 (DOI 10.1063/1.555706)
+              is the retired secondary fit (t-1545).
             activity_basis: single-cation NaO0.5 Raoultian activity
-            # Premise: Na2O(l) = 2 Na(g) + 1/2 O2(g); NaO0.5 basis halves DeltaG and log10 K.
-            # Algebra: DeltaG°/RT = DeltaH°298,rxn/(R·T) - Deltafef(T); log10 K_r,full = -DeltaG°/(RT ln10);
-            #   log10 K_r,NaO0.5 = 1/2 log10 K_r,full (atm standard, paper §2.1c).
-            #   DeltaH°298,rxn/R = 2·12.88 - (-50.17) = 75.93 kK (Table 4); fef from Table 2
-            #   liquid Na2O + Na(g) + O2 segments (verified dual extraction t-383 Step 0).
-            # Units: K_r is dimensionless on the 1 atm standard; runtime Pref uses 1 bar
-            #   (100000 Pa). Conversion (Deltan_gas = 1.25): log10(P_ref/Pa) = log10 K_r,atm
-            #   + log10(1e5) + 1.25·log10(1.01325) = log10 K_r,atm + 5.007145765517163.
-            # Sanity: landed A/B/C give max |log10 P_fit - log10 P_assembly| =
-            #   1.189126e-4 dex on the 1405-1600 K source grid (1405 K:
-            #   11.342243-12140.316409/(1405-163.701)=1.561910937 vs assembly
-            #   1.562029850; res=-0.000118912 dex). Stored residual_dex /
-            #   fit_residual_dex.max_abs remain the rounded 0.000118 snapshot;
-            #   runtime consumes A/B/C, not that snapshot. Denser 5 K grid is a
-            #   provenance claim about the original fit, not a retune. Sossi
-            #   second-hand linear (DeltaH=255 kJ/mol, DeltaS=0.128 kJ/mol/K) is
-            #   NOT the landed Pref (cross-check only in kems-012) -- table assembly is
-            #   ~0.62 dex lower at 1429 K than that linear form.
-            # Boundary: do not retune coefficients to make 1.18e-4 true, and do
-            #   not assert 1.18e-4 still bounds the live fit.
+            # Premise: Na2O(l) = 2 Na(g) + 1/2 O2(g) at p° = 0.1 MPa = 1 bar.
+            #   Runtime row is the half reaction NaO0.5(l) = Na(g) + 1/4 O2(g),
+            #   so DeltaG_half = DeltaG_full/2. Above the Na boil, Na(g) is the
+            #   element reference: Na-005 DeltafG = 0 on the 100 K grid from 1300 K,
+            #   and O-029 DeltafG(O2) = 0, so DeltaG°_rxn,full = -DeltafG(Na2O,l).
+            #   An atm/bar miss is only ~0.5 kJ (Deltan_gas = 2.5) and does not
+            #   explain the retired L&H gap (11.1 kJ at 1523 K, 17.0 kJ at 1673 K).
+            #   1400 K uses Na-013 supercooled liquid (DeltafG = -192.041), not the
+            #   Na-014 crystal (-192.218). Fusion is 1405.2 K; 1400-1405.2 K is the
+            #   source-tabulated supercooled branch, not a silent extrapolation.
+            #   The compiled Na-013 table drops the 1500 K row (delimiter collapse).
+            #   The printed source line is DeltafG = -167.596 kJ/mol, which matches
+            #   Na-014 at 1500 K and above. Nodes 1500-2300 K are that liquid value.
+            # Algebra: R = 8.31446261815324 J/(mol·K) (physical_constants.GAS_CONSTANT).
+            #   K_half = exp(-DeltaG_half/(R T)); at a_NaO0.5 = 1 and pO2 = 1 bar,
+            #   K_half = p_Na/1e5, so
+            #   log10(p_Na/Pa) = 5 - DeltaG°_full(J/mol)/(2 R T ln(10)).
+            #   Antoine log10(p_Na/Pa) = A - B/(T_K+C) is least squares in 1/(T+C)
+            #   on that grid; C is the golden-section minimizer of the max |dex|.
+            # Units: table DeltafG and DeltaG° are kJ/mol; the Pa conversion uses J.
+            # Sanity at 1700 K (printed Na-014 row, no interpolation):
+            #   DeltafG(Na2O,l) = -119.580 kJ/mol => DeltaG°_rxn = 119.580 kJ/mol
+            #   => log10(p_Na/Pa) = 3.16291285. Landed fit gives 3.16378507 and
+            #   DeltaG° = 119.523 kJ/mol (residual +0.000872 dex, -0.057 kJ/mol).
+            #   Grid max |dex| = 0.001721 at 2300 K (0.152 kJ/mol on the full reaction).
+            # One fit, not an L&H band plus a bridge: the 11 kJ L&H error is inside
+            #   1405-1600 K. Gamma is not retuned. Out-of-band T still predict-and-flags
+            #   on valid_domain [1400, 2300] K.
             fit_form: log10(P_Na_Pa)=A-B/(T_K+C)+log10(a_NaO0.5)-0.25*log10(pO2_bar/1bar)
             pressure_standard_Pa: 100000
-            source: Lamoreaux & Hildenbrand 1984 J. Phys. Chem. Ref. Data 13:151-173 Tables 2/4,
-              DOI 10.1063/1.555706; verified extraction
-              docs-private/research/2026-08-08-t383-naox/lamoreaux-hildenbrand-1984-na2o-verified-data.md
+            source: NIST-JANAF 4th edition tables Na-013, Na-014, Na-005, O-029
+              (Chase 1998); liquid formation Gibbs, 1 bar. 1500 K Na-013 row restored
+              from the printed source line (compiled table omits it); agrees with Na-014.
             source_urls:
-            - https://doi.org/10.1063/1.555706
+            - https://janaf.nist.gov/tables/Na-013.html
+            - https://janaf.nist.gov/tables/Na-014.html
+            - https://janaf.nist.gov/tables/Na-005.html
+            - https://janaf.nist.gov/tables/O-029.html
             source_table_values:
-            - T_K: 1405.0
-              log10_K_r_NaO0_5_atm: -3.445115916
-              log10_P_Na_ref_Pa: 1.562029850
-              fit_log10_P_Na_ref_Pa: 1.561911762
-              residual_dex: -0.000118
-            - T_K: 1429.0
-              log10_K_r_NaO0_5_atm: -3.259795336
-              log10_P_Na_ref_Pa: 1.747350430
-              fit_log10_P_Na_ref_Pa: 1.747423597
-              residual_dex: 7.3e-05
-            - T_K: 1450.0
-              log10_K_r_NaO0_5_atm: -3.103196117
-              log10_P_Na_ref_Pa: 1.903949648
-              fit_log10_P_Na_ref_Pa: 1.904067735
-              residual_dex: 0.000118
-            - T_K: 1475.0
-              log10_K_r_NaO0_5_atm: -2.923217471
-              log10_P_Na_ref_Pa: 2.083928294
-              fit_log10_P_Na_ref_Pa: 2.084007148
-              residual_dex: 7.9e-05
+            - T_K: 1400.0
+              table: Na-013
+              delta_fG_Na2O_l_kJ_mol: -192.041
+              log10_P_Na_ref_Pa: 1.41750120
+              fit_log10_P_Na_ref_Pa: 1.415780812
+              residual_dex: -0.001720
             - T_K: 1500.0
-              log10_K_r_NaO0_5_atm: -2.749925516
-              log10_P_Na_ref_Pa: 2.257220250
-              fit_log10_P_Na_ref_Pa: 2.257213808
-              residual_dex: -6.4e-06
-            - T_K: 1550.0
-              log10_K_r_NaO0_5_atm: -2.422141815
-              log10_P_Na_ref_Pa: 2.585003950
-              fit_log10_P_Na_ref_Pa: 2.584885863
-              residual_dex: -0.000118
+              table: Na-014
+              delta_fG_Na2O_l_kJ_mol: -167.596
+              log10_P_Na_ref_Pa: 2.08195140
+              fit_log10_P_Na_ref_Pa: 2.083211592
+              residual_dex: 0.001260
             - T_K: 1600.0
-              log10_K_r_NaO0_5_atm: -2.117519572
-              log10_P_Na_ref_Pa: 2.889626194
-              fit_log10_P_Na_ref_Pa: 2.889744281
-              residual_dex: 0.000118
+              table: Na-014
+              delta_fG_Na2O_l_kJ_mol: -143.448
+              log10_P_Na_ref_Pa: 2.65849739
+              fit_log10_P_Na_ref_Pa: 2.660132359
+              residual_dex: 0.001635
+            - T_K: 1700.0
+              table: Na-014
+              delta_fG_Na2O_l_kJ_mol: -119.580
+              log10_P_Na_ref_Pa: 3.16291285
+              fit_log10_P_Na_ref_Pa: 3.163785067
+              residual_dex: 0.000872
+            - T_K: 1800.0
+              table: Na-014
+              delta_fG_Na2O_l_kJ_mol: -95.974
+              log10_P_Na_ref_Pa: 3.60748071
+              fit_log10_P_Na_ref_Pa: 3.607293746
+              residual_dex: -0.000187
+            - T_K: 1900.0
+              table: Na-014
+              delta_fG_Na2O_l_kJ_mol: -72.614
+              log10_P_Na_ref_Pa: 4.00187050
+              fit_log10_P_Na_ref_Pa: 4.000824605
+              residual_dex: -0.001046
+            - T_K: 2000.0
+              table: Na-014
+              delta_fG_Na2O_l_kJ_mol: -49.488
+              log10_P_Na_ref_Pa: 4.35376565
+              fit_log10_P_Na_ref_Pa: 4.352374853
+              residual_dex: -0.001391
+            - T_K: 2100.0
+              table: Na-014
+              delta_fG_Na2O_l_kJ_mol: -26.582
+              log10_P_Na_ref_Pa: 4.66941093
+              fit_log10_P_Na_ref_Pa: 4.668321867
+              residual_dex: -0.001089
+            - T_K: 2200.0
+              table: Na-014
+              delta_fG_Na2O_l_kJ_mol: -3.886
+              log10_P_Na_ref_Pa: 4.95386822
+              fit_log10_P_Na_ref_Pa: 4.953813545
+              residual_dex: -0.000055
+            - T_K: 2300.0
+              table: Na-014
+              delta_fG_Na2O_l_kJ_mol: 18.611
+              log10_P_Na_ref_Pa: 5.21133041
+              fit_log10_P_Na_ref_Pa: 5.213050965
+              residual_dex: 0.001721
             fit_residual_dex:
-              max_abs: 0.000118
-              rms: 9.8e-05
+              max_abs: 0.001721
+              rms: 0.001233
             comparison_anchor:
               T_K: 1429.0
               measured_log10_pO2_bar: -7.853114
               measured_pNa_Pa_12022_line: 0.0793
-              predicted_pNa_Pa_with_runtime_gamma: 0.035201224843865266
-              residual_dex_model_minus_demaria: -0.3527
+              predicted_pNa_Pa_with_runtime_gamma: 0.0262428383991
+              residual_dex_model_minus_demaria: -0.4803
               partial_melt_caveat: both Apollo 12022/12065 Na rows are sub-liquidus (~1573 K
                 for 12022); runtime assumes fully liquid activity surface
             heldout_demaria_comparison:
@@ -738,30 +781,30 @@ families:
               X_NaO0_5: 0.006852615457
               gamma_runtime: 0.001
               measured_pNa_Pa: 0.032271
-              predicted_pNa_Pa: 0.024492
-              residual_dex_model_minus_demaria: -0.1198
-              domain_status: below_liquid_fef_domain_1405K_OOR_status_bearing
+              predicted_pNa_Pa: 0.019294875
+              residual_dex_model_minus_demaria: -0.2234
+              domain_status: below_janaf_liquid_grid_1400K_OOR_status_bearing
               partial_melt: true
-              note: O2 Table-1 12022 row; pNa from 12022 digitized-line fit; T below L&H liquid domain
+              note: O2 Table-1 12022 row; pNa from 12022 digitized-line fit; T below the JANAF liquid-grid floor (predict-and-flag)
             - sample: '12022'
               T_K: 1429.0
               log10_pO2_bar: -7.853114
               X_NaO0_5: 0.006852615457
               gamma_runtime: 0.001
               measured_pNa_Pa: 0.0793
-              predicted_pNa_Pa: 0.035201224843865266
-              residual_dex_model_minus_demaria: -0.3527
+              predicted_pNa_Pa: 0.0262428383991
+              residual_dex_model_minus_demaria: -0.4803
               domain_status: in_domain
               partial_melt: true
-              note: investigation anchor; extract line_anchor_1429K p=7.93e-2 Pa; |res| near sigma=0.30
+              note: investigation anchor; extract line_anchor_1429K p=7.93e-2 Pa; residual is outside the 0.30 dex digitization sigma after the JANAF re-ground and is not fitted away
             - sample: '12022'
               T_K: 1475.0
               log10_pO2_bar: -7.2988
               X_NaO0_5: 0.006852615457
               gamma_runtime: 0.001
               measured_pNa_Pa: 0.46562
-              predicted_pNa_Pa: 0.055535
-              residual_dex_model_minus_demaria: -0.9235
+              predicted_pNa_Pa: 0.038564293
+              residual_dex_model_minus_demaria: -1.0818
               domain_status: in_domain
               partial_melt: true
               note: O2 Table-1 12022 high-T row; pNa from 12022 digitized-line extrapolation
@@ -771,8 +814,8 @@ families:
               X_NaO0_5: 0.005145315414
               gamma_runtime: 0.001
               measured_pNa_Pa: 0.0030489
-              predicted_pNa_Pa: 0.039199
-              residual_dex_model_minus_demaria: 1.1091
+              predicted_pNa_Pa: 0.029035689
+              residual_dex_model_minus_demaria: 0.9788
               domain_status: in_domain
               partial_melt: true
               note: own 12065 composition (Na2O 0.27 wt%) and Table-1 pO2; not cross-sample
@@ -782,8 +825,8 @@ families:
               X_NaO0_5: 0.005145315414
               gamma_runtime: 0.001
               measured_pNa_Pa: 0.014265
-              predicted_pNa_Pa: 0.066307
-              residual_dex_model_minus_demaria: 0.6673
+              predicted_pNa_Pa: 0.045575090
+              residual_dex_model_minus_demaria: 0.5045
               domain_status: in_domain
               partial_melt: true
               note: own 12065 composition and Table-1 pO2; measured pNa is a
@@ -796,8 +839,8 @@ families:
               X_NaO0_5: 0.005145315414
               gamma_runtime: 0.001
               measured_pNa_Pa: 0.023798
-              predicted_pNa_Pa: 0.075739
-              residual_dex_model_minus_demaria: 0.5028
+              predicted_pNa_Pa: 0.050807577
+              residual_dex_model_minus_demaria: 0.3294
               domain_status: in_domain
               partial_melt: true
               note: own 12065 composition and Table-1 pO2; measured pNa is a
@@ -825,15 +868,17 @@ families:
           pO2_reference_bar: 1.0
           boiling_point_C: 883
           notes: 'Direct liquid-NaO0.5 standard-reaction term for NaO0.5(l) = Na(g) + 0.25 O2
-            (t-383, 2026-08-08). The coefficient is not a VapoRock fit, not a DeMaria
-            back-solve, and not a Chase/JANAF gas_standard_fugacity surrogate: it is fitted
-            only to the Lamoreaux & Hildenbrand 1984 Tables 2/4 liquid-Na2O thermodynamic
-            assembly (DOI 10.1063/1.555706), halved to the single-cation NaO0.5 Raoultian
-            basis consumed by melt activity. Table gamma_NaO0.5=1e-3 is coherent by
-            provenance in the L&H frame (Sossi 2019). DeMaria 12022/12065 are held-out
-            validation with pre-registered sigma; residuals are reported, never fitted away.
-            Full-VapoRock/TE-μ0 route is a status-bearing non-authoritative shadow bracket
-            only (ADR-001). authority_class remains uncertified (framework §6.5).
+            (t-1545, 2026-10-27). The coefficient is not a VapoRock fit and not a DeMaria
+            back-solve. It is an Antoine fit to NIST-JANAF 4th liquid Na2O formation Gibbs
+            (Na-013/Na-014, with Na-005 and O-029 at the 1 bar standard), halved to the
+            single-cation NaO0.5 basis. The Lamoreaux & Hildenbrand 1984 Tables 2/4 fit
+            (t-383) is retired: it sat 11.1 kJ/mol (1523 K) and 17.0 kJ/mol (1673 K) below
+            JANAF on the full reaction, including inside its own 1405-1600 K band.
+            Table gamma_NaO0.5=1e-3 stays the Sossi 2019 point anchor and is not re-fitted
+            to this standard. DeMaria 12022/12065 are held-out validation; residuals are
+            reported, never fitted away. Full-VapoRock/TE-μ0 route is a status-bearing
+            non-authoritative shadow bracket only (ADR-001). authority_class remains
+            uncertified (framework §6.5).
 
             '
           validation:
@@ -866,8 +911,8 @@ families:
             species_basis: monomer
             valid_domain:
               temperature_K:
-              - 1405
-              - 1600
+              - 1400
+              - 2300
             provenance:
             - source: schema_v1_in_place_migration
             evaluator_family: standard_reaction_term
@@ -877,14 +922,16 @@ families:
             reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                # Minimax |log10 P_fit - log10 P_assembly| on the extracted liquid
-                # grid 1405-1600 K (K precedent). Live max|res| = 1.189126e-4 dex
-                # from landed A/B/C (1405 K residual -0.000118912 dex). Stored
-                # 1.18e-4 / 0.000118 is a rounded evidence snapshot. Runtime
-                # consumes these coefficients. Do not retune A/B/C to recover 1.18e-4.
-                A: 11.342243
-                B: 12140.316409
-                C: -163.701
+                # Least-squares Antoine on NIST-JANAF liquid log10(p_Na/Pa),
+                # 1400 K (Na-013 supercooled) and 1500-2300 K step 100 (Na-014
+                # liquid, equal to Na-013). C by golden section. Live max |dex|
+                # = 0.00172055 at 2300 K; stored max_abs 0.001721 is that
+                # residual rounded up. Runtime consumes these coefficients.
+                # Outside [1400, 2300] K the existing predict-and-flag notice
+                # applies. Do not retune A/B/C or gamma to close residuals.
+                A: 10.591766
+                B: 11697.747789
+                C: -125.178
             activity_exponent: 1.0
             pO2_exponent: -0.25
             pO2_reference_bar: 1.0
@@ -13522,34 +13569,25 @@ families:
           - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
             species_basis: cluster
-            # valid_domain [1400,1900] RETAINED (not clamped to L&H monatomic
-            # base fit [1405,1600]). Honest choice under catalog OOR conventions:
-            # the hot C2A process operates to 1800 °C (2073 K), so clamping the
-            # composite domain would mark the plant operating window OOR and hide
-            # a channel that is already live. MARKED EXTRAPOLATION of the L&H
-            # base Antoine above its certified liquid-grid fit:
-            #   monatomic OOR uses 1/T tangent continuation from 1600 K;
-            #   composites evaluate the raw Antoine in-domain through 1900 K.
-            # Measured base incoherence (unit-activity, pO2=1 bar):
-            #   +0.026 dex @1900 K; +0.055 dex @2073 K (1800 °C plant point);
-            #   Na2 pressure inherits ~2x via r_base² (<=0.11 dex @2073 K).
-            # Direction: composite LOW vs monatomic-coherent. Coefficient-
-            # identity with metals_na_family Na Pref is byte-true; runtime
-            # identity holds only inside the L&H fit domain. Pins at 1950 K
-            # are status-bearing OOR (out_of_range_conservative_continuation).
+            # valid_domain [1400,1900] RETAINED. The monatomic JANAF Antoine
+            # (t-1545) is certified on [1400, 2300] K, so this composite window
+            # evaluates the same in-band Antoine as monatomic Na. There is no
+            # base incoherence inside 1900 K. 1950 K remains outside this
+            # composite domain (status-bearing OOR on the composite row only);
+            # the monatomic row is still in band there.
             valid_domain:
               temperature_K:
               - 1400
               - 1900
               marked_extrapolation:
-                base_fit_domain_K: [1405.0, 1600.0]
-                base_source: metals_na_family Na L&H liquid-NaO0.5 Pref (t-383)
-                max_base_incoherence_dex_at_2073_K: 0.055
+                base_fit_domain_K: [1400.0, 2300.0]
+                base_source: metals_na_family Na JANAF liquid-NaO0.5 Pref (t-1545)
+                max_base_incoherence_dex_at_2073_K: 0.0
                 note: >-
-                  Composite keeps the pre-existing [1400,1900] process window;
-                  L&H base coefficients are extrapolated above 1600 K while the
-                  monatomic row uses 1/T OOR tangent continuation. Quantified
-                  base incoherence <=0.055 dex at 2073 K (1800 °C).
+                  Composite keeps the pre-existing [1400,1900] process window.
+                  That window sits inside the monatomic JANAF band, so both
+                  rows evaluate the same Antoine. 1950 K is composite-row OOR
+                  only.
             provenance:
             - source_id: nasa-cea-thermo
               observation_ids:
@@ -13559,11 +13597,12 @@ families:
               status: status_bearing_non_authoritative
             - source_id: metals_na_family
               observation_id: liquid_nao0_5_standard_reaction
-              note: 'b-151 (2026-08-08): monatomic base Pref retargeted to L&H liquid-NaO0.5
-                unit-activity Antoine (t-383 landed monatomic). Prior base A=5.18586 /
-                B=11127.434869 / C=1000 was the retired pseudo_psat_backsolved_from_vaporock
-                effective-pressure fit (activity already folded at grid compositions) --
-                dual-attribution class. See docs-private/research/2026-08-08-b151-na-composites/.'
+              note: 'b-151 (2026-08-08): monatomic base Pref copied from metals_na_family
+                Na. t-1545 re-grounded that base on NIST-JANAF liquid Na2O. Prior base
+                A=5.18586 / B=11127.434869 / C=1000 was the retired
+                pseudo_psat_backsolved_from_vaporock effective-pressure fit (activity
+                already folded at grid compositions) -- dual-attribution class. See
+                docs-private/research/2026-08-08-b151-na-composites/.'
             evaluator_family: nasa_cea_9
             source_reaction_id: liquid_na2o_to_na2_gas
             activity_semantics: source_reaction_activity
@@ -13571,12 +13610,12 @@ families:
             base_reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                # Aligned with monatomic Na L&H liquid-NaO0.5 Pref (t-383 / b-151 2026-08-08).
+                # Byte copy of monatomic Na JANAF liquid-NaO0.5 Pref (t-1545).
                 # Was retired VapoRock pseudo_psat A=5.18586 / B=11127.434869 / C=1000
                 # (activity-folded effective pressure -- NOT a unit-activity reference).
-                A: 11.342243
-                B: 12140.316409
-                C: -163.701
+                A: 10.591766
+                B: 11697.747789
+                C: -125.178
             base_vapor_formula: Na
             gas_exchange_reaction:
               reactants:
@@ -13595,7 +13634,7 @@ families:
                   source_id: nasa-cea-thermo
                   observation_id: cea_Na2_gibbs
             # Premise: r_base MUST be the monatomic unit-activity Pref at pO2_ref
-            #   (L&H liquid-NaO0.5 Antoine, identical to metals_na_family Na
+            #   (JANAF liquid-NaO0.5 Antoine, identical to metals_na_family Na
             #   reference_pressure_model). Composite Na2 = 2 Na(g) exchange, so
             #   runtime then multiplies by a_Na2O once via activity_exponent.
             # Algebra: r_v = (K_exchange * r_base^2.0 * r_O2^0.0)^(1/1),
@@ -13610,9 +13649,9 @@ families:
             #   activity_exponent again is the dual-attribution class Ca/Mg/Na
             #   audits exist to eliminate. Base = unit-activity reference only;
             #   activity is applied once, here.
-            derivation: 'Premise: r_base is the landed L&H liquid-NaO0.5 unit-activity
-              monatomic Pref at pO2_ref (b-151 retarget; was retired activity-folded
-              pseudo_psat). Algebra: r_v=(K_exchange*r_base^2.0*r_O2^0.0)^(1/1),
+            derivation: 'Premise: r_base is the JANAF liquid-NaO0.5 unit-activity
+              monatomic Pref at pO2_ref (t-1545; b-151 retarget off the retired
+              activity-folded pseudo_psat). Algebra: r_v=(K_exchange*r_base^2.0*r_O2^0.0)^(1/1),
               K_exchange=exp(-DeltaG_exchange/RT); activity applied once via
               activity_exponent. Unit check: every r and K is dimensionless; r_v*P0
               is Pa. Sanity: K_exchange=1 with unit gas ratios recovers the stoichiometric
@@ -13723,34 +13762,25 @@ families:
           - fit_target: standard_reaction_term
             pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
-            # valid_domain [1400,1900] RETAINED (not clamped to L&H monatomic
-            # base fit [1405,1600]). Honest choice under catalog OOR conventions:
-            # the hot C2A process operates to 1800 °C (2073 K), so clamping the
-            # composite domain would mark the plant operating window OOR and hide
-            # a channel that is already live. MARKED EXTRAPOLATION of the L&H
-            # base Antoine above its certified liquid-grid fit:
-            #   monatomic OOR uses 1/T tangent continuation from 1600 K;
-            #   composites evaluate the raw Antoine in-domain through 1900 K.
-            # Measured base incoherence (unit-activity, pO2=1 bar):
-            #   +0.026 dex @1900 K; +0.055 dex @2073 K (1800 °C plant point);
-            #   Na2 pressure inherits ~2x via r_base² (<=0.11 dex @2073 K).
-            # Direction: composite LOW vs monatomic-coherent. Coefficient-
-            # identity with metals_na_family Na Pref is byte-true; runtime
-            # identity holds only inside the L&H fit domain. Pins at 1950 K
-            # are status-bearing OOR (out_of_range_conservative_continuation).
+            # valid_domain [1400,1900] RETAINED. The monatomic JANAF Antoine
+            # (t-1545) is certified on [1400, 2300] K, so this composite window
+            # evaluates the same in-band Antoine as monatomic Na. There is no
+            # base incoherence inside 1900 K. 1950 K remains outside this
+            # composite domain (status-bearing OOR on the composite row only);
+            # the monatomic row is still in band there.
             valid_domain:
               temperature_K:
               - 1400
               - 1900
               marked_extrapolation:
-                base_fit_domain_K: [1405.0, 1600.0]
-                base_source: metals_na_family Na L&H liquid-NaO0.5 Pref (t-383)
-                max_base_incoherence_dex_at_2073_K: 0.055
+                base_fit_domain_K: [1400.0, 2300.0]
+                base_source: metals_na_family Na JANAF liquid-NaO0.5 Pref (t-1545)
+                max_base_incoherence_dex_at_2073_K: 0.0
                 note: >-
-                  Composite keeps the pre-existing [1400,1900] process window;
-                  L&H base coefficients are extrapolated above 1600 K while the
-                  monatomic row uses 1/T OOR tangent continuation. Quantified
-                  base incoherence <=0.055 dex at 2073 K (1800 °C).
+                  Composite keeps the pre-existing [1400,1900] process window.
+                  That window sits inside the monatomic JANAF band, so both
+                  rows evaluate the same Antoine. 1950 K is composite-row OOR
+                  only.
             provenance:
             - source_id: nasa-cea-thermo
               observation_ids:
@@ -13761,11 +13791,12 @@ families:
               status: status_bearing_non_authoritative
             - source_id: metals_na_family
               observation_id: liquid_nao0_5_standard_reaction
-              note: 'b-151 (2026-08-08): monatomic base Pref retargeted to L&H liquid-NaO0.5
-                unit-activity Antoine (t-383 landed monatomic). Prior base A=5.18586 /
-                B=11127.434869 / C=1000 was the retired pseudo_psat_backsolved_from_vaporock
-                effective-pressure fit (activity already folded at grid compositions) --
-                dual-attribution class. See docs-private/research/2026-08-08-b151-na-composites/.'
+              note: 'b-151 (2026-08-08): monatomic base Pref copied from metals_na_family
+                Na. t-1545 re-grounded that base on NIST-JANAF liquid Na2O. Prior base
+                A=5.18586 / B=11127.434869 / C=1000 was the retired
+                pseudo_psat_backsolved_from_vaporock effective-pressure fit (activity
+                already folded at grid compositions) -- dual-attribution class. See
+                docs-private/research/2026-08-08-b151-na-composites/.'
             evaluator_family: nasa_cea_9
             source_reaction_id: liquid_na2o_to_na2o_gas_gas
             activity_semantics: source_reaction_activity
@@ -13773,12 +13804,12 @@ families:
             base_reference_pressure_model:
               evaluator_family: antoine
               coefficients:
-                # Aligned with monatomic Na L&H liquid-NaO0.5 Pref (t-383 / b-151 2026-08-08).
+                # Byte copy of monatomic Na JANAF liquid-NaO0.5 Pref (t-1545).
                 # Was retired VapoRock pseudo_psat A=5.18586 / B=11127.434869 / C=1000
                 # (activity-folded effective pressure -- NOT a unit-activity reference).
-                A: 11.342243
-                B: 12140.316409
-                C: -163.701
+                A: 10.591766
+                B: 11697.747789
+                C: -125.178
             base_vapor_formula: Na
             gas_exchange_reaction:
               reactants:
@@ -13803,7 +13834,7 @@ families:
                   source_id: nasa-cea-thermo
                   observation_id: cea_O2_gibbs
             # Premise: r_base MUST be the monatomic unit-activity Pref at pO2_ref
-            #   (L&H liquid-NaO0.5 Antoine, identical to metals_na_family Na
+            #   (JANAF liquid-NaO0.5 Antoine, identical to metals_na_family Na
             #   reference_pressure_model). Composite Na2O(g) exchange uses 2 Na,
             #   so runtime multiplies by a_Na2O once via activity_exponent.
             # Algebra: r_v = (K_exchange * r_base^2.0 * r_O2^0.5)^(1/1),
@@ -13817,16 +13848,16 @@ families:
             #   *effective* pressure. Using it as base_reference then applying
             #   activity_exponent again is the dual-attribution class Ca/Mg/Na
             #   audits exist to eliminate. Base = unit-activity reference only;
-            #   activity is applied once, here. Na2O_gas squares the base, so the
-            #   retired-vs-L&H base gap (~3 dex @1900 K) becomes ~6 dex here.
-            derivation: 'Premise: r_base is the landed L&H liquid-NaO0.5 unit-activity
-              monatomic Pref at pO2_ref (b-151 retarget; was retired activity-folded
-              pseudo_psat). Algebra: r_v=(K_exchange*r_base^2.0*r_O2^0.5)^(1/1),
+            #   activity is applied once, here. Na2O_gas squares the base, so a
+            #   wrong base is doubled in log pressure.
+            derivation: 'Premise: r_base is the JANAF liquid-NaO0.5 unit-activity
+              monatomic Pref at pO2_ref (t-1545; b-151 retarget off the retired
+              activity-folded pseudo_psat). Algebra: r_v=(K_exchange*r_base^2.0*r_O2^0.5)^(1/1),
               K_exchange=exp(-DeltaG_exchange/RT); activity applied once via
               activity_exponent. Unit check: every r and K is dimensionless; r_v*P0
               is Pa. Sanity: K_exchange=1 with unit gas ratios recovers the stoichiometric
-              base-power limit. Do not restore A=5.18586 (dual-attribution; ~6 dex at
-              high T because Na2O_gas squares the base).'
+              base-power limit. Do not restore A=5.18586 (dual-attribution; Na2O_gas
+              squares the base).'
             activity_exponent: 1.0
             pO2_exponent: 0.0
             pO2_reference_bar: 1

@@ -104,7 +104,10 @@ SIO_ANCHOR_HOUR = 6
 # mass-balance artifact (AtomLedger closes). Pin = executed probe value;
 # never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
 # b-850: alkali composite vapour rows now use the parent-oxide activity.
-EXPECTED_SIO_DECADE_DRIFT = 0.2090602025512069
+# t-1545: JANAF Na Pref is ~0.26 dex below the retired L&H Pref near 1673 K.
+# Less Na volatilisation on the alkali-coupled headspace moves the IW SiO
+# leg up (finite leg stays ~1.074 Pa). Executed |log10(finite/IW)| below.
+EXPECTED_SIO_DECADE_DRIFT = 0.18411355852511316
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
