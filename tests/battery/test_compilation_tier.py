@@ -3715,6 +3715,25 @@ def _b1259_point(filename: str, observation_id: str):
     return observation_from_plain(raw)
 
 
+def _generated_b1259_entropy(record_id: str):
+    import json
+
+    from simulator.battery.generators import usgs_b1259
+    from simulator.battery.identity import quantity_token
+
+    record = json.loads(
+        (usgs_b1259.RECORDS_DIR / f"{record_id}.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    generated = usgs_b1259.generate_record(record)
+    return [
+        observation
+        for observation in generated.observations
+        if quantity_token(observation.identity) is Quantity.S
+    ]
+
+
 def test_vaporock_b1259_condensed_reference_state_entropy_refuses_phase_identity() -> None:
     from simulator.battery.generators.usgs_b1259 import (
         SOURCE_ID as b1259_source,
@@ -3793,6 +3812,105 @@ def test_vaporock_b1259_gas_reference_state_entropy_scores_above_transition() ->
     assert attempt.refusal_reason is None
     assert attempt.value is not None
     assert "K-005" in attempt.call_evidence
+
+
+def test_vaporock_b1259_boiling_pair_scores_gas_and_refuses_condensed() -> None:
+    pytest.importorskip("vaporock.equil")
+
+    for record_id, formula, temperature in (
+        ("b1259-ht-0025-potassium-reference-state", "K", Decimal("1043.7")),
+        ("b1259-ht-0031-sodium-reference-state", "Na", Decimal("1176.9")),
+    ):
+        entropy = [
+            observation
+            for observation in _generated_b1259_entropy(record_id)
+            if observation.identity.species.formula == formula
+            and observation.identity.temperature_K.value == temperature
+        ]
+        assert len(entropy) == 2
+        gas = next(
+            observation
+            for observation in entropy
+            if observation.identity.species.phase.value is Phase.G
+        )
+        condensed = next(
+            observation
+            for observation in entropy
+            if observation.identity.species.phase.value is Phase.L
+        )
+
+        gas_attempt = predict_thermo_attempt(Engine.VAPOROCK, gas)
+        assert gas_attempt.refusal_reason is None
+        assert gas_attempt.value is not None
+
+        condensed_attempt = predict_thermo_attempt(Engine.VAPOROCK, condensed)
+        assert condensed_attempt.value is None
+        assert (
+            condensed_attempt.refusal_reason
+            is RefusalReason.ELEMENT_REFERENCE_STATE_PHASE_IDENTITY_MISMATCH
+        )
+
+
+def test_vaporock_b1259_unknown_phase_census_uses_phase_identity_reason() -> None:
+    from simulator.battery.compilation_tier import compilation_tier_census
+    from simulator.battery.generators.usgs_b1259 import SOURCE_ID as b1259_source
+    from simulator.battery.records import Locator
+
+    identity = _gas_thermo("K", Quantity.S, Decimal("1043.7"))
+    identity = replace(
+        identity,
+        species=replace(
+            identity.species,
+            phase=State.unknown("transition pair did not resolve"),
+            polymorph=State.unknown("transition pair did not resolve"),
+        ),
+    )
+    observation = replace(
+        F.observation(
+            "b1259-k-transition-unknown",
+            "exp-1",
+            identity,
+            Decimal("185.4"),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            source_id=b1259_source,
+        ),
+        locator=Locator(
+            table="b1259-ht-0025-potassium-reference-state",
+            record="b1259-ht-0025-potassium-reference-state",
+        ),
+    )
+
+    result = compilation_tier_census(
+        _context(observation),
+        engines=(Engine.VAPOROCK,),
+        audit_compile_residual=False,
+    )
+    row = next(
+        row for row in result["rows"] if row["quantity"] == Quantity.S.value
+    )
+    assert row["numeric"] == 0
+    assert row["refused"][
+        "element_reference_state_phase_identity_mismatch:"
+        "element-reference-state-phase-identity-mismatch"
+    ] == 1
+
+
+def test_vaporock_b1259_calcium_above_boiling_entropy_scores() -> None:
+    pytest.importorskip("vaporock.equil")
+
+    calcium = next(
+        observation
+        for observation in _generated_b1259_entropy(
+            "b1259-ht-0012-calcium-reference-state"
+        )
+        if observation.identity.species.formula == "Ca"
+        and observation.identity.temperature_K.value == Decimal("1800")
+    )
+    assert calcium.identity.species.phase.value is Phase.G
+
+    attempt = predict_thermo_attempt(Engine.VAPOROCK, calcium)
+    assert attempt.refusal_reason is None
+    assert attempt.value is not None
 
 
 def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
