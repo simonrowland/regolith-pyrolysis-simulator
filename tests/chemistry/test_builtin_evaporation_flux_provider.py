@@ -1851,7 +1851,9 @@ def test_missing_transport_channel_is_unavailable_downstream(
 
     si_contract = next(
         contract
-        for contract in completion_contracts_for_campaign(sim.setpoints, "C2A")
+        for contract in completion_contracts_for_campaign(
+            sim.setpoints, "C2A_continuous"
+        )
         if contract.element == "Si"
     )
     with pytest.raises(

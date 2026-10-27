@@ -24,6 +24,10 @@ from simulator.accounting.queries import (
     TERMINAL_RUMP_UNEXTRACTED_METALS,
 )
 from simulator.state import MOLAR_MASS
+from simulator.vapour_rail.instrumentation import (
+    VAPOUR_CARRIER_AUTHORITY_REFUSED,
+    vapour_carrier_authority_status,
+)
 
 _EPS = 1.0e-12
 _WALL_EPS = 1.0e-12
@@ -271,22 +275,33 @@ def evaporation_quantity_unavailabilities(
     def record_refusal(
         species: Any,
         record: Any,
+        *,
+        carrier_channel: bool = False,
     ) -> None:
         if not isinstance(record, Mapping):
             return
         extra = record.get("extra")
         extra = extra if isinstance(extra, Mapping) else {}
-        if (record.get("policy") or extra.get("policy")) != (
-            "fail_loud_missing_transport_parameters"
-        ):
-            return
+        missing_transport = (
+            (record.get("policy") or extra.get("policy"))
+            == "fail_loud_missing_transport_parameters"
+        )
         refusal_type = (
             record.get("refusal_type")
             or record.get("refusal_code")
             or extra.get("refusal_type")
         )
-        if not refusal_type:
+        if missing_transport:
+            if not refusal_type:
+                return
+        elif (
+            not carrier_channel
+            or vapour_carrier_authority_status(
+                record, expected_species_id=str(species)
+            ) != VAPOUR_CARRIER_AUTHORITY_REFUSED
+        ):
             return
+        refusal_type = refusal_type or "VapourCarrierRefusal"
         reason = (
             record.get("reason")
             or record.get("detail")
@@ -314,7 +329,7 @@ def evaporation_quantity_unavailabilities(
         channels = getattr(flux, "carrier_authority_by_species", {}) or {}
         if isinstance(channels, Mapping):
             for species, record in channels.items():
-                record_refusal(species, record)
+                record_refusal(species, record, carrier_channel=True)
 
     target_elements: set[str] | None = None
     registry = getattr(sim, "species_formula_registry", {})
