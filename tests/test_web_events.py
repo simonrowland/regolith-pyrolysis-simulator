@@ -63,6 +63,81 @@ def test_product_story_bucket_omits_species_rounded_to_zero() -> None:
     assert bucket["class_total_kg"] == 0.0
 
 
+def test_product_story_keeps_partial_flag_with_numeric_total():
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    excluded = [{
+        "species": "Si",
+        "account": "process.cleaned_melt",
+        "reason": "missing LJ row",
+        "upper_bound_kg": "unbounded",
+    }]
+    story = web_events._product_story_payload(
+        sim,
+        terminal_rump_by_species={},
+        classification={
+            "ingots_metals": {
+                "status": "partial",
+                "excluded": excluded,
+                "flag": {"status": "partial", "reason": "missing LJ row"},
+            }
+        },
+        account_kg={},
+        extracted_projection={
+            "metal_ingots": {"Fe": 1.0},
+            "glass": {},
+            "captured_volatiles": {},
+            "off_spec_condensate": {},
+            "oxygen": {"O2": 0.0},
+            "oxygen_partition": {"stored": 0.0, "vented": 0.0},
+        },
+    )
+    assert story["metal_ingots"]["class_total_kg"] == 1.0
+    assert story["metal_ingots"]["status"] == "partial"
+    assert story["metal_ingots"]["excluded"] == excluded
+
+
+def test_product_story_rump_composition_keeps_partial_flag_and_exclusion():
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    excluded = [{
+        "species": "Si",
+        "account": "process.cleaned_melt",
+        "reason": "missing LJ row",
+        "upper_bound_kg": "unbounded",
+    }]
+    rump_species = {"Al2O3": 542.0, "SiO2": 457.0}
+    story = web_events._product_story_payload(
+        sim,
+        terminal_rump_by_species=rump_species,
+        classification={
+            "refractory_ceramic_rump": {
+                "status": "partial",
+                "availability_flag": {
+                    "status": "partial",
+                    "reason": "missing LJ row",
+                },
+                "excluded": excluded,
+                "rump_silicate_residual_kg": 457.0,
+            }
+        },
+        account_kg={},
+        extracted_projection={
+            "metal_ingots": {},
+            "glass": {},
+            "captured_volatiles": {},
+            "off_spec_condensate": {},
+            "oxygen": {"O2": 0.0},
+            "oxygen_partition": {"stored": 0.0, "vented": 0.0},
+        },
+    )
+
+    assert story["refractory_ceramic"]["class_total_kg"] == 542.0
+    assert story["refractory_ceramic"]["status"] == "partial"
+    assert story["refractory_ceramic"]["excluded"] == excluded
+    assert story["terminal_residue"]["silicate_residual_kg"] == 457.0
+    assert story["terminal_residue"]["status"] == "partial"
+    assert story["terminal_residue"]["excluded"] == excluded
+
+
 def _identified_socket_client(app):
     http_client = app.test_client()
     assert http_client.get("/").status_code == 200
@@ -4592,20 +4667,30 @@ def test_completion_ceramic_panel_classifies_product_story_refractory_slice(
         lambda: dict(terminal_rump),
     )
     monkeypatch.setattr(
+        sim,
+        "_terminal_rump_by_class",
+        lambda: {
+            "refractory_oxides": 70.0,
+            "silicate_residual": 30.0,
+            "unextracted_metals": 0.0,
+            "other": 0.0,
+        },
+    )
+    monkeypatch.setattr(
         web_events,
         "_product_story_payload",
         lambda _sim, **_kwargs: {
             "refractory_ceramic": {
                 "species_kg": {
                     species: round(mass, 2)
-                    for species, mass in sorted(terminal_rump_by_species.items())
+                    for species, mass in sorted(terminal_rump.items())
                     if species in TERMINAL_RUMP_REFRACTORY_OXIDES
                 }
             },
             "terminal_residue": {
                 "species_kg": {
                     species: round(mass, 2)
-                    for species, mass in sorted(terminal_rump_by_species.items())
+                    for species, mass in sorted(terminal_rump.items())
                     if species not in TERMINAL_RUMP_REFRACTORY_OXIDES
                 }
             },
@@ -4636,6 +4721,52 @@ def test_completion_ceramic_panel_classifies_product_story_refractory_slice(
         payload["ceramic_rump_panel"]["match"]["ceramic_id"]
         == "calcium_aluminate_refractory"
     )
+
+
+def test_completion_rump_outputs_inherit_partial_exclusions(monkeypatch):
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    terminal_rump = {
+        "CaO": 25.0,
+        "Al2O3": 35.0,
+        "SiO2": 30.0,
+        "MgO": 8.0,
+        "TiO2": 2.0,
+    }
+    excluded = [{
+        "species": "Si",
+        "account": "process.cleaned_melt",
+        "reason": "missing LJ row",
+        "upper_bound_kg": "unbounded",
+    }]
+    monkeypatch.setattr(
+        sim, "_terminal_rump_by_species", lambda: dict(terminal_rump)
+    )
+    monkeypatch.setattr(
+        web_events,
+        "classify_products",
+        lambda _sim: {
+            "refractory_ceramic_rump": {
+                "status": "partial",
+                "class_total_kg": 60.0,
+                "availability_flag": {"status": "partial"},
+                "excluded": excluded,
+                "rump_silicate_residual_kg": 30.0,
+            }
+        },
+    )
+
+    payload = _completion_payload(sim)
+
+    for bucket in (
+        payload["product_story"]["refractory_ceramic"],
+        payload["product_story"]["terminal_residue"],
+    ):
+        assert bucket["status"] == "partial"
+        assert bucket["excluded"] == excluded
+    ceramic_panel = payload["ceramic_rump_panel"]
+    assert ceramic_panel["product_class_status"] == "partial"
+    assert ceramic_panel["availability_flag"]["status"] == "partial"
+    assert ceramic_panel["excluded"] == excluded
 
 
 def test_web_payloads_preserve_full_precision_mass_balance_error(

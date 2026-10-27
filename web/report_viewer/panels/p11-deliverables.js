@@ -308,18 +308,27 @@
   }
 
   function producerFlag(record) {
-    if (!isRecord(record) || !own(record, "flag")) return "";
-    const flag = record.flag;
+    if (!isRecord(record) || (!own(record, "flag") && !own(record, "availability_flag"))) return "";
+    if (isRecord(record.availability_flag) && isRecord(record.flag)) {
+      return producerFlag({ flag: record.availability_flag, excluded: record.excluded }) +
+        producerFlag({ flag: record.flag });
+    }
+    const flag = record.availability_flag || record.flag;
     if (typeof flag === "string" && flag.trim()) {
       return `<p class="sec-p11-flag">${esc(flag.trim())}</p>`;
     }
     if (isRecord(flag) && typeof flag.status === "string" && flag.status.trim()) {
       const parts = [
         flag.status.trim(),
+        ...(flag.status === "partial" ? ["computed total is a lower bound"] : []),
         `authority: ${String(flag.authority)}`,
         `band: ${typeof flag.band === "string" ? flag.band : JSON.stringify(flag.band)}`,
         `reason: ${String(flag.reason)}`
       ];
+      const excluded = Array.isArray(record.excluded) ? record.excluded : flag.excluded;
+      if (Array.isArray(excluded) && excluded.length) {
+        parts.push(`excluded: ${excluded.map(item => `${item.species} via ${item.account} (${item.upper_bound_kg} kg bound)`).join(", ")}`);
+      }
       return `<p class="sec-p11-flag">${esc(parts.join(" · "))}</p>`;
     }
     return "";
@@ -346,6 +355,7 @@
       kgRow(row, "metals_total_kg", "Metals subtotal · kg", "qualified-product") +
       kgRow(row, "O2_kg", "Source-side O₂ potential · kg", "qualified-product") +
       partitionRows(row, "O2_partition_kg") +
+      producerFlag(row) +
       `<details class="sec-p11-disclosure"><summary>Metals by species</summary>` +
       speciesList(row, "metals_kg", "No metal species emitted in this class.") +
       `</details>` +
@@ -471,6 +481,7 @@
       kgRow(row, "mixed_melt_residual_kg", "Mixed melt residual · kg", "flagged-unqualified-capture") +
       scalarRow(row, "early_tap_mode", "Early-tap mode") +
       scalarRow(row, "note", "Producer note") +
+      producerFlag(row) +
       renderGlassGrade(row)
     );
   }
@@ -502,6 +513,7 @@
       kgRow(row, "rump_silicate_residual_kg", "Silicate residual · non-product inventory · kg", "flagged-unqualified-capture") +
       kgRow(row, "rump_unextracted_metals_kg", "Unextracted metals residue · non-product inventory · kg", "flagged-unqualified-capture") +
       kgRow(row, "rump_other_kg", "Other / unclassified rump · non-product inventory · kg", "flagged-unqualified-capture") +
+      producerFlag(row) +
       `<details class="sec-p11-disclosure"><summary>Residual inventory by species (not all product)</summary>` +
       speciesList(row, "rump_kg_by_species", "No rump species emitted.") +
       `</details>`
@@ -526,6 +538,7 @@
     const row = bucket.value;
     return cardShell("volatiles", "sec-p11-card--wide", title, subtitle,
       kgRow(row, "class_total_kg", "Captured volatiles total · kg", "qualified-product") +
+      producerFlag(row) +
       `<details class="sec-p11-disclosure" open><summary>Captured volatiles by species</summary>` +
       speciesList(row, "kg_by_species", "No captured-volatile species emitted.") +
       `</details>`

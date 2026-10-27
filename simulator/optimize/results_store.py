@@ -1468,6 +1468,10 @@ def _migrate_objective_values_v5(conn: sqlite3.Connection) -> None:
 
 
 def _objective_value_status(value: Any, evidence: Any) -> str:
+    if isinstance(evidence, Mapping):
+        evidence_status = evidence.get("value_status")
+        if evidence_status == "partial":
+            return "partial"
     if value is not None:
         return "available"
     if isinstance(evidence, Mapping):

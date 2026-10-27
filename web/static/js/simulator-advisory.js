@@ -200,20 +200,43 @@ function renderCeramicRumpPanel(payload) {
     const content = document.getElementById('ceramic-rump-content');
     if (!content) return;
     const status = payload && payload.status ? payload.status : 'n/a';
+    const availability = advisoryObject(payload && payload.availability_flag);
+    const productClassStatus = payload && payload.product_class_status
+        ? payload.product_class_status
+        : availability && availability.status;
     updateAdvisoryState('ceramic-rump-state', status);
     advisoryClear(content);
-    if (!payload || status === 'n/a') {
+    if (!payload || (status === 'n/a' && !productClassStatus)) {
         content.className = 'advisory-empty';
         content.textContent = 'n/a';
         return;
     }
+    content.className = 'advisory-result';
+    if (productClassStatus) {
+        const availabilityDetails = { status: productClassStatus };
+        if (availability && availability.total_basis) {
+            availabilityDetails.total_basis = availability.total_basis;
+        }
+        const excluded = Array.isArray(payload.excluded)
+            ? payload.excluded
+            : availability && availability.excluded;
+        if (Array.isArray(excluded)) availabilityDetails.excluded = excluded;
+        appendAdvisorySection(
+            content, 'Product class availability', availabilityDetails,
+        );
+    }
     if (status === 'no-match' || status === 'ambiguous' || !payload.match) {
+        if (productClassStatus) {
+            appendCeramicLine(
+                content, 'Ceramic composition', `${status} - ${payload.reason || ''}`,
+            );
+            return;
+        }
         content.className = 'advisory-empty';
         content.textContent = status + ' - ' + (payload.reason || '');
         return;
     }
 
-    content.className = 'advisory-result';
     const title = document.createElement('div');
     title.className = 'advisory-result-title';
     title.textContent = payload.match.label || 'n/a';
@@ -361,8 +384,15 @@ function advisoryPrettyKey(key) {
     return String(key).replace(/_/g, ' ');
 }
 
+function advisoryIsProductMetadata(key) {
+    return ['status', 'flag', 'availability_flag', 'excluded', 'reason']
+        .includes(key);
+}
+
 function advisoryFormatValue(value, unit, strictNumeric = false) {
-    if (value === null || value === undefined || value === '') return 'n/a';
+    if (value === null || value === undefined || value === '') {
+        return strictNumeric && unit ? 'unavailable' : 'n/a';
+    }
     if (!strictNumeric && typeof value === 'boolean') return String(value);
     const number = strictNumeric ? value : Number(value);
     if (Number.isFinite(number)) {
@@ -379,25 +409,27 @@ function advisoryFormatValue(value, unit, strictNumeric = false) {
 }
 
 function advisoryNestedValue(value, unit, strictNumeric = false) {
+    if (Array.isArray(value)) {
+        if (strictNumeric && unit) return 'unavailable';
+        const parts = value.map((nested) => advisoryNestedValue(
+            nested, undefined, false,
+        ));
+        return parts.length ? parts.join('; ') : 'none';
+    }
     const payload = advisoryObject(value);
     if (!payload) return advisoryFormatValue(value, unit, strictNumeric);
     const parts = advisoryEntries(payload).map(([key, nested]) => {
-        const nestedPayload = advisoryObject(nested);
-        if (nestedPayload) {
-            const inner = advisoryEntries(nestedPayload)
-                .map(([innerKey, innerValue]) => {
-                    const innerUnit = strictNumeric && (innerKey === 'account' || innerKey === 'disposition')
-                        ? undefined
-                        : unit;
-                    return `${advisoryPrettyKey(innerKey)} ${advisoryFormatValue(innerValue, innerUnit, strictNumeric)}`;
-                })
-                .join(', ');
-            return `${advisoryPrettyKey(key)} (${inner || 'n/a'})`;
-        }
-        const valueUnit = strictNumeric && (key === 'account' || key === 'disposition')
+        const metadata = advisoryIsProductMetadata(key);
+        const valueUnit = metadata
             ? undefined
-            : unit;
-        return `${advisoryPrettyKey(key)} ${advisoryFormatValue(nested, valueUnit, strictNumeric)}`;
+            : ['upper_bound_kg', 'lower_bound_kg'].includes(key)
+                ? 'kg'
+                : strictNumeric && (key === 'account' || key === 'disposition')
+                    ? undefined
+                    : unit;
+        return `${advisoryPrettyKey(key)} ${advisoryNestedValue(
+            nested, valueUnit, metadata ? false : strictNumeric,
+        )}`;
     });
     return parts.length ? parts.join('; ') : unit ? 'unavailable' : 'n/a';
 }
@@ -410,10 +442,19 @@ function appendAdvisorySection(parent, title, mapping, unit, strictNumeric = fal
     heading.textContent = title;
     parent.appendChild(heading);
     for (const [key, value] of entries) {
-        const valueUnit = strictNumeric && (key === 'account' || key === 'disposition')
+        const metadata = advisoryIsProductMetadata(key);
+        const valueUnit = metadata
             ? undefined
-            : unit;
-        appendCeramicLine(parent, advisoryPrettyKey(key), advisoryNestedValue(value, valueUnit, strictNumeric));
+            : ['upper_bound_kg', 'lower_bound_kg'].includes(key)
+                ? 'kg'
+                : strictNumeric && (key === 'account' || key === 'disposition')
+                    ? undefined
+                    : unit;
+        appendCeramicLine(
+            parent,
+            advisoryPrettyKey(key),
+            advisoryNestedValue(value, valueUnit, metadata ? false : strictNumeric),
+        );
     }
     return true;
 }

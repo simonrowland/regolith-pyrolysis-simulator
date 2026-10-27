@@ -241,6 +241,40 @@ def _story_total(story, *keys):
     return sum(story[key]["class_total_kg"] for key in keys)
 
 
+def test_advisory_product_story_renders_partial_metadata() -> None:
+    payload = {
+        "product_story_status": "ok",
+        "product_story": {
+            "metal_ingots": {
+                "species_kg": {"Fe": 1.0},
+                "class_total_kg": 1.0,
+                "status": "partial",
+                "excluded": [{
+                    "species": "Si",
+                    "account": "process.cleaned_melt",
+                    "reason": "missing LJ row",
+                    "upper_bound_kg": "unbounded",
+                }],
+            },
+        },
+        "products": {},
+    }
+    rendered = _render_product_story(
+        html=(
+            '<div id="product-ledger-state"></div>'
+            '<div id="product-ledger-content"></div>'
+        ),
+        payload=payload,
+    )
+
+    text = rendered["text"]["product-ledger-content"]
+    assert "status: partial" in text
+    assert "species Si" in text
+    assert "account process.cleaned_melt" in text
+    assert "reason missing LJ row" in text
+    assert "upper bound kg unbounded" in text
+
+
 # Regression: WEBQA-001 — terminal UI hid the feedstock-to-product story.
 # Found by /qa on 2026-07-19
 # Report: docs-private/research/2026-07-19-webqa/report.md

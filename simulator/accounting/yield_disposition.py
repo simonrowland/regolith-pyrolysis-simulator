@@ -12,7 +12,9 @@ from typing import Any, Callable
 from simulator.accounting.exceptions import OriginUnresolvedError
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.lots import allocate_pool_withdrawal
-from simulator.accounting.queries import TERMINAL_RUMP_REFRACTORY_OXIDES
+from simulator.accounting.queries import (
+    TERMINAL_RUMP_REFRACTORY_OXIDES,
+)
 
 
 YIELD_DISPOSITION_SCHEMA_VERSION = "5.0"

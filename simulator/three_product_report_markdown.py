@@ -136,6 +136,24 @@ def format_three_product_markdown(
             header = '2. Stage 3 silica capture (not a product)'
         lines.append(f"## {header}")
         lines.append(f"**Class total**: {_format_kg(class_total_kg)} kg")
+        if bucket.get('status') == 'partial':
+            details = []
+            for excluded in bucket.get('excluded', ()):
+                bound = excluded.get('upper_bound_kg', 'unbounded')
+                bound_text = (
+                    f"up to {float(bound):.3f} kg"
+                    if isinstance(bound, (int, float))
+                    else str(bound)
+                )
+                details.append(
+                    f"{excluded.get('species', 'unknown')} via "
+                    f"{excluded.get('account', 'unknown')} ({bound_text}; "
+                    f"{excluded.get('reason', 'refused quantity')})"
+                )
+            lines.append(
+                '**Availability**: PARTIAL; computed total is a lower bound. '
+                + '; '.join(details)
+            )
         if bucket_key not in {'metals_plus_O2', 'pure_silica_glass'}:
             flag = bucket.get('flag')
             if isinstance(flag, Mapping):

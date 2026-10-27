@@ -147,6 +147,14 @@
     const silicaClassTotal = silica && hasNumber(silica.class_total_kg) ? silica.class_total_kg : null;
     const silicaCapture = silica && hasNumber(silica.stage_3_capture_kg) ? silica.stage_3_capture_kg : null;
     const silicaFlag = silica ? asMap(silica.flag) : null;
+    const silicaAvailability = silica ? asMap(silica.availability_flag) : null;
+    const silicaClassStatus = silica?.status || silicaAvailability?.status;
+    const silicaPartial = silicaClassStatus === "partial";
+    const silicaExcluded = Array.isArray(silica?.excluded)
+      ? silica.excluded
+      : Array.isArray(silicaAvailability?.excluded)
+        ? silicaAvailability.excluded
+        : [];
     const silicaProduct = silicaClassTotal !== null && silicaClassTotal > 0;
     const silicaFlaggedProduct = silicaProduct && silicaFlag !== null;
     const silicaQualified = silicaProduct && !silicaFlaggedProduct;
@@ -165,7 +173,9 @@
       ? ` style="--sec-p15-product:${esc(speciesColor(emittedProductSpecies))}"`
       : "";
     let routeStatus = "collection not implied";
-    if (stage && isSilicaStage && silicaFlaggedProduct) {
+    if (stage && isSilicaStage && silicaPartial && silicaProduct) {
+      routeStatus = "PARTIAL silica product; computed total is a lower bound";
+    } else if (stage && isSilicaStage && silicaFlaggedProduct) {
       routeStatus = "flagged silica product";
     } else if (stage && isSilicaStage && silicaQualified) {
       routeStatus = "qualified silica product";
@@ -174,9 +184,19 @@
     } else if (emittedProduct) {
       routeStatus = "terminal designated mass emitted";
     }
+    const excludedDetails = silicaPartial
+      ? silicaExcluded.map((item) => {
+        const bound = typeof item.upper_bound_kg === "number"
+          && Number.isFinite(item.upper_bound_kg)
+          ? `up to ${fmtNum(item.upper_bound_kg, "kg")}`
+          : scalarText(item.upper_bound_kg || "unbounded");
+        return `${item.species || "unknown"} via ${item.account || "unknown"} (${bound}; ${item.reason || "refused quantity"})`;
+      })
+      : [];
     const routeNote = stageDefinition.productSpecies
       ? `<span class="sec-p15-stage-route">${esc(
         `Designed product route · ${stageDefinition.productSpecies.map(prettySpecies).join(" / ")} · ${routeStatus}`
+        + (excludedDetails.length ? ` · excluded: ${excludedDetails.join("; ")}` : "")
       )}</span>`
       : "";
     const activeText = active ? " · designed campaign-route focus; activity not emitted" : "";
