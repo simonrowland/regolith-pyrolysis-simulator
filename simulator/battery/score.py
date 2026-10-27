@@ -1675,10 +1675,7 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
         strata.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
-    if (
-        NoticeKind.OUT_OF_CERTIFIED_BAND.value in kinds
-        or NoticeKind.COMPOSITION_PROJECTED.value in kinds
-    ):
+    if NoticeKind.OUT_OF_CERTIFIED_BAND.value in kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND)
     if NoticeKind.OUT_OF_GAMMA_DOMAIN.value in kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
@@ -4953,25 +4950,37 @@ def cell_notices(
                     component_details
                 )
             mass_fraction = row.get("dropped_mass_fraction")
-            notices.append(
-                Notice(
-                    kind=NoticeKind.COMPOSITION_PROJECTED,
-                    affected_quantities=(quantity,),
-                    reason=reason,
-                    origin=f"engine:{engine.value}",
-                    dropped=dropped,
-                    dropped_mass_fraction=(
-                        None
-                        if mass_fraction is None
-                        else as_decimal(mass_fraction)
-                    ),
-                    authority=(
-                        Authority.EXTRAPOLATED
-                        if row.get("authority") == AUTHORITY_EXTRAPOLATED
-                        else None
-                    ),
-                )
+            projection_notice = Notice(
+                kind=NoticeKind.COMPOSITION_PROJECTED,
+                affected_quantities=(quantity,),
+                reason=reason,
+                origin=f"engine:{engine.value}",
+                dropped=dropped,
+                dropped_mass_fraction=(
+                    None
+                    if mass_fraction is None
+                    else as_decimal(mass_fraction)
+                ),
+                authority=(
+                    Authority.EXTRAPOLATED
+                    if row.get("authority") == AUTHORITY_EXTRAPOLATED
+                    else None
+                ),
             )
+            notices.append(projection_notice)
+            if (
+                engine is Engine.MAGEMIN
+                and projection_notice.authority is Authority.EXTRAPOLATED
+            ):
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(quantity,),
+                        reason=reason,
+                        origin=f"engine:{engine.value}",
+                        authority=projection_notice.authority,
+                    )
+                )
         elif kind == NoticeKind.INPUT_OMITTED.value:
             notices.append(
                 Notice(
