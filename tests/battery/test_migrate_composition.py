@@ -1426,6 +1426,106 @@ def test_explicit_point_condition_composition_keeps_its_locator(
     assert mutated_condition.locator.table == "2"
 
 
+def test_activity_row_without_numeric_point_keeps_explicit_point_composition(
+    tmp_path: Path,
+) -> None:
+    """An activity refusal with no numeric point still keeps locator A.
+
+    Seto Table 1 prints mol% on point_conditions and leaves activity null.
+    The exploded-point copy never runs, so the parent identity must carry
+    the explicit composition.
+    """
+
+    printed = {
+        "basis": "printed_mole_percent",
+        "amount_basis": "mole_percent",
+        "components": [["SiO2", "84"], ["Na2O", "16"], ["CaO", "0"]],
+    }
+    locator_a = {"page": 2, "table": "1", "note": "row 1 composition"}
+    locator_b = {"page": 4, "table": "3", "note": "activity row with no numeric point"}
+    document = {
+        "schema_version": "literature_extract.v1",
+        "source_id": "fixture-source",
+        "source": {
+            "citation": "Fixture, A. (2026), Test Journal 1:1, DOI 10.1234/FIXTURE",
+            "doi": "10.1234/FIXTURE",
+        },
+        "extraction": {
+            "method": "unit_test",
+            "date": "2026-10-27",
+            "worker": "pytest",
+        },
+        "review_status": "draft",
+        "fidelity_samples": [],
+        "species": {
+            "Na2O": {
+                "observations": [
+                    {
+                        "observation_id": "activity-without-numeric-point",
+                        "type": "activity_coefficient",
+                        "locator": locator_b,
+                        "T_K": "1473",
+                        "phase": "l",
+                        "units": "dimensionless",
+                        "point_conditions": {
+                            "composition": {
+                                "state": {"tag": "value", "value": printed},
+                                "locator": locator_a,
+                            }
+                        },
+                        "values": {
+                            "quantity": "activity",
+                            "method_class": "quoted_attributed",
+                            "status": "typed_refusal",
+                            "reason": "no numeric activity point is printed",
+                            "activity": None,
+                        },
+                    }
+                ]
+            }
+        },
+    }
+    expected = migrate_module._composition_from_plain(printed)
+    result = migrate(_write_min_tree(tmp_path / "base", document), write=False)
+    row = result.observations["fixture-source::activity-without-numeric-point"]
+    assert row.value.kind is not ValueKind.POINT
+    assert row.identity.composition is not None
+    assert row.identity.composition.is_value
+    assert row.identity.composition.value == expected
+    condition = row.point_conditions["composition"]
+    assert condition.state.value == row.identity.composition.value
+    assert condition.locator is not None
+    assert condition.locator.page == 2
+    assert condition.locator.table == "1"
+    assert condition.locator.note == locator_a["note"]
+    assert row.locator is not None
+    assert row.locator.page == 4
+    assert row.locator.table == "3"
+
+    mutated = deepcopy(document)
+    mutated_components = mutated["species"]["Na2O"]["observations"][0][
+        "point_conditions"
+    ]["composition"]["state"]["value"]["components"]
+    mutated_components[0][1] = "80"
+    mutated_components[1][1] = "20"
+    mutated_printed = mutated["species"]["Na2O"]["observations"][0][
+        "point_conditions"
+    ]["composition"]["state"]["value"]
+    mutated_result = migrate(
+        _write_min_tree(tmp_path / "mutated", mutated), write=False
+    )
+    mutated_row = mutated_result.observations[
+        "fixture-source::activity-without-numeric-point"
+    ]
+    assert mutated_row.identity.composition is not None
+    assert mutated_row.identity.composition.value == migrate_module._composition_from_plain(
+        mutated_printed
+    )
+    assert mutated_row.identity.composition.value != expected
+    assert mutated_row.point_conditions["composition"].locator.page == 2
+    assert mutated_row.point_conditions["composition"].locator.table == "1"
+
+
 def test_bulk_observation_withholds_unsupported_composition_with_key_reason(
     tmp_path: Path,
 ) -> None:
