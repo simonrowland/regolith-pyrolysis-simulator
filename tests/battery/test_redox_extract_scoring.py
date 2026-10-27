@@ -599,20 +599,42 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert {row["observation_id"] for row in table1_rows}.isdisjoint(
         {row["observation_id"] for row in inferred_rows}
     )
+    # t-1534 stored this conversion on derivation.raw_inputs for every
+    # measured_reduced row. The car types the 404 supplementary rows
+    # quoted_attributed, so the same conversion stays on values.inference.
+    # raw_inputs is not valid on quoted evidence.
+    conversion = "x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1."
+    for row in table1_rows:
+        assert row["values"]["evidence_class"] == "measured_direct"
+        assert row["values"]["method_class"] == "measured_direct"
+        assert "inference" not in row["values"]
+        assert "derivation" not in row
+    assert next(
+        row["values"]["fe3_fe2_ratio"]
+        for row in table1_rows
+        if row["observation_id"] == "borisov_2018_table1_row_1"
+    ) == "2.83"
     for row in inferred_rows:
         values = row["values"]
         inference = values["inference"]
-        assert inference["relation"] == values["ratio_derivation"]
+        assert values["evidence_class"] == "quoted_attributed"
+        assert values["method_class"] == "quoted_attributed"
+        assert "derivation" not in row
+        assert values["ratio_derivation"] == conversion
+        assert inference["relation"] == conversion
         assert inference["inputs"] == ["log10_Fe3_over_Fe2_as_published"]
         original = inference["parameters"][0][1]
         assert original["state"]["value"] == values["log10_Fe3_over_Fe2_as_published"]
         assert original["locator"] == row["locator"]
         observation = result.observations[f"{extract.stem}::{row['observation_id']}"]
         assert observation.derivation is not None
-        conversion = observation.derivation.parameters[0][1].inference
-        assert conversion is not None
-        assert conversion.relation == values["ratio_derivation"]
+        migrated_conversion = observation.derivation.parameters[0][1].inference
+        assert migrated_conversion is not None
+        assert migrated_conversion.relation == conversion
 
+    hard_issue_details = [issue.detail for issue in result.validation.hard_issues]
+    assert hard_issue_details.count("derived observation requires derived_from") == 0
+    assert hard_issue_details == []
     assert result.validation.hard_issues == ()
 
     origins = {
@@ -630,7 +652,9 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert len(comparison_candidates(context)) == 435
     rows_by_id = {row.observation_id: row for row in result.observations.values()}
     row4 = rows_by_id[f"{extract.stem}::borisov_2018_table2_row_4"]
-    # Spreadsheet row 155 is article Table 1 (1175b49fc), not a quoted Table 2 id.
+    # t-1534 scored borisov_2018_table2_row_155 near 3.277. Spreadsheet rows
+    # 155-185 are article Table 1 (31 wet-chemical ratios, printed Fe3+/Fe2+
+    # for row 1 is 2.83). That id is not a second scored observation.
     assert f"{extract.stem}::borisov_2018_table2_row_155" not in rows_by_id
 
     # Hand evaluation of Kress & Carmichael 1991 at row 4's printed T and log fO2,

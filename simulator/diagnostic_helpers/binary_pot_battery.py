@@ -33,6 +33,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from decimal import Decimal
+from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
@@ -3661,6 +3662,9 @@ def _close_isolated_cell_workers() -> None:
 
 
 atexit.register(_close_isolated_cell_workers)
+# Run before multiprocessing's exit handler joins live children. Ordinary
+# atexit cleanup can otherwise be ordered after that unbounded join.
+Finalize(None, _close_isolated_cell_workers, exitpriority=10)
 
 
 def _run_cell_in_subprocess(

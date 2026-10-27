@@ -4997,6 +4997,11 @@ def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) 
     root = _write_min_tree(tmp_path / "tree", extract)
     result = migrate(root, write=False)
     out = tmp_path / "issues.tsv"
+    assert result.validation is not None
+    grouped_issues = result.validation.hard_issues_by_observation
+    assert sum(len(issues) for issues in grouped_issues.values()) == len(
+        result.validation.hard_issues
+    )
 
     written = dump_hard_issues(root, out)
     with out.open(encoding="utf-8", newline="") as stream:
@@ -8430,6 +8435,39 @@ def test_borisov_combined_iron_composition_migrates_without_a_redox_split(
     assert table1.identity.composition is not None
     assert not table1.identity.composition.is_value
     assert table1.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+
+
+def test_borisov_compilation_rows_locate_unprinted_reduction_inputs() -> None:
+    extract = REPO_ROOT / "data/literature/extracts/borisov-2018-compilation.yaml"
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "borisov-2018-compilation"
+    ]
+    assert len(rows) == 435
+    assert migrator.result.validation is not None
+    assert not [
+        issue
+        for issue in migrator.result.validation.hard_issues
+        if issue.detail == "derived observation requires derived_from"
+        and any(observation.observation_id in issue.path for observation in rows)
+    ]
+    for observation in rows:
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        derivation = observation.derivation
+        assert derivation is not None
+        assert "recalculated" in derivation.relation.lower()
+        assert observation.locator.table == "Supplementary Table 2"
+        assert observation.locator.record is not None
+        assert derivation.has_located_unprinted_raw_inputs
+        assert derivation.raw_inputs is not None
+        assert derivation.raw_inputs.locator is not None
+        assert derivation.raw_inputs.locator.table == "Supplementary Table 2"
+        assert derivation.raw_inputs.locator.record == observation.locator.record
 
 
 def test_unknown_mole_fraction_component_is_queued_and_withholds_composition() -> None:
