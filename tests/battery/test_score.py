@@ -16072,3 +16072,60 @@ def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> Non
     assert residual.execution.state is ExecutionState.UNSUPPORTED
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+
+
+@pytest.mark.parametrize("parent_id", ("parent-source::raw", "parent-source:raw"))
+def test_filtered_score_context_resolves_cross_source_validation_parent(
+    tmp_path: Path, parent_id: str
+) -> None:
+    from simulator.battery.migrate import dump_yaml, to_plain
+
+    child_source = "child-source"
+    parent_source = "parent-source"
+    child_id = f"{child_source}::reduced"
+    work = replace(F.work(), source_ids=(child_source, parent_source))
+    experiment = F.tabulation_experiment()
+    parent = F.observation(
+        parent_id,
+        experiment.experiment_id,
+        F.pref_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=parent_source,
+    )
+    child = F.observation(
+        child_id,
+        experiment.experiment_id,
+        F.pref_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id=child_source,
+        derived_from=(parent_id,),
+        derivation=Derivation(
+            "reported reduction", (parent_id,), (), "Pa"
+        ),
+    )
+
+    literature = tmp_path / "data" / "literature"
+    (literature / "works").mkdir(parents=True)
+    (literature / "extracts-v2").mkdir()
+    dump_yaml(
+        {"work": to_plain(work), "experiments": [to_plain(experiment)]},
+        literature / "works" / "work.yaml",
+    )
+    for observation in (parent, child):
+        dump_yaml(
+            {"observations": [to_plain(observation)]},
+            literature / "extracts-v2" / f"{observation.source_id}.yaml",
+        )
+
+    full = load_score_context(tmp_path)
+    filtered = load_score_context(tmp_path, sources=(child_source,))
+
+    assert child_id in full.observations
+    assert child_id in filtered.observations
+    assert parent_id not in filtered.observations
+    assert full.hard_issues_by_observation.get(child_id) is None
+    assert filtered.hard_issues_by_observation.get(child_id) == (
+        full.hard_issues_by_observation.get(child_id)
+    )

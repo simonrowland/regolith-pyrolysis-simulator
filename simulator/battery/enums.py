@@ -255,6 +255,7 @@ class NoticeKind(StrEnum):
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
     # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
     ADMISSION_DEFAULTED = "admission_defaulted"
+    VALIDATION_HARD_ISSUE_LABEL = "validation_hard_issue_label"
     FIGURE_ONLY = "figure_only"
     REACTIVE_CELL_NOT_MODELLED = "reactive_cell_not_modelled"
     # t-1123a: printed point sits between printed liquidus positions; scored as

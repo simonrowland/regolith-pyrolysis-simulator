@@ -4274,6 +4274,11 @@ def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) 
     root = _write_min_tree(tmp_path / "tree", extract)
     result = migrate(root, write=False)
     out = tmp_path / "issues.tsv"
+    assert result.validation is not None
+    grouped_issues = result.validation.hard_issues_by_observation
+    assert sum(len(issues) for issues in grouped_issues.values()) == len(
+        result.validation.hard_issues
+    )
 
     written = dump_hard_issues(root, out)
     with out.open(encoding="utf-8", newline="") as stream:
