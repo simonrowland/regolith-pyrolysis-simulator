@@ -121,6 +121,10 @@ class ValidationIssue:
 
 
 _ADVISORY_REASONS = frozenset({RefusalReason.IDENTITY_INCOMPLETE})
+_DERIVATION_EVIDENCE_CLASSES = frozenset(
+    {EvidenceClass.MODEL_DERIVED, EvidenceClass.MEASURED_REDUCED}
+)
+_OBSERVATION_ISSUE_PATH = re.compile(r"^observation\[(.+?)\](?:\.(.*))?$")
 
 # v2.1 vapour-equilibrium blocking qualifications. Sibling activity is
 # not blocked by a pressure-only floor (quantity-scoped affected_quantities).
@@ -151,6 +155,47 @@ class ValidationReport:
     @property
     def hard_issues(self) -> tuple[ValidationIssue, ...]:
         return tuple(i for i in self.issues if i.reason not in _ADVISORY_REASONS)
+
+    @property
+    def hard_issues_by_observation(self) -> Mapping[str, tuple[ValidationIssue, ...]]:
+        grouped: dict[str, list[ValidationIssue]] = {}
+        for issue in self.hard_issues:
+            location = observation_issue_location(issue.path)
+            if location is not None:
+                grouped.setdefault(location[0], []).append(issue)
+        return {
+            observation_id: tuple(issues)
+            for observation_id, issues in grouped.items()
+        }
+
+
+def observation_issue_location(path: str) -> tuple[str, str] | None:
+    """Return an observation ID and field from a validation issue path."""
+
+    match = _OBSERVATION_ISSUE_PATH.match(path)
+    if match is None:
+        return None
+    return match.group(1), match.group(2) or ""
+
+
+def _unavailable_missing_input_work_items(
+    observations: Mapping[str, Observation],
+) -> tuple[Observation, ...]:
+    """Return derived unavailable observations whose input still needs grounding."""
+
+    return tuple(
+        sorted(
+            (
+                observation
+                for observation in observations.values()
+                if observation.evidence.class_.is_value
+                and observation.evidence.class_.value in _DERIVATION_EVIDENCE_CLASSES
+                and observation.value.kind is ValueKind.UNAVAILABLE
+                and observation.derivation is None
+            ),
+            key=lambda observation: observation.observation_id,
+        )
+    )
 
 
 def _issue(path: str, reason: RefusalReason, detail: str) -> ValidationIssue:
@@ -1238,10 +1283,7 @@ def validate_observation(
                         "authority must be extrapolated",
                     )
                 )
-    if ev.is_value and ev.value in {
-        EvidenceClass.MODEL_DERIVED,
-        EvidenceClass.MEASURED_REDUCED,
-    }:
+    if ev.is_value and ev.value in _DERIVATION_EVIDENCE_CLASSES:
         # A caption-only figure admission with no numeric value is never scored,
         # so there is no derived numeric value whose ancestry needs tracing.
         figure_only_without_value = (
@@ -1307,7 +1349,10 @@ def validate_observation(
                         "derived observation requires derived_from",
                     )
                 )
-            if observation.derivation is None:
+            if (
+                observation.derivation is None
+                and observation.value.kind is not ValueKind.UNAVAILABLE
+            ):
                 issues.append(
                     _issue(
                         f"{path}.derivation",
