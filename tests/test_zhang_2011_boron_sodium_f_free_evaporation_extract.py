@@ -1,3 +1,4 @@
+import csv
 from decimal import Decimal
 from pathlib import Path
 
@@ -5,11 +6,21 @@ import pytest
 import yaml
 
 from simulator.battery.enums import StateTag, ValueKind
+from simulator.battery.migrate import wt_pct_to_mole_fraction
 from tests.battery.factories import migrate_one_extract
 
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/zhang-2011-boron-sodium-f-free-evaporation.yaml"
+CELL_AUDIT = (
+    ROOT
+    / "data/literature/extracts/audits/zhang-2011-boron-sodium-f-free-evaporation.cells.csv"
+)
+EXPECTED_TABLE2 = {
+    "CS-1": {"Na2O": Decimal("6.70")},
+    "CS-3": {"CaO": Decimal("46.20"), "SiO2": Decimal("39.11")},
+    "CS-4": {"TiO2": Decimal("5.00")},
+}
 EXPECTED_FLUXES = {
     "zhang_2011_cs3_1300c_measured_flux": (1300, 5.46, "CS-3"),
     "zhang_2011_cs3_1350c_measured_flux": (1350, 14.5, "CS-3"),
@@ -40,9 +51,41 @@ def _assert_table6_render_pins(document: dict) -> None:
         assert row["values"]["admission_status"] == "typed_refusal"
 
 
+def _assert_table2_render_pins(document: dict) -> dict[str, dict[str, Decimal]]:
+    table = next(
+        item
+        for item in document["species"]["slag"]["context"]
+        if item["observation_id"] == "zhang_2011_analyzed_slag_compositions_table2"
+    )
+    rows = {
+        row["slag_id"]: {
+            oxide: Decimal(str(amount))
+            for oxide, amount in row["composition_wt_pct"].items()
+        }
+        for row in table["values"]["table_2_rows"]
+    }
+    assert len(rows) == 5
+    for slag_id, components in EXPECTED_TABLE2.items():
+        for oxide, amount in components.items():
+            assert rows[slag_id][oxide] == amount
+    with CELL_AUDIT.open(newline="") as audit_file:
+        cells = list(csv.DictReader(audit_file))
+    cell = next(
+        item
+        for item in cells
+        if item["printed_table"] == "2"
+        and item["printed_row"] == "CS-1"
+        and item["printed_column"] == "Na2O"
+    )
+    assert cell["printed_value"] == "6.70"
+    assert cell["render_read"] == "6.70"
+    return rows
+
+
 def test_zhang_2011_table6_values_and_conditions_migrate() -> None:
     document = yaml.safe_load(EXTRACT.read_text())
     _assert_table6_render_pins(document)
+    table2 = _assert_table2_render_pins(document)
 
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
@@ -78,6 +121,13 @@ def test_zhang_2011_table6_values_and_conditions_migrate() -> None:
             observation.point_conditions["composition"].inference.relation
             == "wt_pct_to_mole_fraction"
         )
+        if _slag_id == "CS-3 + 2 wt% ZrO2":
+            printed = {**table2["CS-3"], "ZrO2": Decimal("2")}
+        else:
+            printed = table2[_slag_id]
+        assert observation.point_conditions["composition"].state.value == (
+            wt_pct_to_mole_fraction(printed)
+        )
         assert observation.value.kind is ValueKind.UNAVAILABLE
         assert "unmapped mass loss rate unit" in observation.value.unavailable_reason
 
@@ -88,3 +138,20 @@ def test_zhang_2011_render_pin_detects_flux_mutation() -> None:
     document["species"]["slag"]["observations"][0]["values"]["mass_loss_rate"] = 5.47
     with pytest.raises(AssertionError):
         _assert_table6_render_pins(document)
+
+
+def test_zhang_2011_table2_render_pin_detects_composition_mutation() -> None:
+    document = yaml.safe_load(EXTRACT.read_text())
+    rows = _assert_table2_render_pins(document)
+    assert rows["CS-3"]["CaO"] == Decimal("46.20")
+    table2 = next(
+        item
+        for item in document["species"]["slag"]["context"]
+        if item["observation_id"] == "zhang_2011_analyzed_slag_compositions_table2"
+    )
+    cs3 = next(
+        row for row in table2["values"]["table_2_rows"] if row["slag_id"] == "CS-3"
+    )
+    cs3["composition_wt_pct"]["CaO"] = 1.0
+    with pytest.raises(AssertionError):
+        _assert_table2_render_pins(document)
