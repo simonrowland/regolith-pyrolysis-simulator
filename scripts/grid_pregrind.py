@@ -1568,6 +1568,17 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
             "warnings": list(warnings or []),
             "diagnostics": dict(diagnostics or {}),
         }
+        # Same call shape as AlphaMELTSBackend._equilibrate_prepared:
+        # the keyword is present only when the adapter set a gas coordinate.
+        # Always passing it TypeErrors a callee that matches the non-gas-only
+        # signature, and the subprocess budget is then never captured.
+        call_kwargs: dict[str, Any] = {
+            "total_input_kg": total_input_kg,
+            "diagnostics": diagnostics,
+            "run_mode": run_mode,
+        }
+        if gas_only_fo2_log is not None:
+            call_kwargs["gas_only_fo2_log"] = gas_only_fo2_log
         with mock.patch.object(
             module,
             "_run_alphamelts_subprocess",
@@ -1579,10 +1590,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 fO2_log,
                 pressure_bar,
                 warnings,
-                total_input_kg=total_input_kg,
-                diagnostics=diagnostics,
-                run_mode=run_mode,
-                gas_only_fo2_log=gas_only_fo2_log,
+                **call_kwargs,
             )
 
     try:
