@@ -1,0 +1,6 @@
+MinerU row-aware compare unavailable: this born-digital source has no MinerU content list by controller ruling.
+Manual reconcile: Table 1 printed/extracted rows 2/2; Table 2 printed/extracted rows 3/3. All five rows and their numeric cells are render_verified in seto-2010-na2o-activity-glass-emf-summary.mapping.yaml (absolute PDF page 2).
+
+REAL isolated migration: observations=5, hard=0, unavailable=5. All five rows carry T_K=1473 and their row-local mol-percent composition in point_conditions; no pressure or fO2 is printed, and both remain unknown. The three representative migrated identities (Table 1 row 2; Table 2 rows 2 and 3) have temperature_K=1473, total_pressure_Pa=unknown and fO2_Pa=unknown. Their identity.composition remains unknown because typed-refused rows lack a numeric activity, so the migrator does not enter its exploded-point composition binding path; the printed composition is present in each observation's point_conditions. This residual composition identity gap is documented; the extraction task forbids changing the schema or migrator.
+
+Expected full-store delta: +5 observations, all unavailable; no scored Na2O activity values and no store regeneration.

@@ -1,0 +1,158 @@
+schema_version: literature_extract.v1
+source_id: seto-2010-na2o-activity-glass-emf-summary
+source:
+  citation: >-
+    Seto, M., Sugawara, T., Kato, M., Yoshida, S., Miura, Y. and Matsuoka, J.
+    (2010), “Na2O activity in Glass melts by EMF measurement” (起電力法による
+    ガラス融液におけるNa2O活量の測定), 51st Symposium on Glass and Photonics
+    Materials, 16–17 December 2010, two-page research summary.
+  year: 2010
+extraction:
+  method: >-
+    table tool unavailable: born-digital, pdftotext + image audit. Manually
+    transcribed both printed tables from the born-digital pdftotext and checked
+    every numeric cell and each table's row/column assignment against the page
+    2 render. Printed log10(activity) and RT ln(activity) forms have no schema
+    token and are retained verbatim as typed refusals; no conversions were made.
+  date: '2026-10-27'
+  worker: codex
+  provenance_path: text/seto-2010-na2o-activity-glass-emf-summary/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+  - path: species.Na2O.observations[seto_2010_table1_r2_sls_1473k].values.RT_ln_a_Na2O_kJ_mol_as_printed
+    value: '-263.0'
+    locator: {page: 2, table: '1', note: 'row 2, RT ln a(Na2O)'}
+  - path: species.Na2O.observations[seto_2010_table2_r2_als_1473k].values.log10_a_Na2O_as_printed
+    value: '-7.98'
+    locator: {page: 2, table: '2', note: 'row 2, log a(Na2O)'}
+  - path: species.Na2O.observations[seto_2010_table2_r3_als_1473k].values.RT_ln_a_Na2O_kJ_mol_as_printed
+    value: '-216.6'
+    locator: {page: 2, table: '2', note: 'row 3, RT ln a(Na2O)'}
+species:
+  Na2O:
+    observations:
+      - observation_id: seto_2010_table1_r1_sls_1473k
+        type: activity_coefficient
+        locator: {page: 2, table: '1', note: 'row 1'}
+        T_K: '1473'
+        phase: l
+        units: 'RT ln a(Na2O): kJ/mol; log a(Na2O): dimensionless, base 10; composition: mol%'
+        standard_state: Thermodynamic standard state not stated in this summary; authors use the Na2O-SiO2 melt activity values [2] as the reference.
+        equipment:
+          apparatus_method:
+            value: EMF concentration cell; alumina Tammann tube and liquid junction; Pt wire electrodes in a Pt crucible; Na+ is shown as the mobile ion in Fig. 1.
+            locator: {page: 1, figure: '1', section: Experimental method}
+        point_conditions:
+          composition:
+            state: {tag: value, value: {basis: printed_mole_percent, amount_basis: mole_percent, components: [[SiO2, '84'], [Na2O, '16'], [CaO, '0']]}}
+            locator: {page: 2, table: '1', note: 'row 1 composition'}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          attribution: '[2]'
+          status: typed_refusal
+          reason: no schema token for the printed log10(activity) and RT ln(activity) forms
+          activity: null
+          composition_as_printed: '84SiO2-16Na2O-0CaO (mol%)'
+          RT_ln_a_Na2O_kJ_mol_as_printed: '-263.9'
+          log10_a_Na2O_as_printed: '-9.36'
+      - observation_id: seto_2010_table1_r2_sls_1473k
+        type: activity_coefficient
+        locator: {page: 2, table: '1', note: 'row 2'}
+        T_K: '1473'
+        phase: l
+        units: 'RT ln a(Na2O): kJ/mol; log a(Na2O): dimensionless, base 10; composition: mol%'
+        standard_state: Thermodynamic standard state not stated in this summary; authors use the Na2O-SiO2 melt activity values [2] as the reference.
+        equipment:
+          apparatus_method:
+            value: EMF concentration cell; alumina Tammann tube and liquid junction; Pt wire electrodes in a Pt crucible; Na+ is shown as the mobile ion in Fig. 1.
+            locator: {page: 1, figure: '1', section: Experimental method}
+        point_conditions:
+          composition:
+            state: {tag: value, value: {basis: printed_mole_percent, amount_basis: mole_percent, components: [[SiO2, '74'], [Na2O, '16'], [CaO, '10']]}}
+            locator: {page: 2, table: '1', note: 'row 2 composition'}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          attribution: This study
+          status: typed_refusal
+          reason: no schema token for the printed log10(activity) and RT ln(activity) forms
+          activity: null
+          composition_as_printed: '74SiO2-16Na2O-10CaO (mol%)'
+          RT_ln_a_Na2O_kJ_mol_as_printed: '-263.0'
+          log10_a_Na2O_as_printed: '-9.33'
+      - observation_id: seto_2010_table2_r1_als_1473k
+        type: activity_coefficient
+        locator: {page: 2, table: '2', note: 'row 1'}
+        T_K: '1473'
+        phase: l
+        units: 'RT ln a(Na2O): kJ/mol; log a(Na2O): dimensionless, base 10; composition: mol%'
+        standard_state: Thermodynamic standard state not stated in this summary; authors use the Na2O-SiO2 melt activity values [2] as the reference.
+        equipment:
+          apparatus_method:
+            value: EMF concentration cell; alumina Tammann tube and liquid junction; Pt wire electrodes in a Pt crucible; Na+ is shown as the mobile ion in Fig. 1.
+            locator: {page: 1, figure: '1', section: Experimental method}
+        point_conditions:
+          composition:
+            state: {tag: value, value: {basis: printed_mole_percent, amount_basis: mole_percent, components: [[SiO2, '70'], [Na2O, '30'], [Al2O3, '0']]}}
+            locator: {page: 2, table: '2', note: 'row 1 composition'}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          attribution: '[2]'
+          status: typed_refusal
+          reason: no schema token for the printed log10(activity) and RT ln(activity) forms
+          activity: null
+          composition_as_printed: '70SiO2-30Na2O-0Al2O3 (mol%)'
+          RT_ln_a_Na2O_kJ_mol_as_printed: '-232.8'
+          log10_a_Na2O_as_printed: '-8.25'
+      - observation_id: seto_2010_table2_r2_als_1473k
+        type: activity_coefficient
+        locator: {page: 2, table: '2', note: 'row 2'}
+        T_K: '1473'
+        phase: l
+        units: 'RT ln a(Na2O): kJ/mol; log a(Na2O): dimensionless, base 10; composition: mol%'
+        standard_state: Thermodynamic standard state not stated in this summary; authors use the Na2O-SiO2 melt activity values [2] as the reference.
+        equipment:
+          apparatus_method:
+            value: EMF concentration cell; alumina Tammann tube and liquid junction; Pt wire electrodes in a Pt crucible; Na+ is shown as the mobile ion in Fig. 1.
+            locator: {page: 1, figure: '1', section: Experimental method}
+        point_conditions:
+          composition:
+            state: {tag: value, value: {basis: printed_mole_percent, amount_basis: mole_percent, components: [[SiO2, '65'], [Na2O, '30'], [Al2O3, '5']]}}
+            locator: {page: 2, table: '2', note: 'row 2 composition'}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          attribution: This study
+          status: typed_refusal
+          reason: no schema token for the printed log10(activity) and RT ln(activity) forms
+          activity: null
+          composition_as_printed: '65SiO2-30Na2O-5Al2O3 (mol%)'
+          RT_ln_a_Na2O_kJ_mol_as_printed: '-225.1'
+          log10_a_Na2O_as_printed: '-7.98'
+      - observation_id: seto_2010_table2_r3_als_1473k
+        type: activity_coefficient
+        locator: {page: 2, table: '2', note: 'row 3'}
+        T_K: '1473'
+        phase: l
+        units: 'RT ln a(Na2O): kJ/mol; log a(Na2O): dimensionless, base 10; composition: mol%'
+        standard_state: Thermodynamic standard state not stated in this summary; authors use the Na2O-SiO2 melt activity values [2] as the reference.
+        equipment:
+          apparatus_method:
+            value: EMF concentration cell; alumina Tammann tube and liquid junction; Pt wire electrodes in a Pt crucible; Na+ is shown as the mobile ion in Fig. 1.
+            locator: {page: 1, figure: '1', section: Experimental method}
+        point_conditions:
+          composition:
+            state: {tag: value, value: {basis: printed_mole_percent, amount_basis: mole_percent, components: [[SiO2, '60'], [Na2O, '30'], [Al2O3, '10']]}}
+            locator: {page: 2, table: '2', note: 'row 3 composition'}
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          attribution: This study
+          status: typed_refusal
+          reason: no schema token for the printed log10(activity) and RT ln(activity) forms
+          activity: null
+          composition_as_printed: '60SiO2-30Na2O-10Al2O3 (mol%)'
+          RT_ln_a_Na2O_kJ_mol_as_printed: '-216.6'
+          log10_a_Na2O_as_printed: '-7.68'
