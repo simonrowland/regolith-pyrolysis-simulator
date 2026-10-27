@@ -220,3 +220,31 @@ species:
           species_formula: MnO / Mn
           temperature_C: '1300'
           note: 'The authors relate these results to Fig. 6; no complete per-run slag compositions, metal assays, or pressure are printed.'
+  Mn:
+    observations: []
+    context:
+      - observation_id: simeonov_sano_1985_t1_manganous_capacity_schema_gap
+        type: measured_table_context
+        locator:
+          page: 5
+          published_page: 1120
+          pdf_page_index: 4
+          table: '1'
+          column_header: log C_Mn2+
+        units: log manganous capacity as printed
+        attribution: Simeonov and Sano (1985), present work; capacity definition in Eq. (8)
+        values:
+          quantity: printed_table_values_without_compatible_token
+          method_class: quoted_attributed
+          admission_status: typed_refusal
+          schema_gap: No existing quantity token represents the printed manganous capacity C_Mn2+.
+          reason: Preserve the printed capacity values and definition as context; do not change the schema.
+          candidate_tokens_checked: [distribution_ratio, activity, activity_coefficient, phosphate_capacity, sulfide_capacity]
+          defining_equation_as_printed: C_Mn2+ = (%Mn2+) / (a_Mn(l) · P_O2^1/2) = K · a_O2- / f_Mn2+ (Eq. 8)
+          reference_state_as_printed: a_Mn(l) is manganese activity in carbon-saturated iron with reference to liquid manganese
+          equation_locator: {page: 3, published_page: 1118, pdf_page_index: 2, equation: '8'}
+          table_rows:
+            - {row_label: '10', caF2_wt_percent: '10', log_C_Mn2_plus: '10.53'}
+            - {row_label: '15', caF2_wt_percent: '15', log_C_Mn2_plus: '10.52'}
+            - {row_label: '20', caF2_wt_percent: '20', log_C_Mn2_plus: '10.50'}
+            - {row_label: '25', caF2_wt_percent: '25', log_C_Mn2_plus: '10.53'}

@@ -80,6 +80,7 @@ def test_table1_mn_distribution_rows_match_render_and_migrate(tmp_path: Path) ->
         assert row.identity.composition.is_unknown
         assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.fO2_Pa.is_unknown
+    assert sum(map(len, result.context_by_work.values())) == 3
 
 
 def test_na2o_prose_conflict_and_figure_values_stay_typed_refused() -> None:
@@ -96,3 +97,15 @@ def test_na2o_prose_conflict_and_figure_values_stay_typed_refused() -> None:
     assert context[1]["values"]["distribution_ratio_as_published"] == (
         "0.37 and 0.32, respectively"
     )
+    capacity = doc["species"]["Mn"]["context"][0]
+    assert capacity["values"]["admission_status"] == "typed_refusal"
+    assert "no existing quantity token" in capacity["values"]["schema_gap"].lower()
+    rows = capacity["values"]["table_rows"]
+    assert len(rows) == 4
+    assert [row["log_C_Mn2_plus"] for row in rows] == [
+        "10.53",
+        "10.52",
+        "10.50",
+        "10.53",
+    ]
+    assert capacity["values"]["equation_locator"]["page"] == 3

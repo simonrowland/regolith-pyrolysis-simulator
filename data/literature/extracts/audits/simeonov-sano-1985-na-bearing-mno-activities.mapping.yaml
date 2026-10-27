@@ -34,3 +34,25 @@ tables:
       - {row: 3, column: 4, text: '0.64'}
       - {row: 4, column: 4, text: '0.53'}
       - {row: 5, column: 4, text: '0.41'}
+  - page: 5
+    table_index: 1
+    published_page: 1120
+    printed_table: '1'
+    type: measured_table_context
+    quantity: printed_table_values_without_compatible_token
+    unit: log manganous capacity as printed
+    evidence_class: quoted_attributed
+    phase: l
+    experiment: simeonov-sano-1985-table1-mn-distribution
+    regime: slag_metal_equilibrium
+    rows: [2, 3, 4, 5]
+    values:
+      - column: 6
+        species: Mn
+        schema_gap: No existing quantity token represents the printed manganous capacity C_Mn2+.
+        defining_equation: Eq. (8), page 3, published page 1118
+    render_verified:
+      - {row: 2, column: 6, text: '10.53'}
+      - {row: 3, column: 6, text: '10.52'}
+      - {row: 4, column: 6, text: '10.50'}
+      - {row: 5, column: 6, text: '10.53'}
