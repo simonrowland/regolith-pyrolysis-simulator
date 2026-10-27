@@ -366,7 +366,15 @@ def _mathieu_pressure_context() -> tuple[ScoreContext, tuple[Observation, ...]]:
         for observation in rows
         if observation.admission.status is AdmissionStatus.ADMITTED
     )
-    assert len(admitted) == 63
+    # The previous 63 included 23 Tableau III.2 rows whose own reasons reject
+    # them; two Table IV.6 rows also lack run-condition fO2. Removing those 25
+    # leaves the 38 source-admitted rows.
+    assert len(admitted) == 38
+    assert all(
+        observation.identity.fO2_Pa is not None
+        and observation.identity.fO2_Pa.is_value
+        for observation in admitted
+    )
     context = ScoreContext(
         works=migrator.result.works,
         experiments=migrator.result.experiments,

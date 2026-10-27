@@ -10,8 +10,12 @@ extraction:
   method: All 68 inventoried printed data tables (61 earlier plus the seven English-article and reprinted-letter
     tables on PDF pages 78 and 121-129, added 2026-10-05) have structured CSV transcriptions checked against page
     images. The 2026-10-05 fix corrected two-column shifts in t1, t2 and t44, two missing rows in t38 and the t27
-    duration column.
-  date: '2026-10-05'
+    duration column. The 2026-10-26 recast refuses the 23 previously admitted Tableau III.2
+    Na-pressure rows and two Table IV.6 rows, omitting caption fO2 where it is not a run
+    condition. The NS2 source condition is 1250 °C while the Tableau III.2 captions give
+    1400 °C; JANAF residuals are +0.20 dex at 1250 °C and +1.01 dex at 1400 °C. The rows
+    remain refused with their printed run temperatures unchanged.
+  date: '2026-10-26'
   worker: codex-resume-67166-1791235744
   provenance_path: tables/mathieu-2009-sodium-solubility-thesis/
 benches:
@@ -3962,7 +3966,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 6.01
         Na2O_wt_pct_as_printed: 6.01 (0.14)
         Na2O_wt_pct_sd: 0.14
@@ -3979,15 +3983,6 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.86e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Wo+liq
@@ -3995,10 +3990,14 @@ species:
         P_Na_atm_run: 8.86e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.86 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 6.01
           MgO: 1.46
@@ -4074,7 +4073,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 7.28
         Na2O_wt_pct_as_printed: 7.28 (0.22)
         Na2O_wt_pct_sd: 0.22
@@ -4091,15 +4090,6 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.86e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Wo+liq
@@ -4107,10 +4097,14 @@ species:
         P_Na_atm_run: 8.86e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.86 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 7.28
           MgO: 0.43
@@ -4181,7 +4175,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 18.5
         Na2O_wt_pct_as_printed: 18.5 (0.22)
         Na2O_wt_pct_sd: 0.22
@@ -4198,24 +4192,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.86e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.86e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.86 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 18.5
           MgO: 19.71
@@ -4374,7 +4363,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 21.12
         Na2O_wt_pct_as_printed: 21.12 (0.35)
         Na2O_wt_pct_sd: 0.35
@@ -4391,25 +4380,20 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.86e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Fo+liq
         P_Na_atm_run: 8.86e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.86 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 21.12
           MgO: 19.96
@@ -4569,7 +4553,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 8.5
         Na2O_wt_pct_as_printed: 8.5 (0.28)
         Na2O_wt_pct_sd: 0.28
@@ -4586,24 +4570,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.69e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.69e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.69 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 8.5
           MgO: 6.14
@@ -4762,7 +4741,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 11.39
         Na2O_wt_pct_as_printed: 11.39 (0.26)
         Na2O_wt_pct_sd: 0.26
@@ -4779,24 +4758,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.69e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.69e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.69 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 11.39
           MgO: 8.53
@@ -4955,7 +4929,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 16.29
         Na2O_wt_pct_as_printed: 16.29 (0.22)
         Na2O_wt_pct_sd: 0.22
@@ -4972,24 +4946,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.69e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.69e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.69 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 16.29
           MgO: 8.46
@@ -5148,7 +5117,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 12.13
         Na2O_wt_pct_as_printed: 12.13 (0.85)
         Na2O_wt_pct_sd: 0.85
@@ -5165,25 +5134,20 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.69e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Di+Ak+liq
         P_Na_atm_run: 8.69e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.69 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 12.13
           MgO: 8.45
@@ -5343,7 +5307,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 10.27
         Na2O_wt_pct_as_printed: 10.27 (0.14)
         Na2O_wt_pct_sd: 0.14
@@ -5360,24 +5324,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.69e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.69e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.69 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 10.27
           MgO: 11.56
@@ -5536,7 +5495,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 13.94
         Na2O_wt_pct_as_printed: 13.94 (0.16)
         Na2O_wt_pct_sd: 0.16
@@ -5553,24 +5512,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.43e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.43e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.43 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 13.94
           MgO: 14.24
@@ -5729,7 +5683,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 12.54
         Na2O_wt_pct_as_printed: 12.54 (0.56)
         Na2O_wt_pct_sd: 0.56
@@ -5746,25 +5700,20 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.43e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Fo+Ak+liq
         P_Na_atm_run: 8.43e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.43 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 12.54
           MgO: 18.45
@@ -5924,7 +5873,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 11.17
         Na2O_wt_pct_as_printed: 11.17 (0.8)
         Na2O_wt_pct_sd: 0.8
@@ -5941,25 +5890,20 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.43e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Fo+Ak+liq
         P_Na_atm_run: 8.43e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.43 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 11.17
           MgO: 18.39
@@ -6119,7 +6063,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 10.93
         Na2O_wt_pct_as_printed: 10.93 (0.45)
         Na2O_wt_pct_sd: 0.45
@@ -6136,25 +6080,20 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.43e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Fo+liq
         P_Na_atm_run: 8.43e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.43 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 10.93
           MgO: 18.22
@@ -6314,7 +6253,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 14.75
         Na2O_wt_pct_as_printed: 14.75 (0.41)
         Na2O_wt_pct_sd: 0.41
@@ -6331,24 +6270,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.43e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.43e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.43 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 14.75
           MgO: 18.88
@@ -6507,7 +6441,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 13.03
         Na2O_wt_pct_as_printed: 13.03 (0.66)
         Na2O_wt_pct_sd: 0.66
@@ -6524,25 +6458,20 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.4e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Fo+Ak
         P_Na_atm_run: 8.4e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.40 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 13.03
           MgO: 16.31
@@ -6702,7 +6631,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 10.1
         Na2O_wt_pct_as_printed: 10.1 (0.4)
         Na2O_wt_pct_sd: 0.4
@@ -6719,25 +6648,20 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.4e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Fo+liq
         P_Na_atm_run: 8.4e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.40 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 10.1
           MgO: 17.29
@@ -6914,25 +6838,20 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.4e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Fo+liq
         P_Na_atm_run: 8.4e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.40 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 14.4
           MgO: 15.77
@@ -7087,15 +7006,6 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.4e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Wo+liq
@@ -7103,10 +7013,14 @@ species:
         P_Na_atm_run: 8.4e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.40 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_note: no unique appendix analysis row with matching run, label and analysed Na2O; composition is
           the printed label only
         fO2_not_landed_reason: caption pairs 1400 C with the NS2 1250 C source activity (see admission reason)
@@ -7165,7 +7079,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 14.1
         Na2O_wt_pct_as_printed: 14.1 (0.15)
         Na2O_wt_pct_sd: 0.15
@@ -7182,24 +7096,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.4e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.4e-06
         P_Na_sd_atm_run: 2.0e-08
         P_Na_run_as_printed: 8.40 (0.02) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 14.1
           MgO: 2.81
@@ -7358,7 +7267,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 14.77
         Na2O_wt_pct_as_printed: 14.77 (0.25)
         Na2O_wt_pct_sd: 0.25
@@ -7375,24 +7284,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.42e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.42e-06
         P_Na_sd_atm_run: 1.8e-07
         P_Na_run_as_printed: 8.42 (0.18) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 14.77
           MgO: 3.74
@@ -7551,7 +7455,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 13.87
         Na2O_wt_pct_as_printed: 13.87 (0.36)
         Na2O_wt_pct_sd: 0.36
@@ -7568,24 +7472,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.42e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.42e-06
         P_Na_sd_atm_run: 1.8e-07
         P_Na_run_as_printed: 8.42 (0.18) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 13.87
           MgO: 7.32
@@ -7744,7 +7643,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 16.38
         Na2O_wt_pct_as_printed: 16.38 (0.32)
         Na2O_wt_pct_sd: 0.32
@@ -7761,24 +7660,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.42e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.42e-06
         P_Na_sd_atm_run: 1.8e-07
         P_Na_run_as_printed: 8.42 (0.18) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 16.38
           MgO: 14.58
@@ -7937,7 +7831,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 11.94
         Na2O_wt_pct_as_printed: 11.94 (0.1)
         Na2O_wt_pct_sd: 0.1
@@ -7954,25 +7848,20 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.7e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Wo+Mel+liq
         P_Na_atm_run: 8.7e-06
         P_Na_sd_atm_run: 1.9e-07
         P_Na_run_as_printed: 8.70 (0.19) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 11.94
           MgO: 14.03
@@ -8132,7 +8021,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 9.04
         Na2O_wt_pct_as_printed: 9.04 (0.07)
         Na2O_wt_pct_sd: 0.07
@@ -8149,24 +8038,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.7e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.7e-06
         P_Na_sd_atm_run: 1.9e-07
         P_Na_run_as_printed: 8.70 (0.19) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 9.04
           MgO: 9.03
@@ -8325,7 +8209,7 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
         Na2O_wt_pct: 12.05
         Na2O_wt_pct_as_printed: 12.05 (0.04)
         Na2O_wt_pct_sd: 0.04
@@ -8342,24 +8226,19 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.7e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: [149, 150]
-            table: 'III.2 (caption; III.3 in text)'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.7e-06
         P_Na_sd_atm_run: 1.9e-07
         P_Na_run_as_printed: 8.70 (0.19) x10^-6 atm
-        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the paragraph
-          introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
-          condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau
-          IV.6). The caption temperature is carried as printed; the row is not admitted.'
+        reason: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+          paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and
+          the caption source condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition
+          (Annexe 8, Tableau A.8.3; Tableau IV.6). The thesis gives the NS2 source condition at 1250 °C
+          (PDF p.149 / printed p.126; Table IV.6, PDF p.180), but these runs carry the printed 1400 °C
+          caption, not a 1250 °C run temperature. Do not correct the printed run temperature. JANAF matches
+          printed PNa at 1250 °C (+0.20 dex), not at 1400 °C (+1.01 dex). The caption fO2 is not a run
+          condition, so fO2_Pa is unknown for P_PARTIAL. The row is not admitted.'
         composition_wt_pct:
           Na2O: 12.05
           MgO: 8.64
@@ -23846,7 +23725,8 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
+        reason: 'source_fO2_not_landed: fO2_not_landed_reason says the Table IV.6 caption fO2 is not a run condition, so this P_PARTIAL observation is not admitted without a run fO2 value.'
         Na2O_wt_pct: 18.51
         Na2O_wt_pct_as_printed: 18.51 (0.21)
         Na2O_wt_pct_sd: 0.21
@@ -23863,15 +23743,6 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.7e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: 180
-            table: 'IV.6'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         P_Na_atm_run: 8.7e-06
@@ -24028,7 +23899,8 @@ species:
         quantity: partial_pressure
         gas_species: Na
         method_class: measured_tabulated
-        admission_status: admitted
+        admission_status: typed_refusal
+        reason: 'source_fO2_not_landed: fO2_not_landed_reason says the Table IV.6 caption fO2 is not a run condition, so this P_PARTIAL observation is not admitted without a run fO2 value.'
         Na2O_wt_pct: 12.79
         Na2O_wt_pct_as_printed: '12.79'
         analysis_note_as_printed: une mesure
@@ -24045,15 +23917,6 @@ species:
         fO2_atm_caption: 2.11e-06
         pressure_atm: 8.7e-06
         pressure_atm_source: run
-        oxygen_partial_pressure:
-          value: '2.11e-06'
-          units: atm
-          method_class: quoted_unattributed
-          derivation: printed Ni/NiO buffer fO2 in the table caption
-          locator:
-            pdf_page: 180
-            table: 'IV.6'
-            note: table caption
         P_Na_atm_caption: 5.5e-06
         P_Na_caption_as_printed: 5.50*10-06
         associated_phases_as_printed: Mel+liq
