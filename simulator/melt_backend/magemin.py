@@ -130,9 +130,8 @@ from simulator.melt_backend.base import (
 from simulator.composition_projection import (
     PROJECTED_BULK_CLASSIFICATION_KEY,
     ProjectedBulkClassification,
-    classify_projected_bulk,
+    _classify_projected_bulk_from_source,
     format_projected_component_mol,
-    projected_component_moles_per_kg,
 )
 from simulator.engine_pool import (
     EngineWorkerDied,
@@ -581,25 +580,6 @@ def composition_projected_liquidus_notice(
             ],
         }
     return None
-
-
-def _magemin_projection_classification(
-    bulk_projection: _MAGEMinBulkProjection,
-    *,
-    species_formula_registry: Optional[Mapping[str, Any]],
-) -> ProjectedBulkClassification:
-    dropped_wt_pct = dict(bulk_projection.dropped_wt_pct_by_component)
-    dropped_mol_per_kg, unavailable_reasons = projected_component_moles_per_kg(
-        dropped_wt_pct,
-        source_sum_wt_pct=bulk_projection.source_sum_wt_pct,
-        species_formula_registry=species_formula_registry,
-    )
-    return classify_projected_bulk(
-        dropped_wt_pct,
-        source_sum_wt_pct=bulk_projection.source_sum_wt_pct,
-        dropped_component_mol_per_kg=dropped_mol_per_kg,
-        dropped_component_mol_unavailable_reasons=unavailable_reasons,
-    )
 
 
 def _magemin_projection_notice(
@@ -1647,8 +1627,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 diagnostics=projection_diagnostics,
             )
 
-        projection_classification = _magemin_projection_classification(
-            bulk_projection,
+        projection_classification = _classify_projected_bulk_from_source(
+            dict(bulk_projection.dropped_wt_pct_by_component),
+            source_sum_wt_pct=bulk_projection.source_sum_wt_pct,
             species_formula_registry=species_formula_registry,
         )
         result_diagnostics = projection_diagnostics_for_melt_input(

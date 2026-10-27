@@ -50,6 +50,10 @@ from simulator.melt_regime import (
     liquid_fraction_invalidity,
 )
 from simulator.battery.enums import NoticeKind
+from simulator.composition_projection import (
+    PROJECTED_BULK_CLASSIFICATION_KEY,
+    _classify_projected_bulk_from_source,
+)
 from simulator.engine_pool import (
     EngineWorkerDied,
     EngineWorkerRemoteError,
@@ -1310,10 +1314,26 @@ def _composition_projected_notice(
 ) -> dict[str, Any] | None:
     """Return dropped-component payload when the adapter flagged a projection.
 
-    Match the structured ``composition_projected`` notice / status reason, not
-    the shared VapoRock ``input_composition_projected`` projection reason —
-    that token is present on every MAGEMin bulk, including in-basis solves.
+    Read MAGEMin's shared classification first, then the typed notice/status
+    and legacy projection block. Do not match the shared VapoRock
+    ``input_composition_projected`` reason alone: it appears on every
+    MAGEMin bulk, including in-basis solves.
     """
+
+    classification = diagnostics.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+    if isinstance(classification, Mapping):
+        dropped = [
+            str(name)
+            for name in (classification.get("dropped_components") or ())
+        ]
+        total_wt_pct = finite_float(classification.get("dropped_total_wt_pct"))
+        if dropped:
+            return {
+                "dropped_components": dropped,
+                "dropped_mass_fraction": (
+                    None if total_wt_pct is None else total_wt_pct / 100.0
+                ),
+            }
 
     structured = str(diagnostics.get("backend_status_reason") or "")
     projection = diagnostics.get("input_composition_projection")
@@ -1322,13 +1342,31 @@ def _composition_projected_notice(
         raw = projection.get(REFUSAL_COMPOSITION_PROJECTED)
         if isinstance(raw, Mapping):
             notice = raw
-    if structured != REFUSAL_COMPOSITION_PROJECTED and notice is None:
+    direct_notice = diagnostics.get("composition_projected_notice")
+    if structured != REFUSAL_COMPOSITION_PROJECTED and notice is None and not (
+        isinstance(direct_notice, Mapping)
+        and direct_notice.get("dropped_components")
+    ):
         return None
     dropped: list[str] = []
     fraction = None
     if notice is not None:
         dropped = [str(name) for name in (notice.get("dropped_components") or [])]
         fraction = notice.get("dropped_mass_fraction")
+    if not dropped and isinstance(direct_notice, Mapping):
+        rows = direct_notice.get("dropped_components") or ()
+        dropped = [
+            str(row.get("component"))
+            for row in rows
+            if isinstance(row, Mapping) and row.get("component")
+        ]
+        fractions = [
+            finite_float(row.get("mass_fraction"))
+            for row in rows
+            if isinstance(row, Mapping)
+        ]
+        if fractions and all(value is not None for value in fractions):
+            fraction = sum(value for value in fractions if value is not None)
     if not dropped and isinstance(projection, Mapping):
         dropped = [
             str(name) for name in (projection.get("dropped_bulk_components") or [])
@@ -1471,7 +1509,7 @@ def reclassify_projected_composition_cells(
     """Rewrite MAGEMin ok-cells whose pot drops ig-order components.
 
     Used when regenerating reports from JSON captured before the adapter
-    refused projected bulks. Does not call the MAGEMin binary.
+    classified its projected bulks. Does not call the MAGEMin binary.
     """
 
     compositions: dict[str, Mapping[str, float]] = {}
@@ -1505,7 +1543,11 @@ def reclassify_projected_composition_cells(
         except MeltCompositionError:
             rewritten.append(cell)
             continue
-        if not projection.dropped_components:
+        classification = _classify_projected_bulk_from_source(
+            dict(projection.dropped_wt_pct_by_component),
+            source_sum_wt_pct=float(projection.source_sum_wt_pct),
+        )
+        if not classification.dropped_components:
             rewritten.append(cell)
             continue
         source_sum = float(projection.source_sum_wt_pct)
@@ -1516,7 +1558,7 @@ def reclassify_projected_composition_cells(
             else 0.0
         )
         note = composition_projected_note(
-            projection.dropped_components,
+            classification.dropped_components,
             fraction,
         )
         rewritten.append(

@@ -264,6 +264,26 @@ def projected_component_moles_per_kg(
     return moles_per_kg, unavailable_reasons
 
 
+def _classify_projected_bulk_from_source(
+    dropped_component_wt_pct: Mapping[str, float],
+    *,
+    source_sum_wt_pct: float,
+    species_formula_registry: Mapping[str, Any] | None = None,
+) -> ProjectedBulkClassification:
+    """Resolve source-bulk moles and classify one projected bulk."""
+    moles_per_kg, unavailable_reasons = projected_component_moles_per_kg(
+        dropped_component_wt_pct,
+        source_sum_wt_pct=source_sum_wt_pct,
+        species_formula_registry=species_formula_registry,
+    )
+    return classify_projected_bulk(
+        dropped_component_wt_pct,
+        source_sum_wt_pct=source_sum_wt_pct,
+        dropped_component_mol_per_kg=moles_per_kg,
+        dropped_component_mol_unavailable_reasons=unavailable_reasons,
+    )
+
+
 def format_projected_component_mol(
     classification: ProjectedBulkClassification,
     component: str,
