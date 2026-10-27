@@ -119,6 +119,9 @@ class ValidationIssue:
 
 
 _ADVISORY_REASONS = frozenset({RefusalReason.IDENTITY_INCOMPLETE})
+_DERIVATION_EVIDENCE_CLASSES = frozenset(
+    {EvidenceClass.MODEL_DERIVED, EvidenceClass.MEASURED_REDUCED}
+)
 
 # v2.1 vapour-equilibrium blocking qualifications. Sibling activity is
 # not blocked by a pressure-only floor (quantity-scoped affected_quantities).
@@ -149,6 +152,26 @@ class ValidationReport:
     @property
     def hard_issues(self) -> tuple[ValidationIssue, ...]:
         return tuple(i for i in self.issues if i.reason not in _ADVISORY_REASONS)
+
+
+def _unavailable_missing_input_work_items(
+    observations: Mapping[str, Observation],
+) -> tuple[Observation, ...]:
+    """Return derived unavailable observations whose input still needs grounding."""
+
+    return tuple(
+        sorted(
+            (
+                observation
+                for observation in observations.values()
+                if observation.evidence.class_.is_value
+                and observation.evidence.class_.value in _DERIVATION_EVIDENCE_CLASSES
+                and observation.value.kind is ValueKind.UNAVAILABLE
+                and observation.derivation is None
+            ),
+            key=lambda observation: observation.observation_id,
+        )
+    )
 
 
 def _issue(path: str, reason: RefusalReason, detail: str) -> ValidationIssue:
@@ -1154,10 +1177,7 @@ def validate_observation(
                         "authority must be extrapolated",
                     )
                 )
-    if ev.is_value and ev.value in {
-        EvidenceClass.MODEL_DERIVED,
-        EvidenceClass.MEASURED_REDUCED,
-    }:
+    if ev.is_value and ev.value in _DERIVATION_EVIDENCE_CLASSES:
         # A caption-only figure admission with no numeric value is never scored,
         # so there is no derived numeric value whose ancestry needs tracing.
         figure_only_without_value = (

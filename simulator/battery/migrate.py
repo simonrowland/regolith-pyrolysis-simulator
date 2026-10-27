@@ -42,7 +42,7 @@ import inspect
 import json
 import re
 import unicodedata
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field, fields, is_dataclass, replace
 from decimal import Decimal, InvalidOperation, localcontext
 from enum import Enum
@@ -170,6 +170,7 @@ from simulator.battery.enums import BenchIdentityBasis, CellMaterial
 from simulator.battery.validate import (
     ValidationIssue,
     ValidationReport,
+    _unavailable_missing_input_work_items,
     validate_corpus,
 )
 from simulator.physical_constants import STANDARD_ATMOSPHERE_PA
@@ -3254,6 +3255,14 @@ def _convert_rate_to_kg_per_s(
     unit = unit.replace("−", "-").replace("⁻", "-")
     if unit in {"kg/s", "kg_per_s", "kgs-1"}:
         return amount, "identity:kg_per_s"
+    if "table2doesnotstatetherateunit" in unit:
+        return None, "rate_unit_not_stated"
+    if unit.startswith("mol/s/m2"):
+        return None, "sample_area_not_printed"
+    if unit.startswith("g/h/g"):
+        return None, "sample_mass_not_printed"
+    if "molcm-2s-1" in unit or "cm-2fordensities" in unit:
+        return None, "exposed_area_not_printed"
     return None, f"unmapped {quantity_label} unit {units!r}"
 
 
@@ -21303,6 +21312,14 @@ def write_report(result: MigrationResult, path: Path) -> None:
     hard = 0 if result.validation is None else len(result.validation.hard_issues)
     rows_in = sum(c.rows_in for c in result.source_counts.values())
     obs_out = len(result.observations)
+    unavailable_work = _unavailable_missing_input_work_items(result.observations)
+    unavailable_work_by_reason = Counter(
+        observation.value.unavailable_reason.strip()
+        if isinstance(observation.value.unavailable_reason, str)
+        and observation.value.unavailable_reason.strip()
+        else "<missing_reason>"
+        for observation in unavailable_work
+    )
     lines = [
         "# Battery v2.1 migration report",
         "",
@@ -21316,11 +21333,29 @@ def write_report(result: MigrationResult, path: Path) -> None:
         f"index sources: {sum(c.index_works_in for c in result.source_counts.values())}",
         f"hard issues: {hard}",
         "",
-        "## Spec vs measured",
+        "## Unavailable input work census",
         "",
-        "| count | spec | measured |",
-        "|---|---:|---:|",
+        f"unavailable derived values without derivation: {len(unavailable_work)}",
+        "",
+        "Each count is page-grounding work keyed by the value's typed unavailable_reason.",
+        "",
+        "| kind | count |",
+        "|---|---:|",
     ]
+    for reason, count in sorted(
+        unavailable_work_by_reason.items(), key=lambda item: (-item[1], item[0])
+    ):
+        display_reason = reason.replace("|", "\\|").replace("\n", " ")
+        lines.append(f"| `unavailable_missing_input:{display_reason}` | {count} |")
+    lines.extend(
+        [
+            "",
+            "## Spec vs measured",
+            "",
+            "| count | spec | measured |",
+            "|---|---:|---:|",
+        ]
+    )
     mapping = [
         ("citations", "citations"),
         ("doi_works", "doi_works"),
