@@ -123,9 +123,11 @@ def test_metals_total_excludes_o2():
         atom_ledger=None,
     )
     result = classify_products(sim)
-    assert result['metals_plus_O2']['metals_total_kg'] == 6.0
-    assert result['metals_plus_O2']['O2_kg'] == 2.0
-    assert result['metals_plus_O2']['class_total_kg'] == 8.0
+    # Pin the pre-refactor numeric report from this independently specified
+    # ledger fixture: Fe 5 kg + Na 1 kg, plus O2 2 kg.
+    assert result['metals_plus_O2']['metals_total_kg'].hex() == (6.0).hex()
+    assert result['metals_plus_O2']['O2_kg'].hex() == (2.0).hex()
+    assert result['metals_plus_O2']['class_total_kg'].hex() == (8.0).hex()
 
 
 # ---------------------------------------------------------------------------
