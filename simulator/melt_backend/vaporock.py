@@ -962,6 +962,10 @@ def _bootstrap_vaporock_worker(
     fresh-per-request on any mismatch. Hits after that prefix are reused
     without comparison. The integer 20 is a probe budget, not a grid proof.
     """
+    try:
+        _load_thermoengine_phaseobjc_library()
+    except (ImportError, OSError) as exc:
+        raise VapoRockCallError(exc) from exc
     module = None
     errors: list[str] = []
     for module_name in _IMPORT_CANDIDATES:
