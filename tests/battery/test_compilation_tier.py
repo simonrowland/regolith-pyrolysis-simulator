@@ -3367,9 +3367,9 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
     magnesium S at 1361 K declares 100000 Pa, so S answers the gas table
     even though the elemental zero is the crystal.
     B1452 SiO has no elemental ideal-gas enthalpy reference; Cp and S
-    still answer O-012, and H−H298 refuses. B1259 and B1452 oxygen are
-    the ideal gas at 298.15 K, so those rows return the printed O-029
-    node.
+    still answer O-012, and H−H298 refuses. B1259 oxygen H−H298 and B1452
+    oxygen S use the printed O-029 nodes. B1259 oxygen reference-state S
+    at 298.15 K is refused by its dedicated unresolved-basis rule.
     """
 
     import pytest
