@@ -1435,7 +1435,9 @@ def _element_reference_species_for_transition_entropy(
         return None
     pair: list[tuple[int, Decimal, Decimal, Decimal, Decimal]] = []
 
-    def cell_value(row: Mapping[str, Any], column: str) -> tuple[Decimal, Decimal] | None:
+    def cell_value(
+        row: Mapping[str, Any], column: str
+    ) -> tuple[Decimal, Decimal] | None:
         cell = _as_published_cell(row.get(column))
         if cell is None or cell[1]:
             return None
@@ -1449,12 +1451,14 @@ def _element_reference_species_for_transition_entropy(
         if not isinstance(row, Mapping) or row.get("kind") != "data":
             continue
         row_temperature = cell_value(row, "temperature")
+        if row_temperature is None or row_temperature[0] != temperature:
+            continue
         entropy = cell_value(row, "entropy")
+        if entropy is None:
+            continue
         enthalpy = cell_value(row, "H_minus_H298")
-        if row_temperature is None or entropy is None or enthalpy is None:
-            continue
-        if row_temperature[0] != temperature:
-            continue
+        if enthalpy is None:
+            return None
         pair.append(
             (
                 row_index,
@@ -1468,7 +1472,13 @@ def _element_reference_species_for_transition_entropy(
         return None
 
     condensed, gas = sorted(pair, key=lambda row: row[1])
-    _condensed_row, condensed_s, condensed_s_half, condensed_h, condensed_h_half = condensed
+    (
+        _condensed_row,
+        condensed_s,
+        condensed_s_half,
+        condensed_h,
+        condensed_h_half,
+    ) = condensed
     _gas_row, gas_s, gas_s_half, gas_h, gas_h_half = gas
 
     # At T_b, S_gas-S_condensed = (H_gas-H_condensed)/T_b. Convert the

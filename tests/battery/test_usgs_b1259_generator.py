@@ -331,6 +331,13 @@ def test_element_reference_state_boiling_rows_pair_entropy_with_phase() -> None:
             Decimal("23.688"),
             Decimal("43.473"),
         ),
+        (
+            "b1259-ht-0027-magnesium-reference-state",
+            "Mg",
+            "1363",
+            Decimal("20.710"),
+            Decimal("43.050"),
+        ),
     ):
         generated = _generation(record_id)
         entropy = _observations_for(
@@ -357,7 +364,7 @@ def test_element_reference_state_boiling_rows_pair_entropy_with_phase() -> None:
         assert gas.value.point > condensed.value.point
 
 
-def test_element_reference_state_transition_pair_with_bad_enthalpy_stays_unknown() -> None:
+def test_element_reference_transition_bad_enthalpy_stays_unknown() -> None:
     record = _load("b1259-ht-0025-potassium-reference-state")
     for row in record["rows"]:
         if (
