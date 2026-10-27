@@ -24,6 +24,11 @@ from simulator.chemistry.kernel import (
     IntentResultStatusError,
     ProviderUnavailableError,
 )
+from simulator.composition_projection import (
+    PROJECTED_BULK_CLASSIFICATION_KEY,
+    classify_projected_bulk,
+    projected_component_moles_per_kg,
+)
 from simulator.core import PoisonedHourError
 from simulator.evaporation import (
     EvaporationFluxRefusal,
@@ -6900,6 +6905,99 @@ def test_external_liquidus_fraction_within_epsilon_snaps_to_one(
 
     assert curve['path'] == expected_path
     assert getattr(sim, '_reduced_real_repair_notices', []) == []
+
+
+def test_successful_projected_gate_dispatch_preserves_classification(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    dropped_wt_pct = {'MnO': 0.3}
+    mol_per_kg, unavailable_reasons = projected_component_moles_per_kg(
+        dropped_wt_pct,
+        source_sum_wt_pct=100.0,
+    )
+    classification = classify_projected_bulk(
+        dropped_wt_pct,
+        source_sum_wt_pct=100.0,
+        dropped_component_mol_per_kg=mol_per_kg,
+        dropped_component_mol_unavailable_reasons=unavailable_reasons,
+    ).as_diagnostics()
+    projected_notice = {
+        'kind': 'composition_projected',
+        'reason': 'composition_projected',
+        'authority': 'extrapolated',
+        'certified_band': {
+            'engine': 'magemin',
+            'database': 'ig',
+            'bulk_components': ['SiO2', 'MgO'],
+        },
+        'dropped_components': [
+            {'component': 'MnO', 'mass_fraction': 0.003},
+        ],
+    }
+    diagnostic = {
+        'backend_status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+        'liquid_fraction_path': (
+            {'temperature_C': 1000.0, 'liquid_fraction': 0.0},
+            {'temperature_C': 1150.0, 'liquid_fraction': 0.5},
+            {'temperature_C': 1300.0, 'liquid_fraction': 1.0},
+        ),
+        'backend_diagnostics': {
+            PROJECTED_BULK_CLASSIFICATION_KEY: classification,
+            'composition_projected_notice': projected_notice,
+        },
+    }
+    monkeypatch.setattr(
+        sim,
+        '_register_freeze_gate_liquid_fraction_providers',
+        lambda: None,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda *args, **kwargs: SimpleNamespace(
+            status='ok',
+            diagnostic=diagnostic,
+        ),
+    )
+
+    curve = sim._freeze_gate_curve_from_gate_dispatch(
+        [],
+        fO2_log=-9.0,
+    )
+
+    assert curve is not None
+    assert curve[PROJECTED_BULK_CLASSIFICATION_KEY] == classification
+    assert curve['composition_projected_notice'] == projected_notice
+    sim._resolved_melt_redox_gate_authority = (
+        lambda *args, **kwargs: curve
+    )
+    sim.melt.temperature_C = 1150.0
+    assert sim._freeze_gate_liquid_fraction_factor() == pytest.approx(0.5)
+    assert (
+        sim._last_freeze_gate_diagnostic[PROJECTED_BULK_CLASSIFICATION_KEY]
+        == classification
+    )
+    sim._record_composition_projected_liquidus_notice_from_curve(curve)
+    metadata = {}
+    _attach_composition_projected_liquidus_notice(metadata, sim)
+    assert (
+        metadata['composition_projected_liquidus_notice']['notices'][0][
+            PROJECTED_BULK_CLASSIFICATION_KEY
+        ]
+        == classification
+    )
 
 
 def test_failed_freeze_gate_refusal_preserves_repair_notices_without_memoizing(

@@ -39,6 +39,7 @@ from simulator.engine_pool import (
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 from engines.domain_reason import OutOfDomainReason
 from engines.magemin.domain import MAGEMinDomainGate
+from simulator.composition_projection import PROJECTED_BULK_CLASSIFICATION_KEY
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
@@ -782,6 +783,7 @@ def _assert_magemin_bulk_drop_projected(
     dropped = set(projection["dropped_bulk_components"])
     expected = set(expected_components)
     notice = projection[COMPOSITION_PROJECTED]
+    classification = result.diagnostics[PROJECTED_BULK_CLASSIFICATION_KEY]
 
     assert projection["status"] == "projected"
     assert projection["reason"] == "input_composition_projected"
@@ -792,6 +794,10 @@ def _assert_magemin_bulk_drop_projected(
         assert expected <= dropped
     assert projection["bulk_dropped_wt_pct"] >= min_dropped_wt_pct
     assert notice["dropped_components"] == projection["dropped_bulk_components"]
+    assert classification["dropped_components"] == projection[
+        "dropped_bulk_components"
+    ]
+    assert classification["projection_verdict"] == "over_threshold"
     assert notice["dropped_mass_fraction"] == projection["dropped_mass_fraction"]
     assert notice["dropped_mass_fraction"] > 0.0
     if min_dropped_mass_fraction is not None:
@@ -2239,7 +2245,7 @@ def test_magemin_fake_bridge_receives_pressure_in_gpa(monkeypatch):
     assert captured["T_K"] == pytest.approx(1450.0 + 273.15)
 
 
-def test_magemin_bulk_projection_drop_is_composition_projected_refusal(
+def test_magemin_bulk_projection_drop_at_0_99_wt_pct_solves_with_notice(
     monkeypatch,
 ):
     calls = []
@@ -2263,13 +2269,68 @@ def test_magemin_bulk_projection_drop_is_composition_projected_refusal(
         pressure_bar=5000.0,
     )
 
+    assert len(calls) == 1
+    assert "MnO" not in calls[0]["composition"]
+    assert result.status == "ok"
+    classification = result.diagnostics[PROJECTED_BULK_CLASSIFICATION_KEY]
+    assert classification["projection_verdict"] == "within_threshold"
+    assert classification["dropped_components"] == ["MnO"]
+    assert classification["dropped_total_wt_pct"] == pytest.approx(
+        100.0 / 101.0
+    )
+    component = classification["components"][0]
+    assert component["component"] == "MnO"
+    assert component["wt_pct"] == pytest.approx(100.0 / 101.0)
+    assert component["mol"] is not None and component["mol"] > 0.0
+    assert classification["dropped_component_mol_per_kg"]["MnO"] == (
+        component["mol"]
+    )
+    projected_notice = result.diagnostics["composition_projected_notice"]
+    assert projected_notice["dropped_components"][0]["component"] == "MnO"
+    notice = next(
+        warning
+        for warning in result.warnings
+        if "MAGEMin solved projected composition" in warning
+    )
+    assert "MnO=" in notice and "wt%" in notice and "mol/kg" in notice
+
+
+def test_magemin_bulk_projection_drop_at_1_01_wt_pct_is_refused(
+    monkeypatch,
+):
+    calls = []
+
+    def minimize(**kwargs):
+        calls.append(kwargs)
+        return {"phases": {"liq": {"mass_kg": 1.0}}}
+
+    fake_module = types.SimpleNamespace(minimize=minimize)
+    _make_available_magemin(monkeypatch, fake_module)
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        backend.initialize({})
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg={"SiO2": 50.0, "MgO": 48.99, "MnO": 1.01},
+        fO2_log=-8.0,
+        pressure_bar=5000.0,
+    )
+
     assert calls == []
     _assert_magemin_bulk_drop_projected(
         result,
         ("MnO",),
-        min_dropped_wt_pct=0.9,
+        min_dropped_wt_pct=1.0,
         exact_components=True,
     )
+    classification = result.diagnostics[PROJECTED_BULK_CLASSIFICATION_KEY]
+    assert classification["dropped_total_wt_pct"] == pytest.approx(1.01)
+    assert classification["dropped_total_wt_pct"] > classification[
+        "threshold_wt_pct"
+    ]
 
 
 def test_magemin_bulk_projection_mass_fraction_float_hex_pin():
@@ -2339,9 +2400,7 @@ def test_magemin_p2o5_bulk_is_composition_projected_refusal(monkeypatch):
 
 
 def test_magemin_liquidus_of_projected_bulk_stays_composition_projected():
-    """The ig-order drop stays a refusal. The projected bulk's liquidus is
-    attached for the freeze gate; it is not reported as status=ok.
-    """
+    """An over-threshold ig-order drop stays flagged as a refusal."""
     backend = MAGEMinBackend()
     backend._available = True
     backend._bridge = "subprocess"
@@ -2378,6 +2437,10 @@ def test_magemin_liquidus_of_projected_bulk_stays_composition_projected():
     assert calls
     assert result.status == "out_of_domain"
     assert result.status != "ok"
+    classification = result.diagnostics[PROJECTED_BULK_CLASSIFICATION_KEY]
+    assert classification["projection_verdict"] == "over_threshold"
+    assert set(classification["dropped_components"]) == {"P2O5", "MnO"}
+    assert all(row["mol"] is not None for row in classification["components"])
     assert result.solidus_T_C == pytest.approx(1000.0, abs=2.0)
     assert result.liquidus_T_C == pytest.approx(1200.0, abs=2.0)
     assert result.solidus_T_C < result.liquidus_T_C

@@ -23,6 +23,11 @@ from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.capabilities import CapabilityProfile
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.composition_projection import (
+    PROJECTED_BULK_CLASSIFICATION_KEY,
+    classify_projected_bulk,
+    projected_component_moles_per_kg,
+)
 from simulator.corpus_version import current_corpus_version
 from simulator.fe_redox import (
     KRESS91_FO2_KEY_REFERENCE_T_K,
@@ -3331,15 +3336,27 @@ def test_pt1_projected_gate_notice_replays_into_run_metadata(tmp_path: Path) -> 
             "bulk_components": ["SiO2", "MgO"],
         },
         "dropped_components": [
-            {"component": "P2O5", "mass_fraction": 0.01},
+            {"component": "P2O5", "mass_fraction": 0.005},
         ],
     }
+    dropped_wt_pct = {"P2O5": 0.5}
+    mol_per_kg, unavailable_reasons = projected_component_moles_per_kg(
+        dropped_wt_pct,
+        source_sum_wt_pct=100.0,
+    )
+    classification = classify_projected_bulk(
+        dropped_wt_pct,
+        source_sum_wt_pct=100.0,
+        dropped_component_mol_per_kg=mol_per_kg,
+        dropped_component_mol_unavailable_reasons=unavailable_reasons,
+    ).as_diagnostics()
     curve = {
         "source": "unit-test:composition_projected",
         "solidus_T_C": 1100.0,
         "liquidus_T_C": 1600.0,
         "path": (),
         "composition_projected_notice": notice,
+        PROJECTED_BULK_CLASSIFICATION_KEY: classification,
     }
 
     capture = PT0DeterminismStore("capture", db_path=db_path)
@@ -3361,8 +3378,12 @@ def test_pt1_projected_gate_notice_replays_into_run_metadata(tmp_path: Path) -> 
     _attach_composition_projected_liquidus_notice(metadata, replay_sim)
 
     assert replayed_curve == curve
-    assert metadata["composition_projected_liquidus_notice"]["notices"] == [
-        notice
+    replayed_notice = metadata["composition_projected_liquidus_notice"]
+    assert replayed_notice["notices"] == [
+        {
+            **notice,
+            PROJECTED_BULK_CLASSIFICATION_KEY: classification,
+        }
     ]
 
 

@@ -131,6 +131,7 @@ from simulator.composition_projection import (
     PROJECTED_BULK_CLASSIFICATION_KEY,
     ProjectedBulkClassification,
     classify_projected_bulk,
+    format_projected_component_mol,
     projected_component_moles_per_kg,
 )
 from simulator.engine_pool import (
@@ -598,6 +599,25 @@ def _magemin_projection_classification(
         source_sum_wt_pct=bulk_projection.source_sum_wt_pct,
         dropped_component_mol_per_kg=dropped_mol_per_kg,
         dropped_component_mol_unavailable_reasons=unavailable_reasons,
+    )
+
+
+def _magemin_projection_notice(
+    classification: ProjectedBulkClassification,
+    *,
+    refused: bool,
+) -> str:
+    component_text = ', '.join(
+        f'{component}={wt_pct:.12g} wt%, '
+        f'{format_projected_component_mol(classification, component)}'
+        for component, wt_pct in classification.dropped_component_wt_pct
+    )
+    action = 'refused' if refused else 'solved'
+    return (
+        f'MAGEMin {action} projected composition; dropped components: '
+        f'{component_text}; total dropped='
+        f'{classification.dropped_total_wt_pct:.12g} wt% '
+        f'(threshold {classification.threshold_wt_pct:g} wt%)'
     )
 
 
@@ -1649,13 +1669,22 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             result_diagnostics[PROJECTED_BULK_CLASSIFICATION_KEY] = (
                 projection_classification.as_diagnostics()
             )
-        if bulk_projection.dropped_components:
-            # A result for a different (projected) bulk is not a result for
-            # this one. Do not call MAGEMin on the truncated vector.
+            projection_notice = composition_projected_liquidus_notice(
+                result_diagnostics
+            )
+            if projection_notice is not None:
+                result_diagnostics['composition_projected_notice'] = (
+                    projection_notice
+                )
+        if (
+            bulk_projection.dropped_components
+            and not projection_classification.within_threshold
+        ):
+            # A materially different projected bulk is not a result for this
+            # one. Do not call MAGEMin on the truncated vector.
             diagnostics = dict(result_diagnostics)
             diagnostics['backend_status'] = 'out_of_domain'
             diagnostics['backend_status_reason'] = COMPOSITION_PROJECTED
-            dropped = ', '.join(bulk_projection.dropped_components)
             return EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
@@ -1664,8 +1693,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 warnings=[
                     *prior_warnings,
                     *bulk_projection.warnings,
-                    'MAGEMin refused projected composition; dropped '
-                    f'components have no documented ig endmember: {dropped}',
+                    _magemin_projection_notice(
+                        projection_classification,
+                        refused=True,
+                    ),
                 ],
                 diagnostics=diagnostics,
             )
@@ -1878,6 +1909,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             liquid_fraction,
             liquid_composition_wt_pct,
         ) = self._phase_assemblage_payload(raw)
+        if bulk_projection.dropped_components:
+            all_warnings.append(
+                _magemin_projection_notice(
+                    projection_classification,
+                    refused=False,
+                )
+            )
         result = EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
@@ -1922,6 +1960,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
 
         sample_warnings: list[str] = []
+        sample_projection_classification: Dict[str, Any] | None = None
+        sample_projection_notice: Dict[str, Any] | None = None
 
         # Mandatory aggregate budget: generic finder default is unbounded so
         # AlphaMELTS is not silently capped; MAGEMin always applies a finite
@@ -1974,6 +2014,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             temperature_C: float,
             remaining_budget_s: Optional[float] = None,
         ) -> float:
+            nonlocal sample_projection_classification, sample_projection_notice
             sample_fO2_log = (
                 fO2_log
                 if redox_state is None
@@ -1990,6 +2031,16 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 call_timeout_s=remaining_budget_s,
                 projected_oxide_wt_pct=projected_oxide_wt_pct,
             )
+            classification = (result.diagnostics or {}).get(
+                PROJECTED_BULK_CLASSIFICATION_KEY
+            )
+            if isinstance(classification, Mapping):
+                sample_projection_classification = dict(classification)
+            projection_notice = (result.diagnostics or {}).get(
+                'composition_projected_notice'
+            )
+            if isinstance(projection_notice, Mapping):
+                sample_projection_notice = dict(projection_notice)
             if result.status != 'ok':
                 warning = '; '.join(result.warnings) or result.status
                 # Raise the TYPED sample error so the finder preserves which
@@ -2030,16 +2081,25 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         warnings_out = [*result.warnings, *sample_warnings[:6]]
         diagnostics = dict(result.diagnostics or {})
-        # An ig-order drop is a refusal of the requested bulk (status stays
-        # out_of_domain — not ok). The freeze gate is allowed to predict on
-        # the projected bulk, so the search for that different bulk is
-        # attached here, once, with the drop notice. A second drop does not
-        # recurse.
+        if sample_projection_classification is not None:
+            diagnostics[PROJECTED_BULK_CLASSIFICATION_KEY] = (
+                sample_projection_classification
+            )
+        if sample_projection_notice is not None:
+            diagnostics['composition_projected_notice'] = (
+                sample_projection_notice
+            )
+        # Accepted small drops arrive here as status='ok' with the notice
+        # retained. For an over-threshold refusal, one projected search can
+        # still supply bounds to the freeze gate's explicit projection route;
+        # the requested-bulk status stays out_of_domain and it does not recurse.
         notice = (
             None
             if projected_retry
             else composition_projected_liquidus_notice(diagnostics)
         )
+        if notice is not None and result.status == 'ok':
+            diagnostics['composition_projected_notice'] = notice
         if (
             notice is not None
             and result.status == 'out_of_domain'

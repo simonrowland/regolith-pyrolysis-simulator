@@ -12,6 +12,7 @@ from typing import Any, NamedTuple
 from simulator.alpha_kinetics import parse_alpha_contract
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.composition_projection import PROJECTED_BULK_CLASSIFICATION_KEY
 from simulator.chemistry.melt_activity import single_cation_mole_fractions
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -1814,8 +1815,16 @@ class EvaporationMixin:
         curve: Mapping[str, Any],
     ) -> None:
         notice = curve.get('composition_projected_notice')
+        classification = curve.get(PROJECTED_BULK_CLASSIFICATION_KEY)
         if isinstance(notice, Mapping):
-            self._record_composition_projected_liquidus_notice(notice)
+            recorded_notice = dict(notice)
+            if isinstance(classification, Mapping):
+                recorded_notice[PROJECTED_BULK_CLASSIFICATION_KEY] = dict(
+                    classification
+                )
+            self._record_composition_projected_liquidus_notice(
+                recorded_notice
+            )
 
     def _record_composition_projected_liquidus_notice(
         self,
@@ -1838,6 +1847,11 @@ class EvaporationMixin:
                 if isinstance(row, Mapping)
             ],
         }
+        classification = notice.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+        if isinstance(classification, Mapping):
+            stored_notice[PROJECTED_BULK_CLASSIFICATION_KEY] = dict(
+                classification
+            )
         # Present only when the projected bounds were not the curve. A
         # usable projection keeps the historical notice shape.
         if 'bounds_source' in notice:
@@ -1873,10 +1887,10 @@ class EvaporationMixin:
         self._composition_projected_liquidus_notices = stored
 
     def composition_projected_liquidus_run_notice(self) -> dict[str, Any] | None:
-        """Run-level flag for liquidus solved on a projected bulk.
+        """Run-level notice for a liquidus tied to a projected bulk.
 
-        MAGEMin's equilibrate result stays ``out_of_domain``. This notice is
-        the category-3 flag: each dropped component and its mass fraction.
+        Each entry carries the dropped mass fractions and, when available,
+        their shared wt% and mol/kg classification.
         """
         stored = getattr(self, '_composition_projected_liquidus_notices', None)
         if not stored:
@@ -1961,6 +1975,9 @@ class EvaporationMixin:
             )
         curve = dict(curve)
         curve['composition_projected_notice'] = notice
+        classification = diagnostic.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+        if isinstance(classification, Mapping):
+            curve[PROJECTED_BULK_CLASSIFICATION_KEY] = dict(classification)
         return curve
 
     def _record_freeze_gate_curve_source_repair(
@@ -2637,6 +2654,7 @@ class EvaporationMixin:
         redox_state: RedoxState | None = None,
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_determinism import (
+            GATE_CURVE_NOTICE_KEYS,
             GateCurveProviderOutcome,
             gate_curve_provider_outcome_for_status,
             gate_curve_provider_timed_out,
@@ -2693,6 +2711,9 @@ class EvaporationMixin:
                     or 'unavailable'
                 )
                 warnings = list(getattr(result, 'warnings', ()) or ())
+            backend_diagnostics = diagnostic.get('backend_diagnostics')
+            if isinstance(backend_diagnostics, Mapping):
+                diagnostic = {**dict(backend_diagnostics), **diagnostic}
             if not gate_curve_provider_timed_out(diagnostic) or attempt == 1:
                 break
 
@@ -2706,6 +2727,19 @@ class EvaporationMixin:
             diagnostic,
         )
         record_gate_curve_provider_outcome(self, status_outcome)
+
+        def retain_gate_notices(
+            curve: dict[str, Any] | None,
+        ) -> dict[str, Any] | None:
+            if curve is None:
+                return None
+            retained = dict(curve)
+            for notice_key in GATE_CURVE_NOTICE_KEYS:
+                notice = diagnostic.get(notice_key)
+                if isinstance(notice, Mapping):
+                    retained[notice_key] = dict(notice)
+            return retained
+
         if status_outcome is GateCurveProviderOutcome.FAILED:
             if diagnostic.get('exception_class'):
                 mark_uncacheable_replay_disposition(
@@ -2738,7 +2772,7 @@ class EvaporationMixin:
                     repair_notices=repair_notices,
                 )
                 if projected is not None:
-                    return projected
+                    return retain_gate_notices(projected)
                 if _diagnostic_names_composition_projected(diagnostic):
                     if not any(
                         'composition_projected' in reason for reason in reasons
@@ -2778,7 +2812,7 @@ class EvaporationMixin:
                         provider_outcome=status_outcome,
                         provider_diagnostic=diagnostic,
                     )
-                return curve
+                return retain_gate_notices(curve)
             reasons.append(
                 'gate liquid fraction unavailable: '
                 f'status={status}'
@@ -2799,7 +2833,7 @@ class EvaporationMixin:
                     self,
                     GateCurveProviderOutcome.PRODUCED,
                 )
-                return curve
+                return retain_gate_notices(curve)
             if _liquidus_fraction_inconsistent_since(reasons, reason_mark):
                 return None
             reasons.append('gate liquid fraction table invalid')
@@ -2814,7 +2848,7 @@ class EvaporationMixin:
                 self,
                 GateCurveProviderOutcome.PRODUCED,
             )
-            return curve
+            return retain_gate_notices(curve)
         record_gate_curve_provider_outcome(
             self,
             GateCurveProviderOutcome.FAILED,
