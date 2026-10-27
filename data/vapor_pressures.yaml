@@ -670,9 +670,13 @@ families:
             #   1400 K uses Na-013 supercooled liquid (DeltafG = -192.041), not the
             #   Na-014 crystal (-192.218). Fusion is 1405.2 K; 1400-1405.2 K is the
             #   source-tabulated supercooled branch, not a silent extrapolation.
-            #   The compiled Na-013 table drops the 1500 K row (delimiter collapse).
-            #   The printed source line is DeltafG = -167.596 kJ/mol, which matches
-            #   Na-014 at 1500 K and above. Nodes 1500-2300 K are that liquid value.
+            #   The printed Na-013 1500 K line collapses the tail
+            #   ("531.992  167.596 5.836"): DeltafH and DeltafG are unsigned and
+            #   not tab-separated. The tracked compilation records that line as
+            #   a parse ambiguity (6 fields, not 8) and has no 1500 K values
+            #   row. The liquid value used is DeltafG = -167.596 kJ/mol, which
+            #   matches signed Na-014 at 1500 K and the neighbour trend.
+            #   Nodes 1500-2300 K are that liquid value.
             # Algebra: R = 8.31446261815324 J/(mol·K) (physical_constants.GAS_CONSTANT).
             #   K_half = exp(-DeltaG_half/(R T)); at a_NaO0.5 = 1 and pO2 = 1 bar,
             #   K_half = p_Na/1e5, so
@@ -691,8 +695,9 @@ families:
             fit_form: log10(P_Na_Pa)=A-B/(T_K+C)+log10(a_NaO0.5)-0.25*log10(pO2_bar/1bar)
             pressure_standard_Pa: 100000
             source: NIST-JANAF 4th edition tables Na-013, Na-014, Na-005, O-029
-              (Chase 1998); liquid formation Gibbs, 1 bar. 1500 K Na-013 row restored
-              from the printed source line (compiled table omits it); agrees with Na-014.
+              (Chase 1998); liquid formation Gibbs, 1 bar. 1500 K uses DeltafG =
+              -167.596 kJ/mol from the printed Na-013 line, signed to match Na-014.
+              The tracked compilation still has no 1500 K values row.
             source_urls:
             - https://janaf.nist.gov/tables/Na-013.html
             - https://janaf.nist.gov/tables/Na-014.html
@@ -13570,7 +13575,8 @@ families:
             pressure_kind: equilibrium_partial_pressure
             species_basis: cluster
             # valid_domain [1400,1900] RETAINED. The monatomic JANAF Antoine
-            # (t-1545) is certified on [1400, 2300] K, so this composite window
+            # (t-1545) is the in-band reference on [1400, 2300] K. Its
+            # authority_class stays uncertified. This composite window
             # evaluates the same in-band Antoine as monatomic Na. There is no
             # base incoherence inside 1900 K. 1950 K remains outside this
             # composite domain (status-bearing OOR on the composite row only);
@@ -13763,7 +13769,8 @@ families:
             pressure_kind: equilibrium_partial_pressure
             species_basis: monomer
             # valid_domain [1400,1900] RETAINED. The monatomic JANAF Antoine
-            # (t-1545) is certified on [1400, 2300] K, so this composite window
+            # (t-1545) is the in-band reference on [1400, 2300] K. Its
+            # authority_class stays uncertified. This composite window
             # evaluates the same in-band Antoine as monatomic Na. There is no
             # base incoherence inside 1900 K. 1950 K remains outside this
             # composite domain (status-bearing OOR on the composite row only);

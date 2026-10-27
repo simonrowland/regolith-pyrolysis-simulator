@@ -1880,11 +1880,19 @@ def test_demaria_1971_na_heldout_per_sample_residuals(
 
 # Printed NIST-JANAF ΔfG(Na2O, liquid) kJ/mol. Na(g) and O2 are the element
 # references (ΔfG = 0), so ΔG° of Na2O(l) = 2 Na(g) + 1/2 O2 is -ΔfG.
-# 1500 K is the printed Na-013 source line, which matches Na-014.
+# 1400 K is Na-013 supercooled liquid. 1500 K is the printed Na-013 source
+# line, signed to match Na-014. 1600-2300 K are Na-014 liquid.
 _JANAF_NA2O_LIQUID_FORMATION_KJ = (
+    (1400.0, -192.041),
     (1500.0, -167.596),
     (1600.0, -143.448),
     (1700.0, -119.580),
+    (1800.0, -95.974),
+    (1900.0, -72.614),
+    (2000.0, -49.488),
+    (2100.0, -26.582),
+    (2200.0, -3.886),
+    (2300.0, 18.611),
 )
 
 
@@ -1899,20 +1907,25 @@ def _janaf_na2o_liquid_formation_kJ(temperature_K: float) -> float:
     raise AssertionError(f"temperature {temperature_K} is outside the pinned nodes")
 
 
-def test_na_janaf_reaction_gibbs_at_1523_and_1673_K():
-    """Production unit-activity Pref matches JANAF ΔG° within the fit residual.
+def test_na_janaf_reaction_gibbs_on_1400_to_2300_K_grid():
+    """Production unit-activity Pref matches JANAF ΔG° on the fit grid.
 
     Full reaction Na2O(l) = 2 Na(g) + 1/2 O2. K_half = p_Na/1e5 Pa at
     a_NaO0.5 = 1 and pO2 = 1 bar, and ΔG_full = 2 (-R T ln K_half).
+    1523 K and 1673 K are linear between the printed 100 K nodes.
     """
 
     payload = yaml.safe_load(
         (Path(__file__).resolve().parents[2] / "data" / "vapor_pressures.yaml").read_text()
     )
     evaluator = compile_vapour_rail_catalog(payload).species["Na"].evaluator
-    # 0.12 kJ/mol is inside the 0.152 kJ grid residual and far inside the
-    # retired 11 kJ / 17 kJ Lamoreaux & Hildenbrand gaps.
-    for temperature_K in (1523.0, 1673.0, 1700.0):
+    # 0.16 kJ/mol sits just above the worst grid residual (0.152 kJ at
+    # 2300 K) and far inside the retired 11 kJ / 17 kJ gaps. A +0.01
+    # shift in A moves this ΔG by about 0.7 kJ near 1523 K.
+    temperatures_K = tuple(
+        node[0] for node in _JANAF_NA2O_LIQUID_FORMATION_KJ
+    ) + (1523.0, 1673.0)
+    for temperature_K in temperatures_K:
         pressure_pa = evaluator.evaluate(
             temperature_K,
             source_activity=1.0,
@@ -1921,7 +1934,7 @@ def test_na_janaf_reaction_gibbs_at_1523_and_1673_K():
         k_half = pressure_pa / 100_000.0
         dg_full_kJ = 2.0 * (-GAS_CONSTANT * temperature_K * math.log(k_half)) / 1000.0
         janaf_kJ = -_janaf_na2o_liquid_formation_kJ(temperature_K)
-        assert dg_full_kJ == pytest.approx(janaf_kJ, abs=0.12)
+        assert dg_full_kJ == pytest.approx(janaf_kJ, abs=0.16)
 
 
 def test_na_temperature_outside_janaf_band_is_predict_and_flag(

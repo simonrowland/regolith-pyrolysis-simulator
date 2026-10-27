@@ -1376,7 +1376,8 @@ def test_psat_pair_identity_and_nbp_sanity_rows() -> None:
     mg_P = _evaluate_rail_pressure_Pa("Mg", MG_NBP_K)
     assert isinstance(na_P, float)
     assert isinstance(mg_P, float)
-    # Melt Pref is ~0.15 Pa (Na) / 5e-13 Pa (Mg); sidecar is ~1 bar.
+    # Melt Pref continuation at the Na boil (1156 K, below the 1400 K
+    # floor) is ~0.194 Pa. Mg melt Pref is ~5e-13 Pa. Sidecar is ~1 bar.
     assert na_P == pytest.approx(84612.0, rel=0.02)
     assert mg_P == pytest.approx(103271.0, rel=0.02)
     assert abs(math.log10(na_P / JANAF_STANDARD_PRESSURE_PA)) < 0.1
