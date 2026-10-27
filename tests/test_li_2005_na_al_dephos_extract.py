@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity
+from simulator.battery.enums import Phase, Quantity
 from tests.battery.factories import migrate_one_extract
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,6 +48,34 @@ def test_li_2005_tables_render_values_and_migrated_conditions():
     assert len(result.registry_issues) == 0
     assert result.validation is not None
     assert len(result.validation.hard_issues) == 0
+    source_observations = [
+        observation
+        for species in extract["species"].values()
+        for observation in species["observations"]
+    ]
+    retagged = [
+        observation
+        for observation in source_observations
+        if observation.get("values", {}).get("quantity")
+        in {"distribution_ratio", "valence_ratio", "log10_phosphate_capacity"}
+    ]
+    assert len(retagged) == 75
+    assert all(observation["type"] == "composition_series" for observation in retagged)
+    assert Counter(observation["values"]["quantity"] for observation in retagged) == {
+        "distribution_ratio": 25,
+        "valence_ratio": 25,
+        "log10_phosphate_capacity": 25,
+    }
+
+    feo15_series = extract["species"]["FeO1.5"]["observations"]
+    assert len(feo15_series) == 2
+    for observation in feo15_series:
+        reference = observation["standard_state"]
+        assert reference["locator"]["page"] == 6
+        assert reference["locator"]["published_page"] == 17
+        endmember = reference["state"]["value"]["endmember"]
+        assert endmember["phase"]["value"] == "cr"
+        assert endmember["polymorph"]["tag"] == "unknown"
     for experiment, ratio in zip(extract["experiments"], ("1/10", "1/18")):
         assert experiment["fO2_control"]["channel"]["value"] == "gas_mix"
         assert ratio in experiment["fO2_control"]["buffer"]["state"]["value"]
@@ -79,6 +107,20 @@ def test_li_2005_tables_render_values_and_migrated_conditions():
         assert item.locator.page == 3
         assert item.locator.table == table
         assert f":row={row}:" in item.observation_id or f"_row_{row}_" in item.observation_id
+
+    feo15_gamma = [
+        item
+        for item in result.observations.values()
+        if item.identity.quantity.is_value
+        and item.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+        and item.identity.species.formula == "FeO1.5"
+    ]
+    assert len(feo15_gamma) == 25
+    for item in feo15_gamma:
+        reference = item.identity.reference_state
+        assert reference.is_value
+        assert reference.value.endmember.phase.value is Phase.CR
+        assert reference.value.endmember.polymorph.is_unknown
 
     typed = [
         item for item in result.observations.values()
@@ -125,7 +167,8 @@ def test_li_2005_tables_render_values_and_migrated_conditions():
     capacity_rows = [
         point
         for obs in extract["species"]["P"]["observations"]
-        if obs["type"] == "phosphate_capacity"
+        if obs["type"] == "composition_series"
+        and obs["values"]["quantity"] == "log10_phosphate_capacity"
         for point in obs["values"]["points"]
     ]
     assert len(capacity_rows) == 25
