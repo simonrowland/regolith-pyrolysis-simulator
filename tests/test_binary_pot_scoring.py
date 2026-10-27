@@ -12,8 +12,24 @@ import pytest
 import yaml
 
 from simulator.composition_projection import PROJECTED_BULK_CLASSIFICATION_KEY
-from simulator.battery.enums import Authority, Engine, Quantity
-from simulator.battery.score import cell_notices
+from simulator.battery.enums import (
+    Authority,
+    Engine,
+    ExecutionState,
+    NoticeKind,
+    Quantity,
+    Rail,
+    ResidualStatus,
+    SourceRelation,
+)
+from simulator.battery.records import Execution, Notice, Residual
+from simulator.battery.score import (
+    FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND,
+    FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN,
+    _measured_residuals,
+    cell_notices,
+    flagged_strata,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
 from scripts.calibration_battery import envelope, rail_for
@@ -175,6 +191,32 @@ def test_cell_notices_preserves_projected_component_wt_pct_and_mol() -> None:
     assert "MnO" in notices[0].reason
     assert "0.3 wt%" in notices[0].reason
     assert "0.0423 mol/kg" in notices[0].reason
+
+    assert flagged_strata(notices) == (FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND,)
+    residual = Residual(
+        key="projected::activity::magemin",
+        reference="projected",
+        execution=Execution(state=ExecutionState.PRODUCED),
+        rail=Rail.MELT_ACTIVITY,
+        status=ResidualStatus.NO_BAND,
+        source_relation=SourceRelation.INDEPENDENT,
+        score_eligible=False,
+        exclusions=(),
+        notices=notices,
+    )
+    assert _measured_residuals((residual,), context=None) == []
+
+
+def test_extrapolated_non_projection_notice_keeps_its_existing_stratum() -> None:
+    notice = Notice(
+        kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="outside the gamma model domain",
+        origin="engine:magemin",
+        authority=Authority.EXTRAPOLATED,
+    )
+
+    assert flagged_strata((notice,)) == (FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN,)
 
 
 def test_sync_does_not_rewrite_engine_arm_pots(tmp_path: Path) -> None:
