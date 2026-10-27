@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import List, Mapping, Optional
+import math
 import warnings
 
 from engines.alphamelts.thermoengine import (
@@ -33,8 +34,10 @@ from simulator.melt_backend.alphamelts import (
 )
 from simulator.melt_backend.base import (
     EquilibriumResult,
+    FO2_GAS_ONLY_NOTICE,
     RealBackendAuthority,
     RealBackendFamily,
+    fo2_gas_only_diagnostic,
 )
 from simulator.melt_backend.pure_phase import PurePhaseProperties
 from simulator.melt_backend.vaporock import VapoRockBackend
@@ -360,6 +363,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         warnings: List[str],
         crash_diagnostics: Optional[Mapping[str, object]] = None,
         call_timeout_s: Optional[float] = None,
+        gas_only_fo2_log: Optional[float] = None,
         **_unused: object,
     ) -> EquilibriumResult:
         # t-894: certified SiO2/T band is notice+run via the shared
@@ -376,6 +380,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             commissioning_diagnostics=_commissioning_notice_fields(
                 crash_diagnostics
             ),
+            gas_only_fo2_log=gas_only_fo2_log,
         )
 
     def _equilibrate_thermoengine(
@@ -387,6 +392,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         warnings: Optional[List[str]] = None,
         call_timeout_s: Optional[float] = None,
         commissioning_diagnostics: Optional[Mapping[str, object]] = None,
+        gas_only_fo2_log: Optional[float] = None,
     ) -> EquilibriumResult:
         """Use ENKI ThermoEngine MELTS for equilibrium + first-class mu."""
         if self._thermoengine_transport is None:
@@ -406,11 +412,16 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                     warnings=warnings,
                 )
             )
+            gas_only = (
+                gas_only_fo2_log is not None
+                and math.isfinite(float(gas_only_fo2_log))
+            )
+            melt_fO2_log = None if gas_only else fO2_log
             equilibrate_kwargs = {
                 'temperature_C': temperature_C,
                 'pressure_bar': solved_pressure_bar,
                 'comp_wt': comp_wt,
-                'fO2_log': fO2_log,
+                'fO2_log': melt_fO2_log,
                 'warnings': tuple(result_warnings),
             }
             if call_timeout_s is not None:
@@ -439,22 +450,25 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 if payload.warnings:
                     detail = f'{detail}: {"; ".join(payload.warnings)}'
                 raise ThermoEngineFO2OmittedError(detail)
-            if fO2_log is not None:
+            if melt_fO2_log is not None:
                 if solved_fO2_log is None:
                     raise ThermoEngineFO2UndefinedError(
                         'ThermoEngine equilibrium did not report the requested '
                         'solved fO2'
                     )
-                echo_delta = abs(solved_fO2_log - float(fO2_log))
+                echo_delta = abs(solved_fO2_log - float(melt_fO2_log))
                 if echo_delta >= 1.0e-3:
                     raise ThermoEngineOutOfDomainError(
                         ThermoEngineRefusalCause.FO2_ECHO_OUTSIDE_TOLERANCE,
-                        requested=float(fO2_log),
+                        requested=float(melt_fO2_log),
                         solved=solved_fO2_log,
                     )
                 fO2_transport = 'thermoengine_oxygen_root'
-                clamp_diagnostics['requested_fO2_log'] = float(fO2_log)
+                clamp_diagnostics['requested_fO2_log'] = float(melt_fO2_log)
                 clamp_diagnostics['fO2_echo_abs_delta'] = echo_delta
+            elif gas_only:
+                fO2_transport = 'external_on_gas_only'
+                clamp_diagnostics['intrinsic_fO2_log'] = solved_fO2_log
             elif solved_fO2_log is None:
                 fO2_transport = 'thermoengine_intrinsic_undefined'
             else:
@@ -479,8 +493,22 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 'authoritative_for_solved_conditions': True,
             })
             status = 'ok' if payload.phases_present else 'not_converged'
+            gas_coordinate = solved_fO2_log
+            reported_fO2_log = solved_fO2_log
+            requested_fO2_log = None
+            emit_warnings = list(payload.warnings)
+            if gas_only and payload.phases_present:
+                gas_coordinate = float(gas_only_fo2_log)
+                reported_fO2_log = None
+                requested_fO2_log = gas_coordinate
+                clamp_diagnostics.update(fo2_gas_only_diagnostic(gas_coordinate))
+                if FO2_GAS_ONLY_NOTICE not in emit_warnings:
+                    emit_warnings.append(FO2_GAS_ONLY_NOTICE)
+            elif gas_only:
+                gas_coordinate = None
+                reported_fO2_log = None
             vaporock_envelope_diagnostics = {}
-            if solved_fO2_log is None:
+            if gas_coordinate is None:
                 vapor_pressures = {}
                 vapor_pressure_source = VaporPressureActivityRefusal(
                     missing_precursor_species=(),
@@ -496,7 +524,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         T_C=temperature_C,
                         solved_melt_wt_pct=payload.liquid_composition_wt_pct,
                         liquid_fraction=payload.liquid_fraction,
-                        fO2_log=solved_fO2_log,
+                        fO2_log=gas_coordinate,
                         pressure_bar=solved_pressure_bar,
                         activities=payload.activity_coefficients,
                     )
@@ -509,7 +537,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                     temperature_C,
                     payload.activity_coefficients,
                     comp_wt,
-                    pO2_bar=10.0 ** solved_fO2_log,
+                    pO2_bar=10.0 ** gas_coordinate,
                     context='ThermoEngine VapoRock fallback unavailable',
                 )
                 vapor_pressures, vapor_pressure_source = (
@@ -521,7 +549,8 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             eq = self._emit_equilibrium_result(
                 temperature_C=temperature_C,
                 pressure_bar=solved_pressure_bar,
-                fO2_log=solved_fO2_log,
+                fO2_log=reported_fO2_log,
+                requested_fO2_log=requested_fO2_log,
                 phases_present=list(payload.phases_present),
                 phase_masses_kg=payload.phase_masses_kg,
                 liquid_fraction=payload.liquid_fraction,
@@ -540,7 +569,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 vapor_pressures_source=self._vapor_pressure_source_map(
                     vapor_pressures, vapor_pressure_source
                 ),
-                warnings=list(payload.warnings),
+                warnings=emit_warnings,
                 status=status,
                 diagnostics=self._vapor_pressure_diagnostics(
                     {

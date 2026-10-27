@@ -1089,6 +1089,18 @@ def engine_flags_from_result(
         _ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX,
     )
 
+    gas_only = diagnostics.get("fo2_gas_only")
+    if isinstance(gas_only, Mapping):
+        reason = gas_only.get("notice")
+        if isinstance(reason, str) and reason:
+            notices.append(
+                {
+                    "kind": NoticeKind.ENGINE_MODEL_CAVEAT.value,
+                    "authority": None,
+                    "reason": reason,
+                }
+            )
+
     for warning in getattr(result, "warnings", None) or ():
         if (
             isinstance(warning, str)

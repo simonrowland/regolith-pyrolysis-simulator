@@ -1544,15 +1544,20 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
         total_input_kg: float | None = None,
         diagnostics: Mapping[str, Any] | None = None,
         run_mode: Any,
+        gas_only_fo2_log: float | None = None,
     ) -> Any:
         nonlocal native_input
+        if gas_only_fo2_log is None:
+            recorded_constraint = {
+                "path": "Absolute",
+                "offset": float(fO2_log),
+            }
+        else:
+            recorded_constraint = {"path": None, "offset": None}
         native_input = {
             "temperature_C": float(temperature_C),
             "composition_wt_pct": dict(composition_wt_pct),
-            "fO2_constraint": {
-                "path": "Absolute",
-                "offset": float(fO2_log),
-            },
+            "fO2_constraint": recorded_constraint,
             "adapter_fO2_log_argument": float(fO2_log),
             "pressure_bar": float(pressure_bar),
             "run_mode": run_mode.value if hasattr(run_mode, "value") else str(run_mode),
@@ -1577,6 +1582,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 total_input_kg=total_input_kg,
                 diagnostics=diagnostics,
                 run_mode=run_mode,
+                gas_only_fo2_log=gas_only_fo2_log,
             )
 
     try:

@@ -4918,6 +4918,15 @@ def cell_notices(
                     ),
                 )
             )
+        elif kind == NoticeKind.ENGINE_MODEL_CAVEAT.value:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=str(row.get("reason") or kind),
+                    origin=f"engine:{engine.value}",
+                )
+            )
         elif kind == NoticeKind.INPUT_OMITTED.value:
             notices.append(
                 Notice(
