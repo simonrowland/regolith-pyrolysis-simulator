@@ -1525,12 +1525,6 @@ class CampaignManager:
         order = c2a_staged_stage_order(order_value)
         return [stages_by_name[name] for name in order]
 
-    def _c2a_staged_current_stage(self) -> dict | None:
-        stages = self._c2a_staged_enabled_stages()
-        idx = min(max(0, int(self._c2a_staged_stage_idx)), len(stages) - 1)
-        self._c2a_staged_stage_idx = idx
-        return stages[idx]
-
     def _c2a_stage_target_and_ramp(self, stage: Mapping) -> tuple[float, float]:
         stage_name = stage.get('name')
         cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
@@ -2189,16 +2183,7 @@ class CampaignManager:
             return (self.furnace_max_T_C, ramp)
 
         elif campaign == CampaignPhase.C2A_STAGED:
-            stages = self._c2a_staged_enabled_stages()
-            if (
-                    self._c2a_staged_depletion_flux_decay_fraction() <= 0.0
-                    and not self._c2a_staged_has_log_slope_depletion(stages)):
-                selected = self._c2a_staged_stage_by_hour(campaign_hour, stages)
-                if selected is None:
-                    raise ValueError('C2A_staged.stages did not select a stage')
-                return self._c2a_stage_target_and_ramp(selected)
-
-            selected = self._c2a_staged_current_stage()
+            selected = self._c2a_staged_active_stage(campaign_hour)
             if selected is None:
                 raise ValueError('C2A_staged.stages did not select a stage')
             return self._c2a_stage_target_and_ramp(selected)
