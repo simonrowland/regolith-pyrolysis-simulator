@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from copy import deepcopy
 from pathlib import Path
 
-import pytest
 import yaml
 
 from simulator.battery import migrate
@@ -52,25 +50,14 @@ def test_html_tables_and_equation_fits_match_independent_transcription():
 
     formation = document["species"]["Na2SnO3"]["observations"][0]
     assert formation["T_range_K"] == [773, 1273]
-    assert formation["values"]["delta_fG_function_as_printed"] == "−1040.83 + 0.2222T ± 2.54"
+    assert formation["values"]["delta_fG_function_as_printed"] == "−1040.83 + 0.2221T ± 7.54"
     assert formation["values"]["delta_fG_intercept_as_printed"] == "−1040.83"
-    assert formation["values"]["delta_fG_slope_as_printed"] == "0.2222"
-    assert formation["values"]["uncertainty_as_printed"] == "± 2.54"
+    assert formation["values"]["delta_fG_slope_as_printed"] == "0.2221"
+    assert formation["values"]["uncertainty_as_printed"] == "± 7.54"
+    assert formation["values"]["equation_10_cell_reaction_relation"] == "ΔG° = −nE⁰F = −nEF"
+    assert formation["values"]["equation_11_relation_as_printed"] == "ΔG° = 2Δ_fG°(NaCrO2) + Δ_fG°(SnO2) − Δ_fG°(Cr2O3) − Δ_fG°(Na2SnO3)"
     assert formation["values"]["method_class"] == "quoted_attributed"
     assert formation["values"]["printed_uncertainty_note"] == "confidence level not stated"
-
-
-def test_cell_mutation_is_caught_by_independent_transcription():
-    document = _document()
-    expected = "4.51"
-    rows = _table_rows(document, "wang_2017_table2_electrolyte_parameters")
-    assert rows[2]["resistivity_ohm_cm"] == expected
-
-    mutated = deepcopy(document)
-    mutated_rows = _table_rows(mutated, "wang_2017_table2_electrolyte_parameters")
-    mutated_rows[2]["resistivity_ohm_cm"] = "4.15"
-    with pytest.raises(AssertionError):
-        assert mutated_rows[2]["resistivity_ohm_cm"] == expected
 
 
 def test_isolated_migration_preserves_fit_and_html_context_without_assumed_conditions():

@@ -16,10 +16,10 @@ fidelity_samples:
     value: '−1040.83'
     locator: {equation: '12', section: 'Results of sodium stannate’s formation free energy'}
   - path: species.Na2SnO3.observations[wang_2017_eq12_sodium_stannate_formation_gibbs_fit].values.delta_fG_slope_as_printed
-    value: '0.2222'
+    value: '0.2221'
     locator: {equation: '12', section: 'Results of sodium stannate’s formation free energy'}
   - path: species.Na2SnO3.observations[wang_2017_eq12_sodium_stannate_formation_gibbs_fit].values.uncertainty_as_printed
-    value: '± 2.54'
+    value: '± 7.54'
     locator: {equation: '12', section: 'Results of sodium stannate’s formation free energy'}
 species:
   Na2O:
@@ -64,14 +64,14 @@ species:
           quantity: delta_fG
           method_class: quoted_attributed
           attribution: Wang et al. (2017), Equation (12), as printed
-          delta_fG_function_as_printed: '−1040.83 + 0.2222T ± 2.54'
+          delta_fG_function_as_printed: '−1040.83 + 0.2221T ± 7.54'
           delta_fG_intercept_as_printed: '−1040.83'
-          delta_fG_slope_as_printed: '0.2222'
-          uncertainty_as_printed: '± 2.54'
+          delta_fG_slope_as_printed: '0.2221'
+          uncertainty_as_printed: '± 7.54'
           T_range_K_as_printed: '773–1273 K'
-          equation_10_cell_reaction_relation: 'ΔG° = −nEF'
+          equation_10_cell_reaction_relation: 'ΔG° = −nE⁰F = −nEF'
           equation_10_cell_reaction_fit_as_printed: '−113.86 + 0.0514T ± 2.54'
-          equation_11_relation_as_printed: formation Gibbs energies of Na2SnO3, SnO2, Cr2O3, and NaCrO2 combined for the cell reaction
+          equation_11_relation_as_printed: 'ΔG° = 2Δ_fG°(NaCrO2) + Δ_fG°(SnO2) − Δ_fG°(Cr2O3) − Δ_fG°(Na2SnO3)'
           cell_scheme: 'Pt|SnO2, Na2SnO3|β-β″-Al2O3|NaCrO2, Cr2O3|Pt'
           reference_electrode: NaCrO2 + Cr2O3 mixed in a 1:1 mole ratio
           standard_state: standard formation free energy of Na2SnO3
