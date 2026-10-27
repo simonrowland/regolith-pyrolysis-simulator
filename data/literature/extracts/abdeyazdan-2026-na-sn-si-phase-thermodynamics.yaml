@@ -13,7 +13,9 @@ extraction:
     cell is retained in the audit transcript. Cell assignments were reconciled row-by-row against the HTML table;
     note markers a/b retained with note text. Table 3 (161 HTML rows, including 2 header rows and grouped assemblage
     rows) parsed with merged cells expanded; each table cell is retained in the audit transcript. Cell assignments
-    were reconciled row-by-row against the HTML table; footnote a and its text retained.
+    were reconciled row-by-row against the HTML table; footnote a and its text retained. Model-only Table 4 database
+    parameters and Table 5 calculated-minus-experimental liquidus summaries are retained as quoted_attributed context;
+    no figure values were digitized.
   date: '2026-10-27'
   worker: codex-resume-54072-1793135638
 review_status: draft
@@ -2136,7 +2138,9 @@ fidelity_samples:
       in air.
     html_row: 4
     column: Si/SiO2
-- path: species.NaO0.5.observations[abdeyazdan_2026_t1_run01_NaSi9_r_glass_nao0p5].values.component_amount_as_published
+- species: NaO0.5
+  observation_id: abdeyazdan_2026_t1_run01_NaSi9_r_glass_nao0p5
+  field: component_amount_as_published
   value: 9.0 ± 0.17 mol.%
   locator: &id003
     table: '1'
@@ -2152,7 +2156,9 @@ fidelity_samples:
       in air.
     html_row: 7
     column: Si/SiO2
-- path: species.NaO0.5.observations[abdeyazdan_2026_t1_run02_NaSi1_glass_nao0p5].values.component_amount_as_published
+- species: NaO0.5
+  observation_id: abdeyazdan_2026_t1_run02_NaSi1_glass_nao0p5
+  field: component_amount_as_published
   value: 38.5 ± 0.22 mol.%
   locator: &id004
     table: '1'
@@ -2176,7 +2182,9 @@ fidelity_samples:
       system in air.
     html_row: 4
     column: Sn/SnO2
-- path: species.NaO0.5.observations[abdeyazdan_2026_t2_run01_NSnS2_glass_nao0p5].values.component_amount_as_published
+- species: NaO0.5
+  observation_id: abdeyazdan_2026_t2_run01_NSnS2_glass_nao0p5
+  field: component_amount_as_published
   value: 41.4 ± 0.70 mol.%
   locator:
     table: '2'
@@ -2200,7 +2208,9 @@ fidelity_samples:
       system in equilibrium with Sn metal.
     html_row: 4
     column: Sn/“SnO”
-- path: species.NaO0.5.observations[abdeyazdan_2026_t3_run01_NsnS35_glass_nao0p5].values.component_amount_as_published
+- species: NaO0.5
+  observation_id: abdeyazdan_2026_t3_run01_NsnS35_glass_nao0p5
+  field: component_amount_as_published
   value: 29.3 ± 0.60 mol.%
   locator:
     table: '3'
@@ -7474,6 +7484,878 @@ species:
           chloride brine at -20°C.
         quench_state_as_published: not stated whether quench preserves or alters the equilibrated composition
         disposition: Censored, missing, or unsupported-role composition cells preserved without numeric conversion.
+    - type: table_context
+      observation_id: abdeyazdan_2026_factSage_table4_optimized_database
+      locator:
+        table: '4'
+        caption: Thermodynamic parameters of the Na2O–SnO–SnO2–SiO2 system, optimized in the present study (J/mol).
+      units: J/mol; J/(mol K); K; Cp(T) as printed
+      values:
+        section: model_results
+        candidate_token: interaction_parameter
+        method_class: quoted_attributed
+        model: FactSage 7.2; Modified Quasichemical Formalism; GUTS, Bragg-Williams, and Quasichemical models as
+          printed
+        attribution: Authors report thermodynamic parameters optimized in the present study. The caption does not
+          identify the exact input-row set, so these are retained as attributed model outputs without lineage parents.
+        subtables:
+        - subsection: Excess interaction parameters (slag)
+          html_table_block: 4
+          printed_row_count: 41
+          columns:
+          - parameter label (publisher equation image)
+          - Value, J/mol
+          - Model
+          rows:
+          - - Excess interaction parameters (slag)
+            - Value, J/mol
+            - Model
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0001.png
+            - −299574.4 +35.9824*T
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0002.png
+            - −158155.2
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0003.png
+            - 171125.6 -20.0832*T
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0004.png
+            - −45605.6
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0005.png
+            - −9204.8 +41.84*T
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0006.png
+            - −16 736
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0007.png
+            - −125 520
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0008.png
+            - −184 096
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0009.png
+            - 121 336
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0010.png
+            - −5020.8
+            - Bragg-Williams
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0011.png
+            - −122591.2
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0012.png
+            - −253550.4
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0013.png
+            - '114641.6'
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0014.png
+            - '34308.8'
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0015.png
+            - 2.092*T
+            - Bragg-Williams
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0016.png
+            - '19246.4'
+            - Bragg-Williams
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0017.png
+            - '25522.4'
+            - Quasichemical
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0018.png
+            - 14853.2 -7.5312*T
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0019.png
+            - '14267.44'
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0020.png
+            - '11296.8'
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0021.png
+            - '15480.8'
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0022.png
+            - −1338.88
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0023.png
+            - −33 472
+            - Bragg–Williams
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0024.png
+            - −75 312
+            - Bragg–Williams
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0025.png
+            - −48 116
+            - Bragg–Williams
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0026.png
+            - −25 104 -13.8072*T
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0027.png
+            - 4602.4 -26.7776*T
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0028.png
+            - '12970.4'
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0029.png
+            - −12 552
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0030.png
+            - 31 380
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0031.png
+            - 12 552
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0032.png
+            - 146 440
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0033.png
+            - −13807.2
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0034.png
+            - −6276
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0035.png
+            - −24.2672*T
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0036.png
+            - −6276
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0037.png
+            - 23 012
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0038.png
+            - 46 024
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0039.png
+            - 142 256
+            - GUTS
+          - - cell_as_published: 0.6887, 1.3774, 2.7549 (E = any cation)
+              image_asset_as_published: jace71038-math-0040.png
+        - subsection: Geometric groupings and Sn–O liquid metal parameters
+          html_table_block: 5
+          printed_row_count: 9
+          columns: as printed in HTML table cells
+          rows:
+          - - 'Geometric groupings in slag:'
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-gra-0001.png
+          - - Sn–O liquid metal
+          - - Excess interaction parameters
+            - Value, J/mol
+            - Model
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0043.png
+            - −130959.2 + 0.2092T
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0044.png
+            - 79 496
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0045.png
+            - −52718.4 -2.092T
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0046.png
+            - −62 760 +8.368T
+            - GUTS
+          - - cell_as_published: ''
+              image_asset_as_published: jace71038-math-0047.png
+            - 41 840
+            - GUTS
+        - subsection: Liquid slag, liquid metal, and stoichiometric solid endmember parameters
+          html_table_block: 6
+          printed_row_count: 105
+          columns:
+          - Endmember
+          - ΔH0298, J/mol
+          - S0298, J/(mol K)
+          - Temperature range, K
+          - Cp(T), J/(mol K)
+          rows:
+          - - Endmembers in liquid slag
+          - - Endmember
+            - ΔH0298, J/mol
+            - S0298, J/(mol K)
+            - Temperature range, K
+            - Cp (T), J/(mol K)
+          - - SiO2
+            - −906244.805
+            - '43.73'
+            - 0–50
+            - 0.0003T3-8.03274 × 10−6 T4 + 6.14328 × 10−8 T5
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −1.58728 + 0.130883T + 0.000801T2–4.05645 × 10−6 T3 + 5.51748 × 10−9 T4
+          - - ''
+            - ''
+            - ''
+            - 298.15–3500
+            - −209.89–0.155843 T + 9.22876 × 10−6 T2–1307291.75 T−2–2925.304 T−1 + 11.663394 T0.5 + 2130.928475
+              T−0.5
+          - - ''
+            - ''
+            - ''
+            - '>3500'
+            - '82.8079'
+          - - Na2O
+            - −360771.77
+            - '115.781'
+            - 0-50
+            - 0.000173627T3 -1.55124×10−6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −22.5672 +0.884952T -0.0044759T2 +1.28724×10−5T3 -1.46387×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1405
+            - 57.0521 +0.0685049T -569327/T2 -2.45251×10−5T2
+          - - ''
+            - ''
+            - ''
+            - '>1405'
+            - '104.6'
+          - - SnO
+            - −262980
+            - '64.8'
+            - 0-298.15
+            - 0.14077291T +0.001507048T2 -7.13471×10−6T3 +8.64113×10−9T4
+          - - ''
+            - ''
+            - ''
+            - '>298.15'
+            - 63 -700000T−2
+          - - SnO2
+            - −540800
+            - '51.82'
+            - 0-298.15
+            - 0.01T +0.00297163T2 -1.34001×10−5T3 +1.78798×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-933.15
+            - 15.10928355 +0.178823033T -585000T−2 -9.65884×10−5T2
+          - - ''
+            - ''
+            - ''
+            - '>933.15'
+            - '97.2'
+          - - Endmembers in liquid metal
+          - - Sn
+            - '6263.2'
+            - '62.893'
+            - 0-298.15
+            - 0.003975949T2 -1.9927×10−5T3 2.69×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-800
+            - 21.539232 +0.006146296T +1288253.6T−2
+          - - ''
+            - ''
+            - ''
+            - 800–6000
+            - '28.4512'
+          - - Fe
+            - '14177.239'
+            - '36.5766'
+            - 0-298.15
+            - 0.000359347T +0.00160425654T2 -7.319596292×10−6T3 +9.580823653×10−9T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1811
+            - 13.059455 +0.036292252T +127763T−2 -1.00081×10−5T2
+          - - ''
+            - ''
+            - ''
+            - 1811–6000
+            - '46'
+          - - Stoichiometric solid compounds
+          - - Na2O(s1)
+            - −417982
+            - '75.061'
+            - 0-50
+            - 0.000173627T3 -1.55124×10−6T4
+          - - low-T
+            - ''
+            - ''
+            - 50–298.15
+            - −22.5672 +0.884952T -0.0044759T2 +1.28724×10−5T3 -1.46387×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1575
+            - 66.216 +0.0438651T -813370/T2 -1.40875×10−5T2
+          - - ''
+            - ''
+            - ''
+            - '>1575'
+            - '100.03'
+          - - Na2O(s2)
+            - −416224.72
+            - '76.7788'
+            - 0-50
+            - 0.000173627T3 -1.55124×10−6T4
+          - - medium-T
+            - ''
+            - ''
+            - 50–298.15
+            - −22.5672 +0.884952T -0.0044759T2 +1.28724×10−5T3 -1.46387×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1575
+            - 66.216 +0.0438651T -813370/T2 -1.40875×10−5T2
+          - - ''
+            - ''
+            - ''
+            - '>1575'
+            - '100.03'
+          - - Na2O(s3)
+            - −404300.32
+            - '86.372'
+            - 0-50
+            - 0.000173627T3 -1.55124×10−6T4
+          - - high-T
+            - ''
+            - ''
+            - 50–298.15
+            - −22.5672 +0.884952T -0.0044759T2 +1.28724×10−5T3 -1.46387×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1575
+            - 66.216 +0.0438651T -813370/T2 -1.40875×10−5T2
+          - - ''
+            - ''
+            - ''
+            - '>1575'
+            - '100.03'
+          - - SiO2_Quartz(l)
+            - −910700
+            - '41.46'
+            - 0-50
+            - 0.000122017T3 -1.51256×10−6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −3.5035 +0.16874T +0.00048566T2 -2.96634×10−6T3 +4.20792×10−9T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-373
+            - 80.012 -3546684T−2 -240.276T−0.5 +491568369T−3
+          - - ''
+            - ''
+            - ''
+            - 373–848.02
+            - 80.012 +0.00844T -3546684T−2 -4.52127×10−5T2 +6.0550446×10−8T3 -240.276T−0.5 +491568369T−3
+          - - ''
+            - ''
+            - ''
+            - 848.02-3000
+            - 80.012 -3546684T−2 -240.276T−0.5 +491568369T−3
+          - - SiO2_Quartz(h)
+            - −908627
+            - '44.2068'
+            - 0-50
+            - 0.000122017T3 -1.51256×10−6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −3.5035 +0.16874T +0.00048566T2 -2.96634×10−6T3 +4.20792×10−9T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-3000
+            - 80.012 -3546684T−2 -240.276T−0.5 +491568369T−3
+          - - SiO2_Tridymite(h)
+            - −907045
+            - '45.5237'
+            - 0-50
+            - 0.0003T3 -8.03274×10−6T4 +6.14328×10−8T5
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −1.587 +0.13088T +0.000801248T2 -4.05645×10−6T3 +5.54804×10−9T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-3000
+            - 75.3727 -5958095T−2 + 958246123T−3
+          - - SiO2_Cristobalite(h)
+            - −906377
+            - '46.0288'
+            - 0-50
+            - 0.0003T3 -8.03274×10−6T4 +6.14328×10−8T5
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −1.587 +0.13088T +0.000801248T2 -4.05645×10−6T3 +5.54804×10−9T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-3000
+            - 83.5136 -2455360T−2 -374.693T−0.5 +280072194T−3
+          - - SnO2_Cassiterite
+            - −574627
+            - '51.82'
+            - 0-298.15
+            - 0.01T +0.00297163T2 -1.34001×10−5T3 +1.78798×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-2673
+            - 76.041 +0.00736217T -2223867T−2 +7.69×10−10T2
+          - - Na2SiO3
+            - −1558450
+            - '115.4'
+            - 0-50
+            - 0.000164408T3 -1.03689×10−6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −26.8636 +0.8758659T -0.000930606T2 -4.8033×10−6T3 +1.10285×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1480
+            - 234.77 -2218.9/T0.5 +135300000/T3
+          - - ''
+            - ''
+            - ''
+            - '>1480'
+            - '177.318'
+          - - Na4SiO4
+            - −2109400
+            - '189.6'
+            - 0-50
+            - 0.000341491T3 -2.50915E-6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −54.3814 +1.8940893T -0.005665655T2 +6.71522×10−6T3
+          - - ''
+            - ''
+            - ''
+            - 298.15-1473
+            - 172.5497 +0.120152T -1780955/T2 -4.11631×10−5T2
+          - - ''
+            - ''
+            - ''
+            - '>1473'
+            - '259.408'
+          - - Na2Si2O5 (s1)
+            - −2470200
+            - '165.3'
+            - 0-50
+            - 0.000415T3 -4.56173×10−6T4
+          - - low-T
+            - ''
+            - ''
+            - 50–298.15
+            - −48.8853 +1.4998144T +17578.8/T2 -0.004156285T2 +4.87631×10−6T3
+          - - ''
+            - ''
+            - ''
+            - 298.15-2000
+            - 254.8162 +0.00104767T -17353883/T2 -4.96988×10−7T2 +2607746439/T3
+          - - Na2Si2O5 (s2)
+            - −2468677
+            - '166.9015'
+            - 0-50
+            - 0.000415T3 -4.56173×10−6T4
+          - - medium-T
+            - ''
+            - ''
+            - 50–298.15
+            - −48.8853 +1.4998144T +17578.8/T2 -0.004156285T2 +4.87631×10−6T3
+          - - ''
+            - ''
+            - ''
+            - 298.15-2000
+            - 254.8162 +0.00104767T -17353883/T2 -4.96988×10−7T2 +2607746439/T3
+          - - Na2Si2O5 (s3)
+            - −2467917
+            - '167.677'
+            - 0-50
+            - 0.000415T3 -4.56173×10−6T4
+          - - medium-T
+            - ''
+            - ''
+            - 50–298.15
+            - −48.8853 +1.4998144T +17578.8/T2 -0.004156285T2 +4.87631×10−6T3
+          - - ''
+            - ''
+            - ''
+            - 298.15-2000
+            - 254.8162 +0.00104767T -17353883/T2 -4.96988×10−7T2 +2607746439/T3
+          - - Na6Si2O7
+            - −3609400
+            - '357'
+            - 0-50
+            - 0.000685675T3 -3.54604×10−6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −54.2451 +2.6793968T -0.00659626T2 +1.91192×10−6T3 +1.10285×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1483
+            - 501.006 -13945392/T2 -2340.02/T0.5 +2317776454/T3
+          - - Na6Si8O19
+            - −9188700
+            - '636'
+            - 0-50
+            - 0.001280402T3 -1.282834×10−5T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −97.2925 +3.7309302T -0.002755165T2 -2.241624×10−5T3 +4.909464×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1082
+            - 987.692 -35540630/T2 -4020.72/T0.5 +5410599850/T3
+          - - Na2SnO3
+            - −1193100
+            - '114.6'
+            - 0-50
+            - 0.000247041T3 -2.33636×10−6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −22.5672 +0.884952T -0.002504271T2 +7.45351×10−6T3 -1.17589×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1575
+            - 135.5073 +0.05122727T -2337237/T2 -1.4086731×10−5T2
+          - - ''
+            - ''
+            - ''
+            - '>1575'
+            - 169.3213 +0.00736217T -1523867/T2 +7.69×10−10T2
+          - - Na4SnO4
+            - −1611600
+            - '196.1'
+            - 0-50
+            - 0.000420668T3 -3.8876×10−6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −45.1345 +1.769904T -0.006980172T2 +2.03259×10−5T3 -2.63976×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1575
+            - 201.7233 +0.09509237T -3150607/T2 -2.8174232×10−5T2
+          - - ''
+            - ''
+            - ''
+            - '>1575'
+            - 269.3513 +0.00736217T -1523867/T2 +7.69×10−10T2
+          - - Na4Sn3O8
+            - −2894200
+            - '323.5'
+            - 0-50
+            - 0.01T +0.00297163T2 +0.000480681T3 -4.65484×10−6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −45.1345 +1.769904T -0.002036912T2 +1.50691×10−6T3 -5.638×10−9T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1575
+            - 347.0557 +0.10981671T -6898341/T2 -2.81726938×10−5T2
+          - - ''
+            - ''
+            - ''
+            - '>1575'
+            - 414.6837 +0.02208651T -5271601/T2 +2.307×10−9T2
+          - - Na4SnO3
+            - −1243000
+            - '207'
+            - 0-50
+            - 0.000610822T3 -6.67264E-6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −56.071 +2.3080222T -0.011392727T2 +3.232284×10−5T3 -3.696839×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1575
+            - 195.632 +0.0877302T -1626740/T2 -2.817500077×10−5T2 -295.47/T0.5
+          - - ''
+            - ''
+            - ''
+            - '>1575'
+            - 263.26 -295.47/T0.5
+          - - Na4SnSi2O8
+            - −3694300
+            - '282'
+            - 0-50
+            - 0.01T +0.00297163T2 +0.0003154159T3 -2.0559002×10−6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −53.7272 +1.7617318T +0.001110418T2 -2.30067×10−5T3 +3.99368×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1480
+            - 545.581 +0.00736217T -2223867/T2 +7.69×10−10T2 -4437.8/T0.5 +270600000/T3
+          - - ''
+            - ''
+            - ''
+            - '>1480'
+            - 430.677 +0.00736217T -2223867/T2 +7.69×10−10T2
+          - - Na8SnSi6O18
+            - −8650000
+            - '630.5'
+            - 0-50
+            - 0.01T +0.00297163T2 +0.0010063279T3 -8.5913802×10−6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −113.9175 +4.024029T -0.001373912T2 -3.399574×10−5T3 +6.7056×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1480
+            - 1046.961 +0.00736217T -33525867/T2 +7.69×10−10T2 +4704600000/T3 -4437.8/T0.5
+          - - ''
+            - ''
+            - ''
+            - '>1480'
+            - 932.057 +0.00736217T -33525867/T2 +7.69×10−10T2 +4434000000/T3
+          - - Na2Sn2Si2O7
+            - −3026500
+            - '303'
+            - 0-50
+            - 0.000942135T3 -1.170205×10−5T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −70.759 +2.57605T +17579/T2 -0.009038135T2 +1.803239×10−5T3 -1.5382×10−8T4
+          - - ''
+            - ''
+            - ''
+            - '>298.15'
+            - 381.216 +0.0010477T -17353883/T2 -4.96988×10−7T2 -590.94/T0.5 +2607746439/T3
+          - - Na4Sn2Si3O12
+            - −5181600
+            - '401'
+            - 0-50
+            - 0.027747T +0.00594326T2 +0.0004830638T3 -4.2688704×10−6T4
+          - - ''
+            - ''
+            - ''
+            - 50–298.15
+            - −56.959 +2.0347616T +0.003770489T2 -3.709802×10−5T3 +6.03477×10−8T4
+          - - ''
+            - ''
+            - ''
+            - 298.15-1480
+            - 637.542 +0.01472434T -20098734/T2 +1.538×10−9T2 -2218.9/T0.5 +2352300000/T3
+          - - ''
+            - ''
+            - ''
+            - '>1480'
+            - 580.09 +0.01472434T -20098734/T2 1.538×10−9T2 +2217000000/T3
+        disposition: Model parameter and thermodynamic database cells kept in this context section, separate from
+          measured observations.
+    - type: table_context
+      observation_id: abdeyazdan_2026_factSage_table5_calculated_liquidus_residuals
+      locator:
+        table: '5'
+        caption: Summary of differences of calculated and experimental liquidus (ΔT, °C) for all phases encountered
+          in the present study.
+      units: ΔT °C; count as printed
+      values:
+        section: model_results
+        quantity: calculated_minus_experimental_liquidus_summary
+        method_class: quoted_attributed
+        model: FactSage 7.2 thermodynamic database
+        attribution: Authors summarize model-calculated minus experimental liquidus temperatures; exact source-row
+          membership is not declared in the caption.
+        air_html_table_block: 7
+        air_printed_row_count: 6
+        air_rows:
+        - - (a) in air
+          - Cassiterite (SnO2)
+          - Tridymite, cristobalite (SiO2)
+          - Na4Sn2Si3O12
+          - Na8SnSi6O18
+          - Na4SnSi2O8
+          - Na2Si2O5
+          - Na2SiO3
+          - Na2SnO3
+          - Na4Sn3O8
+        - - Count
+          - '44'
+          - '5'
+          - '5'
+          - '4'
+          - '1'
+          - '2'
+          - '3'
+          - '9'
+          - '14'
+        - - Average
+          - −19.1
+          - −28.0
+          - −39.7
+          - '14.4'
+          - −76.1
+          - '2.4'
+          - −16.7
+          - '17.4'
+          - −11.6
+        - - Min
+          - −204.5
+          - −53.1
+          - −101.0
+          - −25.2
+          - −76.1
+          - '0.6'
+          - −43.6
+          - −42.8
+          - −60.0
+        - - Max
+          - '127.8'
+          - '9.0'
+          - '44.5'
+          - '60.0'
+          - −76.1
+          - '4.2'
+          - '6.2'
+          - '110.9'
+          - '17.5'
+        - - RMSa
+          - '72.8'
+          - '37.9'
+          - '72.0'
+          - '34.5'
+          - '76.1'
+          - '3.0'
+          - '26.5'
+          - '54.4'
+          - '21.9'
+        metal_equilibrium_html_table_block: 8
+        metal_equilibrium_printed_row_count: 6
+        metal_equilibrium_rows:
+        - - (b) in eq. with metal
+          - Cassiterite (SnO2)
+          - Quartz, tridymite, cristobalite (SiO2)
+          - Na8SnSi6O18
+          - Na2Si2O5
+          - Na2SiO3
+          - Na2SnO3
+          - Na2Sn2Si2O7
+        - - Count
+          - '20'
+          - '19'
+          - '9'
+          - '5'
+          - '10'
+          - '16'
+          - '4'
+        - - Average
+          - '11.8'
+          - '8.6'
+          - −19.2
+          - −23.8
+          - −9.7
+          - −18.8
+          - −16.4
+        - - Min
+          - −114.3
+          - −43.3
+          - −73.1
+          - −76.6
+          - −53.6
+          - −79.6
+          - −34.6
+        - - Max
+          - '84.4'
+          - '75.3'
+          - '5.8'
+          - '8.9'
+          - '12.7'
+          - '26.7'
+          - −7.0
+        - - RMSa
+          - '41.0'
+          - '29.4'
+          - '29.1'
+          - '38.7'
+          - '23.3'
+          - '37.0'
+          - '19.6'
+        disposition: Model comparison summaries retained in a separate context section; not mixed with measured
+          phase-composition rows.
     observations:
     - observation_id: abdeyazdan_2026_t1_run01_NaSi9_r_glass_sio2
       type: composition_series
