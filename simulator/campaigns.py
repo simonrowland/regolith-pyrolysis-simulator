@@ -489,6 +489,10 @@ class CampaignManager:
         self.c0_first_melt_backstop = False
         self.c5_enabled = False
         self._c2a_staged_stage_idx: int = 0
+        self._yield_entry_inventory: dict = {}
+        self._endpoint_yield_observation = None
+        self._stage_endpoint_outcomes: list = []
+        self._c2a_staged_yield_hours_saved: int = 0
         self._c2a_staged_stage_start_hour: int = 0
         self._c2a_staged_peak_flux_by_species: dict[str, float] = {}
         self._c2a_staged_cumulative_yield_mol_by_species: dict[str, float] = {}
@@ -1281,7 +1285,7 @@ class CampaignManager:
             self.last_c2a_staged_gas_control.pop('max_hold_adjustment', None)
         return max_hold_hr
 
-    def _resolve_endpoint(self, campaign: CampaignPhase, record: BatchRecord) -> dict:
+    def _resolve_endpoint(self, campaign: CampaignPhase, record: BatchRecord, *, campaign_hour=0) -> dict:
         """Resolve the legacy clocks and aliases once, without changing precedence.
 
         Scalar aliases replace caps only on the historic _max_hold_hr paths.
@@ -1319,13 +1323,18 @@ class CampaignManager:
             resolved['stages'] = self._c2a_staged_enabled_stages()
             resolved['legacy_fraction'] = self._c2a_staged_depletion_flux_decay_fraction()
             resolved['has_log_slope'] = self._c2a_staged_has_log_slope_depletion(resolved['stages'])
-            stage_idx = min(max(0, int(self._c2a_staged_stage_idx)), len(resolved['stages']) - 1)
-            stage = resolved['stages'][stage_idx]
+            stage = self._c2a_staged_active_stage(campaign_hour)
+            stage_idx = resolved['stages'].index(stage)
+            resolved['scheduled_stages'] = resolved['legacy_fraction'] <= 0 and not resolved['has_log_slope']
+            if resolved['scheduled_stages']:
+                resolved['stage_start_h'] = sum(max(1, int(self._float(item.get('duration_h'), 1.)))
+                                                for item in resolved['stages'][:stage_idx]) - self._c2a_staged_yield_hours_saved
             endpoint = stage.get('endpoint', {})
             if not isinstance(endpoint, Mapping):
                 endpoint = {}
             resolved['stage_idx'] = stage_idx
             resolved['stage'] = stage
+            resolved['yield_target'] = self._stage_yield_target(stage)
             resolved['stage_species'] = self._c2a_staged_flux_decay_species(stage)
             resolved['stage_duration_h'] = max(1, int(self._float(stage.get('duration_h'), 1.0)))
             resolved['stage_minimum_h'] = self._float(
@@ -1371,16 +1380,40 @@ class CampaignManager:
             resolved['window_C'] = self._c4_temperature_window()
             resolved['acquisition_hr'], resolved['acquisition_source'] = self._c4_target_acquisition_limit()
             resolved['process_hr'], resolved['process_source'] = self._c4_process_wall_clock_limit()
+        if campaign != CampaignPhase.C2A_STAGED:
+            resolved['yield_target'] = self._resolve_yield_target(resolved['yield_target'], cfg)
         return resolved
+
+    @classmethod
+    def _stage_yield_target(cls, stage):
+        endpoint = stage.get('endpoint', {})
+        if not isinstance(endpoint, Mapping):
+            return {'mode': 'off'}
+        return cls._resolve_yield_target(endpoint.get('yield_target', {'mode': 'off'}), endpoint)
+
+    @staticmethod
+    def _resolve_yield_target(target, context):
+        if not isinstance(target, Mapping):
+            raise CampaignStopConfigurationRefusal('yield_target must be a mapping')
+        target = dict(target)
+        if target.get('mode') == 'enabled' and not isinstance(target.get('capture_stage'), int):
+            raise CampaignStopConfigurationRefusal('yield_target.capture_stage is required')
+        if target.get('mode') == 'enabled' and 'threshold_pct_ref' in target:
+            try:
+                band = context
+                for key in target['threshold_pct_ref'].split('.'):
+                    band = band[key]
+                # The existing percent band's lower edge is the sole stop.
+                # percent / 100 = dimensionless mol/mol; no midpoint or upper stop.
+                target['threshold'] = float(band[0]) / 100.0
+            except (KeyError, TypeError, ValueError, IndexError) as exc:
+                raise CampaignStopConfigurationRefusal('yield_target threshold_pct_ref must name a percent band') from exc
+        return target
 
     @staticmethod
     def _yield_target_reached(target: Mapping, *, eligible: bool,
                               inventories: Mapping | None = None) -> bool:
-        """Dormant feed-recovery hook. Inventories are mol, never melt wt%.
-
-        No phase supplies inventories or enables a target until its owner
-        rules on feed attribution (including exclusion of imported reductants).
-        """
+        """Gate solely on evaluable captured feed-origin atoms, in mol/mol."""
         if not isinstance(target, Mapping):
             raise CampaignStopConfigurationRefusal('yield_target must be a mapping')
         mode = target.get('mode')
@@ -1393,9 +1426,10 @@ class CampaignManager:
         quantity = target.get('quantity')
         threshold = target.get('threshold')
         if (
-            not isinstance(species, str) or not species
+            not isinstance(species, (str, list, tuple)) or not species
+            or any(not isinstance(item, str) or not item for item in ([species] if isinstance(species, str) else species))
             or denominator not in ('initial_feed_element_inventory', 'phase_entry_recoverable_inventory')
-            or quantity not in ('extracted', 'captured')
+            or quantity != 'captured'
             or not is_declared_real_scalar(threshold)
             or not math.isfinite(float(threshold)) or not 0.0 <= float(threshold) <= 1.0
         ):
@@ -1403,19 +1437,69 @@ class CampaignManager:
         if not eligible:
             return False
         if inventories is None:
-            raise CampaignStopConfigurationRefusal('yield_target requires feed-attributed mol inventories')
+            return False
+        species = [species] if isinstance(species, str) else species
         try:
-            denominator_mol = inventories[denominator][species]
-            numerator_mol = inventories[quantity][species]
-        except KeyError as exc:
-            raise CampaignStopConfigurationRefusal('yield_target is missing a declared mol inventory') from exc
+            denominator_mol = math.fsum(inventories[denominator][item] for item in species)
+            numerator_mol = math.fsum(inventories['captured'][item] for item in species)
+        except (KeyError, TypeError):
+            return False
         if not math.isfinite(denominator_mol) or denominator_mol <= 0.0:
-            raise CampaignStopConfigurationRefusal('yield_target denominator must be finite and positive')
+            return False
         if not math.isfinite(numerator_mol) or numerator_mol < 0.0:
-            raise CampaignStopConfigurationRefusal('yield_target quantity must be finite and nonnegative')
-        # Both inventories count the same feed-attributed element in mol;
-        # their ratio is dimensionless, zero extraction gives zero recovery.
+            return False
+        # Y = sum(captured feed-origin element mol) / sum(denominator mol).
+        # Units mol/mol; zero capture gives zero recovery. Na+K use an atom
+        # sum, giving each target atom equal weight without atomic-mass bias.
         return numerator_mol / denominator_mol >= float(threshold)
+
+    def _observe_yield(self, target, projection):
+        species = target['species']
+        species = [species] if isinstance(species, str) else species
+        if projection is None:
+            return {'status': 'unavailable', 'reason': 'yield_inventory_unavailable',
+                    'species': species, 'denominator': target['denominator'],
+                    'threshold': target['threshold']}, None
+        inventories = projection.inventory(species, target['capture_stage'])
+        entry = self._yield_entry_inventory
+        inventories['phase_entry_recoverable_inventory'] = entry.get('melt', {})
+        feed = math.fsum(inventories['initial_feed_element_inventory'].values())
+        entry_mol = math.fsum(entry.get('melt', {}).get(item, 0.) for item in species)
+        captures = inventories['capture']
+        unavailable = next((row for row in captures.values() if row['status'] != 'available'), None)
+        captured = None if unavailable else math.fsum(inventories['captured'].values())
+        extracted = math.fsum(inventories['extracted'].values())
+        initial_capture = entry.get('captured', {})
+        entry_captured = None if any(initial_capture.get(item) is None for item in species) else math.fsum(initial_capture[item] for item in species)
+        entry_extracted = math.fsum(entry.get('extracted', {}).get(item, 0.) for item in species)
+        captured_delta = None if captured is None or entry_captured is None else captured - entry_captured
+        extracted_delta = extracted - entry_extracted
+        basis = target['denominator']
+        denominator = feed if basis == 'initial_feed_element_inventory' else entry_mol
+        numerator = captured if basis == 'initial_feed_element_inventory' else captured_delta
+        extracted_numerator = extracted if basis == 'initial_feed_element_inventory' else extracted_delta
+        def fraction(value, divisor):
+            return value / divisor if value is not None and divisor > 0 else None
+        capture_fraction = fraction(numerator, denominator)
+        observation = {
+            'status': 'unavailable' if unavailable or denominator <= 0 else 'available',
+            'reason': unavailable['reason'] if unavailable else ('denominator_inventory_unavailable' if denominator <= 0 else None),
+            'species': species, 'denominator': basis, 'denominator_mol': denominator,
+            'feed_denominator_mol': feed, 'entry_denominator_mol': entry_mol,
+            'captured_mol': captured, 'extracted_mol': extracted,
+            'captured_fraction': capture_fraction, 'extracted_fraction': fraction(extracted_numerator, denominator),
+            'captured_vs_feed': fraction(captured, feed), 'extracted_vs_feed': fraction(extracted, feed),
+            'captured_vs_entry': fraction(captured_delta, entry_mol), 'extracted_vs_entry': fraction(extracted_delta, entry_mol),
+            'threshold': target['threshold'],
+            'shortfall': None if capture_fraction is None else max(0., target['threshold'] - capture_fraction),
+            'wrong_stage_mol': None if unavailable else math.fsum(row['wrong_stage_mol'] for row in captures.values()),
+            'capture_by_element': captures, 'losses_mol': inventories['losses'],
+            'extracted_accounts': inventories['extracted_accounts'],
+        }
+        if basis == 'phase_entry_recoverable_inventory':
+            inventories['captured'] = {item: None if inventories['captured'][item] is None or initial_capture.get(item) is None
+                                      else inventories['captured'][item] - initial_capture[item] for item in species}
+        return observation, inventories
 
     def _finish_endpoint(self, melt: MeltState, predicates: list[dict],
                          clocks: dict, *, legacy: Mapping | None = None) -> bool:
@@ -1434,6 +1518,10 @@ class CampaignManager:
             'bound_predicates': [item['condition'] for item in predicates if item['bound']],
             'clocks': clocks,
         }
+        if self._endpoint_yield_observation is not None:
+            self.last_termination['yield_target'] = self._endpoint_yield_observation
+        if self._stage_endpoint_outcomes:
+            self.last_termination['stage_endpoints'] = list(self._stage_endpoint_outcomes)
         return True
 
     def record_physics_refusal(self, melt: MeltState, diagnostic: Mapping) -> None:
@@ -1588,9 +1676,13 @@ class CampaignManager:
         if (
                 self._c2a_staged_depletion_flux_decay_fraction() <= 0.0
                 and not self._c2a_staged_has_log_slope_depletion(stages)):
-            return self._c2a_staged_stage_by_hour(campaign_hour, stages)
+            return self._c2a_staged_stage_by_hour(campaign_hour + self._c2a_staged_yield_hours_saved, stages)
         idx = min(max(0, int(self._c2a_staged_stage_idx)), len(stages) - 1)
         return stages[idx]
+
+    @staticmethod
+    def _c2a_staged_has_yield_target(stages):
+        return any(CampaignManager._stage_yield_target(stage).get('mode') == 'enabled' for stage in stages)
 
     @staticmethod
     def _c2a_staged_stage_label(stage: Mapping) -> str:
@@ -1871,7 +1963,7 @@ class CampaignManager:
             raise ValueError('target_delta_below_ceiling_C must be finite and non-negative')
         return min(self.furnace_max_T_C, process_high_C) - delta
 
-    def configure_campaign(self, melt: MeltState, campaign: CampaignPhase):
+    def configure_campaign(self, melt: MeltState, campaign: CampaignPhase, *, yield_projection=None):
         """
         Set gas-side atmosphere and process parameters for a campaign.
 
@@ -1882,6 +1974,18 @@ class CampaignManager:
         Called when starting a new campaign phase.
         """
         self.last_termination = None
+        self._endpoint_yield_observation = None
+        self._stage_endpoint_outcomes = []
+        self._yield_entry_inventory = {}
+        cfg = self._campaign_config(campaign)
+        targets = [self._resolve_yield_target(cfg.get('yield_target', {'mode': 'off'}), cfg)] + [
+            self._stage_yield_target(stage) for stage in (cfg.get('stages') or [])]
+        for target in targets:
+            self._yield_target_reached(target, eligible=False)
+            if target.get('mode') == 'enabled' and yield_projection is not None:
+                species = target['species']
+                self._yield_entry_inventory = yield_projection.inventory(
+                    [species] if isinstance(species, str) else species, target['capture_stage'])
         self._reset_stage_background_gas(melt)
         self._materialized_target_T_C_by_phase.pop(campaign, None)
         materialized_target = self._materialize_target_from_delta(campaign)
@@ -1907,6 +2011,7 @@ class CampaignManager:
             self._active_post_mg_c2a_overrides = None
 
         if campaign == CampaignPhase.C2A_STAGED:
+            self._c2a_staged_yield_hours_saved = 0
             self._c2a_staged_stage_idx = 0
             self._c2a_staged_stage_start_hour = 0
             self._c2a_staged_peak_flux_by_species = {}
@@ -2588,6 +2693,7 @@ class CampaignManager:
                        record: BatchRecord,
                        *,
                        transport_state: Mapping[str, object] | None = None,
+                       yield_projection=None,
                        ) -> bool:
         """
         Check if the current campaign has reached its endpoint.
@@ -2625,7 +2731,8 @@ class CampaignManager:
 
         if campaign in (CampaignPhase.IDLE, CampaignPhase.COMPLETE):
             return False
-        resolved = self._resolve_endpoint(campaign, record)
+        resolved = self._resolve_endpoint(campaign, record, campaign_hour=melt.campaign_hour)
+        self._endpoint_yield_observation = None
         max_hold_hr = resolved['budget_hr']
         predicates = []
         clocks = {'campaign_hour': float(melt.campaign_hour),
@@ -2645,13 +2752,15 @@ class CampaignManager:
         if wall_escape is not None:
             wall_bound = bind('operator_wall_budget', completed_campaign_hour >= wall_escape,
                               completed_campaign_hour, wall_escape)
-        # Targets stay disabled until their feed attribution has been ruled on.
-        # The hook must remain inert even before operating-state acquisition.
         def bind_yield(eligible):
             target = resolved['yield_target']
-            bind('species_yield_target',
-                 self._yield_target_reached(target, eligible=eligible),
-                 None, target.get('threshold'), 'target_reached')
+            observation, inventories = None, None
+            if target.get('mode') == 'enabled':
+                observation, inventories = self._observe_yield(target, yield_projection)
+                self._endpoint_yield_observation = observation
+            return bind('species_yield_target',
+                        self._yield_target_reached(target, eligible=eligible, inventories=inventories),
+                        observation, target.get('threshold'), 'target_reached')
 
         self._yield_target_reached(resolved['yield_target'], eligible=False)
 
@@ -2739,7 +2848,7 @@ class CampaignManager:
                     'C2A_staged.depletion_flux_decay_fraction conflicts with '
                     'per-stage depletion_log_slope_epsilon_per_hr'
                 )
-            if legacy_fraction <= 0.0 and not has_log_slope_depletion:
+            if legacy_fraction <= 0.0 and not has_log_slope_depletion and not self._c2a_staged_has_yield_target(stages):
                 fixed_duration = bind('fixed_duration', completed_campaign_hour >= max_hold_hr,
                                       completed_campaign_hour, max_hold_hr)
                 if fixed_duration and not wall_bound:
@@ -2750,13 +2859,15 @@ class CampaignManager:
                 return self._finish_endpoint(melt, predicates, clocks, legacy=self.last_c2a_staged_termination)
 
             stage_idx = resolved['stage_idx']
-            self._c2a_staged_stage_idx = stage_idx
+            if not resolved['scheduled_stages']:
+                self._c2a_staged_stage_idx = stage_idx
             stage = resolved['stage']
             species = resolved['stage_species']
-            stage_elapsed_h = melt.campaign_hour - self._c2a_staged_stage_start_hour + 1
+            stage_elapsed_h = melt.campaign_hour - resolved.get('stage_start_h', self._c2a_staged_stage_start_hour) + 1
             duration_h = resolved['stage_duration_h']
             min_hold_h = resolved['stage_minimum_h']
             log_slope_epsilon = resolved['stage_log_slope_epsilon']
+            yield_complete = bind_yield(stage_elapsed_h >= min_hold_h)
             if log_slope_epsilon > 0.0:
                 log_slope_complete = self._c2a_staged_log_slope_depletion_complete(
                     species=species,
@@ -2813,8 +2924,10 @@ class CampaignManager:
             bind('maximum_hold', completed_campaign_hour >= max_hold_hr, completed_campaign_hour, max_hold_hr)
             if wall_bound:
                 return self._finish_endpoint(melt, predicates, clocks)
-            if depletion_complete or stage_timeout:
-                reason = depletion_reason if depletion_complete else 'duration_cap_timeout'
+            if completed_campaign_hour >= max_hold_hr and not final_stage:
+                return self._finish_endpoint(melt, predicates, clocks)
+            if yield_complete or depletion_complete or stage_timeout:
+                reason = 'species_yield_target' if yield_complete else (depletion_reason if depletion_complete else 'duration_cap_timeout')
                 self.last_c2a_staged_termination = {
                     'reason': reason,
                     'stage': self._c2a_staged_stage_label(stage),
@@ -2828,9 +2941,23 @@ class CampaignManager:
                         self._c2a_staged_last_log_slope_by_species
                     ),
                 }
+                self._finish_endpoint(melt, predicates, clocks, legacy=self.last_c2a_staged_termination)
+                outcome = dict(self.last_termination)
+                outcome.pop('stage_endpoints', None)
+                self._stage_endpoint_outcomes.append(outcome)
                 if final_stage:
-                    return self._finish_endpoint(melt, predicates, clocks, legacy=self.last_c2a_staged_termination)
-                self._c2a_staged_stage_idx = stage_idx + 1
+                    self.last_termination['stage_endpoints'] = list(self._stage_endpoint_outcomes)
+                    return True
+                # A completed substage is not a terminated campaign. Keep its
+                # outcome for the final summary without exposing a false
+                # campaign termination through the runner's refusal channel.
+                self.last_termination = None
+                if resolved['scheduled_stages']:
+                    # A yield-completed substage removes only its unused
+                    # scheduled hours; cooldown and later stages still run.
+                    self._c2a_staged_yield_hours_saved += max(0, duration_h - stage_elapsed_h)
+                else:
+                    self._c2a_staged_stage_idx = stage_idx + 1
                 self._c2a_staged_stage_start_hour = melt.campaign_hour + 1
                 self._c2a_staged_peak_flux_by_species = {}
                 self._c2a_staged_cumulative_yield_mol_by_species = {}
@@ -3094,14 +3221,10 @@ class CampaignManager:
                 ),
             )
             next_low_hours = 0
-            if at_cap and signal_armed:
-                current_A = melt.mre_current_A
-                if not wall_bound and not ladder_complete:
-                    current_A = validate_signal(
-                        current_A,
-                        name='C5.mre_current_A',
-                        unit='A',
-                    )
+            current_A = None
+            if at_cap and signal_armed and not wall_bound and not ladder_complete:
+                current_A = validate_signal(
+                    melt.mre_current_A, name='C5.mre_current_A', unit='A')
                 if current_A < threshold_A:
                     next_low_hours = melt.mre_low_current_hours + 1
             if not wall_bound and not ladder_complete:
@@ -3111,7 +3234,7 @@ class CampaignManager:
             bind('ladder_complete', ladder_complete, bool(ladder_complete), True,
                  'rate_depleted' if signal_armed else 'no_signal')
             bind('current_floor', next_low_hours >= consecutive_hours,
-                 {'current_A': float(melt.mre_current_A), 'consecutive_hours': next_low_hours},
+                 {'current_A': current_A, 'consecutive_hours': next_low_hours},
                  {'current_A': threshold_A, 'consecutive_hours': consecutive_hours}, 'rate_depleted')
             bind('maximum_hold', completed_campaign_hour >= max_hold_hr, completed_campaign_hour, max_hold_hr,
                  'time_budget_reached' if signal_armed else 'no_signal')
@@ -3185,20 +3308,19 @@ class CampaignManager:
                 threshold_A,
                 min_voltage_V=min_voltage_V,
             )
-            if (
-                melt.mre_voltage_V >= min_voltage_V
-                and melt.mre_current_A < threshold_A
-                and signal_armed
-            ):
-                next_low_hours = melt.mre_low_current_hours + 1
-            else:
-                next_low_hours = 0
+            next_low_hours = 0
+            current_A = None
+            if melt.mre_voltage_V >= min_voltage_V and signal_armed and not wall_bound:
+                current_A = validate_signal(
+                    melt.mre_current_A, name='MRE_BASELINE.mre_current_A', unit='A')
+                if current_A < threshold_A:
+                    next_low_hours = melt.mre_low_current_hours + 1
             if not wall_bound:
                 melt.mre_low_current_hours = next_low_hours
             bind_yield(melt.mre_voltage_V >= min_voltage_V)
             clocks.update(low_current_hours=next_low_hours, signal_armed=signal_armed)
             bind('current_floor', next_low_hours >= consecutive_hours,
-                 {'current_A': float(melt.mre_current_A), 'consecutive_hours': next_low_hours},
+                 {'current_A': current_A, 'consecutive_hours': next_low_hours},
                  {'current_A': threshold_A, 'consecutive_hours': consecutive_hours}, 'rate_depleted')
             bind('maximum_hold', completed_campaign_hour >= max_hold_hr, completed_campaign_hour, max_hold_hr,
                  'time_budget_reached' if signal_armed else 'no_signal')

@@ -49,8 +49,8 @@ def test_round1_canonical_lunar_yield_off_terminal_ticks():
             cfg["yield_target"]["mode"] = "off"
         if isinstance(cfg, dict):
             for stage in cfg.get("stages", []):
-                if "yield_target" in stage:
-                    stage["yield_target"]["mode"] = "off"
+                if "yield_target" in stage.get("endpoint", {}):
+                    stage["endpoint"]["yield_target"]["mode"] = "off"
     manager = CampaignManager(setpoints)
     record = BatchRecord(feedstock_key="lunar_mare_low_ti", path="A_staged")
     melt = _melt(CampaignPhase.C2A_STAGED, 0)
@@ -325,15 +325,107 @@ def test_yield_off_is_inert_without_reading_inventories(mode, eligible):
 
 
 @pytest.mark.parametrize("denominator", ["initial_feed_element_inventory", "phase_entry_recoverable_inventory"])
-@pytest.mark.parametrize("quantity", ["extracted", "captured"])
-def test_yield_hook_uses_declared_mol_inventory_and_acquisition(denominator, quantity):
+def test_yield_hook_uses_declared_mol_inventory_and_acquisition(denominator):
     # Synthetic dimensionless recovery check; no campaign target is selected.
-    target = dict(mode='enabled', species='Fe', denominator=denominator, quantity=quantity, threshold=0.5)
-    inventories = {denominator: {'Fe': 10.0}, quantity: {'Fe': 5.0}}
+    target = dict(mode='enabled', species=['Fe'], denominator=denominator, quantity='captured', threshold=0.5)
+    inventories = {denominator: {'Fe': 10.0}, 'captured': {'Fe': 5.0}}
     assert CampaignManager._yield_target_reached(target, eligible=False) is False
     assert CampaignManager._yield_target_reached(target, eligible=True, inventories=inventories) is True
-    with pytest.raises(CampaignStopConfigurationRefusal, match='feed-attributed'):
-        CampaignManager._yield_target_reached(target, eligible=True)
+    assert CampaignManager._yield_target_reached(target, eligible=True) is False
+
+
+@pytest.mark.parametrize('phase', [CampaignPhase.C5, CampaignPhase.MRE_BASELINE])
+@pytest.mark.parametrize('current', [None, 'not-a-number'])
+@pytest.mark.parametrize('skip', ['below_cap', 'wall', 'unarmed'])
+def test_mre_missing_current_is_not_read_on_unneeded_ticks(phase, current, skip):
+    manager = CampaignManager(_setpoints())
+    if skip == 'wall':
+        manager.overrides[phase.name] = {'max_hours': 1}
+    melt = _melt(phase, 0, voltage_V=0.0 if skip == 'below_cap' else 2.5)
+    melt.mre_current_A = current
+    record = BatchRecord()
+    if skip != 'unarmed':
+        record.snapshots.append(HourSnapshot(campaign=phase, mre_current_A=100, mre_voltage_V=2.5))
+    assert manager.check_endpoint(melt, _flux(), CondensationTrain(), record) is (skip == 'wall')
+
+
+@pytest.mark.parametrize('phase', [CampaignPhase.C5, CampaignPhase.MRE_BASELINE])
+@pytest.mark.parametrize('current', [None, 'not-a-number'])
+def test_mre_needed_missing_current_uses_typed_refusal(phase, current):
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(snapshots=[HourSnapshot(campaign=phase, mre_current_A=100, mre_voltage_V=2.5)])
+    melt = _melt(phase, 0, voltage_V=2.5)
+    melt.mre_current_A = current
+    with pytest.raises(CampaignEndpointRefusal):
+        manager.check_endpoint(melt, _flux(), CondensationTrain(), record)
+
+
+def test_combined_capture_is_the_only_yield_gate():
+    target = dict(mode='enabled', species=['Na', 'K'], denominator='initial_feed_element_inventory',
+                  quantity='captured', threshold=0.88)
+    inventories = {'initial_feed_element_inventory': {'Na': 9., 'K': 1.},
+                   'captured': {'Na': 8., 'K': 0.8}, 'extracted': {'Na': 9., 'K': 1.}}
+    assert CampaignManager._yield_target_reached(target, eligible=True, inventories=inventories)
+    inventories['captured']['K'] = None
+    assert not CampaignManager._yield_target_reached(target, eligible=True, inventories=inventories)
+    del target['species']
+    with pytest.raises(CampaignStopConfigurationRefusal):
+        CampaignManager._yield_target_reached(target, eligible=False)
+
+
+def test_enabled_capture_unavailable_preserves_time_cap_and_diagnostic():
+    from simulator.accounting import AtomLedger
+    from simulator.accounting.campaign_yield import CampaignYieldProjection
+    from simulator.accounting.formulas import resolve_species_formula
+
+    ledger = AtomLedger()
+    ledger.load_external_mol('process.cleaned_melt', {'Na': 9, 'K': 1}, material_origin='feedstock')
+    ledger.load_external_mol('process.condensation_train', {'Na': 1}, material_origin='reagent')
+    kg = resolve_species_formula('Na', {}).molar_mass_kg_per_mol()
+    projection = CampaignYieldProjection(SimpleNamespace(atom_ledger=ledger,
+        _stage_collection_kg_by_source={('process.condensation_train', 4, 'Na'): kg}))
+    manager = CampaignManager(_setpoints())
+    melt = _melt(CampaignPhase.C2A, 0)
+    manager.configure_campaign(melt, CampaignPhase.C2A, yield_projection=projection)
+    melt.campaign_hour = 29
+    assert manager.check_endpoint(melt, _flux(2), CondensationTrain(), BatchRecord(), yield_projection=projection)
+    outcome = manager.last_termination
+    assert outcome['winning_condition'] == 'maximum_hold'
+    observed = outcome['yield_target']
+    assert observed['status'] == 'unavailable'
+    assert observed['reason'] == 'origin_unresolved_for_stage_split'
+    assert observed['captured_fraction'] is None
+    assert observed['threshold'] == .88
+    assert observed['entry_denominator_mol'] == pytest.approx(10)
+
+
+def test_fe_yield_advances_only_hot_hold_and_records_both_bases():
+    from simulator.accounting import AtomLedger
+    from simulator.accounting.campaign_yield import CampaignYieldProjection
+    from simulator.accounting.formulas import resolve_species_formula
+
+    config = _setpoints()
+    config['campaigns']['C2A_staged']['stages'][2]['duration_h'] = 4
+    manager = CampaignManager(config)
+    ledger = AtomLedger()
+    ledger.load_external_mol('process.cleaned_melt', {'Fe': 10}, material_origin='feedstock')
+    stages = {}
+    projection = CampaignYieldProjection(SimpleNamespace(atom_ledger=ledger, _stage_collection_kg_by_source=stages))
+    melt = _melt(CampaignPhase.C2A_STAGED, 0)
+    manager.configure_campaign(melt, melt.campaign, yield_projection=projection)
+    captured = 9 * resolve_species_formula('Fe', {}).molar_mass_kg_per_mol()
+    ledger.move('capture', 'process.cleaned_melt', 'process.condensation_train', {'Fe': captured})
+    stages[('process.condensation_train', 1, 'Fe')] = captured
+    melt.campaign_hour = 7
+    assert not manager.check_endpoint(melt, _flux(2), CondensationTrain(), BatchRecord(), yield_projection=projection)
+    assert manager._c2a_staged_active_stage(8)['name'] == 'cool_for_na_shuttle'
+    assert manager.last_termination is None
+    outcome = manager._stage_endpoint_outcomes[-1]
+    assert outcome['stage'] == 'fe_hot_hold'
+    assert outcome['winning_condition'] == 'species_yield_target'
+    assert outcome['yield_target']['captured_vs_feed'] == pytest.approx(.9)
+    assert outcome['yield_target']['extracted_vs_entry'] == pytest.approx(.9)
+    assert outcome['yield_target']['threshold'] == .86
 
 
 @pytest.mark.parametrize("phase", [CampaignPhase.C0, CampaignPhase.C2B, CampaignPhase.C7_CA_ALUMINOTHERMIC])

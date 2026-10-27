@@ -117,8 +117,11 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # defaults; d-293 moves the unchanged recipe bound pairs into YAML.
     # Re-derived through PyrolysisRun._session_config(); existing leaves and
     # bounds_digest remain unchanged (endpoint-r1 config/pin proofs).
+    # d-295 activates only the Na+K target and fe_hot_hold endpoint target;
+    # their percent-band references retain the existing values and bounds.
+    # Recomputed through the production resolver after a structural YAML diff.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "1db63935cf38f17a53f56f9021aaaa2601d10e5a403bc04b60573036603a3651"
+        "b9ffcae7498fe38bbe91df58875f8cee4354cde37b79471a50fe18bc6f480801"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.

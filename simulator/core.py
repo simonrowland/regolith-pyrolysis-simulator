@@ -13116,7 +13116,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._campaign_start_O2 = self._oxygen_total_kg()
 
         # Configure atmosphere and targets from setpoints
-        self.campaign_mgr.configure_campaign(self.melt, campaign)
+        from simulator.accounting.campaign_yield import CampaignYieldProjection
+
+        self.campaign_mgr.configure_campaign(
+            self.melt, campaign, yield_projection=CampaignYieldProjection(self))
         self.melt.validate_melt_pressures()
         self._configure_overhead_headspace(
             campaign,
@@ -15108,6 +15111,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _check_campaign_endpoint(self, evap_flux: EvaporationFlux) -> bool:
         """Evaluate the endpoint and record typed campaign refusals."""
         from simulator.campaigns import CampaignEndpointRefusal
+        from simulator.accounting.campaign_yield import CampaignYieldProjection
 
         try:
             return self.campaign_mgr.check_endpoint(
@@ -15115,6 +15119,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 evap_flux,
                 self.train,
                 self.record,
+                yield_projection=CampaignYieldProjection(self),
                 transport_state={
                     'binding_cause': str(getattr(
                         self.overhead,
