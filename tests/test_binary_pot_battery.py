@@ -587,6 +587,7 @@ def test_magemin_small_projected_bulk_is_scored_with_component_notice():
                 ],
             },
             "input_composition_projection": {
+                "backend": "MAGEMin",
                 "composition_projected": {
                     "dropped_components": ["MnO"],
                     "dropped_mass_fraction": 0.003,
