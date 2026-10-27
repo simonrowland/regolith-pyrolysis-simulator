@@ -381,6 +381,10 @@ def test_element_reference_transition_bad_enthalpy_stays_unknown() -> None:
         ):
             row["H_minus_H298"]["as_published"] = "30.014"
             row["H_minus_H298"]["value"] = 30.014
+            # Keep the Planck identity: 44.547 - 1000*30.014/1043.7
+            # is 15.789694..., which prints as 15.790 at three decimals.
+            row["gibbs_function"]["as_published"] = "15.790"
+            row["gibbs_function"]["value"] = 15.790
     generated = generator.generate_record(record)
     entropy = _observations_for(
         generated, Quantity.S, temperature="1043.7", formula="K"

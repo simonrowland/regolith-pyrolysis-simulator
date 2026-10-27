@@ -3875,6 +3875,10 @@ def test_vaporock_b1259_bad_transition_enthalpy_refuses_both_rows() -> None:
         ):
             row["H_minus_H298"]["as_published"] = "30.014"
             row["H_minus_H298"]["value"] = 30.014
+            # Keep the Planck identity: 44.547 - 1000*30.014/1043.7
+            # is 15.789694..., which prints as 15.790 at three decimals.
+            row["gibbs_function"]["as_published"] = "15.790"
+            row["gibbs_function"]["value"] = 15.790
     generated = usgs_b1259.generate_record(record)
     entropy = [
         observation
