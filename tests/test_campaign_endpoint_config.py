@@ -37,6 +37,45 @@ from simulator.state import (
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 
 
+def test_round1_canonical_lunar_yield_off_terminal_ticks():
+    from simulator.recipe_io import load_recipe_patch
+
+    recipe = load_recipe_patch(DATA_DIR / "recipes/canonical_lunar_full_yield.yaml")
+    setpoints = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", setpoints_patch=recipe,
+    )._session_config().setpoints
+    for cfg in setpoints["campaigns"].values():
+        if isinstance(cfg, dict) and "yield_target" in cfg:
+            cfg["yield_target"]["mode"] = "off"
+        if isinstance(cfg, dict):
+            for stage in cfg.get("stages", []):
+                if "yield_target" in stage:
+                    stage["yield_target"]["mode"] = "off"
+    manager = CampaignManager(setpoints)
+    record = BatchRecord(feedstock_key="lunar_mare_low_ti", path="A_staged")
+    melt = _melt(CampaignPhase.C2A_STAGED, 0)
+    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
+    stages = []
+    terminal = []
+    for hour in range(9):
+        melt.campaign_hour = hour
+        stages.append(manager._c2a_staged_active_stage(hour)["name"])
+        terminal.append(manager.check_endpoint(melt, _flux(2.0), CondensationTrain(), record))
+    # Observed on round-1 tip 56dd37320. These are completed campaign ticks,
+    # independent of the preceding C0/C0B wall-clock hours and engine startup.
+    assert stages == ["alkali_early_fe"] * 4 + ["sio_window"] * 3 + ["fe_hot_hold", "cool_for_na_shuttle"]
+    assert terminal == [False] * 8 + [True]
+    assert manager.get_next_campaign(CampaignPhase.C4, record) == CampaignPhase.C2A
+    melt = _melt(CampaignPhase.C2A, 0)
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+    terminal = []
+    for hour in range(160):
+        melt.campaign_hour = hour
+        terminal.append(manager.check_endpoint(melt, _flux(2.0), CondensationTrain(), record))
+    assert terminal == [False] * 159 + [True]
+    assert manager.last_termination["winning_condition"] == "operator_wall_budget"
+
+
 def _setpoints() -> dict:
     return yaml.safe_load((DATA_DIR / "setpoints.yaml").read_text()) or {}
 
