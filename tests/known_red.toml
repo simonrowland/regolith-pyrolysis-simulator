@@ -25,3 +25,24 @@ ticket = "b-946"
 tier = "pr"
 reason = "C2A staged run captures species outside the pinned set."
 since = "7dd268c6f"
+
+[[test]]
+node = "tests/test_sso_r_validation_map.py::test_owner_pn2_anchor_reports_current_certification_state"
+ticket = "b-1050"
+tier = "pr"
+reason = "b-858 Si evaporation moves the SSO-R owner rows; physics re-measures on the b-1050 bundle (offers seq 1282)"
+since = "f62696110"
+
+[[test]]
+node = "tests/test_sso_r_validation_map.py::test_owner_live_pn2_tick_uses_sweep_floor_and_drains_o2"
+ticket = "b-1050"
+tier = "pr"
+reason = "b-858 Si evaporation moves the SSO-R owner rows; physics re-measures on the b-1050 bundle (offers seq 1282)"
+since = "f62696110"
+
+[[test]]
+node = "tests/test_sso_r_validation_map.py::test_distilled_golden_fixture_matches_current_anchors"
+ticket = "b-1050"
+tier = "pr"
+reason = "b-858 Si evaporation moves the SSO-R owner rows; physics re-measures on the b-1050 bundle (offers seq 1282)"
+since = "f62696110"
