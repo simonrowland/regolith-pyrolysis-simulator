@@ -3699,7 +3699,8 @@ def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
     pressure_shift = ideal_gas_entropy_pressure_shift_J_per_mol_K(
         STANDARD_PRESSURE_PA, Decimal("101325")
     )
-    assert pressure_shift.quantize(Decimal("0.00001")) == Decimal("0.10944")
+    # For 1 bar -> 1 atm, ΔS = -R ln(p_to/p_from) = -R ln(101325/100000).
+    assert pressure_shift.quantize(Decimal("0.00001")) == Decimal("-0.10944")
     printed_oxygen_entropy = _printed_janaf_node(
         "O-029", Decimal("800"), "entropy"
     )
