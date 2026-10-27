@@ -338,6 +338,13 @@ def test_element_reference_state_boiling_rows_pair_entropy_with_phase() -> None:
             Decimal("20.710"),
             Decimal("43.050"),
         ),
+        (
+            "b1259-ht-0012-calcium-reference-state",
+            "Ca",
+            "1756",
+            Decimal("25.070"),
+            Decimal("45.800"),
+        ),
     ):
         generated = _generation(record_id)
         entropy = _observations_for(
@@ -390,6 +397,24 @@ def test_calcium_reference_state_rows_above_boiling_are_gas() -> None:
         )
         assert len(entropy) == 1
         assert entropy[0].identity.species.phase.value is Phase.G
+
+
+def test_calcium_reference_state_gas_entropy_below_condensed_floor_stays_unknown() -> None:
+    record = _load("b1259-ht-0012-calcium-reference-state")
+    for row in record["rows"]:
+        if (
+            row.get("kind") == "data"
+            and row.get("temperature", {}).get("as_published") == "1800"
+        ):
+            row["entropy"]["as_published"] = "24.000"
+            row["entropy"]["value"] = 24.0
+
+    generated = generator.generate_record(record)
+    entropy = _observations_for(
+        generated, Quantity.S, temperature="1800", formula="Ca"
+    )
+    assert len(entropy) == 1
+    assert entropy[0].identity.species.phase.is_unknown
 
 
 def test_reference_schedule_transition_rows_match_b1259_tables() -> None:
