@@ -5235,13 +5235,20 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
             Decimal("-7.33"),
             "contested",
         ),
+        # 4e0819f6d types the 26 Table 2 oxygen columns quoted_attributed
+        # (Eq. (4) and Eqns 1–2 with Eqs. (5)–(6), p. 688). The 8 measured
+        # pCa rows are unchanged. resolve_source_oxygen commands that printed
+        # cell pO as fO2, so this residual slope is 2.33 dex per x(CaO).
+        # 1.04 was the engine oxygen-balance slope while those columns were
+        # model_derived. b162 does not edit this extract. The paper prints
+        # the pressures, not this slope.
         (
             "stolyarova-1995",
             "stolyarova-1995-cao-alumina-kems",
             "stolyarova_1995_ca_partial_pressure_table2",
             "x(CaO)",
             8,
-            Decimal("1.04"),
+            Decimal("2.33"),
             "liquid",
         ),
     ),
