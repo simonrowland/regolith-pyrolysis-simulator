@@ -15094,13 +15094,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             raise RuntimeError(
                 f'Unsupported campaign endpoint refusal for {campaign.name}'
             )
+        # Coercing a rejected observation again can mask the typed refusal.
         refusal = {
             'status': 'refused',
             'reaction_family': 'c4_mg_selective_pyrolysis',
             'hour': int(self.melt.hour),
             'campaign_hour': self.melt.campaign_hour,
             'campaign': campaign.name,
-            'temperature_C': float(self.melt.temperature_C),
+            'temperature_C': self.melt.temperature_C,
             'diagnostic': dict(diagnostic),
         }
         self._last_c4_refusal_diagnostic = dict(refusal)

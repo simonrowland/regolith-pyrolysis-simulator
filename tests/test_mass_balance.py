@@ -301,8 +301,8 @@ def _capture_post_mg_c2a_hold_limit(monkeypatch, campaign_mgr) -> dict:
     limits = {}
     configure_campaign = campaign_mgr.configure_campaign
 
-    def configure_and_capture(melt, campaign):
-        configure_campaign(melt, campaign)
+    def configure_and_capture(melt, campaign, **kwargs):
+        configure_campaign(melt, campaign, **kwargs)
         if campaign == CampaignPhase.C2A:
             limits[CampaignPhase.C2A] = campaign_mgr._max_hold_hr(
                 CampaignPhase.C2A

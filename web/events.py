@@ -551,6 +551,12 @@ _REFUSAL_EXPLANATIONS = {
         'MRE cannot certify the requested product phase for the reducible '
         'oxide, so the step refused.'
     ),
+    'c4_clock_invalid': (
+        'C4 requires a finite, nonnegative campaign clock; the supplied clock is invalid.'
+    ),
+    'c4_temperature_invalid': (
+        'C4 requires finite temperature observations; an observation is missing or invalid.'
+    ),
     'c4_target_window_not_acquired': (
         'C4 did not acquire its configured temperature window before the '
         'acquisition limit.'

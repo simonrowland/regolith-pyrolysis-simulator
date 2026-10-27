@@ -326,7 +326,7 @@ def test_pyrolysis_run_emits_binding_c6_refusal_diagnostic():
     )
 
 
-def test_run_executor_promotes_c4_acquisition_timeout_without_c6_mislabel() -> None:
+def test_run_executor_refuses_missing_c4_budget_without_c6_mislabel() -> None:
     config = _run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C4",
@@ -337,22 +337,15 @@ def test_run_executor_promotes_c4_acquisition_timeout_without_c6_mislabel() -> N
     backend.initialize({})
     session = SimSession()
     session.start(config, backend=backend)
-    session.simulator.campaign_mgr.campaigns["C4"][
-        "max_target_acquisition_hr"
-    ] = 1.0
+    del session.simulator.campaign_mgr.campaigns["C4"]["max_target_acquisition_hr"]
 
     execution = RunExecutor().execute_session(session, hours=1)
 
     assert execution.status == "refused"
-    assert execution.reason == "c4_target_window_not_acquired"
+    assert execution.reason == "campaign_stop_configuration_missing"
     assert execution.error_message == execution.reason
-    assert execution.refusal_diagnostic["campaign"] == "C4"
-    assert execution.refusal_diagnostic["reaction_family"] == (
-        "c4_mg_selective_pyrolysis"
-    )
-    assert execution.refusal_diagnostic["diagnostic"]["reason_refused"] == (
-        execution.reason
-    )
+    assert execution.refusal_diagnostic["reason_refused"] == execution.reason
+    assert "C4.max_target_acquisition_hr" in execution.refusal_diagnostic["detail"]
     assert session.simulator._last_c6_refusal_diagnostic == {}
 
 
