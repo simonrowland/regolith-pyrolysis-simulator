@@ -36,7 +36,8 @@ def test_eq12_fit_and_conditions_migrate_with_rendered_values() -> None:
     assert row["point_conditions"]["total_pressure_Pa"]["state"]["tag"] == "unknown"
     assert row["standard_state"]["locator"]["page"] == 2
     assert row["point_conditions"]["composition"]["locator"]["page"] == 4
-    assert row["point_conditions"]["atmosphere"]["locator"]["page"] == 4
+    assert row["point_conditions"]["atmosphere"]["locator"]["page"] == 3
+    assert "paper labels slope numerator A and intercept B" in row["values"]["notes_printed"]
 
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
@@ -66,3 +67,5 @@ def test_eq12_fit_and_conditions_migrate_with_rendered_values() -> None:
     assert {
         entry["locator"]["page"] for entry in audit["source_conflict"]
     } == {1, 4}
+    assert "0.4 mass% K2O" in audit["source_conflict"][-1]["reading"]
+    assert "0.4 mass% Na2O" in audit["source_conflict"][-1]["reading"]

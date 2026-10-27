@@ -15,7 +15,9 @@ extraction:
     ±0.08 agree between both machine reads. Render checks on PDF pages 1 and
     4 confirm the abstract/Eq. 12 intercepts respectively. Eq. 12 used
     because it agrees with the conclusion; the abstract conflict is retained
-    below. The fitted coefficients are quoted_attributed because per-run
+    below. The abstract's separate 0.4 mass% K2O versus conclusion's 0.4
+    mass% Na2O conflict concerns the phosphorus-partition result and is out of
+    scope here. The fitted coefficients are quoted_attributed because per-run
     inputs are not available as printed numeric rows. No K2O activity rows:
     K2O occurs in phosphorus-partition figures, whose coordinates are outside
     this extraction. Useful figure candidates are Fig. 6 (temperature fit
@@ -63,7 +65,7 @@ species:
             locator: {page: 4, published_page: 732, figure: '6'}
           atmosphere:
             state: {tag: value, value: 'CO2-CO gas; P_CO2/P_CO varied from 0.01 to 10'}
-            locator: {page: 4, published_page: 732, section: '3.2'}
+            locator: {page: 3, published_page: 731, section: '3.2'}
           total_pressure_Pa:
             state: {tag: unknown, reason: not stated for this experiment}
             locator: {page: 2, published_page: 730, section: '2.2'}
@@ -79,7 +81,7 @@ species:
           temperature_basis: K
           A_printed: '7.23'
           B_printed: '−18,600'
-          notes_printed: '1423–1623 K; CaO-4 mass% Na2O-CaF2-SiO2 flux doubly saturated with CaO and 3CaO·SiO2; standard state pure Na2O(l); abstract prints intercept 7.53 while Eq. 12 and conclusion print 7.23; Eq. 12 used'
+          notes_printed: '1423–1623 K; CaO-4 mass% Na2O-CaF2-SiO2 flux doubly saturated with CaO and 3CaO·SiO2; standard state pure Na2O(l); paper labels slope numerator A and intercept B in the form, while schema A_printed is the intercept and B_printed is the signed slope; abstract prints intercept 7.53 while Eq. 12 and conclusion print 7.23; Eq. 12 used'
           fit:
             form_as_published: 'log gamma_Na2O = -A/T + B'
             slope_numerator_as_published: '18,600'
