@@ -66,6 +66,7 @@ class Quantity(StrEnum):
     FUGACITY = "fugacity"
     P_REFERENCE = "p_reference"
     LOG10_KF = "log10_Kf"
+    LOG10_K_REACTION = "log10_K_reaction"
     LOG10_K_STAR = "log10_K_star"
     ACTIVITY = "activity"
     ACTIVITY_COEFFICIENT = "activity_coefficient"
@@ -254,6 +255,7 @@ class NoticeKind(StrEnum):
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
     # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
     ADMISSION_DEFAULTED = "admission_defaulted"
+    VALIDATION_HARD_ISSUE_LABEL = "validation_hard_issue_label"
     FIGURE_ONLY = "figure_only"
     REACTIVE_CELL_NOT_MODELLED = "reactive_cell_not_modelled"
     # t-1123a: printed point sits between printed liquidus positions; scored as
@@ -517,6 +519,17 @@ class ValueKind(StrEnum):
     UNAVAILABLE = "unavailable"
 
 
+class BoundDirection(StrEnum):
+    LOWER = "lower"
+    UPPER = "upper"
+
+
+class BoundInclusivity(StrEnum):
+    INCLUDED = "included"
+    EXCLUDED = "excluded"
+    UNKNOWN = "unknown"
+
+
 class UncertaintyKind(StrEnum):
     PRINTED = "printed"
     DERIVED = "derived"
@@ -547,6 +560,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.FUGACITY: "Pa",
     Quantity.P_REFERENCE: "Pa",
     Quantity.LOG10_KF: "dimensionless",
+    Quantity.LOG10_K_REACTION: "dimensionless",
     Quantity.LOG10_K_STAR: "dimensionless",
     Quantity.ACTIVITY: "dimensionless",
     Quantity.ACTIVITY_COEFFICIENT: "dimensionless",

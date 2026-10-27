@@ -14416,8 +14416,30 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             "kems-012-sossi-2019",
         )
     )
-    observations = context.observations
-    filtered = context
+    fresh_stolyarova_1996 = _migrate_real_extract(
+        tmp_path / "fresh-stolyarova-1996",
+        "stolyarova-1996-cao-alumina-silica-kems.yaml",
+    )
+    fresh_stolyarova_1996_pressures = {
+        key: observation
+        for key, observation in fresh_stolyarova_1996.observations.items()
+        if observation.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+        and isinstance(observation.identity, Identity)
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and observation.observation_id.split("::")[1].startswith(
+            "stolyarova_1996_table2_pO"
+        )
+        and observation.admission.status is AdmissionStatus.ADMITTED
+    }
+    assert len(fresh_stolyarova_1996_pressures) == 55
+    assert all(
+        observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        for observation in fresh_stolyarova_1996_pressures.values()
+    )
+    observations = dict(context.observations)
+    observations.update(fresh_stolyarova_1996_pressures)
+    filtered = replace(context, observations=observations)
     stolyarova_atomic_oxygen_pressures = {
         key
         for key in observations
@@ -14472,7 +14494,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and quantity_token(obs.identity) is Quantity.P_PARTIAL
         and obs.admission.status is AdmissionStatus.ADMITTED
         and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
     }
     kems_model_derived = {
         key
@@ -14498,7 +14520,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         for key in stolyarova_atomic_oxygen_pressures
     )
     fresh_stolyarova = _migrate_real_extract(
-        tmp_path, "kems-053-stolyarova-1991.yaml"
+        tmp_path / "fresh-stolyarova-1991", "kems-053-stolyarova-1991.yaml"
     )
     fresh_stolyarova_pressures = {
         key: observation
@@ -14515,8 +14537,8 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
     # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9) are model-derived,
     # not measured pressures (review, Derived O / O2).
     assert len(stolyarova_1995_derived_pressures) == 26
-    # Table 2's calculated 1933 K oxygen-pressure columns contain 30 pO,
-    # 10 p'O, and 15 p''O observations, all model-derived.
+    # Table 2 reports quoted_attributed calculated columns: 30 pO, 10 p'O,
+    # and 15 p''O observations.
     assert len(stolyarova_1996_derived_pressures) == 55
     assert {
         observations[key].observation_id.split("::")[1]
@@ -14543,7 +14565,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
     ) == 91
     assert len(headline_diagnostic_references) == 136
     assert admitted_model_derived == (
-        headline_diagnostic_references - stolyarova_atomic_oxygen_pressures
+        headline_diagnostic_references
+        - stolyarova_atomic_oxygen_pressures
+        - stolyarova_1996_derived_pressures
     )
     assert admitted_model_derived <= {
         obs.observation_id for obs in score_module.comparison_candidates(filtered)
@@ -14823,6 +14847,17 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         assert len(stolyarova_1996_rows) == 55
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_1996_rows)
         assert all(not row.score_eligible for row in stolyarova_1996_rows)
+        assert all(
+            observations[row.reference].evidence.class_.is_value
+            and observations[row.reference].evidence.class_.value
+            is EvidenceClass.QUOTED_ATTRIBUTED
+            and any(
+                notice.kind is NoticeKind.FIGURE_ONLY
+                and notice.reason == "evidence_class:quoted_attributed"
+                for notice in row.notices
+            )
+            for row in stolyarova_1996_rows
+        )
         assert {
             row.refusal.reason
             for row in stolyarova_1996_rows
@@ -16072,3 +16107,60 @@ def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> Non
     assert residual.execution.state is ExecutionState.UNSUPPORTED
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+
+
+@pytest.mark.parametrize("parent_id", ("parent-source::raw", "parent-source:raw"))
+def test_filtered_score_context_resolves_cross_source_validation_parent(
+    tmp_path: Path, parent_id: str
+) -> None:
+    from simulator.battery.migrate import dump_yaml, to_plain
+
+    child_source = "child-source"
+    parent_source = "parent-source"
+    child_id = f"{child_source}::reduced"
+    work = replace(F.work(), source_ids=(child_source, parent_source))
+    experiment = F.tabulation_experiment()
+    parent = F.observation(
+        parent_id,
+        experiment.experiment_id,
+        F.pref_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=parent_source,
+    )
+    child = F.observation(
+        child_id,
+        experiment.experiment_id,
+        F.pref_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id=child_source,
+        derived_from=(parent_id,),
+        derivation=Derivation(
+            "reported reduction", (parent_id,), (), "Pa"
+        ),
+    )
+
+    literature = tmp_path / "data" / "literature"
+    (literature / "works").mkdir(parents=True)
+    (literature / "extracts-v2").mkdir()
+    dump_yaml(
+        {"work": to_plain(work), "experiments": [to_plain(experiment)]},
+        literature / "works" / "work.yaml",
+    )
+    for observation in (parent, child):
+        dump_yaml(
+            {"observations": [to_plain(observation)]},
+            literature / "extracts-v2" / f"{observation.source_id}.yaml",
+        )
+
+    full = load_score_context(tmp_path)
+    filtered = load_score_context(tmp_path, sources=(child_source,))
+
+    assert child_id in full.observations
+    assert child_id in filtered.observations
+    assert parent_id not in filtered.observations
+    assert full.hard_issues_by_observation.get(child_id) is None
+    assert filtered.hard_issues_by_observation.get(child_id) == (
+        full.hard_issues_by_observation.get(child_id)
+    )

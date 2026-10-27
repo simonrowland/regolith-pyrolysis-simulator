@@ -104,6 +104,7 @@ from simulator.battery.migrate import (
     canonicalize_rail,
     iter_observation_store_paths,
     load_migrated_benches,
+    load_migrated_context,
     load_migrated_store,
     load_yaml,
     _convert_compilation_amount,
@@ -163,12 +164,15 @@ from simulator.battery.source_lineage import (
     openimcc_pack_coefficient_sources,
 )
 from simulator.battery.validate import (
+    ValidationIssue,
     _asset_ids,
     _observation_lineage,
+    observation_issue_location,
     _pressure_blocking_notices,
     _resolve_coefficient_sources,
     _table_ids,
     _VAPOUR_EQUILIBRIUM,
+    validate_corpus,
 )
 from simulator.battery.validity import (
     GateOutcome,
@@ -507,6 +511,10 @@ def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
     return {"reason": "quantity_not_predicted", "quantity": quantity.value}
 
 
+def _is_quantity_not_predicted(quantity: Quantity | None) -> bool:
+    return quantity is Quantity.LOG10_K_REACTION
+
+
 @dataclass(frozen=True)
 class ScoreContext:
     works: Mapping[str, Work]
@@ -517,6 +525,9 @@ class ScoreContext:
     hostname: str = ""
     benches: Mapping[str, Bench] = field(default_factory=dict)
     root: Path = REPO_ROOT
+    hard_issues_by_observation: Mapping[str, tuple[ValidationIssue, ...]] = field(
+        default_factory=dict
+    )
 
 
 @dataclass(frozen=True)
@@ -4415,7 +4426,7 @@ def _source_alignment_group_key(
     if not isinstance(identity, Identity):
         return None
     quantity = quantity_token(identity)
-    if quantity is None:
+    if quantity is None or identity.species is None:
         return None
     phase = phase_token(identity.species)
     charge = identity.species.charge
@@ -5013,10 +5024,14 @@ def oxygen_is_scorer_input(
     quantity = quantity_token(identity)
     from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
 
-    redox = multivalent_components(
-        composition,
-        identity.species.formula,
-        oxide_aliases=MELTS_OXIDE_ALIASES,
+    redox = (
+        multivalent_components(
+            composition,
+            identity.species.formula,
+            oxide_aliases=MELTS_OXIDE_ALIASES,
+        )
+        if quantity in MELT_ACTIVITY_QUANTITIES
+        else ()
     )
     if quantity in MELT_ACTIVITY_QUANTITIES:
         if redox:
@@ -5463,9 +5478,9 @@ def paired_quench_diagnostics(
         if not isinstance(identity, Identity):
             continue
         quantity = quantity_token(identity)
-        phase = phase_token(identity.species)
         if quantity not in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
             continue
+        phase = phase_token(identity.species)
         if phase not in {Phase.L, Phase.GLASS}:
             continue
         if not observation.source_id:
@@ -6530,7 +6545,11 @@ def _implied_alpha_activity_observation(observation: Observation) -> Observation
     """
 
     metadata = _implied_alpha_metadata(observation)
-    if metadata is None or not isinstance(observation.identity, Identity):
+    if (
+        metadata is None
+        or not isinstance(observation.identity, Identity)
+        or observation.identity.species is None
+    ):
         return None
     oxide = str(metadata["oxide_formula"])
     coefficient_formula = _IMPLIED_ALPHA_SINGLE_CATION_FORMULAS.get(oxide, oxide)
@@ -6571,6 +6590,8 @@ def _implied_alpha_coefficient_basis_matches(
     if not isinstance(expected_identity, Identity) or not isinstance(
         actual_identity, Identity
     ):
+        return False
+    if expected_identity.species is None or actual_identity.species is None:
         return False
     if actual_identity.species.formula != expected_identity.species.formula:
         return False
@@ -7943,6 +7964,18 @@ def predict_with_engine(
 
     _require_score_engine(engine)
     identity = observation.identity
+    quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+    if _is_quantity_not_predicted(quantity):
+        return EnginePrediction(
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail=_quantity_not_predicted_detail(quantity),
+            identity=identity,
+        )
     sample_phase_detail = (
         melt_activity_sample_phase_refusal(identity)
         if isinstance(identity, Identity)
@@ -10259,7 +10292,7 @@ def _is_bulk_not_liquid_composition(observation: Observation) -> bool:
     """Read the source's two-phase marker; never classify from composition values."""
 
     identity = observation.identity
-    if isinstance(identity, Identity):
+    if isinstance(identity, Identity) and identity.species is not None:
         phase = identity.species.phase
         if isinstance(phase, State) and phase.is_unknown:
             reason = phase.reason or ""
@@ -10364,7 +10397,11 @@ def compile_residual(
         reference = fusion_comparison_reference(reference, engine=engine)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-    formula = identity.species.formula if isinstance(identity, Identity) else ""
+    formula = (
+        identity.species.formula
+        if isinstance(identity, Identity) and identity.species is not None
+        else ""
+    )
     rail = rail_for_quantity(quantity, species_formula=formula)
     T = temperature_of(identity) if isinstance(identity, Identity) else None
     key = residual_key(
@@ -10419,6 +10456,31 @@ def compile_residual(
         evidence_class_notices,
         _quench_notices(reference),
     )
+    validation_notices: list[Notice] = []
+    for observation_id in dict.fromkeys(
+        (source_reference.observation_id, lineage_observation_id)
+    ):
+        if observation_id is None:
+            continue
+        issues = context.hard_issues_by_observation.get(observation_id, ())
+        if not issues:
+            continue
+        issue_codes = set()
+        for issue in issues:
+            location = observation_issue_location(issue.path)
+            field = "" if location is None else location[1]
+            issue_codes.add(
+                issue.reason.value if not field else f"{issue.reason.value}:{field}"
+            )
+        validation_notices.append(
+            Notice(
+                kind=NoticeKind.VALIDATION_HARD_ISSUE_LABEL,
+                affected_quantities=() if quantity is None else (quantity,),
+                reason="hard_validation_issue:" + ",".join(sorted(issue_codes)),
+                origin=observation_id,
+            )
+        )
+    notices = union_notices(notices, tuple(validation_notices))
     comparison_ids = comparison_ids or {reference.observation_id}
 
     def _refused(
@@ -10463,6 +10525,14 @@ def compile_residual(
                 quench_state=_residual_quench_state(reference),
             ),
             candidate,
+        )
+
+    if _is_quantity_not_predicted(quantity):
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            _quantity_not_predicted_detail(quantity),
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            exclusions=("status_match_or_mismatch",),
         )
 
     if (
@@ -11481,6 +11551,35 @@ def load_score_context(
     else:
         works, experiments, observations = load_migrated_store(root, sources=sources)
     benches = load_migrated_benches(root)
+    validation_observations = observations
+    if sources is not None:
+        referenced_ids: set[str] = set()
+        for observation in observations.values():
+            referenced_ids.update(observation.derived_from or ())
+            if observation.derivation is not None:
+                referenced_ids.update(observation.derivation.inputs)
+            if observation.admission.superseded_by is not None:
+                referenced_ids.add(observation.admission.superseded_by)
+        unresolved_reference_ids = referenced_ids.difference(observations).difference(
+            _asset_ids(works)
+        )
+        if unresolved_reference_ids:
+            _, _, all_observations = load_migrated_store(root)
+            validation_observations = {
+                **observations,
+                **{
+                    observation_id: all_observations[observation_id]
+                    for observation_id in unresolved_reference_ids
+                    if observation_id in all_observations
+                },
+            }
+    validation = validate_corpus(
+        works,
+        experiments,
+        validation_observations,
+        benches=benches,
+        context_rows=load_migrated_context(root),
+    )
     origins: dict[str, str] = {}
     extract_review: dict[str, str | None] = {}
     literature = root / "data" / "literature"
@@ -11529,6 +11628,7 @@ def load_score_context(
         hostname=socket.gethostname(),
         benches=benches,
         root=root,
+        hard_issues_by_observation=validation.hard_issues_by_observation,
     )
 
 
@@ -11626,7 +11726,11 @@ def _refusal_diagnostic_references(context: ScoreContext) -> tuple[Observation, 
             and obs.value.kind is ValueKind.UNAVAILABLE
             and rail_for_quantity(
                 quantity_token(obs.identity),
-                species_formula=obs.identity.species.formula,
+                species_formula=(
+                    obs.identity.species.formula
+                    if obs.identity.species is not None
+                    else None
+                ),
             ) is not None
         )
         if (
@@ -11699,7 +11803,12 @@ def _score_store_with_decisions(
         kept: list[Observation] = []
         for obs in refs:
             quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
-            formula = obs.identity.species.formula if isinstance(obs.identity, Identity) else ""
+            formula = (
+                obs.identity.species.formula
+                if isinstance(obs.identity, Identity)
+                and obs.identity.species is not None
+                else ""
+            )
             if rail_for_quantity(quantity, species_formula=formula) is rail:
                 kept.append(obs)
         refs = kept
@@ -12568,11 +12677,14 @@ def _e15_axis_component(observation: Observation, series: str) -> str | None:
         return "SiO2"
     if "_pO_prime_" in series:
         return "Al2O3"
-    if observation.identity.species.formula in {"Ca", "CaO"}:
+    species = observation.identity.species
+    if species is None:
+        return None
+    if species.formula in {"Ca", "CaO"}:
         return "CaO"
-    if observation.identity.species.formula in {"SiO", "SiO2"}:
+    if species.formula in {"SiO", "SiO2"}:
         return "SiO2"
-    if observation.identity.species.formula in {"Al", "AlO", "Al2O3", "O"}:
+    if species.formula in {"Al", "AlO", "Al2O3", "O"}:
         return "Al2O3" if "_pO_" not in series else "CaO"
     return None
 
@@ -12835,6 +12947,7 @@ def _e15_condensed_phase(observation: Observation) -> str | None:
     if (
         observation.source_id == "kems-053-stolyarova-1991"
         and isinstance(identity, Identity)
+        and identity.species is not None
         and identity.species.formula == "SiO2"
     ):
         return "cr"
@@ -15232,7 +15345,11 @@ def candidate_rail_census(
     for obs in comparison_candidates(context):
         identity = obs.identity
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-        formula = identity.species.formula if isinstance(identity, Identity) else ""
+        formula = (
+            identity.species.formula
+            if isinstance(identity, Identity) and identity.species is not None
+            else ""
+        )
         rail = rail_for_quantity(quantity, species_formula=formula)
         if rail is None:
             reason = no_headline_rail_reason(quantity, species_formula=formula)
@@ -16862,6 +16979,7 @@ class _ScorePayloadAccumulator:
                 formula = (
                     observation.identity.species.formula
                     if isinstance(observation.identity, Identity)
+                    and observation.identity.species is not None
                     else ""
                 )
                 headline_rail = rail_for_quantity(token, species_formula=formula)
