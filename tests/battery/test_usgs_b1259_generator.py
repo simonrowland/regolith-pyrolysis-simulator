@@ -287,6 +287,19 @@ def test_formation_references_follow_b1259_temperature_schedules() -> None:
     )
 
 
+def test_element_reference_state_observations_follow_temperature_schedule() -> None:
+    generated = _generation("b1259-ht-0025-potassium-reference-state")
+    potassium = _observations_for(
+        generated, Quantity.S, temperature="1000", formula="K"
+    )
+    assert len(potassium) == 1
+
+    reference = generator._element_reference_species("K", Decimal("1000"))
+    assert reference is not None
+    expected_species, _atoms = reference
+    assert potassium[0].identity.species == expected_species
+
+
 def test_reference_schedule_transition_rows_match_b1259_tables() -> None:
     expectations = (
         ("Ba", "643", "648", Phase.CR, Polymorph.BETA),
