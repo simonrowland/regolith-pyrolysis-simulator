@@ -15,9 +15,30 @@ ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/seto-2010-na2o-activity-glass-emf-summary.yaml"
 SID = "seto-2010-na2o-activity-glass-emf-summary"
 _PINS = {
+    "seto_2010_table1_r1_sls_1473k": (
+        "RT_ln_a_Na2O_kJ_mol_as_printed", "-263.9"
+    ),
     "seto_2010_table1_r2_sls_1473k": ("RT_ln_a_Na2O_kJ_mol_as_printed", "-263.0"),
     "seto_2010_table2_r2_als_1473k": ("log10_a_Na2O_as_printed", "-7.98"),
     "seto_2010_table2_r3_als_1473k": ("RT_ln_a_Na2O_kJ_mol_as_printed", "-216.6"),
+}
+_TABLE_1_ROWS = {
+    "seto_2010_table1_r1_sls_1473k": {
+        "composition_as_printed": "84SiO2-16Na2O-0CaO (mol%)",
+        "composition_components": ["84", "16", "0"],
+        "temperature_K": "1473",
+        "RT_ln_a_Na2O_kJ_mol_as_printed": "-263.9",
+        "log10_a_Na2O_as_printed": "-9.36",
+        "reference": "[2]",
+    },
+    "seto_2010_table1_r2_sls_1473k": {
+        "composition_as_printed": "74SiO2-16Na2O-10CaO (mol%)",
+        "composition_components": ["74", "16", "10"],
+        "temperature_K": "1473",
+        "RT_ln_a_Na2O_kJ_mol_as_printed": "-263.0",
+        "log10_a_Na2O_as_printed": "-9.33",
+        "reference": "This study",
+    },
 }
 
 
@@ -28,6 +49,27 @@ def _assert_page_2_pins(document: dict) -> None:
     }
     for observation_id, (field, expected) in _PINS.items():
         assert observations[observation_id]["values"][field] == expected
+    for observation_id, expected in _TABLE_1_ROWS.items():
+        row = observations[observation_id]
+        assert row["T_K"] == expected["temperature_K"]
+        assert row["regime"] == "emf_cell"
+        assert "composition: mol%" in row["units"]
+        assert row["values"]["composition_as_printed"] == expected["composition_as_printed"]
+        composition = row["point_conditions"]["composition"]["state"]["value"]
+        assert composition["basis"] == "printed_mole_percent"
+        assert composition["amount_basis"] == "mole_percent"
+        assert composition["components"] == [
+            ["SiO2", expected["composition_components"][0]],
+            ["Na2O", expected["composition_components"][1]],
+            ["CaO", expected["composition_components"][2]],
+        ]
+        assert row["values"]["RT_ln_a_Na2O_kJ_mol_as_printed"] == expected[
+            "RT_ln_a_Na2O_kJ_mol_as_printed"
+        ]
+        assert row["values"]["log10_a_Na2O_as_printed"] == expected[
+            "log10_a_Na2O_as_printed"
+        ]
+        assert row["values"]["attribution"] == expected["reference"]
 
 
 def test_seto_2010_table_cells_and_row_count_match_page_2_render() -> None:
@@ -52,6 +94,10 @@ def test_seto_2010_migrates_with_printed_temperature_and_composition_only(tmp_pa
     }
 
     assert len(rows) == 5
+    assert len(result.queue) == 10
+    assert {axis for entry in result.queue for axis in entry.axes} == {
+        "reference_state", "value"
+    }
     for row in rows.values():
         assert row.identity.temperature_K.value == 1473
         # The printed composition remains in the typed-refused source rows;
@@ -61,7 +107,9 @@ def test_seto_2010_migrates_with_printed_temperature_and_composition_only(tmp_pa
         assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.fO2_Pa.is_unknown
         assert row.value.unavailable_reason
+        assert row.admission.status.value == "rejected"
     assert sum(row.value.kind.value == "unavailable" for row in rows.values()) == 5
+    assert sum(row.value.kind.value != "unavailable" for row in rows.values()) == 0
     assert dict(rows["seto_2010_table1_r2_sls_1473k"].point_conditions["composition"].state.value.components) == {
         "SiO2": Decimal("0.74"), "Na2O": Decimal("0.16"), "CaO": Decimal("0.1")
     }
@@ -75,9 +123,9 @@ def test_seto_2010_migrates_with_printed_temperature_and_composition_only(tmp_pa
 
 def test_seto_2010_source_pin_fails_if_value_is_mutated() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    document["species"]["Na2O"]["observations"][-1]["values"][
+    document["species"]["Na2O"]["observations"][0]["values"][
         "RT_ln_a_Na2O_kJ_mol_as_printed"
-    ] = "-216.7"
+    ] = "-264.0"
     try:
         _assert_page_2_pins(document)
     except AssertionError:

@@ -1,5 +1,9 @@
 source_id: seto-2010-na2o-activity-glass-emf-summary
 method: table tool unavailable: born-digital, pdftotext + image audit
+method_mapping: >-
+  The summary describes EMF measurements with a concentration cell (page 1,
+  Fig. 1 / Experimental method). All five observations carry regime emf_cell,
+  which maps to MethodToken.EMF_CELL.
 input_order:
   - text/seto-2010-na2o-activity-glass-emf-summary/pdftotext-layout.txt
   - page 2 PDF render, used only for the full-cell audit under controller ruling
@@ -52,9 +56,10 @@ evidence_classification:
     stored. No value is promoted to measured_reduced without those inputs.
   identity_composition_gap: >-
     A typed-refused activity with no numeric activity cannot enter the
-    migrator's exploded-point path, so its printed row composition remains in
-    values.points.point_conditions but cannot reach the migrated Identity.
-    Do not invent a positive activity or change the schema/migrator to avoid
-    this source-form refusal.
+    migrator's exploded-point composition binder. The printed row composition
+    is present in observation.point_conditions, but migration leaves
+    Identity.composition unknown (no composition mapped from source); this is
+    migrator bug b-1052, which is being fixed separately. Do not work around it
+    by changing the schema or migrator in this extraction task.
 figure_read_candidates:
   - Figure 2 shows other-source activity points and an inherited Sugawara et al. [2] curve; not digitized.
