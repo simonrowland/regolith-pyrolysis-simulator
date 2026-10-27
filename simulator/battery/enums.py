@@ -332,6 +332,12 @@ class Polymorph(StrEnum):
     CRISTOBALITE_HIGH = "cristobalite_high"
     CRISTOBALITE_LOW = "cristobalite_low"
     CLINOENSTATITE = "clinoenstatite"
+    # B1452 records 0274/0275, printed pp. 300–301, name aragonite.
+    ARAGONITE = "aragonite"
+    # B1452 records 0379 (printed p. 405) and 0380 (printed p. 406) name low form.
+    KALIOPHILLITE_LOW = "kaliophillite_low"
+    # B1452 record 0380-phase-02 (printed p. 406) names high form.
+    KALIOPHILLITE_HIGH = "kaliophillite_high"
     DIOPSIDE = "diopside"
     ALBITE_HIGH = "albite_high"
     SANIDINE_HIGH = "sanidine_high"
