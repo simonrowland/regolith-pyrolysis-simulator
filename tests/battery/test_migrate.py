@@ -13653,6 +13653,8 @@ def test_shaw_lms1_quoted_density_is_attributed_context(tmp_path: Path) -> None:
 def test_shaw_hkl_unavailable_points_do_not_require_derivation(
     tmp_path: Path,
 ) -> None:
+    from simulator.battery.migrate import write_report
+
     result = _migrate_real_extract(
         tmp_path, "sublimation-kinetics-2023-minerals.yaml", write=False
     )
@@ -13680,6 +13682,12 @@ def test_shaw_hkl_unavailable_points_do_not_require_derivation(
     assert result.validation is not None
     assert not any(
         issue.path in derivation_paths for issue in result.validation.hard_issues
+    )
+    report_path = tmp_path / "migration-report.md"
+    write_report(result, report_path)
+    assert (
+        "| `unavailable_missing_input:sample_area_not_printed` | 21 |"
+        in report_path.read_text(encoding="utf-8")
     )
 
 
