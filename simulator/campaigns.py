@@ -3036,46 +3036,29 @@ class CampaignManager:
                      completed_campaign_hour - acquisition_elapsed_hr, acquisition_limit_hr + process_limit_hr, 'acquisition_deadline')
                 acquisition_bound = bind('acquisition_deadline', acquisition_elapsed_hr >= acquisition_limit_hr,
                      acquisition_elapsed_hr, acquisition_limit_hr, 'acquisition_deadline')
-                if held_wall_bound:
+                if held_wall_bound or acquisition_bound:
                     diagnostic = {
                         'reason_refused': (
                             C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON
+                            if held_wall_bound
+                            else C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON
                         ),
                         'requested_window_C': requested_window_C,
                         'temperature_C': float(melt.temperature_C),
-                        'elapsed_hours': completed_campaign_hour,
-                        'completed_campaign_hour': completed_campaign_hour,
-                        'acquisition_opportunity_hr': acquisition_elapsed_hr,
-                        'acquisition_limit_hr': acquisition_limit_hr,
-                        'acquisition_limit_source': acquisition_limit_source,
-                        'process_wall_clock_limit_hr': process_limit_hr,
-                        'process_wall_clock_limit_source': (
-                            process_limit_source
-                        ),
-                    }
-                    if transport_state is not None:
-                        diagnostic['binding_transport_state'] = dict(
-                            transport_state
-                        )
-                    self._finish_endpoint(melt, predicates, clocks, legacy=diagnostic)
-                    raise CampaignC4EndpointRefusal(diagnostic)
-                if acquisition_bound:
-                    diagnostic = {
-                        'reason_refused': (
-                            C4_TARGET_WINDOW_ACQUISITION_REFUSAL_REASON
-                        ),
-                        'requested_window_C': requested_window_C,
-                        'temperature_C': float(melt.temperature_C),
-                        'elapsed_hours': acquisition_elapsed_hr,
+                        'elapsed_hours': (completed_campaign_hour if held_wall_bound
+                                          else acquisition_elapsed_hr),
                         'completed_campaign_hour': completed_campaign_hour,
                         'acquisition_opportunity_hr': acquisition_elapsed_hr,
                         'acquisition_limit_hr': acquisition_limit_hr,
                         'acquisition_limit_source': acquisition_limit_source,
                     }
-                    if transport_state is not None:
-                        diagnostic['binding_transport_state'] = dict(
-                            transport_state
+                    if held_wall_bound:
+                        diagnostic.update(
+                            process_wall_clock_limit_hr=process_limit_hr,
+                            process_wall_clock_limit_source=process_limit_source,
                         )
+                    if transport_state is not None:
+                        diagnostic['binding_transport_state'] = dict(transport_state)
                     self._finish_endpoint(melt, predicates, clocks, legacy=diagnostic)
                     raise CampaignC4EndpointRefusal(diagnostic)
                 return False
