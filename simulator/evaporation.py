@@ -2722,6 +2722,8 @@ class EvaporationMixin:
                     'provider_diagnostic': diagnostic,
                     'status': status,
                     'warnings': warnings,
+                    **({'backend_failure_disposition': 'environment'}
+                       if gate_curve_provider_timed_out(diagnostic) else {}),
                     **({'detail': diagnostic['exception_message']}
                        if diagnostic.get('exception_message') else {}),
                 },
