@@ -33,6 +33,7 @@ from simulator.optimize.physics import (
 from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
 from simulator.cost_energy import is_unavailable_quantity, unavailable_reason_of
 from simulator.core import read_high_t_melt_activity_fallback_notice
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.three_product_report import classify_products
 from simulator.diagnostics import (
@@ -1892,19 +1893,23 @@ def _tap_coating_product_summary(
         snapshots,
         hour,
     )
+    authority = _coating_authority_status(raw_by_segment, run_execution)
+    lifetime = _coating_lifetime_projection(
+        raw_by_segment,
+        campaigns_elapsed=campaigns_elapsed,
+        authority=authority,
+    )
     if not raw_by_segment:
-        authority = _coating_authority_status(raw_by_segment, run_execution)
         return MappingProxyType(
             {
                 "wall_deposit_kg_by_segment_species": MappingProxyType({}),
                 "wall_deposit_kg_by_zone_species": MappingProxyType({}),
                 "wall_deposit_remobilization_by_segment_species": MappingProxyType({}),
-                "campaigns_to_resinter": "infinite",
-                "aggregate_campaigns_to_resinter": "infinite",
-                "has_positive_qualified_fouling": False,
+                **lifetime,
                 **_furnace_lifespan_cost_summary_from_raw(
                     raw_by_segment,
                     campaigns_elapsed=campaigns_elapsed,
+                    authority=authority,
                 ),
                 **_coating_authority_summary(authority),
             }
@@ -1926,7 +1931,6 @@ def _tap_coating_product_summary(
         cumulative_deposits_kg=raw_by_segment,
         through_hour=hour,
     )
-    authority = _coating_authority_status(raw_by_segment, run_execution)
     return MappingProxyType(
         {
             "wall_deposit_kg_by_segment_species": by_segment,
@@ -1943,20 +1947,11 @@ def _tap_coating_product_summary(
                 })
                 for segment, species_map in remobilization.items()
             }),
-            "campaigns_to_resinter": _campaigns_to_resinter(
-                raw_by_segment,
-                campaigns_elapsed=campaigns_elapsed,
-            ),
-            "aggregate_campaigns_to_resinter": _aggregate_campaigns_to_resinter(
-                raw_by_segment,
-                campaigns_elapsed=campaigns_elapsed,
-            ),
-            "has_positive_qualified_fouling": _has_positive_wall_deposit(
-                raw_by_segment
-            ),
+            **lifetime,
             **_furnace_lifespan_cost_summary_from_raw(
                 raw_by_segment,
                 campaigns_elapsed=campaigns_elapsed,
+                authority=authority,
             ),
             **_coating_authority_summary(authority),
         }
@@ -3442,10 +3437,14 @@ def furnace_amortization_cost_per_run(
     multiplier: float,
     min_fouling_penalty: float,
     *,
-    has_positive_fouling: bool,
+    has_positive_fouling: bool | None,
 ) -> float:
     """Price one run's share of the furnace lifetime."""
 
+    if has_positive_fouling is None:
+        raise ObjectiveComputationError(
+            "furnace amortization is unavailable with a refused wall-deposit figure"
+        )
     if not has_positive_fouling:
         return 0.0
     campaigns = _normalize_campaigns_to_resinter(campaigns_to_resinter)
@@ -3631,7 +3630,12 @@ def product_summary(
     high_t_activity = read_high_t_melt_activity_fallback_notice(sim)
     if high_t_activity:
         summary["high_t_melt_activity_fallback_notice"] = high_t_activity
-    summary.update(_coating_product_summary(run_execution))
+    summary.update(
+        _coating_product_summary(
+            run_execution,
+            coating_margin=coating_margin,
+        )
+    )
     # Unavailability comes from the gate verdict. Authority prose, including
     # an extrapolated-quantity sentence next to a '=refused' carrier token,
     # must not reclassify a clear or violated verdict.
@@ -3665,13 +3669,14 @@ def product_summary(
                     getattr(coating_margin, "status_reason", "") or ""
                 )
     coating_status = str(summary.get("coating_status", ""))
-    lifetime, has_positive_fouling = _selection_coating_lifetime(
-        coating_margin,
-        fallback_campaigns=summary.get("campaigns_to_resinter", math.inf),
-        fallback_positive=bool(summary.get("has_positive_qualified_fouling", False)),
+    lifetime = summary.get(
+        "campaigns_to_resinter_worst_segment",
+        summary.get("campaigns_to_resinter", math.inf),
     )
+    has_positive_fouling = summary.get("has_positive_qualified_fouling", False)
     summary["campaigns_to_resinter_worst_segment"] = lifetime
     summary["has_positive_qualified_fouling"] = has_positive_fouling
+    refusal = summary.get("wall_deposit_refusal")
     if cost_parameters is not None:
         summary.update(
             _furnace_amortization_summary(
@@ -3681,6 +3686,7 @@ def product_summary(
                 cost_parameters=cost_parameters,
                 coating_status=coating_status,
                 coating_status_reason=str(summary.get("coating_status_reason", "")),
+                refusal=refusal,
             )
         )
     return MappingProxyType(summary)
@@ -3726,50 +3732,24 @@ def _rump_expectation_notice(sim: Any) -> Mapping[str, Any] | None:
     return dict(notice)
 
 
-def _selection_coating_lifetime(
-    coating_margin: Any,
-    *,
-    fallback_campaigns: Any,
-    fallback_positive: bool,
-) -> tuple[Any, bool]:
-    payload = getattr(coating_margin, "status_payload", {}) or {}
-    if (
-        str(getattr(coating_margin, "status", "")) == "unavailable"
-        or (
-            isinstance(payload, Mapping)
-            and payload.get("coating_verdict") == "unavailable"
-        )
-    ):
-        return fallback_campaigns, False
-    if not isinstance(payload, Mapping):
-        return fallback_campaigns, fallback_positive
-    if payload.get("coating_constraint_mode") == "no_unqualified_deposition":
-        return fallback_campaigns, fallback_positive
-    if "campaigns_to_resinter_worst_segment" not in payload:
-        return fallback_campaigns, fallback_positive
-    campaigns = payload["campaigns_to_resinter_worst_segment"]
-    rate = payload.get("wall_deposit_kg_per_campaign")
-    if isinstance(rate, bool) or not isinstance(rate, int | float):
-        raise ObjectiveComputationError(
-            "qualified coating lifetime missing numeric wall_deposit_kg_per_campaign"
-        )
-    numeric_rate = float(rate)
-    if not math.isfinite(numeric_rate) or numeric_rate < 0.0:
-        raise ObjectiveComputationError(
-            "qualified coating deposition rate must be finite and non-negative"
-        )
-    return campaigns, numeric_rate > 0.0
-
-
 def _furnace_amortization_summary(
     sim: Any,
     campaigns_to_resinter: Any,
     *,
-    has_positive_fouling: bool,
+    has_positive_fouling: bool | None,
     cost_parameters: Mapping[str, Any] | CostParameters | None,
     coating_status: str | None = None,
     coating_status_reason: str = "",
+    refusal: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
+    if has_positive_fouling is None or refusal is not None:
+        payload = {
+            "furnace_amortization_status": "batch_cost_unavailable",
+            "furnace_amortization_batch_cost_equivalents": None,
+        }
+        if refusal is not None:
+            payload["wall_deposit_refusal"] = refusal
+        return MappingProxyType(payload)
     if coating_status == "unavailable":
         return MappingProxyType({
             "furnace_amortization_status": "unavailable",
@@ -3887,7 +3867,11 @@ def _extraction_constraints_from_profile(profile: Mapping[str, Any]) -> PhysicsC
     return replace(base, **updates) if updates else base
 
 
-def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
+def _coating_product_summary(
+    run_execution: Any,
+    *,
+    coating_margin: Any = None,
+) -> Mapping[str, Any]:
     trace = getattr(run_execution, "trace", None)
     if trace is None:
         return MappingProxyType({})
@@ -3921,6 +3905,13 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
         cumulative_deposits_kg=known_by_segment,
     )
     authority = _coating_authority_status(raw_by_segment, run_execution)
+    campaigns_elapsed = _campaigns_elapsed(run_execution)
+    lifetime = _coating_lifetime_projection(
+        raw_by_segment,
+        campaigns_elapsed=campaigns_elapsed,
+        authority=authority,
+        coating_margin=coating_margin,
+    )
     return MappingProxyType({
         "wall_deposit_kg_by_segment_species": by_segment,
         "wall_deposit_kg_by_zone_species": MappingProxyType({
@@ -3934,20 +3925,12 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
             })
             for segment, species_map in remobilization.items()
         }),
-        "campaigns_to_resinter": _campaigns_to_resinter(
-            known_by_segment,
-            campaigns_elapsed=_campaigns_elapsed(run_execution),
-        ),
-        "aggregate_campaigns_to_resinter": _aggregate_campaigns_to_resinter(
-            known_by_segment,
-            campaigns_elapsed=_campaigns_elapsed(run_execution),
-        ),
-        "has_positive_qualified_fouling": _has_positive_wall_deposit(
-            known_by_segment
-        ),
+        **lifetime,
         **_furnace_lifespan_cost_summary_from_raw(
-            known_by_segment,
-            campaigns_elapsed=_campaigns_elapsed(run_execution),
+            raw_by_segment,
+            campaigns_elapsed=campaigns_elapsed,
+            authority=authority,
+            coating_margin=coating_margin,
         ),
         **_coating_authority_summary(authority),
     })
@@ -4303,43 +4286,119 @@ def _campaigns_to_resinter(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
     *,
     campaigns_elapsed: float = 1.0,
-) -> float | str:
-    elapsed = _finite_float(campaigns_elapsed, "campaigns_elapsed")
-    if elapsed <= 0.0:
-        raise ObjectiveComputationError("campaigns_elapsed must be positive")
-    by_segment = _wall_deposit_by_segment_species_summary(
-        wall_deposit_by_segment_species
-    )
-    segment_loads_kg_per_campaign = [
-        sum(species_kg.values()) / elapsed
-        for species_kg in by_segment.values()
-        if sum(species_kg.values()) > 0.0
-    ]
-    if not segment_loads_kg_per_campaign:
-        return "infinite"
-    controlling_load_kg_per_campaign = max(segment_loads_kg_per_campaign)
-    threshold = _wall_resinter_threshold_kg()
-    if threshold is None:
-        return _ungrounded_campaigns_to_resinter(controlling_load_kg_per_campaign)
-    return threshold / controlling_load_kg_per_campaign
+) -> float | str | None:
+    return _coating_lifetime_projection(
+        wall_deposit_by_segment_species,
+        campaigns_elapsed=campaigns_elapsed,
+    )["campaigns_to_resinter"]
 
 
 def _aggregate_campaigns_to_resinter(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
     *,
     campaigns_elapsed: float = 1.0,
-) -> float | str:
-    by_species = _wall_deposit_by_species_summary(wall_deposit_by_segment_species)
-    if not by_species:
-        return "infinite"
+) -> float | str | None:
+    return _coating_lifetime_projection(
+        wall_deposit_by_segment_species,
+        campaigns_elapsed=campaigns_elapsed,
+    )["aggregate_campaigns_to_resinter"]
+
+
+def _coating_lifetime_projection(
+    wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
+    *,
+    campaigns_elapsed: float = 1.0,
+    authority: Mapping[str, Any] | None = None,
+    coating_margin: Any = None,
+) -> Mapping[str, Any]:
+    """Project coating lifetimes once, preserving a refused deposit as unavailable."""
+
     elapsed = _finite_float(campaigns_elapsed, "campaigns_elapsed")
     if elapsed <= 0.0:
         raise ObjectiveComputationError("campaigns_elapsed must be positive")
-    aggregate_load_kg_per_campaign = sum(by_species.values()) / elapsed
-    threshold = _wall_resinter_threshold_kg()
-    if threshold is None:
-        return _ungrounded_campaigns_to_resinter(aggregate_load_kg_per_campaign)
-    return threshold / aggregate_load_kg_per_campaign
+    by_segment = _wall_deposit_by_segment_species_summary(
+        wall_deposit_by_segment_species
+    )
+    segment_loads = [
+        sum(species_kg.values()) / elapsed
+        for species_kg in by_segment.values()
+        if sum(species_kg.values()) > 0.0
+    ]
+    by_species = _wall_deposit_by_species_summary(
+        wall_deposit_by_segment_species
+    )
+    aggregate_load = sum(by_species.values()) / elapsed
+    if not segment_loads:
+        campaigns_to_resinter: float | str = "infinite"
+        aggregate_campaigns_to_resinter: float | str = "infinite"
+    else:
+        threshold = _wall_resinter_threshold_kg()
+        controlling_load = max(segment_loads)
+        campaigns_to_resinter = (
+            _ungrounded_campaigns_to_resinter(controlling_load)
+            if threshold is None
+            else threshold / controlling_load
+        )
+        aggregate_campaigns_to_resinter = (
+            "infinite"
+            if aggregate_load <= 0.0
+            else (
+                _ungrounded_campaigns_to_resinter(aggregate_load)
+                if threshold is None
+                else threshold / aggregate_load
+            )
+        )
+
+    lifetime = campaigns_to_resinter
+    has_positive_fouling: bool | None = _has_positive_wall_deposit(
+        wall_deposit_by_segment_species
+    )
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=has_positive_fouling,
+        authority=authority,
+    )
+    unavailable = availability.status == "refused"
+    payload = getattr(coating_margin, "status_payload", {}) or {}
+    if isinstance(payload, Mapping) and payload.get(
+        "coating_constraint_mode"
+    ) != "no_unqualified_deposition":
+        if "campaigns_to_resinter_worst_segment" in payload:
+            rate = payload.get("wall_deposit_kg_per_campaign")
+            raw_lifetime = payload["campaigns_to_resinter_worst_segment"]
+            if raw_lifetime is None or rate is None:
+                unavailable = True
+            else:
+                if isinstance(rate, bool) or not isinstance(rate, int | float):
+                    raise ObjectiveComputationError(
+                        "qualified coating lifetime rate must be numeric or null"
+                    )
+                numeric_rate = float(rate)
+                if not math.isfinite(numeric_rate) or numeric_rate < 0.0:
+                    raise ObjectiveComputationError(
+                        "qualified coating deposition rate must be finite and non-negative"
+                    )
+                lifetime = raw_lifetime
+                has_positive_fouling = numeric_rate > 0.0
+        elif (
+            "wall_deposit_kg_per_campaign" in payload
+            and payload["wall_deposit_kg_per_campaign"] is None
+        ):
+            unavailable = True
+
+    if unavailable:
+        campaigns_to_resinter = None
+        aggregate_campaigns_to_resinter = None
+        lifetime = None
+        has_positive_fouling = None
+    result = {
+        "campaigns_to_resinter": campaigns_to_resinter,
+        "aggregate_campaigns_to_resinter": aggregate_campaigns_to_resinter,
+        "campaigns_to_resinter_worst_segment": lifetime,
+        "has_positive_qualified_fouling": has_positive_fouling,
+    }
+    if availability.refusal is not None:
+        result["wall_deposit_refusal"] = availability.refusal
+    return MappingProxyType(result)
 
 
 def _campaigns_elapsed(run_execution: Any) -> float:
@@ -4414,6 +4473,7 @@ def _furnace_lifespan_cost_summary(
         campaigns_elapsed=(
             _campaigns_elapsed(run_execution) if run_execution is not None else 1.0
         ),
+        authority=_coating_authority_status(raw, run_execution),
     )
 
 
@@ -4421,6 +4481,8 @@ def _furnace_lifespan_cost_summary_from_raw(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
     *,
     campaigns_elapsed: float = 1.0,
+    authority: Mapping[str, Any] | None = None,
+    coating_margin: Any = None,
 ) -> Mapping[str, Any]:
     elapsed = _finite_float(campaigns_elapsed, "campaigns_elapsed")
     if elapsed <= 0.0:
@@ -4435,22 +4497,53 @@ def _furnace_lifespan_cost_summary_from_raw(
     })
     total_wall_load_kg = cumulative_total_wall_load_kg / elapsed
     threshold = _wall_resinter_threshold_kg()
+    if threshold is not None and threshold <= 0.0:
+        raise ObjectiveComputationError("resinter_threshold_kg must be positive")
+    lifetime = _coating_lifetime_projection(
+        wall_deposit_by_segment_species,
+        campaigns_elapsed=elapsed,
+        authority=authority,
+        coating_margin=coating_margin,
+    )
+    wall_deposit_unavailable = (
+        lifetime["has_positive_qualified_fouling"] is None
+    )
     summary: dict[str, Any] = {
         "furnace_lifespan_consumed_fraction": None,
-        "lifespan_cost_status": "threshold_unavailable",
+        "lifespan_cost_status": (
+            "wall_deposit_unavailable"
+            if wall_deposit_unavailable
+            else "threshold_unavailable"
+        ),
         "lifespan_cost_status_reason": (
-            "resinter_threshold_kg is null; furnace lifespan cost is not priced"
+            str(authority.get("message", "wall deposit is unavailable"))
+            if wall_deposit_unavailable and isinstance(authority, Mapping)
+            else (
+                "wall deposit is unavailable"
+                if wall_deposit_unavailable
+                else "resinter_threshold_kg is null; furnace lifespan cost is not priced"
+            )
         ),
         "resinter_threshold_kg": threshold,
-        "wall_deposit_total_kg": total_wall_load_kg,
-        "wall_deposit_kg_by_species": by_species,
-        "wall_deposit_cumulative_total_kg": cumulative_total_wall_load_kg,
-        "wall_deposit_cumulative_kg_by_species": cumulative_by_species,
+        "wall_deposit_total_kg": (
+            None if wall_deposit_unavailable else total_wall_load_kg
+        ),
+        "wall_deposit_kg_by_species": (
+            None if wall_deposit_unavailable else by_species
+        ),
+        "wall_deposit_cumulative_total_kg": (
+            None if wall_deposit_unavailable else cumulative_total_wall_load_kg
+        ),
+        "wall_deposit_cumulative_kg_by_species": (
+            None if wall_deposit_unavailable else cumulative_by_species
+        ),
     }
+    if lifetime.get("wall_deposit_refusal") is not None:
+        summary["wall_deposit_refusal"] = lifetime["wall_deposit_refusal"]
+    if wall_deposit_unavailable:
+        return MappingProxyType(summary)
     if threshold is None:
         return MappingProxyType(summary)
-    if threshold <= 0.0:
-        raise ObjectiveComputationError("resinter_threshold_kg must be positive")
     summary["furnace_lifespan_consumed_fraction"] = total_wall_load_kg / threshold
     summary["lifespan_cost_status"] = "available"
     summary["lifespan_cost_status_reason"] = ""
@@ -4752,10 +4845,15 @@ def _marginal_extraction_cost_summary(
     # Marginal extraction cost = variable energy + reagent replacement loss +
     # per-run furnace depreciation. Capital purchase and launch costs are not
     # included in this run-local objective.
+    depreciation_usd = depreciation["depreciation_expense_per_run_usd"]
     total = (
-        energy_cost_usd
-        + float(reagent["reagent_cost_usd"])
-        + float(depreciation["depreciation_expense_per_run_usd"])
+        None
+        if depreciation_usd is None
+        else (
+            energy_cost_usd
+            + float(reagent["reagent_cost_usd"])
+            + float(depreciation_usd)
+        )
     )
     return MappingProxyType({
         "schema_version": "optimizer-marginal-cost-v1",
@@ -4887,18 +4985,41 @@ def _depreciation_expense_per_run_summary(
             "resinter_threshold_kg": None,
             "wall_deposit_total_kg": None,
         })
+    if summary.get("lifespan_cost_status") == "wall_deposit_unavailable":
+        payload = {
+            "status": "wall_deposit_unavailable",
+            "furnace_resinter_cost_usd": cost_parameters.furnace_resinter_cost_usd,
+            "depreciation_expense_per_run_usd": None,
+            "configured_default_depreciation_expense_per_run_usd": (
+                cost_parameters.depreciation_expense_per_run
+            ),
+            "campaigns_to_resinter": None,
+            "resinter_threshold_kg": summary.get("resinter_threshold_kg"),
+            "wall_deposit_total_kg": None,
+        }
+        if summary.get("wall_deposit_refusal") is not None:
+            payload["wall_deposit_refusal"] = summary["wall_deposit_refusal"]
+        return MappingProxyType(payload)
     threshold = summary.get("resinter_threshold_kg")
     wall_load = _finite_float(summary.get("wall_deposit_total_kg", 0.0), "wall_deposit_total_kg")
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=wall_load > 0.0,
+        refusal=summary.get("wall_deposit_refusal"),
+    )
     if threshold is not None:
         threshold_kg = _finite_float(threshold, "resinter_threshold_kg")
         if threshold_kg <= 0.0:
             raise ObjectiveComputationError("resinter_threshold_kg must be positive")
-        if wall_load <= 0.0:
+        if availability.status == "measured_empty":
             campaigns_to_resinter = None
             depreciation = 0.0
             status = "no_wall_deposit"
         else:
             campaigns_to_resinter = threshold_kg / wall_load
+            if campaigns_to_resinter <= 0.0:
+                raise ObjectiveComputationError(
+                    "aggregate campaigns_to_resinter must be positive"
+                )
             # Unit check: USD/resinter / runs/resinter = USD/run.
             depreciation = cost_parameters.furnace_resinter_cost_usd / campaigns_to_resinter
             status = "campaigns_to_resinter"

@@ -27,6 +27,7 @@ from simulator.diagnostics import (
     _carrier_is_inapplicable,
     wall_deposit_sticking_authority_status,
 )
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.trace import WALL_DEPOSIT_ZONE_NAMES
 
@@ -814,6 +815,56 @@ class PhysicsConstraintSet:
                 output_status=output_status,
                 status_reason=status_reason,
             )
+        raw_wall_rate = report.get("wall_deposit_kg_per_campaign")
+        if (
+            "wall_deposit_kg_per_campaign" in report
+            and raw_wall_rate is None
+            and report.get("unqualified_deposition_rate_kg_per_campaign") is None
+        ):
+            availability = wall_deposit_figure_availability(
+                has_positive_deposit=False,
+                authority=authority_payload,
+                refusal=(
+                    report.get("refusal")
+                    if isinstance(report.get("refusal"), Mapping)
+                    else None
+                ),
+                measured=False,
+            )
+            if availability.status == "refused":
+                unavailable_reason = (
+                    status_reason
+                    or str(
+                        (availability.refusal or {}).get("reason")
+                        or "wall-deposit quantity unavailable"
+                    )
+                )
+                status_payload = {
+                    **report,
+                    "constraint_mode": "continuous",
+                    "coating_verdict": "unavailable",
+                    "coating_unavailable_reason": unavailable_reason,
+                }
+                if threshold_is_unqualified:
+                    status_payload.update(
+                        coating_constraint_mode="no_unqualified_deposition",
+                        coating_constraint_authoritative=False,
+                    )
+                if availability.refusal is not None:
+                    status_payload["wall_deposit_refusal"] = availability.refusal
+                return GateMargin(
+                    gate="coating",
+                    feasible=False,
+                    margin=-math.inf,
+                    threshold=self.coating_min_campaigns_to_resinter,
+                    observed=None,
+                    detail=f"coating unavailable: {unavailable_reason}",
+                    status="unavailable",
+                    authoritative=False,
+                    output_status=output_status,
+                    status_reason=unavailable_reason,
+                    status_payload=status_payload,
+                )
         warning_flags = _coating_dew_point_warnings(
             diagnostics,
             authority_payload,

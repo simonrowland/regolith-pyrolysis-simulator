@@ -476,10 +476,14 @@ def test_runner_fouling_report_non_authoritative_is_unconstrained_and_surfaced()
     assert "resinter threshold is not grounded" in coating.detail
 
 
-@pytest.mark.parametrize("nominal_load", [0.0, 0.1])
+@pytest.mark.parametrize(
+    "nominal_load",
+    [0.0, 0.1, None],
+    ids=["measured-zero", "positive-rate", "unavailable-rate"],
+)
 @pytest.mark.parametrize("output_status", ["status_bearing", "non-authoritative-threshold"])
 def test_null_threshold_unavailable_wall_channel_is_not_an_authoritative_pass(
-    nominal_load: float, output_status: str,
+    nominal_load: float | None, output_status: str,
 ) -> None:
     from simulator.optimize.results_store import (
         _deserialize_grounding_margins, _serialize_margins,
@@ -522,6 +526,7 @@ def test_null_threshold_unavailable_wall_channel_is_not_an_authoritative_pass(
     assert coating.status == "unavailable"
     assert coating.authoritative is False
     assert coating.observed is None
+    assert coating.status_payload["wall_deposit_kg_per_campaign"] == nominal_load
     assert coating.status_payload["coating_constraint_authoritative"] is False
     assert coating.status_payload["coating_verdict"] == "unavailable"
     assert coating.status_reason == report["status_reason"]
@@ -1284,6 +1289,31 @@ def test_unconfigured_kg_limit_still_fails_authoritative_coating_gate() -> None:
     assert coating.observed == math.inf
     assert "absolute kg limit unconfigured" in coating.detail
     assert coating.status_payload["coating_verdict"] == "violated"
+
+
+def test_wall_pressure_refusal_without_deposit_is_unavailable_for_direct_gate() -> None:
+    trace = _trace(
+        condensed=({(3, "SiO"): 20.0},),
+        wall=({},),
+        wall_deposit_sticking_authority={
+            "wall_saturation_pressure_refusals_by_species": {
+                "SiO": {
+                    "hot_wall": {
+                        "status": "refused",
+                        "output_status": "status_bearing",
+                    }
+                }
+            }
+        },
+    )
+
+    coating = PhysicsConstraintSet().coating(trace)
+
+    assert coating.feasible
+    assert coating.status == "unavailable"
+    assert coating.authoritative is False
+    assert coating.observed is None
+    assert math.isinf(coating.margin)
 
 
 def test_coating_and_segment_allowable_readout_reports_small_wall_deposit_margin() -> None:

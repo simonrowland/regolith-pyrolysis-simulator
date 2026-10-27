@@ -11,7 +11,7 @@ from simulator.optimize import study
 import simulator.optimize.objective as objective_module
 from scripts import sso_r_validation_map as validation_map
 from simulator.cost_parameters import CostParameters
-from simulator.optimize.evaluate import RunReference, ScoredResult
+from simulator.optimize.evaluate import RunReference, ScoredResult, _run_reference
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
@@ -61,6 +61,23 @@ def _available_furnace_summary(penalty: float) -> dict[str, float | str]:
         "furnace_amortization_status": "available",
         "furnace_amortization_batch_cost_equivalents": penalty,
     }
+
+
+def _furnace_test_cost_parameters() -> CostParameters:
+    return CostParameters(
+        electricity_cost_per_kWh=1.0,
+        furnace_resinter_cost_usd=1.0,
+        depreciation_expense_per_run=1.0,
+        generic_reagent_cost_per_kg=1.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 1.0,
+            "K": 1.0,
+            "Mg": 1.0,
+            "Ca": 1.0,
+        },
+        furnace_lifetime_cost_multiplier=500.0,
+        min_fouling_penalty=1.0,
+    )
 
 
 def test_dominates_requires_strict_improvement() -> None:
@@ -761,7 +778,13 @@ def test_multisegment_lifespan_and_economics_normalize_cumulative_campaign_load(
         cost_parameters=cost_parameters,
     )
     assert depreciation["campaigns_to_resinter"] == pytest.approx(10.0 / 2.2)
+    assert depreciation["campaigns_to_resinter"].hex() == (
+        "0x1.22e8ba2e8ba2ep+2"
+    )
     assert depreciation["depreciation_expense_per_run_usd"] == pytest.approx(22.0)
+    assert depreciation["depreciation_expense_per_run_usd"].hex() == (
+        "0x1.6000000000001p+4"
+    )
 
 
 def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() -> None:
@@ -984,18 +1007,17 @@ def test_furnace_amortization_cost_trades_continuously_against_yield() -> None:
     ) == 0.0
     assert objective_module._has_positive_wall_deposit({("wall", "SiO"): 1e-30})
     assert not objective_module._has_positive_wall_deposit({("wall", "SiO"): 0.0})
-    lifetime, positive = objective_module._selection_coating_lifetime(
-        SimpleNamespace(
+    lifetime = objective_module._coating_lifetime_projection(
+        {},
+        coating_margin=SimpleNamespace(
             status_payload={
                 "campaigns_to_resinter_worst_segment": 1e30,
                 "wall_deposit_kg_per_campaign": 1e-30,
             }
         ),
-        fallback_campaigns="infinite",
-        fallback_positive=False,
     )
-    assert lifetime == pytest.approx(1e30)
-    assert positive is True
+    assert lifetime["campaigns_to_resinter_worst_segment"] == pytest.approx(1e30)
+    assert lifetime["has_positive_qualified_fouling"] is True
 
     params = CostParameters(
         electricity_cost_per_kWh=1.0,
@@ -1165,6 +1187,143 @@ def test_refused_wall_evidence_is_unavailable_not_zero_cost() -> None:
             DEFINITIONS,
             product_summary=summary,
         )
+
+
+def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> None:
+    run_execution = _refused_empty_wall_deposit_execution()
+    reference = _run_reference(
+        run_execution,
+        {},
+        cost_parameters=_furnace_test_cost_parameters(),
+    )
+    summary = reference.product_summary
+
+    assert summary["campaigns_to_resinter"] is None
+    assert summary["aggregate_campaigns_to_resinter"] is None
+    assert summary["campaigns_to_resinter_worst_segment"] is None
+    assert summary["has_positive_qualified_fouling"] is None
+    assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
+    assert "furnace_amortization_cost_per_run_usd" not in summary
+    assert summary["furnace_amortization_batch_cost_equivalents"] is None
+    with pytest.raises(ObjectiveComputationError, match="batch_cost_unavailable"):
+        cost_adjusted_objective_scores(
+            {"oxygen_kg": 10.0, "energy_kWh": 1.0},
+            DEFINITIONS,
+            product_summary=summary,
+        )
+
+    refused_record = SimpleNamespace(
+        candidate_id="refused",
+        cache_key="refused",
+        objectives={"oxygen_kg": 10.0, "energy_kWh": 1.0},
+        product_summary=summary,
+    )
+    clean_record = SimpleNamespace(
+        candidate_id="clean",
+        cache_key="clean",
+        objectives={"oxygen_kg": 1.0, "energy_kWh": 1.0},
+        product_summary=_available_furnace_summary(0.0),
+    )
+    assert study._record_objective_scores(refused_record, DEFINITIONS) == (
+        None,
+        None,
+    )
+    assert study._rank_key(refused_record, DEFINITIONS) > study._rank_key(
+        clean_record,
+        DEFINITIONS,
+    )
+
+
+def test_finite_threshold_null_coating_rate_stays_unavailable_in_run_reference() -> None:
+    reference = _run_reference(
+        _refused_empty_wall_deposit_execution(),
+        {},
+        cost_parameters=_furnace_test_cost_parameters(),
+        coating_margin=SimpleNamespace(
+            status_payload={
+                "campaigns_to_resinter_worst_segment": None,
+                "wall_deposit_kg_per_campaign": None,
+                "resinter_threshold_kg": 4.5,
+            }
+        ),
+    )
+
+    assert reference.product_summary["campaigns_to_resinter_worst_segment"] is None
+    assert reference.product_summary["has_positive_qualified_fouling"] is None
+    assert reference.product_summary["furnace_amortization_status"] == (
+        "batch_cost_unavailable"
+    )
+
+
+def test_finite_threshold_refused_empty_deposit_is_unavailable_for_lifespan_cost(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 4.5)
+    run_execution = _refused_empty_wall_deposit_execution()
+    sim = run_execution.simulator
+
+    summary = objective_module._furnace_lifespan_cost_summary(run_execution, sim)
+
+    assert summary["furnace_lifespan_consumed_fraction"] is None
+    assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
+    assert summary["wall_deposit_total_kg"] is None
+    assert summary["wall_deposit_cumulative_total_kg"] is None
+    assert objective_module._furnace_lifespan_consumed_fraction(
+        run_execution,
+        sim,
+    ) is None
+
+
+def test_finite_threshold_refused_empty_deposit_is_unavailable_for_depreciation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 4.5)
+    run_execution = _refused_empty_wall_deposit_execution()
+    sim = run_execution.simulator
+    sim.energy_cumulative_breakdown_kWh = {
+        "electrical": 0.0,
+        "evaporation_thermal": 0.0,
+    }
+    cost_parameters = _furnace_test_cost_parameters()
+
+    depreciation = objective_module._depreciation_expense_per_run_summary(
+        run_execution,
+        sim,
+        cost_parameters=cost_parameters,
+    )
+    marginal = objective_module._marginal_extraction_cost_summary(
+        sim,
+        objective_module._product_ledger(sim),
+        run_execution=run_execution,
+        cost_parameters=cost_parameters,
+    )
+    metric_value = _metric_value(
+        "throughput_cost_owner_ratify_usd",
+        sim,
+        objective_module._product_ledger(sim),
+        {},
+        run_execution=run_execution,
+        cost_parameters=cost_parameters,
+    )
+    reference = _run_reference(
+        run_execution,
+        {},
+        cost_parameters=cost_parameters,
+    )
+    record = SimpleNamespace(
+        objectives={"throughput_cost_owner_ratify_usd": None},
+        product_summary=reference.product_summary,
+    )
+
+    assert depreciation["depreciation_expense_per_run_usd"] is None
+    assert depreciation["status"] == "wall_deposit_unavailable"
+    assert depreciation["wall_deposit_total_kg"] is None
+    assert marginal["marginal_cost_usd"] is None
+    assert metric_value is None
+    assert study._record_objective_scores(
+        record,
+        (ObjectiveDefinition("throughput_cost_owner_ratify_usd", "minimize", "USD"),),
+    ) == (None,)
 
 
 def test_furnace_amortization_clean_recipe_skips_missing_lifetime() -> None:
@@ -1817,6 +1976,30 @@ class _FakeProductSim:
 
     def _c3_alkali_credit_outstanding_kg_by_species(self) -> dict[str, float]:
         return {}
+
+
+def _refused_empty_wall_deposit_execution() -> SimpleNamespace:
+    sim = _FakeProductSim()
+    sim.record.cost_rollup = {
+        "run_input_cost": {"owner_ratify_money_projection": 20.0}
+    }
+    return SimpleNamespace(
+        simulator=sim,
+        trace=SimpleNamespace(
+            wall_deposit_by_segment_species_kg={},
+            wall_zone_by_segment={},
+            wall_deposit_sticking_authority={
+                "wall_saturation_pressure_refusals_by_species": {
+                    "SiO": {
+                        "hot_wall": {
+                            "status": "refused",
+                            "output_status": "status_bearing",
+                        }
+                    }
+                }
+            },
+        ),
+    )
 
 
 class _FakeUnclassifiedProductSim(_FakeProductSim):
