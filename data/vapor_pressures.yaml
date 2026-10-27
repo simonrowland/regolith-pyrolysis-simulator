@@ -590,7 +590,7 @@ families:
             anchor. t-1545 did not re-fit gamma onto the JANAF standard; the anchor was
             defined against the Lamoreaux & Hildenbrand K and that frame no longer matches
             the reaction term. Stored residual_dex 0.001721 is the rounded max |log10 P
-            fit − JANAF| on the 1400-2300 K liquid grid (live max 0.00172055 at 2300 K).
+            fit - JANAF| on the 1400-2300 K liquid grid (live max 0.00172055 at 2300 K).
             Runtime consumes the coefficients, not this snapshot. Gamma temperature
             extrapolation dominates uncertainty and is UNCERTIFIED outside (1673,1673) K.
             Certifying callers must treat out-of-domain gamma as authority-limited
