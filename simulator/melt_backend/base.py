@@ -114,6 +114,147 @@ def multivalent_components(
     return tuple(sorted(set(present)))
 
 
+# alphaMELTS writes an oxide into the .melts file only when its wt% is
+# strictly above this floor (simulator/melt_backend/alphamelts.py serializer).
+# Iron the file does not carry cannot be the FeO/Fe2O3 buffer the MELTS
+# family uses to impose fO2, so the couple test and the serializer are one
+# threshold. A sum test of FeO+Fe2O3 <= 0.001 would still call
+# FeO=0.0006 plus Fe2O3=0.0006 Fe-bearing, then impose fO2 into a binary
+# that received neither oxide.
+MELTS_CARRIED_COMPONENT_MIN_WT_PCT = 0.001
+
+# Exact sentence the adapters attach when the external fO2 is applied to
+# the gas only. Battery wiring copies this text; it does not restate it.
+FO2_GAS_ONLY_NOTICE = (
+    'the engine did not resolve intrinsic fO2; '
+    'the external fO2 was imposed on the gas only.'
+)
+
+
+def imposed_absolute_fo2_without_iron_couple(
+    composition_wt_pct: Mapping[str, float],
+    *,
+    oxide_aliases: Mapping[str, str],
+    fO2_log: Optional[float],
+    redox_mode: Optional[str],
+    redox_buffer: Optional[str],
+    fo2_offset: Optional[float],
+) -> Optional[tuple[str, tuple[str, ...]]]:
+    """Classify an absolute fO2 request that the Fe redox couple cannot carry.
+
+    Premise: a MELTS-family engine imposes absolute fO2 only by moving iron
+    between FeO and Fe2O3 (2 FeO + 1/2 O2 = Fe2O3). The ferric fraction is
+    undefined when that inventory is absent, which is why ThermoEngine raises
+    ``FO2_REQUIRES_IRON`` and alphaMELTS aborts after ``log fo2 path: absolute``.
+
+    Without a redox couple the condensed equilibria have no fO2 degree of
+    freedom: the stated bulk fixes the melt. fO2 still enters gas speciation,
+    for example NaO0.5(melt) = Na(g) + 1/4 O2, so the printed absolute fO2 is
+    a gas coordinate, not a melt constraint.
+
+    Units: wt% on the normalized MELTS bulk, the same basis as the .melts
+    file and the ThermoEngine bulk vector. An iron oxide is carried only when
+    its wt% is strictly above ``MELTS_CARRIED_COMPONENT_MIN_WT_PCT`` (0.001).
+    Fe-free means no iron oxide is carried, so the carried FeO+Fe2O3 sum is 0,
+    which is below that floor.
+
+    Sanity: a CMAS melt with both iron oxides at 0 is Fe-free. A basalt with
+    about 18 wt% FeO is not. FeO = 0.001 exactly is not carried (the serializer
+    uses ``>``) and is Fe-free. FeO = 0.0010001 is Fe-bearing and stays on
+    today's imposed-fO2 path. Any other element in ``MULTIVALENT_MELT_ELEMENTS``
+    with a positive amount, including one below the emission floor, refuses:
+    the engine may still have a redox variable, and dropping it would be a
+    silent pass.
+
+    Returns None when today's path must stay in force: Fe is carried, the
+    request is not a finite absolute fO2, a named buffer or an fO2 offset is
+    set, or redox is ``not_an_input``. Otherwise ``('gas_only', ())`` or
+    ``('other_redox', component_names)``.
+    """
+    if redox_mode == REDOX_MODE_NOT_AN_INPUT:
+        return None
+    if redox_buffer is not None or fo2_offset is not None:
+        return None
+    try:
+        requested = float(fO2_log) if fO2_log is not None else None
+    except (TypeError, ValueError):
+        return None
+    if requested is None or not math.isfinite(requested):
+        return None
+
+    fe_carried = False
+    others: list[str] = []
+    items = (
+        composition_wt_pct.items()
+        if isinstance(composition_wt_pct, Mapping)
+        else ()
+    )
+    for name, amount in items:
+        try:
+            wt_pct = float(amount)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(wt_pct) or wt_pct <= 0.0:
+            continue
+        elements = _elements_of_component(str(name), oxide_aliases)
+        if (
+            'Fe' in elements
+            and wt_pct > MELTS_CARRIED_COMPONENT_MIN_WT_PCT
+        ):
+            fe_carried = True
+        if any(
+            element != 'Fe' and element in MULTIVALENT_MELT_ELEMENTS
+            for element in elements
+        ):
+            others.append(str(name))
+    if fe_carried:
+        return None
+    if others:
+        return ('other_redox', tuple(sorted(set(others))))
+    return ('gas_only', ())
+
+
+def fo2_gas_only_diagnostic(printed_fO2_log: float) -> dict[str, Any]:
+    """Diagnostics for an external fO2 applied to the gas only."""
+    printed = float(printed_fO2_log)
+    return {
+        'fo2_gas_only': {
+            'printed_fO2_log': printed,
+            'notice': FO2_GAS_ONLY_NOTICE,
+        },
+        'fO2_transport': 'external_on_gas_only',
+    }
+
+
+def other_redox_without_iron_couple_refusal(
+    *,
+    temperature_C: float,
+    pressure_bar: float,
+    fO2_log: Optional[float],
+    components: tuple[str, ...],
+) -> 'EquilibriumResult':
+    """Typed refusal: imposed fO2, no iron couple, another redox element present."""
+    reason = OutOfDomainReason.UNSUPPORTED_INPUT.value
+    message = (
+        'imposed absolute fO2 has no iron redox couple and other '
+        'redox-active components are present: ' + ', '.join(components)
+    )
+    return EquilibriumResult(
+        temperature_C=float(temperature_C),
+        pressure_bar=float(pressure_bar),
+        fO2_log=None if fO2_log is None else float(fO2_log),
+        status='out_of_domain',
+        warnings=[message],
+        diagnostics={
+            'backend_status': 'out_of_domain',
+            'backend_status_reason': reason,
+            'backend_failure_reason_code': 'redox_active_without_iron_couple',
+            'redox_active_components': list(components),
+            'authoritative_for_requested_conditions': False,
+        },
+    )
+
+
 class RealBackendFamily(str, Enum):
     """Closed typed authority carried by explicit real-engine adapters."""
 

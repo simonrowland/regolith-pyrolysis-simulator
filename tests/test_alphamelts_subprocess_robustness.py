@@ -134,10 +134,22 @@ def test_sigsegv_alphamelts_returns_composition_and_crash_point(tmp_path):
     assert any('SIGSEGV' in warning for warning in result.warnings)
 
 
-def test_known_crashing_alkali_silica_binary_refuses_before_launch(tmp_path):
+def test_known_crashing_alkali_silica_binary_launches_without_fo2_path(tmp_path):
+    """Absolute fO2 on Na2O-SiO2 is gas-only: the binary starts with no path.
+
+    The old pre-launch crash token applied when the resolver wrote
+    ``log fo2 path``. High-SiO2 alkali is above the crash floor, so the
+    melt calculation is the unconstrained one. Empty stdout then fails
+    the parse, which is after launch.
+    """
     marker = tmp_path / 'invoked'
+    melts_copy = tmp_path / 'input.melts'
     stub = tmp_path / 'alphamelts'
-    stub.write_text(f'#!/bin/sh\nprintf invoked > "{marker}"\n')
+    stub.write_text(
+        '#!/bin/sh\n'
+        f'cp input.melts "{melts_copy}"\n'
+        f'printf invoked > "{marker}"\n'
+    )
     stub.chmod(0o755)
     backend = _backend(stub, timeout_s=1.0)
     composition = {
@@ -147,34 +159,19 @@ def test_known_crashing_alkali_silica_binary_refuses_before_launch(tmp_path):
         }
     }
 
-    result = _run(backend, composition)
+    with pytest.raises(AlphaMELTSSubprocessContractError) as caught:
+        _run(backend, composition)
 
-    assert result.status != 'out_of_domain'
-    assert result.status == 'not_converged'
-    assert result.diagnostics['backend_status_reason'] == (
+    assert marker.is_file()
+    melts_text = melts_copy.read_text(encoding='utf-8')
+    assert 'Log fO2 Path' not in melts_text
+    assert 'Log fO2 Offset' not in melts_text
+    assert 'Initial Composition: Na2O' in melts_text
+    assert 'Initial Composition: SiO2' in melts_text
+    assert caught.value.backend_status_reason == 'parse_empty_output'
+    assert caught.value.backend_status_reason != (
         ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH
     )
-    assert result.diagnostics['backend_failure_category'] == 'engine_crash'
-    assert result.diagnostics['subprocess_input_guard']['predicate'] == (
-        'fe_free_and_imposed_absolute_fo2'
-    )
-    assert result.diagnostics['subprocess_input_guard']['matching_scope'] == (
-        'two_component_na2o_or_k2o_silica_family'
-    )
-    assert result.diagnostics['subprocess_input_guard']['not_the_predicate'] == (
-        'no_Fe'
-    )
-    assert result.diagnostics['subprocess_input_guard']['active_components'] == [
-        'Na2O',
-        'SiO2',
-    ]
-    assert 'Fe-free' in result.warnings[0]
-    assert 'imposed' in result.warnings[0]
-    assert 'two-component alkali-silica' not in result.warnings[0]
-    assert result.diagnostics['out_of_domain_crash_point'][
-        'composition_mol_by_account'
-    ] == composition
-    assert not marker.exists()
 
 
 def test_real_subprocess_projection_closes_dry_alkali_silica_oxygen_balance(
@@ -478,42 +475,44 @@ def test_cao_sio2_binary_refuses_before_launch_without_imposed_fo2(tmp_path):
         ),
     ),
 )
-def test_measured_fe_free_silicate_imposed_fo2_refuses_before_launch(
+def test_measured_fe_free_silicate_absolute_fo2_launches_without_path(
     tmp_path,
     label: str,
     moles: dict[str, float],
 ):
-    """SIGSEGV when an fO2 path is imposed. Not the alkali reason.
+    """Absolute fO2 on these sets is gas-only, so no fO2 path is written.
 
     mullite: shornikov-1994 / shults-1994, 34 rows.
     cas: stolyarova-1996, 142 rows.
     hastie: kems-020, 3 rows, inside the certified T and SiO2 band.
+    A named buffer still refuses before launch; this is the absolute case.
     """
     del label
-    backend, marker = _marker_backend(tmp_path)
+    melts_copy = tmp_path / 'input.melts'
+    marker = tmp_path / 'invoked'
+    stub = tmp_path / 'alphamelts'
+    stub.write_text(
+        '#!/bin/sh\n'
+        f'cp input.melts "{melts_copy}"\n'
+        f'printf invoked > "{marker}"\n'
+    )
+    stub.chmod(0o755)
+    backend = _backend(stub, timeout_s=1.0)
 
-    result = _run(backend, _melt(moles))
+    with pytest.raises(AlphaMELTSSubprocessContractError) as caught:
+        _run(backend, _melt(moles))
 
-    assert not marker.exists()
-    assert result.status == 'not_converged'
-    reason = _crash_reason(
+    assert marker.is_file()
+    melts_text = melts_copy.read_text(encoding='utf-8')
+    assert 'Log fO2 Path' not in melts_text
+    assert 'Log fO2 Offset' not in melts_text
+    for oxide in moles:
+        assert f'Initial Composition: {oxide}' in melts_text
+    assert caught.value.backend_status_reason == 'parse_empty_output'
+    assert caught.value.backend_status_reason != _crash_reason(
         'ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH',
         _FE_FREE_SILICATE_IMPOSED_FO2_CRASH,
     )
-    assert result.diagnostics['backend_status_reason'] == reason
-    assert result.diagnostics['backend_status_reason'] != (
-        ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH
-    )
-    assert result.diagnostics['backend_failure_category'] == 'engine_crash'
-    guard = result.diagnostics['subprocess_input_guard']
-    assert guard['predicate'] == 'fe_free_silicate_and_imposed_fo2'
-    assert guard['resolved_fo2_path'] == 'Absolute'
-    assert guard['resolved_fo2_offset'] == -9.0
-    assert guard['measured_signal'] == 'SIGSEGV'
-    assert guard['not_the_predicate'] == 'no_Fe'
-    assert guard['active_components'] == sorted(moles)
-    assert sorted(moles) in guard['component_sets']
-    assert 'imposed' in result.warnings[0]
 
 
 @pytest.mark.skipif(os.name != 'posix', reason='signal contract is POSIX')
