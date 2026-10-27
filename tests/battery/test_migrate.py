@@ -696,8 +696,10 @@ def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
             )
             - 1
         ) < Decimal("1e-24")
+    # The unavailable-value exemption removes two missing-derivation issues;
+    # the separate derived_from lineage issues remain required.
     assert Counter(issue.reason.value for issue in result.validation.hard_issues) == Counter(
-        {"conditional_field": 4}
+        {"conditional_field": 2}
     )
 
     expected = {
@@ -4191,10 +4193,14 @@ def test_g08_model_derived_keeps_table_destination(tmp_path: Path) -> None:
 
 def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
-    values = extract["species"]["Na"]["observations"][0]["values"]
+    row = extract["species"]["Na"]["observations"][0]
+    row["type"] = "density"
+    row["units"] = "kg/m3"
+    values = row["values"]
+    values.clear()
+    values["quantity"] = "density"
     values["method_class"] = "model_derived"
-    values.pop("series", None)
-    values["pressure_atm"] = 1.0
+    values["density_kg_m3"] = 1.0
     values["admission_status"] = "typed_refusal"
     root = _write_min_tree(tmp_path, extract)
     result = migrate(root, write=False)
@@ -7394,7 +7400,7 @@ def test_j01_declared_quantity_refuses_area_normalized_rate_without_area() -> No
     )
     assert selection.value.kind is ValueKind.UNAVAILABLE
     assert selection.field_name == "evaporation_rate_1200C"
-    assert "unmapped evaporation rate unit" in (selection.reason or "")
+    assert selection.value.unavailable_reason == "sample_area_not_printed"
 
 
 def test_j01_declared_quantity_refuses_regolith_specific_rate_without_mass() -> None:
@@ -7405,7 +7411,7 @@ def test_j01_declared_quantity_refuses_regolith_specific_rate_without_mass() -> 
     )
     assert selection.value.kind is ValueKind.UNAVAILABLE
     assert selection.field_name == "evaporation_rate"
-    assert "unmapped evaporation rate unit" in (selection.reason or "")
+    assert selection.value.unavailable_reason == "sample_mass_not_printed"
 
 
 def test_rate_census_oracle_uses_production_unit_conversion() -> None:
@@ -7424,6 +7430,50 @@ def test_rate_census_oracle_uses_production_unit_conversion() -> None:
     ) is None
 
 
+@pytest.mark.parametrize(
+    ("quantity", "units", "field", "reason"),
+    [
+        (
+            Quantity.EVAPORATION_RATE,
+            "mol/s/m2 as printed",
+            "evaporation_rate",
+            "sample_area_not_printed",
+        ),
+        (
+            Quantity.EVAPORATION_RATE,
+            "g/h/g of regolith as printed",
+            "evaporation_rate",
+            "sample_mass_not_printed",
+        ),
+        (
+            Quantity.EVAPORATION_RATE,
+            "mol cm^-2 s^-1",
+            "evaporation_rate",
+            "exposed_area_not_printed",
+        ),
+        (
+            Quantity.EVAPORATION_RATE,
+            "m/sec for evaporation_rate; cm^-2 for densities",
+            "evaporation_rate",
+            "exposed_area_not_printed",
+        ),
+        (
+            Quantity.MASS_LOSS_RATE,
+            "as printed; Table 2 does not state the rate unit",
+            "mass_loss_rate",
+            "rate_unit_not_stated",
+        ),
+    ],
+)
+def test_rate_refusal_reason_names_the_missing_input(
+    quantity: Quantity, units: str, field: str, reason: str
+) -> None:
+    selection = select_declared_source(quantity, units, {field: "1"})
+
+    assert selection.value.kind is ValueKind.UNAVAILABLE
+    assert selection.value.unavailable_reason == reason
+
+
 def test_dacko_mass_loss_rates_without_units_migrate_as_unavailable(
     tmp_path: Path,
 ) -> None:
@@ -7439,6 +7489,9 @@ def test_dacko_mass_loss_rates_without_units_migrate_as_unavailable(
     ]
     assert len(rates) == 18
     assert all(rate.value.kind is ValueKind.UNAVAILABLE for rate in rates)
+    assert {rate.value.unavailable_reason for rate in rates} == {
+        "rate_unit_not_stated"
+    }
     assert sum(
         rate.evidence.class_.is_value
         and rate.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
@@ -7463,6 +7516,10 @@ def test_area_and_velocity_evaporation_rates_migrate_as_unavailable(
         ]
         assert len(rates) == 4, name
         assert all(rate.value.kind is ValueKind.UNAVAILABLE for rate in rates), name
+        assert all(
+            rate.value.unavailable_reason == "exposed_area_not_printed"
+            for rate in rates
+        ), name
 
 
 def test_density_source_converts_g_per_cm3_and_refuses_unknown_unit() -> None:
