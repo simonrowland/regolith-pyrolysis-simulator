@@ -2114,10 +2114,13 @@ def _solve_vapor_engine_cell_oxygen_balance(
 
     previous_root_logp: float | None = None
     max_fixed_point_iterations = 8
-    # The inner OpenIMCC solve uses Brent xtol=1e-12 dex. Require the
-    # re-anchored engine root to settle to that same resolution before its
-    # pressure map and closure diagnostics are published.
-    fixed_point_tolerance_dex = 1e-12
+    # The inner OpenIMCC solve uses Brent xtol=1e-12 dex. A re-anchored
+    # root is a second Brent solve of a nearby pressure map, so successive
+    # anchors reproduce to a few xtol rather than to xtol itself. t-1545's
+    # Na reference moves that floor to 4.51e-12 dex on the dry Na2O-K2O-SiO2
+    # fixed point at 1800 K (the step changes sign and stops shrinking).
+    # 1e-11 dex accepts that solver noise and still rejects a 1e-6 dex miss.
+    fixed_point_tolerance_dex = 1e-11
     iteration_count = max_fixed_point_iterations if fixed_point_activities else 1
     for iteration in range(1, iteration_count + 1):
         low_logp = high_logp = activity_anchor_logp
@@ -2237,11 +2240,11 @@ def _solve_vapor_engine_cell_oxygen_balance(
             )
             fresh_logp = math.log10(fresh_solution[0])
             if abs(fresh_logp - solved_logp) <= fixed_point_tolerance_dex:
-                # The refreshed solve is within Brent's xtol of this pO2.
-                # Return the pO2 where the engine cell was evaluated so the
-                # pressure and closure diagnostics stay tied to that cell.
+                # Publish the fresh root: it is the pO2 the returned pressure
+                # map was solved at. Returning the anchor pO2 instead leaves
+                # the published root 4.51e-12 dex off that map after t-1545.
                 return (
-                    solution[0],
+                    fresh_solution[0],
                     fresh_solution[1],
                     fresh_solution[2],
                     fresh_solution[3],
