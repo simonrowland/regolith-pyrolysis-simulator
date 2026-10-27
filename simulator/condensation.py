@@ -6141,10 +6141,11 @@ def _try_antoine_psat_pa(
 ) -> tuple[float | None, bool]:
     """Return a wall pressure or a named, fail-closed range refusal.
 
-    ``(None, True)`` means typed refusal — including the case where the
-    species has Antoine data somewhere but no segment covers ``T_K``
-    (``_antoine_psat_pa`` returns None without raising). Never invent a
-    pressure for that gap (b-127 fabricated 100 Pa).
+    ``(None, True)`` means typed refusal. The lower-level
+    ``_antoine_psat_pa`` may raise ``WallSaturationPressureRefusal`` for an
+    unusable fit or return ``None`` when an evaluator supplies no pressure;
+    this adapter normalizes both outcomes. Never invent a pressure for that
+    gap (b-127 fabricated 100 Pa).
     """
 
     from engines.builtin.vapor_pressure import VaporPressureRangeError

@@ -336,8 +336,8 @@ def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
     import simulator.condensation as condensation_module
 
     # Standard-reaction row with pure sidecar that poles at 1000 K → wall
-    # selector returns empty coefficients → _antoine_psat_pa returns None
-    # without raising, while _species_has_antoine_data is still True.
+    # selector returns no usable coefficients. The raw helper raises a typed
+    # refusal, while _try_antoine_psat_pa translates it to (None, True).
     vapor_data = {
         "metals": {
             "Na": {
@@ -355,10 +355,10 @@ def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
         "Na", vapor_pressure_data=vapor_data
     )
     T_K = 1000.0
-    raw = condensation_module._antoine_psat_pa(
-        "Na", T_K, vapor_pressure_data=vapor_data
-    )
-    assert raw is None
+    with pytest.raises(condensation_module.WallSaturationPressureRefusal):
+        condensation_module._antoine_psat_pa(
+            "Na", T_K, vapor_pressure_data=vapor_data
+        )
     pressure_pa, refused = condensation_module._try_antoine_psat_pa(
         "Na", T_K, vapor_pressure_data=vapor_data
     )

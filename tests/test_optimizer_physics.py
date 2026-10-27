@@ -1309,11 +1309,16 @@ def test_wall_pressure_refusal_without_deposit_is_unavailable_for_direct_gate() 
 
     coating = PhysicsConstraintSet().coating(trace)
 
-    assert coating.feasible
+    assert not coating.feasible
     assert coating.status == "unavailable"
     assert coating.authoritative is False
     assert coating.observed is None
-    assert math.isinf(coating.margin)
+    assert coating.margin == -math.inf
+    assert coating.status_payload["coating_verdict"] == "unavailable"
+    refusals = coating.status_payload[
+        "wall_saturation_pressure_refusals_by_species"
+    ]
+    assert refusals["SiO"]["hot_wall"]["status"] == "refused"
 
 
 def test_coating_and_segment_allowable_readout_reports_small_wall_deposit_margin() -> None:
