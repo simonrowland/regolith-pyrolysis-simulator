@@ -5316,11 +5316,11 @@ def _context_for_sibling_oxygen(
 ) -> ScoreContext:
     """Score the store, or a fresh migration when its oxygen is stale.
 
-    Quoted Table 2 oxygen is the regenerated sibling: return the store
-    context. ``model_derived`` is the committed sibling: migrate
-    ``extract_name`` and return those observations. A stale sibling does
-    not share observation ids, because ``:h=`` hashes the extract row
-    (stable_ids.py). The series stems, that suffix stripped, must match.
+    The regenerated sibling is ``quoted_attributed`` and its observation
+    ids match a fresh migration of ``extract_name``. Anything else is
+    stale: ``model_derived``, or a quoted relabel that kept the previous
+    ``:h=`` ids (stable_ids.py hashes the extract row). Series stems,
+    that suffix stripped, must still match.
     """
     from simulator.battery.migrate import load_migrated_context
     from tests.battery.test_migrate import _migrate_real_extract
@@ -5339,14 +5339,20 @@ def _context_for_sibling_oxygen(
     assert all(
         observation.evidence.class_.value is oxygen_class for observation in oxygen
     )
-    if oxygen_class is EvidenceClass.QUOTED_ATTRIBUTED:
-        return context
-    assert oxygen_class is EvidenceClass.MODEL_DERIVED
+    assert oxygen_class in {
+        EvidenceClass.QUOTED_ATTRIBUTED,
+        EvidenceClass.MODEL_DERIVED,
+    }
     fresh = _migrate_real_extract(
         tmp_path,
         extract_name,
         use_repository_index_row=True,
     )
+    if (
+        oxygen_class is EvidenceClass.QUOTED_ATTRIBUTED
+        and set(fresh.observations) == set(context.observations)
+    ):
+        return context
     assert {_series_stem(observation_id) for observation_id in fresh.observations} == {
         _series_stem(observation_id) for observation_id in context.observations
     }
@@ -5640,8 +5646,8 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
 
     source_id = "stolyarova-1996-cao-alumina-silica-kems"
     context = load_score_context(sources=(source_id,))
-    # t-1534 (742704443) is extract-only. The committed sibling still
-    # labels Table 2 oxygen model_derived until regen.
+    # t-1534 (742704443) is extract-only. Green's committed sibling
+    # relabels Table 2 oxygen quoted_attributed and keeps the old :h= ids.
     context = _context_for_sibling_oxygen(
         context,
         tmp_path,
