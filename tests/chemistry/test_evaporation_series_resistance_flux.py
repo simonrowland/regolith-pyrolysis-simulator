@@ -218,12 +218,17 @@ def test_transition_and_free_molecular_regimes_do_not_apply_continuum_gas_film()
 def test_missing_chapman_enskog_parameters_do_not_fall_back_to_constant():
     with pytest.raises(
         EvaporationFluxConfigurationError,
-        match="missing Chapman-Enskog transport parameters.*species='Si'",
+        match="missing Chapman-Enskog transport parameters.*species='H2O'",
     ):
-        _evap(species="Si", knudsen_number=1.0e-7)
+        _evap(
+            species="H2O",
+            molar_mass_kg_mol=0.01801528,
+            knudsen_number=1.0e-7,
+        )
 
     free_molecular = _evap(
-        species="Si",
+        species="H2O",
+        molar_mass_kg_mol=0.01801528,
         knudsen_number=math.inf,
         melt_resistance_enabled=False,
     )

@@ -361,7 +361,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         else silica_product_kg + mixed_melt_residual_kg
     )
     has_metal_product = bool(metals_kg)
-    has_oxygen_product = bool(oxygen_partition) or 'O2' in products
+    has_oxygen_product = (
+        any(amount > 0.0 for amount in oxygen_partition.values())
+        or 'O2' in products
+    )
     has_silica_capture = bool(stage_3_kg_by_species)
     has_silica_product = silica_is_product and has_silica_capture
     has_mixed_glass_inventory = early_tap_mode and bool(mixed_melt_residual_kg)
