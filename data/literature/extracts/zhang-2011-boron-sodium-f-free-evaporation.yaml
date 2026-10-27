@@ -19,11 +19,15 @@ extraction:
     6's measured values are whole-slag mass fluxes and Table 6's estimated column
     is a calculated gas-film flux. The schema has no mass-per-area-per-time
     quantity token, so these values remain typed refusals with their printed units.
-    The numerical argon flow, total pressure, and individual starting mass are not
-    stated. Table 2's caption says post-measured slag, while section 3.1 identifies
+    The absolute argon flow, total pressure, and individual starting mass are not
+    stated; the authors say the flow was five times the rate expected to control
+    evaporation. Table 2's caption says post-measured slag, while section 3.1 identifies
     the XRF analysis as pre-melting composition; Table 2 compositions are used for
     the named base slags only. The CS-3 plus ZrO2 mixture composition is retained
-    as printed without inventing a normalized analysis.
+    as printed without inventing a normalized analysis. Explicit Table 2
+    composition conditions remain at their printed p2/table2 locator; current
+    migration leaves identity.composition unknown for mass_loss_rate. The
+    migrator gap and expected identity projection are recorded in the audit map.
 review_status: draft
 fidelity_samples:
   - species: slag
@@ -73,6 +77,7 @@ species:
         point_conditions:
           T_C: {state: {tag: value, value: 1300}, locator: {page: 8, table: '6'}}
           atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          gas_flow: {state: {tag: value, value: 'fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling'}, locator: {page: 2, section: '2.2 Experimental Procedures', note: 'Absolute rate not stated; comparison on p5, section 3.3.2'}}
           composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081}}}, locator: {page: 2, table: '2', note: 'CS-3 pre-melting XRF composition'}}
         phase: l
         regime: thermogravimetric_analysis
@@ -87,7 +92,7 @@ species:
           T_C: 1300
           slag_id: CS-3
           gas_atmosphere: argon
-          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          gas_flow_as_printed: fixed flow rate above starvation rate; authors state this was five times the flow expected to be rate-controlling (p5); absolute flow not stated
           hold_time_min: 120
           initial_rate_window_min: 15
           heating_rate_K_per_min: 50
@@ -99,6 +104,7 @@ species:
         point_conditions:
           T_C: {state: {tag: value, value: 1350}, locator: {page: 8, table: '6'}}
           atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          gas_flow: {state: {tag: value, value: 'fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling'}, locator: {page: 2, section: '2.2 Experimental Procedures', note: 'Absolute rate not stated; comparison on p5, section 3.3.2'}}
           composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081}}}, locator: {page: 2, table: '2', note: 'CS-3 pre-melting XRF composition'}}
         phase: l
         regime: thermogravimetric_analysis
@@ -113,7 +119,7 @@ species:
           T_C: 1350
           slag_id: CS-3
           gas_atmosphere: argon
-          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          gas_flow_as_printed: fixed flow rate above starvation rate; authors state this was five times the flow expected to be rate-controlling (p5); absolute flow not stated
           hold_time_min: 120
           initial_rate_window_min: 15
           heating_rate_K_per_min: 50
@@ -125,6 +131,7 @@ species:
         point_conditions:
           T_C: {state: {tag: value, value: 1400}, locator: {page: 8, table: '6'}}
           atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          gas_flow: {state: {tag: value, value: 'fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling'}, locator: {page: 2, section: '2.2 Experimental Procedures', note: 'Absolute rate not stated; comparison on p5, section 3.3.2'}}
           composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081}}}, locator: {page: 2, table: '2', note: 'CS-3 pre-melting XRF composition'}}
         phase: l
         regime: thermogravimetric_analysis
@@ -139,7 +146,7 @@ species:
           T_C: 1400
           slag_id: CS-3
           gas_atmosphere: argon
-          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          gas_flow_as_printed: fixed flow rate above starvation rate; authors state this was five times the flow expected to be rate-controlling (p5); absolute flow not stated
           hold_time_min: 120
           initial_rate_window_min: 15
           heating_rate_K_per_min: 50
@@ -151,6 +158,7 @@ species:
         point_conditions:
           T_C: {state: {tag: value, value: 1300}, locator: {page: 8, table: '6'}}
           atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          gas_flow: {state: {tag: value, value: 'fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling'}, locator: {page: 2, section: '2.2 Experimental Procedures', note: 'Absolute rate not stated; comparison on p5, section 3.3.2'}}
           composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081, ZrO2: 2}}}, locator: {page: 2, table: '2', note: 'CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed'}}
         phase: l
         regime: thermogravimetric_analysis
@@ -166,7 +174,7 @@ species:
           composition_as_printed: CS-3 with 2 wt% ZrO2 addition; a post-addition analysis is not tabulated
           slag_id: CS-3 + 2 wt% ZrO2
           gas_atmosphere: argon
-          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          gas_flow_as_printed: fixed flow rate above starvation rate; authors state this was five times the flow expected to be rate-controlling (p5); absolute flow not stated
           hold_time_min: 120
           initial_rate_window_min: 15
           heating_rate_K_per_min: 50
@@ -177,6 +185,7 @@ species:
         point_conditions:
           T_C: {state: {tag: value, value: 1350}, locator: {page: 8, table: '6'}}
           atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          gas_flow: {state: {tag: value, value: 'fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling'}, locator: {page: 2, section: '2.2 Experimental Procedures', note: 'Absolute rate not stated; comparison on p5, section 3.3.2'}}
           composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081, ZrO2: 2}}}, locator: {page: 2, table: '2', note: 'CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed'}}
         phase: l
         regime: thermogravimetric_analysis
@@ -192,7 +201,7 @@ species:
           composition_as_printed: CS-3 with 2 wt% ZrO2 addition; a post-addition analysis is not tabulated
           slag_id: CS-3 + 2 wt% ZrO2
           gas_atmosphere: argon
-          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          gas_flow_as_printed: fixed flow rate above starvation rate; authors state this was five times the flow expected to be rate-controlling (p5); absolute flow not stated
           hold_time_min: 120
           initial_rate_window_min: 15
           heating_rate_K_per_min: 50
@@ -203,6 +212,7 @@ species:
         point_conditions:
           T_C: {state: {tag: value, value: 1400}, locator: {page: 8, table: '6'}}
           atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          gas_flow: {state: {tag: value, value: 'fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling'}, locator: {page: 2, section: '2.2 Experimental Procedures', note: 'Absolute rate not stated; comparison on p5, section 3.3.2'}}
           composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081, ZrO2: 2}}}, locator: {page: 2, table: '2', note: 'CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed'}}
         phase: l
         regime: thermogravimetric_analysis
@@ -218,7 +228,7 @@ species:
           composition_as_printed: CS-3 with 2 wt% ZrO2 addition; a post-addition analysis is not tabulated
           slag_id: CS-3 + 2 wt% ZrO2
           gas_atmosphere: argon
-          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          gas_flow_as_printed: fixed flow rate above starvation rate; authors state this was five times the flow expected to be rate-controlling (p5); absolute flow not stated
           hold_time_min: 120
           initial_rate_window_min: 15
           heating_rate_K_per_min: 50
@@ -229,6 +239,7 @@ species:
         point_conditions:
           T_C: {state: {tag: value, value: 1300}, locator: {page: 8, table: '6'}}
           atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          gas_flow: {state: {tag: value, value: 'fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling'}, locator: {page: 2, section: '2.2 Experimental Procedures', note: 'Absolute rate not stated; comparison on p5, section 3.3.2'}}
           composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 43.80, SiO2: 36.91, Al2O3: 3.12, Na2O: 6.54, B2O3: 4.63, TiO2: 5.00}}}, locator: {page: 2, table: '2', note: 'CS-4 pre-melting XRF composition'}}
         phase: l
         regime: thermogravimetric_analysis
@@ -243,7 +254,7 @@ species:
           T_C: 1300
           slag_id: CS-4
           gas_atmosphere: argon
-          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          gas_flow_as_printed: fixed flow rate above starvation rate; authors state this was five times the flow expected to be rate-controlling (p5); absolute flow not stated
           hold_time_min: 120
           initial_rate_window_min: 15
           heating_rate_K_per_min: 50
@@ -255,6 +266,7 @@ species:
         point_conditions:
           T_C: {state: {tag: value, value: 1350}, locator: {page: 8, table: '6'}}
           atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          gas_flow: {state: {tag: value, value: 'fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling'}, locator: {page: 2, section: '2.2 Experimental Procedures', note: 'Absolute rate not stated; comparison on p5, section 3.3.2'}}
           composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 43.80, SiO2: 36.91, Al2O3: 3.12, Na2O: 6.54, B2O3: 4.63, TiO2: 5.00}}}, locator: {page: 2, table: '2', note: 'CS-4 pre-melting XRF composition'}}
         phase: l
         regime: thermogravimetric_analysis
@@ -269,7 +281,7 @@ species:
           T_C: 1350
           slag_id: CS-4
           gas_atmosphere: argon
-          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          gas_flow_as_printed: fixed flow rate above starvation rate; authors state this was five times the flow expected to be rate-controlling (p5); absolute flow not stated
           hold_time_min: 120
           initial_rate_window_min: 15
           heating_rate_K_per_min: 50
@@ -281,6 +293,7 @@ species:
         point_conditions:
           T_C: {state: {tag: value, value: 1400}, locator: {page: 8, table: '6'}}
           atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          gas_flow: {state: {tag: value, value: 'fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling'}, locator: {page: 2, section: '2.2 Experimental Procedures', note: 'Absolute rate not stated; comparison on p5, section 3.3.2'}}
           composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 43.80, SiO2: 36.91, Al2O3: 3.12, Na2O: 6.54, B2O3: 4.63, TiO2: 5.00}}}, locator: {page: 2, table: '2', note: 'CS-4 pre-melting XRF composition'}}
         phase: l
         regime: thermogravimetric_analysis
@@ -295,7 +308,7 @@ species:
           T_C: 1400
           slag_id: CS-4
           gas_atmosphere: argon
-          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          gas_flow_as_printed: fixed flow rate above starvation rate; authors state this was five times the flow expected to be rate-controlling (p5); absolute flow not stated
           hold_time_min: 120
           initial_rate_window_min: 15
           heating_rate_K_per_min: 50
@@ -340,7 +353,7 @@ species:
           premelt_schedule: dried 4 h at 200 C; heated to 1400 C at 5 C/min
           test_atmosphere: argon
           reaction_tube_evacuation_min: 5
-          test_gas_flow: fixed rate above starvation rate; numerical flow not stated
+          test_gas_flow: fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling (p5); absolute flow not stated
           test_heating_rate_K_per_min: 50
           hold_time_min: 120
           tga_detection_limit_ug: 1
@@ -370,11 +383,6 @@ species:
             rows:
               - {species: NaBO2_g, values: [2298, 4417, 8164]}
               - {species: B2O3_g, values: [1.46, 4.69, 14.06]}
-          fitted_apparent_activation_energy:
-            status: figure_read_candidate
-            figure: '9'
-            printed_numeric_values: not tabulated; not digitised
-            quote: The calculated apparent activation energy for the mechanism(s) responsible for evaporation of slag CS-3 is larger than those of slag CS-3 containing ZrO2 and slag CS-4 containing TiO2.
       - observation_id: zhang_2011_table6_estimated_gas_film_flux
         type: method
         locator: {page: 8, table: '6', note: 'Estimated gas-film mass flux column'}
@@ -398,3 +406,11 @@ species:
           printed_unit: mg/(cm^2 s)
           reason: no quantity token stores an areal mass flux per unit time; rate_series mass_loss_rate is typed-refused and preserves the published value and unit
           figure_only_candidates: [3, 4, 5, 6, 7, 8, 9]
+      - observation_id: zhang_2011_apparent_activation_energy_figure9
+        type: model_comparison
+        locator: {page: 4, figure: '9'}
+        values:
+          quantity: apparent_activation_energy_comparison
+          evidence_class: quoted_attributed
+          statement: Calculated apparent activation energy for the evaporation mechanism(s) of CS-3 is larger than for CS-3 with ZrO2 and CS-4 with TiO2.
+          figure_read_candidate: numerical activation energies are shown only in Figure 9 and were not digitised

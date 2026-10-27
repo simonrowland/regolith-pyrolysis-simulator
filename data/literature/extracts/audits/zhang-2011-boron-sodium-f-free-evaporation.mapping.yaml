@@ -76,3 +76,7 @@ table_tool_status:
   compare_output: data/literature/extracts/audits/zhang-2011-boron-sodium-f-free-evaporation.compare.txt
   printed_numeric_cells_audited: 99
   audit_result: all_matches
+migrator_identity_gap:
+  location: simulator/battery/migrate.py:16645-16654
+  behavior: projected_oxide_map overwrites an explicit point_conditions.composition and uses the observation locator, p8/table6.
+  expected_after_fix: keep each explicit point_conditions.composition at p2/table2 and project that printed composition into identity.composition for all nine Table 6 rows; total pressure and fO2 remain unknown.

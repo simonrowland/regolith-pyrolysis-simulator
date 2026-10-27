@@ -55,16 +55,29 @@ def test_zhang_2011_table6_values_and_conditions_migrate() -> None:
         observation = by_id[observation_id]
         assert observation.identity.temperature_K.tag is StateTag.VALUE
         assert observation.identity.temperature_K.value == Decimal(str(temperature_c + 273.15))
-        assert observation.identity.composition.tag is StateTag.VALUE
+        # The source prints this composition (and the point condition below
+        # carries it at Table 2). Current mass_loss_rate migration does not
+        # bind it into identity; see the extract's recorded migrator gap.
+        assert observation.identity.composition.tag is StateTag.UNKNOWN
+        assert "no composition field" in observation.identity.composition.reason
         assert observation.identity.total_pressure_Pa.tag is StateTag.UNKNOWN
         assert observation.identity.fO2_Pa.tag is StateTag.UNKNOWN
         assert observation.point_conditions["T_C"].state.value == Decimal(temperature_c)
         assert observation.point_conditions["T_C"].locator.page == 8
         assert observation.point_conditions["T_C"].locator.table == "6"
         assert observation.point_conditions["atmosphere"].state.value == "argon"
+        gas_flow = observation.point_conditions["gas_flow"]
+        assert gas_flow.state.tag is StateTag.VALUE
+        assert "five times" in gas_flow.state.value
+        assert gas_flow.locator.page == 2
+        assert gas_flow.locator.section == "2.2 Experimental Procedures"
         assert observation.point_conditions["composition"].state.tag is StateTag.VALUE
         assert observation.point_conditions["composition"].locator.page == 2
         assert observation.point_conditions["composition"].locator.table == "2"
+        assert (
+            observation.point_conditions["composition"].inference.relation
+            == "wt_pct_to_mole_fraction"
+        )
         assert observation.value.kind is ValueKind.UNAVAILABLE
         assert "unmapped mass loss rate unit" in observation.value.unavailable_reason
 
