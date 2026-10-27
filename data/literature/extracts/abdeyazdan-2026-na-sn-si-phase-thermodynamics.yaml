@@ -1,0 +1,869 @@
+schema_version: literature_extract.v1
+source_id: abdeyazdan-2026-na-sn-si-phase-thermodynamics
+source:
+  citation: Abdeyazdan, H., Shevchenko, M. & Jak, E. (2026). Experimental Phase Equilibria Study and Thermodynamic
+    Modeling of the Na₂O–SnO–SnO₂–SiO₂ System. Journal of the American Ceramic Society, 109(7), e71038. DOI 10.1111/jace.71038.
+  doi: 10.1111/jace.71038
+  url: https://doi.org/10.1111/jace.71038
+  year: 2026
+extraction:
+  method: HTML table markup; table 1 rows and cells parsed from the captured full-text HTML table. Cell assignments
+    checked against the table markup; each experimental phase row and all nonempty cells were audited.
+  date: '2026-10-27'
+  worker: codex-resume-54072-1793135638
+review_status: draft
+experiments:
+- experiment_id: abdeyazdan_2026_t1_run01_NaSi9_r
+  method: quench_equilibration
+  locator:
+    table: '1'
+    caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+      in air.
+    html_row: 4
+  sample_id_as_published: NaSi9-r
+  run_number_as_published: '1'
+  substrate_as_published: SiO2 ampoule
+  pre_melt_T_C_as_published: '1610'
+  T_C: 1600
+  equilibration_time_h_as_published: '17'
+  assemblage_as_published: Slag + Cassiterite
+  atmosphere_as_published: air
+  bulk_composition_as_published: not reported separately from the measured phase compositions in Table 1
+  quench_temperature_C_as_published: -20
+  quench_statement_as_published: Following equilibration, the samples were rapidly quenched in calcium or magnesium
+    chloride brine at -20°C.
+- experiment_id: abdeyazdan_2026_t1_run02_NaSi1
+  method: quench_equilibration
+  locator:
+    table: '1'
+    caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+      in air.
+    html_row: 7
+  sample_id_as_published: NaSi1
+  run_number_as_published: '2'
+  substrate_as_published: SiO2 ampoule
+  pre_melt_T_C_as_published: '900'
+  T_C: 780
+  equilibration_time_h_as_published: '120'
+  assemblage_as_published: Slag + Quartz
+  atmosphere_as_published: air
+  bulk_composition_as_published: not reported separately from the measured phase compositions in Table 1
+  quench_temperature_C_as_published: -20
+  quench_statement_as_published: Following equilibration, the samples were rapidly quenched in calcium or magnesium
+    chloride brine at -20°C.
+- experiment_id: abdeyazdan_2026_t1_run04_NaSi11
+  method: quench_equilibration
+  locator:
+    table: '1'
+    caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+      in air.
+    html_row: 10
+  sample_id_as_published: NaSi11
+  run_number_as_published: '4'
+  substrate_as_published: Pt foil
+  pre_melt_T_C_as_published: '825'
+  T_C: 800
+  equilibration_time_h_as_published: '17'
+  assemblage_as_published: Slag + Na2Si2O5
+  atmosphere_as_published: air
+  bulk_composition_as_published: not reported separately from the measured phase compositions in Table 1
+  quench_temperature_C_as_published: -20
+  quench_statement_as_published: Following equilibration, the samples were rapidly quenched in calcium or magnesium
+    chloride brine at -20°C.
+- experiment_id: abdeyazdan_2026_t1_run05_NaSi12
+  method: quench_equilibration
+  locator:
+    table: '1'
+    caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+      in air.
+    html_row: 13
+  sample_id_as_published: NaSi12
+  run_number_as_published: '5'
+  substrate_as_published: Pt foil
+  pre_melt_T_C_as_published: '940'
+  T_C: 900
+  equilibration_time_h_as_published: '4'
+  assemblage_as_published: Slag + Na2SiO3
+  atmosphere_as_published: air
+  bulk_composition_as_published: not reported separately from the measured phase compositions in Table 1
+  quench_temperature_C_as_published: -20
+  quench_statement_as_published: Following equilibration, the samples were rapidly quenched in calcium or magnesium
+    chloride brine at -20°C.
+- experiment_id: abdeyazdan_2026_t1_run06_NaSi12
+  method: quench_equilibration
+  locator:
+    table: '1'
+    caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+      in air.
+    html_row: 15
+  sample_id_as_published: NaSi12
+  run_number_as_published: '6'
+  substrate_as_published: Pt foil
+  pre_melt_T_C_as_published: '970'
+  T_C: 930
+  equilibration_time_h_as_published: '4'
+  assemblage_as_published: Slag + Na2SiO3
+  atmosphere_as_published: air
+  bulk_composition_as_published: not reported separately from the measured phase compositions in Table 1
+  quench_temperature_C_as_published: -20
+  quench_statement_as_published: Following equilibration, the samples were rapidly quenched in calcium or magnesium
+    chloride brine at -20°C.
+fidelity_samples:
+- path: species.SiO2.observations[abdeyazdan_2026_t1_run01_NaSi9_r_glass_sio2].values.component_amount_as_published
+  value: 91.0 ± 0.17 mol.%
+  locator: &id001
+    table: '1'
+    caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+      in air.
+    html_row: 4
+    column: Si/SiO2
+- path: species.NaO0.5.observations[abdeyazdan_2026_t1_run01_NaSi9_r_glass_nao0p5].values.component_amount_as_published
+  value: 9.0 ± 0.17 mol.%
+  locator: &id003
+    table: '1'
+    caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+      in air.
+    html_row: 4
+    column: Na/NaO0.5
+- path: species.SiO2.observations[abdeyazdan_2026_t1_run02_NaSi1_glass_sio2].values.component_amount_as_published
+  value: 61.5 ± 0.22 mol.%
+  locator: &id002
+    table: '1'
+    caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+      in air.
+    html_row: 7
+    column: Si/SiO2
+- path: species.NaO0.5.observations[abdeyazdan_2026_t1_run02_NaSi1_glass_nao0p5].values.component_amount_as_published
+  value: 38.5 ± 0.22 mol.%
+  locator: &id004
+    table: '1'
+    caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+      in air.
+    html_row: 7
+    column: Na/NaO0.5
+species:
+  SiO2:
+    context:
+    - type: table_context
+      observation_id: abdeyazdan_2026_t1_run01_NaSi9_r_solid_cristobalite
+      locator:
+        table: '1'
+        caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+          in air.
+        html_row: 5
+      units: mol.% and wt.% as printed
+      values:
+        candidate_token: equilibrium_phase_composition
+        schema_gap: The composition quantity has no closed crystal phase_role token; retain all printed cells as
+          typed-refused context.
+        method_class: measured_direct
+        sample_id_as_published: NaSi9-r
+        phase_as_published: Cristobalite
+        phase_state: crystalline solid
+        assemblage_as_published: Slag + Cassiterite
+        T_C: 1600
+        equilibration_time_h_as_published: '17'
+        composition_as_published:
+          SiO2:
+            value: '100.0'
+            uncertainty: null
+            column: Si/SiO2
+          NaO0.5:
+            value: '0.02'
+            uncertainty: '0.02'
+            column: Na/NaO0.5
+        old_total_wt_percent_as_published: '102.7'
+        old_total_uncertainty_as_published: '0.23'
+        atmosphere_as_published: air
+        quench_state_as_published: not stated whether quench preserves or alters the equilibrated composition
+        quench_statement_as_published: Following equilibration, the samples were rapidly quenched in calcium or
+          magnesium chloride brine at -20°C.
+        disposition: Measured EPMA phase composition preserved; not migrated as an observation because the closed
+          phase-role schema has no crystalline-solid role.
+    - type: table_context
+      observation_id: abdeyazdan_2026_t1_run02_NaSi1_solid_quartz
+      locator:
+        table: '1'
+        caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+          in air.
+        html_row: 8
+      units: mol.% and wt.% as printed
+      values:
+        candidate_token: equilibrium_phase_composition
+        schema_gap: The composition quantity has no closed crystal phase_role token; retain all printed cells as
+          typed-refused context.
+        method_class: measured_direct
+        sample_id_as_published: NaSi1
+        phase_as_published: Quartz
+        phase_state: crystalline solid
+        assemblage_as_published: Slag + Quartz
+        T_C: 780
+        equilibration_time_h_as_published: '120'
+        composition_as_published:
+          SiO2:
+            value: '99.9'
+            uncertainty: '0.10'
+            column: Si/SiO2
+          NaO0.5:
+            value: '0.15'
+            uncertainty: '0.10'
+            column: Na/NaO0.5
+        old_total_wt_percent_as_published: '97.8'
+        old_total_uncertainty_as_published: '2.3'
+        atmosphere_as_published: air
+        quench_state_as_published: not stated whether quench preserves or alters the equilibrated composition
+        quench_statement_as_published: Following equilibration, the samples were rapidly quenched in calcium or
+          magnesium chloride brine at -20°C.
+        disposition: Measured EPMA phase composition preserved; not migrated as an observation because the closed
+          phase-role schema has no crystalline-solid role.
+    - type: table_context
+      observation_id: abdeyazdan_2026_t1_run04_NaSi11_solid_na2si2o5
+      locator:
+        table: '1'
+        caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+          in air.
+        html_row: 11
+      units: mol.% and wt.% as printed
+      values:
+        candidate_token: equilibrium_phase_composition
+        schema_gap: The composition quantity has no closed crystal phase_role token; retain all printed cells as
+          typed-refused context.
+        method_class: measured_direct
+        sample_id_as_published: NaSi11
+        phase_as_published: Na2Si2O5
+        phase_state: crystalline solid
+        assemblage_as_published: Slag + Na2Si2O5
+        T_C: 800
+        equilibration_time_h_as_published: '17'
+        composition_as_published:
+          SiO2:
+            value: '52.3'
+            uncertainty: '0.44'
+            column: Si/SiO2
+          NaO0.5:
+            value: '47.7'
+            uncertainty: '0.44'
+            column: Na/NaO0.5
+        old_total_wt_percent_as_published: '100.6'
+        old_total_uncertainty_as_published: '0.33'
+        atmosphere_as_published: air
+        quench_state_as_published: not stated whether quench preserves or alters the equilibrated composition
+        quench_statement_as_published: Following equilibration, the samples were rapidly quenched in calcium or
+          magnesium chloride brine at -20°C.
+        disposition: Measured EPMA phase composition preserved; not migrated as an observation because the closed
+          phase-role schema has no crystalline-solid role.
+    - type: table_context
+      observation_id: abdeyazdan_2026_t1_run05_NaSi12_solid_na2sio3
+      locator:
+        table: '1'
+        caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+          in air.
+        html_row: 14
+      units: mol.% and wt.% as printed
+      values:
+        candidate_token: equilibrium_phase_composition
+        schema_gap: The composition quantity has no closed crystal phase_role token; retain all printed cells as
+          typed-refused context.
+        method_class: measured_direct
+        sample_id_as_published: NaSi12
+        phase_as_published: Na2SiO3
+        phase_state: crystalline solid
+        assemblage_as_published: Slag + Na2SiO3
+        T_C: 900
+        equilibration_time_h_as_published: '4'
+        composition_as_published:
+          SiO2:
+            value: '34.3'
+            uncertainty: '0.19'
+            column: Si/SiO2
+          NaO0.5:
+            value: '65.7'
+            uncertainty: '0.19'
+            column: Na/NaO0.5
+        old_total_wt_percent_as_published: '100.0'
+        old_total_uncertainty_as_published: '1.0'
+        atmosphere_as_published: air
+        quench_state_as_published: not stated whether quench preserves or alters the equilibrated composition
+        quench_statement_as_published: Following equilibration, the samples were rapidly quenched in calcium or
+          magnesium chloride brine at -20°C.
+        disposition: Measured EPMA phase composition preserved; not migrated as an observation because the closed
+          phase-role schema has no crystalline-solid role.
+    - type: table_context
+      observation_id: abdeyazdan_2026_t1_run06_NaSi12_solid_na2sio3
+      locator:
+        table: '1'
+        caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+          in air.
+        html_row: 16
+      units: mol.% and wt.% as printed
+      values:
+        candidate_token: equilibrium_phase_composition
+        schema_gap: The composition quantity has no closed crystal phase_role token; retain all printed cells as
+          typed-refused context.
+        method_class: measured_direct
+        sample_id_as_published: NaSi12
+        phase_as_published: Na2SiO3
+        phase_state: crystalline solid
+        assemblage_as_published: Slag + Na2SiO3
+        T_C: 930
+        equilibration_time_h_as_published: '4'
+        composition_as_published:
+          SiO2:
+            value: '34.8'
+            uncertainty: '0.20'
+            column: Si/SiO2
+          NaO0.5:
+            value: '65.2'
+            uncertainty: '0.20'
+            column: Na/NaO0.5
+        old_total_wt_percent_as_published: '96.7'
+        old_total_uncertainty_as_published: '0.11'
+        atmosphere_as_published: air
+        quench_state_as_published: not stated whether quench preserves or alters the equilibrated composition
+        quench_statement_as_published: Following equilibration, the samples were rapidly quenched in calcium or
+          magnesium chloride brine at -20°C.
+        disposition: Measured EPMA phase composition preserved; not migrated as an observation because the closed
+          phase-role schema has no crystalline-solid role.
+    observations:
+    - observation_id: abdeyazdan_2026_t1_run01_NaSi9_r_glass_sio2
+      type: composition_series
+      experiment: abdeyazdan_2026_t1_run01_NaSi9_r
+      phase: glass
+      locator: *id001
+      units: mol.% as printed
+      uncertainty:
+        reported_status: printed
+        units: mol.%
+        sigma: 0.17
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        component_amount: 0.91
+        component_amount_as_published: 91.0 ± 0.17 mol.%
+        phase_label: melt
+        phase_label_as_published: Slag
+        basis: mole_fraction
+        T_C: 1600
+        sample_id_as_published: NaSi9-r
+        assemblage_as_published: Slag + Cassiterite
+        method_class: measured_direct
+        analytical_method: EPMA; composition reported in mol.% on the printed Si/SiO2 and Na/NaO0.5 basis
+        quench_statement_as_published: Following equilibration, samples were rapidly quenched in calcium or magnesium
+          chloride brine at -20°C, washed with water and ethanol, dried, and mounted in epoxy resin.
+        quench_state: not_stated
+        old_total_as_published: 100.3 ± 0.63 wt.%
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1600
+            locator:
+              table: '1'
+              caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2
+                system in air.
+              html_row: 3
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator:
+              table: '1'
+              caption: system in air
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              section: Experimental Method
+              note: Rapid quench is stated; preservation or alteration is not stated.
+    - observation_id: abdeyazdan_2026_t1_run02_NaSi1_glass_sio2
+      type: composition_series
+      experiment: abdeyazdan_2026_t1_run02_NaSi1
+      phase: glass
+      locator: *id002
+      units: mol.% as printed
+      uncertainty:
+        reported_status: printed
+        units: mol.%
+        sigma: 0.22
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        component_amount: 0.615
+        component_amount_as_published: 61.5 ± 0.22 mol.%
+        phase_label: melt
+        phase_label_as_published: Slag
+        basis: mole_fraction
+        T_C: 780
+        sample_id_as_published: NaSi1
+        assemblage_as_published: Slag + Quartz
+        method_class: measured_direct
+        analytical_method: EPMA; composition reported in mol.% on the printed Si/SiO2 and Na/NaO0.5 basis
+        quench_statement_as_published: Following equilibration, samples were rapidly quenched in calcium or magnesium
+          chloride brine at -20°C, washed with water and ethanol, dried, and mounted in epoxy resin.
+        quench_state: not_stated
+        old_total_as_published: 98.7 ± 0.51 wt.%
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 780
+            locator:
+              table: '1'
+              caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2
+                system in air.
+              html_row: 6
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator:
+              table: '1'
+              caption: system in air
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              section: Experimental Method
+              note: Rapid quench is stated; preservation or alteration is not stated.
+    - observation_id: abdeyazdan_2026_t1_run04_NaSi11_glass_sio2
+      type: composition_series
+      experiment: abdeyazdan_2026_t1_run04_NaSi11
+      phase: glass
+      locator:
+        table: '1'
+        caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+          in air.
+        html_row: 10
+        column: Si/SiO2
+      units: mol.% as printed
+      uncertainty:
+        reported_status: printed
+        units: mol.%
+        sigma: 0.29
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        component_amount: 0.583
+        component_amount_as_published: 58.3 ± 0.29 mol.%
+        phase_label: melt
+        phase_label_as_published: Slag
+        basis: mole_fraction
+        T_C: 800
+        sample_id_as_published: NaSi11
+        assemblage_as_published: Slag + Na2Si2O5
+        method_class: measured_direct
+        analytical_method: EPMA; composition reported in mol.% on the printed Si/SiO2 and Na/NaO0.5 basis
+        quench_statement_as_published: Following equilibration, samples were rapidly quenched in calcium or magnesium
+          chloride brine at -20°C, washed with water and ethanol, dried, and mounted in epoxy resin.
+        quench_state: not_stated
+        old_total_as_published: 98.7 ± 1.3 wt.%
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 800
+            locator:
+              table: '1'
+              caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2
+                system in air.
+              html_row: 9
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator:
+              table: '1'
+              caption: system in air
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              section: Experimental Method
+              note: Rapid quench is stated; preservation or alteration is not stated.
+    - observation_id: abdeyazdan_2026_t1_run05_NaSi12_glass_sio2
+      type: composition_series
+      experiment: abdeyazdan_2026_t1_run05_NaSi12
+      phase: glass
+      locator:
+        table: '1'
+        caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+          in air.
+        html_row: 13
+        column: Si/SiO2
+      units: mol.% as printed
+      uncertainty:
+        reported_status: printed
+        units: mol.%
+        sigma: 0.17
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        component_amount: 0.455
+        component_amount_as_published: 45.5 ± 0.17 mol.%
+        phase_label: melt
+        phase_label_as_published: Slag
+        basis: mole_fraction
+        T_C: 900
+        sample_id_as_published: NaSi12
+        assemblage_as_published: Slag + Na2SiO3
+        method_class: measured_direct
+        analytical_method: EPMA; composition reported in mol.% on the printed Si/SiO2 and Na/NaO0.5 basis
+        quench_statement_as_published: Following equilibration, samples were rapidly quenched in calcium or magnesium
+          chloride brine at -20°C, washed with water and ethanol, dried, and mounted in epoxy resin.
+        quench_state: not_stated
+        old_total_as_published: 98.9 ± 0.73 wt.%
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 900
+            locator:
+              table: '1'
+              caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2
+                system in air.
+              html_row: 12
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator:
+              table: '1'
+              caption: system in air
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              section: Experimental Method
+              note: Rapid quench is stated; preservation or alteration is not stated.
+    - observation_id: abdeyazdan_2026_t1_run06_NaSi12_glass_sio2
+      type: composition_series
+      experiment: abdeyazdan_2026_t1_run06_NaSi12
+      phase: glass
+      locator:
+        table: '1'
+        caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+          in air.
+        html_row: 15
+        column: Si/SiO2
+      units: mol.% as printed
+      uncertainty:
+        reported_status: printed
+        units: mol.%
+        sigma: 0.28
+      values:
+        quantity: equilibrium_phase_composition
+        formula: SiO2
+        component_amount: 0.435
+        component_amount_as_published: 43.5 ± 0.28 mol.%
+        phase_label: melt
+        phase_label_as_published: Slag
+        basis: mole_fraction
+        T_C: 930
+        sample_id_as_published: NaSi12
+        assemblage_as_published: Slag + Na2SiO3
+        method_class: measured_direct
+        analytical_method: EPMA; composition reported in mol.% on the printed Si/SiO2 and Na/NaO0.5 basis
+        quench_statement_as_published: Following equilibration, samples were rapidly quenched in calcium or magnesium
+          chloride brine at -20°C, washed with water and ethanol, dried, and mounted in epoxy resin.
+        quench_state: not_stated
+        old_total_as_published: 99.0 ± 0.59 wt.%
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 930
+            locator:
+              table: '1'
+              caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2
+                system in air.
+              html_row: 14
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator:
+              table: '1'
+              caption: system in air
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              section: Experimental Method
+              note: Rapid quench is stated; preservation or alteration is not stated.
+  NaO0.5:
+    observations:
+    - observation_id: abdeyazdan_2026_t1_run01_NaSi9_r_glass_nao0p5
+      type: composition_series
+      experiment: abdeyazdan_2026_t1_run01_NaSi9_r
+      phase: glass
+      locator: *id003
+      units: mol.% as printed
+      uncertainty:
+        reported_status: printed
+        units: mol.%
+        sigma: 0.17
+      values:
+        quantity: equilibrium_phase_composition
+        formula: NaO0.5
+        component_amount: 0.09
+        component_amount_as_published: 9.0 ± 0.17 mol.%
+        phase_label: melt
+        phase_label_as_published: Slag
+        basis: mole_fraction
+        T_C: 1600
+        sample_id_as_published: NaSi9-r
+        assemblage_as_published: Slag + Cassiterite
+        method_class: measured_direct
+        analytical_method: EPMA; composition reported in mol.% on the printed Si/SiO2 and Na/NaO0.5 basis
+        quench_statement_as_published: Following equilibration, samples were rapidly quenched in calcium or magnesium
+          chloride brine at -20°C, washed with water and ethanol, dried, and mounted in epoxy resin.
+        quench_state: not_stated
+        old_total_as_published: 100.3 ± 0.63 wt.%
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 1600
+            locator:
+              table: '1'
+              caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2
+                system in air.
+              html_row: 3
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator:
+              table: '1'
+              caption: system in air
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              section: Experimental Method
+              note: Rapid quench is stated; preservation or alteration is not stated.
+    - observation_id: abdeyazdan_2026_t1_run02_NaSi1_glass_nao0p5
+      type: composition_series
+      experiment: abdeyazdan_2026_t1_run02_NaSi1
+      phase: glass
+      locator: *id004
+      units: mol.% as printed
+      uncertainty:
+        reported_status: printed
+        units: mol.%
+        sigma: 0.22
+      values:
+        quantity: equilibrium_phase_composition
+        formula: NaO0.5
+        component_amount: 0.385
+        component_amount_as_published: 38.5 ± 0.22 mol.%
+        phase_label: melt
+        phase_label_as_published: Slag
+        basis: mole_fraction
+        T_C: 780
+        sample_id_as_published: NaSi1
+        assemblage_as_published: Slag + Quartz
+        method_class: measured_direct
+        analytical_method: EPMA; composition reported in mol.% on the printed Si/SiO2 and Na/NaO0.5 basis
+        quench_statement_as_published: Following equilibration, samples were rapidly quenched in calcium or magnesium
+          chloride brine at -20°C, washed with water and ethanol, dried, and mounted in epoxy resin.
+        quench_state: not_stated
+        old_total_as_published: 98.7 ± 0.51 wt.%
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 780
+            locator:
+              table: '1'
+              caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2
+                system in air.
+              html_row: 6
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator:
+              table: '1'
+              caption: system in air
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              section: Experimental Method
+              note: Rapid quench is stated; preservation or alteration is not stated.
+    - observation_id: abdeyazdan_2026_t1_run04_NaSi11_glass_nao0p5
+      type: composition_series
+      experiment: abdeyazdan_2026_t1_run04_NaSi11
+      phase: glass
+      locator:
+        table: '1'
+        caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+          in air.
+        html_row: 10
+        column: Na/NaO0.5
+      units: mol.% as printed
+      uncertainty:
+        reported_status: printed
+        units: mol.%
+        sigma: 0.29
+      values:
+        quantity: equilibrium_phase_composition
+        formula: NaO0.5
+        component_amount: 0.41700000000000004
+        component_amount_as_published: 41.7 ± 0.29 mol.%
+        phase_label: melt
+        phase_label_as_published: Slag
+        basis: mole_fraction
+        T_C: 800
+        sample_id_as_published: NaSi11
+        assemblage_as_published: Slag + Na2Si2O5
+        method_class: measured_direct
+        analytical_method: EPMA; composition reported in mol.% on the printed Si/SiO2 and Na/NaO0.5 basis
+        quench_statement_as_published: Following equilibration, samples were rapidly quenched in calcium or magnesium
+          chloride brine at -20°C, washed with water and ethanol, dried, and mounted in epoxy resin.
+        quench_state: not_stated
+        old_total_as_published: 98.7 ± 1.3 wt.%
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 800
+            locator:
+              table: '1'
+              caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2
+                system in air.
+              html_row: 9
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator:
+              table: '1'
+              caption: system in air
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              section: Experimental Method
+              note: Rapid quench is stated; preservation or alteration is not stated.
+    - observation_id: abdeyazdan_2026_t1_run05_NaSi12_glass_nao0p5
+      type: composition_series
+      experiment: abdeyazdan_2026_t1_run05_NaSi12
+      phase: glass
+      locator:
+        table: '1'
+        caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+          in air.
+        html_row: 13
+        column: Na/NaO0.5
+      units: mol.% as printed
+      uncertainty:
+        reported_status: printed
+        units: mol.%
+        sigma: 0.17
+      values:
+        quantity: equilibrium_phase_composition
+        formula: NaO0.5
+        component_amount: 0.545
+        component_amount_as_published: 54.5 ± 0.17 mol.%
+        phase_label: melt
+        phase_label_as_published: Slag
+        basis: mole_fraction
+        T_C: 900
+        sample_id_as_published: NaSi12
+        assemblage_as_published: Slag + Na2SiO3
+        method_class: measured_direct
+        analytical_method: EPMA; composition reported in mol.% on the printed Si/SiO2 and Na/NaO0.5 basis
+        quench_statement_as_published: Following equilibration, samples were rapidly quenched in calcium or magnesium
+          chloride brine at -20°C, washed with water and ethanol, dried, and mounted in epoxy resin.
+        quench_state: not_stated
+        old_total_as_published: 98.9 ± 0.73 wt.%
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 900
+            locator:
+              table: '1'
+              caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2
+                system in air.
+              html_row: 12
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator:
+              table: '1'
+              caption: system in air
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              section: Experimental Method
+              note: Rapid quench is stated; preservation or alteration is not stated.
+    - observation_id: abdeyazdan_2026_t1_run06_NaSi12_glass_nao0p5
+      type: composition_series
+      experiment: abdeyazdan_2026_t1_run06_NaSi12
+      phase: glass
+      locator:
+        table: '1'
+        caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2 system
+          in air.
+        html_row: 15
+        column: Na/NaO0.5
+      units: mol.% as printed
+      uncertainty:
+        reported_status: printed
+        units: mol.%
+        sigma: 0.28
+      values:
+        quantity: equilibrium_phase_composition
+        formula: NaO0.5
+        component_amount: 0.565
+        component_amount_as_published: 56.5 ± 0.28 mol.%
+        phase_label: melt
+        phase_label_as_published: Slag
+        basis: mole_fraction
+        T_C: 930
+        sample_id_as_published: NaSi12
+        assemblage_as_published: Slag + Na2SiO3
+        method_class: measured_direct
+        analytical_method: EPMA; composition reported in mol.% on the printed Si/SiO2 and Na/NaO0.5 basis
+        quench_statement_as_published: Following equilibration, samples were rapidly quenched in calcium or magnesium
+          chloride brine at -20°C, washed with water and ethanol, dried, and mounted in epoxy resin.
+        quench_state: not_stated
+        old_total_as_published: 99.0 ± 0.59 wt.%
+        point_conditions:
+          T_C:
+            state:
+              tag: value
+              value: 930
+            locator:
+              table: '1'
+              caption: Experimental conditions and measured compositions of the condensed phases for the NaO0.5–SiO2
+                system in air.
+              html_row: 14
+          atmosphere:
+            state:
+              tag: value
+              value: air
+            locator:
+              table: '1'
+              caption: system in air
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              section: Experimental Method
+              note: Rapid quench is stated; preservation or alteration is not stated.
