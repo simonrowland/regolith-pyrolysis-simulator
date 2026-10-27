@@ -20,23 +20,8 @@ reason = "Full-run stage 0-to-1 wall Fe deposit disagrees with the pinned ledger
 since = "7dd268c6f"
 
 [[test]]
-node = "tests/chemistry/test_sio_step_wall_deposit.py::test_hot_wall_sio_reactive_deposit_uses_product_psat_floor"
-ticket = "b-808"
-tier = "pr"
-reason = "Required hot-wall SiO saturation fit is unavailable."
-since = "7dd268c6f"
-
-[[test]]
 node = "tests/test_staged_bakeout.py::test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture"
 ticket = "b-946"
 tier = "pr"
 reason = "C2A staged run captures species outside the pinned set."
 since = "7dd268c6f"
-
-[[test]]
-node = "tests/test_vr11_instrumentation.py::test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa"
-ticket = "b-808"
-tier = "pr"
-reason = "Na Antoine wall segment has no usable extrapolation fit."
-since = "7dd268c6f"
-
