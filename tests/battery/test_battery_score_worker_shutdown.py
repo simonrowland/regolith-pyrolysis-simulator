@@ -72,23 +72,34 @@ class BatteryScoreWorkerShutdownTest(unittest.TestCase):
         for mode, expected_code in (("normal", 0), ("exception", 1)):
             with self.subTest(mode=mode), tempfile.TemporaryDirectory() as tmp:
                 pid_file = Path(tmp) / "worker.pid"
-                started = time.monotonic()
+                process = subprocess.Popen(
+                    [
+                        sys.executable,
+                        "-c",
+                        child_script,
+                        str(pid_file),
+                        mode,
+                    ],
+                    cwd=ROOT,
+                    env=env,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                )
+                startup_deadline = time.monotonic() + 60.0
+                while not pid_file.exists() and process.poll() is None:
+                    if time.monotonic() >= startup_deadline:
+                        process.kill()
+                        _stdout, stderr = process.communicate()
+                        self.fail(f"worker did not start: {stderr}")
+                    time.sleep(0.02)
+                if not pid_file.exists():
+                    _stdout, stderr = process.communicate()
+                    self.fail(f"worker exited before startup: {stderr}")
+
+                started_after_worker_ready = time.monotonic()
                 try:
-                    result = subprocess.run(
-                        [
-                            sys.executable,
-                            "-c",
-                            child_script,
-                            str(pid_file),
-                            mode,
-                        ],
-                        cwd=ROOT,
-                        env=env,
-                        capture_output=True,
-                        text=True,
-                        timeout=5.0,
-                        check=False,
-                    )
+                    process.wait(timeout=5.0)
                 except subprocess.TimeoutExpired as exc:
                     if pid_file.exists():
                         try:
@@ -96,14 +107,17 @@ class BatteryScoreWorkerShutdownTest(unittest.TestCase):
                             os.kill(pid, signal.SIGKILL)
                         except (OSError, ValueError):
                             pass
+                    process.kill()
+                    process.communicate()
                     self.fail(f"worker shutdown hung during {mode} exit: {exc}")
 
+                _stdout, stderr = process.communicate()
                 self.assertEqual(
-                    result.returncode,
+                    process.returncode,
                     expected_code,
-                    msg=result.stderr,
+                    msg=stderr,
                 )
-                self.assertLess(time.monotonic() - started, 5.0)
+                self.assertLess(time.monotonic() - started_after_worker_ready, 5.0)
 
 
 if __name__ == "__main__":
