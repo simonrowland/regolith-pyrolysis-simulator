@@ -161,10 +161,18 @@ def test_feto_split_mean_t_is_eight_point_five() -> None:
 
 
 def test_cell_notices_preserves_projected_component_wt_pct_and_mol() -> None:
+    projected_wt_pct = 0.30181086519114686
+    projected_mol_per_kg = (
+        projected_wt_pct * 10.0 / oxide_molar_mass_g_mol("MnO")
+    )
     classification = {
         "projection_verdict": "within_threshold",
         "components": [
-            {"component": "MnO", "wt_pct": 0.3, "mol": 0.0423},
+            {
+                "component": "MnO",
+                "wt_pct": projected_wt_pct,
+                "mol": projected_mol_per_kg,
+            },
         ],
     }
     result = SimpleNamespace(
@@ -185,12 +193,22 @@ def test_cell_notices_preserves_projected_component_wt_pct_and_mol() -> None:
 
     notices = cell_notices(Quantity.ACTIVITY, Engine.MAGEMIN, cell)
 
-    assert len(notices) == 1
-    assert notices[0].kind.value == "composition_projected"
-    assert notices[0].authority is Authority.EXTRAPOLATED
-    assert "MnO" in notices[0].reason
-    assert "0.3 wt%" in notices[0].reason
-    assert "0.0423 mol/kg" in notices[0].reason
+    assert len(notices) == 2
+    projection_notice = next(
+        notice
+        for notice in notices
+        if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+    )
+    band_notice = next(
+        notice
+        for notice in notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+    assert projection_notice.authority is Authority.EXTRAPOLATED
+    assert "MnO" in projection_notice.reason
+    assert "0.301811 wt%" in projection_notice.reason
+    assert f"{projected_mol_per_kg:.12g} mol/kg" in projection_notice.reason
+    assert band_notice.origin == "engine:magemin"
 
     assert flagged_strata(notices) == (FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND,)
     residual = Residual(
@@ -200,11 +218,39 @@ def test_cell_notices_preserves_projected_component_wt_pct_and_mol() -> None:
         rail=Rail.MELT_ACTIVITY,
         status=ResidualStatus.NO_BAND,
         source_relation=SourceRelation.INDEPENDENT,
-        score_eligible=False,
+        score_eligible=True,
         exclusions=(),
         notices=notices,
     )
     assert _measured_residuals((residual,), context=None) == []
+    assert _measured_residuals(
+        (residual,), context=None, include_engine_out_of_band=True
+    ) == [residual]
+
+
+def test_bridge_projected_notice_remains_measured_and_unflagged() -> None:
+    notice = Notice(
+        kind=NoticeKind.COMPOSITION_PROJECTED,
+        affected_quantities=(Quantity.FE3_FE2_RATIO,),
+        reason="Kress91 oxide basis omits Cr2O3",
+        origin="simulator.fe_redox:melt_mol_fractions_for_kress91",
+        dropped=("Cr2O3",),
+        authority=Authority.BRIDGE,
+    )
+    residual = Residual(
+        key="projected::redox::kress91",
+        reference="projected",
+        execution=Execution(state=ExecutionState.PRODUCED),
+        rail=Rail.REDOX,
+        status=ResidualStatus.NO_BAND,
+        source_relation=SourceRelation.INDEPENDENT,
+        score_eligible=True,
+        exclusions=(),
+        notices=(notice,),
+    )
+
+    assert flagged_strata((notice,)) == ()
+    assert _measured_residuals((residual,), context=None) == [residual]
 
 
 def test_extrapolated_non_projection_notice_keeps_its_existing_stratum() -> None:
