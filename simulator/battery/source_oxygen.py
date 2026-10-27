@@ -163,7 +163,7 @@ def _lineage(row: Observation, rows: Mapping[str, Observation], seen: frozenset[
         parent = rows.get(token)
         if parent is None:
             continue  # PDF/compilation references are not gas observations.
-        if _point_key(parent) != _point_key(row):
+        if parent.identity.species is None or _point_key(parent) != _point_key(row):
             return None
         species.add(parent.identity.species.formula)
         ancestry = _lineage(parent, rows, seen)
