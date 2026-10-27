@@ -565,6 +565,11 @@ def test_patched_transport_loads_library_from_build_prefix(tmp_path, monkeypatch
             self._initialized = True
 
     monkeypatch.setattr(thermoengine_module, "ThermoEngineTransport", FakeTransport)
+    monkeypatch.setattr(
+        engine_local_config,
+        "setup_thermoengine_dylib_path",
+        engine_local_config.setup_thermoengine_dylib_path,
+    )
 
     transport = worker._patched_build_transport(prefix)
 
