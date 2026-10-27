@@ -5415,6 +5415,9 @@ def test_thermoengine_loader_reports_missing_phaseobjc_library(
     library_dir = tmp_path / 'lib'
     library_dir.mkdir()
     library_path = library_dir / 'libphaseobjc.dylib'
+    monkeypatch.setenv(
+        'DYLD_FALLBACK_LIBRARY_PATH', str(tmp_path / 'missing-search-path')
+    )
     monkeypatch.setattr(
         thermoengine_module,
         'setup_thermoengine_dylib_path',
