@@ -3656,33 +3656,48 @@ def test_parallel_composition_target_stub_study_completes(
         seed=0,
     )
 
-    assert result.winner is not None
-    winner_summary = result.winner.product_summary
-    assert winner_summary["furnace_amortization_status"] == "available"
-    assert isinstance(
-        winner_summary["furnace_amortization_batch_cost_equivalents"], float
-    )
-
     pareto_path = tmp_path / "study" / "pareto.json"
     assert pareto_path.exists()
     payload = json.loads(pareto_path.read_text())
-    winner_row = next(
-        row for row in payload["pareto"]
-        if row["candidate_id"] == result.winner.candidate_id
-    )
-    authority = winner_row["product_summary"]["wall_deposit_sticking_authority"]
-    fe_records = authority["alpha_s_provenance_by_species"]["Fe"].values()
-    fe_extrapolation = next(
-        record for record in fe_records
-        if record.get("alpha_s_extrapolation_notice", {}).get(
-            "authority_level"
-        ) == "extrapolated"
-    )
-    assert fe_extrapolation["alpha_s"] == pytest.approx(0.02)
-    assert fe_extrapolation["authority_level"] == "extrapolated"
-    assert fe_extrapolation["alpha_s_extrapolation_notice"][
-        "temperature_used_K"
-    ] == pytest.approx(1523.15)
+    assert result.status == "completed-no-feasible-winner"
+    assert result.winner is None
+    assert result.pareto == ()
+    assert payload["status"] == "completed-no-feasible-winner"
+    assert payload["winner_candidate_id"] is None
+    assert payload["pareto"] == []
+    assert result.records
+    assert all(record.feasible for record in result.records)
+
+    # t-1368 owns the missing SiO wall-pressure rail; until it lands, these
+    # candidates must remain unpriced and cannot restore a study winner.
+    for candidate in result.records:
+        summary = candidate.product_summary
+        assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
+        refusal = summary["wall_deposit_refusal"]
+        authority = refusal["authority"]
+        assert "wall_deposit_saturation_pressure_refused" in authority["codes"]
+        assert "SiO" in authority["wall_saturation_pressure_refused_species"]
+        sio_refusals = authority["wall_saturation_pressure_refusals_by_species"][
+            "SiO"
+        ]
+        assert sio_refusals
+        assert all(
+            record["status"] == "refused"
+            for record in sio_refusals.values()
+        )
+
+        wall_authority = summary["wall_deposit_sticking_authority"]
+        fe_records = wall_authority["alpha_s_provenance_by_species"]["Fe"].values()
+        assert any(
+            record.get("alpha_s", 0.0) == pytest.approx(0.02)
+            and record.get("alpha_s_extrapolation_notice", {}).get(
+                "authority_level"
+            ) == "extrapolated"
+            and record["alpha_s_extrapolation_notice"].get(
+                "temperature_used_K"
+            ) == pytest.approx(1523.15)
+            for record in fe_records
+        )
 
 
 def test_leaderboard_separates_certified_envelope_from_preference_score(tmp_path) -> None:
