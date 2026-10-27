@@ -883,7 +883,7 @@ def test_positive_deposit_distinguishes_in_range_and_above_range_alpha(
     if expected_authoritative:
         assert record["alpha_s_domain_status"] == "in_domain"
     else:
-        assert record["alpha_s_domain_status"] == "out_of_domain"
+        assert record["alpha_s_domain_status"] == "extrapolated"
         assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
 
 

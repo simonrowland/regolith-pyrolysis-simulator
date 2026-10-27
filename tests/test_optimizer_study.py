@@ -3657,7 +3657,32 @@ def test_parallel_composition_target_stub_study_completes(
     )
 
     assert result.winner is not None
-    assert (tmp_path / "study" / "pareto.json").exists()
+    winner_summary = result.winner.product_summary
+    assert winner_summary["furnace_amortization_status"] == "available"
+    assert isinstance(
+        winner_summary["furnace_amortization_batch_cost_equivalents"], float
+    )
+
+    pareto_path = tmp_path / "study" / "pareto.json"
+    assert pareto_path.exists()
+    payload = json.loads(pareto_path.read_text())
+    winner_row = next(
+        row for row in payload["pareto"]
+        if row["candidate_id"] == result.winner.candidate_id
+    )
+    authority = winner_row["product_summary"]["wall_deposit_sticking_authority"]
+    fe_records = authority["alpha_s_provenance_by_species"]["Fe"].values()
+    fe_extrapolation = next(
+        record for record in fe_records
+        if record.get("alpha_s_extrapolation_notice", {}).get(
+            "authority_level"
+        ) == "extrapolated"
+    )
+    assert fe_extrapolation["alpha_s"] == pytest.approx(0.02)
+    assert fe_extrapolation["authority_level"] == "extrapolated"
+    assert fe_extrapolation["alpha_s_extrapolation_notice"][
+        "temperature_used_K"
+    ] == pytest.approx(1523.15)
 
 
 def test_leaderboard_separates_certified_envelope_from_preference_score(tmp_path) -> None:
