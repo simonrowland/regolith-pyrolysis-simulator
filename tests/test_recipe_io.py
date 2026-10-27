@@ -170,6 +170,22 @@ def test_stage_recipe_must_be_optimizer_shape(tmp_path: Path) -> None:
         load_recipe_patch(recipe_path)
 
 
+def test_stage_level_yield_target_is_rejected(tmp_path: Path) -> None:
+    recipe = yaml.safe_load(
+        (RECIPE_DIR / "c2a_staged_temperature_ladder.yaml").read_text(
+            encoding="utf-8",
+        )
+    )
+    recipe["campaigns"]["C2A_staged"]["stages"][0]["yield_target"] = {
+        "mode": "off",
+    }
+    recipe_path = tmp_path / "stage-yield-target.recipe.yaml"
+    recipe_path.write_text(yaml.safe_dump(recipe, sort_keys=False), encoding="utf-8")
+
+    with pytest.raises(RecipeIOError, match="unknown C2A_staged stage field"):
+        load_recipe_patch(recipe_path)
+
+
 def test_save_recipe_helper_normalizes_optimizer_winner(
     tmp_path: Path,
 ) -> None:

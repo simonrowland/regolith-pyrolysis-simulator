@@ -2,7 +2,7 @@ import pytest
 import yaml
 
 import app as app_module
-from simulator.campaigns import CampaignManager
+from simulator.campaigns import CampaignManager, CampaignStopConfigurationRefusal
 from simulator.core import PyrolysisSimulator
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -135,7 +135,7 @@ def test_debug_feedstocks_stay_low_melt_metal_oxide_probes(monkeypatch):
 
 
 def test_debug_batches_auto_apply_branching_decisions():
-    manager = CampaignManager({"campaigns": {}})
+    manager = CampaignManager(_minimal_campaign_config())
     record = BatchRecord(feedstock_key="debug_pure_feo")
 
     assert manager.get_next_campaign(CampaignPhase.C0B, record) == CampaignPhase.C2A_STAGED
@@ -161,6 +161,17 @@ def test_debug_batches_auto_apply_branching_decisions():
 
 def _setpoints() -> dict:
     return yaml.safe_load((DATA_DIR / "setpoints.yaml").read_text()) or {}
+
+
+def _minimal_campaign_config() -> dict:
+    # Explicit final-pass inputs keep C4's minimal fixture self-contained.
+    return {
+        "campaigns": {
+            "C2A_continuous": {
+                "post_mg_final_pass": {"min_hold_hr": 82, "max_hold_hr": 160},
+            },
+        },
+    }
 
 
 def _simulator_shell(melt: MeltState, setpoints: dict) -> PyrolysisSimulator:
@@ -246,7 +257,7 @@ def test_clean_stage_to_c2a_staged_reapplies_stage_n2_background():
 
 
 def test_debug_batches_skip_c5_by_default_after_c4():
-    manager = CampaignManager({"campaigns": {}})
+    manager = CampaignManager(_minimal_campaign_config())
     record = BatchRecord(feedstock_key="debug_pure_feo")
     record.branch = "two"
 
@@ -296,7 +307,7 @@ def test_branch_one_completes_when_c5_default_off():
 
 
 def test_normal_batches_still_pause_for_branching_decisions():
-    manager = CampaignManager({"campaigns": {}})
+    manager = CampaignManager(_minimal_campaign_config())
     record = BatchRecord(feedstock_key="lunar_mare_low_ti")
 
     assert manager.get_next_campaign(CampaignPhase.C0B, record) is None
@@ -308,6 +319,37 @@ def test_normal_batches_still_pause_for_branching_decisions():
     # pause for the C6_PROCEED decision after the final C2A bake-out —
     # exactly this test's subject (normal batches still pause).
     assert manager.get_next_campaign(CampaignPhase.C2A, record) is None
+
+
+@pytest.mark.parametrize(
+    ("campaigns", "missing_key"),
+    [
+        ({}, "min_hold_hr"),
+        (
+            {
+                "C2A_continuous": {
+                    "max_hold_hr": 240,
+                    "post_mg_final_pass": {"min_hold_hr": 82},
+                },
+            },
+            "max_hold_hr",
+        ),
+    ],
+    ids=("empty-document-minimum", "no-c2a-cap-fallback"),
+)
+def test_c4_exit_refuses_missing_post_mg_final_pass_value(
+    campaigns: dict, missing_key: str,
+) -> None:
+    manager = CampaignManager({"campaigns": campaigns})
+    record = BatchRecord(branch="two")
+
+    with pytest.raises(CampaignStopConfigurationRefusal) as refusal:
+        manager.get_next_campaign(CampaignPhase.C4, record)
+
+    assert refusal.value.reason == CampaignStopConfigurationRefusal.reason
+    assert refusal.value.diagnostic["detail"] == (
+        f"Missing numeric campaign setpoint: C2A_continuous.{missing_key}"
+    )
 
 
 def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):

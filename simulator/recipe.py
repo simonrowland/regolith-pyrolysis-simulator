@@ -245,7 +245,7 @@ C2A_STAGED_STAGE_GAS_FIELDS: tuple[str, ...] = (
     "gas_cover_mode",
 )
 C2A_STAGED_STAGE_METADATA_FIELDS: frozenset[str] = frozenset(
-    ("target_species", "endpoint", "verification", "yield_target")
+    ("target_species", "endpoint", "verification")
 )
 C2A_STAGED_GAS_COVER_MODES: tuple[str, ...] = ("pn2_sweep", "po2_hold")
 C2A_STAGED_STAGE_FIELDS_BY_NAME: Mapping[str, tuple[str, ...]] = MappingProxyType(
