@@ -153,7 +153,7 @@ def test_thermoengine_dylib_dir_fail_loud_when_missing(
     empty_home.mkdir()
     monkeypatch.setenv("HOME", str(empty_home))
     monkeypatch.delenv("DYLD_LIBRARY_PATH", raising=False)
-    monkeypatch.delenv("DYLD_FALLBACK_LIBRARY_PATH", raising=False)
+    monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", "")
     write_config(config)
 
     with pytest.raises(
@@ -184,12 +184,11 @@ def test_thermoengine_dylib_dir_sets_dyld_fallback(
         lambda: tmp_path / "engines.local.toml",
     )
     write_config(config)
-    monkeypatch.delenv("DYLD_FALLBACK_LIBRARY_PATH", raising=False)
+    monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", "")
 
     resolved = setup_thermoengine_dylib_path()
     assert resolved == dylib_dir
     assert str(dylib_dir) in __import__("os").environ["DYLD_FALLBACK_LIBRARY_PATH"]
-    monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", str(dylib_dir))
 
 
 @pytest.mark.parametrize(
@@ -218,7 +217,7 @@ def test_thermoengine_dylib_dir_resolves_from_dyld_variables(
         if variable == "DYLD_LIBRARY_PATH"
         else "DYLD_LIBRARY_PATH"
     )
-    monkeypatch.delenv(other_variable, raising=False)
+    monkeypatch.setenv(other_variable, "")
 
     assert setup_thermoengine_dylib_path() == dylib_dir
 
@@ -252,10 +251,6 @@ def test_vaporock_objc_load_uses_dyld_path_without_local_config(
             (candidate / name).is_file() for name in artifact_names
         ):
             continue
-        try:
-            ctypes.CDLL(str(candidate / phaseobjc_name))
-        except OSError:
-            continue
         native_dir = candidate
         break
 
@@ -286,7 +281,7 @@ if mode == 'missing':
         assert token in backend._last_error, backend._last_error
     print('TYPED_IMPORT_ERROR ImportError', backend._last_error)
 else:
-    assert module is not None
+    assert module is not None, backend._last_error
     from rubicon.objc import ObjCClass
     ObjCClass('LiquidMelts')
     assert sys.argv[3] in loaded_native_paths, loaded_native_paths
