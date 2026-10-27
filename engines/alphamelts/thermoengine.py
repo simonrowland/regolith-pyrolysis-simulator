@@ -7,7 +7,6 @@ emits a ledger transition.
 
 from __future__ import annotations
 
-import ctypes
 import faulthandler
 import hashlib
 import json
@@ -30,9 +29,7 @@ from typing import Any, Callable, Mapping, Optional
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.engine_local_config import (
     cache_version_for,
-    load_engine_lock,
-    setup_thermoengine_dylib_path,
-    thermoengine_artifact_names,
+    _load_thermoengine_phaseobjc_library,
     warn_legacy_once,
 )
 from simulator.engine_pool import (
@@ -745,31 +742,6 @@ _THERMOENGINE_ADAPTER_VERSION = 'regolith-thermoengine-v2'
 
 def _thermoengine_cache_identity(native_identity: str) -> str:
     return f'{native_identity} (adapter={_THERMOENGINE_ADAPTER_VERSION})'
-
-
-def _load_thermoengine_phaseobjc_library() -> Path:
-    dylib_dir = setup_thermoengine_dylib_path()
-    library_name = next(
-        (
-            Path(name).name
-            for name in thermoengine_artifact_names(load_engine_lock())
-            if Path(name).name.startswith('libphaseobjc.')
-        ),
-        None,
-    )
-    if library_name is None:
-        raise ImportError(
-            'ThermoEngine engine lock does not declare its phaseobjc library'
-        )
-    library_path = dylib_dir / library_name
-    try:
-        ctypes.CDLL(str(library_path))
-    except OSError as exc:
-        raise ImportError(
-            f'ThermoEngine Objective-C library could not be loaded from '
-            f'{library_path}: {exc}'
-        ) from exc
-    return library_path
 
 
 _THERMOENGINE_LOG_DIR_ENV = 'REGOLITH_THERMOENGINE_LOG_DIR'
