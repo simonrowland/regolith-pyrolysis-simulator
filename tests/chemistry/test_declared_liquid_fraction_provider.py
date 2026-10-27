@@ -562,7 +562,7 @@ def test_wrapped_diagnostic_distinguishes_numerical_and_environment_failure(
     }).value == expected
 
 
-@pytest.mark.parametrize('mode', ['reason', 'exception', 'backend_exception'])
+@pytest.mark.parametrize('mode', ['reason', 'exception', 'backend_exception', 'aggregate_budget'])
 @pytest.mark.parametrize('recover', [False, True])
 def test_timeout_retries_same_declared_gate_once(
     monkeypatch, mode, recover, vapor_pressure_data, feedstocks_data, setpoints_data,
@@ -584,7 +584,11 @@ def test_timeout_retries_same_declared_gate_once(
                 'projected_liquidus_status': 'not_converged',
                 'projected_liquidus_diagnostics': (
                     {'backend_failure_exception': 'TimeoutExpired'}
-                    if mode == 'backend_exception' else {'reason': 'engine_worker_timeout'}
+                    if mode == 'backend_exception' else (
+                        {'reason': 'aggregate_budget_exceeded', 'budget_s': 60.0,
+                         'call_count': 26, 'last_T_C': 1700.0}
+                        if mode == 'aggregate_budget' else {'reason': 'engine_worker_timeout'}
+                    )
                 ),
             },
         })
@@ -596,6 +600,10 @@ def test_timeout_retries_same_declared_gate_once(
         with pytest.raises(EvaporationFluxRefusal) as error:
             sim._freeze_gate_curve()
         assert error.value.diagnostic['provider'] == 'magemin'
+        assert error.value.diagnostic['backend_failure_disposition'] == 'environment'
+        assert evaluate_module._run_execution_has_environment_failure_disposition(
+            SimpleNamespace(failure_exception=error.value),
+        )
         assert sim._freeze_gate_liquid_fraction_cache is None
         assert sim._freeze_gate_liquid_fraction_curve_memo == {}
     assert len(calls) == 2
