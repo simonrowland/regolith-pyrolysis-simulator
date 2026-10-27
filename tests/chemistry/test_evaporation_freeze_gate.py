@@ -1851,15 +1851,21 @@ def test_redox_gate_distinguishes_numerical_failure_from_missing_provider_defaul
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
     T_K = sim.melt.temperature_C + 273.15
     before = sim.atom_ledger.mol_by_account()
-    with pytest.raises(EvaporationFluxRefusal) as error:
-        sim._melt_redox_temperature_shift_is_liquid(T_K)
-    assert error.value.diagnostic['outcome'] == (
-        'failed' if provider_status == 'unavailable' else 'numerical_failure'
-    )
-    with pytest.raises(EvaporationFluxRefusal):
-        sim._melt_redox_source_capacity_mol_per_ln_fO2(fO2_log=-9.0, T_K=T_K)
+    if provider_status == 'unavailable':
+        with pytest.raises(EvaporationFluxRefusal) as error:
+            sim._melt_redox_temperature_shift_is_liquid(T_K)
+        assert error.value.diagnostic['outcome'] == 'failed'
+        with pytest.raises(EvaporationFluxRefusal):
+            sim._melt_redox_source_capacity_mol_per_ln_fO2(fO2_log=-9.0, T_K=T_K)
+        assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+    else:
+        assert sim._melt_redox_temperature_shift_is_liquid(T_K)
+        assert sim._melt_redox_source_capacity_mol_per_ln_fO2(fO2_log=-9.0, T_K=T_K) > 0.0
+        curve = sim._melt_redox_liquidus_gate_curve()
+        assert curve['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+        assert curve['gate_provider_refusal']['outcome'] == 'numerical_failure'
+        assert curve['gate_provider_refusal']['authority'] == 'extrapolated (lower-rung)'
     assert sim.atom_ledger.mol_by_account() == before
-    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
 
 
 def test_redox_gate_propagates_keyerror_from_curve_notice_recording(

@@ -337,28 +337,23 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
             assert curve['source'] == 'kress91_liquid_calibration_floor'
             assert curve['composition_projected_notice']['authority'] == 'extrapolated'
             assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
-        elif reason == 'engine_worker_timeout':
-            for _ in range(2):
-                with pytest.raises(EvaporationFluxRefusal) as error:
-                    sim._melt_redox_liquidus_gate_curve()
-                assert error.value.diagnostic['provider_diagnostic'] == diagnostics[-1]
-                assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.FAILED
-                assert sim._freeze_gate_liquid_fraction_cache is None
-                assert sim._freeze_gate_liquid_fraction_curve_memo == {}
-                assert shared_cache == {}
-                assert store.capture_sequence == []
         else:
-            for _ in range(2):
-                with pytest.raises(EvaporationFluxRefusal) as error:
-                    sim._melt_redox_liquidus_gate_curve()
-                assert error.value.diagnostic['outcome'] == 'numerical_failure'
-                assert error.value.diagnostic['provider_diagnostic'] == diagnostics[-1]
-                assert sim._freeze_gate_provider_outcome.value == 'numerical_failure'
+            for hour in range(2):
+                sim.melt.hour = hour
+                curve = sim._melt_redox_liquidus_gate_curve()
+                notice = curve['gate_provider_refusal']
+                assert curve['source'] == 'kress91_liquid_calibration_floor'
+                assert notice['authority'] == 'extrapolated (lower-rung)'
+                assert notice['provider_diagnostic'] == diagnostics[-1]
+                if reason == 'engine_worker_timeout':
+                    assert notice['backend_failure_disposition'] == 'environment'
+                    assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.FAILED
+                else:
+                    assert notice['outcome'] == 'numerical_failure'
                 assert sim._freeze_gate_liquid_fraction_cache is None
                 assert sim._freeze_gate_liquid_fraction_curve_memo == {}
                 assert shared_cache == {}
                 assert store.capture_sequence == []
-            assert len(diagnostics) == 2
         assert injected
         assert diagnostics[-1]['backend_status'] == 'out_of_domain'
         assert diagnostics[-1]['backend_diagnostics']['projected_liquidus_status'] == status
@@ -587,13 +582,12 @@ def test_timeout_retries_same_declared_gate_once(
     if recover:
         assert sim._freeze_gate_curve()['source'] == 'gate_liquid_fraction'
     else:
-        with pytest.raises(EvaporationFluxRefusal) as error:
-            sim._freeze_gate_curve()
-        assert error.value.diagnostic['provider'] == 'magemin'
-        assert error.value.diagnostic['backend_failure_disposition'] == 'environment'
-        assert evaluate_module._run_execution_has_environment_failure_disposition(
-            SimpleNamespace(failure_exception=error.value),
-        )
+        curve = sim._freeze_gate_curve()
+        notice = curve['gate_provider_refusal']
+        assert curve['source'] == 'kress91_liquid_calibration_floor'
+        assert notice['provider'] == 'magemin'
+        assert notice['backend_failure_disposition'] == 'environment'
+        assert notice['authority'] == 'extrapolated (lower-rung)'
         assert sim._freeze_gate_liquid_fraction_cache is None
         assert sim._freeze_gate_liquid_fraction_curve_memo == {}
     assert len(calls) == 2
@@ -604,7 +598,7 @@ def test_timeout_retries_same_declared_gate_once(
     LiquidusSampleError('not_converged', (), {'reason': 'aggregate_budget_exceeded'}),
     EngineWorkerTimeout('magemin', 15.0, phase='liquidus'),
 ])
-def test_numerical_gate_exception_never_becomes_solidification(
+def test_first_call_gate_exception_uses_flagged_calibration_floor(
     monkeypatch, failure, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
@@ -612,10 +606,11 @@ def test_numerical_gate_exception_never_becomes_solidification(
         raise failure
     monkeypatch.setattr(sim, '_dispatch_only', fail)
     before = sim.atom_ledger.mol_by_account()
-    with pytest.raises(EvaporationFluxRefusal):
-        sim._melt_redox_liquid_fraction_factor(1150.0 + 273.15)
+    floor = KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert sim._melt_redox_liquid_fraction_factor(floor + 1.0 + 273.15) == 1.0
+    notice = sim._melt_redox_liquidus_gate_curve()['gate_provider_refusal']
+    assert notice['authority'] == 'extrapolated (lower-rung)'
     assert sim.atom_ledger.mol_by_account() == before
-    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
 
 
 def test_gate_provider_is_a_run_identity_input():
@@ -661,7 +656,7 @@ def test_optimizer_resolves_gate_declared_in_loaded_setpoints(monkeypatch):
 
 @pytest.mark.parametrize('failure', ['numerical', 'projected_numerical', 'aggregate_timeout', 'warm_timeout'])
 @pytest.mark.parametrize('prior_good', [False, True])
-def test_declared_gate_holds_only_a_prior_good_curve_and_retries_next_hour(
+def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     monkeypatch, failure, prior_good,
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
@@ -706,13 +701,49 @@ def test_declared_gate_holds_only_a_prior_good_curve_and_retries_next_hour(
     sim.melt.temperature_C = 1500.0
     timed_out = failure.endswith('timeout')
     if not prior_good:
-        with pytest.raises(EvaporationFluxRefusal) as error:
-            sim._melt_redox_liquidus_gate_curve()
+        store = PT0DeterminismStore('capture')
+        sim.configure_pt0_determinism_store(store)
+        curve = sim._melt_redox_liquidus_gate_curve()
+        expected = sim._freeze_gate_kress_floor_curve(None, [])
+        assert {k: v for k, v in curve.items() if k != 'gate_provider_refusal'} == expected
+        notice = curve['gate_provider_refusal']
+        assert notice['authority'] == 'extrapolated (lower-rung)'
+        assert notice['qualification'] == 'first_call_kress91_floor_prediction'
+        assert notice['failure_hour'] == 7
+        assert notice['failure_temperature_C'] == 1500.0
+        assert notice['status'] == ('unavailable' if failure == 'warm_timeout' else (
+            'not_converged' if failure == 'numerical' else 'out_of_domain'
+        ))
+        assert notice['provider_diagnostic']
+        assert 'calibration-floor step' in notice['detail']
+        assert 'not a fresh solve or a melting measurement' in notice['detail']
         if timed_out:
-            assert error.value.diagnostic['backend_failure_disposition'] == 'environment'
+            assert notice['backend_failure_disposition'] == 'environment'
+        else:
+            assert notice['outcome'] == 'numerical_failure'
+            assert notice['warnings']
+        assert sim._freeze_gate_last_good_curve is None
         assert sim._freeze_gate_liquid_fraction_cache is None
         assert sim._freeze_gate_liquid_fraction_curve_memo == {}
         assert shared == {}
+        assert store.capture_sequence == []
+        assert sim._make_snapshot().liquid_fraction_gate['redox']['gate_provider_refusal'] == notice
+        call_count = len(calls)
+        assert sim._melt_redox_liquidus_gate_curve() == curve
+        assert len(calls) == call_count
+        sim.melt.hour = 8
+        again = sim._melt_redox_liquidus_gate_curve()
+        assert again['gate_provider_refusal']['failure_hour'] == 8
+        assert len(calls) == call_count + (2 if timed_out else 1)
+        assert sim._freeze_gate_liquid_fraction_curve_memo == {}
+        assert shared == {}
+        assert store.capture_sequence == []
+        sim.melt.hour = 9
+        phase.update(good=True, liquidus=1500.0)
+        recovered = sim._melt_redox_liquidus_gate_curve()
+        assert recovered['liquidus_T_C'] == 1500.0
+        assert 'gate_provider_refusal' not in recovered
+        assert sim._freeze_gate_last_good_curve['computed_hour'] == 9
         return
 
     good = sim._melt_redox_liquidus_gate_curve()
