@@ -434,10 +434,18 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 if payload.solved_fO2_log is None
                 else float(payload.solved_fO2_log)
             )
+            # Gas-only never asks the solver for fO2. A finished assemblage
+            # with no intrinsic echo is that path, not an omitted echo: the
+            # printed value is the gas coordinate. An empty assemblage is
+            # still a refusal. Fe-bearing calls do not set gas_only, so this
+            # guard stays the omission refusal there. The transport
+            # FO2_REQUIRES_IRON refusal is unchanged.
+            completed_gas_only = gas_only and bool(payload.phases_present)
             if (
                 solved_fO2_log is None
                 and payload.solved_fO2_reason
                 != 'undefined_zero_ferric_liquid'
+                and not completed_gas_only
             ):
                 # Row-local: the child already returned a payload. A
                 # failed MELTS search (empty assemblage) and an

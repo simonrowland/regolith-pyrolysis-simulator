@@ -338,6 +338,87 @@ def test_thermoengine_commissioning_notice_does_not_retype_to_refusal(
     )
 
 
+def _fo2_echo_transport(payload: ThermoEnginePayload):
+    class FakeTransport:
+        def equilibrate(self, **kwargs):
+            return payload
+
+        def close(self):
+            return None
+
+    return FakeTransport()
+
+
+def test_gas_only_finished_assemblage_is_not_an_fo2_omission_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A finished Fe-free solve that omits intrinsic fO2 still runs.
+
+    The commissioning fixture echoes the melt fO2 argument. Gas-only
+    passes None, so that echo has no typed undefined reason. That must
+    stay a gas coordinate, not ThermoEngineFO2OmittedError. An empty
+    assemblage and a Fe-bearing omitted echo stay refusals.
+    """
+    finished = ThermoEnginePayload(
+        phases_present=('liquid',),
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct={'SiO2': 50.0, 'Al2O3': 15.0, 'MgO': 35.0},
+        activity_coefficients={'SiO2': 0.4},
+        solved_fO2_log=None,
+        solved_fO2_reason=None,
+    )
+    backend = ThermoEngineBackend()
+    backend._mode = 'thermoengine'
+    backend._engine_version = 'test'
+    backend._vaporock_available = False
+    backend._thermoengine_transport = _fo2_echo_transport(finished)
+    monkeypatch.setattr(
+        backend,
+        '_activities_times_antoine_or_fail',
+        lambda *args, **kwargs: {},
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 50.0, 'Al2O3': 15.0, 'MgO': 35.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'ok'
+    assert result.fO2_log is None
+    assert result.requested_fO2_log == pytest.approx(-9.0)
+    assert result.diagnostics['fO2_transport'] == 'external_on_gas_only'
+
+    empty = ThermoEngineBackend()
+    empty._mode = 'thermoengine'
+    empty._engine_version = 'test'
+    empty._vaporock_available = False
+    empty._thermoengine_transport = _fo2_echo_transport(ThermoEnginePayload())
+    with pytest.raises(ThermoEngineFO2OmittedError, match='omitted solved fO2'):
+        empty._equilibrate_thermoengine(
+            1400.0,
+            {'SiO2': 50.0, 'Al2O3': 15.0, 'MgO': 35.0},
+            -9.0,
+            1.0,
+            gas_only_fo2_log=-9.0,
+        )
+
+    fe_bearing = ThermoEngineBackend()
+    fe_bearing._mode = 'thermoengine'
+    fe_bearing._engine_version = 'test'
+    fe_bearing._vaporock_available = False
+    fe_bearing._thermoengine_transport = _fo2_echo_transport(finished)
+    with pytest.raises(ThermoEngineFO2OmittedError, match='omitted solved fO2'):
+        fe_bearing.equilibrate(
+            temperature_C=1400.0,
+            composition_kg={'SiO2': 50.0, 'FeO': 20.0, 'MgO': 30.0},
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+        )
+
+
 def test_thermoengine_solves_intrinsic_fo2_without_an_input_or_redox_mode(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
