@@ -66,8 +66,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.08'
+    kind: unavailable
+    unavailable_reason: sample_mass_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -738,8 +738,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '1.02'
+    kind: unavailable
+    unavailable_reason: sample_mass_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -1172,96 +1172,6 @@ observations:
               figure: '2'
               section: '3.1'
         output_unit: K
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_quoted_spec_density
-  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
-  identity:
-    quantity:
-      tag: value
-      value: density
-    species:
-      formula: LMS-1
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile density does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile density does not use per
-    temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile density does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile density does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile density does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile density does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile density does not use reservoir
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile density does not use fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: not_applicable
-      reason: profile density does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile density does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile density does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile density does not use wall
-  value:
-    kind: point
-    point: '3.03'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_from_other_workers
-    attribution: For BET calculations a sample density of 3.03 g/cm3 was used as per LMS-1 simulant specifications [10].
-  admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - density
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: sublimation-kinetics-2023-minerals::shaw_2023_lms1_quoted_spec_density
-  source_id: sublimation-kinetics-2023-minerals
-  locator:
-    published_page: 3
-    pdf_page_index: 3
-    section: '2.2'
-  read_from: pdf:sublimation-kinetics-2023-minerals
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_sintering_apparatus
   experiment_id: 10.3390/min13010079::experiment::lms1-sintering-series
   identity:
@@ -1376,8 +1286,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '1.38'
+    kind: unavailable
+    unavailable_reason: sample_mass_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -1762,8 +1672,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.000000000032'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -1817,12 +1727,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1173.15:h=5aad9b4640e6
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -1887,8 +1791,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000000014'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -1942,12 +1846,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1273.15:h=07bf09ab080a
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -2012,8 +1910,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.000000031'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -2067,12 +1965,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1323.15:h=a551374296db
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -2137,8 +2029,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00000013'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -2192,12 +2084,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1373.15:h=4371c318198b
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -2262,8 +2148,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00000046'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -2317,12 +2203,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1423.15:h=3eaca3124688
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -2387,8 +2267,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000015'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -2442,12 +2322,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1473.15:h=ba0b4749d4e7
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -2512,8 +2386,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000046'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -2567,12 +2441,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1073.15:h=bd7ee815379f
   experiment_id: 10.3390/min13010079::experiment::factsage-feo-proxy
   identity:
@@ -3624,8 +3492,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000000021'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -3677,12 +3545,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1173.15:h=2b8fb66a2723
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -3747,8 +3609,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00000006'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -3800,12 +3662,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1273.15:h=4d0020499a44
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -3870,8 +3726,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00000097'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -3923,12 +3779,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1323.15:h=1c35e07225a9
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -3993,8 +3843,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000033'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -4046,12 +3896,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1373.15:h=ab74ae0675ac
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -4116,8 +3960,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00001'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -4169,12 +4013,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1423.15:h=827f924aea24
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -4239,8 +4077,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00003'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -4292,12 +4130,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1473.15:h=8e857c4e90c2
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -4362,8 +4194,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00008'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -4415,12 +4247,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1073.15:h=dcf0d6307219
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5465,8 +5291,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000000034'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -5518,12 +5344,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1173.15:h=96515ec44f47
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5588,8 +5408,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.000000082'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -5641,12 +5461,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1273.15:h=7b08740af713
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5711,8 +5525,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000016'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -5764,12 +5578,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1323.15:h=f5b37a001820
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5834,8 +5642,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.0000059'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -5887,12 +5695,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1373.15:h=f3755c85a5e3
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -5957,8 +5759,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00002'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -6010,12 +5812,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1423.15:h=ca3ebbfcb62a
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -6080,8 +5876,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.000063'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -6133,12 +5929,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1473.15:h=8695e90ddac2
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -6203,8 +5993,8 @@ observations:
       tag: not_applicable
       reason: profile evaporation_rate does not use wall
   value:
-    kind: point
-    point: '0.00018'
+    kind: unavailable
+    unavailable_reason: sample_area_not_printed
     approximate: false
   uncertainty:
     kind: none
@@ -6256,12 +6046,6 @@ observations:
               pdf_page_index: 7
               table: '2'
         output_unit: K
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:sublimation-kinetics-2023-minerals
-    parameters: []
-    output_unit: mol/s/m2 as printed
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1073.15:h=552956d8387d
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
