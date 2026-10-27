@@ -1285,6 +1285,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._freeze_gate_config = self._resolve_freeze_gate_config()
         self._freeze_gate_liquid_fraction_cache: Optional[Dict[str, Any]] = None
+        self._freeze_gate_last_good_curve = None
+        self._freeze_gate_held_curve_record = None
         self._freeze_gate_liquid_fraction_curve_memo: Dict[
             tuple,
             Dict[str, Any],
@@ -1634,6 +1636,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         self._activated_additive_reagents = set()
         self.atom_ledger = self._new_atom_ledger()
+        self._freeze_gate_last_good_curve = None
+        self._freeze_gate_held_curve_record = None
         self._yield_disposition_ledger_snapshots = {}
         self._feedstock_recovered_reagent_kg_by_species = {}
         self._non_feedstock_reagent_element_kg_by_account = {}

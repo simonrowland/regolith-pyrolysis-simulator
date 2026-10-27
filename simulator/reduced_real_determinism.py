@@ -2886,6 +2886,7 @@ def gate_curve_memo_is_cacheable(
 
     if (
         disposition == "replay"
+        or getattr(sim, "_freeze_gate_held_curve_record", None) is not None
         or uncacheable_replay_disposition(sim)
         or not gate_curve_provider_outcome_is_reusable(provider_outcome)
         or not isinstance(curve, Mapping)

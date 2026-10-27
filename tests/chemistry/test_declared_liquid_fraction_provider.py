@@ -349,25 +349,15 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
                 assert store.capture_sequence == []
         else:
             for _ in range(2):
-                curve = sim._melt_redox_liquidus_gate_curve()
-                assert curve['source'] == 'kress91_liquid_calibration_floor'
-                notice = curve['gate_provider_refusal']
-                assert notice['provider_outcome'] == 'numerical_failure'
-                assert notice['authority'] == 'extrapolated'
-                assert notice['qualification'] == 'numerical_failure_kress91_floor_prediction'
-                assert notice['provider_diagnostic'] == diagnostics[-1]
-                assert notice['provider_diagnostic']['backend_diagnostics'][
-                    'projected_liquidus_status'
-                ] == status
-                assert notice['certified_band']['min_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+                with pytest.raises(EvaporationFluxRefusal) as error:
+                    sim._melt_redox_liquidus_gate_curve()
+                assert error.value.diagnostic['outcome'] == 'numerical_failure'
+                assert error.value.diagnostic['provider_diagnostic'] == diagnostics[-1]
                 assert sim._freeze_gate_provider_outcome.value == 'numerical_failure'
                 assert sim._freeze_gate_liquid_fraction_cache is None
                 assert sim._freeze_gate_liquid_fraction_curve_memo == {}
                 assert shared_cache == {}
                 assert store.capture_sequence == []
-                assert sim._make_snapshot().liquid_fraction_gate['redox'][
-                    'gate_provider_refusal'
-                ] == notice
             assert len(diagnostics) == 2
         assert injected
         assert diagnostics[-1]['backend_status'] == 'out_of_domain'
@@ -692,6 +682,7 @@ def test_declared_gate_holds_only_a_prior_good_curve_and_retries_next_hour(
         if phase['good']:
             return SimpleNamespace(status='ok', diagnostic={
                 'solidus_T_C': 1000.0, 'liquidus_T_C': phase['liquidus'],
+                'kernel_fallback_used': 'magemin-shadow',
             }, warnings=())
         if failure == 'warm_timeout':
             raise EngineWorkerTimeout('magemin', 15.0, phase='liquidus')
@@ -727,6 +718,7 @@ def test_declared_gate_holds_only_a_prior_good_curve_and_retries_next_hour(
     good = sim._melt_redox_liquidus_gate_curve()
     memo_keys = set(sim._freeze_gate_liquid_fraction_curve_memo)
     shared_keys = set(shared)
+    assert memo_keys and shared_keys
     phase['good'] = False
     sim.melt.hour = 8
     sim.melt.p_total_mbar += 100.0
@@ -761,11 +753,12 @@ def test_declared_gate_holds_only_a_prior_good_curve_and_retries_next_hour(
     assert len(calls) == call_count
 
     sim.melt.hour = 9
+    sim.melt.p_total_mbar -= 100.0
     again = sim._melt_redox_liquidus_gate_curve()
     assert len(calls) == call_count + (2 if timed_out else 1)
     assert again['gate_provider_refusal']['failure_hour'] == 9
     assert again['gate_provider_refusal']['computed_hour'] == 7
-    assert set(sim._freeze_gate_liquid_fraction_curve_memo) == memo_keys
+    assert set(sim._freeze_gate_liquid_fraction_curve_memo) <= memo_keys
     assert set(shared) == shared_keys
     assert store.capture_sequence == []
 

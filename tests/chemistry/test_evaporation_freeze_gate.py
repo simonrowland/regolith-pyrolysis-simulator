@@ -631,10 +631,10 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             ),
             (
                 'C2A_STAGED',
-                'kress91_liquid_calibration_floor',
-                1200.0,
-                1200.000001,
-                ((1200.0, 0.0), (1200.000001, 1.0)),
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                918.75,
+                1370.3125,
+                ((918.75, 0.0), (1370.3125, 1.0)),
             ),
             (
                 'C2A_STAGED',
@@ -674,15 +674,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 ((1018.75, 0.0), (1320.3125, 1.0)),
             ),
         ],
-        'ci_carbonaceous_chondrite_C2B_12h': [
-            (
-                'C2B',
-                'kress91_liquid_calibration_floor',
-                1200.0,
-                1200.000001,
-                ((1200.0, 0.0), (1200.000001, 1.0)),
-            ),
-        ],
+        'ci_carbonaceous_chondrite_C2B_12h': [],
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
@@ -705,19 +697,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             curve['liquidus_T_C'],
             tuple(tuple(point) for point in curve['path']),
         )
-        if current_scenario[0] == 'ci_carbonaceous_chondrite_C2B_12h':
-            assert [row] == expected[current_scenario[0]]
-            notice = curve['gate_provider_refusal']
-            assert record['provider_outcome'] is GateCurveProviderOutcome.NUMERICAL_FAILURE
-            assert notice['provider_outcome'] == 'numerical_failure'
-            assert notice['authority'] == 'extrapolated'
-            assert notice['certified_band']['min_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
-            assert notice['provider_diagnostic']['backend_diagnostics'][
-                'projected_liquidus_status'
-            ] in {'unavailable', 'not_converged'}
-            observed[current_scenario[0]] = [row]
-        else:
-            observed.setdefault(current_scenario[0], []).append(row)
+        observed.setdefault(current_scenario[0], []).append(row)
         rebuild_counts[current_scenario[0]] = int(
             getattr(sim, '_freeze_gate_cache_rebuild_count', 0)
         )
@@ -748,17 +728,17 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             setpoints_patch={'freeze_gate': {'enabled': True}},
         ).run()
         if name == 'ci_carbonaceous_chondrite_C2B_12h':
-            assert result['status'] == 'ok'
+            assert result['status'] == 'refused'
             artifact = build_run_artifact(result, run_id='ci-numerical-gate')
-            flagged_hours = [
-                step['hour'] for step in artifact['timesteps']
-                if step['summary']['oxygen_reservoir']['liquid_fraction_gate'][
-                    'redox'
-                ]['gate_provider_refusal']['provider_outcome'] == 'numerical_failure'
-            ]
-            assert flagged_hours == list(range(1, scenario['hours'] + 1))
-            assert rebuild_counts.get(name, 0) > 0
+            assert artifact['timesteps'] == []
+            diagnostic = artifact['terminal']['run_metadata']['refusal_diagnostic']
+            assert diagnostic['outcome'] == 'numerical_failure'
+            assert diagnostic['provider_diagnostic']['backend_diagnostics'][
+                'projected_liquidus_status'
+            ] in {'unavailable', 'not_converged'}
+            assert rebuild_counts.get(name, 0) == 0
             assert equilibrium_count[0] > equilibrations_before
+            observed[name] = []
 
     assert observed == expected
 
@@ -1871,17 +1851,13 @@ def test_redox_gate_distinguishes_numerical_failure_from_missing_provider_defaul
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
     T_K = sim.melt.temperature_C + 273.15
     before = sim.atom_ledger.mol_by_account()
-    if provider_status == 'unavailable':
-        with pytest.raises(EvaporationFluxRefusal):
-            sim._melt_redox_temperature_shift_is_liquid(T_K)
-        with pytest.raises(EvaporationFluxRefusal):
-            sim._melt_redox_source_capacity_mol_per_ln_fO2(fO2_log=-9.0, T_K=T_K)
-    else:
-        assert sim._melt_redox_temperature_shift_is_liquid(T_K)
-        assert sim._melt_redox_source_capacity_mol_per_ln_fO2(fO2_log=-9.0, T_K=T_K) > 0.0
-        notice = sim._last_melt_redox_liquidus_gate_diagnostic['gate_provider_refusal']
-        assert notice['provider_outcome'] == 'numerical_failure'
-        assert notice['authority'] == 'extrapolated'
+    with pytest.raises(EvaporationFluxRefusal) as error:
+        sim._melt_redox_temperature_shift_is_liquid(T_K)
+    assert error.value.diagnostic['outcome'] == (
+        'failed' if provider_status == 'unavailable' else 'numerical_failure'
+    )
+    with pytest.raises(EvaporationFluxRefusal):
+        sim._melt_redox_source_capacity_mol_per_ln_fO2(fO2_log=-9.0, T_K=T_K)
     assert sim.atom_ledger.mol_by_account() == before
     assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
 
@@ -6645,12 +6621,8 @@ def test_core_gate_curve_memo_recomputes_after_provider_failure(
         None,
         raising=False,
     )
-    if initial_status == 'not_converged':
-        curve = sim._melt_redox_liquidus_gate_curve()
-        assert curve['gate_provider_refusal']['provider_outcome'] == 'numerical_failure'
-    else:
-        with pytest.raises(EvaporationFluxRefusal):
-            sim._melt_redox_liquidus_gate_curve()
+    with pytest.raises(EvaporationFluxRefusal):
+        sim._melt_redox_liquidus_gate_curve()
     key = _freeze_gate_key_for_current_state(sim)
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
     second = sim._melt_redox_liquidus_gate_curve()
