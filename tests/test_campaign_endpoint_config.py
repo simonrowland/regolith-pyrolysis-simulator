@@ -360,6 +360,17 @@ def test_mre_needed_missing_current_uses_typed_refusal(phase, current):
         manager.check_endpoint(melt, _flux(), CondensationTrain(), record)
 
 
+@pytest.mark.parametrize('current', [None, 'not-a-number'])
+def test_c5_ladder_completion_skips_unneeded_current(current):
+    manager = CampaignManager(_setpoints())
+    melt = _melt(CampaignPhase.C5, 0, voltage_V=2.5)
+    melt.mre_current_A = current
+    melt.mre_c5_ladder_complete = True
+    record = BatchRecord(snapshots=[HourSnapshot(campaign=CampaignPhase.C5, mre_current_A=100, mre_voltage_V=2.5)])
+    assert manager.check_endpoint(melt, _flux(), CondensationTrain(), record)
+    assert manager.last_termination['winning_condition'] == 'ladder_complete'
+
+
 def test_combined_capture_is_the_only_yield_gate():
     target = dict(mode='enabled', species=['Na', 'K'], denominator='initial_feed_element_inventory',
                   quantity='captured', threshold=0.88)
