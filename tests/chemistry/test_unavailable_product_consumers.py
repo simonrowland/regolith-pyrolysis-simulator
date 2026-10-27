@@ -89,6 +89,23 @@ def test_oxygen_partitions_inherit_unavailable_product_total(two_hour_run, monke
         assert "EvaporationFluxConfigurationError" in products[bucket]["flag"]["reason"]
 
 
+def test_real_si_refusal_keeps_product_classes_numeric_and_partial(two_hour_run):
+    products = classify_products(two_hour_run)
+    for name in (
+        "metals_plus_O2",
+        "ingots_metals",
+        "pure_silica_glass",
+        "glass",
+        "refractory_ceramic_rump",
+        "captured_volatiles",
+    ):
+        bucket = products[name]
+        assert bucket.get("status") == "partial"
+        assert isinstance(bucket.get("class_total_kg"), (int, float))
+        assert len(bucket.get("excluded", ())) == 1
+        assert bucket["excluded"][0]["species"] == "Si"
+
+
 def test_extraction_gate_does_not_use_partial_products(two_hour_run):
     constraints = PhysicsConstraintSet(
         target_species=("SiO",),
