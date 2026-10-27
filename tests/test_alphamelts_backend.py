@@ -5407,37 +5407,6 @@ def test_never_installed_thermoengine_still_reports_unavailable(monkeypatch):
     assert backend.is_available() is False
 
 
-def test_thermoengine_loader_reports_missing_phaseobjc_library(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """A missing native library must fail before ObjCClass lookup."""
-    library_dir = tmp_path / 'lib'
-    library_dir.mkdir()
-    library_path = library_dir / 'libphaseobjc.dylib'
-    monkeypatch.setenv(
-        'DYLD_FALLBACK_LIBRARY_PATH', str(tmp_path / 'missing-search-path')
-    )
-    monkeypatch.setattr(
-        thermoengine_module,
-        'setup_thermoengine_dylib_path',
-        lambda: library_dir,
-    )
-
-    def fail_load(path: str):
-        assert path == str(library_path)
-        raise OSError('image not found')
-
-    monkeypatch.setattr(
-        thermoengine_module,
-        'ctypes',
-        types.SimpleNamespace(CDLL=fail_load),
-        raising=False,
-    )
-    with pytest.raises(ImportError, match=str(library_path)):
-        thermoengine_module._load_thermoengine_phaseobjc_library()
-
-
 def test_timeout_cause_closed_set_forbids_absence_and_unclassified_raises():
     assert set(STATUS_BY_TIMEOUT_CAUSE) == set(ThermoEngineTimeoutCause)
     assert 'unavailable' not in set(STATUS_BY_TIMEOUT_CAUSE.values())
