@@ -2281,7 +2281,19 @@ def test_magemin_bulk_projection_drop_at_0_99_wt_pct_solves_with_notice(
     component = classification["components"][0]
     assert component["component"] == "MnO"
     assert component["wt_pct"] == pytest.approx(100.0 / 101.0)
-    assert component["mol"] is not None and component["mol"] > 0.0
+    source_mass_fraction = 1.0 / 101.0
+    mn_molar_mass_kg_per_mol = (54.938044 + 15.999) / 1000.0
+    oxygen_mass_rounding_kg_per_mol = 0.0005 / 1000.0
+    expected_mol_per_kg = source_mass_fraction / mn_molar_mass_kg_per_mol
+    molar_mass_source_tolerance = (
+        source_mass_fraction
+        * oxygen_mass_rounding_kg_per_mol
+        / (mn_molar_mass_kg_per_mol - oxygen_mass_rounding_kg_per_mol) ** 2
+    )
+    assert component["mol"] == pytest.approx(
+        expected_mol_per_kg,
+        abs=molar_mass_source_tolerance,
+    )
     assert classification["dropped_component_mol_per_kg"]["MnO"] == (
         component["mol"]
     )
@@ -2293,6 +2305,90 @@ def test_magemin_bulk_projection_drop_at_0_99_wt_pct_solves_with_notice(
         if "MAGEMin solved projected composition" in warning
     )
     assert "MnO=" in notice and "wt%" in notice and "mol/kg" in notice
+
+
+def test_magemin_bulk_projection_drop_at_exactly_1_wt_pct_solves(
+    monkeypatch,
+):
+    calls = []
+
+    def minimize(**kwargs):
+        calls.append(kwargs)
+        return {"phases": {"liq": {"mass_kg": 1.0}}}
+
+    fake_module = types.SimpleNamespace(minimize=minimize)
+    _make_available_magemin(monkeypatch, fake_module)
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        backend.initialize({})
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg={"SiO2": 50.0, "MgO": 49.0, "MnO": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=5000.0,
+    )
+
+    assert len(calls) == 1
+    assert result.status == "ok"
+    classification = result.diagnostics[PROJECTED_BULK_CLASSIFICATION_KEY]
+    assert classification["projection_verdict"] == "within_threshold"
+    assert classification["dropped_total_wt_pct"] == pytest.approx(1.0)
+    assert result.diagnostics["composition_projected_notice"][
+        "dropped_components"
+    ][0]["component"] == "MnO"
+
+
+def test_magemin_within_threshold_liquidus_returns_ok_with_notice(monkeypatch):
+    import simulator.melt_backend.magemin as magemin_module
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._config = {}
+    backend._subprocess_pool = None
+
+    def fake_call(*, bulk_projection, **_kwargs):
+        assert "MnO" not in bulk_projection.composition_wt_pct
+        return {
+            "phases": {
+                "liq": {"mass_kg": 0.5},
+                "ol": {"mass_kg": 0.5},
+            },
+            "converged": True,
+        }
+
+    def fake_finder(sample_fraction, **_kwargs):
+        assert sample_fraction(1100.0) == pytest.approx(0.5)
+        return liquidus_module.LiquidusSolidusResult(
+            solidus_T_C=1000.0,
+            liquidus_T_C=1200.0,
+            liquid_fraction=0.5,
+            status="ok",
+        )
+
+    backend._call_magemin = fake_call
+    monkeypatch.setattr(
+        magemin_module,
+        "find_liquidus_solidus_by_fraction",
+        fake_finder,
+    )
+
+    result = backend.find_liquidus_solidus(
+        composition_kg={"SiO2": 50.0, "MgO": 49.7, "MnO": 0.3},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == "ok"
+    classification = result.diagnostics[PROJECTED_BULK_CLASSIFICATION_KEY]
+    assert classification["projection_verdict"] == "within_threshold"
+    notice = result.diagnostics["composition_projected_notice"]
+    assert notice["dropped_components"][0]["component"] == "MnO"
+    assert classification["components"][0]["mol"] > 0.0
 
 
 def test_magemin_bulk_projection_drop_at_1_01_wt_pct_is_refused(
@@ -2331,6 +2427,36 @@ def test_magemin_bulk_projection_drop_at_1_01_wt_pct_is_refused(
     assert classification["dropped_total_wt_pct"] > classification[
         "threshold_wt_pct"
     ]
+
+
+def test_magemin_elemental_sulfur_is_not_a_projected_oxide_drop(monkeypatch):
+    calls = []
+
+    def minimize(**kwargs):
+        calls.append(kwargs)
+        return {"phases": {"liq": {"mass_kg": 1.0}}}
+
+    fake_module = types.SimpleNamespace(minimize=minimize)
+    _make_available_magemin(monkeypatch, fake_module)
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        backend.initialize({})
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg={"SiO2": 50.0, "MgO": 49.93, "S": 0.07},
+        fO2_log=-8.0,
+        pressure_bar=5000.0,
+    )
+
+    assert calls == []
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.FORBIDDEN_SPECIES.value
+    )
+    assert PROJECTED_BULK_CLASSIFICATION_KEY not in result.diagnostics
 
 
 def test_magemin_bulk_projection_mass_fraction_float_hex_pin():

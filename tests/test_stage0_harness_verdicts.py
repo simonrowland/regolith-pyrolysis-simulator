@@ -7,6 +7,10 @@ from types import SimpleNamespace
 from typing import Any
 import pytest
 
+from simulator.composition_projection import (
+    PROJECTED_BULK_CLASSIFICATION_KEY,
+    classify_projected_bulk,
+)
 from simulator.chemistry.kernel.dto import (
     DEGRADING_INTENT_RESULT_STATUSES,
 )
@@ -751,6 +755,47 @@ def test_verdict_b_does_not_inject_stale_ood_reason_into_all_ok_history():
     assert verdict_b["backend_status"] == "ok"
     assert verdict_b["backend_status_reason"] is None
     assert verdict_b["hard_gate_failed"] is False
+
+
+def test_verdict_b_serializes_projected_bulk_notice_without_hard_failure():
+    classification = classify_projected_bulk(
+        {"MnO": 0.3},
+        source_sum_wt_pct=100.0,
+        dropped_component_mol_per_kg={"MnO": 0.0423},
+    ).as_diagnostics()
+    notice = {
+        "kind": "composition_projected",
+        "reason": "MAGEMin solved projected bulk",
+        "dropped_components": [
+            {"component": "MnO", "wt_pct": 0.3, "mol": 0.0423},
+        ],
+    }
+    diagnostics = {
+        "backend_status": "ok",
+        PROJECTED_BULK_CLASSIFICATION_KEY: classification,
+        "composition_projected_notice": notice,
+    }
+    sim = SimpleNamespace(
+        _backend_status_history=["ok"],
+        _last_backend_status="ok",
+        _backend_selection_status="ok",
+        _last_backend_diagnostics=diagnostics,
+        _last_out_of_domain_diagnostics={},
+        melt=SimpleNamespace(temperature_C=1400.0),
+    )
+
+    verdict_b = build_harness_verdicts(
+        cleaned_melt_kg=_basalt_oxide_kg(),
+        sim=sim,
+        engine="magemin",
+        timeline=(),
+        T_in_C=1400.0,
+    )["verdict_b"]
+
+    assert verdict_b["backend_status"] == "ok"
+    assert verdict_b["hard_gate_failed"] is False
+    assert verdict_b[PROJECTED_BULK_CLASSIFICATION_KEY] == classification
+    assert verdict_b["composition_projected_notice"] == notice
 
 
 def test_verdict_b_not_converged_crash_reason_stays_distinct_from_forbidden_species():

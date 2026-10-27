@@ -16,6 +16,10 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.composition_projection import (
+    PROJECTED_BULK_CLASSIFICATION_KEY,
+    classify_projected_bulk,
+)
 from simulator.diagnostic_helpers.binary_pot_battery import (
     ARM_QUALIFICATION,
     AUTHORITY_EXTRAPOLATED,
@@ -563,6 +567,97 @@ def test_classify_composition_projected_is_typed_refusal() -> None:
     assert vaporock_reason == "out_of_basis"
 
 
+def test_magemin_small_projected_bulk_is_scored_with_component_notice():
+    classification = classify_projected_bulk(
+        {"MnO": 0.3},
+        source_sum_wt_pct=100.0,
+        dropped_component_mol_per_kg={"MnO": 0.0423},
+    ).as_diagnostics()
+    result = SimpleNamespace(
+        status="ok",
+        diagnostics={
+            "backend_status": "ok",
+            PROJECTED_BULK_CLASSIFICATION_KEY: classification,
+            "composition_projected_notice": {
+                "kind": "composition_projected",
+                "reason": "composition_projected",
+                "authority": AUTHORITY_EXTRAPOLATED,
+                "dropped_components": [
+                    {"component": "MnO", "mass_fraction": 0.003}
+                ],
+            },
+        },
+        warnings=["MAGEMin solved projected composition"],
+        activity_coefficients={"SiO2": 0.4},
+        vapor_pressures_Pa={},
+        liquid_fraction=0.5,
+        phase_assemblage_available=True,
+    )
+    handle = EngineHandle(
+        name="magemin",
+        backend=SimpleNamespace(equilibrate=lambda **_kwargs: result),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = BinaryPot(
+        pot_id="mare_mno_0p30",
+        kato_1993_table4_system=None,
+        why="projected bulk fixture",
+        composition_wt_pct={"SiO2": 99.7, "MnO": 0.3},
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1500.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+    )
+
+    assert cell.status == "ok"
+    assert cell.refusal_reason is None
+    row = next(item for item in cell.notices if item.get("kind") == "composition_projected")
+    assert row[PROJECTED_BULK_CLASSIFICATION_KEY]["projection_verdict"] == (
+        "within_threshold"
+    )
+    component = row[PROJECTED_BULK_CLASSIFICATION_KEY]["components"][0]
+    assert component["component"] == "MnO"
+    assert component["wt_pct"] == pytest.approx(0.3)
+    assert component["mol"] == pytest.approx(0.0423)
+
+
+def test_magemin_over_threshold_projection_remains_battery_refusal():
+    classification = classify_projected_bulk(
+        {"MnO": 1.01},
+        source_sum_wt_pct=100.0,
+        dropped_component_mol_per_kg={"MnO": 1.01 / 70.937044},
+    ).as_diagnostics()
+    result = SimpleNamespace(
+        status="out_of_domain",
+        diagnostics={
+            "backend_status_reason": REFUSAL_COMPOSITION_PROJECTED,
+            PROJECTED_BULK_CLASSIFICATION_KEY: classification,
+            "input_composition_projection": {
+                "composition_projected": {
+                    "dropped_components": ["MnO"],
+                    "dropped_mass_fraction": 0.0101,
+                },
+            },
+        },
+        warnings=["MAGEMin refused projected composition; dropped MnO"],
+        activity_coefficients={},
+        vapor_pressures_Pa={},
+        liquid_fraction=None,
+        phase_assemblage_available=False,
+    )
+
+    assert classify_equilibrate_outcome(result)[:2] == (
+        "refusal",
+        REFUSAL_COMPOSITION_PROJECTED,
+    )
+
+
 def test_reclassify_magemin_p2o5_ok_cell_is_composition_projected() -> None:
     pot = BinaryPot(
         pot_id="kambayashi_1985_feto_p2o5_s01",
@@ -620,6 +715,45 @@ def test_reclassify_magemin_p2o5_ok_cell_is_composition_projected() -> None:
     assert kept[0].status == "ok"
     assert kept[0].refusal_reason is None
     assert kept[0].melt_activities == {"SiO2": 0.4}
+
+
+def test_reclassify_small_magemin_projection_keeps_ok_and_adds_notice():
+    pot = BinaryPot(
+        pot_id="mare_mno_0p30",
+        kato_1993_table4_system=None,
+        why="projected bulk fixture",
+        composition_wt_pct={"SiO2": 50.0, "MgO": 49.7, "MnO": 0.3},
+    )
+    cell = EquilibrateCell(
+        pot_id=pot.pot_id,
+        engine="magemin",
+        temperature_K=1643.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities={"SiO2": 0.4},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=0.5,
+        wall_s=0.2,
+        cpu_s=0.0,
+        hostname="test",
+    )
+
+    rewritten = reclassify_projected_composition_cells((cell,), (pot,))
+
+    assert rewritten[0].status == "ok"
+    assert rewritten[0].refusal_reason is None
+    assert rewritten[0].melt_activities == {"SiO2": 0.4}
+    row = next(
+        item for item in rewritten[0].notices
+        if item.get("kind") == "composition_projected"
+    )
+    component = row[PROJECTED_BULK_CLASSIFICATION_KEY]["components"][0]
+    assert component["component"] == "MnO"
+    assert component["wt_pct"] == pytest.approx(0.3)
+    assert component["mol"] is not None
 
 
 def test_residual_function_is_antisymmetric() -> None:

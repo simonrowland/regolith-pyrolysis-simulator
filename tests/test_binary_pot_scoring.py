@@ -10,6 +10,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.enums import Engine, Quantity
+from simulator.battery.score import cell_notices
 from simulator.yaml_cache import load_cached_safe_yaml
 
 from scripts.calibration_battery import envelope, rail_for
@@ -136,6 +138,35 @@ def test_feto_split_mean_t_is_eight_point_five() -> None:
     assert n_fe2o3 == pytest.approx(0.05)
     assert n_feo + 2.0 * n_fe2o3 == pytest.approx(0.95)
     assert n_feo + 3.0 * n_fe2o3 == pytest.approx(1.0)
+
+
+def test_cell_notices_preserves_projected_component_wt_pct_and_mol() -> None:
+    classification = {
+        "projection_verdict": "within_threshold",
+        "components": [
+            {"component": "MnO", "wt_pct": 0.3, "mol": 0.0423},
+        ],
+    }
+    cell = type("Cell", (), {
+        "notices": [
+            {
+                "kind": "composition_projected",
+                "reason": "MAGEMin solved projected bulk",
+                "composition_projection_classification": classification,
+                "dropped_components": [
+                    {"component": "MnO", "wt_pct": 0.3, "mol": 0.0423},
+                ],
+            }
+        ]
+    })()
+
+    notices = cell_notices(Quantity.ACTIVITY, Engine.MAGEMIN, cell)
+
+    assert len(notices) == 1
+    assert notices[0].kind.value == "composition_projected"
+    assert "MnO" in notices[0].reason
+    assert "0.3 wt%" in notices[0].reason
+    assert "0.0423 mol/kg" in notices[0].reason
 
 
 def test_sync_does_not_rewrite_engine_arm_pots(tmp_path: Path) -> None:

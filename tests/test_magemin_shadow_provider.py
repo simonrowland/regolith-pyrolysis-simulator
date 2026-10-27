@@ -31,6 +31,10 @@ from pathlib import Path
 
 import pytest
 
+from simulator.composition_projection import (
+    PROJECTED_BULK_CLASSIFICATION_KEY,
+    classify_projected_bulk,
+)
 from engines.magemin import (
     MAGEMinDomainGate,
     MAGEMinParityComparator,
@@ -434,6 +438,36 @@ def test_provider_parity_accepts_equal_optional_fo2_state_points() -> None:
     assert report is not None
     assert report.agreement is True
     assert report.warnings == []
+
+
+def test_provider_parity_skips_when_either_result_used_projected_bulk() -> None:
+    provider = MAGEMinShadowProvider()
+    projected = classify_projected_bulk(
+        {"MnO": 0.3},
+        source_sum_wt_pct=100.0,
+        dropped_component_mol_per_kg={"MnO": 0.0423},
+    ).as_diagnostics()
+    diagnostic = {
+        "liquidus_T_C": 1350.0,
+        "phase_modes_wt_pct": {"liq": 100.0},
+        PROJECTED_BULK_CLASSIFICATION_KEY: projected,
+    }
+    clean_diagnostic = {
+        "liquidus_T_C": 1350.0,
+        "phase_modes_wt_pct": {"liq": 100.0},
+    }
+
+    for projected_side in ("authoritative", "shadow"):
+        auth_diagnostic, shadow_diagnostic = (
+            (diagnostic, clean_diagnostic)
+            if projected_side == "authoritative"
+            else (clean_diagnostic, diagnostic)
+        )
+        report = provider.parity_compare(
+            {"status": "ok", "diagnostic": auth_diagnostic},
+            {"status": "ok", "diagnostic": shadow_diagnostic},
+        )
+        assert report is None
 
 
 # ----------------------------------------------------------------------
