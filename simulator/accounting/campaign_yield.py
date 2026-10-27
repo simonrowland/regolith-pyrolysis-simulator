@@ -9,6 +9,7 @@ from simulator.accounting.formulas import resolve_species_formula
 
 
 CONDENSER_ACCOUNT = "process.condensation_train"
+MELT_ACCOUNTS = ("process.cleaned_melt", SPENT_REDUCTANT_RESIDUE_ACCOUNT)
 # Feed atoms in these accounts have left the melt. Reagent inventory includes
 # condensate actually recovered from the train; retained cathode metal counts
 # as extracted but does not become captured condenser product. Raw feed,
@@ -45,10 +46,17 @@ class CampaignYieldProjection:
         # Spent Na2O is melt-resident (the MRE owner moves it into the cleaned
         # account when treating it). Moving oxide into that bookkeeping bin
         # is not extraction, and its feed atoms remain in the entry inventory.
-        accounts = [origins.get(account, {}) for account in
-                    ("process.cleaned_melt", SPENT_REDUCTANT_RESIDUE_ACCOUNT)]
+        accounts = [origins.get(account, {}) for account in MELT_ACCOUNTS]
         return {element: math.fsum(row.get(element, {}).get("feedstock", 0.0) for row in accounts)
                 for element in set().union(*(row.keys() for row in accounts))}
+
+    def melt_element_inventory(self, element):
+        """All origins still in the melt, projected from the mol-native ledger."""
+        mol = math.fsum(self.ledger.atom_moles_by_account(account).get(element, 0.)
+                        for account in MELT_ACCOUNTS)
+        # mol-element * kg/mol-element = kg-element; an empty melt gives zero.
+        kg = mol * resolve_species_formula(element, self.ledger.registry).molar_mass_kg_per_mol()
+        return {"mol": mol, "kg": kg}
 
     def captured_feed_atoms(self, element: str, stage: int) -> CapturedFeedAtoms:
         ledger_mass = self.ledger.project_account_kg(CONDENSER_ACCOUNT)

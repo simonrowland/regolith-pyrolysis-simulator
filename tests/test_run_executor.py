@@ -326,7 +326,7 @@ def test_pyrolysis_run_emits_binding_c6_refusal_diagnostic():
     )
 
 
-def test_run_executor_promotes_c4_acquisition_timeout_without_c6_mislabel() -> None:
+def test_run_executor_refuses_missing_c4_budget_without_c6_mislabel() -> None:
     config = _run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C4",
@@ -337,29 +337,20 @@ def test_run_executor_promotes_c4_acquisition_timeout_without_c6_mislabel() -> N
     backend.initialize({})
     session = SimSession()
     session.start(config, backend=backend)
-    session.simulator.campaign_mgr.campaigns["C4"][
-        "max_target_acquisition_hr"
-    ] = 1.0
+    del session.simulator.campaign_mgr.campaigns["C4"]["max_target_acquisition_hr"]
 
     execution = RunExecutor().execute_session(session, hours=1)
 
     assert execution.status == "refused"
-    assert execution.reason == "c4_target_window_not_acquired"
+    assert execution.reason == "campaign_stop_configuration_missing"
     assert execution.error_message == execution.reason
-    assert execution.refusal_diagnostic["campaign"] == "C4"
-    assert execution.refusal_diagnostic["reaction_family"] == (
-        "c4_mg_selective_pyrolysis"
-    )
-    assert execution.refusal_diagnostic["diagnostic"]["reason_refused"] == (
-        execution.reason
-    )
+    assert execution.refusal_diagnostic["reason_refused"] == execution.reason
+    assert "C4.max_target_acquisition_hr" in execution.refusal_diagnostic["detail"]
     assert session.simulator._last_c6_refusal_diagnostic == {}
 
 
-def test_c4_refusal_is_non_resumable_under_auto_apply_and_decide() -> None:
-    """After a typed C4 endpoint refusal, core/session must not expose or
-    apply a next campaign decision. AUTO_APPLY and decide('yes') must not
-    start C6 (review construction: terminality fail-open)."""
+def test_c4_acquisition_timeout_continues_under_auto_apply() -> None:
+    """An incomplete C4 endpoint continues through the selected final pass."""
     config = _run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C4",
@@ -377,28 +368,24 @@ def test_c4_refusal_is_non_resumable_under_auto_apply_and_decide() -> None:
     ] = 1.0
 
     execution = RunExecutor().execute_session(session, hours=1)
-    assert execution.status == "refused"
-    assert execution.reason == "c4_target_window_not_acquired"
+    assert execution.status != "refused"
+    assert execution.reason != "c4_target_window_not_acquired"
     sim = session.simulator
-    assert sim._c4_campaign_refused is True
-    assert sim.campaign_endpoint_refused() is True
-    assert sim.melt.campaign == CampaignPhase.C4
+    assert sim._c4_campaign_refused is False
+    assert sim.campaign_endpoint_refused() is False
+    assert sim.melt.campaign == CampaignPhase.C2A
+    outcome = session._step_results[-1].campaign_summary["endpoint_outcome"]
+    assert outcome["classification"] == "acquisition_deadline"
+    assert outcome["incomplete"] is True
+    assert outcome["remaining_melt_Mg"]["mol"] > 0
     assert sim.pending_decision is None
     assert sim.paused_for_decision is False
     assert session.pending_decision() is None
 
-    # Another AUTO_APPLY iteration must not create or apply C6_PROCEED.
     list(drive_session(session, hours=2, policy=DecisionPolicy.AUTO_APPLY))
-    assert sim.melt.campaign == CampaignPhase.C4
-    assert sim.pending_decision is None
-    assert sim.paused_for_decision is False
+    assert sim.melt.campaign == CampaignPhase.C2A
     assert sim._c6_campaign_refused is False
     assert sim._last_c6_refusal_diagnostic == {}
-
-    # Direct decide cannot resume a terminally refused batch either.
-    with pytest.raises(RuntimeError, match="non-resumable"):
-        session.decide("yes")
-    assert sim.melt.campaign == CampaignPhase.C4
 
 
 def test_nonterminal_c6_refusal_does_not_mask_reporting_failure(

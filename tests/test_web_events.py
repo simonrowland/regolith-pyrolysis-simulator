@@ -4032,7 +4032,7 @@ def test_persist_failure_visible_on_all_terminal_paths(
             else "c6_refusal_diagnostic"
         )
         refused_reason = (
-            "c4_target_window_not_acquired"
+            "c4_clock_invalid"
             if terminal_path == "c4_refused"
             else "c6 refused"
         )
@@ -4097,14 +4097,14 @@ def test_persist_failure_visible_on_all_terminal_paths(
         if terminal_path == "c4_refused":
             # C4 is terminal: persistence failure attaches typed C4 context.
             assert statuses[-1]["original_refusal_reason"] == (
-                "c4_target_window_not_acquired"
+                "c4_clock_invalid"
             )
             assert statuses[-1]["c4_refusal_diagnostic"]["status"] == "refused"
             assert (
                 statuses[-1]["c4_refusal_diagnostic"]["diagnostic"][
                     "reason_refused"
                 ]
-                == "c4_target_window_not_acquired"
+                == "c4_clock_invalid"
             )
         assert state["running"] is False
         assert state["paused"] is False
@@ -5411,18 +5411,12 @@ def test_socketio_c4_refusal_is_terminal_before_next_decision(
             "status": "refused",
             "reaction_family": "c4_mg_selective_pyrolysis",
             "hour": 1,
-            "campaign_hour": 59,
+            "campaign_hour": None,
             "campaign": "C4",
             "temperature_C": 1220.0,
             "diagnostic": {
-                "reason_refused": "c4_target_window_not_acquired",
-                "requested_window_C": [1580.0, 1670.0],
-                "temperature_C": 1220.0,
-                "elapsed_hours": 60.0,
-                "acquisition_limit_hr": 60.0,
-                "acquisition_limit_source": (
-                    "setpoint:C4.max_target_acquisition_hr"
-                ),
+                "reason_refused": "c4_clock_invalid",
+                "observed": [None],
             },
         }
         return iter([
@@ -5473,7 +5467,7 @@ def test_socketio_c4_refusal_is_terminal_before_next_decision(
             status for status in statuses if status.get("status") == "refused"
         )
 
-        assert refusal["reason"] == "c4_target_window_not_acquired"
+        assert refusal["reason"] == "c4_clock_invalid"
         assert refusal["c4_refusal_diagnostic"]["campaign"] == "C4"
         assert "decision_required" not in [event["name"] for event in events]
         artifact = RunArtifactStore(tmp_path / "runs").load(refusal["run_id"])
@@ -6173,6 +6167,8 @@ def test_web_refusal_registry_covers_stable_typed_reasons():
         "uncertified_multi_oxide_current_partition",
         "non_authoritative_fallback_raw_margin_nonpositive",
         "mre_product_phase_mismatch_refused",
+        "c4_clock_invalid",
+        "c4_temperature_invalid",
         "c4_target_window_not_acquired",
         "c4_process_window_lost",
         "c4_process_wall_clock_exhausted",
