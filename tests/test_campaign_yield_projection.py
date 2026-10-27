@@ -1,4 +1,5 @@
 from copy import deepcopy
+import math
 from types import SimpleNamespace
 
 import pytest
@@ -97,3 +98,16 @@ def test_melt_resident_spent_residue_is_entry_inventory_not_extracted():
     assert inventory['melt']['Na'] == pytest.approx(3)
     assert inventory['extracted']['Na'] == 0
     assert inventory['initial_feed_element_inventory']['Na'] == pytest.approx(3)
+
+
+def test_reconciliation_roundoff_uses_moved_mass_after_near_total_withdrawal():
+    ledger = AtomLedger()
+    ledger.load_external(ACCOUNT, {'Na': 1000.}, material_origin='feedstock')
+    moved = 1000. - 1e-5
+    ledger.move('recover', ACCOUNT, 'process.reagent_inventory', {'Na': moved})
+    retained = 1000. - moved
+    # Independent IEEE-754 scale: cancellation of two tonne-scale floats
+    # leaves their ulp-scale uncertainty, not an ulp of the tiny remainder.
+    assert abs(ledger.project_account_kg(ACCOUNT)['Na'] - retained) < 4 * math.ulp(1000.)
+    result = _projection(ledger, {(ACCOUNT, 4, 'Na'): retained}).captured_feed_atoms('Na', 4)
+    assert result.status == 'available'

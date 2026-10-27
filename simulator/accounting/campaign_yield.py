@@ -64,17 +64,23 @@ class CampaignYieldProjection:
                       if account == CONDENSER_ACCOUNT and carrier == name]
             projected = math.fsum(mass for _, mass in values)
             actual = ledger_mass.get(name, 0.0)
+            flows = self.ledger.gross_account_flows()
+            moved_mass = math.fsum(
+                abs(flows[direction]['species_mol_by_account'].get(CONDENSER_ACCOUNT, {}).get(name, 0.0))
+                for direction in ('inputs', 'withdrawals')
+            ) * formula.molar_mass_kg_per_mol()
             # Each routed credit/debit does a split, kg<->mol conversion and
             # accumulation. Bound those by 8 rounding operations per journal
             # event/retained entry. For n operations, gamma_n=n*eps/(1-n*eps);
-            # absolute roundoff <= gamma_n * sum(|operands|), in kg. No fixed
-            # mass floor: scaling the inventory scales the tolerance, and a
-            # genuinely missing tiny carrier must still be flagged.
+            # absolute roundoff <= gamma_n * sum(|operands|), in kg. Include
+            # gross inputs + withdrawals: cancellation can leave a tiny live
+            # remainder with rounding error set by the previously moved mass.
+            # No fixed mass floor: scaling every inventory scales tolerance.
             n = 8 * (len(self.ledger.external_loads) + sum(
                 len(item.debits) + len(item.credits) for item in self.ledger.transitions
             ) + len(values) + 1)
             eps_n = n * sys.float_info.epsilon
-            tolerance = eps_n / (1 - eps_n) * (abs(actual) + math.fsum(abs(mass) for _, mass in values))
+            tolerance = eps_n / (1 - eps_n) * (moved_mass + abs(actual) + math.fsum(abs(mass) for _, mass in values))
             if any(not math.isfinite(mass) or mass < 0 for _, mass in values) or abs(projected - actual) > tolerance:
                 return CapturedFeedAtoms("unavailable", reason="stage_projection_unreconciled", diagnostic={
                     "species": name, "stage_projection_kg": projected,
