@@ -2272,6 +2272,27 @@ def test_magemin_bulk_projection_drop_is_composition_projected_refusal(
     )
 
 
+def test_magemin_bulk_projection_mass_fraction_float_hex_pin():
+    import simulator.melt_backend.magemin as magemin_module
+
+    backend = MAGEMinBackend()
+    bulk_projection = backend._build_db_bulk_projection({
+        "SiO2": 50.0,
+        "MgO": 40.0,
+        "P2O5": 10.0,
+    })
+    details = magemin_module._magemin_bulk_projection_details(
+        bulk_projection
+    )
+
+    assert details["dropped_mass_fraction"].hex() == (
+        "0x1.999999999999ap-4"
+    )
+    assert details["dropped_component_mass_fractions"]["P2O5"].hex() == (
+        "0x1.999999999999ap-4"
+    )
+
+
 def test_magemin_p2o5_bulk_is_composition_projected_refusal(monkeypatch):
     calls = []
 
