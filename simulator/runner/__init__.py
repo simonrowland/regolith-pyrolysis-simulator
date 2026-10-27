@@ -1566,7 +1566,7 @@ class PyrolysisRun:
                         pumping_context=pumping_context_from_sim(
                             sim, execution.snapshots
                         ),
-                        snapshots=execution.snapshots,
+                        snapshots=tuple(sim.record.snapshots),
                     ),
                     "price_basis": (
                         "legacy_placeholder_awaiting_owner_ratification"

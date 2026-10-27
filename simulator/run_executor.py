@@ -459,7 +459,7 @@ class RunExecutor:
                 per_hour=tuple(per_hour),
                 products_kg=sim.product_ledger(),
                 pumping_context=pumping_context_from_sim(sim, snapshots),
-                snapshots=snapshots,
+                snapshots=all_snapshots,
             )
             trace = _slice_trace(PhysicsTrace.from_simulator(sim), snapshot_start)
             reduced_real_cache = _collect_reduced_real_cache_diagnostic(sim)

@@ -13,6 +13,7 @@ from collections.abc import Callable, Mapping as MappingABC, Sequence
 from typing import Any, Mapping, TypeVar
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.accounting.completeness import evaporation_quantity_unavailability
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.cost_parameters import (
     SHUTTLE_REAGENT_SPECIES,
@@ -4626,6 +4627,11 @@ def _metric_value(
         return _furnace_lifespan_consumed_fraction(run_execution, sim)
     if metric.endswith("_kg"):
         species = metric[:-3]
+        refusal = evaporation_quantity_unavailability(sim, species)
+        if refusal:
+            raise ObjectiveComputationError(
+                f"objective metric {metric!r} is unavailable: {refusal['reason']}"
+            )
         if species in product_ledger:
             return _finite_float(product_ledger[species], metric)
     raise ObjectiveComputationError(
@@ -4937,6 +4943,11 @@ def _nested_float(root: Mapping[str, Any], path: tuple[str, ...]) -> float:
 
 
 def _oxygen_partition_value(sim: Any, key: str) -> float:
+    refusal = evaporation_quantity_unavailability(sim, "O2")
+    if refusal:
+        raise ObjectiveComputationError(
+            f"oxygen_{key}_kg is unavailable: {refusal['reason']}"
+        )
     partition_method = getattr(sim, "_oxygen_terminal_partition_kg", None)
     if callable(partition_method):
         partition = partition_method()

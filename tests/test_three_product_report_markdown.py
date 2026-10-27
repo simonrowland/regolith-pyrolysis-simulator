@@ -179,6 +179,67 @@ def test_refused_silica_product_quantity_is_unavailable_not_zero():
     assert '**Class total**: — kg' not in silica_section
 
 
+def test_refused_metal_total_renders_flag_instead_of_numeric_partial_total():
+    classification = _empty_classification()
+    classification['metals_plus_O2'].update({
+        'metals_kg': {'Na': 1.0},
+        'metals_total_kg': None,
+        'class_total_kg': None,
+        'flag': {
+            'status': 'unavailable',
+            'authority': 'unavailable',
+            'reason': 'EvaporationFluxConfigurationError: Si transport missing',
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+
+    assert 'Metals + O₂ potential: unavailable kg' in report
+    assert '- Metals subtotal: unavailable kg' in report
+    assert 'status=unavailable' in report
+    assert 'EvaporationFluxConfigurationError: Si transport missing' in report
+
+
+def test_refused_oxygen_partition_renders_unavailable_without_numeric_cast():
+    classification = _empty_classification()
+    classification['metals_plus_O2'].update({
+        'metals_total_kg': None,
+        'O2_kg': None,
+        'O2_partition_kg': {'stored': None, 'total': None},
+        'class_total_kg': None,
+        'flag': {
+            'status': 'unavailable',
+            'authority': 'unavailable',
+            'reason': 'Si: EvaporationFluxConfigurationError',
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+
+    assert 'Source-side O₂ potential subtotal (emitted; not recovered/captured): unavailable kg' in report
+
+
+def test_refused_rump_totals_render_unavailable_without_numeric_cast():
+    classification = _empty_classification()
+    classification['refractory_ceramic_rump'].update({
+        'rump_total_kg': None,
+        'rump_refractory_oxides_kg': None,
+        'rump_silicate_residual_kg': None,
+        'rump_unextracted_metals_kg': None,
+        'class_total_kg': None,
+        'flag': {
+            'status': 'unavailable',
+            'authority': 'unavailable',
+            'reason': 'Si: EvaporationFluxConfigurationError',
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+
+    assert 'Residual inventory total (not a product total): unavailable kg' in report
+    assert 'Refractory oxides floor (by physics): unavailable kg' in report
+
+
 def test_rump_class_shows_per_species_breakdown():
     classification = _empty_classification()
     classification['refractory_ceramic_rump'] = {

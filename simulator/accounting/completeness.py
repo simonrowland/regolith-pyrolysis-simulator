@@ -8,7 +8,7 @@ from types import MappingProxyType
 from typing import Any, Mapping
 
 from simulator.accounting.exceptions import AccountingError
-from simulator.accounting.formulas import parse_formula
+from simulator.accounting.formulas import parse_formula, resolve_species_formula
 from simulator.account_ids import METAL_BOTTOM_POOL_ACCOUNT, METAL_FLOAT_LAYER_ACCOUNT
 from simulator.state import MOLAR_MASS
 
@@ -182,6 +182,106 @@ class TargetSpeciesYield:
     provenance_rule: str = TARGET_YIELD_PROVENANCE_RULE
 
 
+def evaporation_quantity_unavailability(
+    sim: Any,
+    target_species: str | tuple[str, ...] | None,
+    *,
+    snapshots: Any = None,
+) -> dict[str, Any] | None:
+    """Return a typed refusal when missing transport overlaps a quantity."""
+
+    refusals: dict[str, dict[str, str]] = {}
+
+    def record_refusal(species: Any, record: Any) -> None:
+        if not isinstance(record, Mapping):
+            return
+        extra = record.get("extra")
+        extra = extra if isinstance(extra, Mapping) else {}
+        if (record.get("policy") or extra.get("policy")) != (
+            "fail_loud_missing_transport_parameters"
+        ):
+            return
+        refusal_type = (
+            record.get("refusal_type")
+            or record.get("refusal_code")
+            or extra.get("refusal_type")
+        )
+        if not refusal_type:
+            return
+        reason = (
+            record.get("reason")
+            or record.get("detail")
+            or extra.get("reason")
+            or "transport parameters are unavailable"
+        )
+        parent_oxide = record.get("parent_oxide") or extra.get("parent_oxide")
+        refusals[str(species)] = {
+            "refusal_type": str(refusal_type),
+            "reason": str(reason),
+            "parent_oxide": str(parent_oxide) if parent_oxide else "",
+        }
+
+    diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+    missing = diagnostic.get("missing_transport_parameters", {})
+    if isinstance(missing, Mapping):
+        for species, record in missing.items():
+            record_refusal(species, record)
+    if snapshots is None:
+        snapshots = getattr(getattr(sim, "record", None), "snapshots", None)
+    if snapshots is None:
+        snapshots = getattr(sim, "snapshots", ())
+    for snapshot in snapshots or ():
+        flux = getattr(snapshot, "evap_flux", None)
+        channels = getattr(flux, "carrier_authority_by_species", {}) or {}
+        if isinstance(channels, Mapping):
+            for species, record in channels.items():
+                record_refusal(species, record)
+
+    target_elements: set[str] | None = None
+    registry = getattr(sim, "species_formula_registry", {})
+    if target_species is not None:
+        targets = (
+            (target_species,)
+            if isinstance(target_species, str)
+            else tuple(target_species)
+        )
+        target_elements = set()
+        for target in targets:
+            try:
+                atoms = set(
+                    resolve_species_formula(str(target), registry).elements
+                )
+            except (AccountingError, ValueError):
+                continue
+            target_elements.update(atoms if len(atoms) == 1 else atoms - {"O"})
+    for species, refusal in sorted(
+        refusals.items()
+    ):
+        try:
+            affected = set(resolve_species_formula(species, registry).elements)
+        except (AccountingError, ValueError):
+            continue
+        parent_oxide = refusal.get("parent_oxide")
+        if parent_oxide:
+            try:
+                affected.update(
+                    resolve_species_formula(parent_oxide, registry).elements
+                )
+            except (AccountingError, ValueError):
+                pass
+        if target_elements is not None and not target_elements & affected:
+            continue
+        return {
+            "status": "unavailable",
+            "authority": "unavailable",
+            "band": None,
+            "reason": (
+                f"{species}: {refusal['refusal_type']}: {refusal['reason']}"
+            ),
+        }
+    return None
+
+
 def extraction_completeness_by_target(
     target_species: tuple[str, ...],
     residual_species_by_target: Mapping[str, tuple[str, ...]],
@@ -310,6 +410,19 @@ def target_species_yield_by_initial_cleaned_melt(
                     exact_product_kg=float(product_species_kg.get(target, 0.0)),
                     gross_product_target_equiv_mol=gross_product_mol,
                     excluded_non_feedstock_reagent_target_equiv_mol=excluded_mol,
+                )
+                continue
+            unavailable = evaporation_quantity_unavailability(
+                getattr(queries, "sim", None),
+                target,
+            )
+            if unavailable:
+                results[target] = TargetSpeciesYield(
+                    target,
+                    None,
+                    0.0,
+                    denominator_mol,
+                    f"unavailable: {unavailable['reason']}",
                 )
                 continue
             results[target] = TargetSpeciesYield(
@@ -529,6 +642,14 @@ def vapor_contract_completeness(
     _validate_contract(contract)
 
     target = contract.target_species or contract.target_key
+    unavailable = evaporation_quantity_unavailability(
+        getattr(queries, "sim", None),
+        target,
+    )
+    if unavailable:
+        raise CompletionContractBlocked(
+            f"{contract.contract_id}: {unavailable['reason']}"
+        )
     product_accounts = tuple(dict.fromkeys((
         *contract.product_accounts,
         _VAPOR_TERMINAL_OFFGAS_ACCOUNT,
