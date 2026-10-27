@@ -23,6 +23,7 @@ from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
     numeric_token,
     validate_record_source_tokens,
 )
+from simulator.battery.score import parse_species_formula
 
 
 IMAGE_VERIFIED_OCR_SWEEP = (
@@ -187,6 +188,62 @@ def test_clinoenstatite_formula_matches_image_verified_page_228(layout_pages):
         "printed_token": "MgSiO3",
         "evidence": "PDF page 228 image visibly prints 'MgSiO3'",
     }
+
+
+def test_engine_carried_formulas_match_image_verified_pages(corpus):
+    manifest, records = corpus
+    by_id = {record["record_id"]: record for record in records}
+    corrections = {
+        correction["correction_id"]: correction
+        for correction in manifest["corrections"]
+    }
+
+    for (pdf_page, name), (record_id, raw, printed) in loader.IMAGE_VERIFIED_298K_FORMULAS.items():
+        record = by_id[record_id]
+        assert (record["pdf_page"], record["name_as_published"]) == (pdf_page, name)
+        assert record["formula_as_published"] == printed
+        assert record["formula"] == printed
+        assert parse_species_formula(record["formula"]) is not None
+        correction_id = (
+            f"b1259-p{record['pdf_page']}-formula_as_published-298k-"
+            f"{record_id.removeprefix('b1259-298k-')}"
+        )
+        correction = next(
+            item
+            for item in record["corrections"]
+            if item["correction_id"] == correction_id
+        )
+        assert correction == corrections[correction_id]
+        assert correction["layout_as_extracted"] == raw
+
+    engine_carried_ht_pages = {
+        99, 117, 143, 144, 145, 160, 164, 190,
+        208, 209, 210, 214, 217, 219, 224, 232,
+    }
+    for pdf_page, metadata in loader.IMAGE_VERIFIED_METADATA.items():
+        printed = metadata.get("formula_as_published")
+        if printed is None or pdf_page not in engine_carried_ht_pages:
+            continue
+        record = next(
+            record
+            for record in records
+            if record["table_kind"] == "high_temperature"
+            and record["pdf_page"] == pdf_page
+        )
+        assert record["formula_as_published"] == printed
+        assert record["formula"] == printed
+        assert parse_species_formula(record["formula"]) is not None
+        raw = loader.IMAGE_VERIFIED_LAYOUT_RAWS[(pdf_page, "formula_as_published")]
+        correction = next(
+            correction
+            for correction in record["corrections"]
+            if correction["field"] == "formula_as_published"
+            and correction["printed_token"] == printed
+        )
+        assert correction["layout_as_extracted"] == raw
+        assert correction["evidence"] == (
+            f"PDF page {pdf_page} image visibly prints {printed!r}"
+        )
 
 
 def test_source_grounded_mutation_probe(corpus, layout_pages):
