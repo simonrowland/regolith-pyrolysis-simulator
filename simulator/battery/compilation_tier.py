@@ -1706,6 +1706,46 @@ def _locator_table_id(observation: Observation) -> str:
     return "" if table is None else str(table).strip()
 
 
+def _b1259_element_reference_phase_refusal(
+    observation: Observation,
+    identity: Identity,
+    quantity: Quantity,
+    *,
+    origin: str,
+) -> ThermoAttempt | None:
+    if quantity is not Quantity.S:
+        return None
+    from simulator.battery.generators.usgs_b1259 import (
+        SOURCE_ID as b1259_source,
+        _is_element_reference_state_record_id,
+    )
+
+    source_record = _locator_table_id(observation)
+    if (
+        observation.source_id != b1259_source
+        or not _is_element_reference_state_record_id(
+            source_record, identity.species.formula
+        )
+    ):
+        return None
+    observed_phase = phase_token(identity.species)
+    if observed_phase is Phase.G:
+        return None
+    return _refuse(
+        RefusalReason.ELEMENT_REFERENCE_STATE_PHASE_IDENTITY_MISMATCH,
+        "element-reference-state-phase-identity-mismatch",
+        quantity=quantity,
+        origin=origin,
+        extra={
+            "engine": Engine.VAPOROCK.value,
+            "species": identity.species.formula,
+            "observation_phase": (
+                None if observed_phase is None else observed_phase.value
+            ),
+        },
+    )
+
+
 def _tabulated_gas_basis_matches(
     observation: Observation, formula: str, table_id: str
 ) -> bool:
@@ -2057,34 +2097,11 @@ def _vaporock_gas_attempt(
     origin: str,
 ) -> ThermoAttempt:
     phase = identity.species.phase
-    if quantity is Quantity.S:
-        from simulator.battery.generators.usgs_b1259 import (
-            SOURCE_ID as b1259_source,
-            _is_element_reference_state_record_id,
-        )
-
-        source_record = _locator_table_id(observation)
-        if (
-            observation.source_id == b1259_source
-            and _is_element_reference_state_record_id(source_record)
-        ):
-            observed_phase = phase_token(identity.species)
-            if observed_phase is not Phase.G:
-                return _refuse(
-                    RefusalReason.ELEMENT_REFERENCE_STATE_PHASE_IDENTITY_MISMATCH,
-                    "element-reference-state-phase-identity-mismatch",
-                    quantity=quantity,
-                    origin=origin,
-                    extra={
-                        "engine": Engine.VAPOROCK.value,
-                        "species": identity.species.formula,
-                        "observation_phase": (
-                            None
-                            if observed_phase is None
-                            else observed_phase.value
-                        ),
-                    },
-                )
+    phase_refusal = _b1259_element_reference_phase_refusal(
+        observation, identity, quantity, origin=origin
+    )
+    if phase_refusal is not None:
+        return phase_refusal
     if (
         not isinstance(phase, State)
         or not phase.is_value
@@ -3781,6 +3798,21 @@ def compilation_tier_census(
             if isinstance(observation.identity, Identity)
             else None
         )
+        if (
+            engine is Engine.VAPOROCK
+            and quantity is Quantity.S
+            and isinstance(observation.identity, Identity)
+        ):
+            phase_refusal = _b1259_element_reference_phase_refusal(
+                observation,
+                observation.identity,
+                quantity,
+                origin=observation.observation_id,
+            )
+            if phase_refusal is not None:
+                return _prediction_from_attempt(
+                    engine, observation, phase_refusal
+                )
         if not nonpositive and quantity in _THERMO_QUANTITIES and isinstance(
             observation.identity, Identity
         ):
