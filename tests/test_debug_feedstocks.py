@@ -135,7 +135,7 @@ def test_debug_feedstocks_stay_low_melt_metal_oxide_probes(monkeypatch):
 
 
 def test_debug_batches_auto_apply_branching_decisions():
-    manager = CampaignManager({"campaigns": {}})
+    manager = CampaignManager(_setpoints())
     record = BatchRecord(feedstock_key="debug_pure_feo")
 
     assert manager.get_next_campaign(CampaignPhase.C0B, record) == CampaignPhase.C2A_STAGED
@@ -246,7 +246,7 @@ def test_clean_stage_to_c2a_staged_reapplies_stage_n2_background():
 
 
 def test_debug_batches_skip_c5_by_default_after_c4():
-    manager = CampaignManager({"campaigns": {}})
+    manager = CampaignManager(_setpoints())
     record = BatchRecord(feedstock_key="debug_pure_feo")
     record.branch = "two"
 
@@ -296,7 +296,7 @@ def test_branch_one_completes_when_c5_default_off():
 
 
 def test_normal_batches_still_pause_for_branching_decisions():
-    manager = CampaignManager({"campaigns": {}})
+    manager = CampaignManager(_setpoints())
     record = BatchRecord(feedstock_key="lunar_mare_low_ti")
 
     assert manager.get_next_campaign(CampaignPhase.C0B, record) is None
