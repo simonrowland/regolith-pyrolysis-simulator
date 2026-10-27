@@ -586,6 +586,12 @@ def test_magemin_small_projected_bulk_is_scored_with_component_notice():
                     {"component": "MnO", "mass_fraction": 0.003}
                 ],
             },
+            "input_composition_projection": {
+                "composition_projected": {
+                    "dropped_components": ["MnO"],
+                    "dropped_mass_fraction": 0.003,
+                },
+            },
         },
         warnings=["MAGEMin solved projected composition"],
         activity_coefficients={"SiO2": 0.4},
