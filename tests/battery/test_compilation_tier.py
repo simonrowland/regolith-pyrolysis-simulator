@@ -3462,25 +3462,21 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
 
     Mg-001 at 1366.104 K is the reference-state gas: published H−H298 is
     169.298, which includes vaporization. Mg-005 at that node is 22.198.
-    That enthalpy still refuses. B1259 magnesium S at 298.15 K declares
-    101325 Pa, so S answers the gas table after conversion to the
-    observation's printed pressure. B1452 magnesium S at 1361 K declares
-    100000 Pa, so S answers the gas table even though the elemental zero
-    is the crystal.
+    That enthalpy still refuses. B1259 magnesium reference-state S at
+    298.15 K has an unresolved basis on the outside-table branch. B1452
+    magnesium S at 1361 K declares 100000 Pa, so S answers the gas table
+    even though the elemental zero is the crystal.
     B1452 SiO has no elemental ideal-gas enthalpy reference; Cp and S
-    still answer O-012, and H−H298 refuses. B1259 and B1452 oxygen are
-    the ideal gas at 298.15 K, so those rows return the printed O-029
-    node.
+    still answer O-012, and H−H298 refuses. B1259 oxygen H−H298 and B1452
+    oxygen S use the printed O-029 nodes. B1259 oxygen reference-state S
+    at 298.15 K is refused by its dedicated unresolved-basis rule.
     """
 
     import pytest
 
     pytest.importorskip("vaporock.equil")
 
-    from simulator.battery.generators.janaf import (
-        STANDARD_PRESSURE_PA as janaf_pressure,
-        janaf_tabulated_gas_thermo,
-    )
+    from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
     from simulator.battery.generators.usgs_b1259 import (
         STANDARD_PRESSURE_PA as b1259_pressure,
     )
@@ -3525,20 +3521,17 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
         ),
     )
     robie_attempt = predict_thermo_attempt(Engine.VAPOROCK, robie)
-    printed_magnesium_entropy = _printed_janaf_node(
-        "Mg-005", Decimal("298.15"), "entropy"
+    assert robie_attempt.value is None
+    assert (
+        robie_attempt.refusal_reason
+        is RefusalReason.ELEMENT_REFERENCE_STATE_BASIS_UNRESOLVED
     )
-    expected_magnesium_entropy = printed_magnesium_entropy + (
-        ideal_gas_entropy_pressure_shift_J_per_mol_K(janaf_pressure, b1259_pressure)
+    assert (
+        robie_attempt.refusal_detail["reason"]
+        == "element-reference-state-S-vs-VapoRock-basis-unresolved"
     )
-    assert robie_attempt.refusal_reason is None
-    assert robie_attempt.value is not None
-    assert abs(robie_attempt.value - expected_magnesium_entropy) <= Decimal("0.001")
-    assert robie_attempt.authority is Authority.BRIDGE
-    assert len(robie_attempt.notices) == 1
-    assert robie_attempt.notices[0].kind is NoticeKind.DERIVATION_USES_COMPILATION
-    assert robie_attempt.notices[0].affected_quantities == (Quantity.S,)
-    assert "branch=table" in robie_attempt.call_evidence
+    assert robie_attempt.refusal_detail["coefficient_interval"] == "outside"
+    assert robie_attempt.refusal_detail["branch"] == "table"
 
     assert b1452_ideal_gas("Mg") is False
     near_boiling = replace(
@@ -3677,12 +3670,11 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
     assert b1259_pressure != b1452_pressure
 
 
-def test_vaporock_gas_entropy_shifts_one_atmosphere_against_janaf() -> None:
-    """The stored B1259 oxygen entropy is 1 atm. JANAF's gas table is 0.1 MPa.
+def test_vaporock_b1259_oxygen_298_entropy_refuses_unresolved_basis() -> None:
+    """B1259 elemental O2 S at 298 K has no resolved VapoRock basis.
 
-    b1259-298k-0060-oxygen S at 298.15 K is 204.999264 J/(mol·K) with
-    standard_pressure_Pa 101325. O-029's catalog entropy is the 1 bar value,
-    shifted to the observation's printed pressure. Cp remains unchanged.
+    The stored value is at 1 atm while O-029 is at 1 bar. The pressure shift
+    cannot make this reference-state comparison meaningful. Cp is unaffected.
     """
 
     import pytest
@@ -3691,7 +3683,6 @@ def test_vaporock_gas_entropy_shifts_one_atmosphere_against_janaf() -> None:
 
     from pathlib import Path
 
-    from simulator.battery.generators.janaf import STANDARD_PRESSURE_PA
     from simulator.battery.migrate import load_yaml, observation_from_plain
     from simulator.battery.records import as_decimal
 
@@ -3713,20 +3704,15 @@ def test_vaporock_gas_entropy_shifts_one_atmosphere_against_janaf() -> None:
     assert observation.value.point == Decimal("204.999264")
 
     attempt = predict_thermo_attempt(Engine.VAPOROCK, observation)
-    printed_entropy = _printed_janaf_node("O-029", Decimal("298.15"), "entropy")
-    expected_entropy = printed_entropy + ideal_gas_entropy_pressure_shift_J_per_mol_K(
-        STANDARD_PRESSURE_PA, declared
+    assert attempt.value is None
+    assert attempt.refusal_reason is not None
+    assert attempt.refusal_reason.value == "element_reference_state_basis_unresolved"
+    assert (
+        attempt.refusal_detail["reason"]
+        == "element-reference-state-S-vs-VapoRock-basis-unresolved"
     )
-    assert attempt.refusal_reason is None
-    assert attempt.value is not None
-    assert abs(attempt.value - expected_entropy) <= Decimal("0.001")
-    assert attempt.authority is Authority.BRIDGE
-    assert len(attempt.notices) == 1
-    notice = attempt.notices[0]
-    assert notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
-    assert notice.affected_quantities == (Quantity.S,)
-    assert notice.authority is Authority.BRIDGE
-    assert "branch=table" in attempt.call_evidence
+    assert attempt.refusal_detail["coefficient_interval"] == "outside"
+    assert attempt.refusal_detail["branch"] == "table"
 
     printed_cp = _printed_janaf_node("O-029", Decimal("500"), "heat_capacity")
     heat_capacity = replace(
@@ -3763,6 +3749,27 @@ def _b1259_point(filename: str, observation_id: str):
     return observation_from_plain(raw)
 
 
+def test_vaporock_b1259_element_reference_state_entropy_refuses_unresolved_basis() -> None:
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+    potassium = _b1259_point(
+        "b1259-ht-0025-potassium-reference-state.yaml",
+        "robie-waldbaum-1968-usgs-b1259:b1259-ht-0025-potassium-reference-state:"
+        "S:shared:T=336.4:col=entropy:name=potassium-(reference-state):v=3c978d3113",
+    )
+    attempt = predict_thermo_attempt(Engine.VAPOROCK, potassium)
+    assert attempt.value is None
+    assert attempt.refusal_reason is not None
+    assert attempt.refusal_reason.value == "element_reference_state_basis_unresolved"
+    assert (
+        attempt.refusal_detail["reason"]
+        == "element-reference-state-S-vs-VapoRock-basis-unresolved"
+    )
+    assert attempt.refusal_detail["coefficient_interval"] == "outside"
+    assert attempt.refusal_detail["branch"] == "table"
+
+
 def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
     """Inside a coefficient row, each quantity keeps its own basis axis.
 
@@ -3792,6 +3799,7 @@ def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
     pressure_shift = ideal_gas_entropy_pressure_shift_J_per_mol_K(
         STANDARD_PRESSURE_PA, Decimal("101325")
     )
+    assert pressure_shift.quantize(Decimal("0.00001")) == Decimal("0.10944")
     printed_oxygen_entropy = _printed_janaf_node(
         "O-029", Decimal("800"), "entropy"
     )
