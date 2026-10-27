@@ -450,7 +450,9 @@ def test_provider_parity_skips_when_either_result_used_projected_bulk() -> None:
     diagnostic = {
         "liquidus_T_C": 1350.0,
         "phase_modes_wt_pct": {"liq": 100.0},
-        PROJECTED_BULK_CLASSIFICATION_KEY: projected,
+        "backend_diagnostics": {
+            PROJECTED_BULK_CLASSIFICATION_KEY: projected,
+        },
     }
     clean_diagnostic = {
         "liquidus_T_C": 1350.0,
