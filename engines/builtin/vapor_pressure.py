@@ -185,6 +185,8 @@ def physical_melt_dissociation_pO2_bar(fO2_log: float) -> tuple[float, bool]:
 MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON = (
     "melt_dissociation_pO2_floor_inverted_through_mass_action"
 )
+COMPILED_SOURCE_ACTIVITY_FLOOR = 1.0e-300
+COMPILED_SOURCE_ACTIVITY_FLOOR_REASON = "source_activity_floored"
 # Catalog operating-envelope lower bound from
 # test_catalog_operating_envelope_no_nonphysical_pressure (1e-12 bar).
 # That sweep stays under CATALOG_PHYSICAL_PRESSURE_CEILING_PA; the 1e-30
@@ -4315,12 +4317,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             source_activity_floor_notice = None
             if compiled_evaluator is not None:
                 assert compiled_species is not None
-                if parent_oxide and reported_activity < 1.0e-300:
+                if (
+                    parent_oxide
+                    and reported_activity < COMPILED_SOURCE_ACTIVITY_FLOOR
+                ):
                     source_activity_floor_notice = {
                         "authority_level": "extrapolated",
-                        "reason": "source_activity_floored",
-                        "original_activity": float(reported_activity),
-                        "floor": 1.0e-300,
+                        "reason": COMPILED_SOURCE_ACTIVITY_FLOOR_REASON,
+                        "certified_band": {
+                            "source_activity": (
+                                COMPILED_SOURCE_ACTIVITY_FLOOR,
+                                1.0,
+                            )
+                        },
+                        "source_activity_used": float(reported_activity),
                     }
                 try:
                     domain_transition = declared_domain_transition(
@@ -4358,7 +4368,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 evaluation = compiled_evaluator.evaluate(
                     T_K,
                     source_activity=(
-                        max(reported_activity, 1.0e-300)
+                        max(
+                            reported_activity,
+                            COMPILED_SOURCE_ACTIVITY_FLOOR,
+                        )
                         if parent_oxide
                         else 1.0
                     ),
@@ -4523,6 +4536,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"{source_label}:"
                         "extrapolated_beyond_valid_range_K"
                     )
+                if source_activity_floor_notice is not None:
+                    source_label = (
+                        f"{source_label}:{COMPILED_SOURCE_ACTIVITY_FLOOR_REASON}"
+                    )
                 vapor_pressure_sources[name] = source_label
                 vapor_pressure_provenance[name] = {
                     "pressure_kind": _runtime_pressure_kind(
@@ -4545,11 +4562,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
-                if source_activity_floor_notice is not None:
-                    vapor_pressure_provenance[name]["extrapolation_notice"] = (
-                        source_activity_floor_notice
-                    )
-                    oxide_vapor_extrapolations[name] = source_activity_floor_notice
                 oxygen_notice = (
                     evaluation.extrapolation_notice
                     if compiled_evaluator is not None
@@ -4558,6 +4570,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if oxygen_notice is not None:
                     vapor_pressure_provenance[name].setdefault(
                         "extrapolation_notice", dict(oxygen_notice)
+                    )
+                if source_activity_floor_notice is not None:
+                    vapor_pressure_provenance[name][
+                        "source_activity_floor_notice"
+                    ] = dict(source_activity_floor_notice)
+                    vapor_pressure_provenance[name].setdefault(
+                        "extrapolation_notice",
+                        dict(source_activity_floor_notice),
                     )
                 if compiled_evaluator is not None:
                     vapor_pressure_provenance[name][
