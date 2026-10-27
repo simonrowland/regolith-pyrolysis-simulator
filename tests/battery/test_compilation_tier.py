@@ -7,9 +7,11 @@ log10 Kf = 0.092. The Ellingham segment at that temperature is
 
 from __future__ import annotations
 
+import re
 from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
+from pathlib import Path
 
 import pytest
 
@@ -26,6 +28,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    IdentityEqualKind,
     NoticeKind,
     PerBasis,
     Phase,
@@ -38,7 +41,11 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import (
+    assumed_crystal_standard_pressure_Pa,
+    bar_to_pa,
+    identity_equal,
     log10K_from_delta_fG_kJ_mol,
+    quantity_token,
     standard_pressure_delta_g_kJ_per_mol,
 )
 from simulator.battery.records import (
@@ -4201,6 +4208,754 @@ def test_pure_phase_refuses_non_298_enthalpy_anchor_before_engine_call() -> None
     assert attempt.refusal_detail["reason"] == "pure-phase-enthalpy-anchor-mismatch"
     assert attempt.refusal_detail["expected_anchor"] == "H(T)-H(298.15 K)"
     assert calls == []
+
+
+# Injected engine enthalpies, J/mol, keyed by the call temperature.
+# 298.15 K is the engine anchor. The expected table pins the scored
+# increment, including the H(298.15)−H(T_ref) correction.
+_ANCHOR_GOLDEN_H_J = {
+    298.0: 987.0,
+    298.15: 1000.0,
+    299.15: 1100.0,
+    1000.0: 5000.0,
+}
+
+
+@pytest.mark.parametrize(
+    ("subtype", "reason", "value", "calls", "correction_J"),
+    [
+        ("H(T)-H(298.15 K)", None, "4", [1000.0, 298.15], None),
+        (
+            "H(T)-H(298.15 K); reference phase: solid",
+            None,
+            "4",
+            [1000.0, 298.15],
+            None,
+        ),
+        (
+            "H(T)-H(298.15 K); reference phase: glass",
+            "pure-phase-enthalpy-anchor-mismatch",
+            None,
+            [],
+            None,
+        ),
+        ("H(T)-H(298 K)", None, "4.013", [1000.0, 298.15, 298.0], "13"),
+        (
+            "H(T)-H(298 K); reference phase: solid",
+            None,
+            "4.013",
+            [1000.0, 298.15, 298.0],
+            "13",
+        ),
+        (
+            "H(T)-H(298 K); reference phase: liquid",
+            "pure-phase-enthalpy-anchor-mismatch",
+            None,
+            [],
+            None,
+        ),
+        (
+            "H(T)-H(299.15 K)",
+            None,
+            "3.9",
+            [1000.0, 298.15, 299.15],
+            "-100",
+        ),
+        (
+            "H(T)-H(296.15 K)",
+            "pure-phase-enthalpy-anchor-outside-1k",
+            None,
+            [],
+            None,
+        ),
+        (
+            "apparent enthalpy, stable-phase anchor",
+            "pure-phase-enthalpy-anchor-mismatch",
+            None,
+            [],
+            None,
+        ),
+    ],
+)
+def test_h_minus_h298_anchor_scoring_golden(
+    subtype, reason, value, calls, correction_J
+) -> None:
+    """Pin pure-phase H(T)-H(T_ref) scoring, including the anchor correction."""
+
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of(subtype),
+    )
+    seen = []
+
+    class _Props:
+        def __init__(self, temperature_K: float) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = _ANCHOR_GOLDEN_H_J[temperature_K]
+            self.Cp_J_K_mol = 37.106
+            self.S_J_K_mol = 26.95
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        seen.append(temperature_K)
+        return _Props(temperature_K)
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo-anchor-golden", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert seen == calls
+    if reason is None:
+        assert attempt.refusal_reason is None
+        assert attempt.value == Decimal(value)
+        assert attempt.authority is Authority.BRIDGE
+        if correction_J is None:
+            assert attempt.notices == ()
+        else:
+            assert len(attempt.notices) == 1
+            notice = attempt.notices[0]
+            assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            assert notice.authority is Authority.BRIDGE
+            assert notice.band == "298.15 K"
+            assert notice.original == Decimal(correction_J)
+            assert f"declared={subtype}" in notice.reason
+            assert f"correction_J_mol={correction_J}" in notice.reason
+            assert "authority=bridge" in notice.reason
+            assert "term=engine-H" in notice.reason
+    else:
+        assert attempt.value is None
+        assert attempt.notices == ()
+        assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+        assert attempt.refusal_detail["reason"] == reason
+
+
+def test_two_kelvin_enthalpy_anchor_still_refuses_typed() -> None:
+    """A 2 K anchor is outside the Cp·ΔT extension and stays a typed refusal."""
+
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(296.15 K)"),
+    )
+    calls = []
+
+    def pure_phase(*_args):
+        calls.append(_args)
+        raise AssertionError("a 2 K anchor must refuse before the engine call")
+
+    attempt = predict_thermo_attempt(
+        Engine.THERMOENGINE,
+        F.observation("mgo-anchor-2k", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert calls == []
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "pure-phase-enthalpy-anchor-outside-1k"
+    assert attempt.refusal_detail["abs_offset_K"] == "2"
+
+
+def _printed_janaf_mgo_cp_298_15() -> Decimal:
+    """JANAF Mg-008 crystal MgO Cp printed at 298.15 K, J/(mol·K)."""
+
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "data"
+        / "literature"
+        / "observations-v2"
+        / "compilations-janaf"
+        / "janaf-Mg.yaml"
+    )
+    text = path.read_text(encoding="utf-8")
+    marker = "observation_id: nist-janaf-4th:Mg-008:cp:phase-window:whole\n"
+    start = text.index(marker)
+    end = text.index("\n- observation_id:", start + len(marker))
+    pairs = re.findall(r"\n    - - '([^']+)'\n      - '([^']+)'", text[start:end])
+    return Decimal(dict(pairs)["298.15"])
+
+
+def test_enthalpy_anchor_correction_matches_janaf_mgo_cp() -> None:
+    """298 K anchor uses the engine Cp when that engine has no H at T_ref.
+
+    The expected joules are the printed JANAF MgO Cp(298.15 K) times the
+    0.15 K gap, 5.5659 J/mol. That product is not computed in this test.
+    """
+
+    printed_cp = _printed_janaf_mgo_cp_298_15()
+    assert printed_cp == Decimal("37.106")
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(298 K)"),
+    )
+
+    class _Props:
+        def __init__(self, enthalpy, heat_capacity) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = heat_capacity
+            self.S_J_K_mol = 26.95
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        if abs(temperature_K - 298.0) < 1e-9:
+            return _Props(None, None)
+        if abs(temperature_K - 298.15) < 1e-9:
+            return _Props(1000.0, float(printed_cp))
+        return _Props(5000.0, None)
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo-janaf-cp-anchor", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert attempt.refusal_reason is None
+    assert attempt.value == Decimal("4.0055659")
+    assert len(attempt.notices) == 1
+    notice = attempt.notices[0]
+    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert notice.original == Decimal("5.5659")
+    assert notice.authority is Authority.BRIDGE
+    assert "term=engine-Cp" in notice.reason
+    assert "authority=bridge" in notice.reason
+    assert "declared=H(T)-H(298 K)" in notice.reason
+
+
+def _printed_robie_pseudowollastonite_volume_cm3() -> str:
+    """Robie and Waldbaum 1968, B1259, pseudowollastonite molar volume."""
+
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "data"
+        / "literature"
+        / "compilations"
+        / "robie-waldbaum-1968-usgs-b1259"
+        / "records"
+        / "b1259-298k-0302-pseudowollastonite.json"
+    )
+    import json
+
+    document = json.loads(path.read_text(encoding="utf-8"))
+    return str(document["molar_volume"]["as_published"])
+
+
+def _mgo_enthalpy_identity(pressure: State):
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    return replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(298.15 K)"),
+        standard_pressure_Pa=pressure,
+    )
+
+
+def test_unknown_condensed_pressure_uses_robie_molar_volume() -> None:
+    """1 bar assumption. The bound is Robie's 40.08 cm3/mol, 4.008 J/mol per bar.
+
+    That product is not computed in this test. The enthalpy value is not
+    shifted by the bound.
+    """
+
+    printed_cm3 = _printed_robie_pseudowollastonite_volume_cm3()
+    assert printed_cm3 == "40.08"
+    volume_m3 = float(Decimal(printed_cm3) * Decimal("1e-6"))
+    identity = _mgo_enthalpy_identity(State.unknown("source does not state pressure"))
+    seen = []
+
+    class _Props:
+        def __init__(self) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = 1000.0
+            self.Cp_J_K_mol = 37.0
+            self.S_J_K_mol = 26.0
+            self.volume_m3_mol = volume_m3
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, pressure_bar):
+        seen.append((temperature_K, pressure_bar))
+        props = _Props()
+        if abs(temperature_K - 1000.0) < 1e-9:
+            props.H_J_mol = 5000.0
+        return props
+
+    attempt = predict_thermo_attempt(
+        Engine.THERMOENGINE,
+        F.observation("mgo-pressure-robie", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert seen == [(1000.0, 1.0), (298.15, 1.0)]
+    assert attempt.refusal_reason is None
+    assert attempt.value == Decimal("4")
+    pressure_notices = [
+        notice
+        for notice in attempt.notices
+        if "standard-pressure-assumed" in notice.reason
+    ]
+    assert len(pressure_notices) == 1
+    notice = pressure_notices[0]
+    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert notice.authority is Authority.BRIDGE
+    assert notice.band == "1 bar"
+    assert notice.original == Decimal("4.008")
+    assert "term=engine-V" in notice.reason
+    assert "pressure_bar=1" in notice.reason
+
+
+def test_unknown_condensed_pressure_uses_stated_volume_bound() -> None:
+    identity = _mgo_enthalpy_identity(State.unknown("source does not state pressure"))
+
+    class _Props:
+        def __init__(self, enthalpy: float) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = 37.0
+            self.S_J_K_mol = 26.0
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        return _Props(5000.0 if abs(temperature_K - 1000.0) < 1e-9 else 1000.0)
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo-pressure-stated", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert attempt.refusal_reason is None
+    assert attempt.value == Decimal("4")
+    notice = next(notice for notice in attempt.notices if "standard-pressure-assumed" in notice.reason)
+    assert notice.original == Decimal("4")
+    assert "term=stated-V" in notice.reason
+    assert ":P_bar=1:assumed" in attempt.call_evidence
+
+
+def test_stated_pressure_is_not_replaced_with_one_bar() -> None:
+    identity = _mgo_enthalpy_identity(State.of(Decimal("200000")))
+    seen = []
+
+    class _Props:
+        def __init__(self, enthalpy: float) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = 37.0
+            self.S_J_K_mol = 26.0
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, pressure_bar):
+        seen.append(pressure_bar)
+        return _Props(5000.0 if abs(temperature_K - 1000.0) < 1e-9 else 1000.0)
+
+    attempt = predict_thermo_attempt(
+        Engine.THERMOENGINE,
+        F.observation("mgo-pressure-2bar", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert seen == [2.0, 2.0]
+    assert attempt.value == Decimal("4")
+    assert attempt.notices == ()
+
+
+def test_cp_and_s_pressure_notices_omit_the_enthalpy_bound() -> None:
+    """The V·dP figure is an enthalpy. Cp and S keep the 1 bar call only."""
+
+    class _Props:
+        formula = "MgO"
+        Cp_J_K_mol = 40.0
+        H_J_mol = 1000.0
+        S_J_K_mol = 26.0
+        volume_m3_mol = 1.0e-5
+        absences = ()
+        warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, pressure_bar):
+        assert temperature_K == 1000.0
+        assert pressure_bar == 1.0
+        return _Props()
+
+    for quantity, printed in ((Quantity.CP, Decimal("40.0")), (Quantity.S, Decimal("26.0"))):
+        identity = replace(
+            _pure_phase_identity(quantity),
+            standard_pressure_Pa=State.unknown("source does not state pressure"),
+        )
+        attempt = predict_thermo_attempt(
+            Engine.THERMOENGINE,
+            F.observation(f"mgo-{quantity.value}-pressure", "exp-1", identity, printed),
+            pure_phase=pure_phase,
+        )
+        assert attempt.refusal_reason is None
+        assert attempt.value == printed
+        notice = next(
+            item for item in attempt.notices if "standard-pressure-assumed" in item.reason
+        )
+        assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        assert "pressure_bar=1" in notice.reason
+        assert "bound_J_mol_per_bar" not in notice.reason
+        assert "term=omitted" in notice.reason
+        assert notice.original is None
+
+
+def test_gas_unknown_pressure_still_refuses() -> None:
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.G,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.CP,
+        standard_pressure_Pa=State.unknown("source does not state pressure"),
+    )
+    calls = []
+
+    def pure_phase(*_args):
+        calls.append(_args)
+        raise AssertionError("gas must not be evaluated at an assumed 1 bar")
+
+    attempt = predict_thermo_attempt(
+        Engine.THERMOENGINE,
+        F.observation("mgo-gas-pressure", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert calls == []
+    assert attempt.value is None
+    assert attempt.notices == ()
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "pure-phase-is-crystal-only"
+
+
+def test_unstated_crystal_pressure_scores_on_census_and_residual(monkeypatch) -> None:
+    """The 1 bar rule has one owner, so census and compile_residual keep the attempt.
+
+    The printed value and the engine value are both 4 kJ/mol. The V·dP
+    bound stays on the notice. ``bar_to_pa("1")`` is the stated-pressure
+    converter, not a second copy of the assumption.
+    """
+
+    from simulator.battery import compilation_tier
+    from simulator.battery.compilation_tier import _prediction_from_attempt
+    from simulator.battery.score import compile_residual
+
+    unknown = replace(
+        _pure_phase_identity(Quantity.H_MINUS_H298),
+        standard_pressure_Pa=State.unknown("source does not state pressure"),
+        subtype=State.of("H(T)-H(298.15 K)"),
+    )
+    one_bar = replace(unknown, standard_pressure_Pa=State.of(bar_to_pa("1")))
+    two_bar = replace(unknown, standard_pressure_Pa=State.of(bar_to_pa("2")))
+    assert assumed_crystal_standard_pressure_Pa(unknown) == bar_to_pa("1")
+    assert assumed_crystal_standard_pressure_Pa(one_bar) is None
+    assert identity_equal(unknown, unknown).kind is IdentityEqualKind.EQUAL
+    assert identity_equal(unknown, one_bar).kind is IdentityEqualKind.EQUAL
+    mismatch = identity_equal(unknown, two_bar)
+    assert mismatch.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert mismatch.fields == ("standard_pressure_Pa",)
+    missing = replace(unknown, standard_pressure_Pa=None)
+    assert identity_equal(missing, one_bar).kind is IdentityEqualKind.EQUAL
+    for quantity in (Quantity.CP, Quantity.S):
+        row = replace(
+            _pure_phase_identity(quantity),
+            standard_pressure_Pa=State.unknown("source does not state pressure"),
+        )
+        assert assumed_crystal_standard_pressure_Pa(row) == bar_to_pa("1")
+        assert identity_equal(row, row).kind is IdentityEqualKind.EQUAL
+
+    observation = F.observation(
+        "mgo-h-unknown-pressure",
+        "exp-1",
+        unknown,
+        Decimal("4"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    calls = []
+
+    class _Props:
+        def __init__(self, enthalpy: float) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = 37.0
+            self.S_J_K_mol = 26.0
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, pressure_bar):
+        calls.append((temperature_K, pressure_bar))
+        enthalpy = 1000.0 if abs(temperature_K - 298.15) < 1e-6 else 5000.0
+        return _Props(enthalpy)
+
+    attempt = predict_thermo_attempt(
+        Engine.THERMOENGINE,
+        observation,
+        pure_phase=pure_phase,
+    )
+    assert calls == [(1000.0, 1.0), (298.15, 1.0)]
+    assert attempt.refusal_reason is None
+    assert attempt.value == Decimal("4")
+    assert any("standard-pressure-assumed" in notice.reason for notice in attempt.notices)
+
+    calls.clear()
+    monkeypatch.setattr(compilation_tier, "default_pure_phase", pure_phase)
+    result = compilation_tier.compilation_tier_census(
+        _context(observation),
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=True,
+        audit_compile_residual=False,
+    )
+    row = next(
+        item for item in result["rows"] if item["quantity"] == Quantity.H_MINUS_H298.value
+    )
+    assert row["numeric"] > 0
+    assert calls == [(1000.0, 1.0), (298.15, 1.0)]
+    assert "identity_unknown:identity_equal" not in row["refused"]
+
+    prediction = _prediction_from_attempt(Engine.THERMOENGINE, observation, attempt)
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.THERMOENGINE,
+        context=_context(observation),
+        comparison_ids=set(),
+        predict=lambda _engine, _obs, **_kwargs: prediction,
+    )
+    assert residual.refusal is None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.numeric.value == Decimal("0")
+    assert any(
+        "standard-pressure-assumed" in notice.reason for notice in residual.notices
+    )
+
+
+def test_liquid_glass_and_formation_unknown_pressure_stay_unknown() -> None:
+    """Liquid and glass are condensed, and the engines still refuse them first."""
+
+    calls = []
+
+    def pure_phase(*_args):
+        calls.append(_args)
+        raise AssertionError("liquid and glass are not evaluated at an assumed 1 bar")
+
+    for phase in (Phase.L, Phase.GLASS):
+        identity = _pure_standard_identity(
+            F.oxide_identity(
+                "MgO",
+                phase,
+                T_K=Decimal("1000"),
+                per=PerBasis.MOL_SPECIES,
+                metal_formula="Mg",
+            ),
+            Quantity.CP,
+        )
+        identity = replace(
+            identity,
+            standard_pressure_Pa=State.unknown("source does not state pressure"),
+        )
+        assert assumed_crystal_standard_pressure_Pa(identity) is None
+        outcome = identity_equal(identity, identity)
+        assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+        assert "standard_pressure_Pa" in outcome.fields
+        attempt = predict_thermo_attempt(
+            Engine.THERMOENGINE,
+            F.observation(f"mgo-{phase.value}-pressure", "exp-1", identity, Decimal("4")),
+            pure_phase=pure_phase,
+        )
+        assert attempt.value is None
+        assert attempt.notices == ()
+        assert attempt.refusal_detail["reason"] == "pure-phase-is-crystal-only"
+    assert calls == []
+
+    gas = replace(
+        _pure_standard_identity(
+            F.oxide_identity(
+                "MgO",
+                Phase.G,
+                T_K=Decimal("1000"),
+                per=PerBasis.MOL_SPECIES,
+                metal_formula="Mg",
+            ),
+            Quantity.CP,
+        ),
+        standard_pressure_Pa=State.unknown("source does not state pressure"),
+    )
+    gas_equal = identity_equal(gas, gas)
+    assert assumed_crystal_standard_pressure_Pa(gas) is None
+    assert gas_equal.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "standard_pressure_Pa" in gas_equal.fields
+
+    formation = replace(
+        F.oxide_identity(
+            "MgO",
+            Phase.CR,
+            T_K=Decimal("1000"),
+            per=PerBasis.MOL_SPECIES,
+            metal_formula="Mg",
+            polymorph=Polymorph.PERICLASE.value,
+        ),
+        standard_pressure_Pa=State.unknown("source does not state pressure"),
+    )
+    assert quantity_token(formation) is Quantity.DELTA_FG
+    assert assumed_crystal_standard_pressure_Pa(formation) is None
+    formed = identity_equal(formation, formation)
+    assert formed.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "standard_pressure_Pa" in formed.fields
+
+
+def test_failed_enthalpy_call_at_t_ref_is_named_on_the_cp_fallback() -> None:
+    """A raised H call at T_ref stays on the Cp·ΔT value and says so.
+
+    A successful call that simply has no H is the same number and does not
+    use that sentence. No Cp and a raised call still refuse, with the
+    failure on the refusal detail.
+    """
+
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(298 K)"),
+    )
+    observation = F.observation("mgo-tref-fail", "exp-1", identity, Decimal("4"))
+
+    class _Props:
+        def __init__(self, enthalpy, heat_capacity) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = heat_capacity
+            self.S_J_K_mol = 26.0
+            self.absences = ()
+            self.warnings = ()
+
+    def at_temperature(temperature_K: float, *, fail: bool, with_cp: bool):
+        if abs(temperature_K - 298.0) < 1e-9:
+            if fail:
+                raise RuntimeError("t-ref down")
+            return _Props(None, None)
+        if abs(temperature_K - 298.15) < 1e-9:
+            return _Props(1000.0, 40.0 if with_cp else None)
+        return _Props(5000.0, None)
+
+    quiet = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        observation,
+        pure_phase=lambda engine, symbol, temperature_K, pressure_bar: at_temperature(
+            temperature_K, fail=False, with_cp=True
+        ),
+    )
+    failed = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        observation,
+        pure_phase=lambda engine, symbol, temperature_K, pressure_bar: at_temperature(
+            temperature_K, fail=True, with_cp=True
+        ),
+    )
+    assert quiet.refusal_reason is None
+    assert failed.refusal_reason is None
+    assert failed.value == quiet.value
+    assert quiet.notices[0].original == failed.notices[0].original
+    assert "term=engine-Cp" in quiet.notices[0].reason
+    assert "after a failed H call" not in quiet.notices[0].reason
+    assert "term=engine-Cp after a failed H call" in failed.notices[0].reason
+    assert "RuntimeError: t-ref down" in failed.notices[0].reason
+
+    refused = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        observation,
+        pure_phase=lambda engine, symbol, temperature_K, pressure_bar: at_temperature(
+            temperature_K, fail=True, with_cp=False
+        ),
+    )
+    assert refused.value is None
+    assert refused.notices == ()
+    assert refused.refusal_reason is RefusalReason.UNSUPPORTED
+    assert refused.refusal_detail["reason"] == "pure-phase-enthalpy-anchor-no-H-or-Cp"
+    assert refused.refusal_detail["H_call_at_T_ref"] == "failed"
+    assert refused.refusal_detail["H_call_detail"] == "RuntimeError: t-ref down"
+
+
+def test_enthalpy_anchor_without_h_or_cp_refuses_typed() -> None:
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(298 K)"),
+    )
+
+    class _Props:
+        def __init__(self, enthalpy) -> None:
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = None
+            self.S_J_K_mol = None
+            self.absences = ()
+            self.warnings = ()
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        if abs(temperature_K - 298.0) < 1e-9:
+            return _Props(None)
+        if abs(temperature_K - 298.15) < 1e-9:
+            return _Props(1000.0)
+        return _Props(5000.0)
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo-anchor-no-cp", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "pure-phase-enthalpy-anchor-no-H-or-Cp"
 
 
 def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> None:

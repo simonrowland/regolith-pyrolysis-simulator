@@ -375,6 +375,9 @@ class Polymorph(StrEnum):
     ZOISITE = "zoisite"
     WOLLASTONITE = "wollastonite"
     CYCLOWOLLASTONITE = "cyclowollastonite"
+    # ThermoEngine pWo. Distinct from cyclowollastonite: that token is the
+    # B1544 printed name and does not select pWo.
+    PSEUDOWOLLASTONITE = "pseudowollastonite"
     LIME = "lime"
     PERICLASE = "periclase"
     DICKITE = "dickite"
