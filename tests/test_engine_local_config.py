@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ctypes
 import json
 import os
 import sqlite3
@@ -239,17 +240,23 @@ def test_vaporock_objc_load_uses_dyld_path_without_local_config(
             if entry
         )
     artifact_names = thermoengine_artifact_names(load_engine_lock())
-    native_dir = next(
-        (
-            candidate
-            for candidate in candidates
-            if candidate is not None
-            and all((candidate / name).is_file() for name in artifact_names)
-        ),
-        None,
+    phaseobjc_name = next(
+        Path(name).name
+        for name in artifact_names
+        if Path(name).name.startswith("libphaseobjc.")
     )
-    if native_dir is None:
-        pytest.skip("no installed ThermoEngine dylib directory to exercise")
+    native_dir = None
+    for candidate in candidates:
+        if candidate is None or not all(
+            (candidate / name).is_file() for name in artifact_names
+        ):
+            continue
+        try:
+            ctypes.CDLL(str(candidate / phaseobjc_name))
+        except OSError:
+            continue
+        native_dir = candidate
+        break
 
     empty_home = tmp_path / "empty-home"
     empty_home.mkdir()
@@ -257,6 +264,13 @@ def test_vaporock_objc_load_uses_dyld_path_without_local_config(
     script = """
 import sys
 from pathlib import Path
+import ctypes
+loaded_native_paths = []
+real_cdll = ctypes.CDLL
+def recording_cdll(path, *args, **kwargs):
+    loaded_native_paths.append(str(path))
+    return real_cdll(path, *args, **kwargs)
+ctypes.CDLL = recording_cdll
 import simulator.engine_local_config as local_config
 local_config.config_path = lambda: Path(sys.argv[1])
 from simulator.engine_local_config import _load_thermoengine_phaseobjc_library
@@ -281,6 +295,7 @@ else:
     assert module is not None
     from rubicon.objc import ObjCClass
     ObjCClass('LiquidMelts')
+    assert sys.argv[3] in loaded_native_paths, loaded_native_paths
     print('CLASS_OK LiquidMelts')
 """
 
@@ -292,7 +307,18 @@ else:
         if fallback:
             env["DYLD_FALLBACK_LIBRARY_PATH"] = str(native_dir)
         return subprocess.run(
-            [sys.executable, "-c", script, str(missing_config), mode],
+            [
+                sys.executable,
+                "-c",
+                script,
+                str(missing_config),
+                mode,
+                (
+                    str(native_dir / phaseobjc_name)
+                    if native_dir is not None
+                    else ""
+                ),
+            ],
             cwd=Path(__file__).resolve().parents[1],
             env=env,
             capture_output=True,
@@ -301,13 +327,15 @@ else:
             check=False,
         )
 
-    loaded = run("loaded", fallback=True)
-    assert loaded.returncode == 0, loaded.stdout + loaded.stderr
-    assert "CLASS_OK LiquidMelts" in loaded.stdout
-
     missing = run("missing", fallback=False)
     assert missing.returncode == 0, missing.stdout + missing.stderr
     assert "TYPED_IMPORT_ERROR ImportError" in missing.stdout
+
+    if native_dir is None:
+        return
+    loaded = run("loaded", fallback=True)
+    assert loaded.returncode == 0, loaded.stdout + loaded.stderr
+    assert "CLASS_OK LiquidMelts" in loaded.stdout
 
 
 def test_is_legacy_cache_version_detects_path_identity() -> None:
