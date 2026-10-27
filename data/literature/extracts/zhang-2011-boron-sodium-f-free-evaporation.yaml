@@ -1,0 +1,400 @@
+schema_version: literature_extract.v1
+source_id: zhang-2011-boron-sodium-f-free-evaporation
+source:
+  citation: 'Zhang, Zuo Tai; Sridhar, Seetharaman; Cho, Jung Wook (2011). An Investigation of the Evaporation of B2O3 and Na2O in F-Free Mold Slags. ISIJ International 51(1), 80–87.'
+  doi: 10.2355/isijinternational.51.80
+  url: https://doi.org/10.2355/isijinternational.51.80
+  year: 2011
+extraction:
+  method: 'table tool unavailable: born-digital, pdftotext + image audit'
+  date: '2026-10-27'
+  worker: w1027na1-zhan11
+  provenance_path: raw/zhang-2011-boron-sodium-f-free-evaporation/zhang-2011-boron-sodium-f-free-evaporation.pdf
+  scope_note: >-
+    Tables 1, 2 and 6 are transcribed from pdftotext-layout and checked cell by cell
+    against rendered PDF pages 2 and 8. The table converter cannot run because this
+    born-digital paper has no MinerU content lists. Tables 3–5 are retained as
+    calculation context on page 7. Figures 3–9 contain weight-loss curves and
+    apparent activation-energy plots; no values were digitised from figures. Table
+    6's measured values are whole-slag mass fluxes and Table 6's estimated column
+    is a calculated gas-film flux. The schema has no mass-per-area-per-time
+    quantity token, so these values remain typed refusals with their printed units.
+    The numerical argon flow, total pressure, and individual starting mass are not
+    stated. Table 2's caption says post-measured slag, while section 3.1 identifies
+    the XRF analysis as pre-melting composition; Table 2 compositions are used for
+    the named base slags only. The CS-3 plus ZrO2 mixture composition is retained
+    as printed without inventing a normalized analysis.
+review_status: draft
+fidelity_samples:
+  - species: slag
+    observation_id: zhang_2011_cs3_1300c_measured_flux
+    field: mass_loss_rate
+    value: 5.46
+    locator: {page: 8, table: '6', note: 'CS-3 measured evaporation rate at 1300 C; multiplier 10^-6 mg/(cm^2 s)'}
+  - species: slag
+    observation_id: zhang_2011_cs3_1350c_measured_flux
+    field: mass_loss_rate
+    value: 14.5
+    locator: {page: 8, table: '6', note: 'CS-3 measured evaporation rate at 1350 C; multiplier 10^-6 mg/(cm^2 s)'}
+  - species: slag
+    observation_id: zhang_2011_cs3zro2_1400c_measured_flux
+    field: mass_loss_rate
+    value: 28.1
+    locator: {page: 8, table: '6', note: 'CS-3 plus ZrO2 measured evaporation rate at 1400 C; multiplier 10^-6 mg/(cm^2 s)'}
+experiments:
+  - experiment_id: zhang_2011_cs3_tga_series
+    method: {tag: value, value: tga}
+    locator: {page: 2, section: '2.2 Experimental Procedures'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081}}}
+        locator: {page: 2, table: '2', note: 'CS-3 XRF composition; section 3.1 identifies analysis as pre-melting'}
+  - experiment_id: zhang_2011_cs3zro2_tga_series
+    method: {tag: value, value: tga}
+    locator: {page: 2, section: '2.2 Experimental Procedures'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081, ZrO2: 2}}}
+        locator: {page: 2, table: '2', note: 'CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed'}
+  - experiment_id: zhang_2011_cs4_tga_series
+    method: {tag: value, value: tga}
+    locator: {page: 2, section: '2.2 Experimental Procedures'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 43.80, SiO2: 36.91, Al2O3: 3.12, Na2O: 6.54, B2O3: 4.63, TiO2: 5.00}}}
+        locator: {page: 2, table: '2', note: 'CS-4 XRF composition; section 3.1 identifies analysis as pre-melting'}
+species:
+  slag:
+    observations:
+      - observation_id: zhang_2011_cs3_1300c_measured_flux
+        experiment: zhang_2011_cs3_tga_series
+        type: rate_series
+        locator: {page: 8, table: '6', note: 'Measured flux; CS-3 row at 1300 C'}
+        point_conditions:
+          T_C: {state: {tag: value, value: 1300}, locator: {page: 8, table: '6'}}
+          atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081}}}, locator: {page: 2, table: '2', note: 'CS-3 pre-melting XRF composition'}}
+        phase: l
+        regime: thermogravimetric_analysis
+        units: 10^-6 mg/(cm^2 s)
+        values:
+          quantity: mass_loss_rate
+          method_class: measured_direct
+          evidence_class: measured_direct
+          admission_status: typed_refusal
+          reason: schema has no mass-per-area-per-time quantity token
+          mass_loss_rate: 5.46
+          T_C: 1300
+          slag_id: CS-3
+          gas_atmosphere: argon
+          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          hold_time_min: 120
+          initial_rate_window_min: 15
+          heating_rate_K_per_min: 50
+          composition_source: Table 2 XRF analysis; section 3.1 identifies analysis as pre-melting composition
+      - observation_id: zhang_2011_cs3_1350c_measured_flux
+        experiment: zhang_2011_cs3_tga_series
+        type: rate_series
+        locator: {page: 8, table: '6', note: 'Measured flux; CS-3 row at 1350 C'}
+        point_conditions:
+          T_C: {state: {tag: value, value: 1350}, locator: {page: 8, table: '6'}}
+          atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081}}}, locator: {page: 2, table: '2', note: 'CS-3 pre-melting XRF composition'}}
+        phase: l
+        regime: thermogravimetric_analysis
+        units: 10^-6 mg/(cm^2 s)
+        values:
+          quantity: mass_loss_rate
+          method_class: measured_direct
+          evidence_class: measured_direct
+          admission_status: typed_refusal
+          reason: schema has no mass-per-area-per-time quantity token
+          mass_loss_rate: 14.5
+          T_C: 1350
+          slag_id: CS-3
+          gas_atmosphere: argon
+          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          hold_time_min: 120
+          initial_rate_window_min: 15
+          heating_rate_K_per_min: 50
+          composition_source: Table 2 XRF analysis; section 3.1 identifies analysis as pre-melting composition
+      - observation_id: zhang_2011_cs3_1400c_measured_flux
+        experiment: zhang_2011_cs3_tga_series
+        type: rate_series
+        locator: {page: 8, table: '6', note: 'Measured flux; CS-3 row at 1400 C'}
+        point_conditions:
+          T_C: {state: {tag: value, value: 1400}, locator: {page: 8, table: '6'}}
+          atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081}}}, locator: {page: 2, table: '2', note: 'CS-3 pre-melting XRF composition'}}
+        phase: l
+        regime: thermogravimetric_analysis
+        units: 10^-6 mg/(cm^2 s)
+        values:
+          quantity: mass_loss_rate
+          method_class: measured_direct
+          evidence_class: measured_direct
+          admission_status: typed_refusal
+          reason: schema has no mass-per-area-per-time quantity token
+          mass_loss_rate: 20.4
+          T_C: 1400
+          slag_id: CS-3
+          gas_atmosphere: argon
+          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          hold_time_min: 120
+          initial_rate_window_min: 15
+          heating_rate_K_per_min: 50
+          composition_source: Table 2 XRF analysis; section 3.1 identifies analysis as pre-melting composition
+      - observation_id: zhang_2011_cs3zro2_1300c_measured_flux
+        experiment: zhang_2011_cs3zro2_tga_series
+        type: rate_series
+        locator: {page: 8, table: '6', note: 'Measured flux; CS-3 plus ZrO2 row at 1300 C'}
+        point_conditions:
+          T_C: {state: {tag: value, value: 1300}, locator: {page: 8, table: '6'}}
+          atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081, ZrO2: 2}}}, locator: {page: 2, table: '2', note: 'CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed'}}
+        phase: l
+        regime: thermogravimetric_analysis
+        units: 10^-6 mg/(cm^2 s)
+        values:
+          quantity: mass_loss_rate
+          method_class: measured_direct
+          evidence_class: measured_direct
+          admission_status: typed_refusal
+          reason: schema has no mass-per-area-per-time quantity token
+          mass_loss_rate: 9.64
+          T_C: 1300
+          composition_as_printed: CS-3 with 2 wt% ZrO2 addition; a post-addition analysis is not tabulated
+          slag_id: CS-3 + 2 wt% ZrO2
+          gas_atmosphere: argon
+          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          hold_time_min: 120
+          initial_rate_window_min: 15
+          heating_rate_K_per_min: 50
+      - observation_id: zhang_2011_cs3zro2_1350c_measured_flux
+        experiment: zhang_2011_cs3zro2_tga_series
+        type: rate_series
+        locator: {page: 8, table: '6', note: 'Measured flux; CS-3 plus ZrO2 row at 1350 C'}
+        point_conditions:
+          T_C: {state: {tag: value, value: 1350}, locator: {page: 8, table: '6'}}
+          atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081, ZrO2: 2}}}, locator: {page: 2, table: '2', note: 'CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed'}}
+        phase: l
+        regime: thermogravimetric_analysis
+        units: 10^-6 mg/(cm^2 s)
+        values:
+          quantity: mass_loss_rate
+          method_class: measured_direct
+          evidence_class: measured_direct
+          admission_status: typed_refusal
+          reason: schema has no mass-per-area-per-time quantity token
+          mass_loss_rate: 20.1
+          T_C: 1350
+          composition_as_printed: CS-3 with 2 wt% ZrO2 addition; a post-addition analysis is not tabulated
+          slag_id: CS-3 + 2 wt% ZrO2
+          gas_atmosphere: argon
+          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          hold_time_min: 120
+          initial_rate_window_min: 15
+          heating_rate_K_per_min: 50
+      - observation_id: zhang_2011_cs3zro2_1400c_measured_flux
+        experiment: zhang_2011_cs3zro2_tga_series
+        type: rate_series
+        locator: {page: 8, table: '6', note: 'Measured flux; CS-3 plus ZrO2 row at 1400 C'}
+        point_conditions:
+          T_C: {state: {tag: value, value: 1400}, locator: {page: 8, table: '6'}}
+          atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081, ZrO2: 2}}}, locator: {page: 2, table: '2', note: 'CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed'}}
+        phase: l
+        regime: thermogravimetric_analysis
+        units: 10^-6 mg/(cm^2 s)
+        values:
+          quantity: mass_loss_rate
+          method_class: measured_direct
+          evidence_class: measured_direct
+          admission_status: typed_refusal
+          reason: schema has no mass-per-area-per-time quantity token
+          mass_loss_rate: 28.1
+          T_C: 1400
+          composition_as_printed: CS-3 with 2 wt% ZrO2 addition; a post-addition analysis is not tabulated
+          slag_id: CS-3 + 2 wt% ZrO2
+          gas_atmosphere: argon
+          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          hold_time_min: 120
+          initial_rate_window_min: 15
+          heating_rate_K_per_min: 50
+      - observation_id: zhang_2011_cs4_1300c_measured_flux
+        experiment: zhang_2011_cs4_tga_series
+        type: rate_series
+        locator: {page: 8, table: '6', note: 'Measured flux; CS-4 row at 1300 C'}
+        point_conditions:
+          T_C: {state: {tag: value, value: 1300}, locator: {page: 8, table: '6'}}
+          atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 43.80, SiO2: 36.91, Al2O3: 3.12, Na2O: 6.54, B2O3: 4.63, TiO2: 5.00}}}, locator: {page: 2, table: '2', note: 'CS-4 pre-melting XRF composition'}}
+        phase: l
+        regime: thermogravimetric_analysis
+        units: 10^-6 mg/(cm^2 s)
+        values:
+          quantity: mass_loss_rate
+          method_class: measured_direct
+          evidence_class: measured_direct
+          admission_status: typed_refusal
+          reason: schema has no mass-per-area-per-time quantity token
+          mass_loss_rate: 8.78
+          T_C: 1300
+          slag_id: CS-4
+          gas_atmosphere: argon
+          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          hold_time_min: 120
+          initial_rate_window_min: 15
+          heating_rate_K_per_min: 50
+          composition_source: Table 2 XRF analysis; section 3.1 identifies analysis as pre-melting composition
+      - observation_id: zhang_2011_cs4_1350c_measured_flux
+        experiment: zhang_2011_cs4_tga_series
+        type: rate_series
+        locator: {page: 8, table: '6', note: 'Measured flux; CS-4 row at 1350 C'}
+        point_conditions:
+          T_C: {state: {tag: value, value: 1350}, locator: {page: 8, table: '6'}}
+          atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 43.80, SiO2: 36.91, Al2O3: 3.12, Na2O: 6.54, B2O3: 4.63, TiO2: 5.00}}}, locator: {page: 2, table: '2', note: 'CS-4 pre-melting XRF composition'}}
+        phase: l
+        regime: thermogravimetric_analysis
+        units: 10^-6 mg/(cm^2 s)
+        values:
+          quantity: mass_loss_rate
+          method_class: measured_direct
+          evidence_class: measured_direct
+          admission_status: typed_refusal
+          reason: schema has no mass-per-area-per-time quantity token
+          mass_loss_rate: 15.3
+          T_C: 1350
+          slag_id: CS-4
+          gas_atmosphere: argon
+          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          hold_time_min: 120
+          initial_rate_window_min: 15
+          heating_rate_K_per_min: 50
+          composition_source: Table 2 XRF analysis; section 3.1 identifies analysis as pre-melting composition
+      - observation_id: zhang_2011_cs4_1400c_measured_flux
+        experiment: zhang_2011_cs4_tga_series
+        type: rate_series
+        locator: {page: 8, table: '6', note: 'Measured flux; CS-4 row at 1400 C'}
+        point_conditions:
+          T_C: {state: {tag: value, value: 1400}, locator: {page: 8, table: '6'}}
+          atmosphere: {state: {tag: value, value: argon}, locator: {page: 2, section: '2.2 Experimental Procedures'}}
+          composition: {state: {tag: value, value: {amount_basis: mass_percent, components: {CaO: 43.80, SiO2: 36.91, Al2O3: 3.12, Na2O: 6.54, B2O3: 4.63, TiO2: 5.00}}}, locator: {page: 2, table: '2', note: 'CS-4 pre-melting XRF composition'}}
+        phase: l
+        regime: thermogravimetric_analysis
+        units: 10^-6 mg/(cm^2 s)
+        values:
+          quantity: mass_loss_rate
+          method_class: measured_direct
+          evidence_class: measured_direct
+          admission_status: typed_refusal
+          reason: schema has no mass-per-area-per-time quantity token
+          mass_loss_rate: 24.4
+          T_C: 1400
+          slag_id: CS-4
+          gas_atmosphere: argon
+          gas_flow_as_printed: fixed flow rate above starvation rate; numerical flow not stated
+          hold_time_min: 120
+          initial_rate_window_min: 15
+          heating_rate_K_per_min: 50
+          composition_source: Table 2 XRF analysis; section 3.1 identifies analysis as pre-melting composition
+    context:
+      - observation_id: zhang_2011_designed_slag_compositions_table1
+        type: composition
+        locator: {page: 2, table: '1', note: 'Designed composition; each oxide row across CS-1 to CS-5'}
+        units: mass%
+        values:
+          quantity: printed_slag_compositions
+          table_1_basis: design composition before melting
+          table_1_rows:
+            - {slag_id: CS-1, composition_wt_pct: {CaO: 39, SiO2: 47, Al2O3: 3, Na2O: 6, B2O3: 5, TiO2: 0}}
+            - {slag_id: CS-2, composition_wt_pct: {CaO: 44, SiO2: 42, Al2O3: 3, Na2O: 6, B2O3: 5, TiO2: 0}}
+            - {slag_id: CS-3, composition_wt_pct: {CaO: 47.8, SiO2: 38.2, Al2O3: 3, Na2O: 6, B2O3: 5, TiO2: 0}}
+            - {slag_id: CS-4, composition_wt_pct: {CaO: 44.6, SiO2: 35.4, Al2O3: 3, Na2O: 6, B2O3: 5, TiO2: 6}}
+            - {slag_id: CS-5, composition_wt_pct: {CaO: 41, SiO2: 39, Al2O3: 3, Na2O: 6, B2O3: 5, TiO2: 6}}
+      - observation_id: zhang_2011_analyzed_slag_compositions_table2
+        type: composition
+        locator: {page: 2, table: '2', note: 'XRF analyses of pre-melted slags per section 3.1'}
+        units: mass%
+        values:
+          quantity: printed_slag_compositions
+          table_2_basis: caption says post-measured slag; section 3.1 says pre-melting XRF analysis
+          table_2_rows:
+            - {slag_id: CS-1, composition_wt_pct: {CaO: 36.92, SiO2: 48.22, Al2O3: 2.93, Na2O: 6.70, B2O3: 5.13, TiO2: 0.092}}
+            - {slag_id: CS-2, composition_wt_pct: {CaO: 41.98, SiO2: 42.90, Al2O3: 3.10, Na2O: 6.71, B2O3: 5.22, TiO2: 0.081}}
+            - {slag_id: CS-3, composition_wt_pct: {CaO: 46.20, SiO2: 39.11, Al2O3: 3.19, Na2O: 6.59, B2O3: 4.81, TiO2: 0.081}}
+            - {slag_id: CS-4, composition_wt_pct: {CaO: 43.80, SiO2: 36.91, Al2O3: 3.12, Na2O: 6.54, B2O3: 4.63, TiO2: 5.00}}
+            - {slag_id: CS-5, composition_wt_pct: {CaO: 38.29, SiO2: 39.18, Al2O3: 3.21, Na2O: 6.61, B2O3: 5.08, TiO2: 5.55}}
+      - observation_id: zhang_2011_geometry_and_run_conditions
+        type: apparatus
+        locator: {page: 2, section: '2.2 Experimental Procedures', figure: '1'}
+        units: as printed
+        values:
+          quantity: thermogravimetric_run_setup
+          furnace: SETARAM TGA 92
+          crucible: platinum; sample suspended by platinum wire in even-temperature zone
+          sample_charge_geometry: liquid slag surface to crucible end distance is L in the model; no numerical L or crucible dimensions are stated
+          premelt_charge_mass_g: 50
+          premelt_schedule: dried 4 h at 200 C; heated to 1400 C at 5 C/min
+          test_atmosphere: argon
+          reaction_tube_evacuation_min: 5
+          test_gas_flow: fixed rate above starvation rate; numerical flow not stated
+          test_heating_rate_K_per_min: 50
+          hold_time_min: 120
+          tga_detection_limit_ug: 1
+      - observation_id: zhang_2011_calculation_tables_3_to_5
+        type: thermodynamic_example
+        locator: {page: 7, table: '3', note: 'Calculation inputs and model estimates; cells checked against render'}
+        units: as printed per field
+        values:
+          quantity: evaporation_transport_model_context
+          table_3:
+            columns: [Ar, NaBO2_g, B2O3_g]
+            rows:
+              - {property: epsilon_over_k_K, values: [122.4, 2378.88, 1388.16]}
+              - {property: sigma_A, values: [3.432, 3.65, 4.23]}
+              - {property: molecular_weight_g_per_mol, values: [39.948, 65.8, 69.62]}
+              - {property: molecular_volume_cm3_per_mol, values: [75.2, 26.7, 41.69]}
+          table_4:
+            unit: 10^-4 m2/s
+            temperatures_C: [1300, 1350, 1400]
+            rows:
+              - {species: NaBO2_g, values: [1.93, 2.05, 2.16]}
+              - {species: B2O3_g, values: [1.75, 1.85, 1.94]}
+          table_5:
+            unit: Pa
+            temperatures_C: [1300, 1350, 1400]
+            source_basis: estimated from ternary Na2O–B2O3–SiO2 slag system; assumed applicable to these slags because their Na2O and B2O3 contents are similar
+            rows:
+              - {species: NaBO2_g, values: [2298, 4417, 8164]}
+              - {species: B2O3_g, values: [1.46, 4.69, 14.06]}
+          fitted_apparent_activation_energy:
+            status: figure_read_candidate
+            figure: '9'
+            printed_numeric_values: not tabulated; not digitised
+            quote: The calculated apparent activation energy for the mechanism(s) responsible for evaporation of slag CS-3 is larger than those of slag CS-3 containing ZrO2 and slag CS-4 containing TiO2.
+      - observation_id: zhang_2011_table6_estimated_gas_film_flux
+        type: method
+        locator: {page: 8, table: '6', note: 'Estimated gas-film mass flux column'}
+        units: 10^-3 mg/(cm^2 s)
+        values:
+          quantity: estimated_gas_film_flux
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          temperatures_C: [1300, 1350, 1400]
+          values_as_printed: [1.12, 2.21, 4.18]
+          attribution: 'Authors calculated with equations (5), (6), and (12); vapor pressures are estimated from a ternary Na2O-B2O3-SiO2 system.'
+          measured_rows_in_table: 3
+          measured_compositions_in_table: [CS-3, CS-3 plus 2 wt% ZrO2, CS-4]
+      - observation_id: zhang_2011_mass_flux_schema_gap
+        type: method
+        locator: {page: 8, table: '6'}
+        units: as printed
+        values:
+          quantity: schema_gap
+          printed_quantity: mass per area per time
+          printed_unit: mg/(cm^2 s)
+          reason: no quantity token stores an areal mass flux per unit time; rate_series mass_loss_rate is typed-refused and preserves the published value and unit
+          figure_only_candidates: [3, 4, 5, 6, 7, 8, 9]
