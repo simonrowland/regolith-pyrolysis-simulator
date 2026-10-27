@@ -1,0 +1,55 @@
+source_id: zhang-2011-boron-sodium-f-free-evaporation
+source_locator_basis: absolute_pdf_page
+machine_text: corpus_text_pdftotext_layout
+mineru_input:
+  expected_text_path: text/zhang-2011-boron-sodium-f-free-evaporation/mineru
+  expected_raw_path: raw/zhang-2011-boron-sodium-f-free-evaporation/ocr-mineru
+  status: missing
+tables:
+  - table: '1'
+    page: 2
+    caption: Chemical compositions of the designed slag specimens (mass%).
+    required_columns: [Brand, CaO, SiO2, Al2O3, Na2O, B2O3, TiO2]
+    render_verified: true
+    render_reason: MinerU content-list and pdftotext table cells unavailable; checked against page render.
+  - table: '2'
+    page: 2
+    caption: Chemical compositions of post-measured slag (mass%).
+    required_columns: [Brand, CaO, SiO2, Al2O3, Na2O, B2O3, TiO2]
+    render_verified: true
+    render_reason: MinerU content-list and pdftotext table cells unavailable; checked against page render.
+  - table: '3'
+    page: 7
+    caption: Summary of values of epsilon/k and sigma for different gaseous species.
+    required_columns: [Gaseous_Species, epsilon_over_k_K, sigma_A, molecular_weight_g_per_mol, molecular_volume_cm3_per_mol]
+    render_verified: true
+    render_reason: MinerU content-list and pdftotext table cells unavailable; checked against page render.
+  - table: '4'
+    page: 7
+    caption: Estimated diffusion coefficient of gaseous species in Ar gas (10^-4 m2/s).
+    required_columns: [Item, 1300_C, 1350_C, 1400_C]
+    render_verified: true
+    render_reason: MinerU content-list and pdftotext table cells unavailable; checked against page render.
+  - table: '5'
+    page: 7
+    caption: Calculated vapor pressure of NaBO2 and B2O3 (Pa).
+    required_columns: [Vapor_pressure, 1300_C, 1350_C, 1400_C]
+    render_verified: true
+    render_reason: MinerU content-list and pdftotext table cells unavailable; checked against page render.
+  - table: '6'
+    page: 8
+    caption: A comparison of estimated and measured evaporation rates.
+    required_columns: [Temp_C, CS-3, CS-3_plus_ZrO2, CS-4, estimated]
+    render_verified: true
+    render_reason: MinerU content-list and pdftotext table cells unavailable; checked against page render.
+expected_table_counts:
+  table_1_body_rows: 6
+  table_2_body_rows: 6
+  table_3_body_rows: 4
+  table_4_body_rows: 2
+  table_5_body_rows: 2
+  table_6_body_rows: 3
+table_tool_status:
+  convert: unavailable_without_mineru_content_lists
+  emit: unavailable_without_mineru_content_lists
+  compare: pending_mineru_index
