@@ -656,7 +656,8 @@ def _cleaned_melt_policy(
             "wt_pct": dict(relaxed_dropped),
             "message": (
                 "Cr2O3 and MnO remain projected from the openimcc input, "
-                "but do not count toward the shared 1.0 wt% gate"
+                "but do not count toward the shared "
+                f"{threshold_classification.threshold_wt_pct} wt% gate"
             ),
         }
         classification_record["openimcc_projection_crmn_relaxed"] = dict(

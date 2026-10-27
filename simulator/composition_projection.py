@@ -9,7 +9,7 @@ import numbers
 from typing import Any
 
 
-# The 1.0 wt% boundary is the shared composition-basis rule from
+# The dropped-bulk boundary is the shared composition-basis rule from
 # ``docs-private/research/2026-09-24-schema-amendments/99-RULING-2026-09-24.md``
 # §"Composition basis" and its MAGEMin-specific addendum
 # ``99-RULING-2026-09-25-addenda.md`` §"MAGEMin projected bulk".
@@ -108,7 +108,7 @@ def classify_projected_bulk(
     dropped_component_mol_per_kg: Mapping[str, float | None] | None = None,
     dropped_component_mol_unavailable_reasons: Mapping[str, str] | None = None,
 ) -> ProjectedBulkClassification:
-    """Classify projected mass against the shared 1.0 wt% boundary.
+    """Classify projected mass against the shared dropped-bulk boundary.
 
     ``dropped_component_wt_pct`` contains component amounts on the same
     unnormalised wt% scale as ``source_sum_wt_pct``. The returned component
