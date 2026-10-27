@@ -490,11 +490,12 @@ def test_legacy_equipment_extract_output_has_no_empty_bench_key(tmp_path) -> Non
         digest.update(b"\0")
         digest.update(path.read_bytes())
         digest.update(b"\0")
-    # 32f8a434f adds Derivation.references; the generic dataclass writer emits
-    # its empty tuple as references: [] in these fixture records. The checks
-    # above are the behavior; this digest pins the complete written tree.
+    # Byte pin of this fixture after the merged migrator. Car 32f8a434f writes
+    # Derivation.references as references: []. Green b-985 adds an empty
+    # "Unavailable input work census" section to migration-report.md. The
+    # checks above are the behaviour; this digest is the merged tree.
     assert digest.hexdigest() == (
-        "3b9705c38dc37a96ec5a3cb5c975e91d65a14076a3e3b5a07a66b9b69587fbdc"
+        "1e71d46b76d3c2f30dd5c0632a7397e412d15f3995e8d43c7d245e6db8e3746a"
     )
 
 

@@ -42,7 +42,7 @@ import inspect
 import json
 import re
 import unicodedata
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field, fields, is_dataclass, replace
 from decimal import Decimal, InvalidOperation, localcontext
 from enum import Enum
@@ -180,6 +180,7 @@ from simulator.battery.enums import BenchIdentityBasis, CellMaterial
 from simulator.battery.validate import (
     ValidationIssue,
     ValidationReport,
+    _unavailable_missing_input_work_items,
     validate_corpus,
 )
 from simulator.physical_constants import STANDARD_ATMOSPHERE_PA
@@ -3366,6 +3367,35 @@ def convert_mass_to_kg(
     return None, f"unmapped mass unit {units!r}"
 
 
+def _convert_rate_to_kg_per_s(
+    value: object, units: str | None, quantity: Quantity
+) -> tuple[Decimal | None, str | None]:
+    quantity_label = (
+        "mass loss rate"
+        if quantity is Quantity.MASS_LOSS_RATE
+        else "evaporation rate"
+    )
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, f"{quantity_label} value is not numeric"
+    if units is None or not str(units).strip():
+        return None, f"missing {quantity_label} unit"
+    unit = re.sub(r"\s+", "", str(units).strip().lower())
+    unit = unit.removesuffix("asprinted").replace("^", "")
+    unit = unit.replace("−", "-").replace("⁻", "-")
+    if unit in {"kg/s", "kg_per_s", "kgs-1"}:
+        return amount, "identity:kg_per_s"
+    if "table2doesnotstatetherateunit" in unit:
+        return None, "rate_unit_not_stated"
+    if unit.startswith("mol/s/m2"):
+        return None, "sample_area_not_printed"
+    if unit.startswith("g/h/g"):
+        return None, "sample_mass_not_printed"
+    if "molcm-2s-1" in unit or "cm-2fordensities" in unit:
+        return None, "exposed_area_not_printed"
+    return None, f"unmapped {quantity_label} unit {units!r}"
+
+
 def convert_length_to_m(
     value: object, units: str | None
 ) -> tuple[Decimal | None, str | None]:
@@ -3476,6 +3506,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     "kPa_to_Pa": (Decimal("1000"), "P_Pa = P_kPa × 1000", "Pa", "kPa"),
     "GPa_to_Pa": (Decimal("1000000000"), "P_Pa = P_GPa × 1e9", "Pa", "GPa"),
     "mbar_to_Pa": (Decimal("100"), "P_Pa = P_mbar × 100", "Pa", "mbar"),
+    "g_per_cm3_to_kg_per_m3": (
+        Decimal("1000"),
+        "rho_kg_per_m3 = rho_g_per_cm3 × 1000",
+        "kg_per_m3",
+        "g_per_cm3",
+    ),
     "celsius_to_kelvin": (
         Decimal("273.15"),
         "T_K = T_C + 273.15",
@@ -4666,13 +4702,17 @@ def conversion_derivation(
 
     if not trail or str(trail).startswith("identity"):
         return None
-    if str(trail).startswith("specific_gas_yield:"):
-        _, species, raw_molar_mass, raw_factor = str(trail).split(":", 3)
+    trail_text = str(trail)
+    if trail_text.startswith(
+        ("specific_gas_yield:", "evolved_gas_yield_wt_percent:")
+    ):
+        _, species, raw_molar_mass, raw_factor = trail_text.split(":", 3)
         molar_mass = _as_dec_or_none(raw_molar_mass)
         factor = _as_dec_or_none(raw_factor)
         original = _as_dec_or_none(original_value)
         if molar_mass is None or molar_mass <= 0 or factor is None:
             return None
+        is_wt_percent = trail_text.startswith("evolved_gas_yield_wt_percent:")
         parameters: list[tuple[str, Located[Decimal]]] = [
             ("molar_mass_g_mol", Located(State.of(molar_mass), locator=locator)),
             ("factor", Located(State.of(factor), locator=locator)),
@@ -4680,10 +4720,21 @@ def conversion_derivation(
         if original is not None:
             parameters.insert(0, ("original", Located(State.of(original), locator=locator)))
         return Derivation(
-            relation=f"specific_gas_yield_{species}_ug_g_to_mol_per_initial_kg",
+            relation=(
+                f"evolved_gas_yield_{species}_wt_percent_to_mol_per_initial_kg"
+                if is_wt_percent
+                else f"specific_gas_yield_{species}_ug_g_to_mol_per_initial_kg"
+            ),
             inputs=(
-                "Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]",
-                "original_unit=ug/g",
+                (
+                    "Y[mol/kg] = y[wt%] * 10 / M[g/mol]",
+                    "original_unit=wt%",
+                )
+                if is_wt_percent
+                else (
+                    "Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]",
+                    "original_unit=ug/g",
+                )
             ),
             parameters=tuple(parameters),
             output_unit="mol_species_per_initial_kg",
@@ -10145,6 +10196,37 @@ def _uncertainty_as_log10_dex(
     return replace(uncertainty, value=converted, basis="log10_dex")
 
 
+def _selection_from_explicit_unit_conversion(
+    amount: Decimal,
+    field_name: str,
+    quantity: Quantity,
+    units: str | None,
+    payload: Mapping[str, Any],
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection | None:
+    if quantity is Quantity.DENSITY:
+        converted, trail = convert_density_to_kg_per_m3(amount, units)
+    elif quantity in {Quantity.EVAPORATION_RATE, Quantity.MASS_LOSS_RATE}:
+        converted, trail = _convert_rate_to_kg_per_s(amount, units, quantity)
+    else:
+        return None
+    if converted is None:
+        return _unavailable_selection(
+            trail or f"{field_name} has an unsupported unit",
+            condition_ranges=condition_ranges,
+            unused_ancillary=_unused_ancillary(payload, field_name),
+            field_name=field_name,
+            unit_trail=trail or "identity",
+        )
+    return _point_selection(
+        converted,
+        field_name,
+        trail or "identity",
+        payload,
+        condition_ranges,
+    )
+
+
 def _interval_selection(
     lo: Decimal,
     hi: Decimal,
@@ -10878,6 +10960,17 @@ def _selection_from_named_field(
             approximate_payload = {**payload, "approximate": True}
         if amount is None:
             continue
+        if q_token in {Quantity.EVAPORATION_RATE, Quantity.MASS_LOSS_RATE}:
+            converted_selection = _selection_from_explicit_unit_conversion(
+                amount,
+                key,
+                q_token,
+                _printed_unit_for_field(payload, key) or units,
+                payload,
+                condition_ranges,
+            )
+            if converted_selection is not None:
+                return converted_selection
         if q_token is Quantity.DENSITY:
             density_units = _printed_unit_for_field(payload, key) or (
                 "kg/m3" if key == "density_kg_m3_also_printed" else units
@@ -10951,19 +11044,29 @@ def _selection_from_named_field(
     if len(decorated) == 1:
         key, amount = decorated[0]
         assert amount is not None
+        if q_token in {Quantity.EVAPORATION_RATE, Quantity.MASS_LOSS_RATE}:
+            converted_selection = _selection_from_explicit_unit_conversion(
+                amount,
+                key,
+                q_token,
+                _printed_unit_for_field(payload, key) or units,
+                payload,
+                condition_ranges,
+            )
+            if converted_selection is not None:
+                return converted_selection
         if q_token is Quantity.DENSITY:
             amount, trail = convert_density_to_kg_per_m3(
                 amount, _printed_unit_for_field(payload, key) or units
             )
             if amount is None:
-                density_refusal = _unavailable_selection(
+                return _unavailable_selection(
                     trail or "density has no supported printed unit",
                     condition_ranges=condition_ranges,
                     unused_ancillary=_unused_ancillary(payload, key),
                     field_name=key,
                     unit_trail=trail or "identity",
                 )
-                return density_refusal
             return _point_selection(amount, key, trail, payload, condition_ranges)
         if q_token is Quantity.MASS_LOSS_AREAL_DENSITY:
             amount, trail = convert_areal_mass_to_kg_per_m2(amount, units)
@@ -11017,8 +11120,47 @@ def _selection_from_named_field(
     if isinstance(raw_range, (list, tuple)) and len(raw_range) >= 2:
         lo, hi = _as_dec_or_none(raw_range[0]), _as_dec_or_none(raw_range[1])
         if lo is not None and hi is not None:
+            field_name = range_key or "range"
+            if q_token in {
+                Quantity.DENSITY,
+                Quantity.EVAPORATION_RATE,
+                Quantity.MASS_LOSS_RATE,
+            }:
+                source_units = _printed_unit_for_field(payload, field_name) or units
+                lo_selection = _selection_from_explicit_unit_conversion(
+                    lo,
+                    field_name,
+                    q_token,
+                    source_units,
+                    payload,
+                    condition_ranges,
+                )
+                hi_selection = _selection_from_explicit_unit_conversion(
+                    hi,
+                    field_name,
+                    q_token,
+                    source_units,
+                    payload,
+                    condition_ranges,
+                )
+                assert lo_selection is not None and hi_selection is not None
+                if lo_selection.value.kind is not ValueKind.POINT:
+                    return lo_selection
+                if hi_selection.value.kind is not ValueKind.POINT:
+                    return hi_selection
+                assert lo_selection.amount is not None and hi_selection.amount is not None
+                return replace(
+                    _interval_selection(
+                        lo_selection.amount,
+                        hi_selection.amount,
+                        field_name,
+                        payload,
+                        condition_ranges,
+                    ),
+                    unit_trail=lo_selection.unit_trail,
+                )
             return _interval_selection(
-                lo, hi, range_key or "range", payload, condition_ranges
+                lo, hi, field_name, payload, condition_ranges
             )
     if malformed_fraction_bound is not None:
         return malformed_fraction_bound
@@ -11297,51 +11439,105 @@ def select_declared_source(
                 unit_trail="as_published",
                 condition_ranges=condition_ranges,
             )
-    if q_token is Quantity.EVOLVED_GAS_YIELD and "yield_ug_g" in payload:
-        amount = _as_dec_or_none(payload.get("yield_ug_g"))
-        gas_species = payload.get("gas_species")
-        if amount is None:
-            return _unavailable_selection(
-                "yield_ug_g is not numeric",
-                condition_ranges=condition_ranges,
-                field_name="yield_ug_g",
-            )
-        if not isinstance(gas_species, str) or not gas_species.strip():
-            return _unavailable_selection(
-                "yield_ug_g conversion requires the printed gas_species",
-                condition_ranges=condition_ranges,
-                field_name="gas_species",
-            )
-        try:
-            from simulator.accounting.formulas import parse_formula
+    if q_token is Quantity.EVOLVED_GAS_YIELD:
+        if "yield_ug_g" in payload:
+            field_name = "yield_ug_g"
+            amount = _as_dec_or_none(payload.get(field_name))
+            gas_species = payload.get("gas_species")
+            source_units = "µg/g"
+        else:
+            fields = [
+                key
+                for key in payload
+                if isinstance(key, str)
+                and key.startswith("evolved_gas_yield_")
+                and _numeric_field(payload, key) is not None
+            ]
+            if len(fields) > 1:
+                return _unavailable_selection(
+                    "evolved gas yield has multiple species fields",
+                    condition_ranges=condition_ranges,
+                    field_name=", ".join(fields),
+                )
+            if fields:
+                field_name = fields[0]
+                amount = _numeric_field(payload, field_name)
+                gas_species = field_name.removeprefix("evolved_gas_yield_")
+                source_units = _printed_unit_for_field(payload, field_name) or units
+            else:
+                field_name = None
+                amount = None
+                gas_species = None
+                source_units = units
+        if field_name is not None:
+            if amount is None:
+                return _unavailable_selection(
+                    f"{field_name} is not numeric",
+                    condition_ranges=condition_ranges,
+                    field_name=field_name,
+                )
+            if not isinstance(gas_species, str) or not gas_species.strip():
+                reason = (
+                    "yield_ug_g conversion requires the printed gas_species"
+                    if field_name == "yield_ug_g"
+                    else "evolved gas yield conversion requires a printed species"
+                )
+                return _unavailable_selection(
+                    reason,
+                    condition_ranges=condition_ranges,
+                    field_name=field_name,
+                )
+            if not isinstance(source_units, str) or not source_units.strip():
+                return _unavailable_selection(
+                    f"missing evolved gas yield unit for {field_name}",
+                    condition_ranges=condition_ranges,
+                    field_name=field_name,
+                )
+            unit = re.sub(r"\s+", "", source_units.lower())
+            unit = unit.removesuffix("asprinted").replace(".", "")
+            unit = unit.replace("μ", "µ").replace("µ", "u")
+            unit = unit.replace("^", "").replace("−", "-").replace("⁻", "-")
+            if unit in {"ug/g", "ugperg", "microgram/g", "micrograms/g"}:
+                factor_prefix = "specific_gas_yield"
+                factor_scale = Decimal("0.001")
+            elif unit in {"wt%", "wtpercent", "weight%", "weightpercent", "%"}:
+                factor_prefix = "evolved_gas_yield_wt_percent"
+                factor_scale = Decimal("10")
+            else:
+                return _unavailable_selection(
+                    f"unmapped evolved gas yield unit {source_units!r}",
+                    condition_ranges=condition_ranges,
+                    field_name=field_name,
+                )
+            try:
+                from simulator.accounting.formulas import parse_formula
 
-            formula = parse_formula(gas_species.strip())
-            molar_mass = Decimal(str(formula.molar_mass_g_per_mol()))
-        except (KeyError, ValueError):
-            return _unavailable_selection(
-                f"printed gas_species {gas_species!r} has no resolved molar mass",
-                condition_ranges=condition_ranges,
-                field_name="gas_species",
+                formula = parse_formula(gas_species.strip())
+                molar_mass = Decimal(str(formula.molar_mass_g_per_mol()))
+            except (KeyError, ValueError):
+                return _unavailable_selection(
+                    f"printed gas species {gas_species!r} has no resolved molar mass",
+                    condition_ranges=condition_ranges,
+                    field_name=field_name,
+                )
+            if molar_mass <= 0:
+                return _unavailable_selection(
+                    f"printed gas species {gas_species!r} has no positive molar mass",
+                    condition_ranges=condition_ranges,
+                    field_name=field_name,
+                )
+            factor = factor_scale / molar_mass
+            amount = amount * factor
+            if factor_prefix == "specific_gas_yield":
+                trail = f"specific_gas_yield:{gas_species.strip()}:{molar_mass}:{factor}"
+            else:
+                trail = (
+                    f"evolved_gas_yield_wt_percent:{gas_species.strip()}"
+                    f":{molar_mass}:{factor}"
+                )
+            return _point_selection(
+                amount, field_name, trail, payload, condition_ranges
             )
-        if molar_mass <= 0:
-            return _unavailable_selection(
-                f"printed gas_species {gas_species!r} has no positive molar mass",
-                condition_ranges=condition_ranges,
-                field_name="gas_species",
-            )
-        # Premise: the source reports micrograms of each named gas per gram of
-        # initial powder. Algebra: Y = y * 1e-3 / M, with y in ug/g and M in
-        # g/mol. Unit check: (ug/g)*(1e-3 g/kg)/(g/mol) = mol/kg. Worked
-        # source point: 4.98 ug/g H2 / 2.016 g/mol * 1e-3 = 0.002470238 mol/kg.
-        factor = Decimal("0.001") / molar_mass
-        amount = amount * factor
-        return _point_selection(
-            amount,
-            "yield_ug_g",
-            f"specific_gas_yield:{gas_species.strip()}:{molar_mass}:{factor}",
-            payload,
-            condition_ranges,
-        )
     if q_token is None and payload.get("semantics") in {"bound_not_point_ordering", "bound_not_point"}:
         reason = (declared.reason if isinstance(declared, State) else None) or (
             f"unsupported quantity {payload['quantity']!r}" if payload.get("quantity")
@@ -17359,6 +17555,7 @@ class Migrator:
         value_conversion: Derivation | None = None
         if (
             q_token in {
+                Quantity.DENSITY,
                 Quantity.MASS_LOSS_AREAL_DENSITY,
                 Quantity.DENSITY,
                 Quantity.FUGACITY,
@@ -18621,15 +18818,35 @@ class Migrator:
                             "locator",
                             "composition_basis",
                         }
-                        has_numeric_value = point_value.available or any(
-                            key not in condition_fields
-                            and not str(key).endswith("_as_printed")
-                            and not (
-                                str(key).startswith("N_")
-                                and raw.get("composition_basis") == "mole_fraction"
+                        raw_range = raw.get("range")
+                        has_numeric_range = (
+                            q_token
+                            in {
+                                Quantity.DENSITY,
+                                Quantity.EVAPORATION_RATE,
+                                Quantity.MASS_LOSS_RATE,
+                            }
+                            and isinstance(raw_range, (list, tuple))
+                            and len(raw_range) >= 2
+                            and all(
+                                _as_dec_or_none(bound) is not None
+                                for bound in raw_range[:2]
                             )
-                            and _numeric_field(raw, str(key)) is not None
-                            for key in raw
+                        )
+                        has_numeric_value = (
+                            point_value.available
+                            or has_numeric_range
+                            or any(
+                                key not in condition_fields
+                                and not str(key).endswith("_as_printed")
+                                and not (
+                                    str(key).startswith("N_")
+                                    and raw.get("composition_basis")
+                                    == "mole_fraction"
+                                )
+                                and _numeric_field(raw, str(key)) is not None
+                                for key in raw
+                            )
                         )
                         if not has_numeric_value:
                             point_locator = (
@@ -22925,6 +23142,14 @@ def write_report(result: MigrationResult, path: Path) -> None:
     hard = 0 if result.validation is None else len(result.validation.hard_issues)
     rows_in = sum(c.rows_in for c in result.source_counts.values())
     obs_out = len(result.observations)
+    unavailable_work = _unavailable_missing_input_work_items(result.observations)
+    unavailable_work_by_reason = Counter(
+        observation.value.unavailable_reason.strip()
+        if isinstance(observation.value.unavailable_reason, str)
+        and observation.value.unavailable_reason.strip()
+        else "<missing_reason>"
+        for observation in unavailable_work
+    )
     lines = [
         "# Battery v2.1 migration report",
         "",
@@ -22938,11 +23163,29 @@ def write_report(result: MigrationResult, path: Path) -> None:
         f"index sources: {sum(c.index_works_in for c in result.source_counts.values())}",
         f"hard issues: {hard}",
         "",
-        "## Spec vs measured",
+        "## Unavailable input work census",
         "",
-        "| count | spec | measured |",
-        "|---|---:|---:|",
+        f"unavailable derived values without derivation: {len(unavailable_work)}",
+        "",
+        "Each count is page-grounding work keyed by the value's typed unavailable_reason.",
+        "",
+        "| kind | count |",
+        "|---|---:|",
     ]
+    for reason, count in sorted(
+        unavailable_work_by_reason.items(), key=lambda item: (-item[1], item[0])
+    ):
+        display_reason = reason.replace("|", "\\|").replace("\n", " ")
+        lines.append(f"| `unavailable_missing_input:{display_reason}` | {count} |")
+    lines.extend(
+        [
+            "",
+            "## Spec vs measured",
+            "",
+            "| count | spec | measured |",
+            "|---|---:|---:|",
+        ]
+    )
     mapping = [
         ("citations", "citations"),
         ("doi_works", "doi_works"),

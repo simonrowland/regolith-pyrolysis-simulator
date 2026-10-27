@@ -1,14 +1,225 @@
 # Battery v2.1 migration report
 
-rows in: 72840
-records out (observations): 152239
+rows in: 72839
+records out (observations): 152238
 works: 444
 experiments: 5612
-queue size: 110337
+queue size: 110370
 identical-payload dedupe aliases: 342
 metadata files: 48
 index sources: 443
-hard issues: 3567
+hard issues: 1887
+
+## Unavailable input work census
+
+unavailable derived values without derivation: 1032
+
+Each count is page-grounding work keyed by the value's typed unavailable_reason.
+
+| kind | count |
+|---|---:|
+| `unavailable_missing_input:declared quantity is unknown; refusing to pick a number` | 400 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample, subsample, run, temperature_range_K, A, B, p_Na_at_1273_K_Pa, a_Na2O_at_1273_K` | 61 |
+| `unavailable_missing_input:empty values` | 40 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'tabulated_equilibrium_condensation_model'; refusing to pick a number` | 27 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to pick a number` | 24 |
+| `unavailable_missing_input:no mapped activity field selected; source fields: sample_no, composition_mol, point_conditions, T_C, X_P2O5, P2O5_wt_percent, t_in_FetO, a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed` | 22 |
+| `unavailable_missing_input:sample_area_not_printed` | 21 |
+| `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu` | 20 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing to pick a number` | 19 |
+| `unavailable_missing_input:no mapped log10_K_star field selected; source fields: quantity, evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species` | 15 |
+| `unavailable_missing_input:declared quantity is unknown; source cells/headers report enthalpy, not delta_fG; refusing to pick a number` | 12 |
+| `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status, caption, axes_as_printed, temperature_as_printed, note` | 11 |
+| `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K, gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K, composition_mol` | 11 |
+| `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid, gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K, composition_mol` | 11 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'quadratic_formalism_interaction_energy_alpha_H_i'; refusing to pick a number` | 10 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'quadratic_formalism_interaction_energy_alpha_ij'; refusing to pick a number` | 10 |
+| `unavailable_missing_input:pressure value is not numeric` | 10 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'apparent_enthalpy_entropy_of_degassing'; refusing to pick a number` | 9 |
+| `unavailable_missing_input:declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing to pick a number` | 8 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient'; refusing to pick a number` | 7 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: gas_species, A_bar, B_bar, C_bar, D_bar` | 7 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activation_energy_of_vaporization'; refusing to pick a number` | 6 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'magnesium_loss_inferred_from_isotope_fractionation'; refusing to pick a number` | 6 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'sample_provenance_and_characterization'; refusing to pick a number` | 6 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'vant_hoff_log_IT_slope'; refusing to pick a number` | 6 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: gas_species, P_1000K_bar, P_1500K_bar, P_2000K_bar` | 6 |
+| `unavailable_missing_input:no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published, locator, printed_quote` | 6 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient_infinite_dilution'; refusing to pick a number` | 5 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: T_K, without_atm_as_printed, without_atm, with_atm_as_printed, with_atm, enhancement_pct` | 5 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample_no, T_C, T_K, P_P2_x1e8_atm_as_printed, P_P2_atm, P_PO_x1e7_atm_as_printed, P_PO_atm, P_PO2_x1e8_atm_as_printed, P_PO2_atm, pressure_conversion, P2O5_mol_percent, FetO_mol_percent, MnO_mol_percent, composition_basis, composition_mol, point_conditions` | 5 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'clausius_clapeyron_averaged_log10_P_kPa'; refusing to pick a number` | 4 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing to pick a number` | 4 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'thermal_dissipation_fraction'; refusing to pick a number` | 4 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample, selected_subsamples, temperature_range_K, A, B, p_K_at_1273_K_Pa, a_K2O_at_1273_K` | 4 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample, selected_subsamples, temperature_range_K, A, B, p_Na_at_1273_K_Pa, a_Na2O_at_1273_K` | 4 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample_no, T_C, T_K, P_P2_x1e8_atm_as_printed, P_P2_atm, P_PO_x1e7_atm_as_printed, P_PO_atm, P_PO2_x1e8_atm_as_printed, P_PO2_atm, pressure_conversion, P2O5_mol_percent, FetO_mol_percent, CaO_mol_percent, composition_basis, composition_mol, point_conditions` | 4 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample_no, T_C, T_K, P_P2_x1e8_atm_as_printed, P_P2_atm, P_PO_x1e7_atm_as_printed, P_PO_atm, P_PO2_x1e8_atm_as_printed, P_PO2_atm, pressure_conversion, P2O5_mol_percent, FetO_mol_percent, MgO_mol_percent, composition_basis, composition_mol, point_conditions` | 4 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample_no, T_C, T_K, P_P2_x1e8_atm_as_printed, P_P2_atm, P_PO_x1e7_atm_as_printed, P_PO_atm, P_PO2_x1e8_atm_as_printed, P_PO2_atm, pressure_conversion, P2O5_mol_percent, FetO_mol_percent, SiO2_mol_percent, composition_basis, composition_mol, point_conditions` | 4 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'published_second_law_fit'; refusing to pick a number` | 3 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'reduced_partition_function_ratio_prefactor'; refusing to pick a number` | 3 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'thermodynamic_functions'; refusing to pick a number` | 3 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'vaporization_reaction_enthalpies_JANAF'; refusing to pick a number` | 3 |
+| `unavailable_missing_input:no mapped evaporation_coefficient_alpha field selected; source fields: run, logfO2, time_min, element, D0_m2_s, D0_uncertainty_m2_s, f_surface, f_bulk, logKstar_surface, logKstar_bulk, tevap_s, delta66Zn_per_mil_calc, alpha_surface_assumed, alpha_bulk_calc` | 3 |
+| `unavailable_missing_input:sample_mass_not_printed` | 3 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1300, 1800] is a temperature domain, not the observable` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1600, 2000] is a temperature domain, not the observable` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_coefficient_gamma_P2O5'; refusing to pick a number` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_coefficient_gamma_SiO2'; refusing to pick a number` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'henrian_log10_gamma_coefficients'; refusing to pick a number` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'oxide_in_model'; refusing to pick a number` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'partial_molar_enthalpy_of_mixing'; refusing to pick a number` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'published_alpha_and_flux_arrhenius_fits'; refusing to pick a number` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'pure_vapor_pressure_fit'; refusing to pick a number` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'third_law_reaction_enthalpy_298K'; refusing to pick a number` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'water_vapor_solubility_deltaG'; refusing to pick a number` | 2 |
+| `unavailable_missing_input:figure_not_digitized` | 2 |
+| `unavailable_missing_input:no mapped activity field selected; source fields: quantity, method_class, admission_status, caption, axes_as_printed, temperature_as_printed, note` | 2 |
+| `unavailable_missing_input:no mapped evaporation_coefficient_alpha field selected; source fields: logfO2, alpha_65Cu_63Cu, uncertainty, N, intercept_delta65Cu_per_mil, intercept_2SD_per_mil` | 2 |
+| `unavailable_missing_input:no mapped evaporation_coefficient_alpha field selected; source fields: logfO2, alpha_66Zn_64Zn, N, intercept_forced_through_origin` | 2 |
+| `unavailable_missing_input:no mapped evaporation_coefficient_alpha field selected; source fields: logfO2, alpha_66Zn_64Zn, uncertainty, N, intercept_delta66Zn_per_mil, intercept_2SD_per_mil` | 2 |
+| `unavailable_missing_input:no mapped log10_Kf field selected; source fields: quantity, method_class, model, generator, equilibrium, expression_as_printed, intercept, inverse_temperature_coefficient_K, standard_state` | 2 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample_no, T_C, T_K, P_P2_x1e8_atm_as_printed, P_P2_atm, P_PO_x1e7_atm_as_printed, P_PO_atm, P_PO2_x1e8_atm_as_printed, P_PO2_atm, pressure_conversion, P2O5_mol_percent, FetO_mol_percent, CaO_mol_percent, SiO2_mol_percent, composition_basis, composition_mol, point_conditions` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1068, 1285] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1100, 1450] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1150, 1450] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1200, 1600] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1400, 1650] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1400, 1900] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1470, 1820] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1500, 1700] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1500, 1800] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1519, 1799] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1550, 2085] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1600, 1750] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1600, 1800] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1600, 1900] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1750, 2150] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1800, 2150] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1873, 1948] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [869, 1014] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [879, 1050] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [891, 1041] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [942, 1271] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [953, 1110] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [973, 1078] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [974, 1071] is a temperature domain, not the observable` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; source does not state a closed quantity; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'Boudouard_equilibrium_constant_fit'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'Brownian_motion_validation_setup'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'CO2_density_and_relative_abundance'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'Ca_perchlorate_decomposition_peak_temperature_shift'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'Delta53Cr_mineral_melt'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'K2O_liquid_dissociation_Kp'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'Kstar_fitting_input_concentrations'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'Mg_deoxidation_thermodynamic_parameters'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'O2_release_peak_temperature_shift'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'P2O5_formation_from_solutes_turkdogan_pearson'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'YA_ordinate_intercept'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_Al_and_pO2_from_oxide_equilibria'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_FetO_liquid_standard_state'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_MnO_solid_standard_state'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_SiO2_cristobalite'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_coefficient_FeO_quadratic_expansion'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_coefficient_SiO2_quadratic_formalism'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_coefficient_temperature_composition_equation'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_coefficient_temperature_equation'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_or_activity_coefficient_equations'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_reference_state_conversion_deltaG'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'arithmetic_mean_heat_of_solution'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'assumed_evaporation_coefficient_ratio'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'belton_fruehan_integrand_linear_fit'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'bulk_Cr_abundance_and_depletion'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'calculated_thermal_properties'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'complementary_vapor_composition'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'cristobalite_melting_deltaG'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'critical_radius_and_nucleation_rate'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'decomposition_temperature_method_difference'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'delta_53Cr_BSE_filtered_mean'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'delta_53Cr_Moon_filtered_mean'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'delta_53Cr_Moon_minus_Earth'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'delta_G_buffer'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'enthalpy_of_formation'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'entropy_of_formation'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'equilibrium_oxygen_partial_pressure'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'equilibrium_vapor_composition'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'estimated_partial_pressures_of_Si_bearing_gases'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'evaporation_T_fO2_window_and_vapor_delta53Cr'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'ferrous_ferric_ratio'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'foreign_published_second_law_fit'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'gas_magma_molar_distribution_coefficients'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'henrian_activity_coefficient_and_self_interaction_parameter'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'hydroxide_gas_partial_pressures'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'indicative_mz18_mass_content_from_rga_integral'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient_and_self_interaction_parameter'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient_and_wagner_epsilon'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'ion_current_ratio_and_wagner_interaction_parameter'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'isotope_fractionation_factor_CrO_l_minus_CrO2_g'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'limiting_molar_heat_of_mixing'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'log_K_Mn_temperature_fit'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'log_K_P1_temperature_fit'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'log_K_P2_temperature_fit'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'manganese_distribution_K_and_gamma_MnO'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'melting_enthalpy_and_temperature'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'mixing_functions'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'model_accuracy_percent'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'numerical_model_parameters_and_constraints'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'one_percent_evaporation_temperature'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'oxygen_distribution_deltaG'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'oxygen_yield_and_process_energy'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'partial_pressure_CsBO2_fit'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'partial_pressure_LiBO2_fit'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'partial_pressure_NaBO2_fit'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'particle_radius_growth'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'particle_size_distribution'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'phosphorus_distribution_K_and_gamma_PO2.5'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'phosphorus_distribution_P2_deltaG'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'photodissociation_coefficients'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'post_impact_cooling_and_escape_caption'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'preset_reducing_partial_pressures'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'printed_on_figure_adsorption_fit_coefficients'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'pure_system_reaction_enthalpy_entropy'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'relative_temperature_sensitivity'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'second_law_enthalpy_of_vaporization_298K'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'second_law_partial_molar_enthalpy_of_sublimation'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'self_interaction_parameter_and_henrian_activity_coefficient'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'standard_enthalpy_of_reaction_at_298_15_K'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'standard_gibbs_energy_change'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'starting_magma_composition_and_model_scope'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'sublimation_enthalpy'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'surface_energy'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'surface_reaction_order'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'ternary_peritectic_temperature_and_phase_compositions'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'thermal_and_pressure_program'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'three_layer_inverse_model_parameter'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'total_flux_relative_drop'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'total_mass_loss_apparent_initial_flux'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'validation_case_parameters_and_runtime'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'vapor_to_saturation_pressure_ratio'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'vaporization_coefficient_alpha_i'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status, caption, axes_as_printed, temperature_as_printed, source_data_attribution_as_printed, note` | 1 |
+| `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, generator, evidence_class, composition, ln_gamma_NaO05, ln_gamma_KO05, gamma_KO05_over_gamma_NaO05, model_comparison` | 1 |
+| `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, generator, evidence_class, illite, SRM_621, model_comparison` | 1 |
+| `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, model, note, selected_rows` | 1 |
+| `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, model_or_data_source, gamma_1370C, gamma_1370C_as_printed, gamma_1380C, gamma_1380C_as_printed, gamma_1390C, gamma_1390C_as_printed` | 1 |
+| `unavailable_missing_input:no mapped cp field selected; source fields: method_class, generator, quantity, fit_segments` | 1 |
+| `unavailable_missing_input:no mapped density field selected; source fields: method_class, generator, quantity, density_g_cm3, density_kg_m3_also_printed` | 1 |
+| `unavailable_missing_input:no mapped evaporation_coefficient_alpha field selected; source fields: quantity, method_class, model_generator, alpha_assumption, surface_area_assumption, alpha_pe_obtained_by, alpha_bound_as_printed, equilibrium_pressure_source, reaction_as_printed, numerical_alpha_values_printed, numerical_activity_coefficients_printed, numerical_equilibrium_pressures_printed` | 1 |
+| `unavailable_missing_input:no mapped evaporation_coefficient_alpha field selected; source fields: run, logfO2, time_min, element, D0_m2_s, D0_uncertainty_m2_s, f_surface, f_bulk, logKstar_surface, logKstar_bulk, tevap_s, delta65Cu_per_mil_calc, alpha_surface_assumed, alpha_bulk_calc` | 1 |
+| `unavailable_missing_input:no mapped evaporation_rate field selected; source fields: quantity, method_class, generator, gas_species, evaporation_coefficient_symbol, variables, note` | 1 |
+| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P2O5_CaO, uncertainty_95pct, T_K` | 1 |
+| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P2O5_MgO, uncertainty_95pct, T_K` | 1 |
+| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P2O5_MnO, uncertainty_95pct, T_K` | 1 |
+| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P2O5_SiO2, uncertainty_95pct, T_K, authors_note` | 1 |
+| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, model_or_data_source, T_C_as_printed, T_K, gamma0_P2O5_1370C, gamma0_source, epsilon_P2O5_CaO, epsilon_P2O5_CaO_as_printed, epsilon_P2O5_MgO, epsilon_P2O5_MgO_as_printed, epsilon_P2O5_MnO, epsilon_P2O5_MnO_as_printed, epsilon_P2O5_SiO2, epsilon_P2O5_SiO2_as_printed, eq10_as_printed, fit_excluded` | 1 |
+| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, model_or_data_source, T_K, epsilon_Mo_Mo, epsilon_Mo_Mo_as_printed, epsilon_Mo_Mo2, epsilon_Mo_Mo2_as_printed, e_Mo_Mo, e_Mo_Mo_as_printed, e_Mo_Mo2, e_Mo_Mo2_as_printed` | 1 |
+| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, model_or_data_source, epsilon_P_Si, epsilon_P_Si_as_printed, T_C_as_printed, T_K, authors_comment` | 1 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: quantity, method_class, generator, gas_species, source_form_as_printed, reference_temperature_K, rows, table_transcription` | 1 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample_no, T_C, T_K, P_P2_x1e8_atm_as_printed, P_P2_atm, P_PO_x1e7_atm_as_printed, P_PO_atm, P_PO2_x1e8_atm_as_printed, P_PO2_atm, pressure_conversion, composition_omitted_reason, point_conditions` | 1 |
+| `unavailable_missing_input:no mapped p_sat field selected; source fields: method_class, generator, quantity, pressure_expression, concentration_expression, P_boil_Pa, T_boil_K, DeltaH_options_J_per_mol, DeltaH_used_J_per_mol, reference_pressure_as_printed, DeltaH_from_reference_point_J_per_mol, reference_point_semantics, R_gas_J_per_mol_K` | 1 |
+| `unavailable_missing_input:no mapped transition_temperature field selected; source fields: method_class, generator, quantity, coalescence_lower_limit_K, upper_limit_semantics, semantics` | 1 |
+| `unavailable_missing_input:no mapped transition_temperature field selected; source fields: method_class, generator, quantity, melting_temperature_as_printed, semantics, disagreement` | 1 |
 
 ## Spec vs measured
 
@@ -17,7 +228,7 @@ hard issues: 3567
 | citations | 147 | 442 (mismatch) |
 | doi_works | 56 | 241 (mismatch) |
 | no_doi_works | 91 | 203 (mismatch) |
-| admission_statuses | 374 | 23800 (mismatch) |
+| admission_statuses | 374 | 23814 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
 | series | 60 | 824 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1637 (mismatch) |
@@ -25,7 +236,7 @@ hard issues: 3567
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 18313 (mismatch) |
 | equipment_payloads | 670 | 955 (mismatch) |
-| absent_admissions | 3511 | 7425 (mismatch) |
+| absent_admissions | 3511 | 7410 (mismatch) |
 | absent_classes | 2174 | 2120 (mismatch) |
 | range_only_T | 3125 | 2637 (mismatch) |
 | system_like_phases | 1065 | 2805 (mismatch) |
@@ -18219,7 +18430,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/matzen-2022-martian-basalt-redox.yaml` | 24 | 24 | 26 |
 | `data/literature/extracts/mccready-1948-sodium-silicate.yaml` | 17 | 17 | 53 |
 | `data/literature/extracts/mendybaev-2017-fun-cai-lab-evaporation.yaml` | 12 | 12 | 18 |
-| `data/literature/extracts/mendybaev-2018-cmas-evaporation.yaml` | 1 | 4 | 1 |
+| `data/literature/extracts/mendybaev-2018-cmas-evaporation.yaml` | 1 | 4 | 9 |
 | `data/literature/extracts/mendybaev-2021-cai-low-pressure-h2-evap.yaml` | 6 | 22 | 64 |
 | `data/literature/extracts/metsoc-2019-6005.yaml` | 3 | 3 | 18 |
 | `data/literature/extracts/metsoc-2024-6131.yaml` | 3 | 3 | 12 |
@@ -18234,7 +18445,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/murchison-degassing-2023-springer.yaml` | 27 | 115 | 113 |
 | `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` | 10 | 42 | 121 |
 | `data/literature/extracts/nagabayashi-hino-banya-1989-phosphorus.yaml` | 10 | 14 | 53 |
-| `data/literature/extracts/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml` | 5 | 16 | 5 |
+| `data/literature/extracts/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml` | 5 | 16 | 13 |
 | `data/literature/extracts/nagata-1989-emf-calcium-aluminates.yaml` | 1 | 4 | 2 |
 | `data/literature/extracts/nakamura-2022-science-ryugu-thermal.yaml` | 3 | 18 | 45 |
 | `data/literature/extracts/nakano-hashimoto-2020-bubbles-to-chondrites-i.yaml` | 9 | 23 | 59 |
@@ -18327,7 +18538,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-2013-potassium-silicate-thermodynamics.yaml` | 27 | 27 | 30 |
 | `data/literature/extracts/shornikov-2014-ca-al-evaporation-coefficients.yaml` | 12 | 12 | 12 |
 | `data/literature/extracts/shornikov-2014-sodium-silicate-model.yaml` | 17 | 17 | 34 |
-| `data/literature/extracts/shornikov-2017-spinel-evaporation.yaml` | 25 | 144 | 48 |
+| `data/literature/extracts/shornikov-2017-spinel-evaporation.yaml` | 25 | 144 | 37 |
 | `data/literature/extracts/shornikov-2018-spinel-solid-solutions.yaml` | 14 | 168 | 0 |
 | `data/literature/extracts/shornikov-2019-lunar-meteorite-evaporation-model.yaml` | 113 | 113 | 113 |
 | `data/literature/extracts/shornikov-2019-perovskite-evaporation.yaml` | 7 | 76 | 0 |
@@ -18355,19 +18566,19 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml` | 9 | 29 | 103 |
 | `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` | 2 | 11 | 49 |
 | `data/literature/extracts/stolyarova-1995-cao-alumina-kems.yaml` | 12 | 56 | 30 |
-| `data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml` | 25 | 312 | 198 |
+| `data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml` | 25 | 312 | 143 |
 | `data/literature/extracts/stolyarova-2021-ti-al-kems-ru.yaml` | 205 | 205 | 177 |
 | `data/literature/extracts/stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement.yaml` | 190 | 1037 | 6 |
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 40 |
 | `data/literature/extracts/su-2024-lunar-volatiles-thesis.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 19 | 57 | 87 |
+| `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 18 | 56 | 152 |
 | `data/literature/extracts/sugawara-akaogi-2003-ni-co-fusion.yaml` | 18 | 18 | 18 |
 | `data/literature/extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml` | 7 | 10 | 7 |
 | `data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml` | 6 | 6 | 6 |
 | `data/literature/extracts/sutton-2005-vanadium-xanes.yaml` | 3 | 59 | 3 |
 | `data/literature/extracts/suzuki-2026-vacuum-oxygen-extraction.yaml` | 7 | 16 | 0 |
 | `data/literature/extracts/ta-badro-2021.yaml` | 28 | 28 | 36 |
-| `data/literature/extracts/ta-dacko-conradt-low-p-transpiration.yaml` | 47 | 47 | 37 |
+| `data/literature/extracts/ta-dacko-conradt-low-p-transpiration.yaml` | 47 | 47 | 55 |
 | `data/literature/extracts/ta-flemetakis-2024.yaml` | 8 | 72 | 177 |
 | `data/literature/extracts/ta-mendybaev-2002-lpsc.yaml` | 6 | 6 | 26 |
 | `data/literature/extracts/ta-mendybaev-2020-lpsc.yaml` | 3 | 3 | 11 |
@@ -18421,74 +18632,74 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3567
+hard issues: 1887
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 2135 |
-| `conditional_field:derivation` | 1180 |
-| `conditional_field:inputs` | 248 |
+| `conditional_field:derived_from` | 1508 |
+| `conditional_field:inputs` | 237 |
+| `conditional_field:derivation` | 138 |
 | `invalid_source:initial_composition` | 4 |
 
 ## Hard issues (first 50)
 
 - `observation[ammin-73-470-oneill-1988::oneill_1988_fe3o4_fe2o3_third_law_enthalpy].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-73-470-oneill-1988::oneill_1988_fe3o4_fe2o3_third_law_enthalpy].derivation` conditional_field: derived observation requires derivation
 - `observation[ammin-75-781-hemingway-1990::hemingway_1990_nio_cp_fits].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-75-781-hemingway-1990::hemingway_1990_nio_cp_fits].derivation` conditional_field: derived observation requires derivation
 - `observation[ammin-75-781-hemingway-1990::hemingway_1990_nio_thermodynamic_table2].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-75-781-hemingway-1990::hemingway_1990_nio_thermodynamic_table2].derivation` conditional_field: derived observation requires derivation
 - `observation[ammin-75-781-hemingway-1990::hemingway_1990_magnetite_thermodynamic_table4].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-75-781-hemingway-1990::hemingway_1990_magnetite_thermodynamic_table4].derivation` conditional_field: derived observation requires derivation
 - `observation[ammin-75-781-hemingway-1990::hemingway_1990_hematite_thermodynamic_table6].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-75-781-hemingway-1990::hemingway_1990_hematite_thermodynamic_table6].derivation` conditional_field: derived observation requires derivation
 - `observation[ammin-75-781-hemingway-1990::hemingway_1990_qfm_and_mh_fitted_relations].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-75-781-hemingway-1990::hemingway_1990_qfm_and_mh_fitted_relations].derivation` conditional_field: derived observation requires derivation
 - `observation[ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_1_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_1_model].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_4_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_4_model].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_5_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_5_model].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_6_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_6_model].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nucleation_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nucleation_model].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_surface_energy_temperature_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_surface_energy_temperature_model].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_saturation_pressure_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_saturation_pressure_model].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_transition_thresholds].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_transition_thresholds].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_melting_threshold_result].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_melting_threshold_result].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_particle_density].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_particle_density].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_condensation_growth_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_condensation_growth_model].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nonreactive_validation_setup].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nonreactive_validation_setup].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_brownian_validation].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_brownian_validation].derivation` conditional_field: derived observation requires derivation
 - `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=db6e6e110926].derived_from` conditional_field: derived observation requires derived_from
-- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=db6e6e110926].derivation` conditional_field: derived observation requires derivation
 - `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=7e9de54a50ed].derived_from` conditional_field: derived observation requires derived_from
-- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=7e9de54a50ed].derivation` conditional_field: derived observation requires derivation
 - `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=33b18f04a864].derived_from` conditional_field: derived observation requires derived_from
-- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=33b18f04a864].derivation` conditional_field: derived observation requires derivation
 - `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=7b7f17639356].derived_from` conditional_field: derived observation requires derived_from
-- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=7b7f17639356].derivation` conditional_field: derived observation requires derivation
 - `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=0f63b96f2067].derived_from` conditional_field: derived observation requires derived_from
-- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=0f63b96f2067].derivation` conditional_field: derived observation requires derivation
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=a4938dd67cfa].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=0305f28d3cf3].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=58d0182ee275].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=8a922e22f37c].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=923c3e0d931e].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=017165c46a9e].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=4:h=4f81f1916c37].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=3ccc41bb232f].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=fa089602adf5].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=2e0d107770c2].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=5607d6c65ca5].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=129a1c5ca5f8].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=fff77175fd6c].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=32b5575d06c3].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=2e28909ef276].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=f5edb03646cf].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=371f4ce95d9b].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=ca8dfebbcf3f].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=bebf6b8a9b27].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=1389f9bdcdc5].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=0575e484dc7c].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=dbffab3168cc].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=4ea65fd64a8f].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=77b788f66cb5].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=916696065c2a].derived_from` conditional_field: derived observation requires derived_from
 
 ## Advisory issue census
 
-advisory issues: 280304
+advisory issues: 280301
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 280304 |
+| `identity_incomplete` | 280301 |
