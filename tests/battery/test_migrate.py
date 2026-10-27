@@ -8658,7 +8658,17 @@ def test_borisov_combined_iron_composition_migrates_without_a_redox_split(
     assert table1.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
 
 
-def test_borisov_compilation_rows_locate_unprinted_reduction_inputs() -> None:
+def test_borisov_table2_rows_stay_quoted_attributed() -> None:
+    """Table 2 stays quoted_attributed. Table 1 composition stays refused.
+
+    fa656eaf5 (t-1534bor, merged into b162; not b-985) required every row
+    measured_reduced, with a recalculated derivation and located unprinted
+    reduction inputs. Resolution A keeps the 404 Supplementary Table 2 rows
+    quoted_attributed: the printed log10 cells do not store inputs that
+    reproduce that derivation. Spreadsheet rows 155-185 are this paper's
+    Table 1, so table2_row_155 is absent. Table 1 stays measured_direct
+    and its composition stays withheld.
+    """
     extract = REPO_ROOT / "data/literature/extracts/borisov-2018-compilation.yaml"
     migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
     migrator._migrate_extract(extract)
@@ -8677,18 +8687,34 @@ def test_borisov_compilation_rows_locate_unprinted_reduction_inputs() -> None:
         if issue.detail == "derived observation requires derived_from"
         and any(observation.observation_id in issue.path for observation in rows)
     ]
+    table1 = []
+    table2 = []
     for observation in rows:
-        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
-        derivation = observation.derivation
-        assert derivation is not None
-        assert "recalculated" in derivation.relation.lower()
+        stem = observation.observation_id.rsplit("::", 1)[-1]
+        if stem.startswith("borisov_2018_table1_"):
+            table1.append(observation)
+        elif stem.startswith("borisov_2018_table2_"):
+            table2.append(observation)
+        else:
+            raise AssertionError(stem)
+    assert len(table1) == 31
+    assert len(table2) == 404
+    assert not any(
+        observation.observation_id.endswith("borisov_2018_table2_row_155")
+        for observation in rows
+    )
+    for observation in table2:
+        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         assert observation.locator.table == "Supplementary Table 2"
-        assert observation.locator.record is not None
-        assert derivation.has_located_unprinted_raw_inputs
-        assert derivation.raw_inputs is not None
-        assert derivation.raw_inputs.locator is not None
-        assert derivation.raw_inputs.locator.table == "Supplementary Table 2"
-        assert derivation.raw_inputs.locator.record == observation.locator.record
+        derivation = observation.derivation
+        if derivation is not None:
+            assert "recalculated" not in derivation.relation.lower()
+            assert not derivation.has_located_unprinted_raw_inputs
+    for observation in table1:
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        assert observation.locator.table != "Supplementary Table 2"
+        assert observation.identity.composition is not None
+        assert not observation.identity.composition.is_value
 
 
 def test_unknown_mole_fraction_component_is_queued_and_withholds_composition() -> None:
