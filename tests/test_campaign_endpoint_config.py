@@ -2026,3 +2026,61 @@ def test_c5_armed_negative_current_is_typed_refusal_not_depletion() -> None:
     with pytest.raises(CampaignEndpointRefusal) as refusal:
         manager.check_endpoint(melt, _flux(), CondensationTrain(), record)
     _assert_depletion_signal_refused(refusal.value, "C5.mre_current_A")
+
+
+@pytest.mark.parametrize("held", [False, True])
+@pytest.mark.parametrize("c5_enabled", [False, True])
+@pytest.mark.parametrize("path", ["A_staged", "B"])
+def test_c4_failed_acquisition_ends_and_preserves_selected_successor(held, c5_enabled, path):
+    from simulator.accounting import AtomLedger
+    from simulator.accounting.campaign_yield import CampaignYieldProjection
+    from simulator.accounting.formulas import resolve_species_formula
+
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C4"]["max_target_acquisition_hr"] = 2.0
+    setpoints["campaigns"]["C4"]["max_process_wall_clock_hr"] = 3.0
+    setpoints["campaigns"]["C5"]["enabled"] = c5_enabled
+    manager = CampaignManager(setpoints)
+    manager.c5_enabled = c5_enabled
+    record = BatchRecord(path=path, branch="two")
+    ledger = AtomLedger()
+    # Independent atom counts: each MgO carries one Mg; include melt-resident
+    # spent oxide and imported Mg, exclude Mg already outside the melt.
+    ledger.load_external_mol("process.cleaned_melt", {"MgO": 7}, material_origin="feedstock")
+    ledger.load_external_mol("process.spent_reductant_residue", {"MgO": 2}, material_origin="reagent")
+    ledger.load_external_mol("process.condensation_train", {"Mg": 3}, material_origin="feedstock")
+    projection = CampaignYieldProjection(SimpleNamespace(atom_ledger=ledger))
+    before = ledger.mol_by_account()
+    transport = {"nominal_ramp_rate_C_hr": 10., "actual_ramp_rate_C_hr": 0.,
+                 "throttle_reason": "transport hold"} if held else None
+    hour = 4 if held else 1
+    melt = _melt(CampaignPhase.C4, hour, temperature_C=1220.)
+    assert manager.check_endpoint(melt, _flux(Mg=0.), CondensationTrain(), record,
+                                  transport_state=transport, yield_projection=projection)
+    outcome = manager.last_termination
+    assert outcome["winning_condition"] == ("preheat_held_wall" if held else "acquisition_deadline")
+    assert outcome["classification"] == "acquisition_deadline"
+    assert outcome["incomplete"] is True
+    assert outcome["temperature_C"] == 1220.
+    assert outcome["requested_window_C"] == [1580., 1670.]
+    assert outcome["outcome"] == ("c4_preheat_wall_clock_exhausted" if held else "c4_target_window_not_acquired")
+    assert "reason_refused" not in outcome
+    assert outcome["remaining_melt_Mg"]["mol"] == pytest.approx(9.)
+    assert outcome["remaining_melt_Mg"]["kg"] == pytest.approx(
+        9 * resolve_species_formula("Mg").molar_mass_kg_per_mol())
+    assert ledger.mol_by_account() == before
+    next_phase = manager.get_next_campaign(CampaignPhase.C4, record)
+    assert next_phase == (CampaignPhase.C5 if c5_enabled else CampaignPhase.C2A)
+    if not c5_enabled:
+        assert record.path == ("B" if path == "B" else "A_post_mg_boiloff")
+        manager.configure_campaign(melt, next_phase)
+        assert manager._active_post_mg_c2a_overrides
+
+
+@pytest.mark.parametrize("hour", [float("nan"), float("inf"), -1.])
+def test_c4_invalid_clock_remains_a_typed_input_refusal(hour):
+    manager = CampaignManager(_setpoints())
+    with pytest.raises(CampaignC4EndpointRefusal) as refusal:
+        manager.check_endpoint(_melt(CampaignPhase.C4, hour, temperature_C=1220.),
+                               _flux(), CondensationTrain(), BatchRecord())
+    assert refusal.value.reason == "c4_clock_invalid"
