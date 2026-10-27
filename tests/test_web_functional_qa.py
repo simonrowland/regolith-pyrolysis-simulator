@@ -360,7 +360,10 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     _PINNED_CRO_OFFGAS_KG = 0.0
     # t-1457 d-252 C0 contract: the full-run trajectory shifts the terminal Cr-bearing offgas;
     # the move enters at 375537bff with the residual Cr2O3 re-pin below (CrO offgas stays 0).
-    _PINNED_CR_OFFGAS_EQ_KG = 9.216286830238766e-06
+    # 2026-10-26 d-268/d-287: Stage 3 bypasses alkali-rich hours and admits
+    # C2A parcels after purity clears; Cr shifts from rump to train CrO3
+    # (3.3280300206015765 -> 3.138949790025742 kg Cr2O3).
+    _PINNED_CR_OFFGAS_EQ_KG = 0.0006508441394888279
     cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _CR_MASS_FRACTION_IN_CR2O3
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
@@ -374,11 +377,12 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         + float(offgas_kg.get("CrO2", 0.0) or 0.0) * (_CR_MW / _CRO2_MW)
         + float(offgas_kg.get("CrO3", 0.0) or 0.0) * (_CR_MW / _CRO3_MW)
     )
-    # Cr conserved; the residual moved via run trajectory/end hour (257 -> 188 h across the t-470..d-019 refusal window), not Cr accounting.
+    # 2026-10-26 attribution: most of the Cr leaving the rump is captured as
+    # CrO3 in the condensation train under d-268/d-287 Stage-3 routing.
     # t-1457 d-252 C0 contract (200 C/h ramp, 1 mbar dry Ar, computed exit): the full-run trajectory shifts.
     # Bisected along the golden car: the move enters at 375537bff; every later car item is bit-identical.
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.3280300206015765, rel=1e-9)
-    assert cr_ingot_kg == pytest.approx(0.18, abs=0.005)
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.138949790025742, rel=1e-9)
+    assert cr_ingot_kg == pytest.approx(0.17, abs=0.005)
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
     assert cr_offgas_eq_kg == pytest.approx(_PINNED_CR_OFFGAS_EQ_KG, rel=1e-6)
@@ -389,9 +393,15 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     assert story["escaped_to_vacuum"]["species_kg"].get("CrO", 0.0) == pytest.approx(
         0.0, abs=0.005
     )
-    # Inventory closure: ceramic Cr + ingot Cr + terminal offgas Cr-eq closes
-    # the ~2.46 kg lunar Cr feed (AtomLedger total 2.459769).
-    assert cr_in_rump_kg + cr_ingot_kg + cr_offgas_eq_kg == pytest.approx(
+    # Inventory closure follows AtomLedger streams: rump Cr + train Cr + Cr
+    # in captured CrO3 + terminal offgas. One Cr per CrO3 gives kg CrO3 *
+    # M(Cr)/M(CrO3) = kg Cr; the molar-mass ratio is dimensionless and tends
+    # to 1 as the oxygen mass tends to zero.
+    train_kg = sim.atom_ledger.project_account_kg(CONDENSATION_TRAIN_ACCOUNT)
+    train_cr_eq_kg = float(train_kg.get("Cr", 0.0) or 0.0) + float(
+        train_kg.get("CrO3", 0.0) or 0.0
+    ) * (_CR_MW / _CRO3_MW)
+    assert cr_in_rump_kg + train_cr_eq_kg + cr_offgas_eq_kg == pytest.approx(
         2.46, abs=0.02
     )
     assert story["refractory_ceramic"]["species_kg"].get("Cr2O3", 0.0) == (
