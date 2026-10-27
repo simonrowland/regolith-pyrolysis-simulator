@@ -492,9 +492,12 @@ def test_legacy_equipment_extract_output_has_no_empty_bench_key(tmp_path) -> Non
         digest.update(b"\0")
     # Byte pin of this fixture after the merged migrator. The checks above
     # are the behaviour; the digest moves when row identity or bench wiring
-    # changes the written tree.
+    # changes the written tree. Re-pinned for b-985 (29fc60f73): the only
+    # changed file is data/battery/migration-report.md, which gains the
+    # empty "Unavailable input work census" section (count 0); no data file
+    # moved.
     assert digest.hexdigest() == (
-        "69d1ac13c09d9bcc31ee40032342c3ffe035a5e84aaa656ce729439041ebea6f"
+        "32d59630b113a521dd317fe28a277f36dc81b5ad04cdc48587fab0e30580a469"
     )
 
 

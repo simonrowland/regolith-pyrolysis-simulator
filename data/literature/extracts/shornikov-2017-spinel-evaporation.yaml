@@ -849,17 +849,9 @@ species:
       derived_from:
         - shornikov_2017_table2_mgo_partial_pressure
         - shornikov_2017_table2_mg_partial_pressure
-      derivation:
-        relation: 'Atomic oxygen partial pressure calculated by Eq. (14).'
-        output_unit: atm
-        inputs:
-          - 'Table 2 mgo pressure series at matching temperature.'
-          - 'Table 2 mg pressure series at matching temperature.'
-          - 'K10(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        admission_status: model_output_not_measurement
+        method_class: quoted_attributed
         gas_species: O
         formula: O
         reservoir_formula: MgAl2O4
@@ -867,6 +859,8 @@ species:
         method_as_printed: 'thermochemical equilibrium calculation'
         equation_as_printed: '(14)'
         thermochemical_data_reference_as_printed: '[10]'
+        attribution: 'Shornikov (2017) reports this author-calculated Eq. (14) value using K10(T) from the Glushko handbook [10]; the numeric constant is not stored in the corpus.'
+        note: 'Quoted model output; K10(T) is not stored, so the calculation is not fully reproducible from stored inputs.'
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
@@ -895,17 +889,9 @@ species:
       derived_from:
         - shornikov_2017_table2_alo_partial_pressure
         - shornikov_2017_table2_al_partial_pressure
-      derivation:
-        relation: 'Atomic oxygen partial pressure calculated by Eq. (15).'
-        output_unit: atm
-        inputs:
-          - 'Table 2 alo pressure series at matching temperature.'
-          - 'Table 2 al pressure series at matching temperature.'
-          - 'K11(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        admission_status: model_output_not_measurement
+        method_class: quoted_attributed
         gas_species: O
         formula: O
         reservoir_formula: MgAl2O4
@@ -913,6 +899,8 @@ species:
         method_as_printed: 'thermochemical equilibrium calculation'
         equation_as_printed: '(15)'
         thermochemical_data_reference_as_printed: '[10]'
+        attribution: 'Shornikov (2017) reports this author-calculated Eq. (15) value using K11(T) from the Glushko handbook [10]; the numeric constant is not stored in the corpus.'
+        note: 'Quoted model output; K11(T) is not stored, so the calculation is not fully reproducible from stored inputs.'
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
@@ -941,17 +929,9 @@ species:
       derived_from:
         - shornikov_2017_table2_al2o_partial_pressure
         - shornikov_2017_table2_al_partial_pressure
-      derivation:
-        relation: 'Atomic oxygen partial pressure calculated by Eq. (16).'
-        output_unit: atm
-        inputs:
-          - 'Table 2 al2o pressure series at matching temperature.'
-          - 'Table 2 al pressure series at matching temperature.'
-          - 'K12(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        admission_status: model_output_not_measurement
+        method_class: quoted_attributed
         gas_species: O
         formula: O
         reservoir_formula: MgAl2O4
@@ -959,6 +939,8 @@ species:
         method_as_printed: 'thermochemical equilibrium calculation'
         equation_as_printed: '(16)'
         thermochemical_data_reference_as_printed: '[10]'
+        attribution: 'Shornikov (2017) reports this author-calculated Eq. (16) value using K12(T) from the Glushko handbook [10]; the numeric constant is not stored in the corpus.'
+        note: 'Quoted model output; K12(T) is not stored, so the calculation is not fully reproducible from stored inputs.'
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
@@ -984,16 +966,9 @@ species:
       point_conditions: *spinel_point_conditions
       derived_from:
         - shornikov_2017_table2_o2_partial_pressure
-      derivation:
-        relation: 'Atomic oxygen partial pressure calculated by Eq. (17).'
-        output_unit: atm
-        inputs:
-          - 'Table 2 o2 pressure series at matching temperature.'
-          - 'K13(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        admission_status: model_output_not_measurement
+        method_class: quoted_attributed
         gas_species: O
         formula: O
         reservoir_formula: MgAl2O4
@@ -1001,6 +976,8 @@ species:
         method_as_printed: 'thermochemical equilibrium calculation'
         equation_as_printed: '(17)'
         thermochemical_data_reference_as_printed: '[10]'
+        attribution: 'Shornikov (2017) reports this author-calculated Eq. (17) value using K13(T) from the Glushko handbook [10]; the numeric constant is not stored in the corpus.'
+        note: 'Quoted model output; K13(T) is not stored, so the calculation is not fully reproducible from stored inputs.'
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:

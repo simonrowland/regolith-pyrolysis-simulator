@@ -58,11 +58,13 @@ from simulator.battery.score import (
     _render_score_report_from_payloads_legacy,
     comparison_candidates,
     compile_residual,
+    dumps_residual_line,
     headline_payload_records,
     headline_records,
     headline_rows,
     score_store,
 )
+from simulator.battery.validate import ValidationIssue, ValidationReport
 from tests.battery import factories as F
 
 
@@ -387,6 +389,98 @@ def test_quoted_attributed_rows_score_on_every_engine_with_class_notice() -> Non
             tier="measured",
             engines=SCORE_ENGINE_SET,
         )
+    )
+
+
+def test_hard_validation_issue_is_labelled_without_changing_scoring() -> None:
+    rows, experiments, bench = _demaria_shape_figure_rows()
+    reference = rows[0]
+    context = _demaria_context([reference], experiments, bench)
+    hard_report = ValidationReport(
+        (
+            ValidationIssue(
+                path=f"observation[{reference.observation_id}].derived_from",
+                reason=RefusalReason.CONDITIONAL_FIELD,
+                detail="derived observation requires derived_from",
+            ),
+        )
+    )
+    hard_context = replace(
+        context,
+        hard_issues_by_observation=hard_report.hard_issues_by_observation,
+    )
+    def predict(engine, observation, **kwargs):
+        return replace(
+            _predict(Decimal("1e-5"), observation.identity),
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+        )
+
+    hard_residuals, _ = score_store(
+        hard_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=False,
+        predict=predict,
+    )
+    plain_residuals, _ = score_store(
+        replace(hard_context, hard_issues_by_observation={}),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=False,
+        predict=predict,
+    )
+    assert len(hard_residuals) == len(plain_residuals) == 1
+    hard_residual = hard_residuals[0]
+    plain_residual = plain_residuals[0]
+    assert hard_residual.status is not ResidualStatus.REFUSED
+    assert hard_residual.numeric is not None
+    assert hard_residual.score_eligible == plain_residual.score_eligible
+    assert hard_residual.status is plain_residual.status
+    assert hard_residual.numeric == plain_residual.numeric
+    hard_headlines = headline_rows(
+        hard_residuals,
+        context=hard_context,
+        tier="all_numeric",
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    assert next(
+        row for row in hard_headlines if row["rail"] == Rail.VAPOUR.value
+    )["n"] == 1
+    validation_notice = next(
+        notice
+        for notice in hard_residual.notices
+        if notice.kind is NoticeKind.VALIDATION_HARD_ISSUE_LABEL
+    )
+    assert validation_notice.reason == (
+        "hard_validation_issue:conditional_field:derived_from"
+    )
+    assert validation_notice.origin == reference.observation_id
+    serialized = dumps_residual_line(hard_residual)
+    assert '"kind":"validation_hard_issue_label"' in serialized
+
+    soft_report = ValidationReport(
+        (
+            ValidationIssue(
+                path=f"observation[{reference.observation_id}].identity",
+                reason=RefusalReason.IDENTITY_INCOMPLETE,
+                detail="identity is incomplete",
+            ),
+        )
+    )
+    assert reference.observation_id not in soft_report.hard_issues_by_observation
+    soft_residuals, _ = score_store(
+        replace(
+            context,
+            hard_issues_by_observation=soft_report.hard_issues_by_observation,
+        ),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=False,
+        predict=predict,
+    )
+    assert len(soft_residuals) == 1
+    assert soft_residuals[0].numeric == plain_residual.numeric
+    assert all(
+        notice.kind is not NoticeKind.VALIDATION_HARD_ISSUE_LABEL
+        for notice in soft_residuals[0].notices
     )
 
 

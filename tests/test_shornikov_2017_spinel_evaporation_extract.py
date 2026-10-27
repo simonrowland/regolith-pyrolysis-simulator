@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import copy
 import sys
+from collections import Counter
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
-from simulator.battery.enums import RefusalReason, UncertaintyKind, ValueKind
+from simulator.battery.enums import EvidenceClass, UncertaintyKind, ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT, convert_pressure_to_pa
 
 TOOLS = REPO_ROOT / "tools"
@@ -22,61 +24,64 @@ EXTRACT = (
     / "data/literature/extracts/shornikov-2017-spinel-evaporation.yaml"
 )
 EXPECTED_COMPOSITION = {"MgO": Decimal("0.5"), "Al2O3": Decimal("0.5")}
-_SOURCE_ID = "shornikov-2017-spinel-evaporation"
-# Eq. (14)-(17) inputs that name a Table 2 series or a Glushko constant
-# without an observation id. b-979 / d-053 flags each one.
-_UNRESOLVED_INPUTS = (
-    (
-        "shornikov_2017_table3_o_pressure_eq14",
-        12,
+
+_QUOTED_MODEL_INPUTS = {
+    14: (
+        "K10(T)",
         (
-            "Table 2 mgo pressure series at matching temperature.",
-            "Table 2 mg pressure series at matching temperature.",
-            "K10(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.",
+            "shornikov_2017_table2_mgo_partial_pressure",
+            "shornikov_2017_table2_mg_partial_pressure",
         ),
     ),
-    (
-        "shornikov_2017_table3_o_pressure_eq15",
-        12,
+    15: (
+        "K11(T)",
         (
-            "Table 2 alo pressure series at matching temperature.",
-            "Table 2 al pressure series at matching temperature.",
-            "K11(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.",
+            "shornikov_2017_table2_alo_partial_pressure",
+            "shornikov_2017_table2_al_partial_pressure",
         ),
     ),
-    (
-        "shornikov_2017_table3_o_pressure_eq16",
-        10,
+    16: (
+        "K12(T)",
         (
-            "Table 2 al2o pressure series at matching temperature.",
-            "Table 2 al pressure series at matching temperature.",
-            "K12(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.",
+            "shornikov_2017_table2_al2o_partial_pressure",
+            "shornikov_2017_table2_al_partial_pressure",
         ),
     ),
-    (
-        "shornikov_2017_table3_o_pressure_eq17",
-        12,
-        (
-            "Table 2 o2 pressure series at matching temperature.",
-            "K13(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.",
-        ),
+    17: (
+        "K13(T)",
+        ("shornikov_2017_table2_o2_partial_pressure",),
     ),
-)
-
-
-def _prose_lineage_detail(text: str) -> str:
-    return (
-        f"derived_from {text!r} is prose, not a resolvable "
-        "observation id; retained here, never minted as a pointer"
-    )
-
-
+}
 def _observations(document: dict) -> list[dict]:
     return [
         observation
         for block in document["species"].values()
         for observation in block["observations"]
     ]
+
+
+def _assert_quoted_model_lineage(document: dict) -> None:
+    observations = _observations(document)
+    for equation, (constant, pressure_parents) in _QUOTED_MODEL_INPUTS.items():
+        row = next(
+            item
+            for item in observations
+            if item["observation_id"]
+            == f"shornikov_2017_table3_o_pressure_eq{equation}"
+        )
+        values = row["values"]
+        assert values["method_class"] == "quoted_attributed"
+        assert values["equation_as_printed"] == f"({equation})"
+        assert values["thermochemical_data_reference_as_printed"] == "[10]"
+        assert values["attribution"] == (
+            f"Shornikov (2017) reports this author-calculated Eq. ({equation}) "
+            f"value using {constant} from the Glushko handbook [10]; the "
+            "numeric constant is not stored in the corpus."
+        )
+        assert "not stored" in values["note"]
+        assert "derivation" not in row
+        assert row["derived_from"] == list(pressure_parents)
+        assert len(values["points"]) == (10 if equation == 16 else 12)
 
 
 def test_table_cells_and_render_pins_are_complete_and_mutation_sensitive() -> None:
@@ -90,18 +95,45 @@ def test_table_cells_and_render_pins_are_complete_and_mutation_sensitive() -> No
     assert sum(not row["values"].get("points") for row in table_2) == 11
     assert sum(len(row["values"].get("points", [])) for row in table_3) == 58
     assert sum(not row["values"].get("points") for row in table_3) == 2
-    eq14 = next(
-        row
-        for row in table_3
-        if row["observation_id"] == "shornikov_2017_table3_o_pressure_eq14"
-    )
-    assert "K10(T)" in eq14["derivation"]["inputs"][2]
-    assert "[10]" in eq14["derivation"]["inputs"][2]
-    assert "K14(T)" not in eq14["derivation"]["inputs"][2]
+    _assert_quoted_model_lineage(document)
+    for equation, (constant, _parents) in _QUOTED_MODEL_INPUTS.items():
+        row = next(
+            item
+            for item in table_3
+            if item["observation_id"]
+            == f"shornikov_2017_table3_o_pressure_eq{equation}"
+        )
+        mutated = copy.deepcopy(document)
+        mutated_row = next(
+            item
+            for item in _observations(mutated)
+            if item["observation_id"] == row["observation_id"]
+        )
+        mutated_row["values"]["attribution"] = (
+            mutated_row["values"]["attribution"]
+            .replace(constant, "K99(T)")
+            .replace("[10]", "[999]")
+        )
+        with pytest.raises(AssertionError):
+            _assert_quoted_model_lineage(mutated)
+        mutated = copy.deepcopy(document)
+        mutated_row = next(
+            item
+            for item in _observations(mutated)
+            if item["observation_id"] == row["observation_id"]
+        )
+        mutated_row["derived_from"][0] = "not_a_stored_pressure_parent"
+        with pytest.raises(AssertionError):
+            _assert_quoted_model_lineage(mutated)
     eq8_9 = next(
         row
         for row in table_3
         if row["observation_id"] == "shornikov_2017_table3_o_pressure_eq8_9"
+    )
+    eq14 = next(
+        row
+        for row in table_3
+        if row["observation_id"] == "shornikov_2017_table3_o_pressure_eq14"
     )
     assert eq8_9["uncertainty"]["bound_value"] == "8%"
     assert "uncertainty" not in eq14
@@ -130,7 +162,7 @@ def test_table_cells_and_render_pins_are_complete_and_mutation_sensitive() -> No
     )
 
 
-def test_isolated_migration_keeps_table_conditions_identity_and_unavailable_rows() -> None:
+def test_isolated_migration_resolves_lineage_and_keeps_rows_unchanged() -> None:
     migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -141,57 +173,20 @@ def test_isolated_migration_keeps_table_conditions_identity_and_unavailable_rows
     assert sum(len(rows) for rows in result.context_by_work.values()) == 8
     assert sum(record.value.kind is ValueKind.UNAVAILABLE for record in records) == 13
     assert result.validation is not None
-    # shornikov_2017_table2_al_partial_pressure resolves, and so do
-    # shornikov_2017_table2_al2o_not_detected_1851 and _1859. The Eq. (16)
-    # unavailable rows name those bare ids. Their wrapped prose is gone.
-    # Eq. (14)-(17) still list series descriptions and Glushko K10(T)-K13(T)
-    # constants. Those strings are not observation ids, so b-979 / d-053
-    # flags them. Each exploded child then keeps the printed_unresolved mark.
-    prose_issues = [
-        issue
-        for issue in result.validation.hard_issues
-        if issue.path.endswith(".derivation.inputs")
-    ]
-    unresolved_issues = [
-        issue
-        for issue in result.validation.hard_issues
-        if issue.path.endswith(".derivation")
-        and issue.detail.startswith("printed derivation inputs do not resolve")
-    ]
-    assert [
-        issue
-        for issue in result.validation.hard_issues
-        if issue not in prose_issues and issue not in unresolved_issues
-    ] == []
-    assert [
-        (issue.path, issue.reason, issue.detail) for issue in prose_issues
-    ] == [
-        (
-            f"observation[{_SOURCE_ID}::{observation_id}].derivation.inputs",
-            RefusalReason.CONDITIONAL_FIELD,
-            _prose_lineage_detail(text),
-        )
-        for observation_id, _points, texts in _UNRESOLVED_INPUTS
-        for text in texts
-    ]
-    assert list(result.registry_issues) == prose_issues
-    unresolved_by_parent: dict[str, int] = {}
-    for issue in unresolved_issues:
-        observation_id = issue.path.split("[", 1)[1].split("]", 1)[0]
-        local = observation_id.split("::", 1)[1]
-        parent, _separator, _point = local.partition("::T=")
-        assert _separator == "::T="
-        assert issue.reason is RefusalReason.CONDITIONAL_FIELD
-        unresolved_by_parent[parent] = unresolved_by_parent.get(parent, 0) + 1
-    assert unresolved_by_parent == {
-        observation_id: points
-        for observation_id, points, _texts in _UNRESOLVED_INPUTS
-    }
-    assert not any(
-        "eq16_not_reported" in issue.path
-        or "Table 2 input series shornikov_2017_table2_" in issue.detail
-        for issue in result.validation.hard_issues
+    # The measured-reduced row records its located not-printed raw-input
+    # declaration. Quoted model outputs retain their known pressure parents and
+    # identify the unstored thermochemical constant in their attribution.
+    assert result.validation.hard_issues == ()
+    assert result.registry_issues == []
+    evidence_counts = Counter(
+        record.evidence.class_.value for record in records
     )
+    assert evidence_counts == {
+        EvidenceClass.MEASURED_DIRECT: 84,
+        EvidenceClass.MEASURED_REDUCED: 12,
+        EvidenceClass.QUOTED_ATTRIBUTED: 46,
+        EvidenceClass.MODEL_DERIVED: 2,
+    }
     for record in records:
         if "eq16_not_reported" not in record.observation_id:
             continue

@@ -118,12 +118,85 @@ def test_conditioning_cell_gases_remain_visible_but_are_not_scored(source_contex
     assert residual.refusal.detail["derivation"]["inputs"]
 
 
-def test_untyped_1996_alternative_oxygen_columns_keep_closure(source_context, monkeypatch):
-    row = _row(source_context, "stolyarova-1996-cao-alumina-silica-kems", "AlO")
-    # The primary lineage is untyped; other columns depend on sample gases.
-    # Multiple raw columns are not multiple independently eligible conditions.
-    assert _resolve(source_context, row).reason is FallbackReason.UNTYPED_LINEAGE
-    notice = _fallback_notice(source_context, monkeypatch, row, source_context.observations.values())
+def test_stolyarova_1996_alternative_oxygen_columns_use_mo_cell_condition(source_context, tmp_path):
+    from simulator.battery.migrate import load_migrated_context
+    from simulator.battery.validate import validate_corpus
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    source_id = "stolyarova-1996-cao-alumina-silica-kems"
+    context = source_context
+    oxygen_rows = tuple(
+        observation
+        for observation in context.observations.values()
+        if "stolyarova_1996_table2_pO" in observation.observation_id
+        and observation.identity.species is not None
+        and observation.identity.species.formula in {"O", "O2"}
+    )
+    assert oxygen_rows
+    oxygen_class = oxygen_rows[0].evidence.class_.value
+    assert all(observation.evidence.class_.value is oxygen_class for observation in oxygen_rows)
+    if oxygen_class is EvidenceClass.MODEL_DERIVED:
+        fresh = _migrate_real_extract(
+            tmp_path, f"{source_id}.yaml", use_repository_index_row=True,
+        )
+        stored_source_rows = {
+            key: observation for key, observation in context.observations.items()
+            if observation.source_id == source_id
+        }
+        assert set(fresh.observations) == set(stored_source_rows)
+        validation = validate_corpus(
+            context.works,
+            context.experiments,
+            fresh.observations,
+            benches=context.benches,
+            context_rows=load_migrated_context(context.root),
+        )
+        context = replace(
+            context,
+            observations={**context.observations, **fresh.observations},
+            hard_issues_by_observation={
+                **context.hard_issues_by_observation,
+                **validation.hard_issues_by_observation,
+            },
+        )
+    else:
+        assert oxygen_class is EvidenceClass.QUOTED_ATTRIBUTED
+
+    row = _row(context, source_id, "AlO")
+    condition = _resolve(context, row)
+    assert isinstance(condition, SourceOxygenCondition)
+    assert condition.observation.identity.species.formula == "O2"
+    used = tuple(context.observations[observation_id] for observation_id in condition.used_observations)
+    mo_cell_column = tuple(
+        observation for observation in used
+        if observation.identity.species.formula == "O"
+        and "stolyarova_1996_table2_pO_1933k" in observation.observation_id
+    )
+    assert len(mo_cell_column) == 1
+    assert mo_cell_column[0].evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    reaction = mo_cell_column[0].identity.reaction
+    assert reaction is not None and reaction.is_value
+    assert {term.species.formula for term in reaction.value.terms} == {"MoO2", "MoO3", "O"}
+
+
+def test_untyped_oxygen_lineage_fixture_keeps_closure(source_context, monkeypatch):
+    context = source_context
+    row = _row(context, "stolyarova-1996-cao-alumina-silica-kems", "AlO")
+    oxygen = replace(
+        row,
+        observation_id="untyped-oxygen-lineage-fixture",
+        identity=replace(
+            row.identity,
+            species=Species("O", Phase.G),
+            composition=State.unknown("oxygen column does not carry a typed composition"),
+        ),
+        evidence=replace(row.evidence, class_=State.of(EvidenceClass.MODEL_DERIVED)),
+        derivation=None,
+        derived_from=(),
+    )
+    rows = (row, oxygen)
+    assert _resolve(context, row, rows).reason is FallbackReason.UNTYPED_LINEAGE
+    notice = _fallback_notice(context, monkeypatch, row, rows)
     assert "source_oxygen_fallback=lineage_untyped" in notice.reason
 
 

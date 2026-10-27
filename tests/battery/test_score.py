@@ -4982,27 +4982,40 @@ def _assert_no_model_derived_e15_points(
 ) -> None:
     from simulator.battery import score as score_mod
 
-    model_derived_oxygen_sources = {
+    nonmeasured_oxygen_sources = {
         observation.source_id
         for observation in context.observations.values()
         if observation.source_id in score_mod._E15_LEVEL_BASIS
         and isinstance(observation.identity, Identity)
         and observation.identity.species.formula in {"O", "O2"}
         and observation.evidence.class_.is_value
-        and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        and observation.evidence.class_.value
+        in {EvidenceClass.MODEL_DERIVED, EvidenceClass.QUOTED_ATTRIBUTED}
     }
-    assert model_derived_oxygen_sources
+    # The exclusion is vacuous unless this context still holds non-measured
+    # oxygen. 1991/1995 keep model_derived columns. 1996's Table 2 oxygen
+    # columns are quoted_attributed after t-1534.
+    assert nonmeasured_oxygen_sources
     for residual in residuals:
         observation = context.observations.get(residual.reference)
         if observation is None:
             continue
+        evidence = observation.evidence.class_
         is_model_derived = (
-            observation.evidence.class_.is_value
-            and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+            evidence.is_value
+            and evidence.value is EvidenceClass.MODEL_DERIVED
+        )
+        quoted_oxygen = (
+            evidence.is_value
+            and evidence.value is EvidenceClass.QUOTED_ATTRIBUTED
+            and isinstance(observation.identity, Identity)
+            and observation.identity.species is not None
+            and observation.identity.species.formula in {"O", "O2"}
         )
         point = score_mod._e15_residual_point(residual, observation)
         if point is not None:
             assert not is_model_derived
+            assert not quoted_oxygen
 
 
 def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
@@ -5194,12 +5207,54 @@ def test_measured_no_rail_refusal_stays_in_accumulator_and_legacy_report() -> No
     assert "`unsupported:no_headline_rail:viscosity` | 1" in refusal_census
 
 
-def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
+def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> None:
     from simulator.battery import score as score_mod
+    from simulator.battery.migrate import load_migrated_context
+    from simulator.battery.validate import validate_corpus
+    from tests.battery.test_migrate import _migrate_real_extract
 
-    context = load_score_context(
-        sources=("stolyarova-1996-cao-alumina-silica-kems",)
+    source_id = "stolyarova-1996-cao-alumina-silica-kems"
+    context = load_score_context(sources=(source_id,))
+    # t-1534 (742704443) is extract-only. The committed extracts-v2 sibling
+    # still labels Table 2 oxygen model_derived until the controller
+    # regenerates it. Score that migration here so the pin is the regen
+    # slope; once the sibling is quoted_attributed, score the store.
+    table2_oxygen = tuple(
+        observation
+        for observation in context.observations.values()
+        if "stolyarova_1996_table2_pO" in observation.observation_id
+        and isinstance(observation.identity, Identity)
+        and observation.identity.species is not None
+        and observation.identity.species.formula in {"O", "O2"}
+        and observation.evidence.class_.is_value
     )
+    assert table2_oxygen
+    oxygen_class = table2_oxygen[0].evidence.class_.value
+    assert all(
+        observation.evidence.class_.value is oxygen_class
+        for observation in table2_oxygen
+    )
+    if oxygen_class is EvidenceClass.MODEL_DERIVED:
+        fresh = _migrate_real_extract(
+            tmp_path,
+            f"{source_id}.yaml",
+            use_repository_index_row=True,
+        )
+        assert set(fresh.observations) == set(context.observations)
+        validation = validate_corpus(
+            context.works,
+            context.experiments,
+            fresh.observations,
+            benches=context.benches,
+            context_rows=load_migrated_context(context.root),
+        )
+        context = replace(
+            context,
+            observations=dict(fresh.observations),
+            hard_issues_by_observation=validation.hard_issues_by_observation,
+        )
+    else:
+        assert oxygen_class is EvidenceClass.QUOTED_ATTRIBUTED
     residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
     selected = [
         (residual, point)
@@ -5248,7 +5303,13 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     points = tuple(point for _residual, point in selected)
     shape = score_mod._e15_level_shape_rows(points)[1]
     assert shape["x_axis"] == "x(CaO)"
-    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("6.76")
+    # t-1534 (742704443) labels Table 2's 55 calculated oxygen columns
+    # quoted_attributed (eqs 7–9; d-110). The 29 measured pCa rows are
+    # unchanged. resolve_source_oxygen then commands that printed cell pO
+    # as fO2, so this residual slope is 5.19 dex per x(CaO). 6.76 was the
+    # engine oxygen-balance slope while those columns were model_derived
+    # (e54df70c40). The paper prints the pressures, not this slope.
+    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("5.19")
 
     from simulator.battery.score import (
         _ScorePayloadAccumulator,
@@ -5272,7 +5333,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     assert production_shape["x_axis"] == "x(CaO)"
     assert production_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("6.76")
+    ) == Decimal("5.19")
     assert (
         score_mod.FLAGGED_STRATUM_CELL_MATERIAL_INFERRED
         in production_shape["flags"]
@@ -5290,9 +5351,11 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
         for residual, point in selected
     )
     wrong_axis_shape = score_mod._e15_level_shape_rows(si_axis_points)[1]
+    # Same residuals on x(SiO2). -4.34 replaces -5.58 for the same
+    # oxygen-condition change.
     assert wrong_axis_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("-5.58")
+    ) == Decimal("-4.34")
 
     contested_payload = next(
         payload
@@ -14416,8 +14479,30 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             "kems-012-sossi-2019",
         )
     )
-    observations = context.observations
-    filtered = context
+    fresh_stolyarova_1996 = _migrate_real_extract(
+        tmp_path / "fresh-stolyarova-1996",
+        "stolyarova-1996-cao-alumina-silica-kems.yaml",
+    )
+    fresh_stolyarova_1996_pressures = {
+        key: observation
+        for key, observation in fresh_stolyarova_1996.observations.items()
+        if observation.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+        and isinstance(observation.identity, Identity)
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and observation.observation_id.split("::")[1].startswith(
+            "stolyarova_1996_table2_pO"
+        )
+        and observation.admission.status is AdmissionStatus.ADMITTED
+    }
+    assert len(fresh_stolyarova_1996_pressures) == 55
+    assert all(
+        observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        for observation in fresh_stolyarova_1996_pressures.values()
+    )
+    observations = dict(context.observations)
+    observations.update(fresh_stolyarova_1996_pressures)
+    filtered = replace(context, observations=observations)
     stolyarova_atomic_oxygen_pressures = {
         key
         for key in observations
@@ -14472,7 +14557,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and quantity_token(obs.identity) is Quantity.P_PARTIAL
         and obs.admission.status is AdmissionStatus.ADMITTED
         and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
     }
     kems_model_derived = {
         key
@@ -14498,7 +14583,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         for key in stolyarova_atomic_oxygen_pressures
     )
     fresh_stolyarova = _migrate_real_extract(
-        tmp_path, "kems-053-stolyarova-1991.yaml"
+        tmp_path / "fresh-stolyarova-1991", "kems-053-stolyarova-1991.yaml"
     )
     fresh_stolyarova_pressures = {
         key: observation
@@ -14515,8 +14600,8 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
     # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9) are model-derived,
     # not measured pressures (review, Derived O / O2).
     assert len(stolyarova_1995_derived_pressures) == 26
-    # Table 2's calculated 1933 K oxygen-pressure columns contain 30 pO,
-    # 10 p'O, and 15 p''O observations, all model-derived.
+    # Table 2 reports quoted_attributed calculated columns: 30 pO, 10 p'O,
+    # and 15 p''O observations.
     assert len(stolyarova_1996_derived_pressures) == 55
     assert {
         observations[key].observation_id.split("::")[1]
@@ -14543,7 +14628,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
     ) == 91
     assert len(headline_diagnostic_references) == 136
     assert admitted_model_derived == (
-        headline_diagnostic_references - stolyarova_atomic_oxygen_pressures
+        headline_diagnostic_references
+        - stolyarova_atomic_oxygen_pressures
+        - stolyarova_1996_derived_pressures
     )
     assert admitted_model_derived <= {
         obs.observation_id for obs in score_module.comparison_candidates(filtered)
@@ -14823,6 +14910,17 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         assert len(stolyarova_1996_rows) == 55
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_1996_rows)
         assert all(not row.score_eligible for row in stolyarova_1996_rows)
+        assert all(
+            observations[row.reference].evidence.class_.is_value
+            and observations[row.reference].evidence.class_.value
+            is EvidenceClass.QUOTED_ATTRIBUTED
+            and any(
+                notice.kind is NoticeKind.FIGURE_ONLY
+                and notice.reason == "evidence_class:quoted_attributed"
+                for notice in row.notices
+            )
+            for row in stolyarova_1996_rows
+        )
         assert {
             row.refusal.reason
             for row in stolyarova_1996_rows
@@ -16072,3 +16170,60 @@ def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> Non
     assert residual.execution.state is ExecutionState.UNSUPPORTED
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+
+
+@pytest.mark.parametrize("parent_id", ("parent-source::raw", "parent-source:raw"))
+def test_filtered_score_context_resolves_cross_source_validation_parent(
+    tmp_path: Path, parent_id: str
+) -> None:
+    from simulator.battery.migrate import dump_yaml, to_plain
+
+    child_source = "child-source"
+    parent_source = "parent-source"
+    child_id = f"{child_source}::reduced"
+    work = replace(F.work(), source_ids=(child_source, parent_source))
+    experiment = F.tabulation_experiment()
+    parent = F.observation(
+        parent_id,
+        experiment.experiment_id,
+        F.pref_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=parent_source,
+    )
+    child = F.observation(
+        child_id,
+        experiment.experiment_id,
+        F.pref_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id=child_source,
+        derived_from=(parent_id,),
+        derivation=Derivation(
+            "reported reduction", (parent_id,), (), "Pa"
+        ),
+    )
+
+    literature = tmp_path / "data" / "literature"
+    (literature / "works").mkdir(parents=True)
+    (literature / "extracts-v2").mkdir()
+    dump_yaml(
+        {"work": to_plain(work), "experiments": [to_plain(experiment)]},
+        literature / "works" / "work.yaml",
+    )
+    for observation in (parent, child):
+        dump_yaml(
+            {"observations": [to_plain(observation)]},
+            literature / "extracts-v2" / f"{observation.source_id}.yaml",
+        )
+
+    full = load_score_context(tmp_path)
+    filtered = load_score_context(tmp_path, sources=(child_source,))
+
+    assert child_id in full.observations
+    assert child_id in filtered.observations
+    assert parent_id not in filtered.observations
+    assert full.hard_issues_by_observation.get(child_id) is None
+    assert filtered.hard_issues_by_observation.get(child_id) == (
+        full.hard_issues_by_observation.get(child_id)
+    )

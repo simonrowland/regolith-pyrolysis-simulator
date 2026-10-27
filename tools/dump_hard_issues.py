@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import re
 import sys
 from pathlib import Path
 
@@ -15,9 +14,8 @@ if str(ROOT) not in sys.path:
 
 from simulator.battery.identity import quantity_token
 from simulator.battery.migrate import migrate
+from simulator.battery.validate import observation_issue_location
 
-
-_OBSERVATION_PATH = re.compile(r"^observation\[(.+?)\](?:\.(.*))?$")
 _FIELDS = (
     "source_id",
     "observation_id",
@@ -40,9 +38,8 @@ def dump_hard_issues(root: Path, out: Path, source: str | None = None) -> int:
         writer.writeheader()
         written = 0
         for issue in hard_issues:
-            match = _OBSERVATION_PATH.match(issue.path)
-            observation_id = match.group(1) if match else ""
-            field = match.group(2) if match and match.group(2) else ""
+            location = observation_issue_location(issue.path)
+            observation_id, field = location if location is not None else ("", "")
             observation = observations.get(observation_id)
             source_id = observation.source_id if observation is not None else ""
             if source is not None and source_id != source:
