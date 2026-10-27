@@ -1,0 +1,118 @@
+schema_version: literature_extract.v1
+source_id: wang-2017-sodium-stannate-formation-emf
+source:
+  citation: Wang Z-M, Xie H-W, Zhang Y, Zhai Y-C (2017). Formation free energy of sodium stannate measured using beta-beta''-Al2O3 ceramic electrolyte. Rare Metals 36(11), 905-911. Online 9 May 2016.
+  doi: 10.1007/s12598-016-0717-4
+  url: https://doi.org/10.1007/s12598-016-0717-4
+  year: 2017
+extraction:
+  method: HTML table markup; equation image assets transcribed visually
+  date: '2026-10-27'
+  worker: w1027na2-wang17
+  provenance_path: raw/wang-2017-sodium-stannate-formation-emf/wang-2017-sodium-stannate-formation-emf.html
+review_status: draft
+fidelity_samples:
+  - path: species.Na2SnO3.observations[wang_2017_eq12_sodium_stannate_formation_gibbs_fit].values.delta_fG_intercept_as_printed
+    value: '−1040.83'
+    locator: {equation: '12', section: 'Results of sodium stannate’s formation free energy'}
+  - path: species.Na2SnO3.observations[wang_2017_eq12_sodium_stannate_formation_gibbs_fit].values.delta_fG_slope_as_printed
+    value: '0.2222'
+    locator: {equation: '12', section: 'Results of sodium stannate’s formation free energy'}
+  - path: species.Na2SnO3.observations[wang_2017_eq12_sodium_stannate_formation_gibbs_fit].values.uncertainty_as_printed
+    value: '± 2.54'
+    locator: {equation: '12', section: 'Results of sodium stannate’s formation free energy'}
+species:
+  Na2O:
+    observations: []
+    context:
+      - observation_id: wang_2017_table1_electrolyte_phase_content
+        type: characterization
+        locator:
+          table: '1'
+          note: 'HTML table markup; Relative content of beta-double-prime-Al2O3'
+        units: mixed as printed
+        values:
+          method: XRD-derived relative phase content
+          rows_as_printed:
+            - {Na2O_content_wt_percent: '9.0', I_beta_026: '2292', I_beta_double_prime_2010: '8813', beta_double_prime_phase_wt_percent: '76.57'}
+            - {Na2O_content_wt_percent: '9.5', I_beta_026: '2309', I_beta_double_prime_2010: '9762', beta_double_prime_phase_wt_percent: '78.17'}
+            - {Na2O_content_wt_percent: '10.0', I_beta_026: '1307', I_beta_double_prime_2010: '9640', beta_double_prime_phase_wt_percent: '86.24'}
+            - {Na2O_content_wt_percent: '10.5', I_beta_026: '1845', I_beta_double_prime_2010: '7843', beta_double_prime_phase_wt_percent: '78.32'}
+      - observation_id: wang_2017_table2_electrolyte_parameters
+        type: characterization
+        locator:
+          table: '2'
+          note: 'HTML table markup; Physical parameters of electrolyte sheet with different Na2O contents'
+        units: mixed as printed
+        values:
+          rows_as_printed:
+            - {Na2O_content_wt_percent: '9.0', resistance_ohm: '19.27', thickness_cm: '0.31', area_cm2: '0.2826', resistivity_ohm_cm: '17.57', density_g_cm3: '3.23'}
+            - {Na2O_content_wt_percent: '9.5', resistance_ohm: '14.51', thickness_cm: '0.36', area_cm2: '0.2826', resistivity_ohm_cm: '11.39', density_g_cm3: '3.23'}
+            - {Na2O_content_wt_percent: '10.0', resistance_ohm: '4.62', thickness_cm: '0.29', area_cm2: '0.2826', resistivity_ohm_cm: '4.51', density_g_cm3: '3.25'}
+            - {Na2O_content_wt_percent: '10.5', resistance_ohm: '9.83', thickness_cm: '0.34', area_cm2: '0.2826', resistivity_ohm_cm: '8.17', density_g_cm3: '3.24'}
+  Na2SnO3:
+    observations:
+      - observation_id: wang_2017_eq12_sodium_stannate_formation_gibbs_fit
+        type: gibbs_table
+        locator:
+          equation: '12'
+          section: Results of sodium stannate’s formation free energy
+          note: Equation image embedded in the HTML article
+        T_range_K: [773, 1273]
+        units: equation coefficients and uncertainty as printed; the HTML gives no unit label
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Wang et al. (2017), Equation (12), as printed
+          delta_fG_function_as_printed: '−1040.83 + 0.2222T ± 2.54'
+          delta_fG_intercept_as_printed: '−1040.83'
+          delta_fG_slope_as_printed: '0.2222'
+          uncertainty_as_printed: '± 2.54'
+          T_range_K_as_printed: '773–1273 K'
+          equation_10_cell_reaction_relation: 'ΔG° = −nEF'
+          equation_10_cell_reaction_fit_as_printed: '−113.86 + 0.0514T ± 2.54'
+          equation_11_relation_as_printed: formation Gibbs energies of Na2SnO3, SnO2, Cr2O3, and NaCrO2 combined for the cell reaction
+          cell_scheme: 'Pt|SnO2, Na2SnO3|β-β″-Al2O3|NaCrO2, Cr2O3|Pt'
+          reference_electrode: NaCrO2 + Cr2O3 mixed in a 1:1 mole ratio
+          standard_state: standard formation free energy of Na2SnO3
+          method_class_reason: The paper fits its measured EMF series and derives formation Gibbs energy from that series, but the numeric EMF inputs are plotted only in Fig. 5 and are not digitized; the fitted line is therefore quoted_attributed under d-110.
+          printed_uncertainty_note: confidence level not stated
+          status: typed_refused_schema_gap
+          schema_gap: The extract-to-battery schema cannot evaluate this printed linear Gibbs function as a point or series, and no EMF input rows are stored. The printed fit remains attributed evidence.
+  Electromotive_force:
+    observations: []
+    context:
+      - observation_id: wang_2017_eq4_reference_emf_fit_schema_gap
+        type: experiment_series
+        locator:
+          equation: '4'
+          section: Results of sodium stannate’s formation free energy
+          note: Equation image embedded in the HTML article; reference battery fit
+        units: mV as stated in the article
+        values:
+          quantity: electromotive_force
+          status: typed_refused_schema_gap
+          method_class: quoted_attributed
+          fit_as_printed: '153.24 + 0.1078T ± 2.32'
+          T_range_K_as_printed: '773–1273 K'
+          correlation_coefficient: '0.982'
+          reference_couple: 'Fe, FeₓO | ZrO2–Y2O3 | NiO, Ni'
+          reason: No EMF quantity token is available in the extract-to-battery schema.
+      - observation_id: wang_2017_eq8_test_cell_emf_fit_schema_gap
+        type: experiment_series
+        locator:
+          equation: '8'
+          section: Results of sodium stannate’s formation free energy
+          note: Equation image embedded in the HTML article; sodium stannate cell fit
+        units: mV as stated in the article
+        values:
+          quantity: electromotive_force
+          status: typed_refused_schema_gap
+          method_class: quoted_attributed
+          fit_as_printed: '589.94 − 0.2660T ± 13.143'
+          T_range_K_as_printed: '773–1273 K'
+          correlation_coefficient: '0.958'
+          cell_scheme: 'Pt|SnO2, Na2SnO3|β-β″-Al2O3|NaCrO2, Cr2O3|Pt'
+          reference_electrode: NaCrO2 + Cr2O3 mixed in a 1:1 mole ratio
+          reference_Na2O_activity: not numerically stated; described as similar to sodium stannate to reduce gaseous Na diffusion
+          reason: No EMF quantity token is available in the extract-to-battery schema.
