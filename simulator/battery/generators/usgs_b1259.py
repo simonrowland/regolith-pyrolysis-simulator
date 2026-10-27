@@ -1387,6 +1387,10 @@ def _element_reference_species(
     return make_species(formula, phase, polymorph_state, charge=0), atom_count
 
 
+def _is_element_reference_state_record_id(record_id: str) -> bool:
+    return "reference-state" in record_id
+
+
 def reference_enthalpy_zero_is_ideal_gas(formula: str) -> bool:
     """True when B1259's 298.15 K elemental reference for this formula is the ideal gas.
 
@@ -1520,7 +1524,28 @@ def _observation(
     reconstruction: Mapping[str, Any] | None = None,
 ) -> Observation:
     record_id = str(record["record_id"])
-    phase, polymorph = _phase_state(record)
+    if _is_element_reference_state_record_id(record_id):
+        counts = _parse_counts(formula)
+        symbol = next(iter(counts)) if counts is not None and len(counts) == 1 else None
+        reference = (
+            None
+            if symbol is None
+            else _element_reference_species(symbol, temperature)
+        )
+        if reference is None:
+            unresolved = (
+                "B1259 elemental reference-state identity is unresolved at "
+                f"{temperature} K"
+            )
+            phase = State.unknown(unresolved)
+            polymorph = State.unknown(unresolved)
+        else:
+            reference_species, _atoms = reference
+            formula = reference_species.formula
+            phase = reference_species.phase
+            polymorph = reference_species.polymorph
+    else:
+        phase, polymorph = _phase_state(record)
     if (
         phase.is_value
         and phase.value is Phase.AQ

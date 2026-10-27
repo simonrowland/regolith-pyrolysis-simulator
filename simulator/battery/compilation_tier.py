@@ -1790,56 +1790,9 @@ def _vaporock_gas_basis_refusal(
     Species, neutral charge, declared gas phase, and mol-species basis
     are the caller's checks, before this function and before either
     branch. H−H298 still requires this observation's enthalpy zero.
-    Cp does not carry that zero. S moves to the printed pressure except
-    for B1259 Mg, Na, K, and O reference-state rows on the outside-interval
-    table branch, where the source basis remains unresolved. None means this
-    quantity may be answered from the gas table.
+    Cp does not carry that zero. S moves to the printed pressure. None means
+    this quantity may be answered from the gas table.
     """
-
-    if quantity is Quantity.S and coefficient_interval == "outside":
-        from simulator.battery.generators.usgs_b1259 import SOURCE_ID as b1259_source
-
-        identity = observation.identity
-        locator = observation.locator
-        source_record = (
-            ""
-            if locator is None
-            else str(locator.record or locator.table or "").strip()
-        )
-        formula = (
-            identity.species.formula.strip()
-            if isinstance(identity, Identity)
-            else ""
-        )
-        temperature = identity.temperature_K if isinstance(identity, Identity) else None
-        is_unresolved_reference_entry = (
-            observation.source_id == b1259_source
-            and isinstance(identity, Identity)
-            and "reference-state" in source_record
-            and formula in {"Mg", "Na", "K", "O2"}
-        )
-        is_unresolved_oxygen_298 = (
-            observation.source_id == b1259_source
-            and formula == "O2"
-            and isinstance(temperature, State)
-            and temperature.is_value
-            and temperature.value is not None
-            and as_decimal(temperature.value) == Decimal("298.15")
-        )
-        if is_unresolved_reference_entry or is_unresolved_oxygen_298:
-            return _refuse(
-                RefusalReason.ELEMENT_REFERENCE_STATE_BASIS_UNRESOLVED,
-                "element-reference-state-S-vs-VapoRock-basis-unresolved",
-                quantity=quantity,
-                origin=origin,
-                extra={
-                    "engine": Engine.VAPOROCK.value,
-                    "species": species_name,
-                    "coefficient_interval": coefficient_interval,
-                    "branch": "table",
-                },
-                call_evidence=call_evidence,
-            )
 
     # Cp = (dH/dT)p is independent of the H origin.
     # S is shifted onto the printed pressure after a value is read.
@@ -2104,6 +2057,34 @@ def _vaporock_gas_attempt(
     origin: str,
 ) -> ThermoAttempt:
     phase = identity.species.phase
+    if quantity is Quantity.S:
+        from simulator.battery.generators.usgs_b1259 import (
+            SOURCE_ID as b1259_source,
+            _is_element_reference_state_record_id,
+        )
+
+        source_record = _locator_table_id(observation)
+        if (
+            observation.source_id == b1259_source
+            and _is_element_reference_state_record_id(source_record)
+        ):
+            observed_phase = phase_token(identity.species)
+            if observed_phase is not Phase.G:
+                return _refuse(
+                    RefusalReason.ELEMENT_REFERENCE_STATE_PHASE_IDENTITY_MISMATCH,
+                    "element-reference-state-phase-identity-mismatch",
+                    quantity=quantity,
+                    origin=origin,
+                    extra={
+                        "engine": Engine.VAPOROCK.value,
+                        "species": identity.species.formula,
+                        "observation_phase": (
+                            None
+                            if observed_phase is None
+                            else observed_phase.value
+                        ),
+                    },
+                )
     if (
         not isinstance(phase, State)
         or not phase.is_value
