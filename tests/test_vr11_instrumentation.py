@@ -376,22 +376,48 @@ def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
     assert local == 0.0
     assert local != 100.0
 
+    from simulator.overhead import OverheadGasModel
+
     model = _efficiency_model()
     model.vapor_pressure_data = vapor_data
+    stage_number = condensation_module.designated_stage_number("Na")
+    assert stage_number is not None
+    stage = next(
+        candidate
+        for candidate in model.train.stages
+        if candidate.stage_number == stage_number
+    )
+    # Use the production geometry defaults. The model itself has no
+    # default Na flowing partial pressure; this is the explicit measured
+    # flow input whose preservation the refusal outcome records.
+    model.configure_operating_conditions(
+        stage_area_m2_by_stage=OverheadGasModel().stage_area_m2_by_stage(),
+    )
     measured_flowing_pressure_pa = 37.5
     model.wall_species_partial_pressures_pa = {
         "Na": measured_flowing_pressure_pa,
     }
     model._species_partial_pressures_configured = True
-    stage = next(s for s in model.train.stages if s.stage_number == 3)
+    stage_alpha_record = condensation_module._stage_alpha_record(
+        stage,
+        "Na",
+        model.materials,
+    )
+    alpha_s_value = condensation_module._required_record_alpha_s(
+        stage_alpha_record,
+        species="Na",
+        site="stage_deposition",
+    )
+    routing_temperature_C = model.condensation_temperatures_C["Na"]
+    residence_s = model.residence_time_s[stage_number]
     outcomes: list[dict[str, Any]] = []
     eta = model._condensation_efficiency(
         stage=stage,
         species="Na",
-        T_cond_C=test_temperature_K - condensation_module.CELSIUS_TO_KELVIN_OFFSET,
-        residence_s=1.0,
+        T_cond_C=routing_temperature_C,
+        residence_s=residence_s,
         available_kg=1.0,
-        alpha_s_value=1.0,
+        alpha_s_value=alpha_s_value,
         efficiency_outcomes=outcomes,
     )
     assert len(outcomes) == 1
@@ -402,6 +428,8 @@ def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
     assert outcome["reason"] == "antoine_psat_unavailable_at_T"
     assert outcome["refusal_type"] == "WallSaturationPressureRefusal"
     assert tuple(outcome["valid_range_K"]) == valid_range
+    assert outcome["stage_number"] == stage_number
+    assert outcome["routing_reference_temperature_C"] == routing_temperature_C
     assert outcome["flowing_pressure_pa"] == measured_flowing_pressure_pa
     assert outcome["flowing_pressure_pa"] != 100.0
     assert outcome["eta"] == eta
