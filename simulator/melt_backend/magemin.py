@@ -127,6 +127,12 @@ from simulator.melt_backend.base import (
     project_melt_to_oxide_projection,
     split_cleaned_melt_account,
 )
+from simulator.composition_projection import (
+    PROJECTED_BULK_CLASSIFICATION_KEY,
+    ProjectedBulkClassification,
+    classify_projected_bulk,
+    projected_component_moles_per_kg,
+)
 from simulator.engine_pool import (
     EngineWorkerDied,
     EngineWorkerPool,
@@ -271,9 +277,7 @@ class _MAGEMinBulkProjection:
     composition_wt_pct: Dict[str, float]
     warnings: Tuple[str, ...]
     dropped_components: Tuple[str, ...] = ()
-    # (component, mass fraction of the post-merge bulk). Empty unless the
-    # ig-order fold dropped something. Not a silent solve of that bulk.
-    dropped_component_mass_fractions: Tuple[Tuple[str, float], ...] = ()
+    dropped_wt_pct_by_component: Tuple[Tuple[str, float], ...] = ()
     merged_components: Tuple[str, ...] = ()
     source_sum_wt_pct: float = 0.0
     projected_sum_wt_pct: float = 0.0
@@ -578,31 +582,34 @@ def composition_projected_liquidus_notice(
     return None
 
 
-def _magemin_dropped_mass_fraction(
+def _magemin_projection_classification(
     bulk_projection: _MAGEMinBulkProjection,
-) -> float:
-    source_sum = float(bulk_projection.source_sum_wt_pct)
-    if source_sum <= 0.0:
-        return 0.0
-    dropped_wt = max(
-        0.0,
-        source_sum - float(bulk_projection.projected_sum_wt_pct),
+    *,
+    species_formula_registry: Optional[Mapping[str, Any]],
+) -> ProjectedBulkClassification:
+    dropped_wt_pct = dict(bulk_projection.dropped_wt_pct_by_component)
+    dropped_mol_per_kg, unavailable_reasons = projected_component_moles_per_kg(
+        dropped_wt_pct,
+        source_sum_wt_pct=bulk_projection.source_sum_wt_pct,
+        species_formula_registry=species_formula_registry,
     )
-    return dropped_wt / source_sum
+    return classify_projected_bulk(
+        dropped_wt_pct,
+        source_sum_wt_pct=bulk_projection.source_sum_wt_pct,
+        dropped_component_mol_per_kg=dropped_mol_per_kg,
+        dropped_component_mol_unavailable_reasons=unavailable_reasons,
+    )
 
 
 def _magemin_bulk_projection_details(
     bulk_projection: Optional[_MAGEMinBulkProjection],
+    classification: ProjectedBulkClassification,
 ) -> Dict[str, Any]:
     if bulk_projection is None:
         return {}
 
     bulk_dropped = tuple(bulk_projection.dropped_components)
     bulk_merged = tuple(bulk_projection.merged_components)
-    dropped_fractions = {
-        str(name): float(fraction)
-        for name, fraction in bulk_projection.dropped_component_mass_fractions
-    }
     details: Dict[str, Any] = {
         'magemin_database': bulk_projection.database,
         'magemin_bulk_order': list(bulk_projection.order),
@@ -611,7 +618,12 @@ def _magemin_bulk_projection_details(
         ),
     }
     if bulk_dropped:
-        dropped_mass_fraction = _magemin_dropped_mass_fraction(bulk_projection)
+        dropped_wt_pct = dict(classification.dropped_component_wt_pct)
+        dropped_fractions = {
+            str(name): value / 100.0
+            for name, value in dropped_wt_pct.items()
+        }
+        dropped_mass_fraction = classification.dropped_total_wt_pct / 100.0
         details['dropped_bulk_components'] = list(bulk_dropped)
         details['dropped_mass_fraction'] = dropped_mass_fraction
         details['dropped_component_mass_fractions'] = dict(dropped_fractions)
@@ -631,11 +643,7 @@ def _magemin_bulk_projection_details(
         details['bulk_projected_sum_wt_pct'] = (
             bulk_projection.projected_sum_wt_pct
         )
-        details['bulk_dropped_wt_pct'] = max(
-            0.0,
-            bulk_projection.source_sum_wt_pct
-            - bulk_projection.projected_sum_wt_pct,
-        )
+        details['bulk_dropped_wt_pct'] = classification.dropped_total_wt_pct
     return details
 
 
@@ -1619,6 +1627,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 diagnostics=projection_diagnostics,
             )
 
+        projection_classification = _magemin_projection_classification(
+            bulk_projection,
+            species_formula_registry=species_formula_registry,
+        )
         result_diagnostics = projection_diagnostics_for_melt_input(
             backend='MAGEMin',
             projection=projection,
@@ -1629,9 +1641,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             dropped_accounts=dropped_accounts,
             dropped_account_species=dropped_account_species,
             extra_projection_details=_magemin_bulk_projection_details(
-                bulk_projection
+                bulk_projection,
+                projection_classification,
             ),
         )
+        if bulk_projection.dropped_components:
+            result_diagnostics[PROJECTED_BULK_CLASSIFICATION_KEY] = (
+                projection_classification.as_diagnostics()
+            )
         if bulk_projection.dropped_components:
             # A result for a different (projected) bulk is not a result for
             # this one. Do not call MAGEMin on the truncated vector.
@@ -3319,13 +3336,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
 
         source_sum_wt_pct = sum(float(value) for value in source.values())
-        dropped_fractions: List[Tuple[str, float]] = []
-        if source_sum_wt_pct > 0.0:
-            for component in dropped:
-                dropped_fractions.append((
-                    component,
-                    float(source[component]) / source_sum_wt_pct,
-                ))
+        dropped_wt_pct = tuple(
+            (component, float(source[component]))
+            for component in dropped
+        )
         return _MAGEMinBulkProjection(
             database=db,
             order=order,
@@ -3337,7 +3351,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             },
             warnings=tuple(diagnostics),
             dropped_components=tuple(dropped),
-            dropped_component_mass_fractions=tuple(dropped_fractions),
+            dropped_wt_pct_by_component=dropped_wt_pct,
             merged_components=tuple(merged),
             source_sum_wt_pct=source_sum_wt_pct,
             projected_sum_wt_pct=sum(float(value) for value in projected.values()),

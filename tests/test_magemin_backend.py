@@ -2281,8 +2281,13 @@ def test_magemin_bulk_projection_mass_fraction_float_hex_pin():
         "MgO": 40.0,
         "P2O5": 10.0,
     })
+    classification = magemin_module._magemin_projection_classification(
+        bulk_projection,
+        species_formula_registry=None,
+    )
     details = magemin_module._magemin_bulk_projection_details(
-        bulk_projection
+        bulk_projection,
+        classification,
     )
 
     assert details["dropped_mass_fraction"].hex() == (
