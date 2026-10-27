@@ -1035,9 +1035,12 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
-    # Re-pinned 2026-10-25 under d-252 from the studio-2 setup.
+    # t-1545: the 1400 C step's non-P mass is 93.6% Na. Na falls 0.262451 dex
+    # (endpoint Antoine at 1673.15 K is -0.264419 dex; the +0.001968 dex is
+    # shared with Na2/Na2O_gas and is not an Fe or fO2 rescaling). Fe and
+    # every non-Na species stay bitwise identical, including the Fe redox split.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.06423670196107581, rel=1e-12, abs=1e-12
+        0.03696635706065208, rel=1e-12, abs=1e-12
     )
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
@@ -1065,15 +1068,14 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # Re-pinned 2026-10-25 under d-252: the 1 mbar Ar cover and 200 C/h
-        # ramp move the first step from 1600 C to 1400 C. The old hard-vacuum
-        # step was 1.39e6% over transport capacity; the new value is 2.47%.
+        # t-1545: total and saturation follow the Na mass above. Melt mass
+        # rises by the Na that no longer leaves. Fe redox reasons are unchanged.
         (
             1,
             1400.0,
-            0.06423670196107581,
-            2.4701307994323103,
-            998.7072055554551,
+            0.03696635706065208,
+            1.3903158261477393,
+            998.7344759003555,
         ),
         rel=1.0e-12,
         abs=1.0e-12,

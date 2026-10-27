@@ -339,7 +339,13 @@ species:
         # Observed max|Delta| on enghar-matched grid after rail flip: 1.536140186984556
         # (prior Chase pin 1.4368670475601244; Delta ~= +0.099 dex from table-assembly
         # L&H-Chase level shift, not the second-hand linear-form +0.735).
-        pinned_residual_dex: 1.536140186984556
+        # t-1545: the NIST-JANAF liquid-Na2O Antoine reference lowers model P(Na)
+        # against the fixed VapoRock rows. The worst row stays 1350 K (all three
+        # fO2, so it is a pure scale, not an fO2 slope). The residual falls by
+        # exactly the Antoine shift at 1350 K, 0.06727216407196934 dex.
+        # t-1539's 15-row refusal does not move this residual: it is already
+        # 1.4688680229125866 at the t-1545 merge, before that refusal.
+        pinned_residual_dex: 1.4688680229125866
         evidence_refs:
           - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
           - validation-data/pin-evidence/na_vaporock_lh_liquid_2026-08-08.yaml

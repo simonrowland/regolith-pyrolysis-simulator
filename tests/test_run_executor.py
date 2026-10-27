@@ -1093,6 +1093,10 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     # Recorded on parent 5672e61d9 by the non-binding fallback probe:
     # B582_RUNTIME_ENFORCEMENT=0 ... b582_identity_probe.py.
     # b-850: alkali composite vapour rows use parent-oxide activity; K2O_gas is below the existing 1e-12 kg/hr cutoff.
+    # t-1545: only Na, Na2, and Na2O_gas move. The hour is cooler than the
+    # 1670 C setpoint; Na2 and Na2O_gas fall by exactly 2x the Na reference
+    # Antoine shift at 1633.29 C (-0.702724 dex). The other 17 species,
+    # including Al, are unchanged.
     expected_rates = {
         "Al": 1.776974630811854e-10,
         "AlO": 2.622990526227972e-10,
@@ -1107,9 +1111,9 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
         "Mg": 7.23266209617007e-05,
         "MgO_gas": 1.0307259466430569e-07,
         "Mn": 2.2585292315558916e-05,
-        "Na": 5.142690508092712e-03,
-        "Na2": 3.013634463408095e-08,
-        "Na2O_gas": 3.0031933641137976e-11,
+        "Na": 0.002349268731777859,
+        "Na2": 5.975392638039387e-09,
+        "Na2O_gas": 5.954690171096651e-12,
         "SiO": 7.769179203709372e-09,
         "SiO2_gas": 4.598894711291365e-06,
         "TiO": 2.8635316467141483e-09,
