@@ -5210,7 +5210,8 @@ def _phase_row_rejection(
     if token in PHASE_COMPOSITION_QUANTITIES:
         basis = str(values.get("basis") or "").strip()
         if basis not in PHASE_BASIS_TOKENS:
-            return "basis is not wt_percent or mole_fraction"
+            accepted = ", ".join(sorted(PHASE_BASIS_TOKENS))
+            return f"basis is not {accepted}"
     if token is Quantity.DISTRIBUTION_RATIO:
         counter = _phase_role_token(values.get("counter_phase_label"))
         if counter is None:
@@ -16988,6 +16989,43 @@ class Migrator:
         ):
             before = self._count(source_key).observations_out
             for item in exploded:
+                # A series item's own derived_from names that row's parents.
+                # The parent observation's list remains the fallback when the
+                # item does not state one. The id hash skips this key.
+                point_derived_from = derived_from
+                point_source_derivation = source_derivation
+                raw_point = item.get("item") if isinstance(item, Mapping) else None
+                if (
+                    isinstance(raw_point, Mapping)
+                    and raw_point.get("derived_from") not in (None, "")
+                ):
+                    try:
+                        item_parents, item_prose = lineage_parents_from_source(
+                            {},
+                            raw_point,
+                            source_id,
+                            local_ids,
+                            source_asset_ids,
+                        )
+                    except ValueError as exc:
+                        item_parents, item_prose = (), (str(exc),)
+                    if item_parents:
+                        point_derived_from = item_parents
+                        if source_derivation is not None:
+                            point_source_derivation = replace(
+                                source_derivation, inputs=item_parents
+                            )
+                    if item_prose:
+                        self._flag_printed_lineage(
+                            item_prose,
+                            field="derived_from",
+                            work_id=work.work_id,
+                            locator=locator,
+                            source_key=source_key,
+                            observation_id=obs_id,
+                            stored_lineage=set(point_derived_from or ()),
+                            queued=queued_prose,
+                        )
                 self._emit_exploded_point(
                     parent_id=obs_id,
                     item=item,
@@ -17002,8 +17040,8 @@ class Migrator:
                     uncertainty=uncertainty_for(obs.get("uncertainty")),
                     units=str(obs.get("units") or ""),
                     read_from=read_from,
-                    derived_from=derived_from,
-                    source_derivation=source_derivation,
+                    derived_from=point_derived_from,
+                    source_derivation=point_source_derivation,
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(

@@ -7564,6 +7564,9 @@ def _predict_phase_row(
         )
     subtype = identity.subtype.value if identity.subtype is not None and identity.subtype.is_value else None
     if solute is None:
+        # Engine phase maps are wt%. mole_fraction and ppm_mass are closed
+        # bases on another scale. ppm_mass_to_wt_percent is the ppm scale
+        # rule and is not applied here: the stored point stays as printed.
         if subtype in PHASE_BASIS_TOKENS and subtype != "wt_percent":
             return refused(
                 RefusalReason.COEFFICIENT_BASIS_MISMATCH,
@@ -7571,7 +7574,10 @@ def _predict_phase_row(
                     "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
                     "basis": subtype,
                     "engine_basis": "wt_percent",
-                    "detail": "engine phase maps are wt%; mole_fraction rows are not converted",
+                    "detail": (
+                        "engine phase maps are wt%; "
+                        f"{subtype} is not converted to wt%"
+                    ),
                 },
             )
         if subtype != "wt_percent":

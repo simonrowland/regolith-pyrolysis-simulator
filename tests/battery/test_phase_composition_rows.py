@@ -32,6 +32,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
     SourceRelation,
+    ppm_mass_to_wt_percent,
 )
 from simulator.battery.identity import Identity, celsius_to_kelvin, profile_for
 from simulator.battery.migrate import REPO_ROOT, migrate
@@ -508,6 +509,111 @@ def test_phase_rows_migrate_printed_components_and_refuse_mutations(tmp_path) ->
             if entry.observation_id and entry.observation_id.endswith(f"::{raw_id}")
         ]
         assert not any("lineage" in why for why in whys)
+
+
+def test_ppm_mass_row_is_stored_as_printed_and_a_foreign_basis_is_refused(
+    tmp_path,
+) -> None:
+    """2500 ppm stays 2500. The wt% scale is a separate function, not a twin."""
+
+    doc = _extract()
+    oxygen = _located(P_O2_PA, table="3", page=160)
+    doc["species"]["Ni"] = {
+        "observations": [
+            _observation(
+                "sample1-ni-ppm",
+                quantity="equilibrium_phase_composition",
+                phase_label="melt",
+                basis="ppm_mass",
+                amount_key="component_amount",
+                amount=2500,
+                table="3",
+                page=160,
+                conditions={"pO2_Pa": oxygen},
+            ),
+            _observation(
+                "reject-bare-ppm",
+                quantity="equilibrium_phase_composition",
+                phase_label="melt",
+                basis="ppm",
+                amount_key="component_amount",
+                amount=2500,
+                table="3",
+                page=160,
+                conditions={"pO2_Pa": oxygen},
+            ),
+        ]
+    }
+    root = _write_min_tree(tmp_path / "tree", doc)
+    result = migrate(root, write=False)
+    row = _row(result, "sample1-ni-ppm")
+    assert row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    assert row.identity.subtype.value == "ppm_mass"
+    assert row.value.point == Decimal("2500")
+    assert row.value.point != Decimal("0.25")
+    assert row.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    weight = _phase_identity(
+        "Ni", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT
+    )
+    ppm = _phase_identity(
+        "Ni",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="ppm_mass",
+    )
+    assert profile_for(ppm).required == profile_for(weight).required
+    emitted = {observation.observation_id for observation in result.observations.values()}
+    assert all(not observation_id.endswith("::reject-bare-ppm") for observation_id in emitted)
+    why = _queue_why(result, "reject-bare-ppm")
+    assert "basis is not " in why
+    assert "ppm_mass" in why
+    assert "wt_percent" in why
+    assert "mole_fraction" in why
+
+
+def test_ppm_mass_to_wt_percent_matches_the_part_scales() -> None:
+    """1 wt% is 1 part per 100; 1 ppm is 1 part per 1_000_000.
+
+    10_000 ppm is therefore 1 wt%, and 2500 ppm is 0.25 wt%. These
+    expected points are that scale, not a second copy of the divisor.
+    """
+
+    assert ppm_mass_to_wt_percent(Decimal("10000")) == Decimal("1")
+    assert ppm_mass_to_wt_percent(Decimal("2500")) == Decimal("0.25")
+    assert ppm_mass_to_wt_percent(Decimal("1")) == Decimal("0.0001")
+
+
+def test_ppm_mass_phase_row_is_refused_without_calling_the_assemblage(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def hook(*args, **kwargs):
+        raise AssertionError("phase assemblage must not be called")
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", hook
+    )
+    identity = _phase_identity(
+        "Ni",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="ppm_mass",
+    )
+    observation = F.observation(
+        "ni-ppm",
+        "sample-1",
+        identity,
+        Decimal("2500"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.value is None
+    assert prediction.refusal_detail["basis"] == "ppm_mass"
+    assert prediction.refusal_detail["engine_basis"] == "wt_percent"
+    assert "ppm_mass is not converted to wt%" in prediction.refusal_detail["detail"]
+    assert "mole_fraction" not in prediction.refusal_detail["detail"]
+    assert metric_operation_for_identity(identity) is MetricOperation.DEX
 
 
 def _bulk() -> Composition:
