@@ -480,6 +480,7 @@ def _install_thermoengine_transport_spy(monkeypatch, backend):
                 liquid_composition_wt_pct=dict(kwargs['comp_wt']),
                 activity_coefficients={'SiO2': 0.4},
                 solved_fO2_log=kwargs['fO2_log'],
+                solver_converged=True,
             )
 
         def close(self):
@@ -684,6 +685,7 @@ def test_liquidus_search_aggregates_commissioning_notice(monkeypatch) -> None:
             liquid_composition_wt_pct=dict(kwargs['comp_wt']),
             activity_coefficients={'SiO2': 0.4},
             solved_fO2_log=kwargs['fO2_log'],
+            solver_converged=True,
         )
 
     backend._thermoengine_transport.equilibrate = fake_equilibrate

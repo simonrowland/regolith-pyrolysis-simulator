@@ -481,6 +481,11 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 fO2_transport = 'thermoengine_intrinsic_undefined'
             else:
                 fO2_transport = 'thermoengine_intrinsic_closed'
+            status = (
+                'ok'
+                if payload.solver_converged and payload.phases_present
+                else 'not_converged'
+            )
             clamp_diagnostics.update({
                 'solved_fO2_log': solved_fO2_log,
                 'solved_fO2_reason': payload.solved_fO2_reason,
@@ -498,9 +503,8 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 'authoritative_for_requested_conditions': not bool(
                     clamp_diagnostics.get('operating_point_clamped')
                 ),
-                'authoritative_for_solved_conditions': True,
+                'authoritative_for_solved_conditions': status == 'ok',
             })
-            status = 'ok' if payload.phases_present else 'not_converged'
             gas_coordinate = solved_fO2_log
             reported_fO2_log = solved_fO2_log
             requested_fO2_log = None
