@@ -5240,8 +5240,10 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
         # pCa rows are unchanged. resolve_source_oxygen commands that printed
         # cell pO as fO2, so this residual slope is 2.33 dex per x(CaO).
         # 1.04 was the engine oxygen-balance slope while those columns were
-        # model_derived. b162 does not edit this extract. The paper prints
-        # the pressures, not this slope.
+        # model_derived. The committed sibling is still that class until
+        # regen; _context_for_sibling_oxygen scores the fresh migration
+        # then, and the store once it is quoted_attributed. b162 does not
+        # edit this extract. The paper prints the pressures, not this slope.
         (
             "stolyarova-1995",
             "stolyarova-1995-cao-alumina-kems",
@@ -5254,6 +5256,7 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
     ),
 )
 def test_e15_production_accumulator_pins_stolyarova_pca(
+    tmp_path: Path,
     source_token: str,
     source: str,
     series: str,
@@ -5266,6 +5269,13 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
     from simulator.battery.score import _ScorePayloadAccumulator
 
     context = load_score_context(sources=(source_token,))
+    if source == "stolyarova-1995-cao-alumina-kems":
+        context = _context_for_sibling_oxygen(
+            context,
+            tmp_path,
+            extract_name=f"{source}.yaml",
+            oxygen_id_contains="stolyarova_1995_o",
+        )
     residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
     payloads = [residual_to_plain(residual) for residual in residuals]
     aggregate = _ScorePayloadAccumulator.from_rows(
@@ -5283,6 +5293,75 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
     assert shape["x_axis"] == x_axis
     assert shape["n"] == expected_n
     assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == expected_slope
+
+
+def _series_stem(observation_id: str) -> str:
+    """Drop a trailing ``:h=<12 hex>`` extract-row hash."""
+    head, separator, tail = observation_id.rpartition(":h=")
+    if (
+        separator
+        and len(tail) == 12
+        and all(character in "0123456789abcdef" for character in tail)
+    ):
+        return head
+    return observation_id
+
+
+def _context_for_sibling_oxygen(
+    context: ScoreContext,
+    tmp_path: Path,
+    *,
+    extract_name: str,
+    oxygen_id_contains: str,
+) -> ScoreContext:
+    """Score the store, or a fresh migration when its oxygen is stale.
+
+    Quoted Table 2 oxygen is the regenerated sibling: return the store
+    context. ``model_derived`` is the committed sibling: migrate
+    ``extract_name`` and return those observations. A stale sibling does
+    not share observation ids, because ``:h=`` hashes the extract row
+    (stable_ids.py). The series stems, that suffix stripped, must match.
+    """
+    from simulator.battery.migrate import load_migrated_context
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    oxygen = tuple(
+        observation
+        for observation in context.observations.values()
+        if oxygen_id_contains in observation.observation_id
+        and isinstance(observation.identity, Identity)
+        and observation.identity.species is not None
+        and observation.identity.species.formula in {"O", "O2"}
+        and observation.evidence.class_.is_value
+    )
+    assert oxygen
+    oxygen_class = oxygen[0].evidence.class_.value
+    assert all(
+        observation.evidence.class_.value is oxygen_class for observation in oxygen
+    )
+    if oxygen_class is EvidenceClass.QUOTED_ATTRIBUTED:
+        return context
+    assert oxygen_class is EvidenceClass.MODEL_DERIVED
+    fresh = _migrate_real_extract(
+        tmp_path,
+        extract_name,
+        use_repository_index_row=True,
+    )
+    assert {_series_stem(observation_id) for observation_id in fresh.observations} == {
+        _series_stem(observation_id) for observation_id in context.observations
+    }
+    validation = validate_corpus(
+        context.works,
+        context.experiments,
+        fresh.observations,
+        benches=context.benches,
+        context_rows=load_migrated_context(context.root),
+    )
+    return replace(
+        context,
+        observations=dict(fresh.observations),
+        hard_issues_by_observation=validation.hard_issues_by_observation,
+    )
 
 
 def _assert_no_model_derived_e15_points(
@@ -5558,52 +5637,17 @@ def test_measured_no_rail_refusal_stays_in_accumulator_and_legacy_report() -> No
 
 def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> None:
     from simulator.battery import score as score_mod
-    from simulator.battery.migrate import load_migrated_context
-    from simulator.battery.validate import validate_corpus
-    from tests.battery.test_migrate import _migrate_real_extract
 
     source_id = "stolyarova-1996-cao-alumina-silica-kems"
     context = load_score_context(sources=(source_id,))
-    # t-1534 (742704443) is extract-only. The committed extracts-v2 sibling
-    # still labels Table 2 oxygen model_derived until the controller
-    # regenerates it. Score that migration here so the pin is the regen
-    # slope; once the sibling is quoted_attributed, score the store.
-    table2_oxygen = tuple(
-        observation
-        for observation in context.observations.values()
-        if "stolyarova_1996_table2_pO" in observation.observation_id
-        and isinstance(observation.identity, Identity)
-        and observation.identity.species is not None
-        and observation.identity.species.formula in {"O", "O2"}
-        and observation.evidence.class_.is_value
+    # t-1534 (742704443) is extract-only. The committed sibling still
+    # labels Table 2 oxygen model_derived until regen.
+    context = _context_for_sibling_oxygen(
+        context,
+        tmp_path,
+        extract_name=f"{source_id}.yaml",
+        oxygen_id_contains="stolyarova_1996_table2_pO",
     )
-    assert table2_oxygen
-    oxygen_class = table2_oxygen[0].evidence.class_.value
-    assert all(
-        observation.evidence.class_.value is oxygen_class
-        for observation in table2_oxygen
-    )
-    if oxygen_class is EvidenceClass.MODEL_DERIVED:
-        fresh = _migrate_real_extract(
-            tmp_path,
-            f"{source_id}.yaml",
-            use_repository_index_row=True,
-        )
-        assert set(fresh.observations) == set(context.observations)
-        validation = validate_corpus(
-            context.works,
-            context.experiments,
-            fresh.observations,
-            benches=context.benches,
-            context_rows=load_migrated_context(context.root),
-        )
-        context = replace(
-            context,
-            observations=dict(fresh.observations),
-            hard_issues_by_observation=validation.hard_issues_by_observation,
-        )
-    else:
-        assert oxygen_class is EvidenceClass.QUOTED_ATTRIBUTED
     residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
     selected = [
         (residual, point)
