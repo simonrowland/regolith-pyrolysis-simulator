@@ -67,6 +67,7 @@ from simulator.chemistry.kernel.dto import (
     IntentResult,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.composition_projection import PROJECTED_BULK_CLASSIFICATION_KEY
 from simulator.fe_redox import normalize_redox_state
 from simulator.melt_backend.base import (
     RealBackendAuthority,
@@ -398,6 +399,25 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         shadow_status = self._extract_status(shadow_result)
         skippable = {'unavailable', 'out_of_domain', 'unsupported'}
         if auth_status in skippable or shadow_status in skippable:
+            return None
+        if any(
+            isinstance(
+                classification, Mapping
+            )
+            and classification.get("dropped_components")
+            for diagnostic in (auth_diag, shadow_diag)
+            for backend_diagnostics in (
+                diagnostic.get("backend_diagnostics"),
+            )
+            for classification in (
+                diagnostic.get(PROJECTED_BULK_CLASSIFICATION_KEY),
+                (
+                    backend_diagnostics.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+                    if isinstance(backend_diagnostics, Mapping)
+                    else None
+                ),
+            )
+        ):
             return None
         return self._parity_comparator.compare(auth_diag, shadow_diag)
 

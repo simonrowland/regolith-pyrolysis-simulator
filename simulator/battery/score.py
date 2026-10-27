@@ -30,6 +30,7 @@ from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Sequence
 
 import yaml
 
+from simulator.composition_projection import PROJECTED_BULK_CLASSIFICATION_KEY
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
@@ -4911,17 +4912,53 @@ def cell_notices(
                 )
             )
         elif kind == "composition_projected":
+            classification = row.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+            components = (
+                [
+                    component
+                    for component in (classification.get("components") or ())
+                    if isinstance(component, Mapping)
+                    and component.get("component")
+                ]
+                if isinstance(classification, Mapping)
+                else []
+            )
+            dropped = tuple(
+                str(component["component"]) for component in components
+            ) or tuple(str(x) for x in (row.get("dropped") or ()))
+            reason = str(row.get("reason") or "composition projected")
+            if components:
+                component_details = []
+                for component in components:
+                    name = str(component["component"])
+                    wt_pct = component.get("wt_pct")
+                    mol_per_kg = component.get("mol")
+                    try:
+                        wt_text = f"{float(wt_pct):g} wt%"
+                    except (TypeError, ValueError, OverflowError):
+                        wt_text = "wt% unavailable"
+                    try:
+                        mol_text = f"{float(mol_per_kg):.12g} mol/kg"
+                    except (TypeError, ValueError, OverflowError):
+                        mol_text = "mol/kg unavailable"
+                    component_details.append(
+                        f"{name}={wt_text}, {mol_text}"
+                    )
+                reason += "; dropped components: " + "; ".join(
+                    component_details
+                )
+            mass_fraction = row.get("dropped_mass_fraction")
             notices.append(
                 Notice(
                     kind=NoticeKind.COMPOSITION_PROJECTED,
                     affected_quantities=(quantity,),
-                    reason=str(row.get("reason") or "composition projected"),
+                    reason=reason,
                     origin=f"engine:{engine.value}",
-                    dropped=tuple(str(x) for x in (row.get("dropped") or ())),
+                    dropped=dropped,
                     dropped_mass_fraction=(
                         None
-                        if row.get("dropped_mass_fraction") is None
-                        else as_decimal(row["dropped_mass_fraction"])
+                        if mass_fraction is None
+                        else as_decimal(mass_fraction)
                     ),
                 )
             )

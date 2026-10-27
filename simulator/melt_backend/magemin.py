@@ -1618,13 +1618,20 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         except MeltCompositionError as exc:
             message = f'MAGEMin bulk projection failed: {exc}'
             self._last_error = message
+            diagnostics = dict(projection_diagnostics)
+            if str(exc).startswith(
+                f'{OutOfDomainReason.FORBIDDEN_SPECIES.value}:'
+            ):
+                diagnostics['backend_status_reason'] = (
+                    OutOfDomainReason.FORBIDDEN_SPECIES.value
+                )
             return EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 status='out_of_domain',
                 warnings=[*prior_warnings, message],
-                diagnostics=projection_diagnostics,
+                diagnostics=diagnostics,
             )
 
         projection_classification = _classify_projected_bulk_from_source(
@@ -3357,6 +3364,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             component for component, value in source.items()
             if component not in order_set and value > 0.0
         )
+        if 'S' in dropped:
+            raise MeltCompositionError(
+                f'{OutOfDomainReason.FORBIDDEN_SPECIES.value}: S'
+            )
         if not projected:
             detail = f'; dropped: {", ".join(dropped)}' if dropped else ''
             raise MeltCompositionError(

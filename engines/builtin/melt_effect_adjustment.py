@@ -19,6 +19,9 @@ from engines.alphamelts.domain import (
     _is_non_oxide_species_name,
 )
 from engines.magemin.domain import MAGEMinDomainGate
+from simulator.composition_projection import (
+    PROJECTED_BULK_CLASSIFICATION_KEY,
+)
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
@@ -2088,6 +2091,18 @@ def build_harness_verdicts(
             "step_resolved": list(verdict_a.step_resolved),
         },
         "verdict_b": {
+            **{
+                key: (
+                    dict(diag[key])
+                    if isinstance(diag[key], Mapping)
+                    else diag[key]
+                )
+                for key in (
+                    PROJECTED_BULK_CLASSIFICATION_KEY,
+                    "composition_projected_notice",
+                )
+                if key in diag
+            },
             "backend_status": verdict_b.backend_status,
             "backend_status_reason": verdict_b.backend_status_reason,
             "layer_a_state": verdict_b.layer_a_state,

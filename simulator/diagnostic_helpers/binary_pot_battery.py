@@ -1039,6 +1039,40 @@ def _plain_data(value: Any) -> Any:
     return value
 
 
+def _projected_bulk_cell_notice(
+    classification: Mapping[str, Any],
+    *,
+    reason: str,
+    dropped_mass_fraction: float | None = None,
+    base_notice: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Serialize the shared projection record into a battery cell notice."""
+    row = _plain_data(base_notice) if isinstance(base_notice, Mapping) else {}
+    projection = _plain_data(classification)
+    components = [
+        dict(component)
+        for component in (projection.get("components") or ())
+        if isinstance(component, Mapping) and component.get("component")
+    ]
+    dropped = [str(component["component"]) for component in components]
+    row.update(
+        {
+            "kind": NoticeKind.COMPOSITION_PROJECTED.value,
+            "reason": str(row.get("reason") or reason),
+            "authority": row.get("authority") or AUTHORITY_EXTRAPOLATED,
+            PROJECTED_BULK_CLASSIFICATION_KEY: projection,
+            "dropped_components": components,
+            "dropped": dropped,
+            "dropped_mass_fraction": (
+                dropped_mass_fraction
+                if dropped_mass_fraction is not None
+                else row.get("dropped_mass_fraction")
+            ),
+        }
+    )
+    return row
+
+
 def engine_flags_from_result(
     result: Any,
 ) -> tuple[list[dict[str, Any]], str | None, dict[str, Any] | None]:
@@ -1107,6 +1141,34 @@ def engine_flags_from_result(
                     "reason": warning,
                 }
             )
+    projection_classification = diagnostics.get(
+        PROJECTED_BULK_CLASSIFICATION_KEY
+    )
+    input_projection = diagnostics.get("input_composition_projection")
+    if (
+        isinstance(projection_classification, Mapping)
+        and projection_classification.get("components")
+        and isinstance(input_projection, Mapping)
+        and str(input_projection.get("backend") or "").lower() == "magemin"
+    ):
+        if not any(
+            isinstance(row, Mapping)
+            and row.get("kind") == NoticeKind.COMPOSITION_PROJECTED.value
+            and PROJECTED_BULK_CLASSIFICATION_KEY in row
+            for row in notices
+        ):
+            notices.append(
+                _projected_bulk_cell_notice(
+                    projection_classification,
+                    reason="MAGEMin solved projected composition",
+                    dropped_mass_fraction=(
+                        finite_float(input_projection.get("dropped_mass_fraction"))
+                    ),
+                    base_notice=diagnostics.get("composition_projected_notice"),
+                )
+            )
+        if authority is None:
+            authority = AUTHORITY_EXTRAPOLATED
     return notices, authority, certified_band
 
 
@@ -1320,23 +1382,31 @@ def _composition_projected_notice(
     MAGEMin bulk, including in-basis solves.
     """
 
+    input_projection = diagnostics.get("input_composition_projection")
     classification = diagnostics.get(PROJECTED_BULK_CLASSIFICATION_KEY)
-    if isinstance(classification, Mapping):
+    if (
+        isinstance(classification, Mapping)
+        and isinstance(input_projection, Mapping)
+        and str(input_projection.get("backend") or "").lower() == "magemin"
+    ):
         dropped = [
             str(name)
             for name in (classification.get("dropped_components") or ())
         ]
-        total_wt_pct = finite_float(classification.get("dropped_total_wt_pct"))
+        fraction = (
+            finite_float(input_projection.get("dropped_mass_fraction"))
+            if isinstance(input_projection, Mapping)
+            else None
+        )
         if dropped:
             return {
                 "dropped_components": dropped,
-                "dropped_mass_fraction": (
-                    None if total_wt_pct is None else total_wt_pct / 100.0
-                ),
+                "dropped_mass_fraction": fraction,
+                "projection_verdict": classification.get("projection_verdict"),
             }
 
     structured = str(diagnostics.get("backend_status_reason") or "")
-    projection = diagnostics.get("input_composition_projection")
+    projection = input_projection
     notice: Mapping[str, Any] | None = None
     if isinstance(projection, Mapping):
         raw = projection.get(REFUSAL_COMPOSITION_PROJECTED)
@@ -1377,6 +1447,7 @@ def _composition_projected_notice(
     return {
         "dropped_components": dropped,
         "dropped_mass_fraction": fraction_number,
+        "projection_verdict": None,
     }
 
 
@@ -1460,7 +1531,10 @@ def classify_equilibrate_outcome(
     ):
         return "refusal", REFUSAL_ENGINE_CRASH, engine_reason
     projected = _composition_projected_notice(diagnostics)
-    if projected is not None:
+    if (
+        projected is not None
+        and projected.get("projection_verdict") != "within_threshold"
+    ):
         return (
             "refusal",
             REFUSAL_COMPOSITION_PROJECTED,
@@ -1561,6 +1635,29 @@ def reclassify_projected_composition_cells(
             classification.dropped_components,
             fraction,
         )
+        notice = _projected_bulk_cell_notice(
+            classification.as_diagnostics(),
+            reason=note,
+            dropped_mass_fraction=fraction,
+        )
+        notices = list(cell.notices)
+        if not any(
+            isinstance(row, Mapping)
+            and row.get("kind") == NoticeKind.COMPOSITION_PROJECTED.value
+            and row.get(PROJECTED_BULK_CLASSIFICATION_KEY)
+            == notice[PROJECTED_BULK_CLASSIFICATION_KEY]
+            for row in notices
+        ):
+            notices.append(notice)
+        if classification.within_threshold:
+            rewritten.append(
+                replace(
+                    cell,
+                    notices=notices,
+                    authority=cell.authority or AUTHORITY_EXTRAPOLATED,
+                )
+            )
+            continue
         rewritten.append(
             replace(
                 cell,
@@ -1568,6 +1665,7 @@ def reclassify_projected_composition_cells(
                 refusal_reason=REFUSAL_COMPOSITION_PROJECTED,
                 engine_status="out_of_domain",
                 engine_reason=note,
+                notices=notices,
                 melt_activities={},
                 melt_activity_coefficients={},
                 gas_partial_pressures_Pa={},
