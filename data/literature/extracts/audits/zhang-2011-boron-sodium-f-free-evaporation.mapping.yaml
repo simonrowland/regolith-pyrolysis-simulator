@@ -1,6 +1,7 @@
 source_id: zhang-2011-boron-sodium-f-free-evaporation
 source_locator_basis: absolute_pdf_page
-machine_text: corpus_text_pdftotext_layout
+machine_text: pdftotext-layout.txt (born-digital exact text layer)
+table_tool_method: 'table tool unavailable: born-digital, pdftotext + image audit'
 mineru_input:
   expected_text_path: text/zhang-2011-boron-sodium-f-free-evaporation/mineru
   expected_raw_path: raw/zhang-2011-boron-sodium-f-free-evaporation/ocr-mineru
@@ -10,38 +11,56 @@ tables:
     page: 2
     caption: Chemical compositions of the designed slag specimens (mass%).
     required_columns: [Brand, CaO, SiO2, Al2O3, Na2O, B2O3, TiO2]
+    mapping: species.slag.context[zhang_2011_designed_slag_compositions_table1].values.table_1_rows[].composition_wt_pct
+    printed_body_rows: 6
+    printed_numeric_cells: 30
     render_verified: true
-    render_reason: MinerU content-list and pdftotext table cells unavailable; checked against page render.
+    render_reason: Table cells absent from pdftotext; hand-transcribed and every numeric cell checked against page render.
   - table: '2'
     page: 2
     caption: Chemical compositions of post-measured slag (mass%).
     required_columns: [Brand, CaO, SiO2, Al2O3, Na2O, B2O3, TiO2]
+    mapping: species.slag.context[zhang_2011_analyzed_slag_compositions_table2].values.table_2_rows[].composition_wt_pct and per-row identity composition for Table 6
+    printed_body_rows: 6
+    printed_numeric_cells: 30
     render_verified: true
-    render_reason: MinerU content-list and pdftotext table cells unavailable; checked against page render.
+    render_reason: Table cells absent from pdftotext; hand-transcribed and every numeric cell checked against page render.
   - table: '3'
     page: 7
     caption: Summary of values of epsilon/k and sigma for different gaseous species.
     required_columns: [Gaseous_Species, epsilon_over_k_K, sigma_A, molecular_weight_g_per_mol, molecular_volume_cm3_per_mol]
+    mapping: species.slag.context[zhang_2011_calculation_tables_3_to_5].values.table_3
+    printed_body_rows: 4
+    printed_numeric_cells: 12
     render_verified: true
-    render_reason: MinerU content-list and pdftotext table cells unavailable; checked against page render.
+    render_reason: Table cells absent from pdftotext; hand-transcribed and every numeric cell checked against page render.
   - table: '4'
     page: 7
     caption: Estimated diffusion coefficient of gaseous species in Ar gas (10^-4 m2/s).
     required_columns: [Item, 1300_C, 1350_C, 1400_C]
+    mapping: species.slag.context[zhang_2011_calculation_tables_3_to_5].values.table_4
+    printed_body_rows: 2
+    printed_numeric_cells: 6
     render_verified: true
-    render_reason: MinerU content-list and pdftotext table cells unavailable; checked against page render.
+    render_reason: Table cells absent from pdftotext; hand-transcribed and every numeric cell checked against page render.
   - table: '5'
     page: 7
     caption: Calculated vapor pressure of NaBO2 and B2O3 (Pa).
     required_columns: [Vapor_pressure, 1300_C, 1350_C, 1400_C]
+    mapping: species.slag.context[zhang_2011_calculation_tables_3_to_5].values.table_5
+    printed_body_rows: 2
+    printed_numeric_cells: 6
     render_verified: true
-    render_reason: MinerU content-list and pdftotext table cells unavailable; checked against page render.
+    render_reason: Table cells absent from pdftotext; hand-transcribed and every numeric cell checked against page render.
   - table: '6'
     page: 8
     caption: A comparison of estimated and measured evaporation rates.
     required_columns: [Temp_C, CS-3, CS-3_plus_ZrO2, CS-4, estimated]
+    mapping: species.slag.observations[].values.mass_loss_rate for measured columns; species.slag.context[zhang_2011_table6_estimated_gas_film_flux].values.values_as_printed for estimated column
+    printed_body_rows: 3
+    printed_numeric_cells: 15
     render_verified: true
-    render_reason: MinerU content-list and pdftotext table cells unavailable; checked against page render.
+    render_reason: Table cells absent from pdftotext; hand-transcribed and every numeric cell checked against page render.
 expected_table_counts:
   table_1_body_rows: 6
   table_2_body_rows: 6
@@ -50,6 +69,10 @@ expected_table_counts:
   table_5_body_rows: 2
   table_6_body_rows: 3
 table_tool_status:
-  convert: unavailable_without_mineru_content_lists
-  emit: unavailable_without_mineru_content_lists
-  compare: pending_mineru_index
+  convert: unavailable_no_mineru_by_design
+  emit: unavailable_no_mineru_by_design
+  compare: replaced_by_full_cell_text_render_audit
+  render_audit: data/literature/extracts/audits/zhang-2011-boron-sodium-f-free-evaporation.cells.csv
+  compare_output: data/literature/extracts/audits/zhang-2011-boron-sodium-f-free-evaporation.compare.txt
+  printed_numeric_cells_audited: 99
+  audit_result: all_matches
