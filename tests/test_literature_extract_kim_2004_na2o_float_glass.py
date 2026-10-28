@@ -6,24 +6,52 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity, StateTag, ValueKind
+from simulator.battery.enums import Quantity, ValueKind
 from tests.battery.factories import migrate_one_extract
+from tools.validate_literature_extracts import validate_extract_file
 
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/kim-2004-na2o-float-glass-emf.yaml"
 
+EXPECTED_ACTIVITY = {
+    "kim_2004_table2_silicate_1268": ("6.745e-10", 3, "2"),
+    "kim_2004_table2_silicate_1272": ("8.762e-10", 3, "2"),
+    "kim_2004_table2_silicate_1300": ("1.028e-9", 3, "2"),
+    "kim_2004_table2_silicate_1307": ("9.898e-10", 3, "2"),
+    "kim_2004_table2_silicate_1325": ("1.286e-9", 3, "2"),
+    "kim_2004_table2_silicate_1341": ("1.385e-9", 3, "2"),
+    "kim_2004_table2_silicate_1348": ("1.548e-9", 3, "2"),
+    "kim_2004_table2_silicate_1373": ("1.931e-9", 3, "2"),
+    "kim_2004_table2_silicate_1375": ("1.834e-9", 3, "2"),
+    "kim_2004_table3_glass_1296": ("1.76e-11", 4, "3"),
+    "kim_2004_table3_glass_1296_lowering": ("1.81e-11", 4, "3"),
+    "kim_2004_table3_glass_1302": ("1.81e-11", 4, "3"),
+    "kim_2004_table3_glass_1325": ("2.21e-11", 4, "3"),
+    "kim_2004_table3_glass_1325_lowering": ("2.27e-11", 4, "3"),
+    "kim_2004_table3_glass_1333": ("2.38e-11", 4, "3"),
+    "kim_2004_table3_glass_1348": ("2.69e-11", 4, "3"),
+    "kim_2004_table3_glass_1348_lowering": ("2.86e-11", 4, "3"),
+    "kim_2004_table3_glass_1354": ("2.80e-11", 4, "3"),
+    "kim_2004_table3_glass_1365": ("3.10e-11", 4, "3"),
+    "kim_2004_table3_glass_1365_lowering": ("3.14e-11", 4, "3"),
+    "kim_2004_table3_glass_1370": ("3.19e-11", 4, "3"),
+}
+
 
 def _assert_kim_2004_pins(document: dict) -> None:
     rows = {
-        row["observation_id"]: row["values"]["points"][0]
+        row["observation_id"]: row
         for row in document["species"]["Na2O"]["observations"]
         if row["values"].get("quantity") == "activity"
     }
-    assert len(rows) == 21
-    assert rows["kim_2004_table2_silicate_1268"]["activity"] == "6.745e-10"
-    assert rows["kim_2004_table3_glass_1296"]["activity"] == "1.76e-11"
-    assert rows["kim_2004_table3_glass_1370"]["activity"] == "3.19e-11"
+    assert len(rows) == len(EXPECTED_ACTIVITY) == 21
+    for observation_id, (activity, page, table) in EXPECTED_ACTIVITY.items():
+        row = rows[observation_id]
+        point = row["values"]["points"][0]
+        assert point["activity"] == activity
+        assert row["locator"]["page"] == page
+        assert row["locator"]["table"] == table
 
 
 def test_kim_2004_tables_migrate_with_render_pins_and_bound_conditions() -> None:
@@ -37,6 +65,10 @@ def test_kim_2004_tables_migrate_with_render_pins_and_bound_conditions() -> None
         pass
     else:
         raise AssertionError("a changed render-pinned activity did not fail")
+
+    validation_errors = validate_extract_file(EXTRACT)
+    assert len(validation_errors) == 21
+    assert all("got 'electromotive_force'" in error for error in validation_errors)
 
     migrator = migrate_one_extract(ROOT, EXTRACT)
     migrator.finalize()
@@ -72,6 +104,7 @@ def test_kim_2004_tables_migrate_with_render_pins_and_bound_conditions() -> None
         assert row.identity.total_pressure_Pa.value == Decimal("101325")
         assert row.identity.fO2_Pa.is_value
         assert row.identity.fO2_Pa.value == Decimal("101325")
+        assert row.identity.reference_state.is_unknown
         assert row.point_conditions["fO2_Pa"].state.value == Decimal("101325")
 
     binary = by_id["kim_2004_table2_silicate_1268"]
@@ -80,7 +113,18 @@ def test_kim_2004_tables_migrate_with_render_pins_and_bound_conditions() -> None
         "SiO2": Decimal("0.657"), "Na2O": Decimal("0.343")
     }
     glass = by_id["kim_2004_table3_glass_1296"]
-    assert glass.identity.composition.tag is StateTag.UNKNOWN
+    assert glass.identity.composition.is_value
+    assert dict(glass.identity.composition.value.components) == {
+        "SiO2": Decimal("0.70175"),
+        "Na2O": Decimal("0.13190"),
+        "CaO": Decimal("0.10046"),
+        "MgO": Decimal("0.05852"),
+        "Al2O3": Decimal("0.00319"),
+        "SO2": Decimal("0.00242"),
+        "Fe2O3": Decimal("0.00035"),
+        "Cl": Decimal("0.00106"),
+        "TiO2": Decimal("0.00035"),
+    }
     table1 = migrator.result.context_by_work
     rows = next(iter(table1.values()))[0]["values"]["rows_as_printed"]
     assert len(rows) == 9

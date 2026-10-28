@@ -11,10 +11,9 @@ extraction:
     audited against the renders.
   date: '2026-10-27'
   worker: w1027na3-kim04
-  note: Table 1 lists float-glass composition in m/o, including SO2 and Cl exactly as printed. Cl has no composition
-    component token; its full printed vector is retained in table context and Table 3 composition conditions remain
-    unknown rather than dropping Cl or renormalizing. Table 2 is the binary cell-reliability check. Table 3 is the
-    float-glass data.
+  note: Table 1 lists the float-glass composition in m/o. Its nine printed components, including SO2 and Cl, are
+    bound to each Table 3 activity point as mole fractions by dividing the printed m/o by 100, without renormalizing.
+    Table 2 is the binary cell-reliability check. Table 3 is the float-glass data.
 review_status: draft
 fidelity_samples:
 - path: species.Na2O.observations[kim_2004_table2_silicate_1268].values.points[0].activity
@@ -241,8 +240,7 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -341,8 +339,7 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -441,8 +438,7 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -541,8 +537,7 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -641,8 +636,7 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -741,8 +735,7 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -841,8 +834,7 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -941,8 +933,7 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1041,8 +1032,7 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1134,8 +1124,7 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1175,6 +1164,16 @@ species:
             fO2_Pa: *id006
           locator: *id044
           phase: null
+          composition_mol:
+            SiO2: '0.70175'
+            Na2O: '0.13190'
+            CaO: '0.10046'
+            MgO: '0.05852'
+            Al2O3: '0.00319'
+            SO2: '0.00242'
+            Fe2O3: '0.00035'
+            Cl: '0.00106'
+            TiO2: '0.00035'
           oxygen_partial_pressure:
             value: '1'
             units: atm
@@ -1234,8 +1233,7 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1276,6 +1274,16 @@ species:
             fO2_Pa: *id006
           locator: *id048
           phase: null
+          composition_mol:
+            SiO2: '0.70175'
+            Na2O: '0.13190'
+            CaO: '0.10046'
+            MgO: '0.05852'
+            Al2O3: '0.00319'
+            SO2: '0.00242'
+            Fe2O3: '0.00035'
+            Cl: '0.00106'
+            TiO2: '0.00035'
           oxygen_partial_pressure:
             value: '1'
             units: atm
@@ -1335,8 +1343,7 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1376,6 +1383,16 @@ species:
             fO2_Pa: *id006
           locator: *id052
           phase: null
+          composition_mol:
+            SiO2: '0.70175'
+            Na2O: '0.13190'
+            CaO: '0.10046'
+            MgO: '0.05852'
+            Al2O3: '0.00319'
+            SO2: '0.00242'
+            Fe2O3: '0.00035'
+            Cl: '0.00106'
+            TiO2: '0.00035'
           oxygen_partial_pressure:
             value: '1'
             units: atm
@@ -1435,8 +1452,7 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1476,6 +1492,16 @@ species:
             fO2_Pa: *id006
           locator: *id056
           phase: null
+          composition_mol:
+            SiO2: '0.70175'
+            Na2O: '0.13190'
+            CaO: '0.10046'
+            MgO: '0.05852'
+            Al2O3: '0.00319'
+            SO2: '0.00242'
+            Fe2O3: '0.00035'
+            Cl: '0.00106'
+            TiO2: '0.00035'
           oxygen_partial_pressure:
             value: '1'
             units: atm
@@ -1535,8 +1561,7 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1577,6 +1602,16 @@ species:
             fO2_Pa: *id006
           locator: *id060
           phase: null
+          composition_mol:
+            SiO2: '0.70175'
+            Na2O: '0.13190'
+            CaO: '0.10046'
+            MgO: '0.05852'
+            Al2O3: '0.00319'
+            SO2: '0.00242'
+            Fe2O3: '0.00035'
+            Cl: '0.00106'
+            TiO2: '0.00035'
           oxygen_partial_pressure:
             value: '1'
             units: atm
@@ -1636,8 +1671,7 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1677,6 +1711,16 @@ species:
             fO2_Pa: *id006
           locator: *id064
           phase: null
+          composition_mol:
+            SiO2: '0.70175'
+            Na2O: '0.13190'
+            CaO: '0.10046'
+            MgO: '0.05852'
+            Al2O3: '0.00319'
+            SO2: '0.00242'
+            Fe2O3: '0.00035'
+            Cl: '0.00106'
+            TiO2: '0.00035'
           oxygen_partial_pressure:
             value: '1'
             units: atm
@@ -1736,8 +1780,7 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1777,6 +1820,16 @@ species:
             fO2_Pa: *id006
           locator: *id068
           phase: null
+          composition_mol:
+            SiO2: '0.70175'
+            Na2O: '0.13190'
+            CaO: '0.10046'
+            MgO: '0.05852'
+            Al2O3: '0.00319'
+            SO2: '0.00242'
+            Fe2O3: '0.00035'
+            Cl: '0.00106'
+            TiO2: '0.00035'
           oxygen_partial_pressure:
             value: '1'
             units: atm
@@ -1836,8 +1889,7 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1878,6 +1930,16 @@ species:
             fO2_Pa: *id006
           locator: *id072
           phase: null
+          composition_mol:
+            SiO2: '0.70175'
+            Na2O: '0.13190'
+            CaO: '0.10046'
+            MgO: '0.05852'
+            Al2O3: '0.00319'
+            SO2: '0.00242'
+            Fe2O3: '0.00035'
+            Cl: '0.00106'
+            TiO2: '0.00035'
           oxygen_partial_pressure:
             value: '1'
             units: atm
@@ -1937,8 +1999,7 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1978,6 +2039,16 @@ species:
             fO2_Pa: *id006
           locator: *id076
           phase: null
+          composition_mol:
+            SiO2: '0.70175'
+            Na2O: '0.13190'
+            CaO: '0.10046'
+            MgO: '0.05852'
+            Al2O3: '0.00319'
+            SO2: '0.00242'
+            Fe2O3: '0.00035'
+            Cl: '0.00106'
+            TiO2: '0.00035'
           oxygen_partial_pressure:
             value: '1'
             units: atm
@@ -2037,8 +2108,7 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -2078,6 +2148,16 @@ species:
             fO2_Pa: *id006
           locator: *id080
           phase: null
+          composition_mol:
+            SiO2: '0.70175'
+            Na2O: '0.13190'
+            CaO: '0.10046'
+            MgO: '0.05852'
+            Al2O3: '0.00319'
+            SO2: '0.00242'
+            Fe2O3: '0.00035'
+            Cl: '0.00106'
+            TiO2: '0.00035'
           oxygen_partial_pressure:
             value: '1'
             units: atm
@@ -2137,8 +2217,7 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -2179,6 +2258,16 @@ species:
             fO2_Pa: *id006
           locator: *id084
           phase: null
+          composition_mol:
+            SiO2: '0.70175'
+            Na2O: '0.13190'
+            CaO: '0.10046'
+            MgO: '0.05852'
+            Al2O3: '0.00319'
+            SO2: '0.00242'
+            Fe2O3: '0.00035'
+            Cl: '0.00106'
+            TiO2: '0.00035'
           oxygen_partial_pressure:
             value: '1'
             units: atm
@@ -2238,8 +2327,7 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: Na2O activity on the scale calibrated to Na2O dissolved in the Na2O–WO3 reference melt; the
-        reference-melt relation is attributed to Lin and Elliott [15].
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -2279,6 +2367,16 @@ species:
             fO2_Pa: *id006
           locator: *id088
           phase: null
+          composition_mol:
+            SiO2: '0.70175'
+            Na2O: '0.13190'
+            CaO: '0.10046'
+            MgO: '0.05852'
+            Al2O3: '0.00319'
+            SO2: '0.00242'
+            Fe2O3: '0.00035'
+            Cl: '0.00106'
+            TiO2: '0.00035'
           oxygen_partial_pressure:
             value: '1'
             units: atm
