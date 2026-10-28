@@ -208,6 +208,11 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "gibbsite": Polymorph.GIBBSITE,
     "kaolinite": Polymorph.KAOLINITE,
     "pyrophyllite": Polymorph.PYROPHYLLITE,
+    "aragonite": Polymorph.ARAGONITE,
+    "low kaliophillite": Polymorph.KALIOPHILLITE_LOW,
+    "kaliophillite low": Polymorph.KALIOPHILLITE_LOW,
+    "high kaliophillite": Polymorph.KALIOPHILLITE_HIGH,
+    "kaliophillite high": Polymorph.KALIOPHILLITE_HIGH,
     "anorthite": Polymorph.ANORTHITE,
     "gehlenite": Polymorph.GEHLENITE,
     "grossular": Polymorph.GROSSULAR,
@@ -241,6 +246,9 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
 # CaMgSi2O6; the other labels have one formula here.
 POLYMORPH_FORMULAS: dict[Polymorph, frozenset[str]] = {
     Polymorph.CLINOENSTATITE: frozenset({"MgSiO3"}),
+    Polymorph.ARAGONITE: frozenset({"CaCO3"}),
+    Polymorph.KALIOPHILLITE_LOW: frozenset({"KAlSiO4"}),
+    Polymorph.KALIOPHILLITE_HIGH: frozenset({"KAlSiO4"}),
     Polymorph.DIOPSIDE: frozenset({"CaMgSi2O6", "CaMg(SiO3)2"}),
     Polymorph.ALBITE_HIGH: frozenset({"NaAlSi3O8"}),
     Polymorph.SANIDINE_HIGH: frozenset({"KAlSi3O8"}),
@@ -291,6 +299,15 @@ NAMED_POLYMORPH_FORMULAS: dict[str, frozenset[str]] = {
 NAMED_POLYMORPH_FORMULAS["alpha_quartz"] = frozenset({"SiO2"})
 NAMED_POLYMORPH_FORMULAS["alpha-quartz"] = frozenset({"SiO2"})
 NAMED_POLYMORPH_FORMULAS["tridymite"] = frozenset({"SiO2"})
+NAMED_POLYMORPH_FORMULAS.update(
+    {
+        "aragonite": POLYMORPH_FORMULAS[Polymorph.ARAGONITE],
+        "low kaliophillite": POLYMORPH_FORMULAS[Polymorph.KALIOPHILLITE_LOW],
+        "kaliophillite low": POLYMORPH_FORMULAS[Polymorph.KALIOPHILLITE_LOW],
+        "high kaliophillite": POLYMORPH_FORMULAS[Polymorph.KALIOPHILLITE_HIGH],
+        "kaliophillite high": POLYMORPH_FORMULAS[Polymorph.KALIOPHILLITE_HIGH],
+    }
+)
 
 
 def classify_printed_qualifier(qualifier: str | None) -> PrintedQualifierKind:
