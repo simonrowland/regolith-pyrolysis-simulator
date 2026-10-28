@@ -1955,6 +1955,8 @@ freeze_gate:
 # to fail-loud on. Engine policy stays strict; this section makes operational
 # overrides explicit + auditable in one place.
 chemistry_kernel:
+  # Fixed run input: analytical explicitly selects the qualified Kress91 floor.
+  liquid_fraction_provider: magemin
   # V1e-impl TIER-3 fail-loud (engine policy: refuse if a species without
   # measured evaporation_alpha is sampled). Cr, CrO2, and Mn currently lack
   # measured α in the literature (audit artifacts:

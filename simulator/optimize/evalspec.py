@@ -36,7 +36,10 @@ from simulator.optimize.canonical import (
     canonical_json_dumps,
     normalize_canonical_value,
 )
-from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
+from simulator.chemistry.kernel.config import (
+    DEFAULT_LIQUID_FRACTION_PROVIDER,
+    normalize_chemistry_kernel_config,
+)
 from simulator.corpus_version import current_corpus_version
 from simulator.optimize.recipe import (
     allowlist_version as DEFAULT_ALLOWLIST_VERSION,
@@ -639,6 +642,9 @@ def _cost_parameters_key_payload(
 
 def _chemistry_kernel_key_payload(kernel: Mapping[str, Any]) -> Mapping[str, Any]:
     payload = dict(kernel)
+    payload.setdefault(
+        'liquid_fraction_provider', DEFAULT_LIQUID_FRACTION_PROVIDER,
+    )
     payload.pop("allow_fallback_vapor", None)
     payload.pop("force_builtin_vapor_pressure", None)
     if payload.get("allow_unmeasured_alpha_fallback") is False:

@@ -41,7 +41,7 @@ from __future__ import annotations
 
 import json
 import re
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from dataclasses import dataclass, fields, is_dataclass
 from decimal import Decimal, InvalidOperation
 from enum import Enum
@@ -2519,22 +2519,28 @@ def validate_corpus(
                 " → ".join(cycle),
             )
         )
-    for residual in res_items:
-        reference = obs_map.get(residual.reference)
-        issues.extend(
-            validate_residual(
-                residual,
-                obs_map,
-                exp_map,
-                work_map,
-                f"residual[{residual.key}]",
-                point_observations=(
-                    ()
-                    if reference is None
-                    else point_observations_by_experiment.get(
-                        reference.experiment_id, ()
-                    )
-                ),
+    lineage_scope = (
+        bound_work_inputs(work_map, obs_map, exp_map)
+        if any(residual.score_eligible for residual in res_items)
+        else nullcontext()
+    )
+    with lineage_scope:
+        for residual in res_items:
+            reference = obs_map.get(residual.reference)
+            issues.extend(
+                validate_residual(
+                    residual,
+                    obs_map,
+                    exp_map,
+                    work_map,
+                    f"residual[{residual.key}]",
+                    point_observations=(
+                        ()
+                        if reference is None
+                        else point_observations_by_experiment.get(
+                            reference.experiment_id, ()
+                        )
+                    ),
+                )
             )
-        )
     return ValidationReport(tuple(issues))
