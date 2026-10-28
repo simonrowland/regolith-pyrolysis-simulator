@@ -1196,6 +1196,7 @@ def _declared_float(value: Any, name: str) -> float:
 class _LiquidusFinderBudgetExceeded(TimeoutError):
     """Hard wall expiry that refuses the liquidus run instead of branching."""
 
+    terminal_refusal = True
     reason_code = "engine_compute_timeout"
 
     def __init__(
