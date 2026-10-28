@@ -1524,6 +1524,32 @@ def test_mass_percent_nonclosing_map_keeps_existing_conversion_behavior() -> Non
     )
 
 
+def test_b704_nonclosing_mass_percent_stays_printed_and_refuses_engine_composition() -> None:
+    sample = _sample_from_plain(
+        {
+            "initial_composition": {
+                "locator": {"table": "1"},
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "basis": "printed_oxides",
+                        "amount_basis": "mass_percent",
+                        "components": [["SiO2", "45"], ["MgO", "45"]],
+                    },
+                },
+            }
+        }
+    )
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == {"SiO2": "45", "MgO": "45"}
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+    assert sample.initial_composition.state.reason == (
+        "mass-percent composition is not usable: mass-percent composition does not close to 100 (sum=90)"
+    )
+
+
 def test_mole_percent_composition_converts_to_mole_fraction() -> None:
     composition = migrate_module._composition_located_from_plain(
         {
