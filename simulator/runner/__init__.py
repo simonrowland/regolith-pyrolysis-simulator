@@ -6414,8 +6414,8 @@ def main_sio_yield(argv: Optional[list[str]] = None) -> int:
                 args.allow_unmeasured_alpha_fallback
             ),
         )
-    except RunnerError as exc:
-        parser.error(str(exc))
+    except RunnerError:
+        raise
     if args.lab_oxygen_diagnostics_output:
         report, diagnostics = result
         diagnostics_path = Path(args.lab_oxygen_diagnostics_output)
@@ -6548,8 +6548,8 @@ def main_sio_tsweep(argv: Optional[list[str]] = None) -> int:
                 args.allow_unmeasured_alpha_fallback
             ),
         )
-    except RunnerError as exc:
-        parser.error(str(exc))
+    except RunnerError:
+        raise
 
     if args.report_output:
         report_path = Path(args.report_output)
@@ -6676,8 +6676,8 @@ def main_sio_wall_sweep(argv: Optional[list[str]] = None) -> int:
                 args.allow_unmeasured_alpha_fallback
             ),
         )
-    except RunnerError as exc:
-        parser.error(str(exc))
+    except RunnerError:
+        raise
 
     if args.report_output:
         report_path = Path(args.report_output)
