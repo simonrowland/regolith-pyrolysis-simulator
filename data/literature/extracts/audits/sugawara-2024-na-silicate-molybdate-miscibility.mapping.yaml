@@ -18,11 +18,13 @@ tables:
     printed_title: Phase proportion and chemical composition of phase-separated silicate liquid and molybdate liquid
     content_list_table: p004-t02
     printed_rows: 8
-    disposition: context
+    disposition: observations_and_context
     context_kind: composition
-    method_class: measured_direct
     columns_as_printed: [Sample, 'Temperature/°C', 'SL mass%', 'ML mass%', 'Qtz mass%', 'Na2O loss mass%', 'SiO2 mol% SL then ML', 'Na2O mol% SL then ML', 'MoO3 mol% SL then ML']
-    schema_gap: 'The analysis is printed in mol%; the phase-composition profile accepts wt_percent, mole_fraction, or ppm_mass. Molybdate liquid is analyzed as a quenched precipitate and the closed phase roles do not include solid.'
+    observations_method_class: measured_direct
+    context_method_class: measured_reduced
+    observations: 'Emit all 48 mol% composition cells as equilibrium_phase_composition with mole_fraction basis; SL maps to glass and ML to melt.'
+    context_columns: 'Sample, temperature, SL mass%, ML mass%, Qtz mass%, and Na2O loss mass% remain in context.'
     render_verified: 'All 8 rows, temperatures, phase proportions, all 48 composition values, and their SL/ML order checked against the page render.'
   - page: 6
     table: '4'

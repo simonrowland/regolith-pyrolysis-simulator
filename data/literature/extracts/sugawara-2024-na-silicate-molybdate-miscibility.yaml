@@ -9,16 +9,87 @@ source:
   corpus_asset: raw/sugawara-2024-na-silicate-molybdate-miscibility/sugawara-2024-na-silicate-molybdate-miscibility.pdf
   corpus_sha256: 196ffb5b0cc0f95232106dfa7397b4666f5cf9d5d38c408087eebee0a9e1453b
 review_status: draft
+fidelity_samples:
+- species: SiO2
+  observation_id: sugawara_2024_table2_s50_15_1200c_sl_sio2_mole_fraction
+  field: component_amount
+  value: '0.5101'
+  locator: {page: 4, table: '2', sample: S50-15, temperature_C: '1200', component: SiO2, phase_label: glass}
+- species: SiO2
+  observation_id: sugawara_2024_table2_s50_15_1000c_sl_sio2_mole_fraction
+  field: component_amount
+  value: '0.5861'
+  locator: {page: 4, table: '2', sample: S50-15, temperature_C: '1000', component: SiO2, phase_label: glass}
+- species: Na2O
+  observation_id: sugawara_2024_table2_s50_15_1200c_sl_na2o_mole_fraction
+  field: component_amount
+  value: '0.4037'
+  locator: {page: 4, table: '2', sample: S50-15, temperature_C: '1200', component: Na2O, phase_label: glass}
+- species: Na2O
+  observation_id: sugawara_2024_table2_s55_15_1000c_ml_na2o_mole_fraction
+  field: component_amount
+  value: '0.4867'
+  locator: {page: 4, table: '2', sample: S55-15, temperature_C: '1000', component: Na2O, phase_label: melt}
+- species: MoO3
+  observation_id: sugawara_2024_table2_s50_15_1200c_sl_moo3_mole_fraction
+  field: component_amount
+  value: '0.0862'
+  locator: {page: 4, table: '2', sample: S50-15, temperature_C: '1200', component: MoO3, phase_label: glass}
+- species: MoO3
+  observation_id: sugawara_2024_table2_s70_15_1000c_ml_moo3_mole_fraction
+  field: component_amount
+  value: '0.4794'
+  locator: {page: 4, table: '2', sample: S70-15, temperature_C: '1000', component: MoO3, phase_label: melt}
 extraction:
   method: MinerU table draft and pdftotext machine reads, with full rendered-page layout checks for Tables 1, 2,
-    and 4. The measured Table 2 compositions are retained as context because their printed mol% basis and quenched
-    molybdate precipitate state do not map to a current closed phase-composition profile. Table 4 CALPHAD parameters
-    are context because the fitted phase-diagram inputs are not stored as measured rows.
+    and 4. Table 2's 48 printed mol% cells are measured phase-composition observations on a mole-fraction basis
+    with the printed mol% retained. Table 1, Table 2 mass proportions, and Table 4 CALPHAD parameters remain context.
   date: '2026-10-28'
   worker: w1028naD-sugawara24-namo
+experiments:
+- experiment_id: sugawara_2024_s50_15_1200c
+  method: phase_equilibration_quench
+  locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1200'}
+- experiment_id: sugawara_2024_s55_15_1200c
+  method: phase_equilibration_quench
+  locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1200'}
+- experiment_id: sugawara_2024_s62_15_1200c
+  method: phase_equilibration_quench
+  locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1200'}
+- experiment_id: sugawara_2024_s70_15_1200c
+  method: phase_equilibration_quench
+  locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1200'}
+- experiment_id: sugawara_2024_s50_15_1000c
+  method: phase_equilibration_quench
+  locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1000'}
+- experiment_id: sugawara_2024_s55_15_1000c
+  method: phase_equilibration_quench
+  locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1000'}
+- experiment_id: sugawara_2024_s62_15_1000c
+  method: phase_equilibration_quench
+  locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1000'}
+- experiment_id: sugawara_2024_s70_15_1000c
+  method: phase_equilibration_quench
+  locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1000'}
 species:
   SiO2:
-    observations: []
+    observations:
+    - {observation_id: sugawara_2024_table2_s50_15_1200c_sl_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s50_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1200', component: SiO2, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: glass, basis: mole_fraction, T_C: '1200', component_amount: '0.5101', component_amount_as_published: '51.01 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s50_15_1200c_ml_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s50_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1200', component: SiO2, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: melt, basis: mole_fraction, T_C: '1200', component_amount: '0.1153', component_amount_as_published: '11.53 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s55_15_1200c_sl_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s55_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1200', component: SiO2, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: glass, basis: mole_fraction, T_C: '1200', component_amount: '0.6201', component_amount_as_published: '62.01 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s55_15_1200c_ml_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s55_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1200', component: SiO2, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: melt, basis: mole_fraction, T_C: '1200', component_amount: '0.0233', component_amount_as_published: '2.33 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s62_15_1200c_sl_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s62_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1200', component: SiO2, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: glass, basis: mole_fraction, T_C: '1200', component_amount: '0.7112', component_amount_as_published: '71.12 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s62_15_1200c_ml_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s62_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1200', component: SiO2, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: melt, basis: mole_fraction, T_C: '1200', component_amount: '0.0143', component_amount_as_published: '1.43 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s70_15_1200c_sl_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s70_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1200', component: SiO2, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: glass, basis: mole_fraction, T_C: '1200', component_amount: '0.7849', component_amount_as_published: '78.49 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s70_15_1200c_ml_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s70_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1200', component: SiO2, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: melt, basis: mole_fraction, T_C: '1200', component_amount: '0.0376', component_amount_as_published: '3.76 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s50_15_1000c_sl_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s50_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1000', component: SiO2, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: glass, basis: mole_fraction, T_C: '1000', component_amount: '0.5861', component_amount_as_published: '58.61 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s50_15_1000c_ml_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s50_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1000', component: SiO2, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: melt, basis: mole_fraction, T_C: '1000', component_amount: '0.0301', component_amount_as_published: '3.01 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s55_15_1000c_sl_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s55_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1000', component: SiO2, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: glass, basis: mole_fraction, T_C: '1000', component_amount: '0.6618', component_amount_as_published: '66.18 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s55_15_1000c_ml_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s55_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1000', component: SiO2, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: melt, basis: mole_fraction, T_C: '1000', component_amount: '0.0062', component_amount_as_published: '0.62 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s62_15_1000c_sl_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s62_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1000', component: SiO2, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: glass, basis: mole_fraction, T_C: '1000', component_amount: '0.7364', component_amount_as_published: '73.64 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s62_15_1000c_ml_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s62_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1000', component: SiO2, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: melt, basis: mole_fraction, T_C: '1000', component_amount: '0.0228', component_amount_as_published: '2.28 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s70_15_1000c_sl_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s70_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1000', component: SiO2, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: glass, basis: mole_fraction, T_C: '1000', component_amount: '0.7666', component_amount_as_published: '76.66 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s70_15_1000c_ml_sio2_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s70_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1000', component: SiO2, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: SiO2, phase_label: melt, basis: mole_fraction, T_C: '1000', component_amount: '0.0139', component_amount_as_published: '1.39 mol%', method_class: measured_direct, admission_status: admitted}}
     context:
     - observation_id: sugawara_2024_table1_experimental_compositions_and_run_products
       type: composition
@@ -140,7 +211,7 @@ species:
         published_page: '7202'
         note: All 8 printed sample-temperature rows; all numeric columns checked against the page render.
       values:
-        quantity: phase_proportions_and_chemical_composition_of_quenched_products
+        quantity: phase_proportions_and_Na2O_loss_as_printed
         system_as_printed: SiO2-Na2O-MoO3
         column_headers_as_printed:
         - Sample
@@ -149,121 +220,24 @@ species:
         - ML mass%
         - Qtz mass%
         - Na2O loss mass%
-        - 'chemical composition mol%: SL then ML for SiO2, Na2O, MoO3'
-        composition_order_as_printed:
-        - SL
-        - ML
         rows_as_printed:
-        - - S50-15
-          - '1200'
-          - '72.9'
-          - '26.5'
-          - ''
-          - '0.6'
-          - - '51.01'
-            - '11.53'
-          - - '40.37'
-            - '48.50'
-          - - '8.62'
-            - '39.97'
-        - - S55-15
-          - '1200'
-          - '65.1'
-          - '33.5'
-          - ''
-          - '1.3'
-          - - '62.01'
-            - '2.33'
-          - - '33.86'
-            - '47.84'
-          - - '4.12'
-            - '49.84'
-        - - S62-15
-          - '1200'
-          - '62.7'
-          - '37.3'
-          - ''
-          - '0.0'
-          - - '71.12'
-            - '1.43'
-          - - '26.53'
-            - '48.96'
-          - - '2.35'
-            - '49.61'
-        - - S70-15
-          - '1200'
-          - '54.6'
-          - '38.8'
-          - '6.6'
-          - '0.0'
-          - - '78.49'
-            - '3.76'
-          - - '19.45'
-            - '46.95'
-          - - '2.06'
-            - '49.29'
-        - - S50-15
-          - '1000'
-          - '61.7'
-          - '36.3'
-          - ''
-          - '2.0'
-          - - '58.61'
-            - '3.01'
-          - - '37.99'
-            - '49.46'
-          - - '3.40'
-            - '47.53'
-        - - S55-15
-          - '1000'
-          - '59.6'
-          - '38.3'
-          - ''
-          - '2.1'
-          - - '66.18'
-            - '0.62'
-          - - '32.09'
-            - '48.67'
-          - - '1.74'
-            - '50.71'
-        - - S62-15
-          - '1000'
-          - '59.2'
-          - '40.8'
-          - ''
-          - '0.0'
-          - - '73.64'
-            - '2.28'
-          - - '25.21'
-            - '49.69'
-          - - '1.15'
-            - '48.03'
-        - - S70-15
-          - '1000'
-          - '38.4'
-          - '41.9'
-          - '19.7'
-          - '0.0'
-          - - '76.66'
-            - '1.39'
-          - - '22.23'
-            - '50.67'
-          - - '1.11'
-            - '47.94'
+        - [S50-15, '1200', '72.9', '26.5', '', '0.6']
+        - [S55-15, '1200', '65.1', '33.5', '', '1.3']
+        - [S62-15, '1200', '62.7', '37.3', '', '0.0']
+        - [S70-15, '1200', '54.6', '38.8', '6.6', '0.0']
+        - [S50-15, '1000', '61.7', '36.3', '', '2.0']
+        - [S55-15, '1000', '59.6', '38.3', '', '2.1']
+        - [S62-15, '1000', '59.2', '40.8', '', '0.0']
+        - [S70-15, '1000', '38.4', '41.9', '19.7', '0.0']
         printed_row_count: 8
-        method_class: measured_direct
+        method_class: measured_reduced
         analysis_as_printed: SL of S50 and S55 analyzed by XRF; other phase analyses by EPMA.
         quench_as_printed: Sample rapidly cooled by immersing the bottom of the platinum crucible in water.
-        quench_state: asserted_altered
-        quench_state_locator:
-          page: 4
-          paragraph: Results of phase equilibrium experiments
-          note: The authors state that Mo-rich spherical particles in whitish glass were precipitated during cooling,
-            not evidence of equilibrium phase separation at high temperature.
-        schema_gap: The measured phase compositions are printed in mol%, but the equilibrium_phase_composition migrator
-          accepts wt_percent, mole_fraction, or ppm_mass. The molybdate liquid is measured as a quenched precipitate;
-          no closed solid phase role exists. Keep the complete table in context and do not relabel quenched products
-          as in-situ liquids.
+        tie_line_quench_note: The separate statement about Mo-rich microspheres in whitish glass concerns cooling
+          precipitates and is not assigned as alteration of these macroscopic SL/ML tie-line analyses.
+        composition_observations: 48 measured mol% cells are emitted separately by oxide, phase, sample, and temperature.
+        phase_proportions_note: The printed mass proportions and Na2O loss are retained here; Table 2 composition cells
+          are represented by the phase-composition observations.
         source_method: MinerU table block and pdftotext; multi-number composition cells and all row/column assignments
           verified against the page render.
     - observation_id: sugawara_2024_table4_calphad_interaction_parameters
@@ -332,3 +306,39 @@ species:
           in water.
         total_pressure: not stated
         fO2: not stated
+  Na2O:
+    observations:
+    - {observation_id: sugawara_2024_table2_s50_15_1200c_sl_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s50_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1200', component: Na2O, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: glass, basis: mole_fraction, T_C: '1200', component_amount: '0.4037', component_amount_as_published: '40.37 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s50_15_1200c_ml_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s50_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1200', component: Na2O, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: melt, basis: mole_fraction, T_C: '1200', component_amount: '0.485', component_amount_as_published: '48.50 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s55_15_1200c_sl_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s55_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1200', component: Na2O, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: glass, basis: mole_fraction, T_C: '1200', component_amount: '0.3386', component_amount_as_published: '33.86 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s55_15_1200c_ml_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s55_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1200', component: Na2O, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: melt, basis: mole_fraction, T_C: '1200', component_amount: '0.4784', component_amount_as_published: '47.84 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s62_15_1200c_sl_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s62_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1200', component: Na2O, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: glass, basis: mole_fraction, T_C: '1200', component_amount: '0.2653', component_amount_as_published: '26.53 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s62_15_1200c_ml_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s62_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1200', component: Na2O, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: melt, basis: mole_fraction, T_C: '1200', component_amount: '0.4896', component_amount_as_published: '48.96 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s70_15_1200c_sl_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s70_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1200', component: Na2O, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: glass, basis: mole_fraction, T_C: '1200', component_amount: '0.1945', component_amount_as_published: '19.45 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s70_15_1200c_ml_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s70_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1200', component: Na2O, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: melt, basis: mole_fraction, T_C: '1200', component_amount: '0.4695', component_amount_as_published: '46.95 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s50_15_1000c_sl_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s50_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1000', component: Na2O, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: glass, basis: mole_fraction, T_C: '1000', component_amount: '0.3799', component_amount_as_published: '37.99 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s50_15_1000c_ml_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s50_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1000', component: Na2O, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: melt, basis: mole_fraction, T_C: '1000', component_amount: '0.4946', component_amount_as_published: '49.46 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s55_15_1000c_sl_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s55_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1000', component: Na2O, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: glass, basis: mole_fraction, T_C: '1000', component_amount: '0.3209', component_amount_as_published: '32.09 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s55_15_1000c_ml_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s55_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1000', component: Na2O, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: melt, basis: mole_fraction, T_C: '1000', component_amount: '0.4867', component_amount_as_published: '48.67 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s62_15_1000c_sl_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s62_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1000', component: Na2O, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: glass, basis: mole_fraction, T_C: '1000', component_amount: '0.2521', component_amount_as_published: '25.21 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s62_15_1000c_ml_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s62_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1000', component: Na2O, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: melt, basis: mole_fraction, T_C: '1000', component_amount: '0.4969', component_amount_as_published: '49.69 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s70_15_1000c_sl_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s70_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1000', component: Na2O, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: glass, basis: mole_fraction, T_C: '1000', component_amount: '0.2223', component_amount_as_published: '22.23 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s70_15_1000c_ml_na2o_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s70_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1000', component: Na2O, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: Na2O, phase_label: melt, basis: mole_fraction, T_C: '1000', component_amount: '0.5067', component_amount_as_published: '50.67 mol%', method_class: measured_direct, admission_status: admitted}}
+  MoO3:
+    observations:
+    - {observation_id: sugawara_2024_table2_s50_15_1200c_sl_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s50_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1200', component: MoO3, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: glass, basis: mole_fraction, T_C: '1200', component_amount: '0.0862', component_amount_as_published: '8.62 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s50_15_1200c_ml_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s50_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1200', component: MoO3, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: melt, basis: mole_fraction, T_C: '1200', component_amount: '0.3997', component_amount_as_published: '39.97 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s55_15_1200c_sl_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s55_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1200', component: MoO3, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: glass, basis: mole_fraction, T_C: '1200', component_amount: '0.0412', component_amount_as_published: '4.12 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s55_15_1200c_ml_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s55_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1200', component: MoO3, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: melt, basis: mole_fraction, T_C: '1200', component_amount: '0.4984', component_amount_as_published: '49.84 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s62_15_1200c_sl_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s62_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1200', component: MoO3, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: glass, basis: mole_fraction, T_C: '1200', component_amount: '0.0235', component_amount_as_published: '2.35 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s62_15_1200c_ml_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s62_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1200', component: MoO3, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: melt, basis: mole_fraction, T_C: '1200', component_amount: '0.4961', component_amount_as_published: '49.61 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s70_15_1200c_sl_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s70_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1200', component: MoO3, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: glass, basis: mole_fraction, T_C: '1200', component_amount: '0.0206', component_amount_as_published: '2.06 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s70_15_1200c_ml_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s70_15_1200c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1200', component: MoO3, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: melt, basis: mole_fraction, T_C: '1200', component_amount: '0.4929', component_amount_as_published: '49.29 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s50_15_1000c_sl_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s50_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1000', component: MoO3, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: glass, basis: mole_fraction, T_C: '1000', component_amount: '0.034', component_amount_as_published: '3.40 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s50_15_1000c_ml_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s50_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S50-15, temperature_C: '1000', component: MoO3, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: melt, basis: mole_fraction, T_C: '1000', component_amount: '0.4753', component_amount_as_published: '47.53 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s55_15_1000c_sl_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s55_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1000', component: MoO3, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: glass, basis: mole_fraction, T_C: '1000', component_amount: '0.0174', component_amount_as_published: '1.74 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s55_15_1000c_ml_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s55_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S55-15, temperature_C: '1000', component: MoO3, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: melt, basis: mole_fraction, T_C: '1000', component_amount: '0.5071', component_amount_as_published: '50.71 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s62_15_1000c_sl_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s62_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1000', component: MoO3, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: glass, basis: mole_fraction, T_C: '1000', component_amount: '0.0115', component_amount_as_published: '1.15 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s62_15_1000c_ml_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s62_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S62-15, temperature_C: '1000', component: MoO3, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: melt, basis: mole_fraction, T_C: '1000', component_amount: '0.4803', component_amount_as_published: '48.03 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s70_15_1000c_sl_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s70_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1000', component: MoO3, phase_label: glass}, phase: glass, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: glass, basis: mole_fraction, T_C: '1000', component_amount: '0.0111', component_amount_as_published: '1.11 mol%', method_class: measured_direct, admission_status: admitted}}
+    - {observation_id: sugawara_2024_table2_s70_15_1000c_ml_moo3_mole_fraction, type: composition_series, units: 'mole fraction (dimensionless); source reports mol%', experiment: sugawara_2024_s70_15_1000c, regime: liquid_liquid_immiscibility, locator: {page: 4, table: '2', published_page: '7202', sample: S70-15, temperature_C: '1000', component: MoO3, phase_label: melt}, phase: l, values: {quantity: equilibrium_phase_composition, formula: MoO3, phase_label: melt, basis: mole_fraction, T_C: '1000', component_amount: '0.4794', component_amount_as_published: '47.94 mol%', method_class: measured_direct, admission_status: admitted}}
