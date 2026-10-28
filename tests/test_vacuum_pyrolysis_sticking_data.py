@@ -348,6 +348,8 @@ def test_fe_stage_one_uses_reviewed_metal_condensation_fit():
     assert record["alpha_s"] == pytest.approx(0.878170956)
     assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
     assert record["citation_status"] == "CITED"
+    assert record["output_status"] == "status_bearing"
+    assert "supersaturation-regime transfer is inferred" in record["uncertainty_flag"]
 
 
 @pytest.mark.parametrize("temperature", [1.0, 1200.0, 1700.0, 3000.0])
