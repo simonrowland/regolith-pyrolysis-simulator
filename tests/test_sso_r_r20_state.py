@@ -2873,9 +2873,17 @@ def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(buffer_o2_mol
     assert exchange["exchange_unbacked_o2_mol"] == pytest.approx(0.0, abs=1e-12)
     assert exchange["exchange_direction"] == "melt_to_headspace"
     assert exchange["exchange_clamped"] is False
+    gate = json.loads(json.dumps(snapshot.liquid_fraction_gate, allow_nan=False))
+    assert gate
     for output in (summary, tick):
-        # Existing public rows include this warning only for real shortfall.
-        assert "oxygen_reservoir" not in json.loads(json.dumps(output, allow_nan=False))
+        # d-298 also exports this container for liquid-fraction gate evidence;
+        # its presence must not turn a conserving release into a shortfall.
+        public = json.loads(json.dumps(output, allow_nan=False))["oxygen_reservoir"]
+        assert public["exchange_o2_mol"] == pytest.approx(released)
+        assert public["exchange_unbacked_o2_mol"] == pytest.approx(0.0, abs=1e-12)
+        assert public["exchange_direction"] == "melt_to_headspace"
+        assert public["exchange_clamped"] is False
+        assert public["liquid_fraction_gate"] == gate
 
 
 def test_headspace_exchange_cannot_instantly_erase_reductant_dose() -> None:
