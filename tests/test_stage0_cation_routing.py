@@ -148,6 +148,39 @@ def test_sulfate_carbon_fallback_is_sorted_and_flagged(monkeypatch, fallback):
         ) in flags
 
 
+def test_missing_sulfate_dg_reaches_public_load_allocation(monkeypatch):
+    from dataclasses import replace
+    from tests.test_subsolidus_bakeout import _molar
+
+    hosts = {host: _molar(host) for host in ("CaSO4", "MgSO4", "FeSO4")}
+    feed = {
+        "stage0_profile": "mars_carbon_cleanup",
+        "stage0_carbon_cleanup": {
+            "carbon_reductant_kg_per_tonne": _molar("C"),
+            "reactions": ["sulfate_so3_to_so2_co"],
+        },
+        "composition_wt_pct": {
+            "SiO2": 100 - sum(hosts.values()) / 10,
+            **{host: kg / 10 for host, kg in hosts.items()},
+        },
+    }
+    sim = _sim({"feed": feed})
+    registry = load_foulant_registry(FOULANT_THERMO)
+    rows = dict(registry.foulant_dG)
+    del rows["CaSO4_thermal_decomp"]
+    monkeypatch.setattr(sim, "_load_foulant_registry_cached", lambda: replace(
+        registry, foulant_dG=rows,
+    ))
+    assert sim._foulant_diagnostics_enabled
+    sim.load_batch("feed", mass_kg=1000, additives_kg={"C": _molar("C")})
+    sim.atom_ledger.assert_balanced()
+    diagnostic = next(row for row in sim._stage0_foulant_diagnostics
+                      if row.get("reaction_family") == "sulfate_carbon_allocation")
+    assert diagnostic["host_order"] == sorted(hosts)
+    assert "sulfate_carbon_missing_dG_canonical_order" in diagnostic["notice_flags"]
+    assert sim._stage0_bakeout_reserved_carbon_kg == pytest.approx(_molar("C"))
+
+
 def test_bakeout_reservation_cannot_overclaim_remaining_carbon():
     from tests.test_subsolidus_bakeout import _molar
 

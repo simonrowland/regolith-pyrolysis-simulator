@@ -66,6 +66,37 @@ def _load_yaml(path: Path):
         return yaml.safe_load(handle)
 
 
+def test_sulfate_diagnostic_refuses_only_missing_thermochemistry(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from dataclasses import replace
+
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    registry = load_foulant_registry(FOULANT_THERMO)
+    rows = dict(registry.foulant_dG)
+    del rows["CaSO4_thermal_decomp"]
+    controls = {
+        "reaction_family": REACTION_FAMILY_SULFATE_DECOMP,
+        "carrier": "CaSO4", "feed_kg": 1.0, "T_C": 1050.0,
+        "pO2_bar": 0.0,
+        "foulant_registry": replace(registry, foulant_dG=rows),
+    }
+    result = _dispatch(sim, controls)
+    assert result.status == "out_of_domain"
+    assert result.transition is None
+    assert "CaSO4_thermal_decomp" in result.diagnostic["reason_out_of_domain"]
+    assert result.warnings
+    with pytest.raises(KeyError, match="unknown foulant carrier"):
+        _dispatch(sim, {**controls, "carrier": "unknown"})
+    with pytest.raises(ValueError, match="pX_bar"):
+        _dispatch(sim, {**controls, "pO2_bar": -1.0})
+    rows["CaSO4_thermal_decomp"] = {"points": []}
+    with pytest.raises(KeyError, match="missing points"):
+        _dispatch(sim, controls)
+
+
 def _dg_points(source_row: dict) -> list[tuple[float, float]]:
     return [
         (float(point["T_K"]), float(point["dG_kJ_per_mol"]))
