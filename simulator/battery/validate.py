@@ -1104,6 +1104,27 @@ def validate_observation(
     path: str = "observation",
     source_owners: Mapping[str, str] | None = None,
 ) -> list[ValidationIssue]:
+    return _validate_observation(
+        observation,
+        experiments,
+        observations,
+        works,
+        path,
+        source_owners,
+        context_ids=frozenset(),
+    )
+
+
+def _validate_observation(
+    observation: Observation,
+    experiments: Mapping[str, Experiment],
+    observations: Mapping[str, Observation],
+    works: Mapping[str, Work] | None = None,
+    path: str = "observation",
+    source_owners: Mapping[str, str] | None = None,
+    *,
+    context_ids: frozenset[str],
+) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     experiment = experiments.get(observation.experiment_id)
     if experiment is None:
@@ -1229,23 +1250,16 @@ def validate_observation(
             )
         )
     if raw_inputs is not None and not (
-        (ev.is_value and ev.value is EvidenceClass.MEASURED_REDUCED)
-        or (
-            declares_printed_unresolved
-            and ev.is_value
-            and ev.value is EvidenceClass.MODEL_DERIVED
-        )
+        ev.is_value
+        and ev.value
+        in {EvidenceClass.MEASURED_REDUCED, EvidenceClass.MODEL_DERIVED}
     ):
-        detail = (
-            "raw_inputs not_printed declaration is invalid for model_derived evidence"
-            if ev.is_value and ev.value is EvidenceClass.MODEL_DERIVED
-            else "raw_inputs declaration is valid only for measured_reduced evidence"
-        )
         issues.append(
             _issue(
                 f"{path}.derivation.raw_inputs",
                 RefusalReason.CONDITIONAL_FIELD,
-                detail,
+                "raw_inputs declaration is valid only for measured_reduced or "
+                "model_derived evidence",
             )
         )
     if raw_inputs is not None and derivation is not None and derivation.inputs:
@@ -1254,6 +1268,25 @@ def validate_observation(
                 f"{path}.derivation.raw_inputs",
                 RefusalReason.CONDITIONAL_FIELD,
                 "raw_inputs declaration conflicts with listed derivation inputs",
+            )
+        )
+    if (
+        raw_inputs is not None
+        and ev.is_value
+        and ev.value is EvidenceClass.MODEL_DERIVED
+        and not (
+            derivation is not None
+            and derivation.has_located_unprinted_raw_inputs
+            and not derivation.inputs
+            and derivation.has_located_method
+            and derivation.has_named_references
+        )
+    ):
+        issues.append(
+            _issue(
+                f"{path}.derivation.raw_inputs",
+                RefusalReason.CONDITIONAL_FIELD,
+                "raw_inputs declaration is invalid for model_derived without a located not_printed declaration, method, and named references",
             )
         )
     if ev.is_value and ev.value is EvidenceClass.ENGINE_PREDICTION:
@@ -1318,11 +1351,7 @@ def validate_observation(
                         ),
                     )
                 )
-        if (
-            ev.value is EvidenceClass.MEASURED_REDUCED
-            and declares_unprinted_raw_inputs
-            and observation.derived_from
-        ):
+        if declares_unprinted_raw_inputs and observation.derived_from:
             issues.append(
                 _issue(
                     f"{path}.derivation.raw_inputs",
@@ -1330,17 +1359,65 @@ def validate_observation(
                     "raw_inputs not_printed declaration contradicts derived_from",
                 )
             )
+        if (
+            ev.value is EvidenceClass.MODEL_DERIVED
+            and declares_unprinted_raw_inputs
+        ):
+            if derivation is None or derivation.method is None:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.method",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived raw_inputs not_printed declaration requires a method",
+                    )
+                )
+            elif derivation.method.locator is None:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.method",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived raw_inputs method requires a locator",
+                    )
+                )
+            elif not derivation.has_located_method:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.method",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
+                    )
+                )
+            if derivation is not None and not derivation.has_named_references:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.references",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived raw_inputs method requires named compiled references",
+                    )
+                )
         has_resolved_lineage = any(
-            parent in observations or parent in asset_ids
+            parent in observations or parent in asset_ids or parent in context_ids
             for parent in observation.derived_from or ()
         )
-        if not figure_only_without_value:
-            # printed_unresolved is not complete lineage. Only a located
-            # not_printed declaration excuses a missing derived_from.
-            if not has_resolved_lineage and not (
+        raw_inputs_supply_lineage = (
+            derivation is not None
+            and derivation.has_located_unprinted_raw_inputs
+            and (
                 ev.value is EvidenceClass.MEASURED_REDUCED
-                and derivation is not None
-                and derivation.has_located_unprinted_raw_inputs
+                or (
+                    ev.value is EvidenceClass.MODEL_DERIVED
+                    and derivation.has_located_method
+                    and derivation.has_named_references
+                )
+            )
+        )
+        if not figure_only_without_value:
+            # printed_unresolved is not complete lineage. A located
+            # not_printed declaration excuses a missing derived_from for
+            # measured_reduced, and for model_derived only with a located
+            # method and named references.
+            if not has_resolved_lineage and not (
+                raw_inputs_supply_lineage
             ):
                 issues.append(
                     _issue(
@@ -1362,7 +1439,11 @@ def validate_observation(
                 )
     if observation.derived_from:
         for parent in observation.derived_from:
-            if parent not in observations and parent not in asset_ids:
+            if (
+                parent not in observations
+                and parent not in asset_ids
+                and parent not in context_ids
+            ):
                 issues.append(
                     _issue(
                         f"{path}.derived_from",
@@ -1372,7 +1453,11 @@ def validate_observation(
                 )
     if observation.derivation is not None:
         for inp in observation.derivation.inputs:
-            if inp not in observations and inp not in asset_ids:
+            if (
+                inp not in observations
+                and inp not in asset_ids
+                and inp not in context_ids
+            ):
                 issues.append(
                     _issue(
                         f"{path}.derivation.inputs",
@@ -2389,17 +2474,43 @@ def validate_corpus(
             )
         )
     source_owners = _source_owners(work_map)
+    context_ids = frozenset(context_map or ())
     for observation in obs_map.values():
         issues.extend(
-            validate_observation(
+            _validate_observation(
                 observation,
                 exp_map,
                 obs_map,
                 work_map,
                 f"observation[{observation.observation_id}]",
                 source_owners,
+                context_ids=context_ids,
             )
         )
+    admitted_transition_points = [
+        observation
+        for observation in obs_map.values()
+        if observation.admission.status is AdmissionStatus.ADMITTED
+        and quantity_token(observation.identity) is Quantity.TRANSITION_TEMPERATURE
+        and observation.value.kind is ValueKind.POINT
+    ]
+    for index, left in enumerate(admitted_transition_points):
+        for right in admitted_transition_points[index + 1 :]:
+            equal = identity_equal(left.identity, right.identity)
+            if (
+                equal.kind is IdentityEqualKind.EQUAL
+                and left.value.point != right.value.point
+            ):
+                issues.append(
+                    _issue(
+                        f"observation[{left.observation_id},{right.observation_id}]",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "identity-equal admitted transition-temperature observations "
+                        f"have different point values: {left.observation_id}="
+                        f"{left.value.point} K, {right.observation_id}="
+                        f"{right.value.point} K",
+                    )
+                )
     for cycle in _ancestry_cycles(obs_map):
         issues.append(
             _issue(

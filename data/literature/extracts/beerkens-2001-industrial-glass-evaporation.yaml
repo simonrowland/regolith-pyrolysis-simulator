@@ -1,0 +1,1067 @@
+schema_version: literature_extract.v1
+source_id: beerkens-2001-industrial-glass-evaporation
+source:
+  citation: >-
+    Beerkens, R. G. C., and van Limpt, J. (2001), "Evaporation in industrial
+    glass melt furnaces", Glass Science and Technology, 74, 245–257.
+  year: 2001
+  doi: 10.34657/13064
+  corpus_asset: raw/beerkens-2001-industrial-glass-evaporation/beerkens-2001-industrial-glass-evaporation.pdf
+  corpus_sha256: c17d2b2b4b0bdcd531a9dd96b70966b868dddd24a27ace4ee19af224628f8d31
+extraction:
+  method: >-
+    Born-digital layout text and the MinerU table draft were compared. Table 1
+    dust and specific emissions and its filter-dust composition have no matching
+    species-level token for these generalized furnace ranges; Table 2 is
+    explicitly estimated from models; Table 3's measured dust and Na2O totals
+    use kg/t glass rather than a rate or mass fraction, and its NaOH pressures
+    are model-derived. The four numeric CO pressures in Table 3 are typed as
+    measured partial pressures; the fifth is a printed upper bound. Table 3's
+    five furnace columns were transcribed from its 600-dpi render. Figures 1–10
+    are metadata only with no digitized points.
+  date: '2026-10-19'
+  worker: fam18-1019
+review_status: draft
+fidelity_samples:
+  - path: species.CO.observations[beerkens_2001_table3_furnace_1_co_partial_pressure].values.partial_pressure_pa
+    value: '100'
+    locator:
+      page: 10
+      pdf_page_index: 9
+      published_page: 254
+      table: '3'
+      row_label: CO-pressure above melt
+      column_header: furnace burner arrangement no. 1
+    note: First numeric CO-pressure cell independently checked against the rendered Table 3.
+species:
+  CO:
+    observations:
+      - observation_id: beerkens_2001_table3_furnace_1_co_partial_pressure
+        type: partial_pressure
+        sample_id: '1'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          published_page: 254
+          table: '3'
+          row_label: CO-pressure above melt
+          column_header: furnace burner arrangement no. 1
+        phase: gas
+        units: Pa
+        values:
+          quantity: partial_pressure
+          method_class: measured_direct
+          admission_status: admitted
+          pressure_species: CO(g)
+          partial_pressure_pa: '100'
+          partial_pressure_pa_as_printed: 0.001 × 10^5 Pa
+          T_C: '1494'
+          glass_Na2O_content_wt_pct_as_printed: '16.5'
+          oxygen_partial_pressure:
+            value: '3000'
+            units: Pa
+            as_printed: '0.03 × 10^5 Pa'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: oxygen pressure above melt
+              column_header: furnace burner arrangement no. 1
+          figure9_pCO_label_as_printed: <500 Pa
+          figure9_locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 254
+            figure: '9'
+            note: The plot prints a coarser CO-pressure label than the Table 3 cell.
+        point_conditions:
+          temperature_C:
+            state: {tag: value, value: '1494'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: average glass melt surface temperature
+              note: 'Model-derived condition (CFD): the paper says the glass-surface temperatures were calculated with a CFD model.'
+          fO2_Pa:
+            state: {tag: value, value: '3000'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: oxygen pressure above melt
+              note: Printed pO2 0.03 × 10^5 Pa; converted to Pa without calculating oxygen pressure.
+          water_vapor_pressure_Pa:
+            state: {tag: value, value: '60000'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: water vapor pressure in furnace atmosphere
+              note: Printed 0.6 × 10^5 Pa; converted to Pa.
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Total furnace pressure is not reported.
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+          composition:
+            state:
+              tag: unknown
+              reason: Only Na2O content 16.5 wt% is printed; the full glass composition is not reported.
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+          sample_id:
+            state: {tag: value, value: '1'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+          gas_velocity_m_s:
+            state: {tag: value, value: '0.5'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: glas velocity above melt
+              note: The paper says gas velocities were calculated with a CFD model.
+      - observation_id: beerkens_2001_table3_furnace_2_co_partial_pressure
+        type: partial_pressure
+        sample_id: '2'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          published_page: 254
+          table: '3'
+          row_label: CO-pressure above melt
+          column_header: furnace burner arrangement no. 2
+        phase: gas
+        units: Pa
+        values:
+          quantity: partial_pressure
+          method_class: measured_direct
+          admission_status: admitted
+          pressure_species: CO(g)
+          partial_pressure_pa: '6500'
+          partial_pressure_pa_as_printed: 0.065 × 10^5 Pa
+          T_C: '1494'
+          glass_Na2O_content_wt_pct_as_printed: '16.5'
+          oxygen_partial_pressure:
+            value: '0'
+            units: Pa
+            as_printed: '0 × 10^5 Pa'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: oxygen pressure above melt
+              column_header: furnace burner arrangement no. 2
+          figure9_pCO_label_as_printed: 6000 Pa
+          figure9_locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 254
+            figure: '9'
+            note: The plot prints a coarser CO-pressure label than the Table 3 cell.
+        point_conditions:
+          temperature_C:
+            state: {tag: value, value: '1494'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: average glass melt surface temperature
+              note: 'Model-derived condition (CFD): the paper says the glass-surface temperatures were calculated with a CFD model.'
+          fO2_Pa:
+            state: {tag: value, value: '0'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: oxygen pressure above melt
+              note: Printed pO2 0 × 10^5 Pa; retained as printed zero.
+          water_vapor_pressure_Pa:
+            state: {tag: value, value: '60000'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: water vapor pressure in furnace atmosphere
+              note: Printed 0.6 × 10^5 Pa; converted to Pa.
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Total furnace pressure is not reported.
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+          composition:
+            state:
+              tag: unknown
+              reason: Only Na2O content 16.5 wt% is printed; the full glass composition is not reported.
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+          sample_id:
+            state: {tag: value, value: '2'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+          gas_velocity_m_s:
+            state: {tag: value, value: '0.5'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: glas velocity above melt
+              note: The paper says gas velocities were calculated with a CFD model.
+      - observation_id: beerkens_2001_table3_furnace_3_co_partial_pressure
+        type: partial_pressure
+        sample_id: '3'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          published_page: 254
+          table: '3'
+          row_label: CO-pressure above melt
+          column_header: furnace burner arrangement no. 3
+        phase: gas
+        units: Pa
+        values:
+          quantity: partial_pressure
+          method_class: measured_direct
+          admission_status: admitted
+          pressure_species: CO(g)
+          partial_pressure_pa: '6500'
+          partial_pressure_pa_as_printed: 0.065 × 10^5 Pa
+          T_C: '1511'
+          glass_Na2O_content_wt_pct_as_printed: '16.5'
+          oxygen_partial_pressure:
+            value: '0'
+            units: Pa
+            as_printed: '0 × 10^5 Pa'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: oxygen pressure above melt
+              column_header: furnace burner arrangement no. 3
+          figure9_pCO_label_as_printed: 6000 Pa
+          figure9_locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 254
+            figure: '9'
+            note: The plot prints a coarser CO-pressure label than the Table 3 cell.
+        point_conditions:
+          temperature_C:
+            state: {tag: value, value: '1511'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: average glass melt surface temperature
+              note: 'Model-derived condition (CFD): the paper says the glass-surface temperatures were calculated with a CFD model.'
+          fO2_Pa:
+            state: {tag: value, value: '0'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: oxygen pressure above melt
+              note: Printed pO2 0 × 10^5 Pa; retained as printed zero.
+          water_vapor_pressure_Pa:
+            state: {tag: value, value: '60000'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: water vapor pressure in furnace atmosphere
+              note: Printed 0.6 × 10^5 Pa; converted to Pa.
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Total furnace pressure is not reported.
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+          composition:
+            state:
+              tag: unknown
+              reason: Only Na2O content 16.5 wt% is printed; the full glass composition is not reported.
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+          sample_id:
+            state: {tag: value, value: '3'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+          gas_velocity_m_s:
+            state: {tag: value, value: '0.7'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: glas velocity above melt
+              note: The paper says gas velocities were calculated with a CFD model.
+      - observation_id: beerkens_2001_table3_furnace_4_co_partial_pressure
+        type: partial_pressure
+        sample_id: '4'
+        locator:
+          page: 10
+          pdf_page_index: 9
+          published_page: 254
+          table: '3'
+          row_label: CO-pressure above melt
+          column_header: furnace burner arrangement no. 4
+        phase: gas
+        units: Pa
+        values:
+          quantity: partial_pressure
+          method_class: measured_direct
+          admission_status: admitted
+          pressure_species: CO(g)
+          partial_pressure_pa: '1300'
+          partial_pressure_pa_as_printed: 0.013 × 10^5 Pa
+          T_C: '1511'
+          glass_Na2O_content_wt_pct_as_printed: '16.5'
+          oxygen_partial_pressure:
+            value: '0'
+            units: Pa
+            as_printed: '0 × 10^5 Pa'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: oxygen pressure above melt
+              column_header: furnace burner arrangement no. 4
+          figure9_pCO_label_as_printed: 1200 Pa
+          figure9_locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 254
+            figure: '9'
+            note: The plot prints a coarser CO-pressure label than the Table 3 cell.
+        point_conditions:
+          temperature_C:
+            state: {tag: value, value: '1511'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: average glass melt surface temperature
+              note: 'Model-derived condition (CFD): the paper says the glass-surface temperatures were calculated with a CFD model.'
+          fO2_Pa:
+            state: {tag: value, value: '0'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: oxygen pressure above melt
+              note: Printed pO2 0 × 10^5 Pa; retained as printed zero.
+          water_vapor_pressure_Pa:
+            state: {tag: value, value: '60000'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: water vapor pressure in furnace atmosphere
+              note: Printed 0.6 × 10^5 Pa; converted to Pa.
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Total furnace pressure is not reported.
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+          composition:
+            state:
+              tag: unknown
+              reason: Only Na2O content 16.5 wt% is printed; the full glass composition is not reported.
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+          sample_id:
+            state: {tag: value, value: '4'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+          gas_velocity_m_s:
+            state: {tag: value, value: '0.7'}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 254
+              table: '3'
+              row_label: glas velocity above melt
+              note: The paper says gas velocities were calculated with a CFD model.
+    context:
+      - observation_id: beerkens_2001_table3_fifth_furnace_co_pressure_bound
+        type: measured_condition_context
+        locator:
+          page: 10
+          pdf_page_index: 9
+          published_page: 254
+          table: '3'
+          row_label: CO-pressure above melt
+          column_header: furnace burner arrangement no. 5
+        units: 10^5 Pa as printed
+        values:
+          quantity: oxygen_carbon_monoxide_pressures
+          sample_id: '5'
+          CO_pressure_as_printed: <0.001
+          oxygen_pressure_as_printed: 0.005
+          note: The CO cell is a strict upper bound; it is not stored as a point.
+  Na2O:
+    observations: []
+    context:
+      - observation_id: beerkens_2001_table1_typical_dust_emissions
+        type: measured_table_context
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 247
+          table: '1'
+        units: mg/m3; kg/t glass; wt%
+        values:
+          quantity_as_printed: Typical dust emissions and dust composition of glass furnaces
+          furnace_types:
+            - container glass (regenerative)
+            - float glass (regenerative)
+            - TV panel glass (regenerative)
+            - sodium boro-silicate glass (recuperative)
+            - E-glass (recuperative)
+          rows:
+            - {label: dust concentration (dry flue gas at 8% O2 for gas-air furnaces), units: mg/m3, values: ['125 to 200', '120 to 180', '200 to 275', '1500 to 2000 including boric acids', '800 to 1400 including boric acids']}
+            - {label: specific emission; oxygen-fired values carry footnote 2, units: kg/t glass, values: ['0.17²) to 0.4', '0.3 to 0.45', '0.5 to 0.9', '3.5 to 5 including boric acids', '3.0 to 5.0 including boric acids']}
+            - {label: Na2O, units: wt%, values: ['25 to 40', '35', '12 to 18', '25 to 30', '2.0 to 5.0']}
+            - {label: K2O, units: wt%, values: ['1.5 to 2.5', '0 to 1', '35 to 40', '5.0 to 10', '10.0 to 20.0']}
+            - {label: SO3, units: wt%, values: ['45 to 55', '45 to 55', '5 to 10', '8.0 to 15', '2.0 to 5.0']}
+            - {label: PbO, units: wt%, values: ['0 to 5', '<0.2', '<1', '<0.5', '<0.1']}
+            - {label: B2O3, units: wt%, values: ['<1', '<0.1', '—', '35 to 40', '55 to 70']}
+            - {label: Sb2O3, units: wt%, values: ['<0.2', '<0.1', '8 to 12', '<0.2', '0']}
+            - {label: SiO2, units: wt%, values: ['0.5 to 2', '0.5 to 1.5', '<5', '<2', '1.0 to 3.0']}
+            - {label: Al2O3, units: wt%, values: ['0.2 to 1', '<1', '<1', '<2', '<1.5']}
+            - {label: MgO, units: wt%, values: ['1.0 to 3.0', '1.0 to 3.0', '<1', '1.0 to 3.0', '0 to 1']}
+            - {label: CaO, units: wt%, values: ['2.0 to 7.0', '2.5 to 4.0', '<1', '2.0 to 5.0', '2']}
+            - {label: chlorides, units: wt%, values: ['<1', '<1', '5 to 8', '<1', '<1']}
+            - {label: fluorides, units: wt%, values: ['<1', '<1', '6 to 12', '<1', '<0.25']}
+            - {label: residue, units: wt%, values: ['5 to 12', '10', '10 to 15', '10', '5 to 10']}
+          table_disposition: >-
+            Candidate tokens: condensate_composition, residue_component_composition,
+            mass_loss_rate, mass_loss_areal_density. Filter-dust wt% is not a
+            row-level melt condensate or residue composition; kg/t glass is a
+            specific particulate emission rather than a mass/time rate or
+            fraction, and concentration mg/m3 has no matching token. Values are
+            generalized ranges and the table does not attribute its rows to
+            one measured sample or source.
+          footnotes:
+            - Based on dry flue-gas volume at 8% oxygen for gas-air-fired furnaces.
+            - Oxygen-fired furnaces.
+      - observation_id: beerkens_2001_table2_estimated_values
+        type: model_table_context
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 253
+          table: '2'
+        units: °C; wt%; m/s; Pa; GJ/t glass; mg/m3
+        values:
+          quantity_as_printed: Estimated sodium concentrations and dust emissions for industrial soda-lime glass furnaces
+          method_class: model_derived
+          furnace_columns: ['1', '2']
+          rows:
+            - {label: average surface temperature, units: °C, values: ['1500', '1450']}
+            - {label: glass type, units: text, values: ['float glass', 'float glass']}
+            - {label: NaCl in soda, units: wt%, values: ['0.25', '0.15']}
+            - {label: gas velocity above melt, units: m/s, values: ['10', '5']}
+            - {label: oxygen pressure above melt, units: Pa, values: ['10', '1000']}
+            - {label: energy consumption, units: GJ/t glass, values: ['5.5', '5.5']}
+            - {label: NaOH in atmosphere, units: Pa, values: ['7.5', '3.0']}
+            - {label: Na2SO4 dust emissions, units: mg/m3, values: ['200 to 250', '90 to 100']}
+          table_disposition: >-
+            Candidate tokens: partial_pressure, mass_loss_rate, residue_component_composition.
+            The table is explicitly estimated from combustion and evaporation models;
+            modeled NaOH pressure and dust totals remain contextual rather than measured
+            observations.
+      - observation_id: beerkens_2001_text_nacl_dust_reduction_context
+        type: reported_process_effect_context
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 253
+          section: Modeling gas velocity in combustion space of glass furnaces
+        units: wt% NaCl in soda; mg/m3 sodium sulfate dust
+        values:
+          quantity_as_printed: Sodium chloride contamination effect on furnace dust
+          NaCl_reduction_as_printed: 0.25 wt% to 0.15 wt%
+          cullet_content_as_printed: 25 wt%
+          dust_decrease_as_printed: about 30 mg/m3
+          dust_species_as_printed: sodium sulfate
+          method_attribution: >-
+            The paragraph reports this process effect but does not say whether
+            the 30 mg/m3 value is measured or model-derived.
+          candidate_tokens: [mass_loss_rate, residue_component_composition, mass_loss_fraction]
+          schema_gap: >-
+            The value is particulate concentration per flue-gas volume, not a
+            species partial pressure, mass/time rate, sample mass fraction, or
+            glass residue composition.
+      - observation_id: beerkens_2001_table3_other_rows
+        type: measured_and_model_table_context
+        locator:
+          page: 10
+          pdf_page_index: 9
+          published_page: 254
+          table: '3'
+        units: °C; m2; wt%; 10^5 Pa; m/s; text; kg/t glass; Pa
+        values:
+          quantity_as_printed: Operational conditions and particulate emissions for five soda-lime furnaces
+          furnace_ids: ['1', '2', '3', '4', '5']
+          rows:
+            - {label: average glass melt surface temperature (CFD calculated), units: °C, values: ['1494', '1494', '1511', '1511', '1453']}
+            - {label: surface area, units: m2, values: ['39', '39', '39', '39', '60']}
+            - {label: Na2O content of glass, units: wt%, values: ['16.5', '16.5', '16.5', '16.5', '16.5']}
+            - {label: water vapor pressure in furnace atmosphere, units: 10^5 Pa, values: ['0.6', '0.6', '0.6', '0.6', '0.6']}
+            - {label: glass velocity above melt (CFD calculated), units: m/s, values: ['0.5', '0.5', '0.7', '0.7', '0.7']}
+            - {label: burner type, units: text, values: ['tube-in-tube', 'tube-in-tube', 'sheet flame', 'sheet flame', 'staged, tube-in-tube']}
+            - {label: low momentum/high momentum, units: text, values: ['high', 'high', 'high', 'high', 'low']}
+            - {label: oxygen pressure above melt, units: 10^5 Pa, values: ['0.03', '0', '0', '0', '0.005']}
+            - {label: CO-pressure above melt, units: 10^5 Pa, values: ['0.001', '0.065', '0.065', '0.013', '<0.001']}
+            - {label: burner horizontal or directed to glass melt surface, units: text, values: ['horizontal', '7° directed', '7° directed', '7° directed', 'horizontal']}
+            - {label: dust emission, units: kg/t glass, values: ['0.276', '0.398', '0.559', '0.485', '0.189']}
+            - {label: Na2O emission, units: kg/t glass, values: ['0.096', '0.190', '0.315', '0.262', '0.087']}
+            - {label: NaOH concentration in furnace atmosphere, units: Pa, values: ['21.8', '26.0', '36.0', '38.5', '9.9']}
+          table_disposition: >-
+            Table 3 CO pressures are the four typed partial_pressure observations below;
+            the fifth remains a bound. Candidate tokens for the untyped dust and Na2O
+            totals are mass_loss_rate and residue_component_composition, but kg/t glass
+            provides neither time nor a melt mass fraction. NaOH concentration is model-derived.
+      - observation_id: beerkens_2001_text_laboratory_sodium_flux
+        type: measured_and_model_text_context
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 251
+          section: Evaporation experiments
+        units: g/(m2 h)
+        values:
+          quantity_as_printed: Na2O evaporation loss rate from float glass melt
+          method_class: measured_direct
+          measured_rate_as_printed: 3.5 to 4
+          model_rate_as_printed: 3.4
+          model_method_class: model_derived
+          conditions_as_printed: >-
+            Average glass-surface temperature 1380 to 1390 °C; oxygen-natural-gas
+            burner; 55 vol.% water vapor; bulk gas velocity 1 m/s; oxidizing conditions.
+          table_disposition: >-
+            Candidate tokens mass_loss_rate and mass_loss_areal_density; neither
+            types a mass flux per area per time, so the measured flux and model
+            comparison remain context. No evaporation-flux token is added.
+      - observation_id: beerkens_2001_abstract_surface_depletion_context
+        type: model_summary_context
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 245
+          section: Abstract
+        units: percent of original surface content
+        values:
+          quantity_as_printed: Sodium and lead surface depletion
+          method_class: model_derived
+          sodium_surface_content_as_printed: down to 80% of original content
+          lead_surface_concentration_reduction_as_printed: more than 50%
+          candidate_tokens: [mass_loss_fraction, mass_loss_fraction_vs_T, residue_component_composition]
+          schema_gap: These percentages describe surface-concentration depletion relative to parent glass, not whole-sample mass loss or a residue composition.
+      - observation_id: beerkens_2001_text_emission_effects_context
+        type: model_summary_context
+        locator:
+          page: 12
+          pdf_page_index: 11
+          published_page: 256
+          section: Conclusions and recommendations
+        units: percent; °C; Pa; g per ton glass
+        values:
+          quantity_as_printed: Model results and process-level emission estimates
+          method_class: model_derived
+          NaOH_evaporation_increase_as_printed: about 50% when surface temperature rises from 1500 to 1550 °C
+          NaOH_evaporation_velocity_effect_as_printed: doubling gas velocity gives 75% more evaporation for turbulent flow when surface depletion is neglected
+          oxygen_firing_reduction_as_printed: factor 2 to 4 reduction in evaporation rates and specific particulate emissions; factor 4 to 5 dust reduction for C-glass or other alkali borosilicate melts
+          reducing_condition_as_printed: pO2 < 100 Pa may increase alkali and lead evaporation by 20 to 40%
+          NaOH_pressure_comparison_as_printed: about 20 to 25% higher at 16 wt% Na2O than at 13 wt% Na2O
+          chloride_emission_as_printed: 300 g chloride (495 g NaCl) up to 450 g Cl per ton glass leads to about 100 g extra dust per ton glass
+          candidate_tokens: [mass_loss_fraction, mass_loss_rate, partial_pressure]
+          schema_gap: The printed values are process ratios, surface depletion, or particulate mass per glass production, not a typed species-level mass fraction, pressure point, or mass/time rate.
+      - observation_id: beerkens_2001_figure9_hot_spot_fraction_context
+        type: model_summary_context
+        locator:
+          page: 10
+          pdf_page_index: 9
+          published_page: 254
+          figure: '9'
+        units: percent of total sodium evaporation
+        values:
+          quantity_as_printed: Fraction of Na2O evaporation from the hottest 30% of glass surface
+          method_class: model_derived
+          value_as_printed: about 60 to 80%
+          candidate_tokens: [mass_loss_fraction]
+          schema_gap: This is a spatial share of total evaporation, not a sample mass-loss fraction.
+      - observation_id: beerkens_2001_figure2_metadata
+        type: figure_record
+        locator:
+          page: 6
+          pdf_page_index: 5
+          published_page: 250
+          figure: '2'
+        units: g/(m2 h); K
+        values:
+          quantity_as_printed: Na2O evaporation loss rate versus temperature
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: Na2O
+            phase: stirred soda-lime-silica float glass melt
+            temperature: axis 1600–1900 K; curves are model results
+          axes_as_printed: Na2O evaporation loss rate in g/(m2 h) versus temperature in K
+          caption: Effect of temperature and oxidation state of furnace atmosphere on sodium oxide evaporation loss from stirred soda-lime-silica float glass melt with no surface depletion, humid atmosphere with 0.18 × 10^5 Pa water vapor pressure and gas velocity 10 m/s.
+          panels:
+            - panel: single
+              series:
+                - {name: no Na vapor, marker_count: 0, evidence_class: model_derived}
+                - {name: pO2 2000 Pa, marker_count: 0, evidence_class: model_derived}
+                - {name: pO2 100 Pa, marker_count: 0, evidence_class: model_derived}
+                - {name: pO2 10 Pa, marker_count: 0, evidence_class: model_derived}
+          attribution: Authors' model.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: beerkens_2001_figure3_metadata
+        type: figure_record
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 251
+          figure: '3a and 3b'
+        units: g/(m2 h); wt%; K; h
+        values:
+          quantity_as_printed: Na2O evaporation loss rate and melt-surface concentration
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: Na2O
+            phase: float glass melt surface
+            temperature: panels plot 1600–1900 K; panel a also varies exposure time
+          axes_as_printed: panel a Na2O evaporation loss rate in g/(m2 h) versus time in h; panel b surface Na2O mass fraction versus temperature in K
+          caption: Evaporation from float glass melt surface exposed to combustion gases, panel a calculated sodium oxide evaporation loss rate from static melt; panel b calculated surface sodium oxide concentration after 2 h.
+          panels:
+            - panel: a
+              series:
+                - {name: 1600 °C, marker_count: 0, evidence_class: model_derived}
+                - {name: 1500 °C, marker_count: 0, evidence_class: model_derived}
+                - {name: 1400 °C, marker_count: 0, evidence_class: model_derived}
+            - panel: b
+              series:
+                - {name: mixing, marker_count: 0, evidence_class: model_derived}
+                - {name: no Na vapor, marker_count: 0, evidence_class: model_derived}
+                - {name: pO2 1000 Pa, marker_count: 0, evidence_class: model_derived}
+                - {name: pO2 10 Pa, marker_count: 0, evidence_class: model_derived}
+          attribution: Authors' evaporation model.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: beerkens_2001_figure4_metadata
+        type: figure_record
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 251
+          figure: '4'
+        units: g/t glass melt; K
+        values:
+          quantity_as_printed: Sodium sulfate dust emissions versus temperature and gas velocity
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: Na2SO4 dust from sodium evaporation
+            phase: glass furnace exhaust dust
+            temperature: axis 1550–1950 K; model curves
+          axes_as_printed: specific Na2SO4 emissions in g/t glass melt versus temperature in K
+          caption: Sodium sulfate dust emissions as a function of temperature and gas velocity above soda-lime-silica glass melt in air-natural gas-fired furnaces with moderate oxygen excess and pO2 100 Pa.
+          panels:
+            - panel: single
+              series:
+                - {name: gas velocity 10 m/s, marker_count: 0, evidence_class: model_derived}
+                - {name: gas velocity 5 m/s, marker_count: 0, evidence_class: model_derived}
+                - {name: gas velocity 2.5 m/s, marker_count: 0, evidence_class: model_derived}
+                - {name: gas velocity 10 m/s and pO2 10 Pa, marker_count: 0, evidence_class: model_derived}
+          attribution: Authors' combustion and evaporation model.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: beerkens_2001_figure8_metadata
+        type: figure_record
+        locator:
+          page: 9
+          pdf_page_index: 8
+          published_page: 253
+          figure: '8'
+        units: m/s; g/kg glass; m
+        values:
+          quantity_as_printed: Gas velocity and specific sodium sulfate dust emissions versus burner distance
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: gas flow and Na2SO4 dust
+            phase: combustion gas above soda-lime-silica glass melt and exhaust dust
+            temperature: typical end-port fired glass furnace; no single numeric temperature
+          axes_as_printed: gas velocity above melt in m/s and Na2SO4 emission in g/kg glass versus burner distance from glass surface in m
+          caption: Calculated gas velocity above glass melt and specific dust emissions calculated by combustion and evaporation models, depending on distance between burner and glass surface in a typical end-port fired glass furnace.
+          panels:
+            - panel: single
+              series:
+                - {name: gas velocity above melt, marker_count: 0, evidence_class: model_derived}
+                - {name: Na2SO4 dust emission, marker_count: 0, evidence_class: model_derived}
+          attribution: Authors' combustion and evaporation models.
+          text_result_as_printed: >-
+            Increasing burner-to-melt distance from 0.6 to 0.7 m to more than
+            1 m lowers gas velocity above the melt by about 50%.
+          candidate_tokens: []
+          schema_gap: >-
+            Gas velocity versus burner distance has no matching quantity token;
+            the figure remains deferred without numeric points.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: beerkens_2001_figure9_metadata
+        type: figure_record
+        locator:
+          page: 10
+          pdf_page_index: 9
+          published_page: 254
+          figure: '9'
+        units: g/h; furnace arrangement number
+        values:
+          quantity_as_printed: Measured total Na2O loss and calculated average Na2O emissions
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: Na2O
+            phase: soda-lime glass melt and furnace atmosphere
+            temperature: furnace-dependent; Table 3 gives CFD-calculated average values 1453–1511 °C
+          axes_as_printed: Na2O evaporation loss rate in g/h versus burner arrangement numbers 1–5
+          caption: Measured sodium evaporation rates and calculated average Na2O emissions for industrial natural gas-oxygen fired soda-lime glass furnaces; CO vapor pressure measured just above the melt is printed under the bars.
+          panels:
+            - panel: single
+              series:
+                - {name: measured Na2O total, marker_count: 5, evidence_class: measured_direct}
+                - {name: calculated Na2O in hot spot area, marker_count: 5, evidence_class: model_derived}
+                - {name: calculated Na2O total, marker_count: 5, evidence_class: model_derived}
+          CO_pressure_labels_as_printed_Pa: ['<500', '6000', '6000', '1200', '<500']
+          attribution: Authors' industrial furnace measurements and model.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+  NaCl:
+    observations:
+      - observation_id: beerkens_2001_text_extra_nacl_evaporated_fraction
+        type: mass_loss
+        locator:
+          page: 11
+          pdf_page_index: 10
+          published_page: 255
+          section: Evaporation of other species from glass melts
+          figure: '10'
+          note: The prose gives an approximate fraction for extra NaCl input, not a digitized figure point.
+        units: '%'
+        per: initial_mass
+        values:
+          quantity: mass_loss_fraction
+          method_class: quoted_attributed
+          admission_status: admitted
+          mass_loss_pct: 50
+          approximate: true
+          value_as_published: about 50% of the extra NaCl added to the batch evaporates
+          attribution: Beek, A. R. M. ter and Thole, E. J. M. C. (1992), reference 37.
+          denominator_as_printed: extra NaCl added above the 0.200 g NaCl per ton glass background
+          background_absorption_as_printed: The first 0.200 g NaCl per ton glass is almost completely absorbed in the melt.
+          products_as_printed: HCl and sodium sulfate dust
+        point_conditions:
+          temperature_C:
+            state:
+              tag: unknown
+              reason: The prose does not state the furnace temperature for this cited test.
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 255
+              section: Evaporation of other species from glass melts
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: No numeric oxygen pressure is stated for the cited test.
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 255
+              section: Evaporation of other species from glass melts
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Total pressure is not stated for the cited test.
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 255
+              section: Evaporation of other species from glass melts
+          composition:
+            state:
+              tag: unknown
+              reason: The prose names float glass and changing soda quality but gives no complete melt composition.
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 255
+              section: Evaporation of other species from glass melts
+    context:
+      - observation_id: beerkens_2001_figure10_emission_markers
+        type: figure_record
+        locator:
+          page: 11
+          pdf_page_index: 10
+          published_page: 255
+          figure: '10'
+        units: mg/m3 emissions; mg/kg glass chloride input
+        values:
+          quantity_as_printed: HCl and dust emissions versus chloride input in batch
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: HCl(g) and dust consisting mainly of Na2SO4
+            phase: raw flue gas before filter and scrubber
+            temperature: not stated
+          axes_as_printed: emissions in mg/m3 versus chloride input in batch in mg/kg glass
+          caption: HCl and dust emissions measured before filter and scrubber system during tests with different soda qualities in a float glass furnace.
+          panels:
+            - panel: single
+              series:
+                - name: dust; 94% Na2SO4
+                  marker_count: 6
+                  evidence_class: quoted_attributed
+                - name: HCl gas
+                  marker_count: 6
+                  evidence_class: quoted_attributed
+          attribution: Industrial float-glass-furnace measurements cited as reference 37.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+  SiO2:
+    observations: []
+    context:
+      - observation_id: beerkens_2001_figure1_metadata
+        type: figure_record
+        locator:
+          page: 4
+          pdf_page_index: 3
+          published_page: 248
+          figure: '1'
+        units: none
+        values:
+          quantity_as_printed: Evaporation process for a melt component j exposed to a gas flow with reacting species k
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: volatile glass component j and gas species k
+            phase: glass melt and gas
+            temperature: spatial profile T shown schematically; no numeric value
+          axes_as_printed: schematic concentration and temperature profiles; no quantitative axes
+          caption: Schematic presentation of evaporation process for a component j from a glass melt exposed to a gas flow with a reacting gas species k.
+          panels:
+            - panel: single
+              series:
+                - name: schematic melt and gas profiles
+                  marker_count: 0
+                  evidence_class: model_derived
+          attribution: Authors' schematic.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: beerkens_2001_figure5_metadata
+        type: figure_record
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 251
+          figure: '5'
+        units: none
+        values:
+          quantity_as_printed: Laboratory equipment schematic for evaporation experiments
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: volatile glass melt components
+            phase: glass melt and combustion gas
+            temperature: adjusted laboratory furnace temperature; no numeric value in figure
+          axes_as_printed: none; apparatus diagram
+          caption: Laboratory equipment for experimental investigation of evaporation processes from glass melts exposed to combustion gases.
+          panels:
+            - panel: single
+              series:
+                - name: burner, melt and gas-analysis apparatus
+                  marker_count: 0
+                  evidence_class: measured_direct
+          attribution: Authors' apparatus schematic.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+  PbO:
+    observations: []
+    context:
+      - observation_id: beerkens_2001_quoted_lead_surface_depletion_context
+        type: quoted_measurement_context
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 252
+          section: Modeling of lead evaporation from glass melts
+        units: °C; h; wt%; percent surface depletion
+        values:
+          quantity_as_printed: Lead oxide surface depletion in a lead-alkali-silicate melt
+          method_class: quoted_attributed
+          attribution: Matousek and Hlavac [19]
+          surface_depletion_as_printed: more than 50%
+          exposure_time_as_printed: 8 h
+          temperature_as_printed: 1300 °C
+          initial_composition_wt_pct_as_printed: {PbO: '24.8', SiO2: '58', K2O: '9.9', Na2O: '4.4'}
+          candidate_tokens: [mass_loss_fraction, residue_component_composition]
+          schema_gap: >-
+            This is depletion of the melt surface concentration, not whole-sample
+            mass loss or a final residue composition.
+      - observation_id: beerkens_2001_figure6_and_7_model_context
+        type: model_context
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 252
+          section: Modeling of lead evaporation from glass melts
+        units: wt%; mol fraction; Pa
+        values:
+          quantity_as_printed: PbO equilibrium vapor pressure and surface depletion model
+          method_class: model_derived
+          equilibrium_pressure_relation_as_printed: p*PbO = C_PbO × 2.06 × 10^11 × exp(-27520/T)
+          glass_composition_as_printed_wt_pct: {PbO: '24.8', SiO2: '58', K2O: '9.9', Na2O: '4.4'}
+          schema_gap: The displayed relation and model curves are fitted/calculated content; no measured numerical PbO series is tabulated.
+      - observation_id: beerkens_2001_figure6_metadata
+        type: figure_record
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 252
+          figure: '6'
+        units: g/(m2 h); s; K
+        values:
+          quantity_as_printed: PbO evaporation loss rate versus time
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: PbO
+            phase: lead-silicate glass melt
+            temperature: six model curves at 1573, 1623, 1673, 1723, 1773, and 1823 K
+          axes_as_printed: PbO evaporation loss rate in g/(m2 h) versus time in s
+          caption: Evaporation loss rate of lead oxide at different melting temperatures in an air-fired glass furnace with gas velocity 8 m/s and initial glass PbO concentration 24.8 wt%.
+          panels:
+            - panel: single
+              series:
+                - {name: 1573 K, marker_count: 0, evidence_class: model_derived}
+                - {name: 1623 K, marker_count: 0, evidence_class: model_derived}
+                - {name: 1673 K, marker_count: 0, evidence_class: model_derived}
+                - {name: 1723 K, marker_count: 0, evidence_class: model_derived}
+                - {name: 1773 K, marker_count: 0, evidence_class: model_derived}
+                - {name: 1823 K, marker_count: 0, evidence_class: model_derived}
+          attribution: Authors' lead evaporation model.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: beerkens_2001_figure7_metadata
+        type: figure_record
+        locator:
+          page: 8
+          pdf_page_index: 7
+          published_page: 252
+          figure: '7'
+        units: mol/m3; s; K
+        values:
+          quantity_as_printed: PbO concentration at glass melt surface versus time
+          method_class: figure_only
+          admission_status: figure_only
+          identity:
+            species: PbO
+            phase: lead-silicate glass melt surface
+            temperature: four model curves at 1573, 1673, 1773, and 1823 K
+          axes_as_printed: PbO surface concentration in mol/m3 versus time in s
+          caption: Depletion of lead oxide at the lead silicate glass melt surface during evaporation in a glass furnace.
+          panels:
+            - panel: single
+              series:
+                - {name: 1573 K, marker_count: 0, evidence_class: model_derived}
+                - {name: 1673 K, marker_count: 0, evidence_class: model_derived}
+                - {name: 1773 K, marker_count: 0, evidence_class: model_derived}
+                - {name: 1823 K, marker_count: 0, evidence_class: model_derived}
+          attribution: Authors' model-calculated surface depletion.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+  B2O3:
+    observations: []
+    context:
+      - observation_id: beerkens_2001_borosilicate_surface_depletion_context
+        type: reported_laboratory_result_context
+        locator:
+          page: 11
+          pdf_page_index: 10
+          published_page: 255
+          section: Evaporation of other species from glass melts
+        units: mm; °C; percent boron concentration reduction
+        values:
+          quantity_as_printed: Boron depletion in surface layers of borosilicate and lead glasses
+          evidence_as_printed: Laboratory experiments are mentioned without an experiment-level attribution in this passage.
+          surface_layer_thickness_as_printed: 0.5 to 3 mm
+          boron_concentration_reduction_as_printed: more than 50%
+          temperature_threshold_as_printed: especially above 1550 °C for E-glass
+          candidate_tokens: [mass_loss_fraction, residue_component_composition]
+          schema_gap: >-
+            The values describe surface-layer thickness and local concentration
+            depletion, not whole-sample mass loss or final residue composition.

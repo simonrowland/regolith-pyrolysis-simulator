@@ -61,7 +61,7 @@ experiments:
   locator:
     paragraph: Whitman-Motzfeld design example; cavity 10×7.6 mm; orifice 1.5×4.0 mm
     line_range: 304-315
-    source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+    source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
   apparatus:
     cell_material_and_liner:
       state:
@@ -70,7 +70,7 @@ experiments:
       locator:
         table: II
         line_range: '319'
-        source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+        source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
     geometry:
       orifice_area_m2:
         state:
@@ -82,7 +82,7 @@ experiments:
         locator:
           paragraph: typical orifice diameter 1.5 mm and length 4.0 mm
           line_range: '315'
-          source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+          source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         inference:
           relation: extract_inference
           inputs:
@@ -99,8 +99,9 @@ experiments:
               locator:
                 paragraph: typical orifice diameter 1.5 mm and length 4.0 mm
                 line_range: '315'
-                source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+                source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
           output_unit: m2
+          references: []
       exposed_area_m2:
         state:
           tag: value
@@ -111,7 +112,7 @@ experiments:
         locator:
           paragraph: cavity diameter 10 mm and height 7.6 mm
           line_range: '315'
-          source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+          source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         inference:
           relation: extract_inference
           inputs:
@@ -128,5 +129,6 @@ experiments:
               locator:
                 paragraph: cavity diameter 10 mm and height 7.6 mm
                 line_range: '315'
-                source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+                source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
           output_unit: m2
+          references: []

@@ -60,7 +60,10 @@ def test_zigo_table_fit_and_composite_rows_use_existing_quantities() -> None:
         )
         for source in fit_point.derived_from
     )
-    assert fit_point.locator.page == 174 and fit_point.locator.table == "1"
+    assert fit_point.locator.page == 4
+    assert fit_point.locator.published_page == 174
+    assert fit_point.locator.pdf_page_index == 3
+    assert fit_point.locator.table == "1"
     assert fit_point.point_conditions["temperature_K"].state.value == Decimal("1519")
     assert fit_point.point_conditions["temperature_K"].locator == fit_point.locator
 
@@ -144,4 +147,6 @@ def test_zigo_table_fit_and_composite_rows_use_existing_quantities() -> None:
     assert fusion_temperature.value.kind is ValueKind.UNAVAILABLE
     assert fusion_temperature.point_conditions["temperature_K"].state.value == Decimal("1863")
     assert fusion_temperature.point_conditions["temperature_K"].locator == fusion_temperature.locator
-    assert fusion_temperature.locator.page == 172
+    assert fusion_temperature.locator.page == 2
+    assert fusion_temperature.locator.published_page == 172
+    assert fusion_temperature.locator.pdf_page_index == 1

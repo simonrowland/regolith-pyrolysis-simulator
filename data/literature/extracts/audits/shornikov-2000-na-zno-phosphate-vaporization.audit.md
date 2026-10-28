@@ -1,36 +1,58 @@
-# Shornikov & Archakov 2000 vapour audit
+# Shornikov and Archakov (2000) vaporization audit
 
-Source: `shornikov-2000-na-zno-phosphate-vaporization`, 8 PDF pages. The paper contains no numbered data tables. MinerU's content-list conversion found **0 tables**; MinerU and the tesseract OCR were used as the two machine reads. The source `pdftotext` output is empty because the PDF has no text layer.
+## Reconciliation
 
-## Eligible observations
+Green's extract is the base. It has six admitted Figure 1(c) observations and
+four Figure 3 series 1 context points. Batch4 has 35 figure reads: ten overlap
+those Green records and 25 add distinct plotted points. The ten overlaps differ
+slightly because the reads used different pixel calibrations; the page renders
+and stated uncertainties support Green's smaller-uncertainty values. The table
+records both reads and the retained Green value.
 
-**Printed Na(g) pressure/flux rows: 0.** On PDF page 2 (published page 59), the authors state that partial pressures for Na and other vapour species were determined using the Hertz–Knudsen equation with partial evaporation coefficients. The text gives no numerical Na pressure, flux, or rowwise composition/temperature values. The study-wide 950–1550 K range is printed in the introduction (PDF page 1), but it does not define point temperatures.
+| Figure / series / point | Green value (x, y) | Batch4 read (x, y) | Retained |
+|---|---|---|---|
+| 1(c), Na2O, near 33 mol% | `33.24, -14.186` | `33.23, -14.17` | Green `shornikov_2000_fig1c_na2o_x33` |
+| 1(c), Na2O, near 40 mol% | `39.93, -14.313` | `39.91, -14.3` | Green `shornikov_2000_fig1c_na2o_x40` |
+| 1(c), ZnO, near 33 mol% | `33.2, -4.143` | `33.13, -4.11` | Green `shornikov_2000_fig1c_zno_x33` |
+| 1(c), ZnO, near 40 mol% | `39.72, -3.723` | `39.75, -3.7` | Green `shornikov_2000_fig1c_zno_x40` |
+| 1(c), P2O5, near 33 mol% | `33.2, -5.886` | `33.21, -5.87` | Green `shornikov_2000_fig1c_p2o5_x33` |
+| 1(c), P2O5, near 40 mol% | `39.85, -5.534` | `39.81, -5.52` | Green `shornikov_2000_fig1c_p2o5_x40` |
+| 3, series 1, near 0 mol% | `-0.02, -31.966` | `-0.03, -31.94` | Green `shornikov_2000_fig3_series1_x0` |
+| 3, series 1, near 33 mol% | `33.22, -18.529` | `33.23, -18.51` | Green `shornikov_2000_fig3_series1_x33` |
+| 3, series 1, near 40 mol% | `39.88, -16.385` | `39.88, -16.38` | Green `shornikov_2000_fig3_series1_x40` |
+| 3, series 1, near 67 mol% | `66.54, -8.706` | `66.57, -8.69` | Green `shornikov_2000_fig3_series1_x67` |
 
-The reported procedure is high-temperature mass-spectrometric Knudsen effusion. The samples were measured in molybdenum effusion cells with an evaporation-to-effusion-square ratio greater than 500 using a modified MI 1201T mass spectrometer (PDF pages 1–2). On PDF page 2, the authors say partial pressures for PO, PO2, P2, Zn, Na, and NaPO3 were determined by the Hertz–Knudsen equation with partial evaporation coefficients. They also report comparison-method agreement using ionization cross-sections and Ag and Zn partial-pressure standards. These statements are retained as typed context, not numerical Na vapour observations.
+The comparison table covers Figure 1(c), p. 60, and Figure 3, p. 63. The
+coordinates are from the 600 dpi renders of PDF p. 3 (printed p. 60) and PDF
+p. 6 (printed p. 63). Green's Figure 1(c) reads have stated
+uncertainty ±0.15 mol% in x and ±0.03 in log activity; its Figure 3 reads have
+±0.15 mol% in x and ±0.04 in ΔG/RT. Batch4's corresponding uncertainties are
+±0.96–1.41 mol% and ±0.19–0.29 in Figure 1(c), and ±0.9 mol% and ±0.57 in
+Figure 3. All ten pairs agree within the combined uncertainties. Green's
+observation IDs and values are retained.
 
-Figures 1–3 contain plotted context on the melt-activity, residue-composition, and thermochemistry rails. All 35 digitised points remain context-only, so the extract still has zero observations. The extraction and figure-inventory context rows list each candidate as read and verified.
+Batch4's two new Figure 1(c) points (ZnO and P2O5 near 67 mol%), all 18 Figure 2
+composition points, and five Figure 3 series 2 points are added as context.
+Figure counts remain 8, 18, and 9. Batch4's method and pressure details are
+folded into Green's existing apparatus and partial-pressure contexts. The
+single figure-inventory context row carries the candidate list also retained
+under `extraction`; no duplicate method or pressure rows are added.
 
-| Figure / page | Points | Axes and units | Standard/reference state | Series and temperature |
-|---|---:|---|---|---|
-| 1(c), p. 60 | 8 | x(ZnO), mole %; y(log a_i(i)) | Pure oxides forming the ternary system | 1 Na2O, 2 ZnO, 3 P2O5; present study at 1100 K |
-| 2, p. 63 | 18 | x(Na2O), mole %; y(x(ZnO)), mole % | Not applicable to composition coordinates | 1 Na2O·ZnO·P2O5; 2 4Na2O·6ZnO·5P2O5; no temperature printed |
-| 3, p. 63 | 9 | x(ZnO), mole %; y(ΔG_T/RT) | Text names pure oxide components as standard states | 1 Na4P2O7–Zn2P2O7, present study at 1100 K; 2 Sn2P2O7–Zn2P2O7, prior data at 1300 K |
+## Disposition and migration
 
-## Digitisation verification
+The source has no numbered numeric tables and prints no rowwise Na(g) pressure,
+flux, or evaporation coefficient. Figure 1(c) shows activities at 1100 K;
+Figure 2 shows residue compositions without a printed temperature; Figure 3
+shows dimensionless ΔG/RT for this study at 1100 K and cited prior data at
+1300 K. Those 35 plotted points remain unscored context. Green's 11 observations
+remain intact.
 
-Two independent calibrated reads were compared. All matched points agree within 2× the combined uncertainty; the largest normalized discrepancy is 0.066. The independent pass identified two missed Fig. 2 series-1 symbols; both were reread from a fresh 600 dpi render and agree with the blind read within 2× the combined uncertainty. Coordinates and x/y uncertainties in the extract are copied from `points-v2.tsv`; uncertainty is digitisation uncertainty (tick-fit residual plus symbol half-width), not reported experimental uncertainty. Pixel centres use the 600 dpi page render, origin at top-left, with row increasing downward.
+The merged extract passes validation. Its isolated migration emits 11 existing
+observations, 35 context rows, and 0 hard issues. Mutation pins retain the
+Batch4 Figure 1(c), Figure 2, and Figure 3 reads while checking the selected
+Green values for the overlapping points.
 
-The verification records document two issues in the earlier read/report: its TSV omitted those two Fig. 2 points, and its report contained an incorrect total and an incorrect claim that an overlapping Fig. 2 locus was not emitted. The reconciled 35-row TSV includes both added symbols and retains the two distinct open rings.
+Verification basis: controller two-read verification, 2026-10-28.
 
-## Migration and regression evidence
-
-The focused regression validates the extract and migrates it in isolation: **0 observations, 0 hard issues, 38 context rows** (3 existing context rows plus 35 figure points). It pins one exact x/y point from each figure and checks point counts of 8, 18, and 9. No schema change or store regeneration is included.
-
-Expected store delta: one work, 38 unscored context rows, and zero observations. No committed battery-store regeneration.
-
-Source and verification records:
-
-- `/Users/simonrowland/Repos/regolith-pyrolysis-simulator/docs-private/research/2026-10-26-scorability/shornikov-2000-figs/points-v2.tsv`
-- `/Users/simonrowland/Repos/regolith-pyrolysis-simulator/docs-private/research/2026-10-26-scorability/shornikov-2000-figs/verify-review.md`
-- `/Users/simonrowland/Repos/regolith-pyrolysis-simulator/docs-private/research/2026-10-26-scorability/shornikov-2000-figs/reconcile.md`
-- `/Users/simonrowland/Repos/regolith-pyrolysis-simulator/docs-private/research/2026-10-26-scorability/shornikov-2000-figs/calibration.md`
+Expected store delta relative to green: 0 scored observations and 25 additional
+unscored context rows. The battery store is not regenerated.

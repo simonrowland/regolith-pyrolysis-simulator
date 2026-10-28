@@ -1,0 +1,331 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2022-na2o-al2o3-melts.yaml
+observations:
+- observation_id: shornikov-2022-na2o-al2o3-melts::na2o_2022_naalO2_tm_matignon
+  experiment_id: 1b327fcaa3392498ee833f1fb2e05f23e2b06c52c6ce4ee7f77612797de1707e::shornikov-2022-na2o-al2o3-melts
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: NaAlO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1923'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '20'
+      verbatim: 1923±20 K
+      confidence_level: not_stated
+      basis: One printed ±. The paper does not state the confidence level.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Matignon (1923)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2022-na2o-al2o3-melts::na2o_2022_naalO2_tm_matignon
+  source_id: shornikov-2022-na2o-al2o3-melts
+  locator:
+    page: 3
+    published_page: 69
+    pdf_page_index: 2
+    section: Introduction
+    note: 'Cited melting temperature of NaAlO2: Matignon (1923).'
+  read_from: pdf:shornikov-2022-na2o-al2o3-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 3
+        published_page: 69
+        pdf_page_index: 2
+        section: Introduction
+        note: 'Cited melting temperature of NaAlO2: Matignon (1923).'
+- observation_id: shornikov-2022-na2o-al2o3-melts::na2o_2022_naalO2_tm_schairer
+  experiment_id: 1b327fcaa3392498ee833f1fb2e05f23e2b06c52c6ce4ee7f77612797de1707e::shornikov-2022-na2o-al2o3-melts
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: NaAlO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2123'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '30'
+      verbatim: 2123±30 K
+      confidence_level: not_stated
+      basis: One printed ±. The paper does not state the confidence level.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Schairer and Bowen (1956)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2022-na2o-al2o3-melts::na2o_2022_naalO2_tm_schairer
+  source_id: shornikov-2022-na2o-al2o3-melts
+  locator:
+    page: 3
+    published_page: 69
+    pdf_page_index: 2
+    section: Introduction
+    note: 'Cited melting temperature of NaAlO2: Schairer and Bowen (1956).'
+  read_from: pdf:shornikov-2022-na2o-al2o3-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        page: 3
+        published_page: 69
+        pdf_page_index: 2
+        section: Introduction
+        note: 'Cited melting temperature of NaAlO2: Schairer and Bowen (1956).'
+- observation_id: shornikov-2022-na2o-al2o3-melts::na2o_2022_naalO2_tm_weber
+  experiment_id: 1b327fcaa3392498ee833f1fb2e05f23e2b06c52c6ce4ee7f77612797de1707e::shornikov-2022-na2o-al2o3-melts
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: NaAlO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2140'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '6'
+      verbatim: 2140±6 K
+      confidence_level: not_stated
+      basis: One printed ±. The paper does not state the confidence level.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Weber and Venero (1970)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2022-na2o-al2o3-melts::na2o_2022_naalO2_tm_weber
+  source_id: shornikov-2022-na2o-al2o3-melts
+  locator:
+    page: 3
+    published_page: 69
+    pdf_page_index: 2
+    section: Introduction
+    note: 'Cited melting temperature of NaAlO2: Weber and Venero (1970).'
+  read_from: pdf:shornikov-2022-na2o-al2o3-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2140'
+      locator:
+        page: 3
+        published_page: 69
+        pdf_page_index: 2
+        section: Introduction
+        note: 'Cited melting temperature of NaAlO2: Weber and Venero (1970).'

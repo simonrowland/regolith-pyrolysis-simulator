@@ -1,0 +1,123 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe
+  citation: Shornikov, S. I. (2007), Redox condition influence on CaO-MgO-FeO-Al2O3-SiO2 melt evaporation, Experiment in Geosciences
+    14(1):37-39.
+  source_ids:
+  - shornikov-2007-ca-aluminosilicate-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:shornikov-2007-ca-aluminosilicate-activities
+      role: pdf
+      path: raw/shornikov-2007-ca-aluminosilicate-activities/shornikov-2007-ca-aluminosilicate-activities.pdf
+      sha256:
+        tag: value
+        value: d9dcb19c31b9e1b298fb3ca4ab80bcda6d4ccbfab44a735510425b02db928635
+    - asset_id: pdftotext:shornikov-2007-ca-aluminosilicate-activities
+      role: pdftotext
+      path: text/shornikov-2007-ca-aluminosilicate-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2007-ca-aluminosilicate-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime "Conference note on redox conditions and oxide-melt evaporation. The printed pressure factors compare a
+      reducing container with chemically neutral evaporation. The two evaporation coefficients are quoted from the paragraph
+      on Hashimoto's graphite-container experiments. No single temperature is printed on those sentences." is not a closed
+      method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe
+  locator:
+    page: 1
+    published_page: 37
+    pdf_page_index: 0
+    section: Redox condition influence
+context:
+- observation_id: shornikov_2007_cas_melts_tail_duplicate
+  type: duplicate_of_extracted_paper
+  locator:
+    page: 1
+    published_page: 37
+    pdf_page_index: 0
+    figure: closing figure of the preceding article
+  units: not extracted
+  values:
+    status: context_only
+    duplicate_of: shornikov-2007-cao-aluminosilicate-melts
+    value_as_printed: not extracted
+    note: PDF page 1 opens with the closing figure of Thermodynamic properties of CaO-Al2O3-SiO2 melts, CaSiO3-CaAl2Si2O8
+      and CaAl2Si2O8-CaAl2O4 at 2000 K. That paper is already shornikov-2007-cao-aluminosilicate-melts, Experiment in Geosciences
+      14(1):35-37. No table on this page is new.
+  context_id: shornikov-2007-ca-aluminosilicate-activities::context::shornikov_2007_cas_melts_tail_duplicate
+  work_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe
+  source_id: shornikov-2007-ca-aluminosilicate-activities
+  species: Fe
+- observation_id: shornikov_2007_figures_not_digitised
+  type: figure_not_digitised
+  locator:
+    page: 2
+    published_page: 38
+    pdf_page_index: 1
+    figure: 1-2
+  units: log pressure as printed
+  values:
+    status: context_only
+    value_as_printed: not sampled
+    unavailable_reason: curves_not_read
+    note: Fig. 1 plots log p(SiO) and log p(Al) against T for several containers. Fig. 2 plots log p(i) against log p(O) at
+      the temperature named in its discussion, 2000 K. The curves were not read. The prose factors are the admitted numbers.
+  context_id: shornikov-2007-ca-aluminosilicate-activities::context::shornikov_2007_figures_not_digitised
+  work_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe
+  source_id: shornikov-2007-ca-aluminosilicate-activities
+  species: Fe
+- observation_id: shornikov_2007_shushkanova_out_of_scope
+  type: unrelated_abstract
+  locator:
+    page: 3
+    published_page: 39
+    pdf_page_index: 2
+  units: not extracted
+  values:
+    status: context_only
+    value_as_printed: not extracted
+    note: Journal page 39 continues the redox note through its conclusions and references 1-23. Shushkanova, Litvin, Dubrovinskaia,
+      and Dubrovinsky begin in the right column after reference 23, on melting relations of a model garnet-pyrrhotite-carbonate
+      system at 7-20 GPa. That abstract is not a Shornikov evaporation dataset.
+  context_id: shornikov-2007-ca-aluminosilicate-activities::context::shornikov_2007_shushkanova_out_of_scope
+  work_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe
+  source_id: shornikov-2007-ca-aluminosilicate-activities
+  species: Fe

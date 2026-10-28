@@ -2,341 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/guo-2021-mgo-activity-cmas-slag.yaml
 observations:
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=32bc4d012e2d
-  experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
-  identity:
-    quantity:
-      tag: value
-      value: activity
-    species:
-      formula: MgO
-      phase:
-        tag: value
-        value: l
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile activity does not use subtype
-    per:
-      tag: value
-      value: dimensionless
-    temperature_K:
-      tag: value
-      value: '1873'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: MgO
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: periclase
-          charge:
-            tag: value
-            value: 0
-        component_basis: MgO
-    reservoir:
-      tag: not_applicable
-      reason: profile activity does not use reservoir
-    composition:
-      tag: value
-      value:
-        basis: printed_mole_fraction
-        components:
-        - - CaO
-          - '0.431719127168'
-        - - SiO2
-          - '0.299946408475'
-        - - MgO
-          - '0.149251590026'
-        - - Al2O3
-          - '0.119082874332'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity does not use wall
-  value:
-    kind: point
-    point: '0.6376'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 5 activity cells.
-  evidence:
-    class:
-      tag: value
-      value: measured_reduced
-    original_method_class: directly_reduced_measurement
-  admission:
-    status: admitted
-    reason: source admission_status=admitted
-    decided_by:
-      worker: codex
-      date: '2026-10-01'
-      evidence:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Eight Table 5 activity rows; each point carries its row locator
-  notices: []
-  source_id: guo-2021-mgo-activity-cmas-slag
-  locator:
-    published_page: 2728
-    pdf_page_index: 4
-    table: '5'
-    note: Row 4; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-  read_from: pdf:guo-2021-mgo-activity-cmas-slag
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Row 4; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '39.32'
-          SiO2: '29.27'
-          MgO: '9.77'
-          Al2O3: '19.72'
-      locator:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Row 4; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_mole_fraction
-          components:
-          - - CaO
-            - '0.431719127168'
-          - - SiO2
-            - '0.299946408475'
-          - - MgO
-            - '0.149251590026'
-          - - Al2O3
-            - '0.119082874332'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Row 4; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
-    parameters: []
-    output_unit: dimensionless activity
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=3c1cc249e132
-  experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
-  identity:
-    quantity:
-      tag: value
-      value: activity
-    species:
-      formula: MgO
-      phase:
-        tag: value
-        value: l
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile activity does not use subtype
-    per:
-      tag: value
-      value: dimensionless
-    temperature_K:
-      tag: value
-      value: '1873'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: MgO
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: periclase
-          charge:
-            tag: value
-            value: 0
-        component_basis: MgO
-    reservoir:
-      tag: not_applicable
-      reason: profile activity does not use reservoir
-    composition:
-      tag: value
-      value:
-        basis: printed_mole_fraction
-        components:
-        - - CaO
-          - '0.455226897569'
-        - - SiO2
-          - '0.323883475959'
-        - - MgO
-          - '0.10192684596'
-        - - Al2O3
-          - '0.118962780512'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity does not use wall
-  value:
-    kind: point
-    point: '0.4751'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 5 activity cells.
-  evidence:
-    class:
-      tag: value
-      value: measured_reduced
-    original_method_class: directly_reduced_measurement
-  admission:
-    status: admitted
-    reason: source admission_status=admitted
-    decided_by:
-      worker: codex
-      date: '2026-10-01'
-      evidence:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Eight Table 5 activity rows; each point carries its row locator
-  notices: []
-  source_id: guo-2021-mgo-activity-cmas-slag
-  locator:
-    published_page: 2728
-    pdf_page_index: 4
-    table: '5'
-    note: Row 6; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-  read_from: pdf:guo-2021-mgo-activity-cmas-slag
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Row 6; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '40.64'
-          SiO2: '30.98'
-          MgO: '6.54'
-          Al2O3: '19.31'
-      locator:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Row 6; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_mole_fraction
-          components:
-          - - CaO
-            - '0.455226897569'
-          - - SiO2
-            - '0.323883475959'
-          - - MgO
-            - '0.10192684596'
-          - - Al2O3
-            - '0.118962780512'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Row 6; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
-    parameters: []
-    output_unit: dimensionless activity
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=4cac59bdf171
+- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873.00:h=0ff897900a53
   experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
   identity:
     quantity:
@@ -427,14 +93,12 @@ observations:
     point: '0.5121'
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 5 activity cells.
+    kind: none
   evidence:
     class:
       tag: value
       value: measured_reduced
-    original_method_class: directly_reduced_measurement
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -445,7 +109,7 @@ observations:
         published_page: 2728
         pdf_page_index: 4
         table: '5'
-        note: Eight Table 5 activity rows; each point carries its row locator
+        note: Eight measured MgO activity results; inputs transcribed in tables/guo-2021-mgo-activity-cmas-slag/t5.csv.
   notices: []
   source_id: guo-2021-mgo-activity-cmas-slag
   locator:
@@ -463,7 +127,6 @@ observations:
         published_page: 2728
         pdf_page_index: 4
         table: '5'
-        note: Row 2; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
     printed_composition:
       state:
         tag: value
@@ -497,13 +160,16 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: Row 2; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+  derived_from:
+  - tables:guo-2021-mgo-activity-cmas-slag
   derivation:
-    relation: as_published
+    relation: Table 5 MgO activity reduced from measured Mg-in-Sn mole fraction using the reference slag value in Table 4
     inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
+    - tables:guo-2021-mgo-activity-cmas-slag
     parameters: []
     output_unit: dimensionless activity
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=71068406e155
+    references: []
+- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873.00:h=3c60c5566bf4
   experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
   identity:
     quantity:
@@ -563,13 +229,13 @@ observations:
         basis: printed_mole_fraction
         components:
         - - CaO
-          - '0.42198059202'
+          - '0.455226897569'
         - - SiO2
-          - '0.304520594964'
+          - '0.323883475959'
         - - MgO
-          - '0.155531288949'
+          - '0.10192684596'
         - - Al2O3
-          - '0.117967524067'
+          - '0.118962780512'
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
@@ -591,17 +257,15 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: point
-    point: '0.6472'
+    point: '0.4751'
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 5 activity cells.
+    kind: none
   evidence:
     class:
       tag: value
       value: measured_reduced
-    original_method_class: directly_reduced_measurement
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -612,14 +276,14 @@ observations:
         published_page: 2728
         pdf_page_index: 4
         table: '5'
-        note: Eight Table 5 activity rows; each point carries its row locator
+        note: Eight measured MgO activity results; inputs transcribed in tables/guo-2021-mgo-activity-cmas-slag/t5.csv.
   notices: []
   source_id: guo-2021-mgo-activity-cmas-slag
   locator:
     published_page: 2728
     pdf_page_index: 4
     table: '5'
-    note: Row 8; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+    note: Row 6; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
   read_from: pdf:guo-2021-mgo-activity-cmas-slag
   point_conditions:
     temperature_K:
@@ -630,20 +294,19 @@ observations:
         published_page: 2728
         pdf_page_index: 4
         table: '5'
-        note: Row 8; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
     printed_composition:
       state:
         tag: value
         value:
-          CaO: '38.58'
-          SiO2: '29.83'
-          MgO: '10.22'
-          Al2O3: '19.61'
+          CaO: '40.64'
+          SiO2: '30.98'
+          MgO: '6.54'
+          Al2O3: '19.31'
       locator:
         published_page: 2728
         pdf_page_index: 4
         table: '5'
-        note: Row 8; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+        note: Row 6; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
     composition:
       state:
         tag: value
@@ -651,26 +314,29 @@ observations:
           basis: printed_mole_fraction
           components:
           - - CaO
-            - '0.42198059202'
+            - '0.455226897569'
           - - SiO2
-            - '0.304520594964'
+            - '0.323883475959'
           - - MgO
-            - '0.155531288949'
+            - '0.10192684596'
           - - Al2O3
-            - '0.117967524067'
+            - '0.118962780512'
           amount_basis: mole_fraction
       locator:
         published_page: 2728
         pdf_page_index: 4
         table: '5'
-        note: Row 8; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+        note: Row 6; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+  derived_from:
+  - tables:guo-2021-mgo-activity-cmas-slag
   derivation:
-    relation: as_published
+    relation: Table 5 MgO activity reduced from measured Mg-in-Sn mole fraction using the reference slag value in Table 4
     inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
+    - tables:guo-2021-mgo-activity-cmas-slag
     parameters: []
     output_unit: dimensionless activity
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=ac3a4d6ec1a1
+    references: []
+- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873.00:h=53042a8e3fb7
   experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
   identity:
     quantity:
@@ -730,13 +396,13 @@ observations:
         basis: printed_mole_fraction
         components:
         - - CaO
-          - '0.439093192417'
+          - '0.431719127168'
         - - SiO2
-          - '0.311176628138'
+          - '0.299946408475'
         - - MgO
-          - '0.129289670492'
+          - '0.149251590026'
         - - Al2O3
-          - '0.120440508952'
+          - '0.119082874332'
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
@@ -758,17 +424,15 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: point
-    point: '0.5716'
+    point: '0.6376'
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 5 activity cells.
+    kind: none
   evidence:
     class:
       tag: value
       value: measured_reduced
-    original_method_class: directly_reduced_measurement
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -779,14 +443,14 @@ observations:
         published_page: 2728
         pdf_page_index: 4
         table: '5'
-        note: Eight Table 5 activity rows; each point carries its row locator
+        note: Eight measured MgO activity results; inputs transcribed in tables/guo-2021-mgo-activity-cmas-slag/t5.csv.
   notices: []
   source_id: guo-2021-mgo-activity-cmas-slag
   locator:
     published_page: 2728
     pdf_page_index: 4
     table: '5'
-    note: Row 7; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+    note: Row 4; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
   read_from: pdf:guo-2021-mgo-activity-cmas-slag
   point_conditions:
     temperature_K:
@@ -797,20 +461,19 @@ observations:
         published_page: 2728
         pdf_page_index: 4
         table: '5'
-        note: Row 7; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
     printed_composition:
       state:
         tag: value
         value:
-          CaO: '39.22'
-          SiO2: '29.78'
-          MgO: '8.3'
-          Al2O3: '19.56'
+          CaO: '39.32'
+          SiO2: '29.27'
+          MgO: '9.77'
+          Al2O3: '19.72'
       locator:
         published_page: 2728
         pdf_page_index: 4
         table: '5'
-        note: Row 7; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+        note: Row 4; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
     composition:
       state:
         tag: value
@@ -818,360 +481,29 @@ observations:
           basis: printed_mole_fraction
           components:
           - - CaO
-            - '0.439093192417'
+            - '0.431719127168'
           - - SiO2
-            - '0.311176628138'
+            - '0.299946408475'
           - - MgO
-            - '0.129289670492'
+            - '0.149251590026'
           - - Al2O3
-            - '0.120440508952'
+            - '0.119082874332'
           amount_basis: mole_fraction
       locator:
         published_page: 2728
         pdf_page_index: 4
         table: '5'
-        note: Row 7; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+        note: Row 4; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+  derived_from:
+  - tables:guo-2021-mgo-activity-cmas-slag
   derivation:
-    relation: as_published
+    relation: Table 5 MgO activity reduced from measured Mg-in-Sn mole fraction using the reference slag value in Table 4
     inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
+    - tables:guo-2021-mgo-activity-cmas-slag
     parameters: []
     output_unit: dimensionless activity
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=b5d6673b3c17
-  experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
-  identity:
-    quantity:
-      tag: value
-      value: activity
-    species:
-      formula: MgO
-      phase:
-        tag: value
-        value: l
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile activity does not use subtype
-    per:
-      tag: value
-      value: dimensionless
-    temperature_K:
-      tag: value
-      value: '1873'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: MgO
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: periclase
-          charge:
-            tag: value
-            value: 0
-        component_basis: MgO
-    reservoir:
-      tag: not_applicable
-      reason: profile activity does not use reservoir
-    composition:
-      tag: value
-      value:
-        basis: printed_mole_fraction
-        components:
-        - - CaO
-          - '0.420553442921'
-        - - SiO2
-          - '0.315812928871'
-        - - MgO
-          - '0.145177566378'
-        - - Al2O3
-          - '0.118456061829'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity does not use wall
-  value:
-    kind: point
-    point: '0.5379'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 5 activity cells.
-  evidence:
-    class:
-      tag: value
-      value: measured_reduced
-    original_method_class: directly_reduced_measurement
-  admission:
-    status: admitted
-    reason: source admission_status=admitted
-    decided_by:
-      worker: codex
-      date: '2026-10-01'
-      evidence:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Eight Table 5 activity rows; each point carries its row locator
-  notices: []
-  source_id: guo-2021-mgo-activity-cmas-slag
-  locator:
-    published_page: 2728
-    pdf_page_index: 4
-    table: '5'
-    note: Row 3; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-  read_from: pdf:guo-2021-mgo-activity-cmas-slag
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Row 3; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '38.33'
-          SiO2: '30.84'
-          MgO: '9.51'
-          Al2O3: '19.63'
-      locator:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Row 3; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_mole_fraction
-          components:
-          - - CaO
-            - '0.420553442921'
-          - - SiO2
-            - '0.315812928871'
-          - - MgO
-            - '0.145177566378'
-          - - Al2O3
-            - '0.118456061829'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Row 3; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
-    parameters: []
-    output_unit: dimensionless activity
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=bb4b7eb5081e
-  experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
-  identity:
-    quantity:
-      tag: value
-      value: activity
-    species:
-      formula: MgO
-      phase:
-        tag: value
-        value: l
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile activity does not use subtype
-    per:
-      tag: value
-      value: dimensionless
-    temperature_K:
-      tag: value
-      value: '1873'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: MgO
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: periclase
-          charge:
-            tag: value
-            value: 0
-        component_basis: MgO
-    reservoir:
-      tag: not_applicable
-      reason: profile activity does not use reservoir
-    composition:
-      tag: value
-      value:
-        basis: printed_mole_fraction
-        components:
-        - - CaO
-          - '0.472143449804'
-        - - SiO2
-          - '0.335207407507'
-        - - MgO
-          - '0.0726421384761'
-        - - Al2O3
-          - '0.120007004212'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity does not use wall
-  value:
-    kind: point
-    point: '0.4236'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 5 activity cells.
-  evidence:
-    class:
-      tag: value
-      value: measured_reduced
-    original_method_class: directly_reduced_measurement
-  admission:
-    status: admitted
-    reason: source admission_status=admitted
-    decided_by:
-      worker: codex
-      date: '2026-10-01'
-      evidence:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Eight Table 5 activity rows; each point carries its row locator
-  notices: []
-  source_id: guo-2021-mgo-activity-cmas-slag
-  locator:
-    published_page: 2728
-    pdf_page_index: 4
-    table: '5'
-    note: Row 5; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-  read_from: pdf:guo-2021-mgo-activity-cmas-slag
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Row 5; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '41.87'
-          SiO2: '31.85'
-          MgO: '4.63'
-          Al2O3: '19.35'
-      locator:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Row 5; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_mole_fraction
-          components:
-          - - CaO
-            - '0.472143449804'
-          - - SiO2
-            - '0.335207407507'
-          - - MgO
-            - '0.0726421384761'
-          - - Al2O3
-            - '0.120007004212'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 2728
-        pdf_page_index: 4
-        table: '5'
-        note: Row 5; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
-    parameters: []
-    output_unit: dimensionless activity
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=d44037e4a1a7
+    references: []
+- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873.00:h=565f906a44e5
   experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
   identity:
     quantity:
@@ -1262,14 +594,12 @@ observations:
     point: '0.4478'
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 5 activity cells.
+    kind: none
   evidence:
     class:
       tag: value
       value: measured_reduced
-    original_method_class: directly_reduced_measurement
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -1280,7 +610,7 @@ observations:
         published_page: 2728
         pdf_page_index: 4
         table: '5'
-        note: Eight Table 5 activity rows; each point carries its row locator
+        note: Eight measured MgO activity results; inputs transcribed in tables/guo-2021-mgo-activity-cmas-slag/t5.csv.
   notices: []
   source_id: guo-2021-mgo-activity-cmas-slag
   locator:
@@ -1298,7 +628,6 @@ observations:
         published_page: 2728
         pdf_page_index: 4
         table: '5'
-        note: Row 1; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
     printed_composition:
       state:
         tag: value
@@ -1332,20 +661,23 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: Row 1; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+  derived_from:
+  - tables:guo-2021-mgo-activity-cmas-slag
   derivation:
-    relation: as_published
+    relation: Table 5 MgO activity reduced from measured Mg-in-Sn mole fraction using the reference slag value in Table 4
     inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
+    - tables:guo-2021-mgo-activity-cmas-slag
     parameters: []
     output_unit: dimensionless activity
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table6_mg_activity_coefficients_1873k::T=1873:h=055156f0bcdd
+    references: []
+- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873.00:h=62f8fbf03035
   experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
   identity:
     quantity:
       tag: value
-      value: activity_coefficient
+      value: activity
     species:
-      formula: Mg
+      formula: MgO
       phase:
         tag: value
         value: l
@@ -1357,7 +689,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
+      reason: profile activity does not use subtype
     per:
       tag: value
       value: dimensionless
@@ -1366,41 +698,45 @@ observations:
       value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
+      reason: profile activity does not use standard_pressure_Pa
     reaction:
       tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
+      reason: profile activity does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
+      reason: profile activity does not use formation_elements
     reference_state:
       tag: value
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Mg
+          formula: MgO
           phase:
             tag: value
-            value: l
+            value: cr
           polymorph:
-            tag: not_applicable
-            reason: not crystal
+            tag: value
+            value: periclase
           charge:
             tag: value
             value: 0
-        component_basis: Mg
+        component_basis: MgO
     reservoir:
       tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
+      reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
         basis: printed_mole_fraction
         components:
-        - - Mg
-          - '0.001959'
-        - - Sn
-          - '0.998041'
+        - - CaO
+          - '0.420553442921'
+        - - SiO2
+          - '0.315812928871'
+        - - MgO
+          - '0.145177566378'
+        - - Al2O3
+          - '0.118456061829'
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
@@ -1410,30 +746,27 @@ observations:
       reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
+      reason: profile activity does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
+      reason: profile activity does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
+      reason: profile activity does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile activity_coefficient does not use wall
+      reason: profile activity does not use wall
   value:
     kind: point
-    point: '3.1703'
+    point: '0.5379'
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 6 coefficients.
+    kind: none
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -1441,17 +774,17 @@ observations:
       worker: codex
       date: '2026-10-01'
       evidence:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Eight tabulated x[Mg], a[Mg](R) and gamma[Mg] columns
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+        note: Eight measured MgO activity results; inputs transcribed in tables/guo-2021-mgo-activity-cmas-slag/t5.csv.
   notices: []
   source_id: guo-2021-mgo-activity-cmas-slag
   locator:
-    published_page: 2730
-    pdf_page_index: 6
-    table: '6'
-    note: Eighth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+    published_page: 2728
+    pdf_page_index: 4
+    table: '5'
+    note: Row 3; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
   read_from: pdf:guo-2021-mgo-activity-cmas-slag
   point_conditions:
     temperature_K:
@@ -1459,40 +792,59 @@ observations:
         tag: value
         value: '1873'
       locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Eighth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '38.33'
+          SiO2: '30.84'
+          MgO: '9.51'
+          Al2O3: '19.63'
+      locator:
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+        note: Row 3; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
     composition:
       state:
         tag: value
         value:
           basis: printed_mole_fraction
           components:
-          - - Mg
-            - '0.001959'
-          - - Sn
-            - '0.998041'
+          - - CaO
+            - '0.420553442921'
+          - - SiO2
+            - '0.315812928871'
+          - - MgO
+            - '0.145177566378'
+          - - Al2O3
+            - '0.118456061829'
           amount_basis: mole_fraction
       locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Eighth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+        note: Row 3; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+  derived_from:
+  - tables:guo-2021-mgo-activity-cmas-slag
   derivation:
-    relation: as_published
+    relation: Table 5 MgO activity reduced from measured Mg-in-Sn mole fraction using the reference slag value in Table 4
     inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
+    - tables:guo-2021-mgo-activity-cmas-slag
     parameters: []
-    output_unit: dimensionless activity coefficient
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table6_mg_activity_coefficients_1873k::T=1873:h=2d78e03fd12a
+    output_unit: dimensionless activity
+    references: []
+- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873.00:h=88244980e4f0
   experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
   identity:
     quantity:
       tag: value
-      value: activity_coefficient
+      value: activity
     species:
-      formula: Mg
+      formula: MgO
       phase:
         tag: value
         value: l
@@ -1504,7 +856,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
+      reason: profile activity does not use subtype
     per:
       tag: value
       value: dimensionless
@@ -1513,41 +865,45 @@ observations:
       value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
+      reason: profile activity does not use standard_pressure_Pa
     reaction:
       tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
+      reason: profile activity does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
+      reason: profile activity does not use formation_elements
     reference_state:
       tag: value
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Mg
+          formula: MgO
           phase:
             tag: value
-            value: l
+            value: cr
           polymorph:
-            tag: not_applicable
-            reason: not crystal
+            tag: value
+            value: periclase
           charge:
             tag: value
             value: 0
-        component_basis: Mg
+        component_basis: MgO
     reservoir:
       tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
+      reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
         basis: printed_mole_fraction
         components:
-        - - Mg
-          - '0.001355'
-        - - Sn
-          - '0.998645'
+        - - CaO
+          - '0.439093192417'
+        - - SiO2
+          - '0.311176628138'
+        - - MgO
+          - '0.129289670492'
+        - - Al2O3
+          - '0.120440508952'
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
@@ -1557,30 +913,27 @@ observations:
       reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
+      reason: profile activity does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
+      reason: profile activity does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
+      reason: profile activity does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile activity_coefficient does not use wall
+      reason: profile activity does not use wall
   value:
     kind: point
-    point: '3.1713'
+    point: '0.5716'
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 6 coefficients.
+    kind: none
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -1588,17 +941,17 @@ observations:
       worker: codex
       date: '2026-10-01'
       evidence:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Eight tabulated x[Mg], a[Mg](R) and gamma[Mg] columns
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+        note: Eight measured MgO activity results; inputs transcribed in tables/guo-2021-mgo-activity-cmas-slag/t5.csv.
   notices: []
   source_id: guo-2021-mgo-activity-cmas-slag
   locator:
-    published_page: 2730
-    pdf_page_index: 6
-    table: '6'
-    note: First x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+    published_page: 2728
+    pdf_page_index: 4
+    table: '5'
+    note: Row 7; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
   read_from: pdf:guo-2021-mgo-activity-cmas-slag
   point_conditions:
     temperature_K:
@@ -1606,40 +959,59 @@ observations:
         tag: value
         value: '1873'
       locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: First x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '39.22'
+          SiO2: '29.78'
+          MgO: '8.3'
+          Al2O3: '19.56'
+      locator:
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+        note: Row 7; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
     composition:
       state:
         tag: value
         value:
           basis: printed_mole_fraction
           components:
-          - - Mg
-            - '0.001355'
-          - - Sn
-            - '0.998645'
+          - - CaO
+            - '0.439093192417'
+          - - SiO2
+            - '0.311176628138'
+          - - MgO
+            - '0.129289670492'
+          - - Al2O3
+            - '0.120440508952'
           amount_basis: mole_fraction
       locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: First x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+        note: Row 7; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+  derived_from:
+  - tables:guo-2021-mgo-activity-cmas-slag
   derivation:
-    relation: as_published
+    relation: Table 5 MgO activity reduced from measured Mg-in-Sn mole fraction using the reference slag value in Table 4
     inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
+    - tables:guo-2021-mgo-activity-cmas-slag
     parameters: []
-    output_unit: dimensionless activity coefficient
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table6_mg_activity_coefficients_1873k::T=1873:h=b4719dd15529
+    output_unit: dimensionless activity
+    references: []
+- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873.00:h=8d632899971c
   experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
   identity:
     quantity:
       tag: value
-      value: activity_coefficient
+      value: activity
     species:
-      formula: Mg
+      formula: MgO
       phase:
         tag: value
         value: l
@@ -1651,7 +1023,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
+      reason: profile activity does not use subtype
     per:
       tag: value
       value: dimensionless
@@ -1660,41 +1032,45 @@ observations:
       value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
+      reason: profile activity does not use standard_pressure_Pa
     reaction:
       tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
+      reason: profile activity does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
+      reason: profile activity does not use formation_elements
     reference_state:
       tag: value
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Mg
+          formula: MgO
           phase:
             tag: value
-            value: l
+            value: cr
           polymorph:
-            tag: not_applicable
-            reason: not crystal
+            tag: value
+            value: periclase
           charge:
             tag: value
             value: 0
-        component_basis: Mg
+        component_basis: MgO
     reservoir:
       tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
+      reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
         basis: printed_mole_fraction
         components:
-        - - Mg
-          - '0.00173'
-        - - Sn
-          - '0.99827'
+        - - CaO
+          - '0.472143449804'
+        - - SiO2
+          - '0.335207407507'
+        - - MgO
+          - '0.0726421384761'
+        - - Al2O3
+          - '0.120007004212'
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
@@ -1704,30 +1080,27 @@ observations:
       reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
+      reason: profile activity does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
+      reason: profile activity does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
+      reason: profile activity does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile activity_coefficient does not use wall
+      reason: profile activity does not use wall
   value:
     kind: point
-    point: '3.1706'
+    point: '0.4236'
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 6 coefficients.
+    kind: none
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -1735,17 +1108,17 @@ observations:
       worker: codex
       date: '2026-10-01'
       evidence:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Eight tabulated x[Mg], a[Mg](R) and gamma[Mg] columns
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+        note: Eight measured MgO activity results; inputs transcribed in tables/guo-2021-mgo-activity-cmas-slag/t5.csv.
   notices: []
   source_id: guo-2021-mgo-activity-cmas-slag
   locator:
-    published_page: 2730
-    pdf_page_index: 6
-    table: '6'
-    note: Seventh x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+    published_page: 2728
+    pdf_page_index: 4
+    table: '5'
+    note: Row 5; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
   read_from: pdf:guo-2021-mgo-activity-cmas-slag
   point_conditions:
     temperature_K:
@@ -1753,40 +1126,59 @@ observations:
         tag: value
         value: '1873'
       locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Seventh x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '41.87'
+          SiO2: '31.85'
+          MgO: '4.63'
+          Al2O3: '19.35'
+      locator:
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+        note: Row 5; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
     composition:
       state:
         tag: value
         value:
           basis: printed_mole_fraction
           components:
-          - - Mg
-            - '0.00173'
-          - - Sn
-            - '0.99827'
+          - - CaO
+            - '0.472143449804'
+          - - SiO2
+            - '0.335207407507'
+          - - MgO
+            - '0.0726421384761'
+          - - Al2O3
+            - '0.120007004212'
           amount_basis: mole_fraction
       locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Seventh x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+        note: Row 5; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+  derived_from:
+  - tables:guo-2021-mgo-activity-cmas-slag
   derivation:
-    relation: as_published
+    relation: Table 5 MgO activity reduced from measured Mg-in-Sn mole fraction using the reference slag value in Table 4
     inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
+    - tables:guo-2021-mgo-activity-cmas-slag
     parameters: []
-    output_unit: dimensionless activity coefficient
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table6_mg_activity_coefficients_1873k::T=1873:h=b7e89f7d47e5
+    output_unit: dimensionless activity
+    references: []
+- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873.00:h=fe42e87f9918
   experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
   identity:
     quantity:
       tag: value
-      value: activity_coefficient
+      value: activity
     species:
-      formula: Mg
+      formula: MgO
       phase:
         tag: value
         value: l
@@ -1798,7 +1190,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
+      reason: profile activity does not use subtype
     per:
       tag: value
       value: dimensionless
@@ -1807,41 +1199,45 @@ observations:
       value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
+      reason: profile activity does not use standard_pressure_Pa
     reaction:
       tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
+      reason: profile activity does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
+      reason: profile activity does not use formation_elements
     reference_state:
       tag: value
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Mg
+          formula: MgO
           phase:
             tag: value
-            value: l
+            value: cr
           polymorph:
-            tag: not_applicable
-            reason: not crystal
+            tag: value
+            value: periclase
           charge:
             tag: value
             value: 0
-        component_basis: Mg
+        component_basis: MgO
     reservoir:
       tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
+      reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
         basis: printed_mole_fraction
         components:
-        - - Mg
-          - '0.001628'
-        - - Sn
-          - '0.998372'
+        - - CaO
+          - '0.42198059202'
+        - - SiO2
+          - '0.304520594964'
+        - - MgO
+          - '0.155531288949'
+        - - Al2O3
+          - '0.117967524067'
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
@@ -1851,30 +1247,27 @@ observations:
       reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
+      reason: profile activity does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
+      reason: profile activity does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
+      reason: profile activity does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile activity_coefficient does not use wall
+      reason: profile activity does not use wall
   value:
     kind: point
-    point: '3.1706'
+    point: '0.6472'
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 6 coefficients.
+    kind: none
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -1882,17 +1275,17 @@ observations:
       worker: codex
       date: '2026-10-01'
       evidence:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Eight tabulated x[Mg], a[Mg](R) and gamma[Mg] columns
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+        note: Eight measured MgO activity results; inputs transcribed in tables/guo-2021-mgo-activity-cmas-slag/t5.csv.
   notices: []
   source_id: guo-2021-mgo-activity-cmas-slag
   locator:
-    published_page: 2730
-    pdf_page_index: 6
-    table: '6'
-    note: Third x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+    published_page: 2728
+    pdf_page_index: 4
+    table: '5'
+    note: Row 8; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
   read_from: pdf:guo-2021-mgo-activity-cmas-slag
   point_conditions:
     temperature_K:
@@ -1900,617 +1293,48 @@ observations:
         tag: value
         value: '1873'
       locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Third x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '38.58'
+          SiO2: '29.83'
+          MgO: '10.22'
+          Al2O3: '19.61'
+      locator:
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+        note: Row 8; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
     composition:
       state:
         tag: value
         value:
           basis: printed_mole_fraction
           components:
-          - - Mg
-            - '0.001628'
-          - - Sn
-            - '0.998372'
+          - - CaO
+            - '0.42198059202'
+          - - SiO2
+            - '0.304520594964'
+          - - MgO
+            - '0.155531288949'
+          - - Al2O3
+            - '0.117967524067'
           amount_basis: mole_fraction
       locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Third x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+        published_page: 2728
+        pdf_page_index: 4
+        table: '5'
+        note: Row 8; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+  derived_from:
+  - tables:guo-2021-mgo-activity-cmas-slag
   derivation:
-    relation: as_published
+    relation: Table 5 MgO activity reduced from measured Mg-in-Sn mole fraction using the reference slag value in Table 4
     inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
+    - tables:guo-2021-mgo-activity-cmas-slag
     parameters: []
-    output_unit: dimensionless activity coefficient
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table6_mg_activity_coefficients_1873k::T=1873:h=e6761f67be4b
-  experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
-  identity:
-    quantity:
-      tag: value
-      value: activity_coefficient
-    species:
-      formula: Mg
-      phase:
-        tag: value
-        value: l
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: value
-      value: dimensionless
-    temperature_K:
-      tag: value
-      value: '1873'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Mg
-          phase:
-            tag: value
-            value: l
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Mg
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: value
-      value:
-        basis: printed_mole_fraction
-        components:
-        - - Mg
-          - '0.001929'
-        - - Sn
-          - '0.998071'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
-  value:
-    kind: point
-    point: '3.1718'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 6 coefficients.
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: admitted
-    reason: source admission_status=admitted
-    decided_by:
-      worker: codex
-      date: '2026-10-01'
-      evidence:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Eight tabulated x[Mg], a[Mg](R) and gamma[Mg] columns
-  notices: []
-  source_id: guo-2021-mgo-activity-cmas-slag
-  locator:
-    published_page: 2730
-    pdf_page_index: 6
-    table: '6'
-    note: Fourth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
-  read_from: pdf:guo-2021-mgo-activity-cmas-slag
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Fourth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_mole_fraction
-          components:
-          - - Mg
-            - '0.001929'
-          - - Sn
-            - '0.998071'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Fourth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
-    parameters: []
-    output_unit: dimensionless activity coefficient
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table6_mg_activity_coefficients_1873k::T=1873:h=f270ccc5465f
-  experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
-  identity:
-    quantity:
-      tag: value
-      value: activity_coefficient
-    species:
-      formula: Mg
-      phase:
-        tag: value
-        value: l
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: value
-      value: dimensionless
-    temperature_K:
-      tag: value
-      value: '1873'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Mg
-          phase:
-            tag: value
-            value: l
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Mg
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: value
-      value:
-        basis: printed_mole_fraction
-        components:
-        - - Mg
-          - '0.00155'
-        - - Sn
-          - '0.99845'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
-  value:
-    kind: point
-    point: '3.1704'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 6 coefficients.
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: admitted
-    reason: source admission_status=admitted
-    decided_by:
-      worker: codex
-      date: '2026-10-01'
-      evidence:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Eight tabulated x[Mg], a[Mg](R) and gamma[Mg] columns
-  notices: []
-  source_id: guo-2021-mgo-activity-cmas-slag
-  locator:
-    published_page: 2730
-    pdf_page_index: 6
-    table: '6'
-    note: Second x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
-  read_from: pdf:guo-2021-mgo-activity-cmas-slag
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Second x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_mole_fraction
-          components:
-          - - Mg
-            - '0.00155'
-          - - Sn
-            - '0.99845'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Second x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
-    parameters: []
-    output_unit: dimensionless activity coefficient
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table6_mg_activity_coefficients_1873k::T=1873:h=f5d3b4b678e1
-  experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
-  identity:
-    quantity:
-      tag: value
-      value: activity_coefficient
-    species:
-      formula: Mg
-      phase:
-        tag: value
-        value: l
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: value
-      value: dimensionless
-    temperature_K:
-      tag: value
-      value: '1873'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Mg
-          phase:
-            tag: value
-            value: l
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Mg
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: value
-      value:
-        basis: printed_mole_fraction
-        components:
-        - - Mg
-          - '0.001438'
-        - - Sn
-          - '0.998562'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
-  value:
-    kind: point
-    point: '3.1704'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 6 coefficients.
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: admitted
-    reason: source admission_status=admitted
-    decided_by:
-      worker: codex
-      date: '2026-10-01'
-      evidence:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Eight tabulated x[Mg], a[Mg](R) and gamma[Mg] columns
-  notices: []
-  source_id: guo-2021-mgo-activity-cmas-slag
-  locator:
-    published_page: 2730
-    pdf_page_index: 6
-    table: '6'
-    note: Sixth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
-  read_from: pdf:guo-2021-mgo-activity-cmas-slag
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Sixth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_mole_fraction
-          components:
-          - - Mg
-            - '0.001438'
-          - - Sn
-            - '0.998562'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Sixth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
-    parameters: []
-    output_unit: dimensionless activity coefficient
-- observation_id: guo-2021-mgo-activity-cmas-slag::guo_2021_table6_mg_activity_coefficients_1873k::T=1873:h=fc582537925e
-  experiment_id: 10.2355/isijinternational.isijint-2021-224::experiment::guo_slag_metal_equilibrium_1873k
-  identity:
-    quantity:
-      tag: value
-      value: activity_coefficient
-    species:
-      formula: Mg
-      phase:
-        tag: value
-        value: l
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: value
-      value: dimensionless
-    temperature_K:
-      tag: value
-      value: '1873'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Mg
-          phase:
-            tag: value
-            value: l
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Mg
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: value
-      value:
-        basis: printed_mole_fraction
-        components:
-        - - Mg
-          - '0.001282'
-        - - Sn
-          - '0.998718'
-        amount_basis: mole_fraction
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
-  value:
-    kind: point
-    point: '3.1707'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty is printed for the Table 6 coefficients.
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: admitted
-    reason: source admission_status=admitted
-    decided_by:
-      worker: codex
-      date: '2026-10-01'
-      evidence:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Eight tabulated x[Mg], a[Mg](R) and gamma[Mg] columns
-  notices: []
-  source_id: guo-2021-mgo-activity-cmas-slag
-  locator:
-    published_page: 2730
-    pdf_page_index: 6
-    table: '6'
-    note: Fifth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
-  read_from: pdf:guo-2021-mgo-activity-cmas-slag
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Fifth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_mole_fraction
-          components:
-          - - Mg
-            - '0.001282'
-          - - Sn
-            - '0.998718'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 2730
-        pdf_page_index: 6
-        table: '6'
-        note: Fifth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
-  derivation:
-    relation: as_published
-    inputs:
-    - pdf:guo-2021-mgo-activity-cmas-slag
-    parameters: []
-    output_unit: dimensionless activity coefficient
+    output_unit: dimensionless activity
+    references: []

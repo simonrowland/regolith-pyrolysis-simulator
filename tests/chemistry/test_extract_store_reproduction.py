@@ -181,7 +181,10 @@ def test_store_yields_adopted_target_type_observations(
     # quoted non-loss bound stays on species Al (1900 -> 1951).
     # famBAND04 (e72d720b9) corrects the Figure 2 marker centres, admitting
     # one series observation: schneider_1980_k_psat_figure2_high_temperature_digitized.
-    assert len(kems) == 1952
+    # Car source edits vs green: 1952 -> 1973. Kambayashi 1983 adds 50 rows;
+    # Yakovlev 1984 and Yakovlev-Shornikov 2011 add 8 and 12, Schneider adds 1;
+    # edits to other KEMS sources net -50 after the reviewed context moves.
+    assert len(kems) == 1973
     # Active KEMS source IDs grew from 45 to 81 (+36); source IDs and added
     # extract files are distinct counts (37 files were added).
     # famBAND04: the Schneider 1980 Figure 2 series adds a new KEMS source
@@ -1500,12 +1503,16 @@ def test_engine_value_mutation_moves_residual_outside_band_goes_red(
     # extract_reproduction imports grounded_alpha by name — patch both.
     monkeypatch.setattr(er, "grounded_alpha", _ten_x)
 
+    # The Fedkin Fe Table 3 values are now context (model-fit outputs), so use
+    # the live Richter Mg alpha series, which still has three measured pins.
     observations = [
         o
         for o in load_adopted_observations()
-        if o.species_id == "Fe" and o.obs_type in {"alpha", "rate_series"}
+        if o.source_id == "richter-et-al-2007"
+        and o.observation_id == "richter_2007_mg_cai_arrhenius_langmuir"
+        and o.obs_type == "alpha"
     ]
-    assert observations, "Fe alpha/rate_series observation missing from store"
+    assert observations, "pinned Richter Mg alpha observation missing from store"
     by_key = residual_baselines["by_key"]
     vapor_pressure_data = load_vapor_pressure_data()
     pinned_records = []
@@ -1519,8 +1526,7 @@ def test_engine_value_mutation_moves_residual_outside_band_goes_red(
             pin = by_key.get(_record_pin_key(record))
             if pin is not None:
                 pinned_records.append((record, pin))
-    assert pinned_records, "Fe mutation must produce pinned comparable records"
-    # Some Fe rate rows are typed refusals; use live points with residual pins.
+    assert pinned_records, "Mg mutation must produce pinned comparable records"
     red_record = None
     reds: list[str] = []
     for record, pin in pinned_records:
@@ -1578,10 +1584,6 @@ def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
 @pytest.mark.parametrize(
     ("observation_id", "skip_reason"),
     (
-        (
-            "stolyarova_1992_binary_wilson_model_parameters_table2",
-            "typed-refusal:model_output_not_measurement",
-        ),
         (
             "halwax_2024_cao_third_law_formation_enthalpy",
             "typed-refusal:superseded",
@@ -1655,8 +1657,9 @@ def test_transition_point_is_an_adopted_target_type(
             and obs.adoption_basis != "superseded"]
     # Offer19 adds 40 points from 11 sources: Ueshima 1983 (+18), Ichise and
     # Ueshima 1989 (+5), Ichise 1986 (+5), Nunoue 1987 (+4), Ichise 1989
-    # (+2), and six other KEMS extracts (+1 each); prior total was 71.
-    assert len(rows) == 111
+    # (+2), and six other KEMS extracts (+1 each); prior total was 71. The car
+    # adds one Schneider 1980 KEMS transition point (kems-213).
+    assert len(rows) == 112
     # NIST NBP/melting rows are priority winners; kems-020 Hastie Na2SO4
     # second-law prose is extract-adopted (mass_spec_extract).
     assert all(
@@ -1903,15 +1906,17 @@ def test_coverage_ledger_is_observation_first_and_exact(
     # famBAND04 (e72d720b9) adds one adopted Schneider Figure 2 series record
     # (schneider_1980_k_psat_figure2_high_temperature_digitized): 2047 -> 2048;
     # it is typed-refused and moves the skipped count from 2024 to 2025.
+    # Car source updates bring the adopted total to 2069, including Kambayashi
+    # 1983 (+50), Yakovlev 1984 (+8), Yakovlev-Shornikov 2011 (+12), and
+    # Schneider 1980 (+1), offset by reviewed source reclassifications.
     assert coverage["observations"] == sum(
         obs.adoption_basis != "superseded" for obs in adopted_observations
-    ) == 2048
-    assert coverage["comparable"] == 23
-    assert coverage["skipped"] == 2025
+    ) == 2069
+    assert coverage["comparable"] == 21
+    assert coverage["skipped"] == 2048
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
-    assert coverage["comparable_points"] == 34
-    # famBAND04: the typed-refused Schneider record is one more gap point: 2028 -> 2029.
-    assert coverage["gap_points"] == 2029
+    assert coverage["comparable_points"] == 26
+    assert coverage["gap_points"] == 2027
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")
@@ -1933,29 +1938,28 @@ def test_coverage_ledger_is_observation_first_and_exact(
         )
         for key, row in by_type.items()
     } == {
-        "activity_coefficient": (485, 1, 484, 1),
-        "alpha": (93, 4, 89, 14),
-        "gibbs_table": (314, 0, 314, 0),
-        # famBAND04: +1 typed-refused Schneider 1980 Figure 2 series record.
-        "psat_series": (240, 1, 239, 2),
-        "rate_series": (805, 2, 803, 2),
-        "transition_point": (111, 15, 96, 15),
+        "activity_coefficient": (504, 1, 503, 1),
+        "alpha": (71, 2, 69, 6),
+        "gibbs_table": (301, 0, 301, 0),
+        "psat_series": (260, 1, 259, 2),
+        "rate_series": (821, 2, 819, 2),
+        "transition_point": (112, 15, 97, 15),
     }
     by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
     assert {
         key: (row["observations"], row["comparable"], row["comparable_points"])
         for key, row in by_family.items()
     } == {
-        "activity_coefficient": (355, 1, 1),
+        "activity_coefficient": (374, 1, 1),
         "activity_self_agreement": (10, 0, 0),
-        "alpha": (93, 4, 14),
-        "gibbs_table": (314, 0, 0),
+        "alpha": (71, 2, 6),
+        "gibbs_table": (301, 0, 0),
         "ordering_activity": (120, 0, 0),
-        "ordering_bound": (163, 2, 2),
-        "psat_series": (240, 1, 2),  # famBAND04 Schneider 1980 Figure 2
-        "rate_hkl": (641, 0, 0),
+        "ordering_bound": (161, 2, 2),
+        "psat_series": (260, 1, 2),
+        "rate_hkl": (659, 0, 0),
         "relative_volatility": (1, 0, 0),
-        "transition_point": (111, 15, 15),
+        "transition_point": (112, 15, 15),
     }
     assert {row["species"] for row in coverage["by_species"]} == {
         obs.species_id for obs in adopted_observations
@@ -2183,9 +2187,6 @@ def test_unclassified_qualitative_payload_is_not_reported_as_ordering_gap() -> N
 # Live-battery qualitative rows that used to share ordering_claim_unparsed.
 # Tokens are the payload class; none of these become comparable.
 _LIVE_QUALITATIVE_SKIP_BY_ID = {
-    "stolyarova_1992_al_cas_vapor_ions_and_gibbs": (
-        "unsupported_observable:species_detected_absolute_P_not_tabulated"
-    ),
     "demaria_1971_al_monatomic_figure7": (
         "unsupported_observable:figure_only_not_digitized"
     ),

@@ -1,0 +1,62 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 75ec3f8251aac9f82633440a57cb58c7ef01159f9ba027451a5fcfa39fb6bcde
+  citation: Shornikov, S. I. (2015). Thermodynamics of Ca–Al-Inclusion’s High-Temperature Minerals. 78th Annual Meeting of
+    the Meteoritical Society, abstract 5017.
+  source_ids:
+  - shornikov-2015-cai-mineral-thermodynamics-metsoc
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:shornikov-2015-cai-mineral-thermodynamics-metsoc
+      role: pdf
+      path: raw/shornikov-2015-cai-mineral-thermodynamics-metsoc/shornikov-2015-cai-mineral-thermodynamics-metsoc.pdf
+      sha256:
+        tag: value
+        value: 61593c040c6ac2f989e3553487e8fc0646d513e28e9baf974e393b0aed58f4e2
+    - asset_id: pdftotext:shornikov-2015-cai-mineral-thermodynamics-metsoc
+      role: pdftotext
+      path: text/shornikov-2015-cai-mineral-thermodynamics-metsoc
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2015-cai-mineral-thermodynamics-metsoc
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: shornikov_2015_metsoc_5017_calculated_model_summary
+  type: model_derived_context
+  locator:
+    page: 1
+    pdf_page_index: 0
+    abstract: '5017'
+    section: Abstract
+  units: not applicable; qualitative summary only
+  values:
+    method_class: model_derived
+    system_as_printed: CaO–Al2O3
+    model_as_printed: ideal associated solutions
+    input_data_as_printed: experimental results obtained by the Knudsen effusion mass spectrometric method [4, 5]
+    temperature_range_as_printed: 1600–2500 K
+    minerals_as_printed:
+    - corundum
+    - hibonite
+    - grossite
+    - dmitryivanovite
+    results_as_printed: The abstract says total vapor pressures over the four refractory minerals are close within an order
+      of magnitude, while vapor composition differs with changes in oxide activities across the crystalline-to-liquid transition.
+    measured_table: none printed
+    numeric_target_species_results: none printed
+    reason: Results are calculated and described qualitatively; numerical pressure and activity values are not printed in
+      this abstract.
+  context_id: shornikov-2015-cai-mineral-thermodynamics-metsoc::context::shornikov_2015_metsoc_5017_calculated_model_summary
+  work_id: 75ec3f8251aac9f82633440a57cb58c7ef01159f9ba027451a5fcfa39fb6bcde
+  source_id: shornikov-2015-cai-mineral-thermodynamics-metsoc
+  species: Al2O3

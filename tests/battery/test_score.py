@@ -2937,6 +2937,38 @@ def test_zero_never_priced_as_value() -> None:
     }
 
 
+def test_one_sided_bound_is_not_scored_as_point() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ref = F.observation(
+        "o2-bounded-value",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    ref = replace(
+        ref,
+        value=Value(
+            kind=ValueKind.BOUND,
+            bound_operator=">",
+            bound_value=Decimal("0.77"),
+        ),
+    )
+
+    residual, _ = _compile(ref, exp, _predict(Decimal("0.8"), ident))
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert residual.refusal.detail == {
+        "reason": "value_unknown",
+        "value_kind": "bound",
+    }
+
+
 def test_species_formula_unparsed_never_string_matched() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
@@ -2955,6 +2987,221 @@ def test_species_formula_unparsed_never_string_matched() -> None:
     assert parse_species_formula("unknown") is None
     assert parse_species_formula("kems-007") is None
     assert parse_species_formula("O2") == (("O", 2.0),)
+
+
+def test_species_formula_parser_preserves_200_existing_parses() -> None:
+    """Pin established formula results before extending the parser grammar."""
+
+    fixture = (
+        Path(__file__).resolve().parents[1]
+        / "fixtures"
+        / "species_formula_parse_golden_200.json"
+    )
+    rows = json.loads(fixture.read_text(encoding="utf-8"))
+    assert len(rows) == 200
+    for row in rows:
+        expected = tuple(
+            (str(symbol), float(count)) for symbol, count in row["elements"]
+        )
+        assert parse_species_formula(row["formula"]) == expected
+
+
+def test_species_formula_parser_accepts_published_typography() -> None:
+    assert parse_species_formula("$Ta_{2}C$") == (("C", 1.0), ("Ta", 2.0))
+    assert parse_species_formula("V₂S₃") == (("S", 3.0), ("V", 2.0))
+    assert parse_species_formula(
+        r"$\text{HCl}(g)$", species=Species("HCl", Phase.G)
+    ) == (("Cl", 1.0), ("H", 1.0))
+
+
+def test_species_formula_parser_refuses_normalized_ascii_dot_adducts() -> None:
+    for formula in ("Al₂O₃.3H₂O", "$Al_2O_3.3H_2O$", "CoSO₄.7H₂O"):
+        assert parse_species_formula(formula) is None
+
+    for formula in ("Fe0.947O", "Al2O3.3H2O"):
+        assert parse_species_formula(formula) == score_mod.formula_composition(formula)
+    assert parse_species_formula(
+        "Fe0.947O(c)", species=Species("Fe0.947O", Phase.CR)
+    ) == score_mod.formula_composition("Fe0.947O")
+
+
+def test_species_formula_parser_accepts_nested_groups() -> None:
+    assert parse_species_formula("[Al(OH)4]") == (
+        ("Al", 1.0),
+        ("H", 4.0),
+        ("O", 4.0),
+    )
+    assert parse_species_formula("(NH4)2SO4") == (
+        ("H", 8.0),
+        ("N", 2.0),
+        ("O", 4.0),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("Fe(OH)") == (
+        ("Fe", 1.0),
+        ("H", 1.0),
+        ("O", 1.0),
+    )
+
+
+def test_species_formula_parser_accepts_hydrate_segments() -> None:
+    assert parse_species_formula("CoSO4·6H2O") == (
+        ("Co", 1.0),
+        ("H", 12.0),
+        ("O", 10.0),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("CaSO4·1/2H2O") == (
+        ("Ca", 1.0),
+        ("H", 1.0),
+        ("O", 4.5),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("H2SO4·6.5H2O") == (
+        ("H", 15.0),
+        ("O", 10.5),
+        ("S", 1.0),
+    )
+
+
+def test_species_formula_parser_requires_phase_axis_for_suffix() -> None:
+    assert parse_species_formula("$As(g)$") is None
+    assert parse_species_formula("$As(g)$", species=Species("As", Phase.G)) == (
+        ("As", 1.0),
+    )
+    assert parse_species_formula("$As(g)$", species=Species("As", Phase.CR)) is None
+
+
+@pytest.mark.parametrize(
+    ("label", "phase"),
+    [
+        ("s", Phase.CR),
+        ("solid", Phase.CR),
+        ("gas", Phase.G),
+        ("liq", Phase.L),
+        ("liquid", Phase.L),
+        ("vapor", Phase.G),
+    ],
+)
+def test_species_formula_parser_gates_common_phase_suffixes(
+    label: str, phase: Phase
+) -> None:
+    formula = f"Fe2O3({label})"
+    wrong_phase = Phase.L if phase is not Phase.L else Phase.G
+
+    assert parse_species_formula(formula) is None
+    assert parse_species_formula(
+        formula, species=Species("Fe2O3", wrong_phase)
+    ) is None
+    assert parse_species_formula(formula, species=Species("Fe2O3", phase)) == (
+        score_mod.formula_composition("Fe2O3")
+    )
+
+
+def test_match_reported_species_does_not_bind_solid_to_liquid_identity() -> None:
+    assert score_mod.match_reported_species(
+        "FeO",
+        {"FeO(s)": 0.15, "FeO(l)": 0.85},
+        species=Species("FeO", Phase.L),
+    ) == ("FeO(l)", 0.85)
+
+
+@pytest.mark.parametrize(
+    ("label", "phase"),
+    [
+        ("s", Phase.CR),
+        ("S", Phase.CR),
+        ("solid", Phase.CR),
+        ("cr", Phase.CR),
+        ("l", Phase.L),
+        ("liq", Phase.L),
+        ("liquid", Phase.L),
+        ("g", Phase.G),
+        ("gas", Phase.G),
+        ("vapor", Phase.G),
+        ("aq", Phase.AQ),
+    ],
+)
+def test_species_formula_parser_gates_terminal_bracket_phase_labels(
+    label: str, phase: Phase
+) -> None:
+    formula = f"Fe2O3[{label}]"
+    wrong_phase = Phase.CR if phase is not Phase.CR else Phase.L
+
+    assert parse_species_formula(formula) is None
+    assert parse_species_formula(
+        formula, species=Species("Fe2O3", wrong_phase)
+    ) is None
+    assert parse_species_formula(formula, species=Species("Fe2O3", phase)) == (
+        score_mod.formula_composition("Fe2O3")
+    )
+
+
+def test_match_reported_species_does_not_bind_bracket_solid_to_liquid_identity() -> None:
+    liquid = Species("FeO", Phase.L)
+    assert score_mod.match_reported_species(
+        "FeO",
+        {"FeO[s]": 0.15, "FeO(l)": 0.85},
+        species=liquid,
+    ) == ("FeO(l)", 0.85)
+    assert score_mod.match_reported_species(
+        "FeO",
+        {"FeO[s]": 0.15},
+        species=liquid,
+    ) is None
+
+
+def test_species_formula_parser_keeps_non_phase_brackets() -> None:
+    assert parse_species_formula("[Al(OH)4]") == (
+        ("Al", 1.0),
+        ("H", 4.0),
+        ("O", 4.0),
+    )
+    assert parse_species_formula("Fe2O3[c]") is None
+    assert parse_species_formula(
+        "Fe2O3[c]", species=Species("Fe2O3", Phase.CR)
+    ) is None
+
+
+def test_species_formula_parser_requires_polymorph_axis_for_suffix() -> None:
+    assert parse_species_formula("Fe(α)") is None
+    assert parse_species_formula(
+        "Fe(α)", species=Species("Fe", Phase.CR, State.of(Polymorph.ALPHA))
+    ) == (("Fe", 1.0),)
+    assert parse_species_formula(
+        "Fe(alpha)", species=Species("Fe", Phase.CR, State.of(Polymorph.ALPHA))
+    ) == (("Fe", 1.0),)
+    assert parse_species_formula(
+        "Fe(α)", species=Species("Fe", Phase.CR, State.of(Polymorph.BETA))
+    ) is None
+    assert parse_species_formula(
+        "SiO2(quartz)",
+        species=Species("SiO2", Phase.CR, State.of(Polymorph.QUARTZ)),
+    ) == (("O", 2.0), ("Si", 1.0))
+
+
+def test_species_formula_parser_requires_charge_axis_for_charge_notation() -> None:
+    assert parse_species_formula("$Ba^{++}(aq)$") is None
+    assert parse_species_formula(
+        "$Ba^{++}(aq)$", species=Species("Ba", Phase.AQ, charge=2)
+    ) == (("Ba", 1.0),)
+    assert parse_species_formula(
+        "$Ba^{++}(aq)$", species=Species("Ba", Phase.AQ, charge=0)
+    ) is None
+
+
+def test_species_formula_parser_keeps_deuterium_distinct() -> None:
+    assert parse_species_formula("AsD_3") == (("As", 1.0), ("D", 3.0))
+    assert parse_species_formula(
+        "$AsD_3(g)$", species=Species("AsD3", Phase.G)
+    ) == (("As", 1.0), ("D", 3.0))
+
+
+def test_species_formula_parser_refuses_names_and_variable_compositions() -> None:
+    assert parse_species_formula("quartz") is None
+    assert parse_species_formula("gibbsite") is None
+    assert parse_species_formula("Fe1-xO") is None
+    assert parse_species_formula("NH.C1") is None
 
 
 def test_compile_mutates_each_conjunct_off() -> None:
@@ -4935,6 +5182,61 @@ def test_figure_only_evidence_adds_notice_to_scored_residual() -> None:
     assert FLAGGED_STRATUM_FIGURE_ONLY in flagged_strata(residual.notices)
 
 
+@pytest.mark.parametrize("approximate", (False, True))
+def test_approximate_reference_value_is_scored_but_left_out_of_headline(
+    approximate: bool,
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
+        flagged_strata,
+        flagged_stratum_rows,
+        headline_rows,
+    )
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity()
+    reference = F.observation(
+        f"approximate-value-{approximate}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    reference = replace(
+        reference,
+        value=replace(reference.value, approximate=approximate),
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=_predict(Decimal("0.3"), identity),
+    )
+
+    assert residual.numeric is not None
+    assert ("not_flagged_stratum" in residual.exclusions) is approximate
+    expected_strata = (
+        (FLAGGED_STRATUM_APPROXIMATE_VALUE,) if approximate else ()
+    )
+    assert flagged_strata(residual.notices) == expected_strata
+    headline = next(
+        row
+        for row in headline_rows(
+            (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+        if row["rail"] == residual.rail.value
+    )
+    assert headline["n"] == (0 if approximate else 1)
+    assert [
+        row["stratum"]
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    ] == list(expected_strata)
+
+
 def test_source_internal_inconsistency_is_flagged_reported_and_excluded() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
@@ -5217,18 +5519,28 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
             Decimal("-7.33"),
             "contested",
         ),
+        # 4e0819f6d types the 26 Table 2 oxygen columns quoted_attributed
+        # (Eq. (4) and Eqns 1–2 with Eqs. (5)–(6), p. 688). The 8 measured
+        # pCa rows are unchanged. resolve_source_oxygen commands that printed
+        # cell pO as fO2, so this residual slope is 2.33 dex per x(CaO).
+        # 1.04 was the engine oxygen-balance slope while those columns were
+        # model_derived. The committed sibling is still that class until
+        # regen; _context_for_sibling_oxygen scores the fresh migration
+        # then, and the store once it is quoted_attributed. b162 does not
+        # edit this extract. The paper prints the pressures, not this slope.
         (
             "stolyarova-1995",
             "stolyarova-1995-cao-alumina-kems",
             "stolyarova_1995_ca_partial_pressure_table2",
             "x(CaO)",
             8,
-            Decimal("1.04"),
+            Decimal("2.33"),
             "liquid",
         ),
     ),
 )
 def test_e15_production_accumulator_pins_stolyarova_pca(
+    tmp_path: Path,
     source_token: str,
     source: str,
     series: str,
@@ -5241,6 +5553,13 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
     from simulator.battery.score import _ScorePayloadAccumulator
 
     context = load_score_context(sources=(source_token,))
+    if source == "stolyarova-1995-cao-alumina-kems":
+        context = _context_for_sibling_oxygen(
+            context,
+            tmp_path,
+            extract_name=f"{source}.yaml",
+            oxygen_id_contains="stolyarova_1995_o",
+        )
     residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
     payloads = [residual_to_plain(residual) for residual in residuals]
     aggregate = _ScorePayloadAccumulator.from_rows(
@@ -5260,12 +5579,86 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
     assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == expected_slope
 
 
+def _series_stem(observation_id: str) -> str:
+    """Drop a trailing ``:h=<12 hex>`` extract-row hash."""
+    head, separator, tail = observation_id.rpartition(":h=")
+    if (
+        separator
+        and len(tail) == 12
+        and all(character in "0123456789abcdef" for character in tail)
+    ):
+        return head
+    return observation_id
+
+
+def _context_for_sibling_oxygen(
+    context: ScoreContext,
+    tmp_path: Path,
+    *,
+    extract_name: str,
+    oxygen_id_contains: str,
+) -> ScoreContext:
+    """Score the store, or a fresh migration when its oxygen is stale.
+
+    The regenerated sibling is ``quoted_attributed`` and its observation
+    ids match a fresh migration of ``extract_name``. Anything else is
+    stale: ``model_derived``, or a quoted relabel that kept the previous
+    ``:h=`` ids (stable_ids.py hashes the extract row). Series stems,
+    that suffix stripped, must still match.
+    """
+    from simulator.battery.migrate import load_migrated_context
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    oxygen = tuple(
+        observation
+        for observation in context.observations.values()
+        if oxygen_id_contains in observation.observation_id
+        and isinstance(observation.identity, Identity)
+        and observation.identity.species is not None
+        and observation.identity.species.formula in {"O", "O2"}
+        and observation.evidence.class_.is_value
+    )
+    assert oxygen
+    oxygen_class = oxygen[0].evidence.class_.value
+    assert all(
+        observation.evidence.class_.value is oxygen_class for observation in oxygen
+    )
+    assert oxygen_class in {
+        EvidenceClass.QUOTED_ATTRIBUTED,
+        EvidenceClass.MODEL_DERIVED,
+    }
+    fresh = _migrate_real_extract(
+        tmp_path,
+        extract_name,
+        use_repository_index_row=True,
+    )
+    if (
+        oxygen_class is EvidenceClass.QUOTED_ATTRIBUTED
+        and set(fresh.observations) == set(context.observations)
+    ):
+        return context
+    assert {_series_stem(observation_id) for observation_id in fresh.observations} == {
+        _series_stem(observation_id) for observation_id in context.observations
+    }
+    validation = validate_corpus(
+        context.works,
+        context.experiments,
+        fresh.observations,
+        benches=context.benches,
+        context_rows=load_migrated_context(context.root),
+    )
+    return replace(
+        context,
+        observations=dict(fresh.observations),
+        hard_issues_by_observation=validation.hard_issues_by_observation,
+    )
+
+
 def _assert_no_model_derived_e15_points(
     residuals: tuple[Residual, ...],
     context: ScoreContext,
 ) -> None:
     from simulator.battery import score as score_mod
-
     nonmeasured_oxygen_sources = {
         observation.source_id
         for observation in context.observations.values()
@@ -5277,8 +5670,8 @@ def _assert_no_model_derived_e15_points(
         in {EvidenceClass.MODEL_DERIVED, EvidenceClass.QUOTED_ATTRIBUTED}
     }
     # The exclusion is vacuous unless this context still holds non-measured
-    # oxygen. 1991/1995 keep model_derived columns. 1996's Table 2 oxygen
-    # columns are quoted_attributed after t-1534.
+    # oxygen. 1995 (4e0819f6d) and 1996 Table 2 (t-1534 / car) are
+    # quoted_attributed. Either class counts.
     assert nonmeasured_oxygen_sources
     for residual in residuals:
         observation = context.observations.get(residual.reference)
@@ -5347,6 +5740,15 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
             "notices": notices,
         }
 
+    measured_reference = next(
+        observation
+        for observation in context.observations.values()
+        if observation.source_id in score_mod._E15_LEVEL_BASIS
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value in MEASURED_EVIDENCE
+        and score_mod._e15_residual_point(payload(observation), observation)
+        is not None
+    )
     model_derived_oxygen = [
         observation
         for observation in context.observations.values()
@@ -5355,6 +5757,43 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
         and observation.evidence.class_.is_value
         and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     ]
+    synthetic_model_derived = None
+    if not model_derived_oxygen:
+        # The reviewed Stolyarova typing now keeps these source rows quoted.
+        # Use one otherwise eligible oxygen row to retain the invariant test.
+        template = None
+        for observation in context.observations.values():
+            if (
+                observation.observation_id == measured_reference.observation_id
+                or observation.source_id not in score_mod._E15_LEVEL_BASIS
+                or observation.identity.species.formula != "O"
+                or not observation.evidence.class_.is_value
+            ):
+                continue
+            measured_observation = replace(
+                observation,
+                evidence=replace(
+                    observation.evidence,
+                    class_=State.of(EvidenceClass.MEASURED_DIRECT),
+                ),
+            )
+            if (
+                score_mod._e15_residual_point(
+                    payload(measured_observation), measured_observation
+                )
+                is not None
+            ):
+                template = observation
+                break
+        assert template is not None
+        synthetic_model_derived = replace(
+            template,
+            evidence=replace(
+                template.evidence,
+                class_=State.of(EvidenceClass.MODEL_DERIVED),
+            ),
+        )
+        model_derived_oxygen = [synthetic_model_derived]
     model_derived_e15 = []
     for observation in model_derived_oxygen:
         measured_observation = replace(
@@ -5372,16 +5811,6 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
         ):
             model_derived_e15.append(observation)
     assert model_derived_e15
-
-    measured_reference = next(
-        observation
-        for observation in context.observations.values()
-        if observation.source_id in score_mod._E15_LEVEL_BASIS
-        and observation.evidence.class_.is_value
-        and observation.evidence.class_.value in MEASURED_EVIDENCE
-        and score_mod._e15_residual_point(payload(observation), observation)
-        is not None
-    )
     two_phase_reference = replace(
         measured_reference,
         observation_id=f"{measured_reference.observation_id}::two-phase-fixture",
@@ -5404,6 +5833,11 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
         context,
         observations={
             **context.observations,
+            **(
+                {synthetic_model_derived.observation_id: synthetic_model_derived}
+                if synthetic_model_derived is not None
+                else {}
+            ),
             two_phase_reference.observation_id: two_phase_reference,
             outside_single_liquid_reference.observation_id: (
                 outside_single_liquid_reference
@@ -5493,52 +5927,17 @@ def test_measured_no_rail_refusal_stays_in_accumulator_and_legacy_report() -> No
 
 def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> None:
     from simulator.battery import score as score_mod
-    from simulator.battery.migrate import load_migrated_context
-    from simulator.battery.validate import validate_corpus
-    from tests.battery.test_migrate import _migrate_real_extract
 
     source_id = "stolyarova-1996-cao-alumina-silica-kems"
     context = load_score_context(sources=(source_id,))
-    # t-1534 (742704443) is extract-only. The committed extracts-v2 sibling
-    # still labels Table 2 oxygen model_derived until the controller
-    # regenerates it. Score that migration here so the pin is the regen
-    # slope; once the sibling is quoted_attributed, score the store.
-    table2_oxygen = tuple(
-        observation
-        for observation in context.observations.values()
-        if "stolyarova_1996_table2_pO" in observation.observation_id
-        and isinstance(observation.identity, Identity)
-        and observation.identity.species is not None
-        and observation.identity.species.formula in {"O", "O2"}
-        and observation.evidence.class_.is_value
+    # t-1534 (742704443) is extract-only. Green's committed sibling
+    # relabels Table 2 oxygen quoted_attributed and keeps the old :h= ids.
+    context = _context_for_sibling_oxygen(
+        context,
+        tmp_path,
+        extract_name=f"{source_id}.yaml",
+        oxygen_id_contains="stolyarova_1996_table2_pO",
     )
-    assert table2_oxygen
-    oxygen_class = table2_oxygen[0].evidence.class_.value
-    assert all(
-        observation.evidence.class_.value is oxygen_class
-        for observation in table2_oxygen
-    )
-    if oxygen_class is EvidenceClass.MODEL_DERIVED:
-        fresh = _migrate_real_extract(
-            tmp_path,
-            f"{source_id}.yaml",
-            use_repository_index_row=True,
-        )
-        assert set(fresh.observations) == set(context.observations)
-        validation = validate_corpus(
-            context.works,
-            context.experiments,
-            fresh.observations,
-            benches=context.benches,
-            context_rows=load_migrated_context(context.root),
-        )
-        context = replace(
-            context,
-            observations=dict(fresh.observations),
-            hard_issues_by_observation=validation.hard_issues_by_observation,
-        )
-    else:
-        assert oxygen_class is EvidenceClass.QUOTED_ATTRIBUTED
     residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
     selected = [
         (residual, point)
@@ -5562,13 +5961,13 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
         )
     }
     assert unverified_keys == {
-        "h=191f88c43b1b",
-        "h=4d3ab2cd6814",
-        "h=4f3dddc64866",
-        "h=67a63ea92d8f",
-        "h=69f870f37475",
-        "h=9151fe49ebd2",
-        "h=ffb85bc52460",
+        "h=2b0d96585c1f",
+        "h=70d0b48ae622",
+        "h=77e8a8961618",
+        "h=8e2834e7ce16",
+        "h=8fb519888bcb",
+        "h=9482b6cd970a",
+        "h=b8e8d996ef46",
     }
     e15_residual = selected[0][0]
     e15_observation = context.observations[e15_residual.reference]
@@ -5668,6 +6067,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
@@ -5713,6 +6113,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             NoticeKind.LIQUIDUS_POSITION_CONTESTED,
             "liquidus_position_contested:probe",
         ),
+        (
+            FLAGGED_STRATUM_APPROXIMATE_VALUE,
+            NoticeKind.APPROXIMATE_VALUE,
+            "approximate_printed_value",
+        ),
     )
     for stratum, kind, reason in cases:
         notice = Notice(
@@ -5734,6 +6139,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
         FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
@@ -5761,6 +6167,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
             "source_flagged_less_reliable:probe",
         ),
         (NoticeKind.FIGURE_ONLY, "figure_only:probe"),
+        (NoticeKind.APPROXIMATE_VALUE, "approximate_printed_value"),
         (NoticeKind.REACTIVE_CELL_NOT_MODELLED, "reactive_cell_not_modelled:probe"),
         (
             NoticeKind.LIQUIDUS_POSITION_CONTESTED,
@@ -5786,6 +6193,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
     )
@@ -13939,7 +14347,7 @@ def test_magemin_nonfinite_native_activity_is_one_typed_unavailable_prediction(
     monkeypatch.setattr(
         bench_module,
         "activity_request_for_engine",
-        lambda *_args: SimpleNamespace(
+        lambda *_args, **_kwargs: SimpleNamespace(
             payload={
                 "composition_mol": {
                     "SiO2": Decimal("0.55"),
@@ -14025,7 +14433,7 @@ def test_magemin_native_activity_failure_keeps_typed_cause(
     monkeypatch.setattr(
         bench_module,
         "activity_request_for_engine",
-        lambda *_args: SimpleNamespace(
+        lambda *_args, **_kwargs: SimpleNamespace(
             payload={
                 "composition_mol": {
                     "SiO2": Decimal("0.55"),
@@ -14095,7 +14503,7 @@ def test_magemin_composition_gate_is_a_typed_out_of_domain_refusal(
     monkeypatch.setattr(
         bench_module,
         "activity_request_for_engine",
-        lambda *_args: SimpleNamespace(
+        lambda *_args, **_kwargs: SimpleNamespace(
             payload={"composition_mol": {"SiO2": Decimal("0.1"), "MgO": Decimal("0.9")}}
         ),
     )
@@ -14338,7 +14746,7 @@ def test_score_store_attempts_all_owned_handle_closes(
     with pytest.raises(RuntimeError, match="close probe"):
         score_store(
             context,
-            engines=(Engine.VAPOROCK, Engine.MAGEMIN),
+            engines=(Engine.VAPOROCK, Engine.INTERNAL_ANALYTICAL),
             include_diagnostics=False,
         )
 
@@ -14763,13 +15171,41 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             "kems-012-sossi-2019",
         )
     )
-    fresh_stolyarova_1996 = _migrate_real_extract(
-        tmp_path / "fresh-stolyarova-1996",
-        "stolyarova-1996-cao-alumina-silica-kems.yaml",
+    fresh_sources = {
+        source_id: _migrate_real_extract(
+            tmp_path / source_id,
+            f"{source_id}.yaml",
+            use_repository_index_row=True,
+        )
+        for source_id in (
+            "kems-053-stolyarova-1991",
+            "stolyarova-1995-cao-alumina-kems",
+            "stolyarova-1996-cao-alumina-silica-kems",
+            "kems-ms2000-044",
+            "kems-012-sossi-2019",
+        )
+    }
+    fresh_observations = {
+        key: observation
+        for migrated in fresh_sources.values()
+        for key, observation in migrated.observations.items()
+    }
+    observations = {
+        key: observation
+        for key, observation in context.observations.items()
+        if observation.source_id not in fresh_sources
+    }
+    context = replace(
+        context,
+        observations={**observations, **fresh_observations},
     )
+    observations = context.observations
+    filtered = context
     fresh_stolyarova_1996_pressures = {
         key: observation
-        for key, observation in fresh_stolyarova_1996.observations.items()
+        for key, observation in fresh_sources[
+            "stolyarova-1996-cao-alumina-silica-kems"
+        ].observations.items()
         if observation.source_id == "stolyarova-1996-cao-alumina-silica-kems"
         and isinstance(observation.identity, Identity)
         and quantity_token(observation.identity) is Quantity.P_PARTIAL
@@ -14784,9 +15220,6 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         for observation in fresh_stolyarova_1996_pressures.values()
     )
-    observations = dict(context.observations)
-    observations.update(fresh_stolyarova_1996_pressures)
-    filtered = replace(context, observations=observations)
     stolyarova_atomic_oxygen_pressures = {
         key
         for key in observations
@@ -14841,7 +15274,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and quantity_token(obs.identity) is Quantity.P_PARTIAL
         and obs.admission.status is AdmissionStatus.ADMITTED
         and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     }
     kems_model_derived = {
         key
@@ -14866,12 +15299,11 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         observations[key].admission.status is AdmissionStatus.ADMITTED
         for key in stolyarova_atomic_oxygen_pressures
     )
-    fresh_stolyarova = _migrate_real_extract(
-        tmp_path / "fresh-stolyarova-1991", "kems-053-stolyarova-1991.yaml"
-    )
     fresh_stolyarova_pressures = {
         key: observation
-        for key, observation in fresh_stolyarova.observations.items()
+        for key, observation in fresh_sources[
+            "kems-053-stolyarova-1991"
+        ].observations.items()
         if key in stolyarova_atomic_oxygen_pressures
     }
     assert set(fresh_stolyarova_pressures) == stolyarova_atomic_oxygen_pressures
@@ -14881,15 +15313,39 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         for observation in fresh_stolyarova_pressures.values()
     )
-    # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9) are model-derived,
-    # not measured pressures (review, Derived O / O2).
-    assert len(stolyarova_1995_derived_pressures) == 26
-    # Table 2 reports quoted_attributed calculated columns: 30 pO, 10 p'O,
-    # and 15 p''O observations.
-    assert len(stolyarova_1996_derived_pressures) == 55
+    # 4e0819f6d and 3de591b81 type the calculated oxygen columns quoted_attributed.
+    # The parents are not printed, so the rows are not model_derived.
+    # b162's 1995 model_derived count of 26 describes the pre-car extract,
+    # which this car retyped. The 1996 count of 55 is the quoted population.
+    assert len(stolyarova_1995_derived_pressures) == 0
+    assert len(stolyarova_1996_derived_pressures) == 0
+    stolyarova_1995_quoted_pressures = {
+        key
+        for key, obs in observations.items()
+        if obs.source_id == "stolyarova-1995-cao-alumina-kems"
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+        and obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    }
+    stolyarova_1996_quoted_pressures = {
+        key
+        for key, obs in observations.items()
+        if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+        and obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    }
+    # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9).
+    assert len(stolyarova_1995_quoted_pressures) == 26
+    # Table 2's calculated 1933 K oxygen-pressure columns: 30 pO, 10 p'O, 15 p''O.
+    assert len(stolyarova_1996_quoted_pressures) == 55
     assert {
         observations[key].observation_id.split("::")[1]
-        for key in stolyarova_1996_derived_pressures
+        for key in stolyarova_1996_quoted_pressures
     } == {
         "stolyarova_1996_table2_pO_1933k",
         "stolyarova_1996_table2_pO_prime_1933k",
@@ -14898,7 +15354,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
     assert [
         sum(
             observations[key].observation_id.split("::")[1] == observation_id
-            for key in stolyarova_1996_derived_pressures
+            for key in stolyarova_1996_quoted_pressures
         )
         for observation_id in (
             "stolyarova_1996_table2_pO_1933k",
@@ -14906,11 +15362,16 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             "stolyarova_1996_table2_pO_double_prime_1933k",
         )
     ] == [30, 10, 15]
-    assert len(kems_model_derived) == 28
+    # dc7eafe24 adds the quoted Table 4 gamma successors. 5f44bd3ee copies the
+    # parent derivation onto them, and 4000d10b6 adds the printed PbO# channel:
+    # its 1573.15 K cell is admitted as model_derived (extract species.PbO,
+    # observation sossi_2019_pb_table4_gamma_this_work_quoted_20260906_pbo_hash,
+    # Table 4 p. 57). The combined KEMS cohort is 51.
+    assert len(kems_model_derived) == 51
     assert len(
         stolyarova_activities | stolyarova_atomic_oxygen_pressures | kems_model_derived
-    ) == 91
-    assert len(headline_diagnostic_references) == 136
+    ) == 114
+    assert len(headline_diagnostic_references) == 78
     assert admitted_model_derived == (
         headline_diagnostic_references
         - stolyarova_atomic_oxygen_pressures
@@ -15142,7 +15603,8 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         stolyarova_rows.extend(
             row
             for row in residuals
-            if row.reference in stolyarova_1996_derived_pressures
+            if row.reference
+            in stolyarova_1996_derived_pressures | stolyarova_1996_quoted_pressures
             and row.key.rsplit("::", 1)[-1] == engine.value
         )
         unavailable_stolyarova_refs = {
@@ -15167,7 +15629,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             for observation in score_module.comparison_candidates(filtered)
             if observation.source_id
             in {"kems-053-stolyarova-1991", "stolyarova-1995-cao-alumina-kems"}
-        } | unavailable_stolyarova_refs | stolyarova_1996_derived_pressures
+        } | unavailable_stolyarova_refs | stolyarova_1996_derived_pressures | stolyarova_1996_quoted_pressures
         assert {row.reference for row in stolyarova_rows} == expected_stolyarova_refs
         assert len(stolyarova_rows) == len(expected_stolyarova_refs)
         activity_rows = [
@@ -15180,20 +15642,31 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         ]
         assert len(activity_rows) == 54
         assert len(derived_pressure_rows) == 9
+        # 4e0819f6d and 3de591b81 type those oxygen columns quoted, so they
+        # are not the model-derived residual slice. d170a39b8 pinned the
+        # observation counts; the slice of this model-derived set is empty.
         stolyarova_1995_rows = [
             row
             for row in stolyarova_rows
             if row.reference in stolyarova_1995_derived_pressures
         ]
-        assert len(stolyarova_1995_rows) == 26
+        assert len(stolyarova_1995_rows) == 0
         stolyarova_1996_rows = [
             row
             for row in stolyarova_rows
             if row.reference in stolyarova_1996_derived_pressures
         ]
-        assert len(stolyarova_1996_rows) == 55
-        assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_1996_rows)
-        assert all(not row.score_eligible for row in stolyarova_1996_rows)
+        assert len(stolyarova_1996_rows) == 0
+        stolyarova_1996_quoted_rows = [
+            row
+            for row in stolyarova_rows
+            if row.reference in stolyarova_1996_quoted_pressures
+        ]
+        assert len(stolyarova_1996_quoted_rows) == 55
+        assert all(
+            row.status is ResidualStatus.REFUSED for row in stolyarova_1996_quoted_rows
+        )
+        assert all(not row.score_eligible for row in stolyarova_1996_quoted_rows)
         assert all(
             observations[row.reference].evidence.class_.is_value
             and observations[row.reference].evidence.class_.value
@@ -15203,11 +15676,11 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
                 and notice.reason == "evidence_class:quoted_attributed"
                 for notice in row.notices
             )
-            for row in stolyarova_1996_rows
+            for row in stolyarova_1996_quoted_rows
         )
         assert {
             row.refusal.reason
-            for row in stolyarova_1996_rows
+            for row in stolyarova_1996_quoted_rows
             if row.refusal is not None
         } == {RefusalReason.IDENTITY_INCOMPLETE}
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
@@ -16349,9 +16822,9 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
     parsed_formulas: list[str] = []
     parse_formula = score_module.parse_species_formula
 
-    def track_formula_parse(formula: str):
+    def track_formula_parse(formula: str, *, species: Species | None = None):
         parsed_formulas.append(formula)
-        return parse_formula(formula)
+        return parse_formula(formula, species=species)
 
     monkeypatch.setattr(score_module, "parse_species_formula", track_formula_parse)
 

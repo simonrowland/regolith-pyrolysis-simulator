@@ -1,0 +1,734 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/romero-serrano-1999-binary-ternary-silicates.yaml
+observations:
+- observation_id: romero-serrano-1999-binary-ternary-silicates::romero_1999_glasser_osborn_invariant_a::T=1753.15:h=b0c04a055d99
+  experiment_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89::romero-serrano-1999-binary-ternary-silicates
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: invariant_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: Only SiO2 and MnO mass percentages are printed for this SiO2–MnO–MgO invariant point; MgO is omitted and no
+        remainder is inferred.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1753.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Glasser and Osborn [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  locator:
+    page: 6
+    published_page: 404
+    pdf_page_index: 5
+    section: 6.1, SiO2–MnO–MgO system
+    note: Prose compares the calculated invariant point a with the experimental value from [19], which is also plotted in
+      Fig. 8 on PDF page 7; it remains one observation.
+  read_from: pdf:romero-serrano-1999-binary-ternary-silicates
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1753.15'
+      locator:
+        page: 6
+        published_page: 404
+        pdf_page_index: 5
+        section: 6.1, SiO2–MnO–MgO system
+        note: Prose compares the calculated invariant point a with the experimental value from [19], which is also plotted
+          in Fig. 8 on PDF page 7; it remains one observation.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1480'
+            locator:
+              page: 6
+              published_page: 404
+              pdf_page_index: 5
+              section: 6.1, SiO2–MnO–MgO system
+              note: Prose compares the calculated invariant point a with the experimental value from [19], which is also plotted
+                in Fig. 8 on PDF page 7; it remains one observation.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 404
+              pdf_page_index: 5
+              section: 6.1, SiO2–MnO–MgO system
+              note: Prose compares the calculated invariant point a with the experimental value from [19], which is also plotted
+                in Fig. 8 on PDF page 7; it remains one observation.
+        output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: The cited prose reports no oxygen fugacity for this invariant point.
+      locator:
+        page: 6
+        published_page: 404
+        pdf_page_index: 5
+        section: '6.1'
+    T_C:
+      state:
+        tag: value
+        value: '1480'
+      locator:
+        page: 6
+        published_page: 404
+        pdf_page_index: 5
+        section: '6.1'
+    composition:
+      state:
+        tag: unknown
+        reason: Only SiO2 and MnO mass percentages are printed for this SiO2–MnO–MgO invariant point; MgO is omitted and no
+          remainder is inferred.
+      locator:
+        page: 6
+        published_page: 404
+        pdf_page_index: 5
+        section: '6.1'
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - pdf:romero-serrano-1999-binary-ternary-silicates
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1480'
+        locator:
+          page: 6
+          published_page: 404
+          pdf_page_index: 5
+          section: 6.1, SiO2–MnO–MgO system
+          note: Prose compares the calculated invariant point a with the experimental value from [19], which is also plotted
+            in Fig. 8 on PDF page 7; it remains one observation.
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          page: 6
+          published_page: 404
+          pdf_page_index: 5
+          section: 6.1, SiO2–MnO–MgO system
+          note: Prose compares the calculated invariant point a with the experimental value from [19], which is also plotted
+            in Fig. 8 on PDF page 7; it remains one observation.
+    output_unit: K
+    references: []
+- observation_id: romero-serrano-1999-binary-ternary-silicates::romero_1999_osborn_muan_invariant_a::T=1743.15:h=bd0b434d88a7
+  experiment_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89::romero-serrano-1999-binary-ternary-silicates
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: invariant_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: Only SiO2 and FeO mass percentages are printed for this SiO2–FeO–MgO invariant point; MgO is omitted and no
+        remainder is inferred.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1743.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Osborn and Muan [22]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  locator:
+    page: 8
+    published_page: 406
+    pdf_page_index: 7
+    section: 6.3, SiO2–FeO–MgO system
+    note: Experimental invariant point a attributed to [22].
+  read_from: pdf:romero-serrano-1999-binary-ternary-silicates
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 8
+        published_page: 406
+        pdf_page_index: 7
+        section: 6.3, SiO2–FeO–MgO system
+        note: Experimental invariant point a attributed to [22].
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1470'
+            locator:
+              page: 8
+              published_page: 406
+              pdf_page_index: 7
+              section: 6.3, SiO2–FeO–MgO system
+              note: Experimental invariant point a attributed to [22].
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 406
+              pdf_page_index: 7
+              section: 6.3, SiO2–FeO–MgO system
+              note: Experimental invariant point a attributed to [22].
+        output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: The cited prose reports no oxygen fugacity for this invariant point.
+      locator:
+        page: 8
+        published_page: 406
+        pdf_page_index: 7
+        section: '6.3'
+    T_C:
+      state:
+        tag: value
+        value: '1470'
+      locator:
+        page: 8
+        published_page: 406
+        pdf_page_index: 7
+        section: '6.3'
+    composition:
+      state:
+        tag: unknown
+        reason: Only SiO2 and FeO mass percentages are printed for this SiO2–FeO–MgO invariant point; MgO is omitted and no
+          remainder is inferred.
+      locator:
+        page: 8
+        published_page: 406
+        pdf_page_index: 7
+        section: '6.3'
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - pdf:romero-serrano-1999-binary-ternary-silicates
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1470'
+        locator:
+          page: 8
+          published_page: 406
+          pdf_page_index: 7
+          section: 6.3, SiO2–FeO–MgO system
+          note: Experimental invariant point a attributed to [22].
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          page: 8
+          published_page: 406
+          pdf_page_index: 7
+          section: 6.3, SiO2–FeO–MgO system
+          note: Experimental invariant point a attributed to [22].
+    output_unit: K
+    references: []
+- observation_id: romero-serrano-1999-binary-ternary-silicates::romero_1999_osborn_muan_invariant_b::T=1578.15:h=de57b01ec0a3
+  experiment_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89::romero-serrano-1999-binary-ternary-silicates
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: invariant_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: Only SiO2 and FeO mass percentages are printed for this SiO2–FeO–MgO invariant point; MgO is omitted and no
+        remainder is inferred.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1578.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Osborn and Muan [22]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  locator:
+    page: 8
+    published_page: 406
+    pdf_page_index: 7
+    section: 6.3, SiO2–FeO–MgO system
+    note: Experimental invariant point b attributed to [22].
+  read_from: pdf:romero-serrano-1999-binary-ternary-silicates
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1578.15'
+      locator:
+        page: 8
+        published_page: 406
+        pdf_page_index: 7
+        section: 6.3, SiO2–FeO–MgO system
+        note: Experimental invariant point b attributed to [22].
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1305'
+            locator:
+              page: 8
+              published_page: 406
+              pdf_page_index: 7
+              section: 6.3, SiO2–FeO–MgO system
+              note: Experimental invariant point b attributed to [22].
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 406
+              pdf_page_index: 7
+              section: 6.3, SiO2–FeO–MgO system
+              note: Experimental invariant point b attributed to [22].
+        output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: The cited prose reports no oxygen fugacity for this invariant point.
+      locator:
+        page: 8
+        published_page: 406
+        pdf_page_index: 7
+        section: '6.3'
+    T_C:
+      state:
+        tag: value
+        value: '1305'
+      locator:
+        page: 8
+        published_page: 406
+        pdf_page_index: 7
+        section: '6.3'
+    composition:
+      state:
+        tag: unknown
+        reason: Only SiO2 and FeO mass percentages are printed for this SiO2–FeO–MgO invariant point; MgO is omitted and no
+          remainder is inferred.
+      locator:
+        page: 8
+        published_page: 406
+        pdf_page_index: 7
+        section: '6.3'
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - pdf:romero-serrano-1999-binary-ternary-silicates
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1305'
+        locator:
+          page: 8
+          published_page: 406
+          pdf_page_index: 7
+          section: 6.3, SiO2–FeO–MgO system
+          note: Experimental invariant point b attributed to [22].
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          page: 8
+          published_page: 406
+          pdf_page_index: 7
+          section: 6.3, SiO2–FeO–MgO system
+          note: Experimental invariant point b attributed to [22].
+    output_unit: K
+    references: []
+- observation_id: romero-serrano-1999-binary-ternary-silicates::romero_1999_riboud_muan_invariant_a::T=1458.15:h=2c203b268ba2
+  experiment_id: 7d5581b680fca08aad132b259f9861ae40ceb8ae2379cd9f7bca2812464e9a89::romero-serrano-1999-binary-ternary-silicates
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: invariant_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: Only SiO2 and MnO mass percentages are printed for this SiO2–FeO–MnO invariant point; FeO is omitted and no
+        remainder is inferred.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1458.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Riboud and Muan [20]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: romero-serrano-1999-binary-ternary-silicates
+  locator:
+    page: 7
+    published_page: 405
+    pdf_page_index: 6
+    section: 6.2, SiO2–FeO–MnO system
+    note: The quoted experimental invariant point is compared with the calculated point a and attributed to [20].
+  read_from: pdf:romero-serrano-1999-binary-ternary-silicates
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1458.15'
+      locator:
+        page: 7
+        published_page: 405
+        pdf_page_index: 6
+        section: 6.2, SiO2–FeO–MnO system
+        note: The quoted experimental invariant point is compared with the calculated point a and attributed to [20].
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1185'
+            locator:
+              page: 7
+              published_page: 405
+              pdf_page_index: 6
+              section: 6.2, SiO2–FeO–MnO system
+              note: The quoted experimental invariant point is compared with the calculated point a and attributed to [20].
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 405
+              pdf_page_index: 6
+              section: 6.2, SiO2–FeO–MnO system
+              note: The quoted experimental invariant point is compared with the calculated point a and attributed to [20].
+        output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: The cited prose reports no oxygen fugacity for this invariant point.
+      locator:
+        page: 7
+        published_page: 405
+        pdf_page_index: 6
+        section: '6.2'
+    T_C:
+      state:
+        tag: value
+        value: '1185'
+      locator:
+        page: 7
+        published_page: 405
+        pdf_page_index: 6
+        section: '6.2'
+    composition:
+      state:
+        tag: unknown
+        reason: Only SiO2 and MnO mass percentages are printed for this SiO2–FeO–MnO invariant point; FeO is omitted and no
+          remainder is inferred.
+      locator:
+        page: 7
+        published_page: 405
+        pdf_page_index: 6
+        section: '6.2'
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - pdf:romero-serrano-1999-binary-ternary-silicates
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1185'
+        locator:
+          page: 7
+          published_page: 405
+          pdf_page_index: 6
+          section: 6.2, SiO2–FeO–MnO system
+          note: The quoted experimental invariant point is compared with the calculated point a and attributed to [20].
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          page: 7
+          published_page: 405
+          pdf_page_index: 6
+          section: 6.2, SiO2–FeO–MnO system
+          note: The quoted experimental invariant point is compared with the calculated point a and attributed to [20].
+    output_unit: K
+    references: []

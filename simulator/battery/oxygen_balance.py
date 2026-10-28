@@ -9,8 +9,8 @@ from typing import Literal
 
 from scipy.optimize import brentq
 
-from simulator.battery.enums import Engine, NoticeKind
-from simulator.battery.records import Notice
+from simulator.battery.enums import CellMaterial, Engine, NoticeKind
+from simulator.battery.records import Located, Notice
 from simulator.physical_constants import GAS_CONSTANT
 
 IMCC_ENGINES: frozenset[Engine] = frozenset({Engine.OPENIMCC})
@@ -29,6 +29,70 @@ _OXYGEN_GAS_ALPHA_SOURCE = (
     "declared common-unity sensitivity alpha=1.0 for O/O2 free-molecular gas escape; "
     "absolute oxygen-gas alpha is not measured"
 )
+_MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
+
+
+def _cell_material_class(
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> str:
+    if not materials:
+        return "unknown"
+    values: list[CellMaterial] = []
+    for material in materials:
+        if not material.state.is_value or not isinstance(material.state.value, CellMaterial):
+            return "unknown"
+        values.append(material.state.value)
+    if any(
+        material in {
+            CellMaterial.W,
+            CellMaterial.MO,
+            CellMaterial.TA,
+            CellMaterial.NB,
+            CellMaterial.C_GRAPHITE,
+            CellMaterial.RE,
+        }
+        for material in values
+    ):
+        return "reactive"
+    if all(material in {CellMaterial.PT, CellMaterial.IR} for material in values):
+        return "inert"
+    return "not_inert"
+
+
+def _uniform_modelled_reactive_cell(
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> str | None:
+    """W or Mo when every typed entry is that same modelled reservoir metal."""
+
+    if not materials:
+        return None
+    values: list[CellMaterial] = []
+    for material in materials:
+        if not material.state.is_value or not isinstance(material.state.value, CellMaterial):
+            return None
+        values.append(material.state.value)
+    if not values:
+        return None
+    metal = values[0]
+    if metal not in _MODELLED_REACTIVE_CELL:
+        return None
+    if any(item is not metal for item in values):
+        return None
+    return metal.value
+
+
+def _cell_oxygen_class(
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> tuple[str, str | None]:
+    """Return material class and the modeled W/Mo oxygen reservoir, if any."""
+
+    material_class = _cell_material_class(materials)
+    modelled = (
+        _uniform_modelled_reactive_cell(materials)
+        if material_class == "reactive"
+        else None
+    )
+    return material_class, modelled
 
 
 @dataclass(frozen=True)

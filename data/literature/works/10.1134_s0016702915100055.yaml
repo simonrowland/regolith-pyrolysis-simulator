@@ -1,0 +1,170 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0016702915100055
+  citation: Shornikov, S. I. (2015). Vaporization Coefficients of Oxides Contained in the Melts of Ca–Al–Inclusions in Chondrites.
+    Geochemistry International, vol. 53, no. 12, pp. 1080–1089.
+  source_ids:
+  - shornikov-2015-cai-vaporization-coefficients
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:shornikov-2015-cai-vaporization-coefficients
+      role: pdf
+      path: raw/shornikov-2015-cai-vaporization-coefficients/shornikov-2015-cai-vaporization-coefficients.pdf
+      sha256:
+        tag: value
+        value: 6c200e01f13ab9675d1407d4f90d65af90a58bd2a53b97e0b65bebd98903c390
+    - asset_id: pdftotext:shornikov-2015-cai-vaporization-coefficients
+      role: pdftotext
+      path: text/shornikov-2015-cai-vaporization-coefficients
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shornikov-2015-cai-vaporization-coefficients
+      role: table_csv
+      path: tables/shornikov-2015-cai-vaporization-coefficients
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:shornikov-2015-cai-vaporization-coefficients
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s0016702915100055
+experiments:
+- experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0016702915100055
+  locator:
+    page: 3
+    published_page: 1082
+    pdf_page_index: 2
+    table: '1'
+    note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells;
+      the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the CaO coefficient in
+      this table was determined only for the crystalline phase. Table 5 does not print a temperature for αvap. The melting
+      temperature in another column is not used.; row_label=1283–1473; column_header=αvap
+context:
+- observation_id: shornikov_2015_fig1_curves_not_read
+  type: figure_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 1085
+    figure: '1'
+    note: 600 dpi page. Both panels are log p (atm) versus 10^4/T, with a top T axis. Open circles are present. They were
+      not digitized. None is a measurement made in this paper.
+  units: not applicable
+  values:
+    method_class: quoted_unattributed
+    reason: Each series is cited literature or a calculated curve. No this-paper marker was digitized.
+    caption_as_printed: (1) total vapor pressure over SiO2 estimated according to Langmuir (Hashimoto, 1990) from a graphite
+      crucible; (2–5) partial pressures of SiO or SiO2 by Knudsen effusion mass spectrometry (Shornikov et al., 1998, 1999)
+      from Pt, Ir, W, and Mo cells; (6) calculated in this publication from Glushko et al. (1978–1982) for chemically neutral
+      conditions.
+    series_refused:
+    - id: '1'
+      citation: Hashimoto, 1990
+      what: Open circles on line 1 in both panels, and the step near 10^4/T = 5.0 is on this line. Panel (a), log p(SiO),
+        has three circles on the high-temperature limb and six on the low-temperature limb. Panel (b), log p(SiO2), has three
+        and six. Langmuir total pressure from a graphite crucible. Literature, not this paper.
+    - id: '2'
+      citation: Shornikov et al., 1998, 1999
+      what: Pt-cell partial pressure. A stroke with no open circle separable from the line. Prior KEMS paper.
+    - id: '3'
+      citation: Shornikov et al., 1998, 1999
+      what: Ir-cell partial pressure. A stroke with no open circle separable from the line. Prior KEMS paper.
+    - id: '4'
+      citation: Shornikov et al., 1998, 1999
+      what: W-cell partial pressure. A stroke with no open circle separable from the line. Prior KEMS paper.
+    - id: '5'
+      citation: Shornikov et al., 1998, 1999
+      what: Mo-cell partial pressure. A stroke with no open circle separable from the line. Prior KEMS paper.
+    - id: '6'
+      citation: calculated in this publication from Glushko et al., 1978–1982
+      what: Solid calculated curve for chemically neutral conditions. Continuous. No step and no marker. The step is on line
+        1.
+    prose_bounds:
+    - Mo-cell p(SiO) differs by almost 10^2 from the p(SiO) calculated for chemically neutral conditions (published p. 1085,
+      Fig. 1a).
+    - p(SiO2) values for cells of any type agree with the thermochemical values within unsystematic errors no greater than
+      15% (published p. 1085, Fig. 1b).
+  context_id: shornikov-2015-cai-vaporization-coefficients::context::shornikov_2015_fig1_curves_not_read
+  work_id: 10.1134/s0016702915100055
+  source_id: shornikov-2015-cai-vaporization-coefficients
+  species: SiO2
+- observation_id: shornikov_2015_fig2_stars_not_read
+  type: figure_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1086
+    figure: '2'
+    note: 'log αvap(i, cr) versus ΔSmelt. Labeled stars and one fitted curve. The CAI oxides repeat Table 5. BeO, BaO, Ga2O3,
+      In2O3, and SnO2 have no table, and the stars were not read: the log axis is small and a stated uncertainty would be
+      an invention.'
+  units: not applicable
+  values:
+    method_class: quoted_unattributed
+    reason: context only; star coordinates were not read
+  context_id: shornikov-2015-cai-vaporization-coefficients::context::shornikov_2015_fig2_stars_not_read
+  work_id: 10.1134/s0016702915100055
+  source_id: shornikov-2015-cai-vaporization-coefficients
+  species: SiO2
+- observation_id: shornikov_2015_table5_thermo_columns_out_of_scope
+  type: out_of_scope_table
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1086
+    table: '5'
+    note: Only the αvap (cr) column is in scope. The other numeric columns were not emitted.
+  units: as printed in the refused columns
+  values:
+    method_class: quoted_unattributed
+    refused_columns:
+    - condensed ΔHf,298
+    - condensed ΔSf,298
+    - Tmelt
+    - ΔHmelt
+    - ΔSmelt
+    - ΔHsubl
+    - gas ΔHf,0
+    - gas ΔSf,298
+    - ΔHat,0
+    reason: 'Outside the requested quantities: oxide activities, activity coefficients, partial pressures, vapour species,
+      partial Gibbs energies, and evaporation coefficients.'
+  context_id: shornikov-2015-cai-vaporization-coefficients::context::shornikov_2015_table5_thermo_columns_out_of_scope
+  work_id: 10.1134/s0016702915100055
+  source_id: shornikov-2015-cai-vaporization-coefficients
+  species: SiO2

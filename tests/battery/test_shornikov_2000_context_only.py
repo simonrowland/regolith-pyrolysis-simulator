@@ -37,9 +37,11 @@ def test_shornikov_2000_context_only_extract_validates_and_migrates(tmp_path: Pa
     }
     expected = set(expected_candidates.items())
     extraction_candidates = doc["extraction"]["figure_read_candidates"]
-    context_candidates = doc["species"]["Na"]["context"][2]["values"][
-        "figure_read_candidates"
-    ]
+    inventory = next(
+        row for row in doc["species"]["Na"]["context"]
+        if row["observation_id"] == "shornikov_2000_figures_1_to_3_context"
+    )
+    context_candidates = inventory["values"]["figure_read_candidates"]
     assert {
         (row["candidate_id"], row["rail"]) for row in extraction_candidates
     } == expected
@@ -52,28 +54,28 @@ def test_shornikov_2000_context_only_extract_validates_and_migrates(tmp_path: Pa
     assert sum(
         len(block["observations"])
         for block in doc["species"].values()
-    ) == 0
+    ) == 11
 
     root = _write_min_tree(tmp_path, doc)
     result = migrate(root, write=False)
 
-    assert result.observations == {}
+    assert len(result.observations) == 11
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     assert len(result.context_by_work) == 1
     context_rows = [
         row for rows in result.context_by_work.values() for row in rows
     ]
-    original_context_types = {
-        "shornikov_2000_experimental_method": "method",
-        "shornikov_2000_partial_pressure_method": "pressure_method_context",
+    reconciled_context_types = {
+        "shornikov_2000_apparatus": "thermodynamic_example",
+        "shornikov_2000_partial_pressures_not_tabulated": "thermodynamic_example",
         "shornikov_2000_figures_1_to_3_context": "figure_inventory",
     }
     assert {
         row["observation_id"]: row["type"]
         for row in context_rows
-        if row["observation_id"] in original_context_types
-    } == original_context_types
+        if row["observation_id"] in reconciled_context_types
+    } == reconciled_context_types
 
     figure_points = [
         row for row in context_rows if row.get("type") == "figure_read_point"

@@ -1,0 +1,959 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s11663-014-0268-8
+  citation: Jakobsson, L. K. and Tangstad, M. (2015). Thermodynamic Activities and Distributions of Calcium and Magnesium
+    Between Silicon and CaO-MgO-SiO2 Slags at 1873 K (1600 °C). Metallurgical and Materials Transactions B, 46, 595-605.
+  source_ids:
+  - jakobsson-tangstad-2015-ca-mg-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:jakobsson-tangstad-2015-ca-mg-activities
+      role: pdf
+      path: raw/jakobsson-tangstad-2015-ca-mg-activities/jakobsson-tangstad-2015-ca-mg-activities.pdf
+      sha256:
+        tag: value
+        value: dfa20355637dd4f891e2044f49f6f1fc3f7ff52da5cfd9f3930238bc288d51ff
+    - asset_id: pdftotext:jakobsson-tangstad-2015-ca-mg-activities
+      role: pdftotext
+      path: text/jakobsson-tangstad-2015-ca-mg-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:jakobsson-tangstad-2015-ca-mg-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/s11663-014-0268-8
+experiments:
+- experiment_id: 10.1007/s11663-014-0268-8::jakobsson-tangstad-2015-ca-mg-activities
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11663-014-0268-8
+  locator:
+    page: 2
+    published_page: 596
+    pdf_page_index: 1
+    table: I
+    note: row=CS1; column=Ca (mg/kg)
+context:
+- observation_id: jakobsson_2015_figure_10_panel_a_sio2_activity
+  type: figure_record
+  locator:
+    page: 10
+    published_page: 604
+    pdf_page_index: 9
+    figure: '10'
+    note: Figure 10
+  units: axes and printed quantity units
+  values:
+    quantity: activity
+    species: SiO2
+    phase: ternary CaO-MgO-SiO2 liquid slag
+    temperature_as_printed: 1873 K (1600 °C)
+    axes_as_printed:
+      ternary_axes: x_MgO, x_CaO, x_SiO2 (mole fractions)
+      contours: a_SiO2(s)
+    caption: Activities of (a) SiO2(s), (b) CaO(s), and (c) MgO(s) at 1873 K (1600 °C) in the ternary CaO-MgO-SiO2 system
+      compared with previous works. The liquidus line from Jung et al. [10] is indicated as a bold solid line and liquidus
+      lines from the Slag Atlas [25] as bold-dashed lines.
+    series:
+    - name: present-work activity contours
+      marker: solid contour lines
+      marker_count: 0
+      evidence_class: measured_reduced
+    - name: previous-work activity contours as identified in legend
+      marker: various line styles
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Jung et al. liquidus
+      marker: bold solid line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Slag Atlas liquidus
+      marker: bold dashed line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  panel: a
+  attribution: Present work and previous sources as identified in the legend; the figure is a contour map, not digitised.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_10_panel_a_sio2_activity
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: SiO2
+- observation_id: jakobsson_2015_figure_10_panel_b_cao_activity
+  type: figure_record
+  locator:
+    page: 10
+    published_page: 604
+    pdf_page_index: 9
+    figure: '10'
+    note: Figure 10
+  units: axes and printed quantity units
+  values:
+    quantity: activity
+    species: CaO
+    phase: ternary CaO-MgO-SiO2 liquid slag
+    temperature_as_printed: 1873 K (1600 °C)
+    axes_as_printed:
+      ternary_axes: x_MgO, x_CaO, x_SiO2 (mole fractions)
+      contours: a_CaO(s)
+    caption: Activities of (a) SiO2(s), (b) CaO(s), and (c) MgO(s) at 1873 K (1600 °C) in the ternary CaO-MgO-SiO2 system
+      compared with previous works. The liquidus line from Jung et al. [10] is indicated as a bold solid line and liquidus
+      lines from the Slag Atlas [25] as bold-dashed lines.
+    series:
+    - name: present-work activity contours
+      marker: solid contour lines
+      marker_count: 0
+      evidence_class: measured_reduced
+    - name: previous-work activity contours as identified in legend
+      marker: various line styles
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Jung et al. liquidus
+      marker: bold solid line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Slag Atlas liquidus
+      marker: bold dashed line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  panel: b
+  attribution: Present work and previous sources as identified in the legend; the figure is a contour map, not digitised.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_10_panel_b_cao_activity
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: CaO
+- observation_id: jakobsson_2015_figure_10_panel_c_mgo_activity
+  type: figure_record
+  locator:
+    page: 10
+    published_page: 604
+    pdf_page_index: 9
+    figure: '10'
+    note: Figure 10
+  units: axes and printed quantity units
+  values:
+    quantity: activity
+    species: MgO
+    phase: ternary CaO-MgO-SiO2 liquid slag
+    temperature_as_printed: 1873 K (1600 °C)
+    axes_as_printed:
+      ternary_axes: x_MgO, x_CaO, x_SiO2 (mole fractions)
+      contours: a_MgO(s)
+    caption: Activities of (a) SiO2(s), (b) CaO(s), and (c) MgO(s) at 1873 K (1600 °C) in the ternary CaO-MgO-SiO2 system
+      compared with previous works. The liquidus line from Jung et al. [10] is indicated as a bold solid line and liquidus
+      lines from the Slag Atlas [25] as bold-dashed lines.
+    series:
+    - name: present-work activity contours
+      marker: solid contour lines
+      marker_count: 0
+      evidence_class: measured_reduced
+    - name: previous-work activity contours as identified in legend
+      marker: various line styles
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Jung et al. liquidus
+      marker: bold solid line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Slag Atlas liquidus
+      marker: bold dashed line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  panel: c
+  attribution: Present work and previous sources as identified in the legend; the figure is a contour map, not digitised.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_10_panel_c_mgo_activity
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: MgO
+- observation_id: jakobsson_2015_figure_1_ca_distribution
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 597
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1
+  units: axes and printed quantity units
+  values:
+    quantity: equilibrium_phase_composition
+    species: Ca
+    phase: liquid silicon equilibrated with CaO-SiO2 slag
+    temperature_as_printed: 1873 K (1600 °C)
+    axes_as_printed:
+      x: CaO/SiO2 (kg/kg)
+      y: Calcium concentration in silicon (mass pct)
+    caption: Concentration of calcium in silicon in equilibrium with binary CaO-SiO2 slags at 1873 K (1600 °C). Holding time
+      in hours is indicated beside the data points.
+    series:
+    - name: boron-doped silicon runs
+      marker: filled circle
+      marker_count: 13
+      evidence_class: measured_direct
+    - name: silicon alloyed with 5 mass pct Ca
+      marker: filled square
+      marker_count: 1
+      evidence_class: measured_direct
+    - name: ICP-OES measurements
+      marker: open square
+      marker_count: 3
+      evidence_class: measured_direct
+    digitisation: deferred to a figure pass
+  panel: whole figure
+  attribution: Present work; legend distinguishes sample preparation and ICP-OES measurements.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_1_ca_distribution
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: CaO
+- observation_id: jakobsson_2015_figure_2_ca_binary_comparison
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 597
+    pdf_page_index: 2
+    figure: '2'
+    note: Figure 2
+  units: axes and printed quantity units
+  values:
+    quantity: equilibrium_phase_composition
+    species: Ca
+    phase: liquid silicon equilibrated with CaO-SiO2 slag
+    temperature_as_printed: series-specific temperatures are printed in the legend; present work at 1873 K (1600 °C)
+    axes_as_printed:
+      x: CaO/SiO2 (kg/kg)
+      y: Calcium concentration in silicon (mass pct)
+    caption: Calcium concentration in silicon in equilibrium with CaO-SiO2 slags compared with previous works conducted in
+      a major part of the liquid region. The liquidus line after Jung et al. [10] at 1873 K (1600 °C) is also indicated as
+      vertical lines.
+    series:
+    - name: Morita et al., 1600 °C
+      marker: plus
+      marker_count: 8
+      evidence_class: quoted_attributed
+    - name: Morita et al., 1550 °C
+      marker: cross
+      marker_count: 8
+      evidence_class: quoted_attributed
+    - name: Wang et al., 1550 °C
+      marker: asterisk
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: Teixeira et al., 1550 °C
+      marker: open square
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Present work, 1600 °C
+      marker: filled circle
+      marker_count: 14
+      evidence_class: measured_direct
+    - name: Schei et al., estimate at 1550 °C
+      marker: filled diamond
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: surface fit
+      marker: solid line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: 95 pct confidence bands
+      marker: dashed lines
+      marker_count: 0
+      evidence_class: model_derived
+    - name: Jung et al. liquidus
+      marker: vertical lines
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  panel: whole figure
+  attribution: Present work and cited literature as named in the legend; fit and liquidus comparison as captioned.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_2_ca_binary_comparison
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: CaO
+- observation_id: jakobsson_2015_figure_3_ca_silica_rich
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 597
+    pdf_page_index: 2
+    figure: '3'
+    note: Figure 3
+  units: axes and printed quantity units
+  values:
+    quantity: equilibrium_phase_composition
+    species: Ca
+    phase: liquid silicon equilibrated with SiO2-rich CaO-SiO2 slag
+    temperature_as_printed: series-specific temperatures are printed in the legend; present work at 1873 K (1600 °C)
+    axes_as_printed:
+      x: CaO/SiO2 (kg/kg)
+      y: Calcium concentration in silicon (mass pct)
+    caption: Measured calcium concentration in equilibrium with SiO2-rich CaO-SiO2 slags. The liquidus line for SiO2 saturation
+      at 1873 K (1600 °C) from Fig. 2 is also indicated. (* studies conducted in a silica crucible).
+    series:
+    - name: Pinto and Takano, 40 min, 1550 °C
+      marker: plus
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Pinto and Takano, 47-131 min, 1550 °C
+      marker: cross
+      marker_count: 4
+      evidence_class: quoted_attributed
+    - name: Weiss and Schwerdtfeger, 2.5 h, 1600 °C
+      marker: asterisk
+      marker_count: 4
+      evidence_class: quoted_attributed
+    - name: Weiss and Schwerdtfeger, 3 h, 1600 °C
+      marker: filled square
+      marker_count: 3
+      evidence_class: quoted_attributed
+    - name: Weiss and Schwerdtfeger, 6.5 h, 1600 °C
+      marker: open circle
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Weiss and Schwerdtfeger, 1 h, 1500 °C
+      marker: open circle
+      marker_count: 4
+      evidence_class: quoted_attributed
+    - name: Weiss and Schwerdtfeger, 3 h, 1500 °C
+      marker: filled circle
+      marker_count: 3
+      evidence_class: quoted_attributed
+    - name: Weiss and Schwerdtfeger, 4 h, 1500 °C
+      marker: small filled square
+      marker_count: 3
+      evidence_class: quoted_attributed
+    - name: Weiss and Schwerdtfeger, 6 h, 1500 °C
+      marker: small open circle
+      marker_count: 3
+      evidence_class: quoted_attributed
+    - name: Miki et al., 18 h, 1450 °C
+      marker: open inverted triangle
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Miki et al., 18 h, 1475 °C
+      marker: open triangle
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Miki et al., 18 h, 1500 °C
+      marker: open diamond
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Miki et al., 18 h, 1525 °C
+      marker: filled diamond
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Miki et al., 18 h, 1550 °C
+      marker: filled inverted triangle
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Morita et al., 18 h, 1600 °C
+      marker: concentric circle
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Morita et al., 18 h, 1550 °C
+      marker: concentric plus
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Wang et al., 4 h, 1550 °C
+      marker: open inverted triangle
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: Teixeira et al., 18 h, 1550 °C
+      marker: filled inverted triangle
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: Schei et al., estimate, 1550 °C
+      marker: open triangle
+      marker_count: 1
+      evidence_class: quoted_attributed
+    - name: Present work, 1600 °C
+      marker: filled circle
+      marker_count: 11
+      evidence_class: measured_direct
+    - name: surface fit
+      marker: solid line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: 95 pct confidence bands
+      marker: dashed lines
+      marker_count: 0
+      evidence_class: model_derived
+    digitisation: deferred to a figure pass
+  panel: whole figure
+  attribution: Present work and prior studies named in the legend; fitted surface and confidence bands are model-derived.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_3_ca_silica_rich
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: CaO
+- observation_id: jakobsson_2015_figure_4_mg_binary
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 597
+    pdf_page_index: 2
+    figure: '4'
+    note: Figure 4
+  units: axes and printed quantity units
+  values:
+    quantity: equilibrium_phase_composition
+    species: Mg
+    phase: liquid silicon equilibrated with MgO-SiO2 slag
+    temperature_as_printed: 1873 K (1600 °C)
+    axes_as_printed:
+      x: MgO/SiO2 (kg/kg)
+      y: Magnesium concentration in silicon (mass pct)
+    caption: Magnesium concentration in silicon in equilibrium with MgO-SiO2 slags at 1873 K (1600 °C). The liquidus line
+      at 1873 K (1600 °C) from Jung et al. [10] is also indicated as vertical lines.
+    series:
+    - name: Morita et al.
+      marker: filled square
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Present work
+      marker: circle
+      marker_count: 8
+      evidence_class: measured_direct
+    - name: surface fit
+      marker: solid line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: 95 pct confidence bands
+      marker: dashed lines
+      marker_count: 0
+      evidence_class: model_derived
+    - name: Jung et al. liquidus
+      marker: vertical lines
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  panel: whole figure
+  attribution: Present work, Morita et al. and the surface fit as identified in caption/legend.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_4_mg_binary
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: MgO
+- observation_id: jakobsson_2015_figure_5_panel_a_ca
+  type: figure_record
+  locator:
+    page: 5
+    published_page: 599
+    pdf_page_index: 4
+    figure: '5'
+    note: Figure 5
+  units: axes and printed quantity units
+  values:
+    quantity: equilibrium_phase_composition
+    species: Ca
+    phase: liquid silicon equilibrated with ternary CaO-MgO-SiO2 slag
+    temperature_as_printed: 1873 K (1600 °C)
+    axes_as_printed:
+      ternary_axes: x_MgO, x_CaO, x_SiO2 (mole fractions)
+      quantity: Ca concentration in silicon (mass pct)
+    caption: Measured concentration of (a) calcium and (b) magnesium in the ternary CaO-MgO-SiO2 system at 1873 K (1600 °C).
+      Iso-concentration lines from the surface fits are also indicated. Liquidus lines are from Jung et al. [10] and the Slag
+      Atlas [25].
+    series:
+    - name: present-work measured sample compositions
+      marker: filled circle
+      marker_count: 20
+      evidence_class: measured_direct
+    - name: surface-fit iso-concentration lines
+      marker: solid lines
+      marker_count: 0
+      evidence_class: model_derived
+    - name: Jung et al. liquidus lines
+      marker: bold solid lines
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Slag Atlas liquidus lines
+      marker: bold dashed lines
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  panel: a
+  attribution: Present-work data; fit lines and liquidus comparisons as captioned.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_5_panel_a_ca
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: CaO
+- observation_id: jakobsson_2015_figure_5_panel_b_mg
+  type: figure_record
+  locator:
+    page: 5
+    published_page: 599
+    pdf_page_index: 4
+    figure: '5'
+    note: Figure 5
+  units: axes and printed quantity units
+  values:
+    quantity: equilibrium_phase_composition
+    species: Mg
+    phase: liquid silicon equilibrated with ternary CaO-MgO-SiO2 slag
+    temperature_as_printed: 1873 K (1600 °C)
+    axes_as_printed:
+      ternary_axes: x_MgO, x_CaO, x_SiO2 (mole fractions)
+      quantity: Mg concentration in silicon (mass pct)
+    caption: Measured concentration of (a) calcium and (b) magnesium in the ternary CaO-MgO-SiO2 system at 1873 K (1600 °C).
+      Iso-concentration lines from the surface fits are also indicated. Liquidus lines are from Jung et al. [10] and the Slag
+      Atlas [25].
+    series:
+    - name: present-work measured sample compositions
+      marker: filled circle
+      marker_count: 20
+      evidence_class: measured_direct
+    - name: surface-fit iso-concentration lines
+      marker: solid lines
+      marker_count: 0
+      evidence_class: model_derived
+    - name: Jung et al. liquidus lines
+      marker: bold solid lines
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Slag Atlas liquidus lines
+      marker: bold dashed lines
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  panel: b
+  attribution: Present-work data; fit lines and liquidus comparisons as captioned.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_5_panel_b_mg
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: MgO
+- observation_id: jakobsson_2015_figure_6_sio2_activity_binary
+  type: figure_record
+  locator:
+    page: 7
+    published_page: 601
+    pdf_page_index: 6
+    figure: '6'
+    note: Figure 6
+  units: axes and printed quantity units
+  values:
+    quantity: activity
+    species: SiO2
+    phase: CaO-SiO2 liquid slag
+    temperature_as_printed: series-specific temperatures are printed in the legend; present work at 1873 K (1600 °C)
+    axes_as_printed:
+      x: x_SiO2
+      y: a_SiO2(s)
+    caption: Activity of SiO2(s) in the binary CaO-SiO2 system compared with previous works. (* activity determined by Gibbs-Duhem
+      integration of the activity of CaO).
+    series:
+    - name: present-work Gibbs-Duhem result
+      marker: solid line
+      marker_count: 0
+      evidence_class: measured_reduced
+    - name: Sakagami, 1600 °C
+      marker: plus
+      marker_count: 3
+      evidence_class: quoted_attributed
+    - name: Yang et al., 1637 °C
+      marker: cross
+      marker_count: 15
+      evidence_class: quoted_attributed
+    - name: Morita et al., 1600 °C
+      marker: asterisk
+      marker_count: 5
+      evidence_class: quoted_attributed
+    - name: Kay and Taylor, 1550 °C
+      marker: open square
+      marker_count: 7
+      evidence_class: quoted_attributed
+    - name: Chang and Derge, 1600 °C
+      marker: filled square
+      marker_count: 8
+      evidence_class: quoted_attributed
+    - name: Omori and Sanbongi, 1630 °C
+      marker: open circle
+      marker_count: 8
+      evidence_class: quoted_attributed
+    - name: Carter and Macfarlane, 1500 °C
+      marker: small open square
+      marker_count: 6
+      evidence_class: quoted_attributed
+    - name: Sharma and Richardson, 1500 °C
+      marker: small filled square
+      marker_count: 6
+      evidence_class: quoted_attributed
+    - name: Sawamura, 1600 °C
+      marker: small open circle
+      marker_count: 6
+      evidence_class: quoted_attributed
+    - name: Jung et al. thermodynamic optimization
+      marker: curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  panel: whole figure
+  attribution: Present work and previous sources named in the figure legend; marker counts transcribed visually from physical
+    page 7.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_6_sio2_activity_binary
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: SiO2
+- observation_id: jakobsson_2015_figure_7_cao_activity_binary
+  type: figure_record
+  locator:
+    page: 7
+    published_page: 601
+    pdf_page_index: 6
+    figure: '7'
+    note: Figure 7
+  units: axes and printed quantity units
+  values:
+    quantity: activity
+    species: CaO
+    phase: CaO-SiO2 liquid slag
+    temperature_as_printed: series-specific temperatures are printed in the legend; present work at 1873 K (1600 °C)
+    axes_as_printed:
+      x: x_CaO
+      y: a_CaO(s)
+    caption: Activity of CaO(s) in the binary CaO-SiO2 system compared with previous works.
+    series:
+    - name: present-work Gibbs-Duhem result
+      marker: solid line
+      marker_count: 0
+      evidence_class: measured_reduced
+    - name: Carter and Macfarlane, 1500 °C
+      marker: plus
+      marker_count: 3
+      evidence_class: quoted_attributed
+    - name: Sharma and Richardson, 1500 °C
+      marker: cross
+      marker_count: 5
+      evidence_class: quoted_attributed
+    - name: Sharma and Richardson, 1550 °C
+      marker: asterisk
+      marker_count: 4
+      evidence_class: quoted_attributed
+    - name: Sawamura, 1600 °C
+      marker: open square
+      marker_count: 5
+      evidence_class: quoted_attributed
+    - name: Morita et al., 1600 °C
+      marker: filled square
+      marker_count: 6
+      evidence_class: quoted_attributed
+    - name: Jung et al. thermodynamic optimization
+      marker: dotted line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Rein and Chipman integration
+      marker: dashed line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  panel: whole figure
+  attribution: Present work and previous sources named in the figure legend; marker counts transcribed visually from physical
+    page 7.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_7_cao_activity_binary
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: CaO
+- observation_id: jakobsson_2015_figure_8_ln_gamma_ca
+  type: figure_record
+  locator:
+    page: 8
+    published_page: 602
+    pdf_page_index: 7
+    figure: '8'
+    note: Figure 8
+  units: axes and printed quantity units
+  values:
+    quantity: activity_coefficient
+    species: Ca
+    phase: liquid silicon; Henrian solute
+    temperature_as_printed: 1600 °C present-work datum; prior series span 1450-1650 °C
+    axes_as_printed:
+      x: Temperature (°C)
+      y: ln gamma_Ca^0
+    caption: Henrian activity coefficient of calcium in silicon compared with previous works.
+    series:
+    - name: Pinto and Takano
+      marker: open circle
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Margaria et al.
+      marker: cross
+      marker_count: 2
+      evidence_class: quoted_attributed
+    - name: Schei et al.
+      marker: dotted line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Miki et al.
+      marker: asterisk
+      marker_count: 5
+      evidence_class: quoted_attributed
+    - name: Miki et al., recalculated
+      marker: dashed line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Heyrman and Chartrand
+      marker: dashed line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: present work
+      marker: filled circle with error bar
+      marker_count: 1
+      evidence_class: measured_reduced
+    digitisation: deferred to a figure pass
+  panel: whole figure
+  attribution: Present work and previous sources as identified in the figure legend; plotted logarithm remains as printed.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_8_ln_gamma_ca
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: CaO
+- observation_id: jakobsson_2015_figure_9_mgo_activity
+  type: figure_record
+  locator:
+    page: 9
+    published_page: 603
+    pdf_page_index: 8
+    figure: '9'
+    note: Figure 9
+  units: axes and printed quantity units
+  values:
+    quantity: activity
+    species: MgO
+    phase: MgO-SiO2 liquid slag
+    temperature_as_printed: 1873 K (1600 °C)
+    axes_as_printed:
+      x: x_SiO2
+      y: a_MgO(s)
+    caption: Activity of MgO(s) and SiO2(s) in the binary MgO-SiO2 system compared with previous works.
+    series:
+    - name: Rein and Chipman
+      marker: curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Morita et al.
+      marker: curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Kambayashi and Kato
+      marker: curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Jung et al.
+      marker: curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Zaitsev et al.
+      marker: curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: present work
+      marker: curve
+      marker_count: 0
+      evidence_class: measured_reduced
+    digitisation: deferred to a figure pass
+  panel: lower
+  attribution: Present work and prior work as identified in the legend; continuous activity curves are not digitised.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_9_mgo_activity
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: MgO
+- observation_id: jakobsson_2015_figure_9_sio2_activity
+  type: figure_record
+  locator:
+    page: 9
+    published_page: 603
+    pdf_page_index: 8
+    figure: '9'
+    note: Figure 9
+  units: axes and printed quantity units
+  values:
+    quantity: activity
+    species: SiO2
+    phase: MgO-SiO2 liquid slag
+    temperature_as_printed: 1873 K (1600 °C)
+    axes_as_printed:
+      x: x_SiO2
+      y: a_SiO2(s)
+    caption: Activity of MgO(s) and SiO2(s) in the binary MgO-SiO2 system compared with previous works.
+    series:
+    - name: Rein and Chipman
+      marker: curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Morita et al.
+      marker: curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Kambayashi and Kato
+      marker: curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Jung et al.
+      marker: curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: Zaitsev et al.
+      marker: curve
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: present work
+      marker: curve
+      marker_count: 0
+      evidence_class: measured_reduced
+    digitisation: deferred to a figure pass
+  panel: upper
+  attribution: Present work and prior work as identified in the legend; continuous activity curves are not digitised.
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_figure_9_sio2_activity
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: SiO2
+- observation_id: jakobsson_2015_table_iv_ca_surface_fit_parameters
+  type: model_fit
+  locator:
+    page: 5
+    published_page: 599
+    pdf_page_index: 4
+    note: Table IV; fit to measured compositions
+  units: dimensionless fit coefficients; ln mass fraction as fit output
+  values:
+    quantity: unavailable
+    quantity_as_published: coefficients a-f for the surface fit to ln w_Ca in Eq. (3)
+    candidate_tokens_reviewed:
+    - activity
+    - activity_coefficient
+    - activity_coefficient_temperature_fit
+    - equilibrium_phase_composition
+    schema_gap: No existing quantity token represents the six coefficients of this composition-dependent surface fit.
+    method_class: model_derived
+    evidence_class: model_derived
+    coefficients_as_published:
+      a: '-7.22866'
+      b: '3511.11'
+      c: '18.5540'
+      d: '17.3019'
+      e: '-11.2707'
+      f: '-30.5502'
+    R_squared: '0.98'
+    fit_uncertainty_as_published: pointwise 95 pct confidence bands in Figures 2-4
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_table_iv_ca_surface_fit_parameters
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: CaO
+- observation_id: jakobsson_2015_table_iv_mg_surface_fit_parameters
+  type: model_fit
+  locator:
+    page: 5
+    published_page: 599
+    pdf_page_index: 4
+    note: Table IV; fit to measured compositions
+  units: dimensionless fit coefficients; ln mass fraction as fit output
+  values:
+    quantity: unavailable
+    quantity_as_published: coefficients a-f for the surface fit to ln w_Mg in Eq. (3)
+    candidate_tokens_reviewed:
+    - activity
+    - activity_coefficient
+    - activity_coefficient_temperature_fit
+    - equilibrium_phase_composition
+    schema_gap: No existing quantity token represents the six coefficients of this composition-dependent surface fit.
+    method_class: model_derived
+    evidence_class: model_derived
+    coefficients_as_published:
+      a: '-10.2973'
+      b: '20568.3'
+      c: '22.7121'
+      d: '16.2950'
+      e: '-7.69311'
+      f: '-10.1856'
+    R_squared: '0.97'
+    fit_uncertainty_as_published: pointwise 95 pct confidence bands in Figures 2-4
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_table_iv_mg_surface_fit_parameters
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: MgO
+- observation_id: jakobsson_2015_text_ln_henrian_gamma_ca_schema_gap
+  type: measurement_summary
+  locator:
+    page: 8
+    published_page: 602
+    pdf_page_index: 7
+    note: Eq. (19) and following paragraph
+  units: natural-log activity coefficient; dimensionless
+  values:
+    quantity: unavailable
+    candidate_token: activity_coefficient
+    quantity_as_published: Henrian activity coefficient of calcium in liquid silicon
+    printed_form: ln
+    temperature_as_published: 1873 K (1600 °C)
+    values_as_printed:
+    - ln gamma_Ca^0 = -6.99 ± 0.15
+    - ln gamma_Ca^0 = -6.97 if the Miki et al. self-interaction coefficient is disregarded
+    basis_as_published: Henrian; liquid silicon solute
+    confidence_level: 95 pct confidence interval for -6.99 ± 0.15
+    schema_gap: The scalar activity-coefficient quantity has no printed_form field for ln; values are preserved without exponentiation.
+    method_class: measured_reduced
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_text_ln_henrian_gamma_ca_schema_gap
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: CaO
+- observation_id: jakobsson_2015_text_ln_henrian_gamma_mg_schema_gap
+  type: measurement_summary
+  locator:
+    page: 9
+    published_page: 603
+    pdf_page_index: 8
+    note: Eq. (21) and following paragraph
+  units: natural-log activity coefficient; dimensionless
+  values:
+    quantity: unavailable
+    candidate_token: activity_coefficient
+    quantity_as_published: Henrian activity coefficient of magnesium in liquid silicon
+    printed_form: ln
+    temperature_as_published: 1873 K (1600 °C)
+    values_as_printed:
+    - ln gamma_Mg^0 = -1.71 ± 0.16 (this work)
+    - ln gamma_Mg^0 = -1.52 at 1873 K (Miki et al. [8])
+    - ln gamma_Mg^0 = -1.74 at 1873 K (Jung et al. [33])
+    - ln gamma_Mg^0 = -1.64 from a linear fit to this work's data
+    basis_as_published: Henrian; liquid silicon solute
+    confidence_level: 95 pct confidence interval for -1.71 ± 0.16
+    schema_gap: The scalar activity-coefficient quantity has no printed_form field for ln; values are preserved without exponentiation.
+    attribution_as_printed:
+      this_work: Jakobsson and Tangstad
+      miki: Miki et al. [8]
+      jung: Jung et al. [33]
+      linear_fit: linear fit to the present work
+    method_class: measured_reduced
+  context_id: jakobsson-tangstad-2015-ca-mg-activities::context::jakobsson_2015_text_ln_henrian_gamma_mg_schema_gap
+  work_id: 10.1007/s11663-014-0268-8
+  source_id: jakobsson-tangstad-2015-ca-mg-activities
+  species: MgO

@@ -1,0 +1,4454 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/costa-2025-ree-cmas-glass-melt-thermochemistry.yaml
+observations:
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_cmas_heat_of_fusion_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Ca0.3234Mg0.1071Al0.1524Si0.4933O1.646
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1493'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3234'
+        - - MgO
+          - '0.1071'
+        - - Al2O3
+          - '0.0762'
+        - - SiO2
+          - '0.4933'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '31.01'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '1.55'
+      units: kJ/mol
+      note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_cmas_heat_of_fusion_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=CMAS; column=ΔHfusion (kJ·mol−1)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.3234'
+          - - MgO
+            - '0.1071'
+          - - Al2O3
+            - '0.0762'
+          - - SiO2
+            - '0.4933'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=CMAS
+    temperature_K:
+      state:
+        tag: value
+        value: '1493'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=CMAS; column=ΔHfusion (kJ·mol−1)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_cmas_tc_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.3234Mg0.1071Al0.1524Si0.4933O1.646
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: crystallization_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3234'
+        - - MgO
+          - '0.1071'
+        - - Al2O3
+          - '0.0762'
+        - - SiO2
+          - '0.4933'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1209'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 6
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_cmas_tc_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=CMAS; column=Tc (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.3234'
+          - - MgO
+            - '0.1071'
+          - - Al2O3
+            - '0.0762'
+          - - SiO2
+            - '0.4933'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=CMAS
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1209'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=CMAS; column=Tc (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_cmas_tg_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.3234Mg0.1071Al0.1524Si0.4933O1.646
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3234'
+        - - MgO
+          - '0.1071'
+        - - Al2O3
+          - '0.0762'
+        - - SiO2
+          - '0.4933'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1021'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 5
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_cmas_tg_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=CMAS; column=Tg (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.3234'
+          - - MgO
+            - '0.1071'
+          - - Al2O3
+            - '0.0762'
+          - - SiO2
+            - '0.4933'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=CMAS
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1021'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=CMAS; column=Tg (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_cmas_tm_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.3234Mg0.1071Al0.1524Si0.4933O1.646
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3234'
+        - - MgO
+          - '0.1071'
+        - - Al2O3
+          - '0.0762'
+        - - SiO2
+          - '0.4933'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1493'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 8
+      units: K
+      note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_cmas_tm_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=CMAS; column=Tm (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.3234'
+          - - MgO
+            - '0.1071'
+          - - Al2O3
+            - '0.0762'
+          - - SiO2
+            - '0.4933'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=CMAS
+    temperature_K:
+      state:
+        tag: value
+        value: '1493'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=CMAS; column=Tm (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_h_heat_of_fusion_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Ca0.312Mg0.0932Al0.1444Gd0.1004Si0.472O1.716
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1475'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Gd2O3
+          - '0.0502'
+        - - CaO
+          - '0.312'
+        - - MgO
+          - '0.0932'
+        - - Al2O3
+          - '0.0722'
+        - - SiO2
+          - '0.472'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '16.36'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.82'
+      units: kJ/mol
+      note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_h_heat_of_fusion_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Gd-H; column=ΔHfusion (kJ·mol−1)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Gd2O3
+            - '0.0502'
+          - - CaO
+            - '0.312'
+          - - MgO
+            - '0.0932'
+          - - Al2O3
+            - '0.0722'
+          - - SiO2
+            - '0.472'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Gd-H
+    temperature_K:
+      state:
+        tag: value
+        value: '1475'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Gd-H; column=ΔHfusion (kJ·mol−1)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_h_tc_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.312Mg0.0932Al0.1444Gd0.1004Si0.472O1.716
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: crystallization_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Gd2O3
+          - '0.0502'
+        - - CaO
+          - '0.312'
+        - - MgO
+          - '0.0932'
+        - - Al2O3
+          - '0.0722'
+        - - SiO2
+          - '0.472'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1243'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 6
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_h_tc_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Gd-H; column=Tc (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Gd2O3
+            - '0.0502'
+          - - CaO
+            - '0.312'
+          - - MgO
+            - '0.0932'
+          - - Al2O3
+            - '0.0722'
+          - - SiO2
+            - '0.472'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Gd-H
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1243'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Gd-H; column=Tc (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_h_tg_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.312Mg0.0932Al0.1444Gd0.1004Si0.472O1.716
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Gd2O3
+          - '0.0502'
+        - - CaO
+          - '0.312'
+        - - MgO
+          - '0.0932'
+        - - Al2O3
+          - '0.0722'
+        - - SiO2
+          - '0.472'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1030'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 5
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_h_tg_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Gd-H; column=Tg (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Gd2O3
+            - '0.0502'
+          - - CaO
+            - '0.312'
+          - - MgO
+            - '0.0932'
+          - - Al2O3
+            - '0.0722'
+          - - SiO2
+            - '0.472'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Gd-H
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1030'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Gd-H; column=Tg (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_h_tm_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.312Mg0.0932Al0.1444Gd0.1004Si0.472O1.716
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Gd2O3
+          - '0.0502'
+        - - CaO
+          - '0.312'
+        - - MgO
+          - '0.0932'
+        - - Al2O3
+          - '0.0722'
+        - - SiO2
+          - '0.472'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1475'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 7
+      units: K
+      note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_h_tm_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Gd-H; column=Tm (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Gd2O3
+            - '0.0502'
+          - - CaO
+            - '0.312'
+          - - MgO
+            - '0.0932'
+          - - Al2O3
+            - '0.0722'
+          - - SiO2
+            - '0.472'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Gd-H
+    temperature_K:
+      state:
+        tag: value
+        value: '1475'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Gd-H; column=Tm (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_l_heat_of_fusion_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Ca0.3224Mg0.1048Al0.1516Gd0.0173Si0.488O1.657
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1457'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Gd2O3
+          - '0.00869'
+        - - CaO
+          - '0.3224'
+        - - MgO
+          - '0.1048'
+        - - Al2O3
+          - '0.0758'
+        - - SiO2
+          - '0.488'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '23.31'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '1.17'
+      units: kJ/mol
+      note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_l_heat_of_fusion_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Gd-L; column=ΔHfusion (kJ·mol−1)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Gd2O3
+            - '0.00869'
+          - - CaO
+            - '0.3224'
+          - - MgO
+            - '0.1048'
+          - - Al2O3
+            - '0.0758'
+          - - SiO2
+            - '0.488'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Gd-L
+    temperature_K:
+      state:
+        tag: value
+        value: '1457'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Gd-L; column=ΔHfusion (kJ·mol−1)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_l_tc_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.3224Mg0.1048Al0.1516Gd0.0173Si0.488O1.657
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: crystallization_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Gd2O3
+          - '0.00869'
+        - - CaO
+          - '0.3224'
+        - - MgO
+          - '0.1048'
+        - - Al2O3
+          - '0.0758'
+        - - SiO2
+          - '0.488'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1231'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 6
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_l_tc_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Gd-L; column=Tc (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Gd2O3
+            - '0.00869'
+          - - CaO
+            - '0.3224'
+          - - MgO
+            - '0.1048'
+          - - Al2O3
+            - '0.0758'
+          - - SiO2
+            - '0.488'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Gd-L
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1231'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Gd-L; column=Tc (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_l_tg_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.3224Mg0.1048Al0.1516Gd0.0173Si0.488O1.657
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Gd2O3
+          - '0.00869'
+        - - CaO
+          - '0.3224'
+        - - MgO
+          - '0.1048'
+        - - Al2O3
+          - '0.0758'
+        - - SiO2
+          - '0.488'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1024'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 5
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_l_tg_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Gd-L; column=Tg (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Gd2O3
+            - '0.00869'
+          - - CaO
+            - '0.3224'
+          - - MgO
+            - '0.1048'
+          - - Al2O3
+            - '0.0758'
+          - - SiO2
+            - '0.488'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Gd-L
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1024'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Gd-L; column=Tg (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_l_tm_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.3224Mg0.1048Al0.1516Gd0.0173Si0.488O1.657
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Gd2O3
+          - '0.00869'
+        - - CaO
+          - '0.3224'
+        - - MgO
+          - '0.1048'
+        - - Al2O3
+          - '0.0758'
+        - - SiO2
+          - '0.488'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1457'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 7
+      units: K
+      note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_gd_l_tm_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Gd-L; column=Tm (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Gd2O3
+            - '0.00869'
+          - - CaO
+            - '0.3224'
+          - - MgO
+            - '0.1048'
+          - - Al2O3
+            - '0.0758'
+          - - SiO2
+            - '0.488'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Gd-L
+    temperature_K:
+      state:
+        tag: value
+        value: '1457'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Gd-L; column=Tm (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_h_heat_of_fusion_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Ca0.3091Mg0.1008Al0.145Y0.0986Si0.468O1.711
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1462'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Y2O3
+          - '0.0493'
+        - - CaO
+          - '0.3091'
+        - - MgO
+          - '0.1008'
+        - - Al2O3
+          - '0.0725'
+        - - SiO2
+          - '0.468'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '14.27'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.71'
+      units: kJ/mol
+      note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_h_heat_of_fusion_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Y-H; column=ΔHfusion (kJ·mol−1)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Y2O3
+            - '0.0493'
+          - - CaO
+            - '0.3091'
+          - - MgO
+            - '0.1008'
+          - - Al2O3
+            - '0.0725'
+          - - SiO2
+            - '0.468'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Y-H
+    temperature_K:
+      state:
+        tag: value
+        value: '1462'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Y-H; column=ΔHfusion (kJ·mol−1)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_h_tc_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.3091Mg0.1008Al0.145Y0.0986Si0.468O1.711
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: crystallization_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Y2O3
+          - '0.0493'
+        - - CaO
+          - '0.3091'
+        - - MgO
+          - '0.1008'
+        - - Al2O3
+          - '0.0725'
+        - - SiO2
+          - '0.468'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1246'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 6
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_h_tc_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Y-H; column=Tc (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Y2O3
+            - '0.0493'
+          - - CaO
+            - '0.3091'
+          - - MgO
+            - '0.1008'
+          - - Al2O3
+            - '0.0725'
+          - - SiO2
+            - '0.468'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Y-H
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1246'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Y-H; column=Tc (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_h_tg_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.3091Mg0.1008Al0.145Y0.0986Si0.468O1.711
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Y2O3
+          - '0.0493'
+        - - CaO
+          - '0.3091'
+        - - MgO
+          - '0.1008'
+        - - Al2O3
+          - '0.0725'
+        - - SiO2
+          - '0.468'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1040'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 5
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_h_tg_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Y-H; column=Tg (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Y2O3
+            - '0.0493'
+          - - CaO
+            - '0.3091'
+          - - MgO
+            - '0.1008'
+          - - Al2O3
+            - '0.0725'
+          - - SiO2
+            - '0.468'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Y-H
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1040'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Y-H; column=Tg (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_h_tm_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.3091Mg0.1008Al0.145Y0.0986Si0.468O1.711
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Y2O3
+          - '0.0493'
+        - - CaO
+          - '0.3091'
+        - - MgO
+          - '0.1008'
+        - - Al2O3
+          - '0.0725'
+        - - SiO2
+          - '0.468'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1462'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 7
+      units: K
+      note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_h_tm_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Y-H; column=Tm (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Y2O3
+            - '0.0493'
+          - - CaO
+            - '0.3091'
+          - - MgO
+            - '0.1008'
+          - - Al2O3
+            - '0.0725'
+          - - SiO2
+            - '0.468'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Y-H
+    temperature_K:
+      state:
+        tag: value
+        value: '1462'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Y-H; column=Tm (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_l_heat_of_fusion_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Ca0.3182Mg0.1054Al0.1502Y0.0297Si0.486O1.665
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1462'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Y2O3
+          - '0.01485'
+        - - CaO
+          - '0.3182'
+        - - MgO
+          - '0.1054'
+        - - Al2O3
+          - '0.0751'
+        - - SiO2
+          - '0.486'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '18.54'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.93'
+      units: kJ/mol
+      note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_l_heat_of_fusion_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Y-L; column=ΔHfusion (kJ·mol−1)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Y2O3
+            - '0.01485'
+          - - CaO
+            - '0.3182'
+          - - MgO
+            - '0.1054'
+          - - Al2O3
+            - '0.0751'
+          - - SiO2
+            - '0.486'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Y-L
+    temperature_K:
+      state:
+        tag: value
+        value: '1462'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Y-L; column=ΔHfusion (kJ·mol−1)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_l_tc_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.3182Mg0.1054Al0.1502Y0.0297Si0.486O1.665
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: crystallization_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Y2O3
+          - '0.01485'
+        - - CaO
+          - '0.3182'
+        - - MgO
+          - '0.1054'
+        - - Al2O3
+          - '0.0751'
+        - - SiO2
+          - '0.486'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1245'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 6
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_l_tc_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Y-L; column=Tc (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Y2O3
+            - '0.01485'
+          - - CaO
+            - '0.3182'
+          - - MgO
+            - '0.1054'
+          - - Al2O3
+            - '0.0751'
+          - - SiO2
+            - '0.486'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Y-L
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1245'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Y-L; column=Tc (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_l_tg_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.3182Mg0.1054Al0.1502Y0.0297Si0.486O1.665
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Y2O3
+          - '0.01485'
+        - - CaO
+          - '0.3182'
+        - - MgO
+          - '0.1054'
+        - - Al2O3
+          - '0.0751'
+        - - SiO2
+          - '0.486'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1025'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 5
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_l_tg_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Y-L; column=Tg (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Y2O3
+            - '0.01485'
+          - - CaO
+            - '0.3182'
+          - - MgO
+            - '0.1054'
+          - - Al2O3
+            - '0.0751'
+          - - SiO2
+            - '0.486'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Y-L
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1025'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Y-L; column=Tg (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_l_tm_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.3182Mg0.1054Al0.1502Y0.0297Si0.486O1.665
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Y2O3
+          - '0.01485'
+        - - CaO
+          - '0.3182'
+        - - MgO
+          - '0.1054'
+        - - Al2O3
+          - '0.0751'
+        - - SiO2
+          - '0.486'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1462'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 7
+      units: K
+      note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_y_l_tm_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Y-L; column=Tm (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Y2O3
+            - '0.01485'
+          - - CaO
+            - '0.3182'
+          - - MgO
+            - '0.1054'
+          - - Al2O3
+            - '0.0751'
+          - - SiO2
+            - '0.486'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Y-L
+    temperature_K:
+      state:
+        tag: value
+        value: '1462'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Y-L; column=Tm (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_h_heat_of_fusion_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Ca0.312Mg0.1006Al0.1266Yb0.099Si0.475O1.701
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1454'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Yb2O3
+          - '0.0495'
+        - - CaO
+          - '0.312'
+        - - MgO
+          - '0.1006'
+        - - Al2O3
+          - '0.0633'
+        - - SiO2
+          - '0.475'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '19.13'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '0.96'
+      units: kJ/mol
+      note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_h_heat_of_fusion_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Yb-H; column=ΔHfusion (kJ·mol−1)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Yb2O3
+            - '0.0495'
+          - - CaO
+            - '0.312'
+          - - MgO
+            - '0.1006'
+          - - Al2O3
+            - '0.0633'
+          - - SiO2
+            - '0.475'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Yb-H
+    temperature_K:
+      state:
+        tag: value
+        value: '1454'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Yb-H; column=ΔHfusion (kJ·mol−1)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_h_tc_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.312Mg0.1006Al0.1266Yb0.099Si0.475O1.701
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: crystallization_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Yb2O3
+          - '0.0495'
+        - - CaO
+          - '0.312'
+        - - MgO
+          - '0.1006'
+        - - Al2O3
+          - '0.0633'
+        - - SiO2
+          - '0.475'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1257'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 6
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_h_tc_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Yb-H; column=Tc (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Yb2O3
+            - '0.0495'
+          - - CaO
+            - '0.312'
+          - - MgO
+            - '0.1006'
+          - - Al2O3
+            - '0.0633'
+          - - SiO2
+            - '0.475'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Yb-H
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1257'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Yb-H; column=Tc (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_h_tg_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.312Mg0.1006Al0.1266Yb0.099Si0.475O1.701
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Yb2O3
+          - '0.0495'
+        - - CaO
+          - '0.312'
+        - - MgO
+          - '0.1006'
+        - - Al2O3
+          - '0.0633'
+        - - SiO2
+          - '0.475'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1044'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 5
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_h_tg_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Yb-H; column=Tg (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Yb2O3
+            - '0.0495'
+          - - CaO
+            - '0.312'
+          - - MgO
+            - '0.1006'
+          - - Al2O3
+            - '0.0633'
+          - - SiO2
+            - '0.475'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Yb-H
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1044'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Yb-H; column=Tg (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_h_tm_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.312Mg0.1006Al0.1266Yb0.099Si0.475O1.701
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Yb2O3
+          - '0.0495'
+        - - CaO
+          - '0.312'
+        - - MgO
+          - '0.1006'
+        - - Al2O3
+          - '0.0633'
+        - - SiO2
+          - '0.475'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1454'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 7
+      units: K
+      note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_h_tm_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Yb-H; column=Tm (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Yb2O3
+            - '0.0495'
+          - - CaO
+            - '0.312'
+          - - MgO
+            - '0.1006'
+          - - Al2O3
+            - '0.0633'
+          - - SiO2
+            - '0.475'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Yb-H
+    temperature_K:
+      state:
+        tag: value
+        value: '1454'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Yb-H; column=Tm (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_l_heat_of_fusion_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Ca0.322Mg0.1057Al0.1484Yb0.0160Si0.490O1.654
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1477'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Yb2O3
+          - '0.008'
+        - - CaO
+          - '0.322'
+        - - MgO
+          - '0.1057'
+        - - Al2O3
+          - '0.0742'
+        - - SiO2
+          - '0.49'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '23.44'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '1.17'
+      units: kJ/mol
+      note: Table footnote states enthalpy uncertainties are assumed to be 5%; extra digits are retained.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_l_heat_of_fusion_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Yb-L; column=ΔHfusion (kJ·mol−1)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Yb2O3
+            - '0.008'
+          - - CaO
+            - '0.322'
+          - - MgO
+            - '0.1057'
+          - - Al2O3
+            - '0.0742'
+          - - SiO2
+            - '0.49'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Yb-L
+    temperature_K:
+      state:
+        tag: value
+        value: '1477'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Yb-L; column=ΔHfusion (kJ·mol−1)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_l_tc_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.322Mg0.1057Al0.1484Yb0.0160Si0.490O1.654
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: crystallization_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Yb2O3
+          - '0.008'
+        - - CaO
+          - '0.322'
+        - - MgO
+          - '0.1057'
+        - - Al2O3
+          - '0.0742'
+        - - SiO2
+          - '0.49'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1225'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 6
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_l_tc_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Yb-L; column=Tc (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Yb2O3
+            - '0.008'
+          - - CaO
+            - '0.322'
+          - - MgO
+            - '0.1057'
+          - - Al2O3
+            - '0.0742'
+          - - SiO2
+            - '0.49'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Yb-L
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1225'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Yb-L; column=Tc (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_l_tg_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.322Mg0.1057Al0.1484Yb0.0160Si0.490O1.654
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Yb2O3
+          - '0.008'
+        - - CaO
+          - '0.322'
+        - - MgO
+          - '0.1057'
+        - - Al2O3
+          - '0.0742'
+        - - SiO2
+          - '0.49'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1024'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 5
+      units: K
+      note: The table prints this uncertainty explicitly; the Tg/Tc footnote states assumed 0.05% uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_l_tg_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Yb-L; column=Tg (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Yb2O3
+            - '0.008'
+          - - CaO
+            - '0.322'
+          - - MgO
+            - '0.1057'
+          - - Al2O3
+            - '0.0742'
+          - - SiO2
+            - '0.49'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Yb-L
+    quench_state:
+      state:
+        tag: value
+        value: asserted_preserved
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: 3. Results
+    temperature_K:
+      state:
+        tag: value
+        value: '1024'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Yb-L; column=Tg (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+- observation_id: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_l_tm_table3
+  experiment_id: 10.1016/j.jnoncrysol.2025.123518::costa-2025-ree-cmas-glass-melt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca0.322Mg0.1057Al0.1484Yb0.0160Si0.490O1.654
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Yb2O3
+          - '0.008'
+        - - CaO
+          - '0.322'
+        - - MgO
+          - '0.1057'
+        - - Al2O3
+          - '0.0742'
+        - - SiO2
+          - '0.49'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1477'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 7
+      units: K
+      note: The table prints this uncertainty explicitly; no confidence level for Tm is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-2025-ree-cmas-glass-melt-thermochemistry::costa_2025_yb_l_tm_table3
+  source_id: costa-2025-ree-cmas-glass-melt-thermochemistry
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '3'
+    note: row=Yb-L; column=Tm (K)
+  read_from: pdf:costa-2025-ree-cmas-glass-melt-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Yb2O3
+            - '0.008'
+          - - CaO
+            - '0.322'
+          - - MgO
+            - '0.1057'
+          - - Al2O3
+            - '0.0742'
+          - - SiO2
+            - '0.49'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '1'
+        note: row=Yb-L
+    temperature_K:
+      state:
+        tag: value
+        value: '1477'
+      locator:
+        page: 11
+        pdf_page_index: 10
+        table: '3'
+        note: row=Yb-L; column=Tm (K)
+    gas_environment:
+      state:
+        tag: value
+        value: air flow, 20 mL/min
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source reports air flow but no oxygen partial pressure or fO2.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: 2.2 Sample characterization

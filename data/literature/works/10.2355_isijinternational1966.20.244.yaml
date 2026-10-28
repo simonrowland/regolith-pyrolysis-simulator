@@ -72,6 +72,7 @@ experiments:
               pdf_page_index: 2
               note: Approximately 1.5 g; unit conversion only; series-level mass applied
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -96,6 +97,7 @@ experiments:
         - component values retained exactly in initial_composition; locator above
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -145,6 +147,7 @@ experiments:
               pdf_page_index: 2
               note: 1600 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -247,6 +250,7 @@ experiments:
               pdf_page_index: 2
               note: Approximately 1.5 g; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -296,6 +300,7 @@ experiments:
               pdf_page_index: 2
               note: 1600 C; unit conversion only
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -377,6 +382,7 @@ experiments:
                 section: II
                 note: Hitachi RM-6K; alumina cell; orifice 0.4-0.6 mm; 22 eV; sample ~1.5 g
           output_unit: '1'
+          references: []
   bench_id: 10.2355/isijinternational1966.20.244::bench::yamada-kato-rm6k
   thermal_schedule:
     method:
@@ -488,6 +494,7 @@ benches:
               section: 1. Knudsen Cell Assembly
               note: 0.4-0.6 mm; unit conversion only. No effective area computed
         output_unit: m
+        references: []
     orifice_channel_length_m:
       state:
         tag: unknown

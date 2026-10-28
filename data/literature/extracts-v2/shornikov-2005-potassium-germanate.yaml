@@ -1,0 +1,5241 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2005-potassium-germanate.yaml
+observations:
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_alpha_geo
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: GeO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.227'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.043'
+      verbatim: (2.27 ± 0.43) × 10^−1
+      confidence_level: not_stated
+      basis: Printed ±. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: This work, from [28] and [30].
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_alpha_geo
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 4
+    published_page: 1348
+    pdf_page_index: 3
+    paragraph: partial vaporization coefficients
+    note: Evaluated from the discrepancy between crucible data [28] and effusion-cell data [30], Sv/sor about 3000. The arithmetic
+      is not shown.
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The sentence does not assign one temperature to alpha. The compared sets are [28] at 1213–1364 K and the [30]
+          effusion-cell intervals. No midpoint is invented.
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        paragraph: partial vaporization coefficients
+        note: Evaluated from the discrepancy between crucible data [28] and effusion-cell data [30], Sv/sor about 3000. The
+          arithmetic is not shown.
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_alpha_o2
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.198'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.085'
+      verbatim: (1.98 ± 0.85) × 10^−1
+      confidence_level: not_stated
+      basis: Printed ±. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: This work, from [28] and [30].
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_alpha_o2
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 4
+    published_page: 1348
+    pdf_page_index: 3
+    paragraph: partial vaporization coefficients
+    note: Evaluated from the discrepancy between crucible data [28] and effusion-cell data [30], Sv/sor about 3000. The arithmetic
+      is not shown.
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The sentence does not assign one temperature to alpha. The compared sets are [28] at 1213–1364 K and the [30]
+          effusion-cell intervals. No midpoint is invented.
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        paragraph: partial vaporization coefficients
+        note: Evaluated from the discrepancy between crucible data [28] and effusion-cell data [30], Sv/sor about 3000. The
+          arithmetic is not shown.
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_54_80
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: K2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: unknown
+            reason: The paper does not name a polymorph of the pure K2O reference.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: K2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - GeO2
+          - '0.548'
+        - - K2O
+          - '0.452'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00000000096272'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: read
+      log10_half_width: '0.05'
+      confidence_level: not_stated
+      basis: Two centre reads differ by at most 0.028 in log10 a. The stated half-width is 0.05.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_54_80
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 3
+    published_page: 1347
+    pdf_page_index: 2
+    figure: '2'
+    note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10 at
+      698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5. Least
+      squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5, 60 at 1205.0,
+      70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol% tick is the right-hand
+      frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical window at the printed
+      composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read half-width 0.05 covers the
+      largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (1059.2, 577.5) log10 a -9.026; read
+      2 page px (1060.0, 575.1) log10 a -9.007.'
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        figure: '2'
+        note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10
+          at 698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5.
+          Least squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5,
+          60 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol%
+          tick is the right-hand frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical
+          window at the printed composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read
+          half-width 0.05 covers the largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (1059.2,
+          577.5) log10 a -9.026; read 2 page px (1060.0, 575.1) log10 a -9.007.'
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_59_59
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: K2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: unknown
+            reason: The paper does not name a polymorph of the pure K2O reference.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: K2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - GeO2
+          - '0.5959'
+        - - K2O
+          - '0.4041'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000003047895'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: read
+      log10_half_width: '0.05'
+      confidence_level: not_stated
+      basis: Two centre reads differ by at most 0.028 in log10 a. The stated half-width is 0.05.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_59_59
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 3
+    published_page: 1347
+    pdf_page_index: 2
+    figure: '2'
+    note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10 at
+      698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5. Least
+      squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5, 60 at 1205.0,
+      70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol% tick is the right-hand
+      frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical window at the printed
+      composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read half-width 0.05 covers the
+      largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (1189.7, 638.5) log10 a -9.518; read
+      2 page px (1189.4, 638.0) log10 a -9.514.'
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        figure: '2'
+        note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10
+          at 698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5.
+          Least squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5,
+          60 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol%
+          tick is the right-hand frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical
+          window at the printed composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read
+          half-width 0.05 covers the largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (1189.7,
+          638.5) log10 a -9.518; read 2 page px (1189.4, 638.0) log10 a -9.514.'
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_62_41
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: K2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: unknown
+            reason: The paper does not name a polymorph of the pure K2O reference.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: K2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - GeO2
+          - '0.6241'
+        - - K2O
+          - '0.3759'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000001518798'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: read
+      log10_half_width: '0.05'
+      confidence_level: not_stated
+      basis: Two centre reads differ by at most 0.028 in log10 a. The stated half-width is 0.05.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_62_41
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 3
+    published_page: 1347
+    pdf_page_index: 2
+    figure: '2'
+    note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10 at
+      698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5. Least
+      squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5, 60 at 1205.0,
+      70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol% tick is the right-hand
+      frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical window at the printed
+      composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read half-width 0.05 covers the
+      largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (1266.9, 675.8) log10 a -9.819; read
+      2 page px (1266.3, 675.6) log10 a -9.818.'
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        figure: '2'
+        note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10
+          at 698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5.
+          Least squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5,
+          60 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol%
+          tick is the right-hand frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical
+          window at the printed composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read
+          half-width 0.05 covers the largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (1266.9,
+          675.8) log10 a -9.819; read 2 page px (1266.3, 675.6) log10 a -9.818.'
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_66_40
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: K2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: unknown
+            reason: The paper does not name a polymorph of the pure K2O reference.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: K2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - GeO2
+          - '0.664'
+        - - K2O
+          - '0.336'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00000000005854637'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: read
+      log10_half_width: '0.05'
+      confidence_level: not_stated
+      basis: Two centre reads differ by at most 0.028 in log10 a. The stated half-width is 0.05.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_66_40
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 3
+    published_page: 1347
+    pdf_page_index: 2
+    figure: '2'
+    note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10 at
+      698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5. Least
+      squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5, 60 at 1205.0,
+      70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol% tick is the right-hand
+      frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical window at the printed
+      composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read half-width 0.05 covers the
+      largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (1377.3, 727.5) log10 a -10.237;
+      read 2 page px (1378.1, 726.4) log10 a -10.228.'
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        figure: '2'
+        note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10
+          at 698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5.
+          Least squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5,
+          60 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol%
+          tick is the right-hand frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical
+          window at the printed composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read
+          half-width 0.05 covers the largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (1377.3,
+          727.5) log10 a -10.237; read 2 page px (1378.1, 726.4) log10 a -10.228.'
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_71_83
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: K2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: unknown
+            reason: The paper does not name a polymorph of the pure K2O reference.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: K2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - GeO2
+          - '0.7183'
+        - - K2O
+          - '0.2817'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00000000001455459'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: read
+      log10_half_width: '0.05'
+      confidence_level: not_stated
+      basis: Two centre reads differ by at most 0.028 in log10 a. The stated half-width is 0.05.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_71_83
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 3
+    published_page: 1347
+    pdf_page_index: 2
+    figure: '2'
+    note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10 at
+      698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5. Least
+      squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5, 60 at 1205.0,
+      70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol% tick is the right-hand
+      frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical window at the printed
+      composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read half-width 0.05 covers the
+      largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (1527.7, 803.6) log10 a -10.851;
+      read 2 page px (1528.4, 800.2) log10 a -10.823.'
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        figure: '2'
+        note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10
+          at 698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5.
+          Least squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5,
+          60 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol%
+          tick is the right-hand frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical
+          window at the printed composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read
+          half-width 0.05 covers the largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (1527.7,
+          803.6) log10 a -10.851; read 2 page px (1528.4, 800.2) log10 a -10.823.'
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_82_93
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: K2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: unknown
+            reason: The paper does not name a polymorph of the pure K2O reference.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: K2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - GeO2
+          - '0.8293'
+        - - K2O
+          - '0.1707'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000004661224'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: read
+      log10_half_width: '0.05'
+      confidence_level: not_stated
+      basis: Two centre reads differ by at most 0.028 in log10 a. The stated half-width is 0.05.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_82_93
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 3
+    published_page: 1347
+    pdf_page_index: 2
+    figure: '2'
+    note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10 at
+      698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5. Least
+      squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5, 60 at 1205.0,
+      70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol% tick is the right-hand
+      frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical window at the printed
+      composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read half-width 0.05 covers the
+      largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (1833.0, 988.2) log10 a -12.341;
+      read 2 page px (1832.5, 985.9) log10 a -12.322.'
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        figure: '2'
+        note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10
+          at 698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5.
+          Least squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5,
+          60 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol%
+          tick is the right-hand frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical
+          window at the printed composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read
+          half-width 0.05 covers the largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (1833.0,
+          988.2) log10 a -12.341; read 2 page px (1832.5, 985.9) log10 a -12.322.'
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_91_00
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: K2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: unknown
+            reason: The paper does not name a polymorph of the pure K2O reference.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: K2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - GeO2
+          - '0.91'
+        - - K2O
+          - '0.09'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00000000000001836538'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: read
+      log10_half_width: '0.05'
+      confidence_level: not_stated
+      basis: Two centre reads differ by at most 0.028 in log10 a. The stated half-width is 0.05.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_fig2a_log_a_K2O_91_00
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 3
+    published_page: 1347
+    pdf_page_index: 2
+    figure: '2'
+    note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10 at
+      698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5. Least
+      squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5, 60 at 1205.0,
+      70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol% tick is the right-hand
+      frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical window at the printed
+      composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read half-width 0.05 covers the
+      largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (2057.7, 1160.3) log10 a -13.730;
+      read 2 page px (2053.5, 1161.7) log10 a -13.742.'
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        published_page: 1347
+        pdf_page_index: 2
+        figure: '2'
+        note: '600 dpi PDF page 3, published page 1347, Fig. 2 panel (a). Labelled y tick lines, page y px: −9 at 574.5, −10
+          at 698.0, −11 at 822.0, −12 at 946.0, −13 at 1070.0, −14 at 1193.5, −15 at 1317.5, −16 at 1441.5, −17 at 1565.5.
+          Least squares log10 a = −0.008072*y − 4.364, residual rms 0.0012. Labelled x tick lines: 50 mol% GeO2 at x 930.5,
+          60 at 1205.0, 70 at 1479.5, 80 at 1754.0, 90 at 2028.5. px = 27.45*mol% − 442, residual rms about 0. The 100 mol%
+          tick is the right-hand frame and has no star. Unlabelled ticks were not used. Read 1 is the ink centroid in a vertical
+          window at the printed composition. Read 2 is the centroid inside a 12 px radius. Stored log10 a is the mean. Read
+          half-width 0.05 covers the largest read difference (0.028) and a 6 px centre error. This star: read 1 page px (2057.7,
+          1160.3) log10 a -13.730; read 2 page px (2053.5, 1161.7) log10 a -13.742.'
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_geo_01
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: GeO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.13881525'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.04e-6'
+      verbatim: ±0.04e-6 on 1.37e-6
+      confidence_level: not_stated
+      basis: Printed ± on the 1300 K pressure cell. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[28]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t1_geo_01
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 4
+    published_page: 1348
+    pdf_page_index: 3
+    table: '1'
+    note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
+      Pt 1213–1364; column_header=p(i, 1300 K), atm
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        table: '1'
+        note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
+          Pt 1213–1364; column_header=p(i, 1300 K), atm
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:shornikov-2005-potassium-germanate
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_geo_02
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: GeO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '2.8067025'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.09e-5'
+      verbatim: ±0.09e-5 on 2.77e-5
+      confidence_level: not_stated
+      basis: Printed ± on the 1300 K pressure cell. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[29]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t1_geo_02
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 4
+    published_page: 1348
+    pdf_page_index: 3
+    table: '1'
+    note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
+      Mo, Pt 1445–1544; column_header=p(i, 1300 K), atm
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        table: '1'
+        note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
+          Mo, Pt 1445–1544; column_header=p(i, 1300 K), atm
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:shornikov-2005-potassium-germanate
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_geo_03
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: GeO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1.5300075'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.01e-5'
+      verbatim: ±0.01e-5 on 1.51e-5
+      confidence_level: not_stated
+      basis: Printed ± on the 1300 K pressure cell. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: This work
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t1_geo_03
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 4
+    published_page: 1348
+    pdf_page_index: 3
+    table: '1'
+    note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
+      – 1100–1308; column_header=p(i, 1300 K), atm
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        table: '1'
+        note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
+          – 1100–1308; column_header=p(i, 1300 K), atm
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:shornikov-2005-potassium-germanate
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_geo_04
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: GeO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1.4894775'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.10e-5'
+      verbatim: ±0.10e-5 on 1.47e-5
+      confidence_level: not_stated
+      basis: Printed ± on the 1300 K pressure cell. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[30]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t1_geo_04
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 4
+    published_page: 1348
+    pdf_page_index: 3
+    table: '1'
+    note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
+      Pt 1302–1376; column_header=p(i, 1300 K), atm
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        table: '1'
+        note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
+          Pt 1302–1376; column_header=p(i, 1300 K), atm
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:shornikov-2005-potassium-germanate
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_geo_05
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: GeO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1.4084175'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.03e-5'
+      verbatim: ±0.03e-5 on 1.39e-5
+      confidence_level: not_stated
+      basis: Printed ± on the 1300 K pressure cell. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived_least_squares
+    attribution: This work
+    model: derived_least_squares
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t1_geo_05
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 4
+    published_page: 1348
+    pdf_page_index: 3
+    table: '1'
+    note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
+      Pt 1092–1305; column_header=p(i, 1300 K), atm
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        table: '1'
+        note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
+          Pt 1092–1305; column_header=p(i, 1300 K), atm
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:shornikov-2005-potassium-germanate
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_geo_06
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: GeO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1.600935'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.09e-5'
+      verbatim: ±0.09e-5 on 1.58e-5
+      confidence_level: not_stated
+      basis: Printed ± on the 1300 K pressure cell. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived_least_squares
+    attribution: This work
+    model: derived_least_squares
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t1_geo_06
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 4
+    published_page: 1348
+    pdf_page_index: 3
+    table: '1'
+    note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
+      Mo 1174–1298; column_header=p(i, 1300 K), atm
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        table: '1'
+        note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(GeO)
+          Mo 1174–1298; column_header=p(i, 1300 K), atm
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:shornikov-2005-potassium-germanate
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_o2_07
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.039212775'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.15e-7'
+      verbatim: ±0.15e-7 on 3.87e-7
+      confidence_level: not_stated
+      basis: Printed ± on the 1300 K pressure cell. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[28]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t1_o2_07
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 4
+    published_page: 1348
+    pdf_page_index: 3
+    table: '1'
+    note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(O2)
+      Pt 1213–1364; column_header=p(i, 1300 K), atm
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        table: '1'
+        note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(O2)
+          Pt 1213–1364; column_header=p(i, 1300 K), atm
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:shornikov-2005-potassium-germanate
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_o2_08
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.766017'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.01e-6'
+      verbatim: ±0.01e-6 on 7.56e-6
+      confidence_level: not_stated
+      basis: Printed ± on the 1300 K pressure cell. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: This work
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t1_o2_08
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 4
+    published_page: 1348
+    pdf_page_index: 3
+    table: '1'
+    note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(O2)
+      – 1100–1308; column_header=p(i, 1300 K), atm
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        table: '1'
+        note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(O2)
+          – 1100–1308; column_header=p(i, 1300 K), atm
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:shornikov-2005-potassium-germanate
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_o2_09
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.474201'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.42e-6'
+      verbatim: ±0.42e-6 on 4.68e-6
+      confidence_level: not_stated
+      basis: Printed ± on the 1300 K pressure cell. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[30]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t1_o2_09
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 4
+    published_page: 1348
+    pdf_page_index: 3
+    table: '1'
+    note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(O2)
+      Pt 1294–1368; column_header=p(i, 1300 K), atm
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        table: '1'
+        note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(O2)
+          Pt 1294–1368; column_header=p(i, 1300 K), atm
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:shornikov-2005-potassium-germanate
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t1_o2_10
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.6586125'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.26e-6'
+      verbatim: ±0.26e-6 on 6.50e-6
+      confidence_level: not_stated
+      basis: Printed ± on the 1300 K pressure cell. Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived_least_squares
+    attribution: This work
+    model: derived_least_squares
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t1_o2_10
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 4
+    published_page: 1348
+    pdf_page_index: 3
+    table: '1'
+    note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(O2)
+      Mo 1205–1298; column_header=p(i, 1300 K), atm
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 4
+        published_page: 1348
+        pdf_page_index: 3
+        table: '1'
+        note: 600 dpi render of PDF page 4 agrees with the text layer on this cell. No digit was hand-corrected.; row_label=p(O2)
+          Mo 1205–1298; column_header=p(i, 1300 K), atm
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:shornikov-2005-potassium-germanate
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_Tm
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: 3Na2O.8SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: decomposition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1081'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_Tm
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=3Na2O·8SiO2; column_header=Tm, K
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1081'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: row_label=3Na2O·8SiO2; column_header=Tm, K
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_dfusH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: 3Na2O.8SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1081'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '7.95'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2, calorimetry cited as [51–53].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_dfusH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=3Na2O·8SiO2; column_header=ΔmH, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1081'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: row_label=3Na2O·8SiO2; column_header=ΔmH, kJ/mol
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_dfusS
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: 3Na2O.8SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1081'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '7.35'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_dfusS
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=3Na2O·8SiO2; column_header=ΔmS,
+      J/(mol K)
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1081'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=3Na2O·8SiO2; column_header=ΔmS,
+          J/(mol K)
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_melt_dfH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: 3Na2O.8SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-50.35'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_melt_dfH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=3Na2O·8SiO2; column_header=ΔfH(T) melt, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The melt column does not print its own temperature. The solid interval is not copied onto it.
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+  derived_from:
+  - shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_solid_dfH
+  - shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_dfusH
+  derivation:
+    relation: Table 2 melt ΔfH(T) = solid ΔfH(T) + ΔmH. The printed numbers add exactly.
+    inputs:
+    - shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_solid_dfH
+    - shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_dfusH
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_solid_dfH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: 3Na2O.8SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [974.0, 1071.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-58.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2, from earlier data [20, 21, 51–53].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_3Na2O_8SiO2_solid_dfH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.; row_label=3Na2O·8SiO2; column_header=ΔfH(T)
+      solid, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The solid column prints an interval. No midpoint is invented.
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_Tm
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2O.2SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1318'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_Tm
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=K2O·2SiO2; column_header=Tm, K
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1318'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: row_label=K2O·2SiO2; column_header=Tm, K
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_dfusH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: K2O.2SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1318'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '10.67'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2, calorimetry cited as [51–53].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_dfusH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=K2O·2SiO2; column_header=ΔmH, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1318'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: row_label=K2O·2SiO2; column_header=ΔmH, kJ/mol
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_dfusS
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: K2O.2SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1318'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '8.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_dfusS
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=K2O·2SiO2; column_header=ΔmS, J/(mol
+      K)
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1318'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=K2O·2SiO2; column_header=ΔmS,
+          J/(mol K)
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_melt_dfH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2O.2SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-101.89'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_melt_dfH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=K2O·2SiO2; column_header=ΔfH(T) melt, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The melt column does not print its own temperature. The solid interval is not copied onto it.
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+  derived_from:
+  - shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_solid_dfH
+  - shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_dfusH
+  derivation:
+    relation: Table 2 melt ΔfH(T) = solid ΔfH(T) + ΔmH. The printed numbers add exactly.
+    inputs:
+    - shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_solid_dfH
+    - shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_dfusH
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_solid_dfH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2O.2SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1014.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-112.56'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2, from earlier data [20, 21, 51–53].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_2SiO2_solid_dfH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.; row_label=K2O·2SiO2; column_header=ΔfH(T)
+      solid, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The solid column prints an interval. No midpoint is invented.
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_4SiO2_Tm
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2O.4SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1043'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_4SiO2_Tm
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=K2O·4SiO2; column_header=Tm, K
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1043'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: row_label=K2O·4SiO2; column_header=Tm, K
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_4SiO2_solid_dfH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2O.4SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [891.0, 1041.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-64.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2, from earlier data [20, 21, 51–53].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_4SiO2_solid_dfH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.; row_label=K2O·4SiO2; column_header=ΔfH(T)
+      solid, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The solid column prints an interval. No midpoint is invented.
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_Tm
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2O.SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1249'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_Tm
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=K2O·SiO2; column_header=Tm, K
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1249'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: row_label=K2O·SiO2; column_header=Tm, K
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_dfusH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: K2O.SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1249'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '8.79'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2, calorimetry cited as [51–53].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_dfusH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=K2O·SiO2; column_header=ΔmH, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1249'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: row_label=K2O·SiO2; column_header=ΔmH, kJ/mol
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_dfusS
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: K2O.SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1249'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '7.04'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_dfusS
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=K2O·SiO2; column_header=ΔmS, J/(mol
+      K)
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1249'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=K2O·SiO2; column_header=ΔmS,
+          J/(mol K)
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_melt_dfH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2O.SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-137.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_melt_dfH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=K2O·SiO2; column_header=ΔfH(T) melt, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The melt column does not print its own temperature. The solid interval is not copied onto it.
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+  derived_from:
+  - shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_solid_dfH
+  - shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_dfusH
+  derivation:
+    relation: Table 2 melt ΔfH(T) = solid ΔfH(T) + ΔmH. The printed numbers add exactly.
+    inputs:
+    - shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_solid_dfH
+    - shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_dfusH
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_solid_dfH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2O.SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [879.0, 1050.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-145.94'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2, from earlier data [20, 21, 51–53].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_K2O_SiO2_solid_dfH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.; row_label=K2O·SiO2; column_header=ΔfH(T)
+      solid, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The solid column prints an interval. No midpoint is invented.
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_Tm
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Na2O.2SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1147'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_Tm
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=Na2O·2SiO2; column_header=Tm, K
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1147'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: row_label=Na2O·2SiO2; column_header=Tm, K
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_dfusH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Na2O.2SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1147'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '12.57'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2, calorimetry cited as [51–53].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_dfusH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=Na2O·2SiO2; column_header=ΔmH, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1147'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: row_label=Na2O·2SiO2; column_header=ΔmH, kJ/mol
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_dfusS
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Na2O.2SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1147'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '10.96'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_dfusS
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=Na2O·2SiO2; column_header=ΔmS, J/(mol
+      K)
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1147'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=Na2O·2SiO2; column_header=ΔmS,
+          J/(mol K)
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_melt_dfH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2O.2SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-61.09'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_melt_dfH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=Na2O·2SiO2; column_header=ΔfH(T) melt, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The melt column does not print its own temperature. The solid interval is not copied onto it.
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+  derived_from:
+  - shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_solid_dfH
+  - shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_dfusH
+  derivation:
+    relation: Table 2 melt ΔfH(T) = solid ΔfH(T) + ΔmH. The printed numbers add exactly.
+    inputs:
+    - shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_solid_dfH
+    - shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_dfusH
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_solid_dfH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2O.2SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [973.0, 1078.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-73.66'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2, from earlier data [20, 21, 51–53].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_2SiO2_solid_dfH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.; row_label=Na2O·2SiO2; column_header=ΔfH(T)
+      solid, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The solid column prints an interval. No midpoint is invented.
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_Tm
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Na2O.SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1362'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_Tm
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=Na2O·SiO2; column_header=Tm, K
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1362'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: row_label=Na2O·SiO2; column_header=Tm, K
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_dfusH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Na2O.SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1362'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '26'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2, calorimetry cited as [51–53].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_dfusH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=Na2O·SiO2; column_header=ΔmH, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1362'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: row_label=Na2O·SiO2; column_header=ΔmH, kJ/mol
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_dfusS
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Na2O.SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1362'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '19.09'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_dfusS
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=Na2O·SiO2; column_header=ΔmS, J/(mol
+      K)
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1362'
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: Caption prints J/(mol K). The stored unit is J/mol K, the same unit.; row_label=Na2O·SiO2; column_header=ΔmS,
+          J/(mol K)
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_melt_dfH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2O.SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-89.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_melt_dfH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: row_label=Na2O·SiO2; column_header=ΔfH(T) melt, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The melt column does not print its own temperature. The solid interval is not copied onto it.
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+  derived_from:
+  - shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_solid_dfH
+  - shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_dfusH
+  derivation:
+    relation: Table 2 melt ΔfH(T) = solid ΔfH(T) + ΔmH. The printed numbers add exactly.
+    inputs:
+    - shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_solid_dfH
+    - shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_dfusH
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_solid_dfH
+  experiment_id: a6275705fe009718d80f4d961034b72236dd1cb59f64b1b5c4dfc669bf50a0e9::shornikov-2005-potassium-germanate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2O.SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [953.0, 1110.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-115.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2, from earlier data [20, 21, 51–53].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2005-potassium-germanate::ge_2005_t2_Na2O_SiO2_solid_dfH
+  source_id: shornikov-2005-potassium-germanate
+  locator:
+    page: 10
+    published_page: 1354
+    pdf_page_index: 9
+    table: '2'
+    note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.; row_label=Na2O·SiO2; column_header=ΔfH(T)
+      solid, kJ/mol
+  read_from: pdf:shornikov-2005-potassium-germanate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The solid column prints an interval. No midpoint is invented.
+      locator:
+        page: 10
+        published_page: 1354
+        pdf_page_index: 9
+        table: '2'
+        note: 600 dpi render of PDF page 10 agrees with the text layer. No digit was hand-corrected.

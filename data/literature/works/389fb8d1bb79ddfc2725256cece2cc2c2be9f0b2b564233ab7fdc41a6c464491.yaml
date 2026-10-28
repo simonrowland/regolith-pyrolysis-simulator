@@ -1,0 +1,950 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  citation: Schneider, S. J. (Project Manager) (1980). MHD Materials—Seed/Slag Interactions and Effects, Quarterly Progress
+    Report, April–June 1980. NBSIR 80-2139. National Bureau of Standards, prepared for the U.S. Department of Energy.
+  source_ids:
+  - kems-213-schneider-1980-nbsir-80-2139
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:kems-213-schneider-1980-nbsir-80-2139
+      role: pdf
+      path: raw/kems-213-schneider-1980-nbsir-80-2139/kems-213-schneider-1980-nbsir-80-2139.pdf
+      sha256:
+        tag: value
+        value: 086256b998956be02dac07407b77caac93aa2b2fbff7155fdde15d56ef249670
+    - asset_id: pdftotext:kems-213-schneider-1980-nbsir-80-2139
+      role: pdftotext
+      path: text/kems-213-schneider-1980-nbsir-80-2139
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-213-schneider-1980-nbsir-80-2139
+      role: table_csv
+      path: tables/kems-213-schneider-1980-nbsir-80-2139
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-213-schneider-1980-nbsir-80-2139
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::experiment::schneider_1980_kcas_vp_1
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1079046880304784699320339433'
+          - - CaO
+            - '0.336788409512816069436534719'
+          - - Al2O3
+            - '0.1495312743610973012848435252'
+          - - SiO2
+            - '0.4057756280956081593465878126'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 4
+        pdf_page_index: 7
+        table: '1'
+        note: Starting composition, wt%, as printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '14.8'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '27.5'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.2'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.5'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          K2O: '14.8'
+          CaO: '27.5'
+          Al2O3: '22.2'
+          SiO2: '35.5'
+      locator:
+        page: 8
+        published_page: 4
+        pdf_page_index: 7
+        table: '1'
+        note: Starting composition, wt%, as printed.
+    form:
+      state:
+        tag: value
+        value: Mechanical mixture of KAlSiO4, Ca2SiO4, Ca3Si2O7, and Ca2Al2SiO7
+      locator:
+        page: 8
+        published_page: 4
+        pdf_page_index: 7
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  locator:
+    page: 8
+    published_page: 4
+    pdf_page_index: 7
+    table: '1'
+    note: row=KCAS-VP-1
+  bench_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::bench::schneider_1980_kcas_kems
+- experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::experiment::schneider_1980_kcas_vp_2
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.08811048610414551457943323862'
+          - - CaO
+            - '0.226510464021506164239284714'
+          - - Al2O3
+            - '0.238539398491767628137084824'
+          - - SiO2
+            - '0.4468396513825806930441972235'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 4
+        pdf_page_index: 7
+        table: '1'
+        note: Starting composition, wt%, as printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '11.5'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.6'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '33.7'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '37.2'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          K2O: '11.5'
+          CaO: '17.6'
+          Al2O3: '33.7'
+          SiO2: '37.2'
+      locator:
+        page: 8
+        published_page: 4
+        pdf_page_index: 7
+        table: '1'
+        note: Starting composition, wt%, as printed.
+    form:
+      state:
+        tag: value
+        value: Mechanical mixture of KAlSiO4, KAlSi2O6, Ca2Al2SiO7, and CaAl2Si2O8
+      locator:
+        page: 8
+        published_page: 4
+        pdf_page_index: 7
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  locator:
+    page: 8
+    published_page: 4
+    pdf_page_index: 7
+    table: '1'
+    note: row=KCAS-VP-2
+  bench_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::bench::schneider_1980_kcas_kems
+- experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::experiment::schneider_1980_kcas_vp_3
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1051196579411954013637472969'
+          - - CaO
+            - '0.2899174407547798073251293946'
+          - - Al2O3
+            - '0.1049887266203345457717490938'
+          - - SiO2
+            - '0.4999741746836902455393742148'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 4
+        pdf_page_index: 7
+        table: '1'
+        note: Starting composition, wt%, as printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '14.8'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '24.3'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '44.9'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 4
+              pdf_page_index: 7
+              table: '1'
+              note: Starting composition, wt%, as printed.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          K2O: '14.8'
+          CaO: '24.3'
+          Al2O3: '16'
+          SiO2: '44.9'
+      locator:
+        page: 8
+        published_page: 4
+        pdf_page_index: 7
+        table: '1'
+        note: Starting composition, wt%, as printed.
+    form:
+      state:
+        tag: value
+        value: Mechanical mixture of KAlSiO4 and CaSiO3
+      locator:
+        page: 8
+        published_page: 4
+        pdf_page_index: 7
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  locator:
+    page: 8
+    published_page: 4
+    pdf_page_index: 7
+    table: '1'
+    note: Measurements were just beginning, according to the report.; row=KCAS-VP-3
+  bench_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::bench::schneider_1980_kcas_kems
+- experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: Vaporization Studies
+benches:
+- id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::bench::schneider_1980_kcas_kems
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion, modulated-beam mass spectrometric method
+    locator:
+      page: 6
+      published_page: 2
+      pdf_page_index: 5
+      section: Vaporization Studies
+      note: The report states the K and O2 vapor pressures were determined with this method.
+  other_facts: []
+context:
+- observation_id: schneider_1980_figure1_k_pressure
+  type: figure_record
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 7
+    figure: '1'
+  panel: whole_figure
+  attribution: Present-work KCAS-VP-1 measurements; comparison curve for a KAlSiO4-derived sample.
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    gas_species: K
+    formula: K
+    phase: gas
+    temperature_as_printed: Plotted versus 10^4/T, K; numerical point temperatures are not printed.
+    composition_as_printed: KCAS-VP-1 at 14.8–12.4 wt% K2O; comparison sample KAlSiO4-derived at 14.7 wt% K2O.
+    axes_as_printed:
+      x: 10^4/T, K
+      y: Potassium Pressure (atm), logarithmic
+    caption_as_printed: Potassium pressure over KCAS-VP-1, series 3-13-80, 14.8–12.4 wt% K2O; slight positive deviation from
+      a straight line above initial melting; comparison curve from a sample initially consisting of KAlSiO4 reduced to 14.7
+      wt% K2O by vaporization.
+    series:
+    - name: KCAS-VP-1
+      composition_as_printed: 14.8–12.4 wt% K2O
+      marker: open circles
+      marker_count: 16
+      evidence_class: measured_reduced
+    - name: least-squares line through KCAS-VP-1 data
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: KAlSiO4-derived sample
+      composition_as_printed: 14.7 wt% K2O
+      marker: line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  context_id: kems-213-schneider-1980-nbsir-80-2139::context::schneider_1980_figure1_k_pressure
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  species: K
+- observation_id: schneider_1980_figure2_k_pressure
+  type: figure_record
+  locator:
+    page: 12
+    pdf_page_index: 11
+    published_page: 8
+    figure: '2'
+  panel: whole_figure
+  attribution: Present-work KCAS-VP-1 measurements; comparison curves for the earlier KCAS-VP-1 range and a KAlSiO4-derived
+    sample.
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    gas_species: K
+    formula: K
+    phase: gas
+    temperature_as_printed: Plotted versus 10^4/T, K; numerical point temperatures are not printed.
+    composition_as_printed: KCAS-VP-1 at 4.8–4.0 and 4.0–1.6 wt% K2O; comparison ranges 14.8–12.4 wt% and 14.7 wt% K2O.
+    axes_as_printed:
+      x: 10^4/T, K
+      y: Potassium Pressure (atm), logarithmic
+    caption_as_printed: Last KCAS-VP-1 data series; straight line fitted over 4.8–4.0 wt% K2O, additional points show pressure
+      decrease as K2O is depleted; upper curve is the original 14.8–12.4 wt% range and lower curve is the KAlSiO4-derived
+      sample at 14.7 wt% K2O.
+    series:
+    - name: KCAS-VP-1
+      composition_as_printed: 4.8–4.0 wt% K2O
+      marker: open circles
+      marker_count: 8
+      evidence_class: measured_reduced
+    - name: KCAS-VP-1 depleted
+      composition_as_printed: 4.0–1.6 wt% K2O
+      marker: filled circles
+      marker_count: 6
+      evidence_class: measured_reduced
+    - name: KCAS-VP-1 earlier range
+      composition_as_printed: 14.8–12.4 wt% K2O
+      marker: line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: KAlSiO4-derived sample
+      composition_as_printed: 14.7 wt% K2O
+      marker: line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  context_id: kems-213-schneider-1980-nbsir-80-2139::context::schneider_1980_figure2_k_pressure
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  species: K
+- observation_id: schneider_1980_figure3_k_pressure
+  type: figure_record
+  locator:
+    page: 13
+    pdf_page_index: 12
+    published_page: 9
+    figure: '3'
+  panel: whole_figure
+  attribution: Present-work KCAS-VP-1 and KCAS-VP-2 measurements; KAlSiO4-derived comparison curve.
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    gas_species: K
+    formula: K
+    phase: gas
+    temperature_as_printed: Plotted versus 10^4/T, K; numerical point temperatures are not printed.
+    composition_as_printed: KCAS-VP-1 14.8–12.4 wt% K2O; KCAS-VP-2 11.4–10.7 wt%; KAlSiO4-derived sample 14.7 wt%.
+    axes_as_printed:
+      x: 10^4/T, K
+      y: Potassium Pressure (atm), logarithmic
+    caption_as_printed: Comparison of KCAS-VP-1 data at 14.8–12.4 wt% K2O, KCAS-VP-2 data at 11.4–10.7 wt% K2O, and the 14.7
+      wt% K2O sample obtained by evaporation of K2O from KAlSiO4.
+    series:
+    - name: KCAS-VP-1
+      composition_as_printed: 14.8–12.4 wt% K2O
+      marker: open circles
+      marker_count: 0
+      evidence_class: measured_reduced
+    - name: KCAS-VP-2
+      composition_as_printed: 11.4–10.7 wt% K2O
+      marker: open circles
+      marker_count: 17
+      evidence_class: measured_reduced
+    - name: KAlSiO4-derived sample
+      composition_as_printed: 14.7 wt% K2O
+      marker: line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  context_id: kems-213-schneider-1980-nbsir-80-2139::context::schneider_1980_figure3_k_pressure
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  species: K
+- observation_id: schneider_1980_figure4_k_pressure
+  type: figure_record
+  locator:
+    page: 14
+    pdf_page_index: 13
+    published_page: 10
+    figure: '4'
+  panel: whole_figure
+  attribution: Present-work KCAS-VP-2 measurements; comparison curves for an earlier KCAS-VP-2 range and a KAlSiO4-derived
+    sample.
+  units: atm
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    gas_species: K
+    formula: K
+    phase: gas
+    temperature_as_printed: Plotted versus 10^4/T, K; numerical point temperatures are not printed.
+    composition_as_printed: KCAS-VP-2 at 6.5–6.2 wt% K2O; comparison ranges 11.4–10.7 wt% and 14.7 wt% K2O.
+    axes_as_printed:
+      x: 10^4/T, K
+      y: Potassium Pressure (atm), logarithmic
+    caption_as_printed: Comparison of KCAS-VP-2 data at 6.5–6.2 wt% K2O, the 11.4–10.7 wt% K2O range, and the 14.7 wt% K2O
+      sample obtained by evaporation of KAlSiO4.
+    series:
+    - name: KCAS-VP-2
+      composition_as_printed: 6.5–6.2 wt% K2O
+      marker: open circles
+      marker_count: 2
+      evidence_class: measured_reduced
+    - name: KCAS-VP-2 earlier range
+      composition_as_printed: 11.4–10.7 wt% K2O
+      marker: line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    - name: KAlSiO4-derived sample
+      composition_as_printed: 14.7 wt% K2O
+      marker: line
+      marker_count: 0
+      evidence_class: quoted_attributed
+    digitisation: deferred to a figure pass
+  context_id: kems-213-schneider-1980-nbsir-80-2139::context::schneider_1980_figure4_k_pressure
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  species: K
+- observation_id: schneider_1980_oxygen_pressure_measurement_without_values
+  type: typed_refusal
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2
+    section: Vaporization Studies
+  units: no numerical values printed
+  values:
+    quantity: unavailable
+    candidate_tokens:
+    - partial_pressure
+    schema_gap: The report states K and O2 vapor-pressure measurements were completed for KCAS-VP-1 and KCAS-VP-2, but prints
+      no O2 pressure values in a table or figure.
+    method_class: measured_direct
+    gas_species: O2
+    formula: O2
+  context_id: kems-213-schneider-1980-nbsir-80-2139::context::schneider_1980_oxygen_pressure_measurement_without_values
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  species: K
+- observation_id: schneider_1980_printed_k_pressure_ratios
+  type: typed_refusal
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 3
+    section: Vaporization Studies
+  units: dimensionless ratios
+  values:
+    quantity: unavailable
+    candidate_tokens:
+    - partial_pressure
+    - activity
+    schema_gap: The seven prose values are dimensionless ratios between K pressures; neither a partial pressure nor a K2O
+      activity token describes a pressure ratio.
+    method_class: measured_reduced
+    ratio_convention: first named pressure divided by second named pressure
+    values_as_printed:
+    - ratio: '250'
+      numerator: calcia-containing KCAS sample at 14.7 wt% K2O
+      denominator: KAlSiO4-derived sample at 14.7 wt% K2O
+    - ratio: about 0.1
+      approximate: true
+      temperature_K: '1625'
+      numerator: KCAS-VP-1 at K2O 4.0–1.6 wt%
+      denominator: KCAS-VP-1 at K2O 14.8–12.4 wt%
+    - ratio: '36'
+      temperature_K: '1625'
+      numerator: KCAS-VP-1 at K2O 4.0–1.6 wt%
+      denominator: KAlSiO4-derived sample at 14.7 wt% K2O
+    - ratio: '4.5'
+      temperature_K: '1625'
+      numerator: KCAS-VP-1 at K2O 14.8–12.4 wt%
+      denominator: KCAS-VP-2 at K2O 11.4–10.7 wt%
+    - ratio: '65'
+      temperature_K: '1625'
+      numerator: KCAS-VP-2 at K2O 11.4–10.7 wt%
+      denominator: KAlSiO4-derived sample at 14.7 wt% K2O
+    - ratio: '2.8'
+      temperature_K: '1625'
+      numerator: KCAS-VP-2 at K2O 11.4–10.7 wt%
+      denominator: KCAS-VP-2 at K2O 6.5–6.2 wt%
+    - ratio: '22'
+      temperature_K: '1625'
+      numerator: KCAS-VP-2 at K2O 6.5–6.2 wt%
+      denominator: KAlSiO4-derived sample at 14.7 wt% K2O
+  context_id: kems-213-schneider-1980-nbsir-80-2139::context::schneider_1980_printed_k_pressure_ratios
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  species: K
+- observation_id: schneider_1980_qualitative_k2o_activity_effect
+  type: qualitative_activity_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 3
+    section: Vaporization Studies
+  units: qualitative statement; no numeric activity
+  values:
+    quantity: activity
+    candidate_token: activity
+    method_class: measured_reduced
+    statement_as_printed: The authors describe CaO as increasing K2O activity, with its major effect appearing at lower K2O
+      concentrations. No numerical K2O activity or activity reference state is printed.
+    activity_reference_state:
+      state: unknown
+      reason: The report prints no reference measurement temperature, so the stable pure-oxide reference phase cannot be inferred.
+  context_id: kems-213-schneider-1980-nbsir-80-2139::context::schneider_1980_qualitative_k2o_activity_effect
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  species: K
+- observation_id: schneider_1980_table2_k_pressure_fit_groups
+  type: fitted_pressure_model_table
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 5
+    table: '2'
+  units: slope A in K as implied by A/T; B dimensionless; standard deviations as printed
+  values:
+    quantity: partial_pressure
+    method_class: model_derived
+    gas_species: K
+    formula: K
+    model_as_printed: log P = A/T + B
+    logarithm_base: not stated
+    note: Nine least-squares fit groups for measured K-pressure data. The table contains fitted slope and intercept terms,
+      not raw pressure points; pressure units are atm as shown on the figures.
+    rows:
+    - sample_id: KCAS-VP-1
+      date: 3/13/80
+      K2O_wt_pct_range: 14.8–12.4
+      A_as_printed: '-20047'
+      SD_A_as_printed: '391'
+      B_as_printed: '8.144'
+      SD_B_as_printed: '.255'
+    - sample_id: KCAS-VP-1
+      date: 3/14/80
+      K2O_wt_pct_range: 12.4–9.3
+      A_as_printed: '-19071'
+      SD_A_as_printed: '524'
+      B_as_printed: '7.278'
+      SD_B_as_printed: '.234'
+    - sample_id: KCAS-VP-1
+      date: 3/18/80
+      K2O_wt_pct_range: 9.3–7.2
+      A_as_printed: '-17429'
+      SD_A_as_printed: '452'
+      B_as_printed: '6.058'
+      SD_B_as_printed: '.289'
+    - sample_id: KCAS-VP-1
+      date: 3/18/80
+      K2O_wt_pct_range: 6.2–4.8
+      A_as_printed: '-16372'
+      SD_A_as_printed: '210'
+      B_as_printed: '5.068'
+      SD_B_as_printed: '.129'
+    - sample_id: KCAS-VP-1
+      date: 3/21/80
+      K2O_wt_pct_range: 4.8–4.0
+      A_as_printed: '-16896'
+      SD_A_as_printed: '279'
+      B_as_printed: '5.289'
+      SD_B_as_printed: '.178'
+    - sample_id: KCAS-VP-2
+      date: 5/14/80
+      K2O_wt_pct_range: 11.4–10.7
+      A_as_printed: '-14632'
+      SD_A_as_printed: '434'
+      B_as_printed: '4.200'
+      SD_B_as_printed: '.278'
+    - sample_id: KCAS-VP-2
+      date: 5/15/80
+      K2O_wt_pct_range: 10.7–8.6
+      A_as_printed: '-16366'
+      SD_A_as_printed: '180'
+      B_as_printed: '5.097'
+      SD_B_as_printed: '.112'
+    - sample_id: KCAS-VP-2
+      date: 5/16/80
+      K2O_wt_pct_range: 8.6–6.5
+      A_as_printed: '-17571'
+      SD_A_as_printed: '257'
+      B_as_printed: '5.656'
+      SD_B_as_printed: '.158'
+    - sample_id: KCAS-VP-2
+      date: 5/19/80
+      K2O_wt_pct_range: 6.5–6.2
+      A_as_printed: '-16606'
+      SD_A_as_printed: '526'
+      B_as_printed: '4.992'
+      SD_B_as_printed: '.321'
+  context_id: kems-213-schneider-1980-nbsir-80-2139::context::schneider_1980_table2_k_pressure_fit_groups
+  work_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  species: K

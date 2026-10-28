@@ -1,0 +1,925 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0869591109060058
+  citation: 'Borisov, A. A. (2009). Influence of SiO2 and Al2O3 on the Activity Coefficients of Alkalis in Melts: An Experimental
+    Study. Petrology 17(6):579–590.'
+  source_ids:
+  - borisov-2009-alkali-activity-coefficients
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:borisov-2009-alkali-activity-coefficients
+      role: pdf
+      path: raw/borisov-2009-alkali-activity-coefficients/borisov-2009-alkali-activity-coefficients.pdf
+      sha256:
+        tag: value
+        value: 9e8731a140f556793745cc776ac3e8e9ffb8cfdb0b95c7840c4fe6ec379ab2d6
+    - asset_id: pdftotext:borisov-2009-alkali-activity-coefficients
+      role: pdftotext
+      path: text/borisov-2009-alkali-activity-coefficients
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:borisov-2009-alkali-activity-coefficients
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s0869591109060058
+experiments:
+- experiment_id: 10.1134/s0869591109060058::borisov-2009-alkali-activity-coefficients
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591109060058
+  locator:
+    page: 2
+    published_page: 580
+    pdf_page_index: 1
+    table: '2'
+    note: row=RNK-38; column=SiO2
+context:
+- observation_id: borisov_2009_experimental_and_analytical_conditions
+  type: experiment_series_context
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 579
+    section: Experimental methods
+  units: as printed
+  values:
+    total_pressure: 1 atm
+    temperature_range_C:
+    - '1300'
+    - '1470'
+    temperature_accuracy_C: ±2
+    log_fO2_accuracy: ±0.2
+    fO2_control: CO/CO2 mixture at the iron–wüstite buffer
+    apparatus: crucible supported loop; alkali vapor source above the crucible
+    microprobe_voltage_kV: '15'
+    microprobe_current_nA: '15'
+    glass_counting_time_s: '40'
+    glass_spots_per_sample: 10–20
+    source_glass_analysis_spots_per_run: 20–40 in the upper 1-mm layer
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_experimental_and_analytical_conditions
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_figure_10_deferred
+  type: deferred_figure
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 589
+    figure: '10'
+  phase: l
+  units: as printed
+  values:
+    quantity: activity_coefficient
+    quantity_as_printed: model activity coefficients of alkalis, process E, from Eq. (3)
+    species:
+    - Li2O
+    - Na2O
+    - K2O
+    - Rb2O
+    - Cs2O
+    formula: Li2O
+    phase: l
+    T_C: not stated
+    axes_as_printed:
+      x: XSiO2 (mole fraction)
+      y: γMe2O
+    caption: Influence of XSiO2 on the activity coefficients of alkalis in melts in accordance with Eq. (3) for process E.
+      The melt with XSiO2 = 0.45 and XAl2O3 = 0.05 is taken as a standard.
+    panels:
+    - main
+    series:
+    - Li2O
+    - Na2O
+    - K2O
+    - Rb2O
+    - Cs2O
+    marker_counts_per_series:
+      Li2O: 0
+      Na2O: 0
+      K2O: 0
+      Rb2O: 0
+      Cs2O: 0
+    attribution: A. A. Borisov (2009), figure as printed
+    digitisation: deferred to a figure pass
+    method_class: model_derived
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_figure_10_deferred
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_figure_11_deferred
+  type: deferred_figure
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 589
+    figure: '11'
+  phase: l
+  units: as printed
+  values:
+    quantity: equilibrium_phase_composition
+    quantity_as_printed: model relative contents C/C0 of alkalis in the MgO–SiO2 system
+    species:
+    - Li
+    - Na
+    - K
+    - Rb
+    - Cs
+    formula: Li
+    phase: l
+    T_C: not stated
+    axes_as_printed:
+      x: XSiO2 (mole fraction)
+      y: C/C0
+    caption: Relative contents of alkalis in the melts of the MgO–SiO2 system at their inert and perfectly mobile behavior
+      (see text for the details of the numerical experiment).
+    panels:
+    - main
+    series:
+    - Li
+    - Na
+    - K
+    - Rb
+    - Cs
+    marker_counts_per_series:
+      Li: 0
+      Na: 0
+      K: 0
+      Rb: 0
+      Cs: 0
+    attribution: A. A. Borisov (2009), figure as printed
+    digitisation: deferred to a figure pass
+    T_C_range_as_printed:
+    - '1557'
+    - '1890'
+    method_class: model_derived
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_figure_11_deferred
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_figure_1_deferred
+  type: deferred_figure
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 582
+    figure: '1'
+  phase: glass
+  units: as printed
+  values:
+    quantity: unavailable
+    quantity_as_printed: beam-induced alkali loss / Me2O wt%
+    species:
+    - Na2O
+    - K2O
+    - Rb2O
+    formula: Na2O
+    phase: glass
+    T_C: not stated
+    axes_as_printed:
+      x_lower: analysis number (1–30)
+      x_upper: electron-beam exposure (s)
+      y: Me2O (wt%)
+    caption: Alkali loss from a silicic glass of the composition 75.9SiO2 · 5.4Na2O · 6.9K2O · 11.0Rb2O (wt %) during microprobe
+      analysis as a function of beam diameter.
+    panels:
+    - main
+    series:
+    - Na2O at 0, 10, and 20 μm beam diameter
+    - K2O at 0, 10, and 20 μm beam diameter
+    - Rb2O at 0, 10, and 20 μm beam diameter
+    marker_counts_per_series:
+      Na2O, each beam diameter: 30
+      K2O, each beam diameter: 30
+      Rb2O, each beam diameter: 30
+    attribution: A. A. Borisov (2009), figure as printed
+    digitisation: deferred to a figure pass
+    schema_gap: No existing quantity token represents the species-specific microprobe-beam analytical migration loss; prose
+      values are retained separately.
+    method_class: figure_only
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_figure_1_deferred
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_figure_2_deferred
+  type: deferred_figure
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 583
+    figure: '2'
+  phase: l
+  units: as printed
+  values:
+    quantity: equilibrium_phase_composition
+    quantity_as_printed: alkali saturation (solubility) in melt, Me2O wt%
+    species:
+    - Na2O
+    - K2O
+    - Rb2O
+    formula: Na2O
+    phase: l
+    T_C: '1470'
+    axes_as_printed:
+      x: Al2O3 content (wt%)
+      y: Me2O content (wt%)
+    caption: Influence of Al2O3 content in the melts of the CSA system (Ca2Si3O8–Al2O3) on the saturation of these melts in
+      alkalis from a combined Rb–K–Na source. The dashed lines are drawn by eye.
+    panels:
+    - main
+    series:
+    - Na2O
+    - K2O
+    - Rb2O
+    marker_counts_per_series:
+      Na2O: 4
+      K2O: 4
+      Rb2O: 4
+    attribution: A. A. Borisov (2009), figure as printed
+    digitisation: deferred to a figure pass
+    method_class: figure_only
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_figure_2_deferred
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_figure_3_deferred
+  type: deferred_figure
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 583
+    figure: '3'
+  phase: l
+  units: as printed
+  values:
+    quantity: equilibrium_phase_composition
+    quantity_as_printed: alkali saturation (solubility) in melt, Me2O wt%
+    species:
+    - Na2O
+    - K2O
+    - Rb2O
+    formula: Na2O
+    phase: l
+    T_C:
+    - '1300'
+    - '1400'
+    - '1470'
+    axes_as_printed:
+      x: SiO2 content (wt%)
+      y: Me2O content (wt%)
+    caption: Influence of SiO2 content in the melts of the DAS system (DA–SiO2) on the saturation of these melts in alkalis
+      from a combined Rb–K–Na source. The dashed lines are approximation of the data by a second-order polynomial.
+    panels:
+    - 1470°C
+    - 1400°C
+    - 1300°C
+    series:
+    - Na2O at each temperature
+    - K2O at each temperature
+    - Rb2O at each temperature
+    marker_counts_per_series:
+      each species at each temperature: 4
+      each species, total across three temperatures: 12
+    attribution: A. A. Borisov (2009), figure as printed
+    digitisation: deferred to a figure pass
+    method_class: figure_only
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_figure_3_deferred
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_figure_4_deferred
+  type: deferred_figure
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 585
+    figure: '4'
+  phase: l
+  units: as printed
+  values:
+    quantity: activity_coefficient
+    quantity_as_printed: relative activity coefficients γNa2O, γK2O, γRb2O
+    species:
+    - Na2O
+    - K2O
+    - Rb2O
+    formula: Na2O
+    phase: l
+    T_C:
+    - '1300'
+    - '1400'
+    - '1470'
+    axes_as_printed:
+      x: XSiO2 (mole fraction)
+      y: γMe2O
+    caption: Influence of XSiO2 on the activity coefficients of Na2O, K2O, and Rb2O in the melts of the DAS system (DA–SiO2).
+      The composition with XSiO2 = 0.45 was accepted as a standard (asterisks). The dashed lines are the approximations of
+      data by a second-order polynomial.
+    panels:
+    - Na2O
+    - K2O
+    - Rb2O
+    series:
+    - Na2O at 1300°C
+    - Na2O at 1400°C
+    - Na2O at 1470°C
+    - K2O at 1300°C
+    - K2O at 1400°C
+    - K2O at 1470°C
+    - Rb2O at 1300°C
+    - Rb2O at 1400°C
+    - Rb2O at 1470°C
+    marker_counts_per_series:
+      Na2O at 1300°C: 5
+      Na2O at 1400°C: 5
+      Na2O at 1470°C: 5
+      K2O at 1300°C: 5
+      K2O at 1400°C: 5
+      K2O at 1470°C: 5
+      Rb2O at 1300°C: 5
+      Rb2O at 1400°C: 5
+      Rb2O at 1470°C: 5
+    attribution: A. A. Borisov (2009), figure as printed
+    digitisation: deferred to a figure pass
+    method_class: figure_only
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_figure_4_deferred
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_figure_5_deferred
+  type: deferred_figure
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 585
+    figure: '5'
+  phase: l
+  units: as printed
+  values:
+    quantity: activity_coefficient
+    quantity_as_printed: relative activity coefficients γNa2O, γK2O, γRb2O
+    species:
+    - Na2O
+    - K2O
+    - Rb2O
+    formula: Na2O
+    phase: l
+    T_C: '1470'
+    axes_as_printed:
+      x: XAl2O3 (mole fraction)
+      x_top: ASI
+      y: γMe2O
+    caption: Influence of XAl2O3 on the activity coefficients of Na2O, K2O, and Rb2O in the melts of the CSA system (Ca2Si3O8–Al2O3).
+      The composition with the lowest Al2O3 content (CSA6) is used as a standard.
+    panels:
+    - main
+    series:
+    - Na2O
+    - K2O
+    - Rb2O
+    marker_counts_per_series:
+      Na2O: 4
+      K2O: 4
+      Rb2O: 4
+    attribution: A. A. Borisov (2009), figure as printed
+    digitisation: deferred to a figure pass
+    method_class: figure_only
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_figure_5_deferred
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_figure_6_deferred
+  type: deferred_figure
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 586
+    figure: '6'
+  phase: l
+  units: as printed
+  values:
+    quantity: activity_coefficient
+    quantity_as_printed: model activity coefficients γNa2O, γK2O, γRb2O from Eq. (3)
+    species:
+    - Na2O
+    - K2O
+    - Rb2O
+    formula: Na2O
+    phase: l
+    T_C: '1470'
+    axes_as_printed:
+      x: XSiO2 (mole fraction)
+      y: γMe2O
+    caption: Influence of XSiO2 on the activity coefficients of Na2O, K2O, and Rb2O in melts in accordance with Eq. (3). The
+      solid lines correspond to process E, and the dashed lines correspond to process A. The melt with XSiO2 = 0.45 and XAl2O3
+      = 0.05 is taken as a standard.
+    panels:
+    - main
+    series:
+    - Na2O, process E
+    - Na2O, process A
+    - K2O, process E
+    - K2O, process A
+    - Rb2O, process E
+    - Rb2O, process A
+    marker_counts_per_series:
+      Na2O, process E: 0
+      Na2O, process A: 0
+      K2O, process E: 0
+      K2O, process A: 0
+      Rb2O, process E: 0
+      Rb2O, process A: 0
+    attribution: A. A. Borisov (2009), figure as printed
+    digitisation: deferred to a figure pass
+    method_class: model_derived
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_figure_6_deferred
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_figure_7_deferred
+  type: deferred_figure
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 586
+    figure: '7'
+  phase: l
+  units: as printed
+  values:
+    quantity: activity_coefficient
+    quantity_as_printed: model activity coefficients γNa2O, γK2O, γRb2O from Eq. (3)
+    species:
+    - Na2O
+    - K2O
+    - Rb2O
+    formula: Na2O
+    phase: l
+    T_C: '1470'
+    axes_as_printed:
+      x: XAl2O3 (mole fraction)
+      y: γMe2O
+    caption: Influence of XAl2O3 on the activity coefficients of Na2O, K2O, and Rb2O in melts in accordance with Eq. (3).
+      The solid lines correspond to process E, and the dashed lines correspond to process A. The melt with XSiO2 = 0.45 and
+      XAl2O3 = 0.05 is taken as a standard.
+    panels:
+    - main
+    series:
+    - Na2O, process E
+    - Na2O, process A
+    - K2O, process E
+    - K2O, process A
+    - Rb2O, process E
+    - Rb2O, process A
+    marker_counts_per_series:
+      Na2O, process E: 0
+      Na2O, process A: 0
+      K2O, process E: 0
+      K2O, process A: 0
+      Rb2O, process E: 0
+      Rb2O, process A: 0
+    attribution: A. A. Borisov (2009), figure as printed
+    digitisation: deferred to a figure pass
+    method_class: model_derived
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_figure_7_deferred
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_figure_8_deferred
+  type: deferred_figure
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 588
+    figure: '8'
+  phase: l
+  units: as printed
+  values:
+    quantity: unavailable
+    quantity_as_printed: diffusion partition coefficient Di (DAS50/DA)
+    species:
+    - Li
+    - Na
+    - K
+    - Rb
+    - Cs
+    formula: Li
+    phase: l
+    T_C: not stated
+    axes_as_printed:
+      x: ionic radius R (Å)
+      y: Di (DAS50/DA), logarithmic form as printed
+    caption: Dependence of log Di (DAS50/DA) for Na, K, and Rb on ionic radius. The extrapolation of this dependence allows
+      us to estimate DCs and DLi.
+    panels:
+    - main
+    series:
+    - Li extrapolation
+    - Na
+    - K
+    - Rb
+    - Cs extrapolation
+    marker_counts_per_series:
+      Li extrapolation: 1
+      Na: 1
+      K: 1
+      Rb: 1
+      Cs extrapolation: 1
+    attribution: A. A. Borisov (2009), figure as printed
+    digitisation: deferred to a figure pass
+    schema_gap: No existing quantity token represents the diffusion partition coefficient Di.
+    method_class: figure_only
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_figure_8_deferred
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_figure_9_deferred
+  type: deferred_figure
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 588
+    figure: '9'
+  phase: l
+  units: as printed
+  values:
+    quantity: unavailable
+    quantity_as_printed: composition-fit coefficients a, b, and c from Eq. (3)
+    species:
+    - Li
+    - Na
+    - K
+    - Rb
+    - Cs
+    formula: Li
+    phase: l
+    T_C: not stated
+    axes_as_printed:
+      x: ionic radius R (Å)
+      y: parameter value
+    caption: Dependence of the a, b, and c coefficients of Eq. (3) for Na, K, and Rb on ionic radius. The extrapolation of
+      this dependence allows us to estimate a, b, and c for Cs and Li.
+    panels:
+    - main
+    series:
+    - a
+    - b
+    - c
+    marker_counts_per_series:
+      a: 5
+      b: 5
+      c: 5
+    attribution: A. A. Borisov (2009), figure as printed
+    digitisation: deferred to a figure pass
+    schema_gap: No existing quantity token represents the fitted composition-regression coefficients; no points digitized.
+    method_class: model_derived
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_figure_9_deferred
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_microprobe_alkali_loss_prose_values
+  type: unscored_measurement_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 582
+    section: Experimental results
+    note: Prose values summarizing Figure 1; no figure markers digitized.
+  units: percent loss of initial alkali-oxide concentration, as printed approximately
+  values:
+    candidate_tokens_checked:
+    - mass_loss_fraction
+    - equilibrium_phase_composition
+    - residue_component_composition
+    no_token_reason: These are species-specific microprobe-beam analytical migration losses, not bulk sample mass loss, an
+      equilibrium composition, or a pyrolysis residue.
+    method_class: measured_direct_as_reported_in_prose
+    reported_values:
+    - beam_diameter_um: '0'
+      exposure_s: '60'
+      Na2O_loss: approximately one fourth
+      K2O_loss: approximately one fourth
+      Rb2O_loss: 5%
+    - beam_diameter_um: '10'
+      exposure_s: '60'
+      Na2O_loss: approximately 8%
+      K2O_loss: approximately 8%
+      Rb2O_loss: approximately 2%
+    - beam_diameter_um: '20'
+      exposure_s: '360'
+      Na2O_loss: approximately 11%
+      K2O_loss: approximately 7%
+      Rb2O_loss: practically unchanged
+    - beam_diameter_um: '20'
+      exposure_s: 10–20
+      Na2O_loss: no apparent loss
+      K2O_loss: no apparent loss
+      Rb2O_loss: no apparent loss
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_microprobe_alkali_loss_prose_values
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_printed_comparison_of_alkali_solubility_changes
+  type: unscored_measurement_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 583
+    section: Influence of Al2O3 content on the solubility of alkalis; Figure 3 discussion
+  units: relative changes in printed alkali solubility
+  values:
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - activity_coefficient
+    no_token_reason: These prose percentages summarize changes across multi-sample series and do not give point compositions
+      or activity coefficients; the plotted points remain deferred.
+    reported_comparisons:
+    - 'Increasing Al2O3 from CSA6 to CSA25: Rb and K solubility increase by 13–14%; Na by 3%.'
+    - 'Across DA to DAS50/DAS200: alkali solubility increases by 20–50% for Na, by a factor of 2.0–2.5 for K, and by a factor
+      of 3.0–3.5 for Rb.'
+    - Solubility maxima occur at 62–75 wt% SiO2; the maxima shift from 62–65 wt% for Na to 68–70 wt% for K and 69–73 wt% for
+      Rb.
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_printed_comparison_of_alkali_solubility_changes
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_table1_derived_starting_glass_compositions
+  type: unscored_measurement_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 580
+    table: '1'
+  units: wt%
+  values:
+    method_class: model_derived
+    system: Ca2Si3O8–Al2O3 and DA–SiO2 starting glasses
+    rows:
+    - sample: CSA6
+      analyses_n: 6
+      composition:
+        SiO2: '57.9'
+        Al2O3: '6.7'
+        MgO: —
+        CaO: '35.4'
+    - sample: CSA12
+      analyses_n: 6
+      composition:
+        SiO2: '53.8'
+        Al2O3: '13.4'
+        MgO: —
+        CaO: '32.9'
+    - sample: CSA18
+      analyses_n: 6
+      composition:
+        SiO2: '49.8'
+        Al2O3: '20.0'
+        MgO: —
+        CaO: '30.2'
+    - sample: CSA25
+      analyses_n: 6
+      composition:
+        SiO2: '45.7'
+        Al2O3: '26.6'
+        MgO: —
+        CaO: '27.7'
+    - sample: DA
+      analyses_n: 9
+      composition:
+        SiO2: '50.2'
+        Al2O3: '15.7'
+        MgO: '10.4'
+        CaO: '23.7'
+    - sample: DAS50
+      analyses_n: 8
+      composition:
+        SiO2: '66.7'
+        Al2O3: '10.6'
+        MgO: '7.0'
+        CaO: '15.7'
+    - sample: DAS200
+      analyses_n: 5
+      composition:
+        SiO2: '83.0'
+        Al2O3: '5.5'
+        MgO: '3.6'
+        CaO: '7.9'
+    - sample: DAS400
+      analyses_n: 6
+      composition:
+        SiO2: '90.2'
+        Al2O3: '3.1'
+        MgO: '2.0'
+        CaO: '4.7'
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    no_token_reason: Table 1 reports starting-glass compositions averaged and recalculated to alkali-free values from all
+      experimental-glass analyses, including Borisov (2008). These are derived recipes, not equilibrium liquid compositions
+      or independent analyses; the current source has no compatible initial-charge composition token.
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_table1_derived_starting_glass_compositions
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_table4_reference_melts
+  type: reference_state_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 584
+    table: '4'
+    note: Reference-standard rows, not independent activity-coefficient observations.
+  units: mole fraction
+  values:
+    method_class: measured_reduced
+    standard_state_as_printed: Relative coefficients are referenced to standard melts with XSiO2 = 0.45; alkali mole fractions
+      were extrapolated separately for each experimental series.
+    reference_rows:
+    - T_C: '1300'
+      X_SiO2: '0.450'
+      X_Na2O: '0.019'
+      X_K2O: '0.010'
+      X_Rb2O: '0.006'
+      gamma_Na2O: '1.000'
+      gamma_K2O: '1.000'
+      gamma_Rb2O: '1.000'
+    - T_C: '1400'
+      X_SiO2: '0.450'
+      X_Na2O: '0.018'
+      X_K2O: '0.011'
+      X_Rb2O: '0.006'
+      gamma_Na2O: '1.000'
+      gamma_K2O: '1.000'
+      gamma_Rb2O: '1.000'
+    - T_C: '1470'
+      X_SiO2: '0.450'
+      X_Na2O: '0.016'
+      X_K2O: '0.009'
+      X_Rb2O: '0.005'
+      gamma_Na2O: '1.000'
+      gamma_K2O: '1.000'
+      gamma_Rb2O: '1.000'
+    reason_no_observation: These rows define the relative standard and gamma = 1; they are not independent melt measurements.
+    reference_phase: 'unknown: each reference is a non-pure, multicomponent melt; no single pure-oxide phase applies.'
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_table4_reference_melts
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_table5_csa6_reference_melt
+  type: reference_state_context
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 586
+    table: '5'
+    row: CSA6
+    note: The CSA6 row defines the reference; it is not an independent activity-coefficient observation.
+  units: mole fraction
+  values:
+    method_class: measured_reduced
+    sample: CSA6
+    X_Al2O3: '0.038'
+    X_Na2O: '0.018'
+    X_K2O: '0.012'
+    X_Rb2O: '0.007'
+    gamma_Na2O: '1.000'
+    gamma_K2O: '1.000'
+    gamma_Rb2O: '1.000'
+    Al_over_alkalis: '1.016'
+    ASI: '0.096'
+    reference_phase: 'unknown: CSA6 is a multicomponent melt, not a pure-oxide reference.'
+    reason_no_observation: This row defines the Table 5 standard and gamma = 1; it is not an independent activity-coefficient
+      observation.
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_table5_csa6_reference_melt
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O
+- observation_id: borisov_2009_table6_fitted_activity_coefficient_model
+  type: model_fit_context
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 587
+    table: '6'
+  units: regression coefficients and derivatives as printed; ionic radius in Å
+  values:
+    quantity_as_printed: Dependence of alkali activity coefficients on SiO2 and Al2O3 content
+    method_class: model_derived
+    equation_as_printed: log gamma = a(XSiO2,std^2 − XSiO2^2) + b(XSiO2,std − XSiO2) + c(XAl2O3,std − XAl2O3)
+    candidate_tokens_checked:
+    - activity_coefficient
+    - activity_coefficient_temperature_fit
+    - interaction_parameter
+    schema_gap: No quantity token represents the printed composition-regression coefficients a, b, c, their derivatives, or
+      the extrapolated Li/Cs fits.
+    rows:
+    - element: Li
+      R_A: '0.76'
+      a: −3.31
+      a_sd: —
+      b: '4.32'
+      b_sd: —
+      c: '0.65'
+      c_sd: —
+      dloggamma_dXSiO2_at_0.45: −1.34
+      at_0.50: −1.01
+      at_0.60: −0.35
+      at_0.70: '0.31'
+      minus_c: −0.65
+      minus_b_over_2a: '0.65'
+      status: extrapolated
+    - element: Na
+      R_A: '1.02'
+      a: −4.33
+      a_sd: '2.33'
+      b: '6.53'
+      b_sd: '3.18'
+      c: '1.43'
+      c_sd: '0.86'
+      dloggamma_dXSiO2_at_0.45: −2.63
+      at_0.50: −2.2
+      at_0.60: −1.34
+      at_0.70: −0.47
+      minus_c: −1.43
+      minus_b_over_2a: '0.75'
+      status: fit to experimental data
+    - element: K
+      R_A: '1.38'
+      a: −5.83
+      a_sd: '3.15'
+      b: '9.63'
+      b_sd: '4.29'
+      c: '2.58'
+      c_sd: '1.16'
+      dloggamma_dXSiO2_at_0.45: −4.39
+      at_0.50: −3.81
+      at_0.60: −2.64
+      at_0.70: −1.48
+      minus_c: −2.58
+      minus_b_over_2a: '0.83'
+      status: fit to experimental data
+    - element: Rb
+      R_A: '1.52'
+      a: −6.31
+      a_sd: '3.56'
+      b: '10.8'
+      b_sd: '4.86'
+      c: '2.93'
+      c_sd: '1.32'
+      dloggamma_dXSiO2_at_0.45: −5.12
+      at_0.50: −4.49
+      at_0.60: −3.23
+      at_0.70: −1.97
+      minus_c: −2.93
+      minus_b_over_2a: '0.86'
+      status: fit to experimental data
+    - element: Cs
+      R_A: '1.67'
+      a: −6.94
+      a_sd: —
+      b: '12.09'
+      b_sd: —
+      c: '3.42'
+      c_sd: —
+      dloggamma_dXSiO2_at_0.45: −5.85
+      at_0.50: −5.16
+      at_0.60: −3.77
+      at_0.70: −2.38
+      minus_c: −3.41
+      minus_b_over_2a: '0.87'
+      status: extrapolated
+  context_id: borisov-2009-alkali-activity-coefficients::context::borisov_2009_table6_fitted_activity_coefficient_model
+  work_id: 10.1134/s0869591109060058
+  source_id: borisov-2009-alkali-activity-coefficients
+  species: Na2O

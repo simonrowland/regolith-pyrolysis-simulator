@@ -7,11 +7,11 @@ source:
   url: https://www.jstage.jst.go.jp/article/jinstmet1952/31/10/31_10_1164/_pdf
   year: 1967
 extraction:
-  method: OCR-artifact transcription (MinerU vlm of scanned J-STAGE PDF) + t-544 langmuir-ingest pilot
+  method: OCR-artifact transcription (MinerU vlm of scanned J-STAGE PDF) + t-544 langmuir-ingest pilot; validated in an internal review, 2026-08-07, ocr-artifacts
     table extract. PDF has no usable text layer.
   date: '2026-08-07'
   worker: langmuir-ingest-gr-t544
-  provenance_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/
+  provenance_path: raw/kems-002-ohno-1967/kems-002-ohno-1967.pdf
 review_status: draft
 species:
   Mn:
@@ -19,9 +19,9 @@ species:
     - observation_id: ohno_1967_mn_specific_evaporation_constant
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '1'
-        line_range: 8157-8200
+        line_range: 192-194
       T_range_K:
       - 1873.15
       - 1873.15
@@ -56,22 +56,22 @@ species:
           value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 30 mm — shortened vs Homma
             1966)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+            source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
             paragraph: るつぼ (CP-2) の寸法は内径 38 mm
-            line_range: experimental method
+            line_range: 27
         chamber_pressure:
           value: {kind: interval, interval_low: '0.001', interval_high: '0.01'}
           units: mmHg
           as_printed: '$10^{-2} \sim 10^{-3}$ mmHg'
           locator:
             page: 1164
-            source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+            source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
             paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
     - observation_id: ohno_1967_mn_olette_alpha_table3
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
-        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        repaired_table_path: text/kems-002-ohno-1967/ocr-repair/kems-002-ohno-1967.md
         table: '3'
         page: PDF p. 4 / printed p. 1167
         paragraph: Evaporation coefficients of Mn, Cu, Sn, Cr and S in molten iron
@@ -132,7 +132,7 @@ species:
     - observation_id: ohno_1967_cu_specific_evaporation_constant
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '1'
       T_range_K:
       - 1873.15
@@ -165,7 +165,7 @@ species:
     - observation_id: ohno_1967_cu_olette_alpha_table3
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '3'
       T_range_K:
       - 1873.15
@@ -205,7 +205,7 @@ species:
     - observation_id: ohno_1967_sn_specific_evaporation_constant
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '1'
       T_range_K:
       - 1873.15
@@ -238,7 +238,7 @@ species:
     - observation_id: ohno_1967_sn_olette_alpha_table3
       type: alpha
       locator:
-        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
+        repaired_table_path: text/kems-002-ohno-1967/ocr-repair/kems-002-ohno-1967.md
         table: '3'
         page: PDF p. 4 / printed p. 1167
       T_range_K:
@@ -286,7 +286,7 @@ species:
     - observation_id: ohno_1967_cr_specific_evaporation_constant
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '1'
       T_range_K:
       - 1873.15
@@ -320,8 +320,8 @@ species:
     - observation_id: ohno_1967_cr_olette_alpha_table3
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
-        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        repaired_table_path: text/kems-002-ohno-1967/ocr-repair/kems-002-ohno-1967.md
         table: '3'
         page: PDF p. 4 / printed p. 1167
       T_range_K:
@@ -392,7 +392,7 @@ species:
     - observation_id: ohno_1967_s_specific_evaporation_constant
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '1'
       T_range_K:
       - 1873.15
@@ -431,8 +431,8 @@ species:
     - observation_id: ohno_1967_s_condensation_alpha_table3
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
-        repaired_table_path: docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        repaired_table_path: text/kems-002-ohno-1967/ocr-repair/kems-002-ohno-1967.md
         table: '3'
         page: PDF p. 4 / printed p. 1167
         paragraph: α (cond) for Fe-S alloys
@@ -514,7 +514,7 @@ species:
     - observation_id: ohno_1967_sis_desulfurization_rate_table2
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '2'
         equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
       T_range_K:
@@ -549,7 +549,7 @@ species:
     - observation_id: ohno_1967_s_condensation_class_b1
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         table: '3'
         paragraph: S condensation coefficient Ward-Machlin
       T_range_K:
@@ -585,7 +585,7 @@ fidelity_samples:
   field: K_V_cm_s
   value: 0.00033
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+    source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
     table: '1'
     paragraph: Fe-Cr K_V = 3.3e-4 cm·s^{-1}
 - species: Cr
@@ -594,7 +594,7 @@ fidelity_samples:
   field: alpha
   value: 2.6
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+    source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
     table: '3'
     paragraph: α_Cr (exp) = 2.6 at t=5 min
 - species: S
@@ -603,7 +603,7 @@ fidelity_samples:
   field: alpha
   value: 0.2
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+    source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
     table: '3'
     paragraph: α (cond) = 0.2 for Fe-S melts
 - species: Sn
@@ -612,7 +612,7 @@ fidelity_samples:
   field: alpha
   value: 17.0
   locator:
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
+    source_path: text/kems-002-ohno-1967/ocr-repair/kems-002-ohno-1967.md
     table: '3'
     page: PDF p. 4 / printed p. 1167
     paragraph: Fe-Sn melt 6602-16 alpha(exp) = 17 at t=5 min
@@ -622,7 +622,7 @@ fidelity_samples:
   field: olette_alpha_theo
   value: 1095
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+    source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
     table: '3'
     paragraph: α_Mn (theo) = 1095
 - species: S
@@ -631,5 +631,5 @@ fidelity_samples:
   field: alpha
   value: 0.2
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+    source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
     table: '3'

@@ -55,7 +55,7 @@ experiments:
       locator:
         page: 221
         paragraph: experimental_results_deposit_edx
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
       inference:
         relation: g_to_kg
         inputs:
@@ -71,7 +71,7 @@ experiments:
             locator:
               page: 221
               paragraph: experimental_results_deposit_edx
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         - - factor
           - state:
               tag: value
@@ -79,8 +79,9 @@ experiments:
             locator:
               page: 221
               paragraph: experimental_results_deposit_edx
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+              source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -113,8 +114,9 @@ experiments:
             - '0.002797615986'
           amount_basis: mole_fraction
       locator:
-        page: 39
-        pdf_page_index: 54
+        page: 54
+        published_page: 39
+        pdf_page_index: 53
         table: '4.1'
         note: EAC-1 column as printed; normalized mole fractions derived from the complete oxide wt% map; printed zero components
           retained
@@ -125,6 +127,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -142,8 +145,9 @@ experiments:
           Fe2O3: '12.2'
           P2O5: '0.61'
       locator:
-        page: 39
-        pdf_page_index: 54
+        page: 54
+        published_page: 39
+        pdf_page_index: 53
         table: '4.1'
         note: 'EAC-1 column; oxide wt% as printed; label EAC-1 (caption: EAC-1A numbers from [25]; column header EAC-1); experimental
           charge is EAC-1A; Total row 100.00 omitted; 0.00 cells retained as printed'
@@ -225,6 +229,7 @@ experiments:
               table: '3.3'
               note: Exposure-12 chamber pressure 8 x 10^-7 to 10^-2 mbar; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -271,6 +276,7 @@ experiments:
                 table: '3.3'
                 note: Exposure-12 initial chamber pressure 6 x 10^-8 mbar; unit conversion only
           output_unit: Pa
+          references: []
   work_id: 10.1016/j.actaastro.2024.08.009
   locator:
     page: 27
@@ -352,6 +358,7 @@ experiments:
               table: '3.3'
               note: Exposure-12 duration 03:12:00; unit conversion only
         output_unit: s
+        references: []
 - experiment_id: 10.1016/j.actaastro.2024.08.009::kems-036-sesko-2024
   kind: literature
   method:
@@ -384,7 +391,7 @@ experiments:
     page: 216
     table: '1'
     paragraph: Regolith and regolith simulant geochemical compositions in % by weight
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+    source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
 benches:
 - id: 10.1016/j.actaastro.2024.08.009::bench::solar-vacuum-pyrolysis-furnace
   work_id: 10.1016/j.actaastro.2024.08.009

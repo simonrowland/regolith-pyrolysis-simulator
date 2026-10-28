@@ -1,52 +1,38 @@
 # Borisov (2009) alkali activity audit
 
-## Extraction decision
+## Reconciliation
 
-Tables 4 and 5 report relative activity coefficients, normalized to a virtual melt with
-`XSiO2 = 0.45` in Table 4 or the CSA6 melt in Table 5. They do not print absolute
-`a(Na2O)` or `a(NaO0.5)`. Following the Asai 1982 precedent and controller ruling, all
-19 printed rows are preserved as `activity_coefficient` observations with the printed
-relative gamma and composition. The absolute activity is typed-refused on every row;
-no reference-melt activity or conversion is invented. The schema gap is the lack of a
-relative-to-reference activity form (t-1563).
+Green's extract is the base. Batch4's Table 4 and Table 5 Na2O readings agree
+with Green's page-render reads at the printed precision, so no duplicate
+observations were added. Green keeps the observation IDs and stores the three
+Table 4 standard melts and the Table 5 CSA6 reference melt in reference-state
+context rather than as independent coefficient rows.
 
-The authors calculated gamma from their experimental data using Eq. (1), with the
-crucible-supported loop technique for alkali-vapor saturation and electron-microprobe
-composition measurements. Table 4 has 15 printed rows and Table 5 has 4; all 19 rows,
-including the four normalization references (Standard 36, 39, 37, and CSA6), are retained
-as printed.
+| Batch4 rows | Green representation | Page-render check | Decision |
+|---|---|---|---|
+| Table 4: 12 Na2O coefficients; 3 series standards | 12 Na2O observations and 3 `reference_rows` under `borisov_2009_table4_reference_melts` | PDF p. 6 / printed p. 584; gamma and four printed mole fractions match exactly | Keep Green IDs and values; keep the standards in context |
+| Table 5: 3 Na2O coefficients; CSA6 reference | 3 Na2O observations and `borisov_2009_table5_csa6_reference_melt` | PDF p. 8 / printed p. 586; gamma and composition match exactly | Keep Green IDs and values; keep CSA6 in context |
 
-The abstract prints total pressure as 1 atm (render-checked on PDF page 1). Table 2 supplies
-temperatures and positive `−log fO2` values for each experimental series; these are retained
-as printed without sign or pressure conversion. The abstract and methods identify the CO/CO2
-gas mix at the iron–wüstite buffer. No Table 4–5 gamma uncertainty is printed. The experiment
-rows preserve the exact table compositions, series conditions, reference convention, and
-method locators.
+Batch4's exact regression pins remain in the focused test: DARNK-36 has
+`gamma = 0.868` and `X_SiO2 = 0.477`; DAS200RNK-39 has `gamma = 0.580` and
+`X_SiO2 = 0.747`; CSA25 has `gamma = 0.881` and `X_Al2O3 = 0.164`. The Green
+test independently pins all Table 2–5 cell values and the Table 4 and 5 row
+counts. Across Na2O, the 15 coefficient observations plus four reference rows
+preserve all 19 printed entries without duplicate facts.
 
-## Cell audit
+## Evidence and migration
 
-| Printed table | Rows | Stored numeric cells per row | Cell evidence |
-|---|---:|---|---|
-| 4, PDF p. 6 / printed p. 584 | 15 | XSiO2, XNa2O, XK2O, XRb2O, gamma_Na2O | MinerU and pdftotext agree on all retained digits; row and column assignment checked against render. |
-| 5, PDF p. 8 / printed p. 586 | 4 | XAl2O3, XNa2O, XK2O, XRb2O, gamma_Na2O | MinerU and pdftotext agree on all retained digits; row and column assignment checked against render. |
+Tables 4 and 5 report relative activity coefficients referenced to multicomponent
+melts. Green retains those coefficients as `activity_coefficient` values and
+keeps the reference phase unknown; the extract does not turn them into absolute
+Na2O activities. The abstract prints total pressure as 1 atm. Table 2 supplies
+the temperature and positive `−log fO2` for each series. These conditions,
+their locators, and the Table 3 sample compositions reach the migrated rows.
 
-The QA pre-screen reported numeric agreement 1.000 for both target tables. No flagged cell
-or render disagreement occurred. The visual page checks confirmed table numbers, row
-labels, column assignments, and the reference rows. Figures 4–7 are figure-read candidates
-and were not digitized. Table 6 contains fit coefficients and derivatives, not measured
-absolute activities, so it was excluded. The draft compare reports zero comparable points
-because the numeric gamma is retained in a typed-refusal field rather than as a migrated
-activity value; its locator audit reports no errors. Numeric agreement was checked directly
-between the two machine reads and the page layouts visually.
+The isolated migration emits 15 Na2O coefficient observations with 0 hard
+issues. The full source test pins 169 observations, including 45 activity
+coefficients across Na2O, K2O, and Rb2O. Mutation checks reject changed gamma
+and cell values.
 
-## Isolated migration
-
-The real migrator emits 19 unavailable activity values, 0 hard issues, and 19 rejected
-admissions. Temperature, composition, and total pressure reach every identity. The printed
-positive `−log fO2` remains in each row's located `point_conditions`; identity `fO2_Pa`
-remains unknown on typed-refused activity rows, per the controller ruling. The log-form
-condition has no identity mapping for typed-refused activity rows (schema gap t-1563); no
-conversion to Pa is made.
-
-Expected store delta without regeneration: +19 activity observations, 0 admitted absolute
-activity values. No battery store was regenerated.
+Expected store delta relative to green: 0 observations. The Green extraction
+already contains these rows. No battery-store regeneration is committed.

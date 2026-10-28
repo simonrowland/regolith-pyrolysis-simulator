@@ -1,0 +1,334 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/leuthold-2023-basalt-partition-fo2.yaml
+observations:
+- observation_id: leuthold-2023-basalt-partition-fo2::leuthold_2023_b62_2_glass_v_1125c_nno_minus4::T=1398.15:h=9d0f9e3919be
+  experiment_id: 10.1007/s00410-023-02069-x::experiment::leuthold_2023_b62_2_picrite_gas_mixing_experiments
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: V
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Vanadium concentration in quenched experimental glass; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1398.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '150'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 7
+        pdf_page_index: 6
+        section: Trace element chemistry
+  notices: []
+  source_id: leuthold-2023-basalt-partition-fo2
+  locator:
+    page: 7
+    pdf_page_index: 6
+    section: Trace element chemistry
+  read_from: pdf:leuthold-2023-basalt-partition-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1398.15'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Trace element chemistry
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1125'
+            locator:
+              page: 7
+              pdf_page_index: 6
+              section: Trace element chemistry
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              pdf_page_index: 6
+              section: Trace element chemistry
+        output_unit: K
+        references: []
+    T_C:
+      state:
+        tag: value
+        value: '1125'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Trace element chemistry
+    delta_NNO:
+      state:
+        tag: value
+        value: '-4'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Trace element chemistry
+        note: Printed buffer condition NNO-4; no absolute fO2 calculated.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Experiments
+        note: Experiments were conducted in one-atmosphere gas-mixing furnaces.
+    composition:
+      state:
+        tag: unknown
+        reason: The final glass analysis and individual run composition are in absent Online Resource 3; Table 1 is only the
+          starting powder composition.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Analyses
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:leuthold-2023-basalt-partition-fo2
+    parameters: []
+    output_unit: µg/g
+    references: []
+- observation_id: leuthold-2023-basalt-partition-fo2::leuthold_2023_b62_2_glass_v_1190c_nno_minus4::T=1463.15:h=db2cd5af19ca
+  experiment_id: 10.1007/s00410-023-02069-x::experiment::leuthold_2023_b62_2_picrite_gas_mixing_experiments
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: V
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Vanadium concentration in quenched experimental glass; µg/g
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1463.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '400'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam19-1019
+      date: '2026-10-20'
+      evidence:
+        page: 7
+        pdf_page_index: 6
+        section: Trace element chemistry
+  notices: []
+  source_id: leuthold-2023-basalt-partition-fo2
+  locator:
+    page: 7
+    pdf_page_index: 6
+    section: Trace element chemistry
+  read_from: pdf:leuthold-2023-basalt-partition-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1463.15'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Trace element chemistry
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1190'
+            locator:
+              page: 7
+              pdf_page_index: 6
+              section: Trace element chemistry
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              pdf_page_index: 6
+              section: Trace element chemistry
+        output_unit: K
+        references: []
+    T_C:
+      state:
+        tag: value
+        value: '1190'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Trace element chemistry
+    delta_NNO:
+      state:
+        tag: value
+        value: '-4'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Trace element chemistry
+        note: Printed buffer condition NNO-4; no absolute fO2 calculated.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Experiments
+        note: Experiments were conducted in one-atmosphere gas-mixing furnaces.
+    composition:
+      state:
+        tag: unknown
+        reason: The final glass analysis and individual run composition are in absent Online Resource 3; Table 1 is only the
+          starting powder composition.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Analyses
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:leuthold-2023-basalt-partition-fo2
+    parameters: []
+    output_unit: µg/g
+    references: []

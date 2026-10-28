@@ -6,10 +6,6 @@ Two independent calibrated reads agree for all 17 symbols within twice the combi
 
 The prose states 10^-9 bar, 30 min, and a temperature range of 1180–1450 °C. Figure symbols around 1026, 1500, and 1600 °C remain included as read. Starting compositions are unknown because none are printed.
 
-Source and verification records:
+Verification basis: controller two-read verification, 2026-10-28.
 
-- `/Users/simonrowland/Repos/regolith-pyrolysis-simulator/docs-private/research/2026-10-26-scorability/yakovlev-2021-fig1/points.tsv`
-- `/Users/simonrowland/Repos/regolith-pyrolysis-simulator/docs-private/research/2026-10-26-scorability/yakovlev-2021-fig1/points-blind.tsv`
-- `/Users/simonrowland/Repos/regolith-pyrolysis-simulator/docs-private/research/2026-10-26-scorability/yakovlev-2021-fig1/verify-review.md`
-- `/Users/simonrowland/Repos/regolith-pyrolysis-simulator/docs-private/research/2026-10-26-scorability/yakovlev-2021-fig1/calibration.md`
 - Primary source sidecar: `~/Repos/regolith-corpus/raw/yakovlev-2021-chondrule-alkali/sidecar.yaml`.

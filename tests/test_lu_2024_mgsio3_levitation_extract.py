@@ -1,0 +1,51 @@
+"""Migration pins for Lu et al. (2024), Table 1."""
+
+from decimal import Decimal
+
+import yaml
+from pathlib import Path
+
+from simulator.battery.enums import Quantity
+from simulator.battery.migrate import Migrator
+
+
+ROOT = Path(__file__).resolve().parents[1]
+EXTRACT = ROOT / "data/literature/extracts/lu-2024-mgsio3-levitation.yaml"
+
+
+def test_table_1_m01_residue_values_and_conditions_migrate() -> None:
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+
+    observations = tuple(migrator.result.observations.values())
+    assert len(observations) == 27
+    m01 = [o for o in observations if o.locator.note == "row=M01"]
+    assert len(m01) == 3
+    assert {o.identity.species.formula: o.value.point for o in m01} == {
+        "SiO2": Decimal("53.62"),
+        "MgO": Decimal("44.44"),
+        "CaO": Decimal("1.64"),
+    }
+    assert all(o.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION for o in m01)
+    assert all(o.identity.temperature_K.value == Decimal("2623") for o in m01)
+    assert all(o.point_conditions["duration_s"].state.value == Decimal("120") for o in m01)
+    assert all(o.locator.published_page == 1195 and o.locator.table == "1" for o in m01)
+    assert not migrator.result.validation.hard_issues
+
+
+def test_all_figure_captions_are_deferred_without_numeric_points() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    figures = [
+        row for row in extract["species"]["SiO2"]["context"]
+        if row.get("type") == "figure_only"
+    ]
+    assert len(figures) == 6
+    assert all(row["values"]["digitisation"] == "deferred to a figure pass" for row in figures)
+    assert all(row["values"]["identity"]["temperature_as_printed"] for row in figures)
+    assert all(row["values"]["series"] for row in figures)
+    figure1 = next(row for row in figures if row["locator"]["figure"] == "1")
+    figure6 = next(row for row in figures if row["locator"]["figure"] == "6")
+    assert figure1["values"]["caption_as_printed"].startswith("FIGURE 1.")
+    assert "Methods" not in figure1["values"]["caption_as_printed"]
+    assert figure6["values"]["caption_as_printed"].startswith("FIGURE 6.")

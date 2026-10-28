@@ -150,42 +150,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5938921582998945505736528565'
-        - - Fe2O3
-          - '0.04775847018151053520230035559'
-        - - Al2O3
-          - '0.03092170232379047692074982569'
-        - - B2O3
-          - '0.0618770118396122730821324633'
-        - - Li2O
-          - '0.08796888103859484902423807954'
-        - - Na2O
-          - '0.0919923625412062804124878744'
-        - - MnO2
-          - '0.02725638671539415627031887632'
-        - - NiO
-          - '0.01599543410131647716558943935'
-        - - CaO
-          - '0.01195464109557555066434296773'
-        - - MgO
-          - '0.00889294384231716960417376657'
-        - - ZrO2
-          - '0.02041507109229302715728528457'
-        - - SrO
-          - '0.0003202805368355789208244550888'
-        - - Cs2O
-          - '0.0001648700342983751054382492711'
-        - - RuO2
-          - '0.0005486798304776872411608867317'
-        - - Re2O7
-          - '0.00004110652688301265530462096359'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -229,7 +196,12 @@ observations:
         pdf_page_index: 42
         paragraph: section 4.1.1 Cs
         note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - activity
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_activity_1200K
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 36
@@ -249,326 +221,14 @@ observations:
         note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5938921582998945505736528565'
-          - - Fe2O3
-            - '0.04775847018151053520230035559'
-          - - Al2O3
-            - '0.03092170232379047692074982569'
-          - - B2O3
-            - '0.0618770118396122730821324633'
-          - - Li2O
-            - '0.08796888103859484902423807954'
-          - - Na2O
-            - '0.0919923625412062804124878744'
-          - - MnO2
-            - '0.02725638671539415627031887632'
-          - - NiO
-            - '0.01599543410131647716558943935'
-          - - CaO
-            - '0.01195464109557555066434296773'
-          - - MgO
-            - '0.00889294384231716960417376657'
-          - - ZrO2
-            - '0.02041507109229302715728528457'
-          - - SrO
-            - '0.0003202805368355789208244550888'
-          - - Cs2O
-            - '0.0001648700342983751054382492711'
-          - - RuO2
-            - '0.0005486798304776872411608867317'
-          - - Re2O7
-            - '0.00004110652688301265530462096359'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         published_page: 36
         pdf_page_index: 42
         paragraph: section 4.1.1 Cs
         note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 'Normalized from the analytical weight-percent values printed in Table 1: x_i=(w_i/M_i)/sum_j(w_j/M_j), using all
-          15 reported compounds.'
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '53.76'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_Fe2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.49'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_Fe2O3_g_mol
-          - state:
-              tag: value
-              value: '159.687'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '4.75'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_B2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.49'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_B2O3_g_mol
-          - state:
-              tag: value
-              value: '69.617'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_Li2O_wt_pct
-          - state:
-              tag: value
-              value: '3.96'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_Li2O_g_mol
-          - state:
-              tag: value
-              value: '29.879'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '8.59'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_MnO2_wt_pct
-          - state:
-              tag: value
-              value: '3.57'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_MnO2_g_mol
-          - state:
-              tag: value
-              value: '86.936044'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_NiO_wt_pct
-          - state:
-              tag: value
-              value: '1.8'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_NiO_g_mol
-          - state:
-              tag: value
-              value: '74.69239999999999'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '1.01'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '0.54'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_ZrO2_wt_pct
-          - state:
-              tag: value
-              value: '3.79'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_ZrO2_g_mol
-          - state:
-              tag: value
-              value: '123.22200000000001'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_SrO_wt_pct
-          - state:
-              tag: value
-              value: '0.05'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_SrO_g_mol
-          - state:
-              tag: value
-              value: '103.619'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_Cs2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_Cs2O_g_mol
-          - state:
-              tag: value
-              value: '281.80990392'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_RuO2_wt_pct
-          - state:
-              tag: value
-              value: '0.11'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_RuO2_g_mol
-          - state:
-              tag: value
-              value: '133.06799999999998'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - original_Re2O7_wt_pct
-          - state:
-              tag: value
-              value: '0.03'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        - - M_Re2O7_g_mol
-          - state:
-              tag: value
-              value: '484.407'
-            locator:
-              published_page: 36
-              pdf_page_index: 42
-              paragraph: section 4.1.1 Cs
-              note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -636,42 +296,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5938921582998945505736528565'
-        - - Fe2O3
-          - '0.04775847018151053520230035559'
-        - - Al2O3
-          - '0.03092170232379047692074982569'
-        - - B2O3
-          - '0.0618770118396122730821324633'
-        - - Li2O
-          - '0.08796888103859484902423807954'
-        - - Na2O
-          - '0.0919923625412062804124878744'
-        - - MnO2
-          - '0.02725638671539415627031887632'
-        - - NiO
-          - '0.01599543410131647716558943935'
-        - - CaO
-          - '0.01195464109557555066434296773'
-        - - MgO
-          - '0.00889294384231716960417376657'
-        - - ZrO2
-          - '0.02041507109229302715728528457'
-        - - SrO
-          - '0.0003202805368355789208244550888'
-        - - Cs2O
-          - '0.0001648700342983751054382492711'
-        - - RuO2
-          - '0.0005486798304776872411608867317'
-        - - Re2O7
-          - '0.00004110652688301265530462096359'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -709,7 +336,12 @@ observations:
   admission:
     status: pending
     reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - activity
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_activity_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 16
@@ -727,295 +359,13 @@ observations:
         figure: '6'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5938921582998945505736528565'
-          - - Fe2O3
-            - '0.04775847018151053520230035559'
-          - - Al2O3
-            - '0.03092170232379047692074982569'
-          - - B2O3
-            - '0.0618770118396122730821324633'
-          - - Li2O
-            - '0.08796888103859484902423807954'
-          - - Na2O
-            - '0.0919923625412062804124878744'
-          - - MnO2
-            - '0.02725638671539415627031887632'
-          - - NiO
-            - '0.01599543410131647716558943935'
-          - - CaO
-            - '0.01195464109557555066434296773'
-          - - MgO
-            - '0.00889294384231716960417376657'
-          - - ZrO2
-            - '0.02041507109229302715728528457'
-          - - SrO
-            - '0.0003202805368355789208244550888'
-          - - Cs2O
-            - '0.0001648700342983751054382492711'
-          - - RuO2
-            - '0.0005486798304776872411608867317'
-          - - Re2O7
-            - '0.00004110652688301265530462096359'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         published_page: 16
         pdf_page_index: 22
         figure: '6'
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 'Normalized from the analytical weight-percent values printed in Table 1: x_i=(w_i/M_i)/sum_j(w_j/M_j), using all
-          15 reported compounds.'
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '53.76'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_Fe2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.49'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_Fe2O3_g_mol
-          - state:
-              tag: value
-              value: '159.687'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '4.75'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_B2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.49'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_B2O3_g_mol
-          - state:
-              tag: value
-              value: '69.617'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_Li2O_wt_pct
-          - state:
-              tag: value
-              value: '3.96'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_Li2O_g_mol
-          - state:
-              tag: value
-              value: '29.879'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '8.59'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_MnO2_wt_pct
-          - state:
-              tag: value
-              value: '3.57'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_MnO2_g_mol
-          - state:
-              tag: value
-              value: '86.936044'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_NiO_wt_pct
-          - state:
-              tag: value
-              value: '1.8'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_NiO_g_mol
-          - state:
-              tag: value
-              value: '74.69239999999999'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '1.01'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '0.54'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_ZrO2_wt_pct
-          - state:
-              tag: value
-              value: '3.79'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_ZrO2_g_mol
-          - state:
-              tag: value
-              value: '123.22200000000001'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_SrO_wt_pct
-          - state:
-              tag: value
-              value: '0.05'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_SrO_g_mol
-          - state:
-              tag: value
-              value: '103.619'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_Cs2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_Cs2O_g_mol
-          - state:
-              tag: value
-              value: '281.80990392'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_RuO2_wt_pct
-          - state:
-              tag: value
-              value: '0.11'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_RuO2_g_mol
-          - state:
-              tag: value
-              value: '133.06799999999998'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_Re2O7_wt_pct
-          - state:
-              tag: value
-              value: '0.03'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_Re2O7_g_mol
-          - state:
-              tag: value
-              value: '484.407'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -1541,6 +891,7 @@ observations:
               pdf_page_index: 41
               section: '4.1'
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -1710,6 +1061,7 @@ observations:
             two (average of Series I and II). The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition
             remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1200.0:h=ad8dcf297945
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -1856,6 +1208,7 @@ observations:
             two (average of Series I and II). The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition
             remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1250.0:h=ae3b69ee8db3
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -2002,6 +1355,7 @@ observations:
             two (average of Series I and II). The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition
             remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1300.0:h=de101914ca94
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -2148,6 +1502,7 @@ observations:
             two (average of Series I and II). The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition
             remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1400.0:h=7f94aad0bd5e
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -2294,6 +1649,7 @@ observations:
             two (average of Series I and II). The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition
             remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1500.0:h=65a15c4273c0
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -2440,6 +1796,7 @@ observations:
             two (average of Series I and II). The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition
             remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1600.0:h=90d7a7af205a
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -2586,6 +1943,7 @@ observations:
             two (average of Series I and II). The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition
             remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1000.0:h=c368d21e3159
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -2729,6 +2087,7 @@ observations:
           note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P. The caption
             pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1100.0:h=79ea37904bcc
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -2872,6 +2231,7 @@ observations:
           note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P. The caption
             pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1200.0:h=2db4dec5147b
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -3015,6 +2375,7 @@ observations:
           note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P. The caption
             pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1250.0:h=297af26062cf
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -3158,6 +2519,7 @@ observations:
           note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P. The caption
             pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1300.0:h=47be77b8b03a
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -3301,6 +2663,7 @@ observations:
           note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P. The caption
             pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1400.0:h=91eba2cdbb09
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -3444,6 +2807,7 @@ observations:
           note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P. The caption
             pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1423.15:h=cc49cab0fda1
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -3587,6 +2951,7 @@ observations:
           note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P. The caption
             pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1500.0:h=f4b5fc597850
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -3730,6 +3095,7 @@ observations:
           note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P. The caption
             pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1600.0:h=302a07b5bab6
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -3873,6 +3239,7 @@ observations:
           note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P. The caption
             pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1000.0:h=ab17e525982e
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -4021,6 +3388,7 @@ observations:
             equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
             The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1100.0:h=0b0d048df3fd
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -4169,6 +3537,7 @@ observations:
             equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
             The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1200.0:h=f00c3544c7ab
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -4317,6 +3686,7 @@ observations:
             equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
             The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1250.0:h=1c52d5bef45c
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -4465,6 +3835,7 @@ observations:
             equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
             The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1300.0:h=bea99e58d80f
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -4613,6 +3984,7 @@ observations:
             equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
             The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1400.0:h=a06ab10e3887
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -4761,6 +4133,7 @@ observations:
             equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
             The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1423.15:h=43868802bb86
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -4909,6 +4282,7 @@ observations:
             equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
             The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1500.0:h=abddf66e4845
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -5057,6 +4431,7 @@ observations:
             equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
             The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1600.0:h=966c02c5f618
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -5205,6 +4580,7 @@ observations:
             equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
             The Fig. 19 caption pools KMS and TMS without per-point sample labels; composition remains unknown.
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig20_21_model_proxy
   experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
   identity:
@@ -5300,8 +4676,8 @@ observations:
     figure: '2'
     paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
     line_range: 145-163
-    source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-  read_from: unknown:kems-027-plante-hastie-1983
+    source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+  read_from: pdftotext:kems-027-plante-hastie-1983
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_approx
   experiment_id: 10.6028/nbs.ir.83-2731::experiment::kms-vacuum-glass-series
   identity:
@@ -5355,42 +4731,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5938921582998945505736528565'
-        - - Fe2O3
-          - '0.04775847018151053520230035559'
-        - - Al2O3
-          - '0.03092170232379047692074982569'
-        - - B2O3
-          - '0.0618770118396122730821324633'
-        - - Li2O
-          - '0.08796888103859484902423807954'
-        - - Na2O
-          - '0.0919923625412062804124878744'
-        - - MnO2
-          - '0.02725638671539415627031887632'
-        - - NiO
-          - '0.01599543410131647716558943935'
-        - - CaO
-          - '0.01195464109557555066434296773'
-        - - MgO
-          - '0.00889294384231716960417376657'
-        - - ZrO2
-          - '0.02041507109229302715728528457'
-        - - SrO
-          - '0.0003202805368355789208244550888'
-        - - Cs2O
-          - '0.0001648700342983751054382492711'
-        - - RuO2
-          - '0.0005486798304776872411608867317'
-        - - Re2O7
-          - '0.00004110652688301265530462096359'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5434,7 +4777,12 @@ observations:
         pdf_page_index: 22
         figure: '6'
         note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - activity
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_approx
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 16
@@ -5445,326 +4793,14 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5938921582998945505736528565'
-          - - Fe2O3
-            - '0.04775847018151053520230035559'
-          - - Al2O3
-            - '0.03092170232379047692074982569'
-          - - B2O3
-            - '0.0618770118396122730821324633'
-          - - Li2O
-            - '0.08796888103859484902423807954'
-          - - Na2O
-            - '0.0919923625412062804124878744'
-          - - MnO2
-            - '0.02725638671539415627031887632'
-          - - NiO
-            - '0.01599543410131647716558943935'
-          - - CaO
-            - '0.01195464109557555066434296773'
-          - - MgO
-            - '0.00889294384231716960417376657'
-          - - ZrO2
-            - '0.02041507109229302715728528457'
-          - - SrO
-            - '0.0003202805368355789208244550888'
-          - - Cs2O
-            - '0.0001648700342983751054382492711'
-          - - RuO2
-            - '0.0005486798304776872411608867317'
-          - - Re2O7
-            - '0.00004110652688301265530462096359'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         published_page: 16
         pdf_page_index: 22
         figure: '6'
         note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 'Normalized from the analytical weight-percent values printed in Table 1: x_i=(w_i/M_i)/sum_j(w_j/M_j), using all
-          15 reported compounds.'
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '53.76'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_Fe2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.49'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_Fe2O3_g_mol
-          - state:
-              tag: value
-              value: '159.687'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '4.75'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_B2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.49'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_B2O3_g_mol
-          - state:
-              tag: value
-              value: '69.617'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_Li2O_wt_pct
-          - state:
-              tag: value
-              value: '3.96'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_Li2O_g_mol
-          - state:
-              tag: value
-              value: '29.879'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '8.59'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_MnO2_wt_pct
-          - state:
-              tag: value
-              value: '3.57'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_MnO2_g_mol
-          - state:
-              tag: value
-              value: '86.936044'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_NiO_wt_pct
-          - state:
-              tag: value
-              value: '1.8'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_NiO_g_mol
-          - state:
-              tag: value
-              value: '74.69239999999999'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '1.01'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '0.54'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_ZrO2_wt_pct
-          - state:
-              tag: value
-              value: '3.79'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_ZrO2_g_mol
-          - state:
-              tag: value
-              value: '123.22200000000001'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_SrO_wt_pct
-          - state:
-              tag: value
-              value: '0.05'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_SrO_g_mol
-          - state:
-              tag: value
-              value: '103.619'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_Cs2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_Cs2O_g_mol
-          - state:
-              tag: value
-              value: '281.80990392'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_RuO2_wt_pct
-          - state:
-              tag: value
-              value: '0.11'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_RuO2_g_mol
-          - state:
-              tag: value
-              value: '133.06799999999998'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - original_Re2O7_wt_pct
-          - state:
-              tag: value
-              value: '0.03'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        - - M_Re2O7_g_mol
-          - state:
-              tag: value
-              value: '484.407'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-              note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -5832,42 +4868,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5938921582998945505736528565'
-        - - Fe2O3
-          - '0.04775847018151053520230035559'
-        - - Al2O3
-          - '0.03092170232379047692074982569'
-        - - B2O3
-          - '0.0618770118396122730821324633'
-        - - Li2O
-          - '0.08796888103859484902423807954'
-        - - Na2O
-          - '0.0919923625412062804124878744'
-        - - MnO2
-          - '0.02725638671539415627031887632'
-        - - NiO
-          - '0.01599543410131647716558943935'
-        - - CaO
-          - '0.01195464109557555066434296773'
-        - - MgO
-          - '0.00889294384231716960417376657'
-        - - ZrO2
-          - '0.02041507109229302715728528457'
-        - - SrO
-          - '0.0003202805368355789208244550888'
-        - - Cs2O
-          - '0.0001648700342983751054382492711'
-        - - RuO2
-          - '0.0005486798304776872411608867317'
-        - - Re2O7
-          - '0.00004110652688301265530462096359'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5905,7 +4908,12 @@ observations:
   admission:
     status: pending
     reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - activity
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 16
@@ -5915,295 +4923,13 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5938921582998945505736528565'
-          - - Fe2O3
-            - '0.04775847018151053520230035559'
-          - - Al2O3
-            - '0.03092170232379047692074982569'
-          - - B2O3
-            - '0.0618770118396122730821324633'
-          - - Li2O
-            - '0.08796888103859484902423807954'
-          - - Na2O
-            - '0.0919923625412062804124878744'
-          - - MnO2
-            - '0.02725638671539415627031887632'
-          - - NiO
-            - '0.01599543410131647716558943935'
-          - - CaO
-            - '0.01195464109557555066434296773'
-          - - MgO
-            - '0.00889294384231716960417376657'
-          - - ZrO2
-            - '0.02041507109229302715728528457'
-          - - SrO
-            - '0.0003202805368355789208244550888'
-          - - Cs2O
-            - '0.0001648700342983751054382492711'
-          - - RuO2
-            - '0.0005486798304776872411608867317'
-          - - Re2O7
-            - '0.00004110652688301265530462096359'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         published_page: 16
         pdf_page_index: 22
         figure: '6'
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 'Normalized from the analytical weight-percent values printed in Table 1: x_i=(w_i/M_i)/sum_j(w_j/M_j), using all
-          15 reported compounds.'
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '53.76'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_Fe2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.49'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_Fe2O3_g_mol
-          - state:
-              tag: value
-              value: '159.687'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '4.75'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_B2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.49'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_B2O3_g_mol
-          - state:
-              tag: value
-              value: '69.617'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_Li2O_wt_pct
-          - state:
-              tag: value
-              value: '3.96'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_Li2O_g_mol
-          - state:
-              tag: value
-              value: '29.879'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '8.59'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_MnO2_wt_pct
-          - state:
-              tag: value
-              value: '3.57'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_MnO2_g_mol
-          - state:
-              tag: value
-              value: '86.936044'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_NiO_wt_pct
-          - state:
-              tag: value
-              value: '1.8'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_NiO_g_mol
-          - state:
-              tag: value
-              value: '74.69239999999999'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '1.01'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '0.54'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_ZrO2_wt_pct
-          - state:
-              tag: value
-              value: '3.79'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_ZrO2_g_mol
-          - state:
-              tag: value
-              value: '123.22200000000001'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_SrO_wt_pct
-          - state:
-              tag: value
-              value: '0.05'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_SrO_g_mol
-          - state:
-              tag: value
-              value: '103.619'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_Cs2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_Cs2O_g_mol
-          - state:
-              tag: value
-              value: '281.80990392'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_RuO2_wt_pct
-          - state:
-              tag: value
-              value: '0.11'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_RuO2_g_mol
-          - state:
-              tag: value
-              value: '133.06799999999998'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - original_Re2O7_wt_pct
-          - state:
-              tag: value
-              value: '0.03'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        - - M_Re2O7_g_mol
-          - state:
-              tag: value
-              value: '484.407'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '6'
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -6328,42 +5054,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5938921582998945505736528565'
-        - - Fe2O3
-          - '0.04775847018151053520230035559'
-        - - Al2O3
-          - '0.03092170232379047692074982569'
-        - - B2O3
-          - '0.0618770118396122730821324633'
-        - - Li2O
-          - '0.08796888103859484902423807954'
-        - - Na2O
-          - '0.0919923625412062804124878744'
-        - - MnO2
-          - '0.02725638671539415627031887632'
-        - - NiO
-          - '0.01599543410131647716558943935'
-        - - CaO
-          - '0.01195464109557555066434296773'
-        - - MgO
-          - '0.00889294384231716960417376657'
-        - - ZrO2
-          - '0.02041507109229302715728528457'
-        - - SrO
-          - '0.0003202805368355789208244550888'
-        - - Cs2O
-          - '0.0001648700342983751054382492711'
-        - - RuO2
-          - '0.0005486798304776872411608867317'
-        - - Re2O7
-          - '0.00004110652688301265530462096359'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6408,7 +5101,12 @@ observations:
         figure: '7'
         note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence, from
           P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - activity
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_activity_approx
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 16
@@ -6420,357 +5118,15 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5938921582998945505736528565'
-          - - Fe2O3
-            - '0.04775847018151053520230035559'
-          - - Al2O3
-            - '0.03092170232379047692074982569'
-          - - B2O3
-            - '0.0618770118396122730821324633'
-          - - Li2O
-            - '0.08796888103859484902423807954'
-          - - Na2O
-            - '0.0919923625412062804124878744'
-          - - MnO2
-            - '0.02725638671539415627031887632'
-          - - NiO
-            - '0.01599543410131647716558943935'
-          - - CaO
-            - '0.01195464109557555066434296773'
-          - - MgO
-            - '0.00889294384231716960417376657'
-          - - ZrO2
-            - '0.02041507109229302715728528457'
-          - - SrO
-            - '0.0003202805368355789208244550888'
-          - - Cs2O
-            - '0.0001648700342983751054382492711'
-          - - RuO2
-            - '0.0005486798304776872411608867317'
-          - - Re2O7
-            - '0.00004110652688301265530462096359'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         published_page: 16
         pdf_page_index: 22
         figure: '7'
         note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence, from
           P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 'Normalized from the analytical weight-percent values printed in Table 1: x_i=(w_i/M_i)/sum_j(w_j/M_j), using all
-          15 reported compounds.'
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '53.76'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_Fe2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.49'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_Fe2O3_g_mol
-          - state:
-              tag: value
-              value: '159.687'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '4.75'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_B2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.49'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_B2O3_g_mol
-          - state:
-              tag: value
-              value: '69.617'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_Li2O_wt_pct
-          - state:
-              tag: value
-              value: '3.96'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_Li2O_g_mol
-          - state:
-              tag: value
-              value: '29.879'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '8.59'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_MnO2_wt_pct
-          - state:
-              tag: value
-              value: '3.57'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_MnO2_g_mol
-          - state:
-              tag: value
-              value: '86.936044'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_NiO_wt_pct
-          - state:
-              tag: value
-              value: '1.8'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_NiO_g_mol
-          - state:
-              tag: value
-              value: '74.69239999999999'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '1.01'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '0.54'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_ZrO2_wt_pct
-          - state:
-              tag: value
-              value: '3.79'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_ZrO2_g_mol
-          - state:
-              tag: value
-              value: '123.22200000000001'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_SrO_wt_pct
-          - state:
-              tag: value
-              value: '0.05'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_SrO_g_mol
-          - state:
-              tag: value
-              value: '103.619'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_Cs2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_Cs2O_g_mol
-          - state:
-              tag: value
-              value: '281.80990392'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_RuO2_wt_pct
-          - state:
-              tag: value
-              value: '0.11'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_RuO2_g_mol
-          - state:
-              tag: value
-              value: '133.06799999999998'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - original_Re2O7_wt_pct
-          - state:
-              tag: value
-              value: '0.03'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        - - M_Re2O7_g_mol
-          - state:
-              tag: value
-              value: '484.407'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '7'
-              note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence,
-                from P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -6839,42 +5195,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5938921582998945505736528565'
-        - - Fe2O3
-          - '0.04775847018151053520230035559'
-        - - Al2O3
-          - '0.03092170232379047692074982569'
-        - - B2O3
-          - '0.0618770118396122730821324633'
-        - - Li2O
-          - '0.08796888103859484902423807954'
-        - - Na2O
-          - '0.0919923625412062804124878744'
-        - - MnO2
-          - '0.02725638671539415627031887632'
-        - - NiO
-          - '0.01599543410131647716558943935'
-        - - CaO
-          - '0.01195464109557555066434296773'
-        - - MgO
-          - '0.00889294384231716960417376657'
-        - - ZrO2
-          - '0.02041507109229302715728528457'
-        - - SrO
-          - '0.0003202805368355789208244550888'
-        - - Cs2O
-          - '0.0001648700342983751054382492711'
-        - - RuO2
-          - '0.0005486798304776872411608867317'
-        - - Re2O7
-          - '0.00004110652688301265530462096359'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6912,7 +5235,12 @@ observations:
   admission:
     status: pending
     reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - activity
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_activity_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 16
@@ -6922,295 +5250,13 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5938921582998945505736528565'
-          - - Fe2O3
-            - '0.04775847018151053520230035559'
-          - - Al2O3
-            - '0.03092170232379047692074982569'
-          - - B2O3
-            - '0.0618770118396122730821324633'
-          - - Li2O
-            - '0.08796888103859484902423807954'
-          - - Na2O
-            - '0.0919923625412062804124878744'
-          - - MnO2
-            - '0.02725638671539415627031887632'
-          - - NiO
-            - '0.01599543410131647716558943935'
-          - - CaO
-            - '0.01195464109557555066434296773'
-          - - MgO
-            - '0.00889294384231716960417376657'
-          - - ZrO2
-            - '0.02041507109229302715728528457'
-          - - SrO
-            - '0.0003202805368355789208244550888'
-          - - Cs2O
-            - '0.0001648700342983751054382492711'
-          - - RuO2
-            - '0.0005486798304776872411608867317'
-          - - Re2O7
-            - '0.00004110652688301265530462096359'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         published_page: 16
         pdf_page_index: 22
         figure: '5'
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 'Normalized from the analytical weight-percent values printed in Table 1: x_i=(w_i/M_i)/sum_j(w_j/M_j), using all
-          15 reported compounds.'
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '53.76'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_Fe2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.49'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_Fe2O3_g_mol
-          - state:
-              tag: value
-              value: '159.687'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '4.75'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_B2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.49'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_B2O3_g_mol
-          - state:
-              tag: value
-              value: '69.617'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_Li2O_wt_pct
-          - state:
-              tag: value
-              value: '3.96'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_Li2O_g_mol
-          - state:
-              tag: value
-              value: '29.879'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '8.59'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_MnO2_wt_pct
-          - state:
-              tag: value
-              value: '3.57'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_MnO2_g_mol
-          - state:
-              tag: value
-              value: '86.936044'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_NiO_wt_pct
-          - state:
-              tag: value
-              value: '1.8'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_NiO_g_mol
-          - state:
-              tag: value
-              value: '74.69239999999999'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '1.01'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '0.54'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_ZrO2_wt_pct
-          - state:
-              tag: value
-              value: '3.79'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_ZrO2_g_mol
-          - state:
-              tag: value
-              value: '123.22200000000001'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_SrO_wt_pct
-          - state:
-              tag: value
-              value: '0.05'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_SrO_g_mol
-          - state:
-              tag: value
-              value: '103.619'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_Cs2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_Cs2O_g_mol
-          - state:
-              tag: value
-              value: '281.80990392'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_RuO2_wt_pct
-          - state:
-              tag: value
-              value: '0.11'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_RuO2_g_mol
-          - state:
-              tag: value
-              value: '133.06799999999998'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - original_Re2O7_wt_pct
-          - state:
-              tag: value
-              value: '0.03'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        - - M_Re2O7_g_mol
-          - state:
-              tag: value
-              value: '484.407'
-            locator:
-              published_page: 16
-              pdf_page_index: 22
-              figure: '5'
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -7338,42 +5384,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5938921582998945505736528565'
-        - - Fe2O3
-          - '0.04775847018151053520230035559'
-        - - Al2O3
-          - '0.03092170232379047692074982569'
-        - - B2O3
-          - '0.0618770118396122730821324633'
-        - - Li2O
-          - '0.08796888103859484902423807954'
-        - - Na2O
-          - '0.0919923625412062804124878744'
-        - - MnO2
-          - '0.02725638671539415627031887632'
-        - - NiO
-          - '0.01599543410131647716558943935'
-        - - CaO
-          - '0.01195464109557555066434296773'
-        - - MgO
-          - '0.00889294384231716960417376657'
-        - - ZrO2
-          - '0.02041507109229302715728528457'
-        - - SrO
-          - '0.0003202805368355789208244550888'
-        - - Cs2O
-          - '0.0001648700342983751054382492711'
-        - - RuO2
-          - '0.0005486798304776872411608867317'
-        - - Re2O7
-          - '0.00004110652688301265530462096359'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7409,7 +5422,12 @@ observations:
   admission:
     status: pending
     reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_o2_figure_only_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 44
@@ -7419,295 +5437,13 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5938921582998945505736528565'
-          - - Fe2O3
-            - '0.04775847018151053520230035559'
-          - - Al2O3
-            - '0.03092170232379047692074982569'
-          - - B2O3
-            - '0.0618770118396122730821324633'
-          - - Li2O
-            - '0.08796888103859484902423807954'
-          - - Na2O
-            - '0.0919923625412062804124878744'
-          - - MnO2
-            - '0.02725638671539415627031887632'
-          - - NiO
-            - '0.01599543410131647716558943935'
-          - - CaO
-            - '0.01195464109557555066434296773'
-          - - MgO
-            - '0.00889294384231716960417376657'
-          - - ZrO2
-            - '0.02041507109229302715728528457'
-          - - SrO
-            - '0.0003202805368355789208244550888'
-          - - Cs2O
-            - '0.0001648700342983751054382492711'
-          - - RuO2
-            - '0.0005486798304776872411608867317'
-          - - Re2O7
-            - '0.00004110652688301265530462096359'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         published_page: 44
         pdf_page_index: 50
         figure: 7 caption; plate 5
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 'Normalized from the analytical weight-percent values printed in Table 1: x_i=(w_i/M_i)/sum_j(w_j/M_j), using all
-          15 reported compounds.'
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '53.76'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_Fe2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.49'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_Fe2O3_g_mol
-          - state:
-              tag: value
-              value: '159.687'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '4.75'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_B2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.49'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_B2O3_g_mol
-          - state:
-              tag: value
-              value: '69.617'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_Li2O_wt_pct
-          - state:
-              tag: value
-              value: '3.96'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_Li2O_g_mol
-          - state:
-              tag: value
-              value: '29.879'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '8.59'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_MnO2_wt_pct
-          - state:
-              tag: value
-              value: '3.57'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_MnO2_g_mol
-          - state:
-              tag: value
-              value: '86.936044'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_NiO_wt_pct
-          - state:
-              tag: value
-              value: '1.8'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_NiO_g_mol
-          - state:
-              tag: value
-              value: '74.69239999999999'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '1.01'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '0.54'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_ZrO2_wt_pct
-          - state:
-              tag: value
-              value: '3.79'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_ZrO2_g_mol
-          - state:
-              tag: value
-              value: '123.22200000000001'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_SrO_wt_pct
-          - state:
-              tag: value
-              value: '0.05'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_SrO_g_mol
-          - state:
-              tag: value
-              value: '103.619'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_Cs2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_Cs2O_g_mol
-          - state:
-              tag: value
-              value: '281.80990392'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_RuO2_wt_pct
-          - state:
-              tag: value
-              value: '0.11'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_RuO2_g_mol
-          - state:
-              tag: value
-              value: '133.06799999999998'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - original_Re2O7_wt_pct
-          - state:
-              tag: value
-              value: '0.03'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        - - M_Re2O7_g_mol
-          - state:
-              tag: value
-              value: '484.407'
-            locator:
-              published_page: 44
-              pdf_page_index: 50
-              figure: 7 caption; plate 5
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -7737,6 +5473,7 @@ observations:
     - pdf:kems-027-plante-hastie-1983
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_o2_kms_figure_only
   experiment_id: 10.6028/nbs.ir.83-2731::experiment::kms-vacuum-glass-series
   identity:
@@ -7793,42 +5530,9 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5938921582998945505736528565'
-        - - Fe2O3
-          - '0.04775847018151053520230035559'
-        - - Al2O3
-          - '0.03092170232379047692074982569'
-        - - B2O3
-          - '0.0618770118396122730821324633'
-        - - Li2O
-          - '0.08796888103859484902423807954'
-        - - Na2O
-          - '0.0919923625412062804124878744'
-        - - MnO2
-          - '0.02725638671539415627031887632'
-        - - NiO
-          - '0.01599543410131647716558943935'
-        - - CaO
-          - '0.01195464109557555066434296773'
-        - - MgO
-          - '0.00889294384231716960417376657'
-        - - ZrO2
-          - '0.02041507109229302715728528457'
-        - - SrO
-          - '0.0003202805368355789208244550888'
-        - - Cs2O
-          - '0.0001648700342983751054382492711'
-        - - RuO2
-          - '0.0005486798304776872411608867317'
-        - - Re2O7
-          - '0.00004110652688301265530462096359'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7874,7 +5578,12 @@ observations:
         figure: '5'
         note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T points
           rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_o2_kms_figure_only
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 50
@@ -7886,357 +5595,15 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5938921582998945505736528565'
-          - - Fe2O3
-            - '0.04775847018151053520230035559'
-          - - Al2O3
-            - '0.03092170232379047692074982569'
-          - - B2O3
-            - '0.0618770118396122730821324633'
-          - - Li2O
-            - '0.08796888103859484902423807954'
-          - - Na2O
-            - '0.0919923625412062804124878744'
-          - - MnO2
-            - '0.02725638671539415627031887632'
-          - - NiO
-            - '0.01599543410131647716558943935'
-          - - CaO
-            - '0.01195464109557555066434296773'
-          - - MgO
-            - '0.00889294384231716960417376657'
-          - - ZrO2
-            - '0.02041507109229302715728528457'
-          - - SrO
-            - '0.0003202805368355789208244550888'
-          - - Cs2O
-            - '0.0001648700342983751054382492711'
-          - - RuO2
-            - '0.0005486798304776872411608867317'
-          - - Re2O7
-            - '0.00004110652688301265530462096359'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         published_page: 50
         pdf_page_index: 56
         figure: '5'
         note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T points
           rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 'Normalized from the analytical weight-percent values printed in Table 1: x_i=(w_i/M_i)/sum_j(w_j/M_j), using all
-          15 reported compounds.'
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '53.76'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_Fe2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.49'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_Fe2O3_g_mol
-          - state:
-              tag: value
-              value: '159.687'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '4.75'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_B2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.49'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_B2O3_g_mol
-          - state:
-              tag: value
-              value: '69.617'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_Li2O_wt_pct
-          - state:
-              tag: value
-              value: '3.96'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_Li2O_g_mol
-          - state:
-              tag: value
-              value: '29.879'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '8.59'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_MnO2_wt_pct
-          - state:
-              tag: value
-              value: '3.57'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_MnO2_g_mol
-          - state:
-              tag: value
-              value: '86.936044'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_NiO_wt_pct
-          - state:
-              tag: value
-              value: '1.8'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_NiO_g_mol
-          - state:
-              tag: value
-              value: '74.69239999999999'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '1.01'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '0.54'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_ZrO2_wt_pct
-          - state:
-              tag: value
-              value: '3.79'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_ZrO2_g_mol
-          - state:
-              tag: value
-              value: '123.22200000000001'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_SrO_wt_pct
-          - state:
-              tag: value
-              value: '0.05'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_SrO_g_mol
-          - state:
-              tag: value
-              value: '103.619'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_Cs2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_Cs2O_g_mol
-          - state:
-              tag: value
-              value: '281.80990392'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_RuO2_wt_pct
-          - state:
-              tag: value
-              value: '0.11'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_RuO2_g_mol
-          - state:
-              tag: value
-              value: '133.06799999999998'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - original_Re2O7_wt_pct
-          - state:
-              tag: value
-              value: '0.03'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        - - M_Re2O7_g_mol
-          - state:
-              tag: value
-              value: '484.407'
-            locator:
-              published_page: 50
-              pdf_page_index: 56
-              figure: '5'
-              note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T
-                points rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -8268,6 +5635,7 @@ observations:
     - pdf:kems-027-plante-hastie-1983
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_offgas_model_quoted
   experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
   identity:
@@ -8327,42 +5695,9 @@ observations:
         tag: value
         value: 0
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5938921582998945505736528565'
-        - - Fe2O3
-          - '0.04775847018151053520230035559'
-        - - Al2O3
-          - '0.03092170232379047692074982569'
-        - - B2O3
-          - '0.0618770118396122730821324633'
-        - - Li2O
-          - '0.08796888103859484902423807954'
-        - - Na2O
-          - '0.0919923625412062804124878744'
-        - - MnO2
-          - '0.02725638671539415627031887632'
-        - - NiO
-          - '0.01599543410131647716558943935'
-        - - CaO
-          - '0.01195464109557555066434296773'
-        - - MgO
-          - '0.00889294384231716960417376657'
-        - - ZrO2
-          - '0.02041507109229302715728528457'
-        - - SrO
-          - '0.0003202805368355789208244550888'
-        - - Cs2O
-          - '0.0001648700342983751054382492711'
-        - - RuO2
-          - '0.0005486798304776872411608867317'
-        - - Re2O7
-          - '0.00004110652688301265530462096359'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -8397,295 +5732,13 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5938921582998945505736528565'
-          - - Fe2O3
-            - '0.04775847018151053520230035559'
-          - - Al2O3
-            - '0.03092170232379047692074982569'
-          - - B2O3
-            - '0.0618770118396122730821324633'
-          - - Li2O
-            - '0.08796888103859484902423807954'
-          - - Na2O
-            - '0.0919923625412062804124878744'
-          - - MnO2
-            - '0.02725638671539415627031887632'
-          - - NiO
-            - '0.01599543410131647716558943935'
-          - - CaO
-            - '0.01195464109557555066434296773'
-          - - MgO
-            - '0.00889294384231716960417376657'
-          - - ZrO2
-            - '0.02041507109229302715728528457'
-          - - SrO
-            - '0.0003202805368355789208244550888'
-          - - Cs2O
-            - '0.0001648700342983751054382492711'
-          - - RuO2
-            - '0.0005486798304776872411608867317'
-          - - Re2O7
-            - '0.00004110652688301265530462096359'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         published_page: 18
         pdf_page_index: 24
         paragraph: Search for Ru, Re, and Sr-containing Species
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 'Normalized from the analytical weight-percent values printed in Table 1: x_i=(w_i/M_i)/sum_j(w_j/M_j), using all
-          15 reported compounds.'
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '53.76'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_Fe2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.49'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_Fe2O3_g_mol
-          - state:
-              tag: value
-              value: '159.687'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '4.75'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_B2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.49'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_B2O3_g_mol
-          - state:
-              tag: value
-              value: '69.617'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_Li2O_wt_pct
-          - state:
-              tag: value
-              value: '3.96'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_Li2O_g_mol
-          - state:
-              tag: value
-              value: '29.879'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '8.59'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_MnO2_wt_pct
-          - state:
-              tag: value
-              value: '3.57'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_MnO2_g_mol
-          - state:
-              tag: value
-              value: '86.936044'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_NiO_wt_pct
-          - state:
-              tag: value
-              value: '1.8'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_NiO_g_mol
-          - state:
-              tag: value
-              value: '74.69239999999999'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '1.01'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '0.54'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_ZrO2_wt_pct
-          - state:
-              tag: value
-              value: '3.79'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_ZrO2_g_mol
-          - state:
-              tag: value
-              value: '123.22200000000001'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_SrO_wt_pct
-          - state:
-              tag: value
-              value: '0.05'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_SrO_g_mol
-          - state:
-              tag: value
-              value: '103.619'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_Cs2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_Cs2O_g_mol
-          - state:
-              tag: value
-              value: '281.80990392'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_RuO2_wt_pct
-          - state:
-              tag: value
-              value: '0.11'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_RuO2_g_mol
-          - state:
-              tag: value
-              value: '133.06799999999998'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - original_Re2O7_wt_pct
-          - state:
-              tag: value
-              value: '0.03'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        - - M_Re2O7_g_mol
-          - state:
-              tag: value
-              value: '484.407'
-            locator:
-              published_page: 18
-              pdf_page_index: 24
-              paragraph: Search for Ru, Re, and Sr-containing Species
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -9107,6 +6160,7 @@ observations:
               table: '1'
               note: SNW glass nominal vs analytical composition (Soper 1982)
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -9150,42 +6204,9 @@ observations:
         tag: value
         value: 0
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.5938921582998945505736528565'
-        - - Fe2O3
-          - '0.04775847018151053520230035559'
-        - - Al2O3
-          - '0.03092170232379047692074982569'
-        - - B2O3
-          - '0.0618770118396122730821324633'
-        - - Li2O
-          - '0.08796888103859484902423807954'
-        - - Na2O
-          - '0.0919923625412062804124878744'
-        - - MnO2
-          - '0.02725638671539415627031887632'
-        - - NiO
-          - '0.01599543410131647716558943935'
-        - - CaO
-          - '0.01195464109557555066434296773'
-        - - MgO
-          - '0.00889294384231716960417376657'
-        - - ZrO2
-          - '0.02041507109229302715728528457'
-        - - SrO
-          - '0.0003202805368355789208244550888'
-        - - Cs2O
-          - '0.0001648700342983751054382492711'
-        - - RuO2
-          - '0.0005486798304776872411608867317'
-        - - Re2O7
-          - '0.00004110652688301265530462096359'
-        amount_basis: mole_fraction
-        proxy_flag: initial_charge_only
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'calculated_oxide_equivalent_mass_loss'; refusing
@@ -9215,326 +6236,14 @@ observations:
   point_conditions:
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5938921582998945505736528565'
-          - - Fe2O3
-            - '0.04775847018151053520230035559'
-          - - Al2O3
-            - '0.03092170232379047692074982569'
-          - - B2O3
-            - '0.0618770118396122730821324633'
-          - - Li2O
-            - '0.08796888103859484902423807954'
-          - - Na2O
-            - '0.0919923625412062804124878744'
-          - - MnO2
-            - '0.02725638671539415627031887632'
-          - - NiO
-            - '0.01599543410131647716558943935'
-          - - CaO
-            - '0.01195464109557555066434296773'
-          - - MgO
-            - '0.00889294384231716960417376657'
-          - - ZrO2
-            - '0.02041507109229302715728528457'
-          - - SrO
-            - '0.0003202805368355789208244550888'
-          - - Cs2O
-            - '0.0001648700342983751054382492711'
-          - - RuO2
-            - '0.0005486798304776872411608867317'
-          - - Re2O7
-            - '0.00004110652688301265530462096359'
-          amount_basis: mole_fraction
-          proxy_flag: initial_charge_only
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
       locator:
         published_page: 15
         pdf_page_index: 21
         table: '3'
         note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        - 'Normalized from the analytical weight-percent values printed in Table 1: x_i=(w_i/M_i)/sum_j(w_j/M_j), using all
-          15 reported compounds.'
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '53.76'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_Fe2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.49'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_Fe2O3_g_mol
-          - state:
-              tag: value
-              value: '159.687'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '4.75'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_B2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.49'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_B2O3_g_mol
-          - state:
-              tag: value
-              value: '69.617'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_Li2O_wt_pct
-          - state:
-              tag: value
-              value: '3.96'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_Li2O_g_mol
-          - state:
-              tag: value
-              value: '29.879'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '8.59'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_MnO2_wt_pct
-          - state:
-              tag: value
-              value: '3.57'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_MnO2_g_mol
-          - state:
-              tag: value
-              value: '86.936044'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_NiO_wt_pct
-          - state:
-              tag: value
-              value: '1.8'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_NiO_g_mol
-          - state:
-              tag: value
-              value: '74.69239999999999'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '1.01'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '0.54'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_ZrO2_wt_pct
-          - state:
-              tag: value
-              value: '3.79'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_ZrO2_g_mol
-          - state:
-              tag: value
-              value: '123.22200000000001'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_SrO_wt_pct
-          - state:
-              tag: value
-              value: '0.05'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_SrO_g_mol
-          - state:
-              tag: value
-              value: '103.619'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_Cs2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_Cs2O_g_mol
-          - state:
-              tag: value
-              value: '281.80990392'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_RuO2_wt_pct
-          - state:
-              tag: value
-              value: '0.11'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_RuO2_g_mol
-          - state:
-              tag: value
-              value: '133.06799999999998'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - original_Re2O7_wt_pct
-          - state:
-              tag: value
-              value: '0.03'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        - - M_Re2O7_g_mol
-          - state:
-              tag: value
-              value: '484.407'
-            locator:
-              published_page: 15
-              pdf_page_index: 21
-              table: '3'
-              note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value

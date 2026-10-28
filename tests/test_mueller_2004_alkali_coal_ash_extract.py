@@ -68,5 +68,7 @@ def test_mueller_2004_text_anchors_and_table_rows_match_rendered_page(tmp_path: 
         assert observation.identity.composition.tag.value == "unknown"
     assert len(migrated.validation.issues) == 12
     assert len(migrated.registry_issues) == 0
-    assert len(migrated.queue) == 4
-    assert {entry.axes[0] for entry in migrated.queue} == {"derived_from"}
+    # Green's grounded-unprinted-input handling keeps these four derivations
+    # on the observations instead of leaving derived_from queue entries.
+    assert migrated.queue == []
+    assert all(observation.derivation is not None for observation in migrated.observations.values())

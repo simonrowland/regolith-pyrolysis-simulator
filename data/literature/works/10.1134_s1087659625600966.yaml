@@ -1,0 +1,368 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s1087659625600966
+  citation: 'Balabanova, E. A., Lopatin, S. I., Tyurnina, N. G. & Tyurnina, Z. G. (2025). Vaporization and Thermodynamic Properties
+    of the SrO–BaO–Al2O3–SiO2 System Based on High-Temperature Mass Spectrometry Data. Glass Physics and Chemistry, 51(6),
+    670–677. DOI: 10.1134/S1087659625600966.'
+  source_ids:
+  - balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+      role: pdf
+      path: raw/balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems/balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems.pdf
+      sha256:
+        tag: value
+        value: fd24ecf4be8569c5cab9cdce3d81ed0dc54e8ffdd3a1ad6ec46bd5a95fca0570
+    - asset_id: pdftotext:balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+      role: pdftotext
+      path: text/balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s1087659625600966
+experiments:
+- experiment_id: 10.1134/s1087659625600966::experiment::balabanova-2025-srba-kems
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s1087659625600966
+  locator:
+    page: 5
+    pdf_page_index: 4
+    table: '2'
+context:
+- observation_id: balabanova_2025_appearance_energies_context
+  type: mass_spectrometry_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Experimental
+  units: eV
+  values:
+    appearance_energies: Sr 5.8 ± 0.3; Ba 5.4 ± 0.3; BaO 7.0 ± 0.3; SiO 11.5 ± 0.3
+  context_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::context::balabanova_2025_appearance_energies_context
+  work_id: 10.1134/s1087659625600966
+  source_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+  species: unknown
+- observation_id: balabanova_2025_figure_a_deferred
+  what: figure_record
+  quantity: activity
+  species: Ba
+  phase: unknown
+  temperature_K: 2000
+  axes_as_printed: x composition; log activity
+  caption: Logarithm of component activities versus Sr_xBa_1-xAl2Si2O8 composition at 2000 K.
+  panel: a
+  series:
+  - BaO
+  - SrO
+  - Al2O3
+  - SiO2
+  marker_count_per_series: not counted; digitisation deferred
+  locator:
+    page: 7
+    pdf_page_index: 6
+  digitisation: deferred to a figure pass
+  type: figure_record
+  values:
+    quantity: activity
+    species: Ba
+    phase: unknown
+    temperature_as_printed: 2000 K
+    axes_as_printed: x composition; log activity
+    caption: Logarithm of component activities versus Sr_xBa_1-xAl2Si2O8 composition at 2000 K.
+    series:
+    - BaO
+    - SrO
+    - Al2O3
+    - SiO2
+    digitisation: deferred to a figure pass
+  units: dimensionless
+  context_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::context::balabanova_2025_figure_a_deferred
+  work_id: 10.1134/s1087659625600966
+  source_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+- observation_id: balabanova_2025_figure_b_deferred
+  what: figure_record
+  quantity: activity
+  species: Sr
+  phase: unknown
+  temperature_K: 2000
+  axes_as_printed: x composition; log activity
+  caption: Logarithm of component activities versus Sr_xBa_1-xAl2Si2O8 composition at 2000 K.
+  panel: b
+  series:
+  - BaO
+  - SrO
+  - Al2O3
+  - SiO2
+  marker_count_per_series: not counted; digitisation deferred
+  locator:
+    page: 7
+    pdf_page_index: 6
+  digitisation: deferred to a figure pass
+  type: figure_record
+  values:
+    quantity: activity
+    species: Sr
+    phase: unknown
+    temperature_as_printed: 2000 K
+    axes_as_printed: x composition; log activity
+    caption: Logarithm of component activities versus Sr_xBa_1-xAl2Si2O8 composition at 2000 K.
+    series:
+    - BaO
+    - SrO
+    - Al2O3
+    - SiO2
+    digitisation: deferred to a figure pass
+  units: dimensionless
+  context_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::context::balabanova_2025_figure_b_deferred
+  work_id: 10.1134/s1087659625600966
+  source_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+- observation_id: balabanova_2025_figure_d_deferred
+  what: figure_record
+  quantity: activity
+  species: SiO2
+  phase: unknown
+  temperature_K: 2000
+  axes_as_printed: x composition; log activity
+  caption: Logarithm of component activities versus Sr_xBa_1-xAl2Si2O8 composition at 2000 K.
+  panel: d
+  series:
+  - BaO
+  - SrO
+  - Al2O3
+  - SiO2
+  marker_count_per_series: not counted; digitisation deferred
+  locator:
+    page: 7
+    pdf_page_index: 6
+  digitisation: deferred to a figure pass
+  type: figure_record
+  values:
+    quantity: activity
+    species: SiO2
+    phase: unknown
+    temperature_as_printed: 2000 K
+    axes_as_printed: x composition; log activity
+    caption: Logarithm of component activities versus Sr_xBa_1-xAl2Si2O8 composition at 2000 K.
+    series:
+    - BaO
+    - SrO
+    - Al2O3
+    - SiO2
+    digitisation: deferred to a figure pass
+  units: dimensionless
+  context_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::context::balabanova_2025_figure_d_deferred
+  work_id: 10.1134/s1087659625600966
+  source_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+- observation_id: balabanova_2025_figure_fig._4_deferred
+  what: figure_record
+  quantity: mixing Gibbs energy (no store token)
+  species: SiO2
+  phase: unknown
+  temperature_K: 2000
+  axes_as_printed: x composition; ΔG and ΔG^E
+  caption: Gibbs and excess Gibbs energies versus composition at 2000 K.
+  panel: Fig. 4
+  series:
+  - ΔG
+  - ΔG^E
+  marker_count_per_series: not counted; digitisation deferred
+  locator:
+    page: 8
+    pdf_page_index: 7
+  digitisation: deferred to a figure pass
+  type: figure_record
+  values:
+    quantity: mixing Gibbs energy (no store token)
+    species: SiO2
+    phase: unknown
+    temperature_as_printed: 2000 K
+    axes_as_printed: x composition; ΔG and ΔG^E
+    caption: Gibbs and excess Gibbs energies versus composition at 2000 K.
+    series:
+    - ΔG
+    - ΔG^E
+    digitisation: deferred to a figure pass
+  units: dimensionless
+  context_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::context::balabanova_2025_figure_fig._4_deferred
+  work_id: 10.1134/s1087659625600966
+  source_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+- observation_id: balabanova_2025_table1_unit_cell_context
+  type: crystallographic_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+  units: Å and degrees
+  values:
+    carbonate_oxide_route:
+      a: '8.525'
+      b: '13.014'
+      c: '14.339'
+      beta: '115.08'
+    aluminosilicate_route:
+      a: '8.521'
+      b: '13.012'
+      c: '14.340'
+      beta: '115.18'
+  context_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::context::balabanova_2025_table1_unit_cell_context
+  work_id: 10.1134/s1087659625600966
+  source_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+  species: unknown
+- observation_id: balabanova_2025_table2_endpoint_vapour_inputs
+  type: table_cell_status
+  locator:
+    page: 5
+    pdf_page_index: 4
+    table: '2'
+    note: Endpoint partial-pressure cells used by the authors' Eq. (10) calculation.
+  units: Pa
+  values:
+    quantity: unpublished_vapour_pressure_inputs
+    partial_pressure_inputs:
+      r03_c02:
+        gas_species: Ba
+        printed: —
+        state:
+          tag: unknown
+          reason: not_published
+        note: BaO remains in the printed row composition, so this missing input is not not_applicable.
+      r13_c04:
+        gas_species: Sr
+        printed: —
+        state:
+          tag: unknown
+          reason: not_published
+        note: SrO remains in the printed row composition, so this missing input is not not_applicable.
+  context_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::context::balabanova_2025_table2_endpoint_vapour_inputs
+  work_id: 10.1134/s1087659625600966
+  source_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+  species: unknown
+- observation_id: balabanova_2025_table2_mass_loss_context
+  type: unsupported_quantity_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    table: '2'
+  units: g h−1
+  values:
+    quantity_as_printed: total mass loss Δm
+    quantity_token: mass_loss_rate
+    schema_gap: The reported total sample mass-loss rate is Hertz–Knudsen Eq. (11), retained in context; the mass_loss_rate
+      token exists but this model-derived series is not scored here.
+    temperature_as_printed: 2000 K
+    composition_x_Sr_as_printed:
+    - '0'
+    - '0.1'
+    - '0.2'
+    - '0.3'
+    - '0.4'
+    - '0.5'
+    - '0.6'
+    - '0.7'
+    - '0.8'
+    - '0.9'
+    - '1'
+    values_as_printed:
+    - '0.73'
+    - '0.49'
+    - '0.50'
+    - '0.53'
+    - '0.49'
+    - '0.48'
+    - '0.53'
+    - '0.40'
+    - '0.57'
+    - '0.59'
+    - '0.68'
+  context_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::context::balabanova_2025_table2_mass_loss_context
+  work_id: 10.1134/s1087659625600966
+  source_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+  species: SiO2
+- observation_id: balabanova_2025_table3_gibbs_context
+  type: unsupported_quantity_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+  units: kJ/mol
+  values:
+    quantity_as_printed: negative Gibbs energy of mixing and negative excess Gibbs energy
+    quantity_token: unavailable
+    schema_gap: No existing store token for Gibbs energy of mixing as tabulated by composition.
+    temperature_as_printed: 2000 K
+    composition_x_Sr_as_printed:
+    - '0'
+    - '0.1'
+    - '0.2'
+    - '0.3'
+    - '0.4'
+    - '0.5'
+    - '0.6'
+    - '0.7'
+    - '0.8'
+    - '0.9'
+    - '1'
+    minus_delta_G_kJ_mol_as_printed:
+    - '53.79'
+    - '55.46'
+    - '57.28'
+    - '58.44'
+    - '59.50'
+    - '58.94'
+    - '58.40'
+    - '57.19'
+    - '55.75'
+    - '54.54'
+    - '53.03'
+    minus_delta_G_excess_kJ_mol_as_printed:
+    - '36.50'
+    - '36.82'
+    - '37.91'
+    - '38.61'
+    - '39.42'
+    - '38.77'
+    - '38.15'
+    - '37.37'
+    - '36.38'
+    - '35.90'
+    - '35.74'
+  context_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::context::balabanova_2025_table3_gibbs_context
+  work_id: 10.1134/s1087659625600966
+  source_id: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems
+  species: SiO2
