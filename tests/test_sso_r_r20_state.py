@@ -3502,6 +3502,7 @@ def test_native_fe_split_updates_fO2_to_saturation_boundary(monkeypatch) -> None
     sim = _reducing_sim()
     _TEST_OWNED_SIMULATORS.append(sim)
     monkeypatch.setattr(sim, "_vacuum_floor_bar", lambda: 1e-20)
+    monkeypatch.setattr(sim, "_oxygen_numerical_floor_bar", lambda: 1e-20)
     monkeypatch.setattr(sim, "_headspace_transport_pO2_bar", lambda: 1e-20)
     sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim._current_melt_redox_fO2_log()
