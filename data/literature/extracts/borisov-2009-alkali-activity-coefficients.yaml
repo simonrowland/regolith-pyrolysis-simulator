@@ -1,0 +1,2010 @@
+schema_version: literature_extract.v1
+source_id: borisov-2009-alkali-activity-coefficients
+source:
+  citation: 'Borisov, A. A. (2009), “Influence of SiO2 and Al2O3 on the Activity Coefficients of Alkalis
+    in Melts: An Experimental Study,” Petrology 17(6), 579–590.'
+  doi: 10.1134/S0869591109060058
+  year: 2009
+extraction:
+  method: MinerU table drafts reconciled with pdftotext and the page renders for Tables 4 and 5; relative
+    gamma values stored as printed and absolute activities typed-refused.
+  date: '2026-10-27'
+  worker: codex-dispatch-w1027naC-borisov-2009-alkali-gamma
+review_status: draft
+fidelity_samples:
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: borisov_2009_table_4_darnk_36_na2o_relative_gamma
+  field: relative_gamma_Na2O_as_published
+  value: '0.868'
+  locator:
+    page: 6
+    published_page: 584
+    table: '4'
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: borisov_2009_table_4_das200rnk_39_na2o_relative_gamma
+  field: relative_gamma_Na2O_as_published
+  value: '0.580'
+  locator:
+    page: 6
+    published_page: 584
+    table: '4'
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: borisov_2009_table_5_csa25_na2o_relative_gamma
+  field: relative_gamma_Na2O_as_published
+  value: '0.881'
+  locator:
+    page: 8
+    published_page: 586
+    table: '5'
+species:
+  Na2O:
+    observations:
+    - observation_id: borisov_2009_table_4_standard_36_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id001
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: Standard 36
+      phase: l
+      T_C: '1300'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573.15'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.450'
+              - - Na2O
+                - '0.019'
+              - - K2O
+                - '0.010'
+              - - Rb2O
+                - '0.006'
+          locator: *id001
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '10.74'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '1.000'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.450'
+          Na2O: '0.019'
+          K2O: '0.010'
+          Rb2O: '0.006'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1300'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-36
+    - observation_id: borisov_2009_table_4_darnk_36_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id002
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: DARNK-36
+      phase: l
+      T_C: '1300'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573.15'
+          locator: *id002
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.477'
+              - - Na2O
+                - '0.022'
+              - - K2O
+                - '0.012'
+              - - Rb2O
+                - '0.008'
+          locator: *id002
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '10.74'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.868'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.477'
+          Na2O: '0.022'
+          K2O: '0.012'
+          Rb2O: '0.008'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1300'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-36
+    - observation_id: borisov_2009_table_4_das50rnk_36_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id003
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: DAS50RNK-36
+      phase: l
+      T_C: '1300'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573.15'
+          locator: *id003
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.616'
+              - - Na2O
+                - '0.033'
+              - - K2O
+                - '0.022'
+              - - Rb2O
+                - '0.020'
+          locator: *id003
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '10.74'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.575'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.616'
+          Na2O: '0.033'
+          K2O: '0.022'
+          Rb2O: '0.020'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1300'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-36
+    - observation_id: borisov_2009_table_4_das200rnk_36_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id004
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: DAS200RNK-36
+      phase: l
+      T_C: '1300'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573.15'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.776'
+              - - Na2O
+                - '0.027'
+              - - K2O
+                - '0.025'
+              - - Rb2O
+                - '0.025'
+          locator: *id004
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '10.74'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.685'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.776'
+          Na2O: '0.027'
+          K2O: '0.025'
+          Rb2O: '0.025'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1300'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-36
+    - observation_id: borisov_2009_table_4_das400rnk_36_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id005
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: DAS400RNK-36
+      phase: l
+      T_C: '1300'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573.15'
+          locator: *id005
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.820'
+              - - Na2O
+                - '0.023'
+              - - K2O
+                - '0.023'
+              - - Rb2O
+                - '0.022'
+          locator: *id005
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '10.74'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.805'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.820'
+          Na2O: '0.023'
+          K2O: '0.023'
+          Rb2O: '0.022'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1300'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-36
+    - observation_id: borisov_2009_table_4_standard_39_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id006
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: Standard 39
+      phase: l
+      T_C: '1400'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1673.15'
+          locator: *id006
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.450'
+              - - Na2O
+                - '0.018'
+              - - K2O
+                - '0.011'
+              - - Rb2O
+                - '0.006'
+          locator: *id006
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '9.63'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '1.000'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.450'
+          Na2O: '0.018'
+          K2O: '0.011'
+          Rb2O: '0.006'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1400'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-39
+    - observation_id: borisov_2009_table_4_darnk_39_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id007
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: DARNK-39
+      phase: l
+      T_C: '1400'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1673.15'
+          locator: *id007
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.477'
+              - - Na2O
+                - '0.021'
+              - - K2O
+                - '0.013'
+              - - Rb2O
+                - '0.008'
+          locator: *id007
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '9.63'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.875'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.477'
+          Na2O: '0.021'
+          K2O: '0.013'
+          Rb2O: '0.008'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1400'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-39
+    - observation_id: borisov_2009_table_4_das50rnk_39_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id008
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: DAS50RNK-39
+      phase: l
+      T_C: '1400'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1673.15'
+          locator: *id008
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.613'
+              - - Na2O
+                - '0.031'
+              - - K2O
+                - '0.028'
+              - - Rb2O
+                - '0.020'
+          locator: *id008
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '9.63'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.579'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.613'
+          Na2O: '0.031'
+          K2O: '0.028'
+          Rb2O: '0.020'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1400'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-39
+    - observation_id: borisov_2009_table_4_das200rnk_39_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id009
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: DAS200RNK-39
+      phase: l
+      T_C: '1400'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1673.15'
+          locator: *id009
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.747'
+              - - Na2O
+                - '0.031'
+              - - K2O
+                - '0.034'
+              - - Rb2O
+                - '0.027'
+          locator: *id009
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '9.63'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.580'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.747'
+          Na2O: '0.031'
+          K2O: '0.034'
+          Rb2O: '0.027'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1400'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-39
+    - observation_id: borisov_2009_table_4_das400rnk_39_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id010
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: DAS400RNK-39
+      phase: l
+      T_C: '1400'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1673.15'
+          locator: *id010
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.832'
+              - - Na2O
+                - '0.025'
+              - - K2O
+                - '0.030'
+              - - Rb2O
+                - '0.026'
+          locator: *id010
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '9.63'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.732'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.832'
+          Na2O: '0.025'
+          K2O: '0.030'
+          Rb2O: '0.026'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1400'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-39
+    - observation_id: borisov_2009_table_4_standard_37_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id011
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: Standard 37
+      phase: l
+      T_C: '1470'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1743.15'
+          locator: *id011
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.450'
+              - - Na2O
+                - '0.016'
+              - - K2O
+                - '0.009'
+              - - Rb2O
+                - '0.005'
+          locator: *id011
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '8.93'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '1.000'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.450'
+          Na2O: '0.016'
+          K2O: '0.009'
+          Rb2O: '0.005'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1470'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-37
+    - observation_id: borisov_2009_table_4_darnk_37_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id012
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: DARNK-37
+      phase: l
+      T_C: '1470'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1743.15'
+          locator: *id012
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.480'
+              - - Na2O
+                - '0.018'
+              - - K2O
+                - '0.012'
+              - - Rb2O
+                - '0.007'
+          locator: *id012
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '8.93'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.857'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.480'
+          Na2O: '0.018'
+          K2O: '0.012'
+          Rb2O: '0.007'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1470'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-37
+    - observation_id: borisov_2009_table_4_das50rnk_37_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id013
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: DAS50RNK-37
+      phase: l
+      T_C: '1470'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1743.15'
+          locator: *id013
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.616'
+              - - Na2O
+                - '0.029'
+              - - K2O
+                - '0.027'
+              - - Rb2O
+                - '0.018'
+          locator: *id013
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '8.93'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.548'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.616'
+          Na2O: '0.029'
+          K2O: '0.027'
+          Rb2O: '0.018'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1470'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-37
+    - observation_id: borisov_2009_table_4_das200rnk_37_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id014
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: DAS200RNK-37
+      phase: l
+      T_C: '1470'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1743.15'
+          locator: *id014
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.753'
+              - - Na2O
+                - '0.029'
+              - - K2O
+                - '0.034'
+              - - Rb2O
+                - '0.025'
+          locator: *id014
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '8.93'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.548'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.753'
+          Na2O: '0.029'
+          K2O: '0.034'
+          Rb2O: '0.025'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1470'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-37
+    - observation_id: borisov_2009_table_4_das400rnk_37_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id015
+        page: 6
+        published_page: 584
+        pdf_page_index: 5
+        table: '4'
+        row_label: DAS400RNK-37
+      phase: l
+      T_C: '1470'
+      standard_state: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st = 1; standard
+        XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 4 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1743.15'
+          locator: *id015
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.829'
+              - - Na2O
+                - '0.024'
+              - - K2O
+                - '0.031'
+              - - Rb2O
+                - '0.024'
+          locator: *id015
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '8.93'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.646'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          SiO2: '0.829'
+          Na2O: '0.024'
+          K2O: '0.031'
+          Rb2O: '0.024'
+        reference_state_as_printed: Relative to a virtual standard melt with XSiO2 = 0.45 and gamma_st
+          = 1; standard XNa2O, XK2O, and XRb2O were extrapolated to XSiO2 = 0.45.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1470'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-37
+    - observation_id: borisov_2009_table_5_csa6_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id016
+        page: 8
+        published_page: 586
+        pdf_page_index: 7
+        table: '5'
+        row_label: CSA6
+      phase: l
+      T_C: '1470'
+      standard_state: Relative to the CSA6 standard melt.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 5 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1743.15'
+          locator: *id016
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - Al2O3
+                - '0.038'
+              - - Na2O
+                - '0.018'
+              - - K2O
+                - '0.012'
+              - - Rb2O
+                - '0.007'
+          locator: *id016
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '8.93'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '1.000'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          Al2O3: '0.038'
+          Na2O: '0.018'
+          K2O: '0.012'
+          Rb2O: '0.007'
+        reference_state_as_printed: Relative to the CSA6 standard melt.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1470'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-38
+    - observation_id: borisov_2009_table_5_csa12_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id017
+        page: 8
+        published_page: 586
+        pdf_page_index: 7
+        table: '5'
+        row_label: CSA12
+      phase: l
+      T_C: '1470'
+      standard_state: Relative to the CSA6 standard melt.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 5 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1743.15'
+          locator: *id017
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - Al2O3
+                - '0.079'
+              - - Na2O
+                - '0.018'
+              - - K2O
+                - '0.013'
+              - - Rb2O
+                - '0.007'
+          locator: *id017
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '8.93'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '1.026'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          Al2O3: '0.079'
+          Na2O: '0.018'
+          K2O: '0.013'
+          Rb2O: '0.007'
+        reference_state_as_printed: Relative to the CSA6 standard melt.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1470'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-38
+    - observation_id: borisov_2009_table_5_csa18_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id018
+        page: 8
+        published_page: 586
+        pdf_page_index: 7
+        table: '5'
+        row_label: CSA18
+      phase: l
+      T_C: '1470'
+      standard_state: Relative to the CSA6 standard melt.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 5 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1743.15'
+          locator: *id018
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - Al2O3
+                - '0.121'
+              - - Na2O
+                - '0.019'
+              - - K2O
+                - '0.014'
+              - - Rb2O
+                - '0.008'
+          locator: *id018
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '8.93'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.937'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          Al2O3: '0.121'
+          Na2O: '0.019'
+          K2O: '0.014'
+          Rb2O: '0.008'
+        reference_state_as_printed: Relative to the CSA6 standard melt.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1470'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-38
+    - observation_id: borisov_2009_table_5_csa25_na2o_relative_gamma
+      type: activity_coefficient
+      locator: &id019
+        page: 8
+        published_page: 586
+        pdf_page_index: 7
+        table: '5'
+        row_label: CSA25
+      phase: l
+      T_C: '1470'
+      standard_state: Relative to the CSA6 standard melt.
+      regime: crucible_supported_loop_alkali_vapor_saturation
+      units: dimensionless relative activity coefficient as printed
+      uncertainty:
+        note: No uncertainty is reported for the Table 5 relative activity coefficient.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1743.15'
+          locator: *id019
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 1
+            published_page: 579
+            paragraph: Abstract
+            note: Printed total pressure 1 atm; converted using 1 atm = 101325 Pa
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction_components
+              amount_basis: mole_fraction
+              components:
+              - - Al2O3
+                - '0.164'
+              - - Na2O
+                - '0.021'
+              - - K2O
+                - '0.016'
+              - - Rb2O
+                - '0.009'
+          locator: *id019
+        minus_log_fO2_as_published:
+          state:
+            tag: value
+            value: '8.93'
+          locator:
+            page: 2
+            published_page: 580
+            table: '2'
+            note: Printed positive -log fO2; reference convention not explicitly stated in Table 2.
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: relative to the printed reference melt; absolute activity not printed
+        schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+        candidate_quantity_as_printed: relative activity coefficient of Na2O
+        component_as_published: Na2O
+        method_class: quoted_attributed
+        relative_gamma_Na2O_as_published: '0.881'
+        composition_mol_basis: printed_mole_fraction_components
+        composition_mol:
+          Al2O3: '0.164'
+          Na2O: '0.021'
+          K2O: '0.016'
+          Rb2O: '0.009'
+        reference_state_as_printed: Relative to the CSA6 standard melt.
+        method_as_printed: Crucible-supported loop technique; simultaneous alkali-vapor saturation of
+          experimental melts; compositions measured by electron microprobe; relative coefficients calculated
+          using Eq. (1).
+        method_locator:
+          page: 6
+          published_page: 584
+          section: Influence of SiO2 and Al2O3 on the Relative Activity Coefficients
+          equation: '1'
+        printed_uncertainty: not reported
+        note: The printed relative gamma is retained; it is not converted to an absolute activity.
+        T_C: '1470'
+        attribution: Borisov (2009), Tables 4–5; authors calculated relative coefficients from the experimental
+          compositions using Eq. (1).
+      experiment: series-38
+experiments:
+- experiment_id: series-36
+  method: crucible_supported_loop_alkali_vapor_saturation
+  locator:
+    page: 2
+    published_page: 580
+    pdf_page_index: 1
+    section: Experimental Methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        published_page: 580
+        pdf_page_index: 1
+        table: '2'
+        row_label: Series 36
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator:
+        page: 1
+        published_page: 579
+        paragraph: Abstract
+        note: Printed 1 atm; converted to Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CO/CO2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 2
+        published_page: 580
+        pdf_page_index: 1
+        section: Experimental Methods
+        note: CO/CO2 mixture; no flow or partial pressure printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 gas mixture; fO2 at the iron-wustite buffer equilibrium
+      locator:
+        page: 2
+        published_page: 580
+        section: Experimental Methods
+    channel: gas_mix
+- experiment_id: series-39
+  method: crucible_supported_loop_alkali_vapor_saturation
+  locator:
+    page: 2
+    published_page: 580
+    pdf_page_index: 1
+    section: Experimental Methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        published_page: 580
+        pdf_page_index: 1
+        table: '2'
+        row_label: Series 39
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator:
+        page: 1
+        published_page: 579
+        paragraph: Abstract
+        note: Printed 1 atm; converted to Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CO/CO2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 2
+        published_page: 580
+        pdf_page_index: 1
+        section: Experimental Methods
+        note: CO/CO2 mixture; no flow or partial pressure printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 gas mixture; fO2 at the iron-wustite buffer equilibrium
+      locator:
+        page: 2
+        published_page: 580
+        section: Experimental Methods
+    channel: gas_mix
+- experiment_id: series-37
+  method: crucible_supported_loop_alkali_vapor_saturation
+  locator:
+    page: 2
+    published_page: 580
+    pdf_page_index: 1
+    section: Experimental Methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 2
+        published_page: 580
+        pdf_page_index: 1
+        table: '2'
+        row_label: Series 37
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator:
+        page: 1
+        published_page: 579
+        paragraph: Abstract
+        note: Printed 1 atm; converted to Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CO/CO2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 2
+        published_page: 580
+        pdf_page_index: 1
+        section: Experimental Methods
+        note: CO/CO2 mixture; no flow or partial pressure printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 gas mixture; fO2 at the iron-wustite buffer equilibrium
+      locator:
+        page: 2
+        published_page: 580
+        section: Experimental Methods
+    channel: gas_mix
+- experiment_id: series-38
+  method: crucible_supported_loop_alkali_vapor_saturation
+  locator:
+    page: 2
+    published_page: 580
+    pdf_page_index: 1
+    section: Experimental Methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1743.15'
+      locator:
+        page: 2
+        published_page: 580
+        pdf_page_index: 1
+        table: '2'
+        row_label: Series 38
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator:
+        page: 1
+        published_page: 579
+        paragraph: Abstract
+        note: Printed 1 atm; converted to Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CO/CO2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 2
+        published_page: 580
+        pdf_page_index: 1
+        section: Experimental Methods
+        note: CO/CO2 mixture; no flow or partial pressure printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 gas mixture; fO2 at the iron-wustite buffer equilibrium
+      locator:
+        page: 2
+        published_page: 580
+        section: Experimental Methods
+    channel: gas_mix
