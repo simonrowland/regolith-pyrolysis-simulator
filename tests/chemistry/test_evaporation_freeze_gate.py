@@ -674,7 +674,16 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 ((1018.75, 0.0), (1320.3125, 1.0)),
             ),
         ],
-        'ci_carbonaceous_chondrite_C2B_12h': [],
+        # Executable capture: 12 hours, six hour-local curve reads per hour.
+        'ci_carbonaceous_chondrite_C2B_12h': [
+            (
+                'C2B',
+                'kress91_liquid_calibration_floor',
+                1200.0,
+                1200.000001,
+                ((1200.0, 0.0), (1200.000001, 1.0)),
+            ),
+        ] * 72,
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
@@ -690,6 +699,13 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             # including it made a second C0 tuple look like a live curve.
             return record
         curve = record['curve']
+        if current_scenario[0] == 'ci_carbonaceous_chondrite_C2B_12h':
+            notice = curve['gate_provider_refusal']
+            assert notice['authority'] == 'extrapolated (lower-rung)'
+            assert notice['outcome'] == 'numerical_failure'
+            assert notice['provider_diagnostic']['backend_diagnostics'][
+                'projected_liquidus_status'
+            ] in {'unavailable', 'not_converged'}
         row = (
             sim.melt.campaign.name,
             curve['source'],
@@ -728,17 +744,11 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             setpoints_patch={'freeze_gate': {'enabled': True}},
         ).run()
         if name == 'ci_carbonaceous_chondrite_C2B_12h':
-            assert result['status'] == 'refused'
-            artifact = build_run_artifact(result, run_id='ci-numerical-gate')
-            assert artifact['timesteps'] == []
-            diagnostic = artifact['terminal']['run_metadata']['refusal_diagnostic']
-            assert diagnostic['outcome'] == 'numerical_failure'
-            assert diagnostic['provider_diagnostic']['backend_diagnostics'][
-                'projected_liquidus_status'
-            ] in {'unavailable', 'not_converged'}
+            assert result['status'] == 'ok'
+            artifact = build_run_artifact(result, run_id='ci-first-call-floor')
+            assert len(artifact['timesteps']) == scenario['hours']
             assert rebuild_counts.get(name, 0) == 0
             assert equilibrium_count[0] > equilibrations_before
-            observed[name] = []
 
     assert observed == expected
 
@@ -6627,8 +6637,10 @@ def test_core_gate_curve_memo_recomputes_after_provider_failure(
         None,
         raising=False,
     )
-    with pytest.raises(EvaporationFluxRefusal):
-        sim._melt_redox_liquidus_gate_curve()
+    first = sim._melt_redox_liquidus_gate_curve()
+    assert first['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert first['gate_provider_refusal']['authority'] == 'extrapolated (lower-rung)'
+    sim.melt.hour += 1
     key = _freeze_gate_key_for_current_state(sim)
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
     second = sim._melt_redox_liquidus_gate_curve()
@@ -7429,8 +7441,14 @@ def test_failed_gate_provider_refusal_does_not_enter_any_memo(
 
     monkeypatch.setattr(sim, '_dispatch_only', injected_provider_result)
 
-    with pytest.raises(EvaporationFluxRefusal):
-        sim._melt_redox_liquidus_gate_curve()
+    if initial_diagnostic.get('backend_status_reason') == 'timeout':
+        first = sim._melt_redox_liquidus_gate_curve()
+        assert first['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+        assert first['gate_provider_refusal']['authority'] == 'extrapolated (lower-rung)'
+        sim.melt.hour += 1
+    else:
+        with pytest.raises(EvaporationFluxRefusal):
+            sim._melt_redox_liquidus_gate_curve()
     key = _freeze_gate_key_for_current_state(sim)
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}

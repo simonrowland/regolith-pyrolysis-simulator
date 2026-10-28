@@ -426,7 +426,7 @@ def test_actual_magemin_launch_oserror_is_typed_environment_refusal(
     'BlockingIOError', 'ConnectionResetError', 'InterruptedError',
     'MemoryError', 'SubprocessError', 'TimeoutExpired', 'CalledProcessError',
 ])
-def test_magemin_launch_environment_errors_refuse_in_every_execution_mode(
+def test_magemin_launch_environment_errors_keep_type_in_every_execution_mode(
     monkeypatch, mode, exception_name,
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
@@ -460,12 +460,19 @@ def test_magemin_launch_environment_errors_refuse_in_every_execution_mode(
     provider._backend_initialised = True
     before = sim.atom_ledger.mol_by_account()
     try:
-        with pytest.raises(EvaporationFluxRefusal) as error:
-            sim._melt_redox_liquidus_gate_curve()
-
-        assert error.value.diagnostic['reason'] == 'liquid_fraction_provider_failed'
-        assert error.value.diagnostic['outcome'] is GateCurveProviderOutcome.FAILED
-        projected = error.value.diagnostic['provider_diagnostic'][
+        if exception_name == 'TimeoutExpired':
+            curve = sim._melt_redox_liquidus_gate_curve()
+            failure = curve['gate_provider_refusal']
+            assert curve['source'] == 'kress91_liquid_calibration_floor'
+            assert failure['authority'] == 'extrapolated (lower-rung)'
+            assert failure['backend_failure_disposition'] == 'environment'
+        else:
+            with pytest.raises(EvaporationFluxRefusal) as error:
+                sim._melt_redox_liquidus_gate_curve()
+            failure = error.value.diagnostic
+            assert failure['reason'] == 'liquid_fraction_provider_failed'
+        assert failure['outcome'] is GateCurveProviderOutcome.FAILED
+        projected = failure['provider_diagnostic'][
             'backend_diagnostics'
         ]['projected_liquidus_diagnostics']
         assert projected['backend_failure_exception'] == exception_name

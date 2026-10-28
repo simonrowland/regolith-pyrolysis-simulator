@@ -2178,6 +2178,7 @@ class EvaporationMixin:
         redox_state: RedoxState | None = None,
     ) -> dict[str, Any]:
         from simulator.reduced_real_determinism import (
+            GateCurveProviderOutcome,
             gate_curve_memo_record,
             gate_curve_memo_is_cacheable,
             record_repair_notice,
@@ -2388,15 +2389,17 @@ class EvaporationMixin:
             )
             if (
                 isinstance(curve, Mapping)
-                and curve.get('gate_provider_refusal', {}).get('authority')
-                == 'extrapolated (held)'
+                and curve.get('gate_provider_refusal', {}).get('outcome') in {
+                    GateCurveProviderOutcome.NUMERICAL_FAILURE,
+                    GateCurveProviderOutcome.FAILED,
+                }
             ):
                 record = gate_curve_memo_record(
-                    curve, self._freeze_gate_last_good_curve.get('origin'),
+                    curve, (self._freeze_gate_last_good_curve or {}).get('origin'),
                     repair_notices, 'live',
                     provider_outcome=self._freeze_gate_provider_outcome,
                 )
-                # A hold is tick-local authority, never a fresh solve or memo.
+                # Holds and first-call floors are tick-local, never solved memos.
                 self._freeze_gate_held_curve_record = {
                     'hour': int(self.melt.hour),
                     'provider': self._liquid_fraction_provider,
@@ -2801,6 +2804,22 @@ class EvaporationMixin:
                 held = self._hold_freeze_gate_provider_curve(failure)
                 if held is not None:
                     return held
+                curve = self._freeze_gate_kress_floor_curve(None, reasons)
+                if curve is not None:
+                    curve['gate_provider_refusal'] = {
+                        **failure,
+                        'reason': (diagnostic.get('backend_status_reason')
+                                   or diagnostic.get('reason') or failure['reason']),
+                        'qualification': 'first_call_kress91_floor_prediction',
+                        'authority': 'extrapolated (lower-rung)',
+                        'failure_hour': int(self.melt.hour),
+                        'failure_temperature_C': float(self.melt.temperature_C),
+                        'detail': (
+                            'Kress91 calibration-floor step; '
+                            'not a fresh solve or a melting measurement'
+                        ),
+                    }
+                    return curve
             if diagnostic.get('exception_class'):
                 mark_uncacheable_replay_disposition(
                     self,
