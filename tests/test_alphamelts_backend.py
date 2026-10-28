@@ -10017,16 +10017,17 @@ def test_project_local_alphamelts_cold_c0_step_returns_when_installed(capsys):
     # ratio retains the full step's serialization diagnostic, including time
     # spent waiting for that shadow and host scheduling.
     #
-    # Measured premise: Mac-Studio-256-2, this test with xdist off, three runs
-    # measured 18.18, 18.23, and 19.13 s CPU. The observed spread is
-    # 19.13 - 18.18 = 0.95 s. Allow five observed spreads (5 x 0.95 = 4.75 s)
-    # beyond the maximum, a 25% margin over the largest run while remaining
-    # well below a doubled solver pass: 19.13 + 4.75 = 23.88 s, rounded up to
-    # 24 s. Unit check: seconds + five x seconds = seconds. Sanity case: two
-    # full AlphaMELTS passes at the largest measured cost 2 x 19.13 = 38.26 s,
-    # which exceeds the cap.
-    assert cpu_elapsed_s < 24.0, (
-        f"cold C0 CPU time {cpu_elapsed_s:.2f}s exceeded 24.0s; "
+    # Measured premise: six xdist-off runs on Mac-Studio-256-2 produced CPU /
+    # wall seconds of 18.18/34.00, 18.23/34.99, 19.13/32.27, 19.23/32.12,
+    # 19.09/30.77, and 18.76/31.20 (wall/CPU 1.61-1.92x). CPU median=18.93 s;
+    # min=18.18 s, max=19.23 s, spread=max-min=1.05 s. Allow five observed
+    # spreads beyond the maximum: 19.23 + 5 x 1.05 = 24.48 s, rounded up to
+    # 25 s. This leaves five full observed run ranges of headroom. Unit check:
+    # seconds + five x seconds = seconds. Sanity case: two full AlphaMELTS
+    # passes at the largest measured cost 2 x 19.23 = 38.46 s, which exceeds
+    # the cap.
+    assert cpu_elapsed_s < 25.0, (
+        f"cold C0 CPU time {cpu_elapsed_s:.2f}s exceeded 25.0s; "
         f"wall={wall_elapsed_s:.2f}s ({wall_cpu_ratio:.2f}x wall/CPU)"
     )
 
