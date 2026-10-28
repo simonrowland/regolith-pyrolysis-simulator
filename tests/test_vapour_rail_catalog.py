@@ -2012,6 +2012,20 @@ def test_composite_constituent_domain_uses_flagged_existing_tangent(species_id, 
     assert notice['certified_band']['temperature_K'] == evaluator.valid_temperature_K
 
 
+@pytest.mark.parametrize("species_id,expected_hex", [
+    ("CrO", "0x1.779fd6a9b87c6p-15"),
+    ("SiO2_gas", "0x1.df74e85d7b664p-10"),
+    ("MnO_gas", "0x1.1b126f54b6035p-10"),
+])
+def test_composite_direct_pressure_refactor_pin(species_id, expected_hex):
+    # Executable 3d11c8fc6 output; refactor identity, not a physical anchor.
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    result = catalog.species[species_id].evaluator.evaluate(
+        1800.0, source_activity=1.0, pO2_bar=1.0,
+    )
+    assert result.pressure_pa.hex() == expected_hex
+
+
 def test_composite_continuation_still_refuses_missing_activity():
     catalog = compile_vapour_rail_catalog(yaml.safe_load((DATA_DIR / 'vapor_pressures.yaml').read_text()))
     with pytest.raises(CatalogCompileError, match='explicit source_activity'):
