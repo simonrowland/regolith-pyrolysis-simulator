@@ -209,9 +209,32 @@ _ENGINE_CELL_PREDICTED_QUANTITIES = frozenset(
     _VAPOUR_EQUILIBRIUM
     | {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
 )
+# Equilibrium partial pressures from these two predictors are independent of
+# total pressure. The evaluation proof is in test_score's pressure-axis test.
+_TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS = frozenset(
+    {
+        (Engine.OPENIMCC, Quantity.P_PARTIAL),
+        (Engine.INTERNAL_ANALYTICAL, Quantity.P_PARTIAL),
+    }
+)
 _SPECIES_FORMULA_INDEPENDENT_QUANTITIES = frozenset(
     {Quantity.MASS_LOSS_FRACTION}
 )
+
+
+def _pressure_independent_comparison(
+    reference: Observation, prediction: EnginePrediction
+) -> bool:
+    identity = reference.identity
+    if not isinstance(identity, Identity):
+        return False
+    quantity = quantity_token(identity)
+    pressure = identity.total_pressure_Pa
+    return (
+        (prediction.engine, quantity)
+        in _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS
+        and (pressure is None or not pressure.is_value)
+    )
 
 
 def _score_identity_equal(
@@ -4925,6 +4948,15 @@ def cell_notices(
                     ),
                 )
             )
+        elif kind == NoticeKind.ENGINE_MODEL_CAVEAT.value:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=str(row.get("reason") or kind),
+                    origin=f"engine:{engine.value}",
+                )
+            )
         elif kind == NoticeKind.INPUT_OMITTED.value:
             notices.append(
                 Notice(
@@ -5212,6 +5244,21 @@ def _assumption_notice(quantity: Quantity, reason: str) -> Notice:
         affected_quantities=(quantity,),
         reason=reason,
         origin="score:predict_with_engine",
+    )
+
+
+def _pressure_independent_comparison_notice(
+    quantity: Quantity, prediction: EnginePrediction
+) -> Notice:
+    return Notice(
+        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        affected_quantities=(quantity,),
+        reason=(
+            "identity comparison does not require total_pressure_Pa: "
+            f"{prediction.engine.value} equilibrium {quantity.value} is "
+            "total-pressure-independent"
+        ),
+        origin="score:comparison_identity",
     )
 
 
@@ -5585,6 +5632,7 @@ def _comparison_identity(
     melt_identity = _melt_identity_for_valence(identity)
     source_pressure = _source_oxygen_pressure_for_score(reference)
     resolved_oxygen = solved_oxygen_balance or source_pressure is not None
+    pressure_independent = _pressure_independent_comparison(reference, prediction)
     redox = quantity_token(identity) in {
         Quantity.FE3_FE2_RATIO,
         Quantity.VALENCE_RATIO,
@@ -5602,6 +5650,7 @@ def _comparison_identity(
     )
     if (
         not resolved_oxygen
+        and not pressure_independent
         and not comparison_activity
         and not redox
         and melt_identity is identity
@@ -5642,7 +5691,7 @@ def _comparison_identity(
         po2_bar = _solved_effusion_po2_bar(prediction)
         if po2_bar is not None:
             updates["fO2_Pa"] = State.of(Decimal(str(po2_bar)) * Decimal("1e5"))
-    if resolved_oxygen and (
+    if (resolved_oxygen or pressure_independent) and (
         identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value
     ):
         quantity = quantity_token(identity)
@@ -7562,6 +7611,9 @@ def _predict_phase_row(
         )
     subtype = identity.subtype.value if identity.subtype is not None and identity.subtype.is_value else None
     if solute is None:
+        # Engine phase maps are wt%. mole_fraction and ppm_mass are closed
+        # bases on another scale. ppm_mass_to_wt_percent is the ppm scale
+        # rule and is not applied here: the stored point stays as printed.
         if subtype in PHASE_BASIS_TOKENS and subtype != "wt_percent":
             return refused(
                 RefusalReason.COEFFICIENT_BASIS_MISMATCH,
@@ -7569,7 +7621,10 @@ def _predict_phase_row(
                     "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
                     "basis": subtype,
                     "engine_basis": "wt_percent",
-                    "detail": "engine phase maps are wt%; mole_fraction rows are not converted",
+                    "detail": (
+                        "engine phase maps are wt%; "
+                        f"{subtype} is not converted to wt%"
+                    ),
                 },
             )
         if subtype != "wt_percent":
@@ -10909,6 +10964,13 @@ def compile_residual(
         )
 
     notices = union_notices(notices, prediction.notices)
+    if quantity is not None and _pressure_independent_comparison(
+        reference, prediction
+    ):
+        notices = union_notices(
+            notices,
+            (_pressure_independent_comparison_notice(quantity, prediction),),
+        )
     expanded_sources = expand_coefficient_sources(prediction.coefficient_sources)
     lineage_complete = lineage_complete_for(
         prediction.coefficient_sources,

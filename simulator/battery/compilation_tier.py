@@ -52,6 +52,9 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import (
     Identity,
+    PA_PER_BAR_DEC,
+    _parse_enthalpy_increment_subtype,
+    assumed_crystal_standard_pressure_Pa,
     identity_equal,
     log10K_from_delta_fG_kJ_mol,
     quantity_token,
@@ -146,8 +149,27 @@ _ENGINE_THERMO_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
     Engine.THERMOENGINE: _ENGINE_PURE_PHASE_QUANTITIES,
     Engine.MAGEMIN: _ENGINE_PURE_PHASE_QUANTITIES,
 }
-_H298_K = 298.15
-_PA_PER_BAR = Decimal("100000")
+# Engines emit H(T)−H(298.15 K). The Decimal is the subtype anchor; the
+# float is the pure-phase call temperature. They are the same value.
+_ENGINE_ENTHALPY_ANCHOR_K = Decimal("298.15")
+_H298_K = float(_ENGINE_ENTHALPY_ANCHOR_K)
+_ANCHOR_OFFSET_LIMIT_K = Decimal("1")
+_REFERENCE_PHASE_TOKEN = {
+    "solid": Phase.CR,
+    "crystal": Phase.CR,
+    "crystalline": Phase.CR,
+    "cr": Phase.CR,
+    "s": Phase.CR,
+    "liquid": Phase.L,
+    "melt": Phase.L,
+    "l": Phase.L,
+    "gas": Phase.G,
+    "g": Phase.G,
+    "glass": Phase.GLASS,
+}
+# Fallback when the engine does not expose V. Derivation is on
+# ``_pressure_effect_bound_J``.
+_STATED_PRESSURE_EFFECT_BOUND_J_MOL = Decimal("4")
 
 
 def _engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
@@ -998,7 +1020,7 @@ def _ellingham_attempt(
         and pressure_state.value is not None
     ):
         printed_pressure = as_decimal(pressure_state.value)
-        if printed_pressure != _PA_PER_BAR:
+        if printed_pressure != PA_PER_BAR_DEC:
             if printed_pressure <= 0:
                 return _refuse(
                     RefusalReason.IDENTITY_UNKNOWN,
@@ -1066,7 +1088,7 @@ def _ellingham_attempt(
             gibbs += standard_pressure_delta_g_kJ_per_mol(
                 delta_n_g_decimal,
                 temperature_K,
-                _PA_PER_BAR,
+                PA_PER_BAR_DEC,
                 printed_pressure,
             )
     if quantity is Quantity.LOG10_KF:
@@ -1117,8 +1139,39 @@ def _ellingham_attempt(
 def _standard_pressure_bar(identity: Identity) -> tuple[float | None, str | None]:
     state = identity.standard_pressure_Pa
     if isinstance(state, State) and state.is_value and state.value is not None:
-        return float(as_decimal(state.value) / _PA_PER_BAR), None
+        return float(as_decimal(state.value) / PA_PER_BAR_DEC), None
     return None, "standard-pressure-unknown"
+
+
+def _pressure_effect_bound_J(*sources: object) -> tuple[Decimal, str]:
+    """J/mol per bar for an enthalpy at an assumed 1 bar.
+
+    Premise. (dH/dP)_T = V(1 - alpha*T), with alpha = (1/V)(dV/dT)_P.
+    One bar is 1e5 Pa. (dS/dP)_T = -alpha*V and
+    (dCp/dP)_T = -T d²V/dT². These property objects carry neither alpha
+    nor d²V/dT², so the caller attaches this bound to enthalpy only.
+
+    Algebra. The scored enthalpy is the engine value at 1 bar. The
+    notice bound is |V| x 1e5 Pa when this engine exposes molar volume,
+    which is V*dP and omits (1 - alpha*T) because alpha is absent.
+    Otherwise the bound is the stated 4 J/mol per bar.
+
+    Units. m3/mol x Pa = J/mol. The scored enthalpy stays kJ/mol; this
+    bound is not added to it.
+
+    Sanity. CaSiO3 V is about 4e-5 m3/mol x 1e5 Pa, about 4 J/mol per
+    bar, against printed increments of about 450 kJ/mol.
+    """
+
+    for source in sources:
+        if source is None:
+            continue
+        volume = _finite_number(getattr(source, "volume_m3_mol", None))
+        if volume is None or volume <= 0.0:
+            continue
+        bound = (as_decimal(str(volume)) * PA_PER_BAR_DEC).copy_abs().normalize()
+        return bound, "engine-V"
+    return _STATED_PRESSURE_EFFECT_BOUND_J_MOL, "stated-V"
 
 
 def _poly_name(identity: Identity) -> str | None:
@@ -1162,6 +1215,9 @@ def _pure_phase_rows(engine: Engine) -> tuple[tuple[str, str, str | None], ...] 
 
 
 def _resolve_symbol(engine: Engine, identity: Identity) -> tuple[str | None, str]:
+    # Liquid and glass are in enums.CONDENSED_PHASES, but these engines are
+    # crystal-only. This refusal runs before the 1 bar assumption, so liquid
+    # and glass are not evaluated at an assumed pressure.
     if phase_token(identity.species) is not Phase.CR:
         return None, "pure-phase-is-crystal-only"
     rows = _pure_phase_rows(engine)
@@ -1262,6 +1318,129 @@ def _property_value(props: object, quantity: Quantity, temperature_K: float, sec
     return None, quantity.value
 
 
+def _finite_number(value: object) -> float | None:
+    if isinstance(value, bool) or value is None:
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(number):
+        return None
+    return number
+
+
+def _same_enthalpy_reference_state(
+    identity: Identity,
+    reference_phase: str | None,
+    reference_polymorph: str | None,
+) -> bool:
+    """True when a declared reference phase is the measured phase.
+
+    The temperature correction below is H(298.15)−H(T_ref) of one phase.
+    A solid reference under a liquid row is a different observable: it
+    includes the phase-change enthalpy, which this correction does not.
+    """
+
+    if reference_phase is not None:
+        expected = _REFERENCE_PHASE_TOKEN.get(reference_phase.casefold())
+        if expected is None or phase_token(identity.species) is not expected:
+            return False
+    if reference_polymorph is not None:
+        actual = _poly_name(identity)
+        if actual is None or actual.casefold() != reference_polymorph.casefold():
+            return False
+    return True
+
+
+def _accepted_enthalpy_anchor(
+    identity: Identity,
+    *,
+    engine: Engine,
+    quantity: Quantity,
+    origin: str,
+) -> tuple[Decimal, str] | ThermoAttempt:
+    """Same-phase anchor within 1 K of 298.15 K, or a typed refusal.
+
+    The refusal is returned before any engine call. An unparsed subtype
+    and a cross-phase reference stay the anchor mismatch: they are not
+    the temperature offset this correction predicts.
+    """
+
+    anchor = _state_value(identity.subtype)
+    parsed = _parse_enthalpy_increment_subtype(anchor) if isinstance(anchor, str) else None
+    mismatch = {
+        "engine": engine.value,
+        "expected_anchor": "H(T)-H(298.15 K)",
+        "actual_anchor": anchor,
+    }
+    if parsed is None or not _same_enthalpy_reference_state(identity, parsed[1], parsed[2]):
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "pure-phase-enthalpy-anchor-mismatch",
+            quantity=quantity,
+            origin=origin,
+            extra=mismatch,
+        )
+    t_ref, _phase, _polymorph = parsed
+    offset = t_ref - _ENGINE_ENTHALPY_ANCHOR_K
+    if abs(offset) > _ANCHOR_OFFSET_LIMIT_K:
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "pure-phase-enthalpy-anchor-outside-1k",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "engine": engine.value,
+                "actual_anchor": anchor,
+                "T_ref_K": format(t_ref.normalize(), "f"),
+                "abs_offset_K": format(abs(offset).normalize(), "f"),
+            },
+        )
+    return t_ref, str(anchor)
+
+
+def _anchor_correction_J(
+    h_29815: float | None,
+    h_tref: float | None,
+    cp_29815: float | None,
+    t_ref_K: Decimal,
+) -> tuple[Decimal, str] | None:
+    """Second term H(298.15) − H(T_ref), in J/mol, and which engine term.
+
+    Premise. Pure-phase engines emit H(T) − H(298.15 K). A printed row
+    is H(T) − H(T_ref) with |T_ref − 298.15 K| ≤ 1 K, same phase.
+
+    Algebra. H(T) − H(T_ref) = [H(T) − H(298.15)] + [H(298.15) − H(T_ref)].
+    The second term is this engine's own H(298.15) − H(T_ref) when it
+    exposes H at T_ref. Otherwise it is ∫ from T_ref to 298.15 of Cp dT,
+    and for |ΔT| ≤ 1 K that integral is Cp(298.15) · (298.15 − T_ref).
+
+    Units. Engine H is J/mol and Cp is J/(mol·K), so the correction is
+    J/mol. The scored increment is kJ/mol; the caller divides by 1000.
+
+    Sanity. CaSiO3 Cp(298 K) ≈ 86 J/(mol·K) × 0.15 K ≈ 13 J/mol, against
+    printed increments of about 450–580 kJ/mol (3×10⁻⁵ relative).
+
+    None means the engine has neither H at T_ref nor Cp at 298.15 K.
+    """
+
+    h_anchor = _finite_number(h_29815)
+    h_ref = _finite_number(h_tref)
+    if h_anchor is not None and h_ref is not None:
+        from simulator.melt_backend.pure_phase_janaf_score import (
+            enthalpy_increment_kJ_mol,
+        )
+
+        correction_kJ = as_decimal(str(enthalpy_increment_kJ_mol(h_anchor, h_ref)))
+        return (correction_kJ * Decimal(1000)).normalize(), "engine-H"
+    cp = _finite_number(cp_29815)
+    if cp is None:
+        return None
+    delta_T = _ENGINE_ENTHALPY_ANCHOR_K - t_ref_K
+    return (as_decimal(str(cp)) * delta_T).normalize(), "engine-Cp"
+
+
 def _pure_phase_attempt(
     engine: Engine,
     identity: Identity,
@@ -1309,21 +1488,15 @@ def _pure_phase_attempt(
                 "actual_per": getattr(per, "value", None),
             },
         )
+    t_ref_K: Decimal | None = None
+    declared_anchor = ""
     if quantity is Quantity.H_MINUS_H298:
-        anchor = _state_value(identity.subtype)
-        expected_anchor = "H(T)-H(298.15 K)"
-        if anchor != expected_anchor:
-            return _refuse(
-                RefusalReason.UNSUPPORTED,
-                "pure-phase-enthalpy-anchor-mismatch",
-                quantity=quantity,
-                origin=origin,
-                extra={
-                    "engine": engine.value,
-                    "expected_anchor": expected_anchor,
-                    "actual_anchor": anchor,
-                },
-            )
+        accepted = _accepted_enthalpy_anchor(
+            identity, engine=engine, quantity=quantity, origin=origin
+        )
+        if isinstance(accepted, ThermoAttempt):
+            return accepted
+        t_ref_K, declared_anchor = accepted
     symbol, why = _resolve_symbol(engine, identity)
     if symbol is None:
         reason = (
@@ -1341,7 +1514,11 @@ def _pure_phase_attempt(
             extra={"engine": engine.value, "symbol": symbol},
         )
     pressure_bar, pressure_reason = _standard_pressure_bar(identity)
-    if pressure_bar is None:
+    assumed_Pa = assumed_crystal_standard_pressure_Pa(identity)
+    assumed_pressure = pressure_bar is None and assumed_Pa is not None
+    if assumed_pressure:
+        pressure_bar = float(assumed_Pa / PA_PER_BAR_DEC)
+    elif pressure_bar is None:
         return _refuse(
             RefusalReason.IDENTITY_UNKNOWN,
             pressure_reason or "standard-pressure-unknown",
@@ -1384,6 +1561,34 @@ def _pure_phase_attempt(
             origin=origin,
             extra={"engine": engine.value, "returned": str(returned)},
         )
+    h_call_failure = None
+    t_ref_props = None
+    if t_ref_K is not None and t_ref_K != _ENGINE_ENTHALPY_ANCHOR_K:
+        t_ref_float = float(t_ref_K)
+        if abs(t_ref_float - float(temperature_K)) <= 1e-9:
+            t_ref_props = props
+        elif abs(t_ref_float - _H298_K) <= 1e-9:
+            t_ref_props = second
+        else:
+            try:
+                fetched = caller(engine, symbol, t_ref_float, pressure_bar)
+            except (
+                PurePhaseAccessError,
+                ImportError,
+                ValueError,
+                OSError,
+                RuntimeError,
+            ) as exc:
+                # A missing H at T_ref is still the Cp·ΔT fallback. The
+                # notice has to say the H call failed, not only term=engine-Cp.
+                fetched = None
+                h_call_failure = f"{type(exc).__name__}: {exc}"
+            fetched_formula = getattr(fetched, "formula", None) if fetched is not None else None
+            if fetched_formula and parse_species_formula(str(fetched_formula)) != parse_species_formula(
+                identity.species.formula
+            ):
+                fetched = None
+            t_ref_props = fetched
     raw, prop_name = _property_value(props, quantity, float(temperature_K), second)
     if raw is None:
         absence = ""
@@ -1399,6 +1604,49 @@ def _pure_phase_attempt(
             extra={"engine": engine.value, "property": prop_name, "absence": absence},
         )
     value = as_decimal(str(raw))
+    anchor_notice = None
+    call_evidence = f"pure-phase:{engine.value}:{symbol}:T={temperature_K}"
+    if t_ref_K is not None and t_ref_K != _ENGINE_ENTHALPY_ANCHOR_K:
+        correction = _anchor_correction_J(
+            getattr(second, "H_J_mol", None),
+            None if t_ref_props is None else getattr(t_ref_props, "H_J_mol", None),
+            getattr(second, "Cp_J_K_mol", None),
+            t_ref_K,
+        )
+        if correction is None:
+            extra = {
+                "engine": engine.value,
+                "actual_anchor": declared_anchor,
+                "T_ref_K": format(t_ref_K.normalize(), "f"),
+            }
+            if h_call_failure is not None:
+                extra["H_call_at_T_ref"] = "failed"
+                extra["H_call_detail"] = h_call_failure
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                "pure-phase-enthalpy-anchor-no-H-or-Cp",
+                quantity=quantity,
+                origin=origin,
+                extra=extra,
+            )
+        correction_J, term = correction
+        if h_call_failure is not None and term == "engine-Cp":
+            term = f"{term} after a failed H call ({h_call_failure})"
+        value += correction_J / Decimal(1000)
+        call_evidence += f":T_ref={format(t_ref_K.normalize(), 'f')}"
+        anchor_notice = Notice(
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            affected_quantities=(quantity,),
+            reason=(
+                f"reference-anchor-offset: declared={declared_anchor}; "
+                f"correction_J_mol={format(correction_J, 'f')}; "
+                f"authority={Authority.BRIDGE.value}; term={term}"
+            ),
+            origin=origin,
+            band="298.15 K",
+            authority=Authority.BRIDGE,
+            original=correction_J,
+        )
     if not value.is_finite():
         return _refuse(
             RefusalReason.METRIC_DOMAIN,
@@ -1407,14 +1655,47 @@ def _pure_phase_attempt(
             origin=origin,
             extra={"engine": engine.value},
         )
+    notices = _unrequested_phase_notices(props, second, quantity, origin, t_ref_props)
+    if anchor_notice is not None:
+        notices = notices + (anchor_notice,)
+    if assumed_pressure:
+        call_evidence += ":P_bar=1:assumed"
+        if quantity is Quantity.H_MINUS_H298:
+            bound_J, bound_term = _pressure_effect_bound_J(props, second, t_ref_props)
+            pressure_reason = (
+                "standard-pressure-assumed: declared=unknown; "
+                f"pressure_bar=1; bound_J_mol_per_bar={format(bound_J, 'f')}; "
+                f"authority={Authority.BRIDGE.value}; term={bound_term}"
+            )
+            pressure_original = bound_J
+        else:
+            # Enthalpy bound only. Cp and S need alpha or d²V/dT², which
+            # these property objects do not carry. The value stays the
+            # 1 bar engine value.
+            pressure_reason = (
+                "standard-pressure-assumed: declared=unknown; "
+                f"pressure_bar=1; authority={Authority.BRIDGE.value}; term=omitted"
+            )
+            pressure_original = None
+        notices = notices + (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason=pressure_reason,
+                origin=origin,
+                band="1 bar",
+                authority=Authority.BRIDGE,
+                original=pressure_original,
+            ),
+        )
     return ThermoAttempt(
         value=value,
         unit=QUANTITY_UNITS[quantity],
         authority=Authority.BRIDGE,
-        notices=_unrequested_phase_notices(props, second, quantity, origin),
+        notices=notices,
         refusal_reason=None,
         refusal_detail={},
-        call_evidence=f"pure-phase:{engine.value}:{symbol}:T={temperature_K}",
+        call_evidence=call_evidence,
     )
 
 
@@ -1423,6 +1704,7 @@ def _unrequested_phase_notices(
     second: object | None,
     quantity: Quantity,
     origin: str,
+    extra: object | None = None,
 ) -> tuple[Notice, ...]:
     """Carry ignored-token diagnostics onto the attempt.
 
@@ -1434,7 +1716,7 @@ def _unrequested_phase_notices(
     from simulator.melt_backend.magemin import _unrelated_gbase_nonfinite_notes
 
     texts: list[str] = []
-    for source in (props, second):
+    for source in (props, second, extra):
         if source is None:
             continue
         warnings = getattr(source, "warnings", ()) or ()
