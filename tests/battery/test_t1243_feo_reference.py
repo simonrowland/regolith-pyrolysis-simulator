@@ -597,6 +597,11 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
         assert conversion.kind is NoticeKind.DERIVATION_USES_COMPILATION
         assert "method=a_FeO(stoich)=N_Fe2+^0*a_FeO(source)" in conversion.reason
         assert "factor=" in conversion.reason
+        assert "log10_shift=" in conversion.reason and " dex;" in conversion.reason
+        if observation.observation_id.endswith("distin1971_t1_1880_1_4"):
+            assert observation.value.point == Decimal("0.952")
+            assert "factor=0.9861" in conversion.reason
+            assert "log10_shift=-0.0061 dex" in conversion.reason
         assert FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION in flagged_strata(
             residual.notices
         )
