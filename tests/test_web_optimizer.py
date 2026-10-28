@@ -1110,6 +1110,7 @@ def test_optimizer_tier_label_requires_backend_authority_for_certified_cache() -
     )
 
     assert label["tier"] == "cached_exact"
+    assert label["canonical"]["runtime_status"] == "ok"
     assert label["certification_allowed"] is True
     assert label["ux_label"] == "UNVERIFIED"
 
