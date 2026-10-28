@@ -8,14 +8,15 @@ source:
   corpus_asset: raw/niggli-1913-silica-alkali-carbonate-equilibria/niggli-1913-silica-alkali-carbonate-equilibria.pdf
 review_status: draft
 extraction:
-  method: MinerU table drafts and pdftotext-layout were reconciled against page renders for all retained numeric cells
-    in Tables II, VI, and VIII, the adjacent Mallard table, and the melting-point passages. The reported Table II
-    percentage loss is Niggli's calculation from gravimetric CO2 loss; the individual raw weighing inputs are not
-    tabulated, so it is attributed to the paper rather than represented as an independently migrated raw measurement.
+  method: >-
+    MinerU table drafts and pdftotext-layout were reconciled against page renders for all retained numeric cells in
+    Tables II, VI, and VIII, the adjacent Mallard table, and the melting-point passages. Table II column (a) is mol
+    per cent of the initial CO2 content lost, calculated from measured weight loss; it remains context because that
+    printed basis is not a sample mass-loss fraction.
   date: '2026-10-28'
   worker: w1028naH-niggli13
-  scope_note: Table II contains potassium-system measured equilibrium CO2-loss data and auxiliary displaced-moles
-    values; Table VI contains the soda-system measured displaced-moles data; Table VIII and the adjacent Mallard table
+  scope_note: Table II contains potassium-system CO2-loss and displaced-moles context; Table VI contains the soda-system
+    displaced-moles data and 956 °C CO2-loss percentages; Table VIII and the adjacent Mallard table
     contain attributed comparison values. Printed melting points are included as transitions, and qualitative
     eutectic descriptions remain context. Table II's printed binary-mixture mole fraction is completed from the stated
     K2CO3 + SiO2 basis for identity mapping; printed composition bases remain separately recorded.
@@ -26,10 +27,24 @@ schema_gaps:
     published_page: 1700
     table: II
   quantity_as_printed: number of mols CO2 displaced by 100 mols SiO2
-  reason: No quantity token has the exact printed molar basis. Quantity.EVOLVED_GAS_YIELD is stored in mol_species_per_initial_kg
-    (simulator/battery/enums.py:614); the specific_gas_yield alias does not accept this mol-per-100-mol-SiO2 unit
-    (simulator/battery/migrate.py:11461-11527). The values are retained in the typed context record, not mapped
-    to a near-miss yield token.
+  reason: >-
+    No quantity token has the exact printed molar basis. Quantity.EVOLVED_GAS_YIELD in
+    simulator/battery/enums.py::Quantity.EVOLVED_GAS_YIELD is stored in mol_species_per_initial_kg; the
+    specific_gas_yield key in QUANTITY_ALIASES in simulator/battery/migrate.py::QUANTITY_ALIASES does not accept
+    mol CO2 per 100 mol SiO2. The values remain context, not a near-miss yield token.
+  values_retained_in: species.K2CO3.context[niggli_1913_table_ii_co2_displaced_schema_gap].values.points
+- locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 1700
+    table: II
+  quantity_as_printed: mol per cent of the initial CO2 content lost
+  reason: >-
+    The closed Quantity enum (simulator/battery/enums.py:67-117) contains the nearby Quantity.MASS_LOSS_FRACTION
+    token (simulator/battery/enums.py:81), whose sample-mass fields are listed in _MASS_LOSS_YIELD_FIELDS
+    (simulator/battery/migrate.py:6285-6295). PHASE_BASIS_TOKENS (simulator/battery/enums.py:676-681) includes
+    mole_fraction for phase composition, not initial carbonate CO2 loss. None is the printed basis, so the values
+    remain context.
   values_retained_in: species.K2CO3.context[niggli_1913_table_ii_co2_displaced_schema_gap].values.points
 - locator: &id041
     page: 23
@@ -37,10 +52,23 @@ schema_gaps:
     published_page: 1715
     table: VI
   quantity_as_printed: number of mols CO2 displaced by 100 mols SiO2
-  reason: No quantity token has the exact printed molar basis. Quantity.EVOLVED_GAS_YIELD is stored in mol_species_per_initial_kg
-    (simulator/battery/enums.py:614); the specific_gas_yield alias does not accept this mol-per-100-mol-SiO2 unit
-    (simulator/battery/migrate.py:11461-11527). The values are retained in the typed context record, not mapped
-    to a near-miss yield token.
+  reason: >-
+    No quantity token has the exact printed molar basis. Quantity.EVOLVED_GAS_YIELD in
+    simulator/battery/enums.py::Quantity.EVOLVED_GAS_YIELD is stored in mol_species_per_initial_kg; the
+    specific_gas_yield key in QUANTITY_ALIASES in simulator/battery/migrate.py::QUANTITY_ALIASES does not accept
+    mol CO2 per 100 mol SiO2. The values remain context, not a near-miss yield token.
+  values_retained_in: species.Na2CO3.context[niggli_1913_table_vi_co2_displaced_schema_gap].values.points
+- locator:
+    page: 23
+    pdf_page_index: 22
+    published_page: 1715
+    table: VI
+  quantity_as_printed: Mol percentage loss of CO2
+  reason: >-
+    The printed value is mol percentage loss of the initial CO2 content, not sample mass fraction or phase
+    mole_fraction. Quantity.MASS_LOSS_FRACTION in simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION and
+    PHASE_BASIS_TOKENS in simulator/battery/enums.py::PHASE_BASIS_TOKENS have different meanings; no exact token
+    represents this initial-CO2 loss basis, so the values remain context.
   values_retained_in: species.Na2CO3.context[niggli_1913_table_vi_co2_displaced_schema_gap].values.points
 - locator:
     page: 33
@@ -48,19 +76,21 @@ schema_gaps:
     published_page: 1725
     table: VIII
   quantity_as_printed: number of mols CO2 displaced by 100 mols SiO2
-  reason: No quantity token has the exact printed molar basis. Quantity.EVOLVED_GAS_YIELD is stored in mol_species_per_initial_kg
-    (simulator/battery/enums.py:614); its supported source fields and units do not accept mol-per-100-mol-SiO2
-    (simulator/battery/migrate.py:9493, 11461-11527). The comparison values are retained as context.
-  values_retained_in: species.K2CO3.context[niggli_1913_table_viii_comparison].values.rows; species.Na2CO3.context[niggli_1913_table_viii_comparison].values.rows
+  reason: >-
+    No quantity token has the exact printed molar basis. Quantity.EVOLVED_GAS_YIELD in
+    simulator/battery/enums.py::Quantity.EVOLVED_GAS_YIELD uses mol_species_per_initial_kg, not mol CO2 per 100 mol
+    SiO2. The comparison values remain context.
+  values_retained_in: species.K2CO3.context[niggli_1913_table_viii_k_comparison].values.rows; species.Na2CO3.context[niggli_1913_table_viii_na_comparison].values.rows
 - locator:
     page: 33
     pdf_page_index: 32
     published_page: 1725
     paragraph: Mallard results following Table VIII
   quantity_as_printed: number of mols CO2 displaced by 100 mols SiO2
-  reason: No quantity token has the exact printed molar basis. Quantity.EVOLVED_GAS_YIELD is stored in mol_species_per_initial_kg
-    (simulator/battery/enums.py:614); its supported source fields and units do not accept mol-per-100-mol-SiO2
-    (simulator/battery/migrate.py:9493, 11461-11527). Values are retained as attributed context.
+  reason: >-
+    No quantity token has the exact printed molar basis. Quantity.EVOLVED_GAS_YIELD in
+    simulator/battery/enums.py::Quantity.EVOLVED_GAS_YIELD uses mol_species_per_initial_kg, not mol CO2 per 100 mol
+    SiO2. Values remain context attributed to Mallard.
   values_retained_in: species.Na2CO3.context[niggli_1913_mallard_soda_displacement].values.rows
 - locator:
     page: 14
@@ -68,1777 +98,25 @@ schema_gaps:
     published_page: 1706
     paragraph: Lebeau results quoted in the K2CO3 dissociation discussion
   quantity_as_printed: equilibrium pressure in mm
-  reason: The partial_pressure quantity token exists, but the source unit token mm is ambiguous; the unit parser
-    maps mm as length (simulator/battery/migrate.py:3420, 4911-4950), whereas pressure requires an explicit mmHg/Torr
-    token (simulator/battery/migrate.py:4868-4902). No mmHg assumption is made.
+  reason: >-
+    The partial_pressure quantity token exists, but the source unit token mm is ambiguous. _normalize_printed_unit
+    in simulator/battery/migrate.py::_normalize_printed_unit preserves mm, while _convert_printed_amount in
+    simulator/battery/migrate.py::_convert_printed_amount converts it as length; convert_pressure_to_pa in
+    simulator/battery/migrate.py::convert_pressure_to_pa requires a pressure unit. No mmHg assumption is made.
   values_retained_in: species.K2CO3.context[niggli_1913_lebeau_pure_carbonate_pressure]
 fidelity_samples:
-- path: species.K2CO3.observations[niggli_1913_table_ii_potassium_co2_loss].values.points[0].mass_loss_pct
+- path: species.K2CO3.context[niggli_1913_table_ii_co2_displaced_schema_gap].values.points[0].co2_loss_mol_percent_initial_as_printed
   value: '6.6'
-  locator:
-    page: 8
-    pdf_page_index: 7
-    published_page: 1700
-    table: II
-    row: I
-    note: column (a), 898°C
-- path: species.K2CO3.observations[niggli_1913_table_ii_potassium_co2_loss].values.points[10].mass_loss_pct
+  locator: {page: 8, pdf_page_index: 7, published_page: 1700, table: II, row: I}
+- path: species.K2CO3.context[niggli_1913_table_ii_co2_displaced_schema_gap].values.points[10].co2_loss_mol_percent_initial_as_printed
   value: '28.6'
-  locator:
-    page: 8
-    pdf_page_index: 7
-    published_page: 1700
-    table: II
-    row: VII
-    note: column (a), 998°C
-- path: species.K2CO3.observations[niggli_1913_table_ii_potassium_co2_loss].values.points[26].mass_loss_pct
+  locator: {page: 8, pdf_page_index: 7, published_page: 1700, table: II, row: VII}
+- path: species.K2CO3.context[niggli_1913_table_ii_co2_displaced_schema_gap].values.points[26].co2_loss_mol_percent_initial_as_printed
   value: '79.3'
-  locator:
-    page: 8
-    pdf_page_index: 7
-    published_page: 1700
-    table: II
-    row: XIII
-    note: column (a), 956°C
+  locator: {page: 8, pdf_page_index: 7, published_page: 1700, table: II, row: XIII}
 species:
   K2CO3:
     observations:
-    - observation_id: niggli_1913_table_ii_potassium_co2_loss
-      type: mass_loss
-      locator:
-        page: 8
-        pdf_page_index: 7
-        published_page: 1700
-        table: II
-        note: Table II reports CO2 loss from K2CO3 + SiO2 mixtures, with the initial charge and temperature assigned
-          per point.
-      phase: l
-      units: '%'
-      values:
-        quantity: mass_loss_fraction
-        method_class: quoted_attributed
-        attribution: Niggli (1913), present measurements, Table II; percentage calculated from observed weight loss,
-          whose raw row-wise weights are not tabulated.
-        points:
-        - row: I
-          T_C: '898'
-          mass_loss_pct: '6.6'
-          initial_mixture_as_printed: 96.9 wt% K2CO3 + 3.1 wt% SiO2; 6.9 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.931'
-            SiO2: '0.069'
-          composition_wt_percent_as_printed:
-            K2CO3: '96.9'
-            SiO2: '3.1'
-          SiO2_mol_percent_as_printed: '6.9'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id001
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: I
-                note: 'Table II row I; initial mixture composition as printed: 96.9 wt% K2CO3 + 3.1 wt% SiO2; 6.9
-                  mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id001
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id001
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id001
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value:
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.931'
-                  - - SiO2
-                    - '0.069'
-              locator: *id001
-          locator: *id001
-        - row: II
-          T_C: '898'
-          mass_loss_pct: '8.3'
-          initial_mixture_as_printed: 96.2 wt% K2CO3 + 3.8 wt% SiO2; 8.2 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.918'
-            SiO2: '0.082'
-          composition_wt_percent_as_printed:
-            K2CO3: '96.2'
-            SiO2: '3.8'
-          SiO2_mol_percent_as_printed: '8.2'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id002
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: II
-                note: 'Table II row II; initial mixture composition as printed: 96.2 wt% K2CO3 + 3.8 wt% SiO2; 8.2
-                  mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id002
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id002
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id002
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value:
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.918'
-                  - - SiO2
-                    - '0.082'
-              locator: *id002
-          locator: *id002
-        - row: III
-          T_C: '898'
-          mass_loss_pct: '9.7'
-          initial_mixture_as_printed: 95.3 wt% K2CO3 + 4.7 wt% SiO2; 10.2 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.898'
-            SiO2: '0.102'
-          composition_wt_percent_as_printed:
-            K2CO3: '95.3'
-            SiO2: '4.7'
-          SiO2_mol_percent_as_printed: '10.2'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id003
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: III
-                note: 'Table II row III; initial mixture composition as printed: 95.3 wt% K2CO3 + 4.7 wt% SiO2;
-                  10.2 mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id003
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id003
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id003
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value:
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.898'
-                  - - SiO2
-                    - '0.102'
-              locator: *id003
-          locator: *id003
-        - row: IV
-          T_C: '898'
-          mass_loss_pct: '10.5'
-          initial_mixture_as_printed: 94.9 wt% K2CO3 + 5.1 wt% SiO2; 10.9 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.891'
-            SiO2: '0.109'
-          composition_wt_percent_as_printed:
-            K2CO3: '94.9'
-            SiO2: '5.1'
-          SiO2_mol_percent_as_printed: '10.9'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id004
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: IV
-                note: 'Table II row IV; initial mixture composition as printed: 94.9 wt% K2CO3 + 5.1 wt% SiO2; 10.9
-                  mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id004
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id004
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id004
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: &id006
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.891'
-                  - - SiO2
-                    - '0.109'
-              locator: *id004
-          locator: *id004
-        - row: IV
-          T_C: '956'
-          mass_loss_pct: '11.1'
-          initial_mixture_as_printed: 94.9 wt% K2CO3 + 5.1 wt% SiO2; 10.9 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.891'
-            SiO2: '0.109'
-          composition_wt_percent_as_printed:
-            K2CO3: '94.9'
-            SiO2: '5.1'
-          SiO2_mol_percent_as_printed: '10.9'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1229.15'
-              locator: &id005
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: IV
-                note: 'Table II row IV; initial mixture composition as printed: 94.9 wt% K2CO3 + 5.1 wt% SiO2; 10.9
-                  mol% SiO2.'
-              note: Converted from the printed 956 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id005
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id005
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id005
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id006
-              locator: *id005
-          locator: *id005
-        - row: V
-          T_C: '898'
-          mass_loss_pct: '15.4'
-          initial_mixture_as_printed: 92.5 wt% K2CO3 + 7.5 wt% SiO2; 15.7 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.843'
-            SiO2: '0.157'
-          composition_wt_percent_as_printed:
-            K2CO3: '92.5'
-            SiO2: '7.5'
-          SiO2_mol_percent_as_printed: '15.7'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id007
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: V
-                note: 'Table II row V; initial mixture composition as printed: 92.5 wt% K2CO3 + 7.5 wt% SiO2; 15.7
-                  mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id007
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id007
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id007
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: &id009
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.843'
-                  - - SiO2
-                    - '0.157'
-              locator: *id007
-          locator: *id007
-        - row: V
-          T_C: '956'
-          mass_loss_pct: '16.6'
-          initial_mixture_as_printed: 92.5 wt% K2CO3 + 7.5 wt% SiO2; 15.7 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.843'
-            SiO2: '0.157'
-          composition_wt_percent_as_printed:
-            K2CO3: '92.5'
-            SiO2: '7.5'
-          SiO2_mol_percent_as_printed: '15.7'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1229.15'
-              locator: &id008
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: V
-                note: 'Table II row V; initial mixture composition as printed: 92.5 wt% K2CO3 + 7.5 wt% SiO2; 15.7
-                  mol% SiO2.'
-              note: Converted from the printed 956 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id008
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id008
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id008
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id009
-              locator: *id008
-          locator: *id008
-        - row: VI
-          T_C: '898'
-          mass_loss_pct: '20.5'
-          initial_mixture_as_printed: 90.3 wt% K2CO3 + 9.7 wt% SiO2; 19.8 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.802'
-            SiO2: '0.198'
-          composition_wt_percent_as_printed:
-            K2CO3: '90.3'
-            SiO2: '9.7'
-          SiO2_mol_percent_as_printed: '19.8'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id010
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: VI
-                note: 'Table II row VI; initial mixture composition as printed: 90.3 wt% K2CO3 + 9.7 wt% SiO2; 19.8
-                  mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id010
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id010
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id010
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value:
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.802'
-                  - - SiO2
-                    - '0.198'
-              locator: *id010
-          locator: *id010
-        - row: VII
-          T_C: '898'
-          mass_loss_pct: '24.7'
-          initial_mixture_as_printed: 88.1 wt% K2CO3 + 11.9 wt% SiO2; 23.8 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.762'
-            SiO2: '0.238'
-          composition_wt_percent_as_printed:
-            K2CO3: '88.1'
-            SiO2: '11.9'
-          SiO2_mol_percent_as_printed: '23.8'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id011
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: VII
-                note: 'Table II row VII; initial mixture composition as printed: 88.1 wt% K2CO3 + 11.9 wt% SiO2;
-                  23.8 mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id011
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id011
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id011
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: &id013
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.762'
-                  - - SiO2
-                    - '0.238'
-              locator: *id011
-          locator: *id011
-        - row: VII
-          T_C: '956'
-          mass_loss_pct: '26.9'
-          initial_mixture_as_printed: 88.1 wt% K2CO3 + 11.9 wt% SiO2; 23.8 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.762'
-            SiO2: '0.238'
-          composition_wt_percent_as_printed:
-            K2CO3: '88.1'
-            SiO2: '11.9'
-          SiO2_mol_percent_as_printed: '23.8'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1229.15'
-              locator: &id012
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: VII
-                note: 'Table II row VII; initial mixture composition as printed: 88.1 wt% K2CO3 + 11.9 wt% SiO2;
-                  23.8 mol% SiO2.'
-              note: Converted from the printed 956 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id012
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id012
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id012
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id013
-              locator: *id012
-          locator: *id012
-        - row: VII
-          T_C: '998'
-          mass_loss_pct: '28.6'
-          initial_mixture_as_printed: 88.1 wt% K2CO3 + 11.9 wt% SiO2; 23.8 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.762'
-            SiO2: '0.238'
-          composition_wt_percent_as_printed:
-            K2CO3: '88.1'
-            SiO2: '11.9'
-          SiO2_mol_percent_as_printed: '23.8'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1271.15'
-              locator: &id014
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: VII
-                note: 'Table II row VII; initial mixture composition as printed: 88.1 wt% K2CO3 + 11.9 wt% SiO2;
-                  23.8 mol% SiO2.'
-              note: Converted from the printed 998 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id014
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id014
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id014
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id013
-              locator: *id014
-          locator: *id014
-        - row: VIII
-          T_C: '898'
-          mass_loss_pct: '36.2'
-          initial_mixture_as_printed: 83.1 wt% K2CO3 + 16.9 wt% SiO2; 31.9 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.681'
-            SiO2: '0.319'
-          composition_wt_percent_as_printed:
-            K2CO3: '83.1'
-            SiO2: '16.9'
-          SiO2_mol_percent_as_printed: '31.9'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id015
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: VIII
-                note: 'Table II row VIII; initial mixture composition as printed: 83.1 wt% K2CO3 + 16.9 wt% SiO2;
-                  31.9 mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id015
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id015
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id015
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: &id017
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.681'
-                  - - SiO2
-                    - '0.319'
-              locator: *id015
-          locator: *id015
-        - row: VIII
-          T_C: '956'
-          mass_loss_pct: '38.9'
-          initial_mixture_as_printed: 83.1 wt% K2CO3 + 16.9 wt% SiO2; 31.9 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.681'
-            SiO2: '0.319'
-          composition_wt_percent_as_printed:
-            K2CO3: '83.1'
-            SiO2: '16.9'
-          SiO2_mol_percent_as_printed: '31.9'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1229.15'
-              locator: &id016
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: VIII
-                note: 'Table II row VIII; initial mixture composition as printed: 83.1 wt% K2CO3 + 16.9 wt% SiO2;
-                  31.9 mol% SiO2.'
-              note: Converted from the printed 956 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id016
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id016
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id016
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id017
-              locator: *id016
-          locator: *id016
-        - row: IX
-          T_C: '898'
-          mass_loss_pct: '42.6'
-          initial_mixture_as_printed: 80.4 wt% K2CO3 + 19.6 wt% SiO2; 36.1 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.639'
-            SiO2: '0.361'
-          composition_wt_percent_as_printed:
-            K2CO3: '80.4'
-            SiO2: '19.6'
-          SiO2_mol_percent_as_printed: '36.1'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id018
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: IX
-                note: 'Table II row IX; initial mixture composition as printed: 80.4 wt% K2CO3 + 19.6 wt% SiO2;
-                  36.1 mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id018
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id018
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id018
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: &id020
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.639'
-                  - - SiO2
-                    - '0.361'
-              locator: *id018
-          locator: *id018
-        - row: IX
-          T_C: '956'
-          mass_loss_pct: '46.3'
-          initial_mixture_as_printed: 80.4 wt% K2CO3 + 19.6 wt% SiO2; 36.1 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.639'
-            SiO2: '0.361'
-          composition_wt_percent_as_printed:
-            K2CO3: '80.4'
-            SiO2: '19.6'
-          SiO2_mol_percent_as_printed: '36.1'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1229.15'
-              locator: &id019
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: IX
-                note: 'Table II row IX; initial mixture composition as printed: 80.4 wt% K2CO3 + 19.6 wt% SiO2;
-                  36.1 mol% SiO2.'
-              note: Converted from the printed 956 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id019
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id019
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id019
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id020
-              locator: *id019
-          locator: *id019
-        - row: IX
-          T_C: '998'
-          mass_loss_pct: '48.6'
-          initial_mixture_as_printed: 80.4 wt% K2CO3 + 19.6 wt% SiO2; 36.1 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.639'
-            SiO2: '0.361'
-          composition_wt_percent_as_printed:
-            K2CO3: '80.4'
-            SiO2: '19.6'
-          SiO2_mol_percent_as_printed: '36.1'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1271.15'
-              locator: &id021
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: IX
-                note: 'Table II row IX; initial mixture composition as printed: 80.4 wt% K2CO3 + 19.6 wt% SiO2;
-                  36.1 mol% SiO2.'
-              note: Converted from the printed 998 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id021
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id021
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id021
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id020
-              locator: *id021
-          locator: *id021
-        - row: X
-          T_C: '898'
-          mass_loss_pct: '44.8'
-          initial_mixture_as_printed: 79.5 wt% K2CO3 + 20.5 wt% SiO2; 37.3 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.627'
-            SiO2: '0.373'
-          composition_wt_percent_as_printed:
-            K2CO3: '79.5'
-            SiO2: '20.5'
-          SiO2_mol_percent_as_printed: '37.3'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id022
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: X
-                note: 'Table II row X; initial mixture composition as printed: 79.5 wt% K2CO3 + 20.5 wt% SiO2; 37.3
-                  mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id022
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id022
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id022
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: &id024
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.627'
-                  - - SiO2
-                    - '0.373'
-              locator: *id022
-          locator: *id022
-        - row: X
-          T_C: '956'
-          mass_loss_pct: '48.6'
-          initial_mixture_as_printed: 79.5 wt% K2CO3 + 20.5 wt% SiO2; 37.3 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.627'
-            SiO2: '0.373'
-          composition_wt_percent_as_printed:
-            K2CO3: '79.5'
-            SiO2: '20.5'
-          SiO2_mol_percent_as_printed: '37.3'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1229.15'
-              locator: &id023
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: X
-                note: 'Table II row X; initial mixture composition as printed: 79.5 wt% K2CO3 + 20.5 wt% SiO2; 37.3
-                  mol% SiO2.'
-              note: Converted from the printed 956 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id023
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id023
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id023
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id024
-              locator: *id023
-          locator: *id023
-        - row: X
-          T_C: '998'
-          mass_loss_pct: '51.4'
-          initial_mixture_as_printed: 79.5 wt% K2CO3 + 20.5 wt% SiO2; 37.3 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.627'
-            SiO2: '0.373'
-          composition_wt_percent_as_printed:
-            K2CO3: '79.5'
-            SiO2: '20.5'
-          SiO2_mol_percent_as_printed: '37.3'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1271.15'
-              locator: &id025
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: X
-                note: 'Table II row X; initial mixture composition as printed: 79.5 wt% K2CO3 + 20.5 wt% SiO2; 37.3
-                  mol% SiO2.'
-              note: Converted from the printed 998 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id025
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id025
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id025
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id024
-              locator: *id025
-          locator: *id025
-        - row: XI
-          T_C: '898'
-          mass_loss_pct: '66.7'
-          initial_mixture_as_printed: 70.7 wt% K2CO3 + 29.3 wt% SiO2; 48.8 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.512'
-            SiO2: '0.488'
-          composition_wt_percent_as_printed:
-            K2CO3: '70.7'
-            SiO2: '29.3'
-          SiO2_mol_percent_as_printed: '48.8'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id026
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: XI
-                note: 'Table II row XI; initial mixture composition as printed: 70.7 wt% K2CO3 + 29.3 wt% SiO2;
-                  48.8 mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id026
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id026
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id026
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: &id028
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.512'
-                  - - SiO2
-                    - '0.488'
-              locator: *id026
-          locator: *id026
-        - row: XI
-          T_C: '956'
-          mass_loss_pct: '71.3'
-          initial_mixture_as_printed: 70.7 wt% K2CO3 + 29.3 wt% SiO2; 48.8 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.512'
-            SiO2: '0.488'
-          composition_wt_percent_as_printed:
-            K2CO3: '70.7'
-            SiO2: '29.3'
-          SiO2_mol_percent_as_printed: '48.8'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1229.15'
-              locator: &id027
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: XI
-                note: 'Table II row XI; initial mixture composition as printed: 70.7 wt% K2CO3 + 29.3 wt% SiO2;
-                  48.8 mol% SiO2.'
-              note: Converted from the printed 956 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id027
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id027
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id027
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id028
-              locator: *id027
-          locator: *id027
-        - row: XI
-          T_C: '998'
-          mass_loss_pct: '75.9'
-          initial_mixture_as_printed: 70.7 wt% K2CO3 + 29.3 wt% SiO2; 48.8 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.512'
-            SiO2: '0.488'
-          composition_wt_percent_as_printed:
-            K2CO3: '70.7'
-            SiO2: '29.3'
-          SiO2_mol_percent_as_printed: '48.8'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1271.15'
-              locator: &id029
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: XI
-                note: 'Table II row XI; initial mixture composition as printed: 70.7 wt% K2CO3 + 29.3 wt% SiO2;
-                  48.8 mol% SiO2.'
-              note: Converted from the printed 998 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id029
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id029
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id029
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id028
-              locator: *id029
-          locator: *id029
-        - row: XII
-          T_C: '898'
-          mass_loss_pct: '68.4'
-          initial_mixture_as_printed: 69.7 wt% K2CO3 + 30.3 wt% SiO2; 49.9 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.501'
-            SiO2: '0.499'
-          composition_wt_percent_as_printed:
-            K2CO3: '69.7'
-            SiO2: '30.3'
-          SiO2_mol_percent_as_printed: '49.9'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id030
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: XII
-                note: 'Table II row XII; initial mixture composition as printed: 69.7 wt% K2CO3 + 30.3 wt% SiO2;
-                  49.9 mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id030
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id030
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id030
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: &id032
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.501'
-                  - - SiO2
-                    - '0.499'
-              locator: *id030
-          locator: *id030
-        - row: XII
-          T_C: '956'
-          mass_loss_pct: '73.0'
-          initial_mixture_as_printed: 69.7 wt% K2CO3 + 30.3 wt% SiO2; 49.9 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.501'
-            SiO2: '0.499'
-          composition_wt_percent_as_printed:
-            K2CO3: '69.7'
-            SiO2: '30.3'
-          SiO2_mol_percent_as_printed: '49.9'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1229.15'
-              locator: &id031
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: XII
-                note: 'Table II row XII; initial mixture composition as printed: 69.7 wt% K2CO3 + 30.3 wt% SiO2;
-                  49.9 mol% SiO2.'
-              note: Converted from the printed 956 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id031
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id031
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id031
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id032
-              locator: *id031
-          locator: *id031
-        - row: XII
-          T_C: '998'
-          mass_loss_pct: '77.7'
-          initial_mixture_as_printed: 69.7 wt% K2CO3 + 30.3 wt% SiO2; 49.9 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.501'
-            SiO2: '0.499'
-          composition_wt_percent_as_printed:
-            K2CO3: '69.7'
-            SiO2: '30.3'
-          SiO2_mol_percent_as_printed: '49.9'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1271.15'
-              locator: &id033
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: XII
-                note: 'Table II row XII; initial mixture composition as printed: 69.7 wt% K2CO3 + 30.3 wt% SiO2;
-                  49.9 mol% SiO2.'
-              note: Converted from the printed 998 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id033
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id033
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id033
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id032
-              locator: *id033
-          locator: *id033
-        - row: XIII
-          T_C: '898'
-          mass_loss_pct: '74.8'
-          initial_mixture_as_printed: 67.5 wt% K2CO3 + 32.5 wt% SiO2; 52.6 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.474'
-            SiO2: '0.526'
-          composition_wt_percent_as_printed:
-            K2CO3: '67.5'
-            SiO2: '32.5'
-          SiO2_mol_percent_as_printed: '52.6'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1171.15'
-              locator: &id034
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: XIII
-                note: 'Table II row XIII; initial mixture composition as printed: 67.5 wt% K2CO3 + 32.5 wt% SiO2;
-                  52.6 mol% SiO2.'
-              note: Converted from the printed 898 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id034
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id034
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id034
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: &id036
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.474'
-                  - - SiO2
-                    - '0.526'
-              locator: *id034
-          locator: *id034
-        - row: XIII
-          T_C: '956'
-          mass_loss_pct: '79.3'
-          initial_mixture_as_printed: 67.5 wt% K2CO3 + 32.5 wt% SiO2; 52.6 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.474'
-            SiO2: '0.526'
-          composition_wt_percent_as_printed:
-            K2CO3: '67.5'
-            SiO2: '32.5'
-          SiO2_mol_percent_as_printed: '52.6'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1229.15'
-              locator: &id035
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: XIII
-                note: 'Table II row XIII; initial mixture composition as printed: 67.5 wt% K2CO3 + 32.5 wt% SiO2;
-                  52.6 mol% SiO2.'
-              note: Converted from the printed 956 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id035
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id035
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id035
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value: *id036
-              locator: *id035
-          locator: *id035
-        - row: XIV
-          T_C: '998'
-          mass_loss_pct: '91.9'
-          initial_mixture_as_printed: 61.5 wt% K2CO3 + 38.5 wt% SiO2; 59.1 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.409'
-            SiO2: '0.591'
-          composition_wt_percent_as_printed:
-            K2CO3: '61.5'
-            SiO2: '38.5'
-          SiO2_mol_percent_as_printed: '59.1'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1271.15'
-              locator: &id037
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: XIV
-                note: 'Table II row XIV; initial mixture composition as printed: 61.5 wt% K2CO3 + 38.5 wt% SiO2;
-                  59.1 mol% SiO2.'
-              note: Converted from the printed 998 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id037
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id037
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id037
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value:
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.409'
-                  - - SiO2
-                    - '0.591'
-              locator: *id037
-          locator: *id037
-        - row: XV
-          T_C: '956'
-          mass_loss_pct: '91.4'
-          initial_mixture_as_printed: 61.0 wt% K2CO3 + 39.0 wt% SiO2; 59.6 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.404'
-            SiO2: '0.596'
-          composition_wt_percent_as_printed:
-            K2CO3: '61.0'
-            SiO2: '39.0'
-          SiO2_mol_percent_as_printed: '59.6'
-          phase: l
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1229.15'
-              locator: &id038
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: XV
-                note: 'Table II row XV; initial mixture composition as printed: 61.0 wt% K2CO3 + 39.0 wt% SiO2;
-                  59.6 mol% SiO2.'
-              note: Converted from the printed 956 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id038
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id038
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id038
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value:
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.404'
-                  - - SiO2
-                    - '0.596'
-              locator: *id038
-          locator: *id038
-    - observation_id: niggli_1913_table_ii_potassium_solid_reaction_endmember
-      type: mass_loss
-      locator:
-        page: 8
-        pdf_page_index: 7
-        published_page: 1700
-        table: II
-        row: unnumbered-3
-        note: Table II, final unnumbered charge row; this initial mixture is 1 K2CO3 + 2 SiO2.
-      phase: cr
-      units: '%'
-      values:
-        quantity: mass_loss_fraction
-        method_class: quoted_attributed
-        attribution: Niggli (1913), present measurements, Table II; 100% of initial CO2 loss calculated from observed
-          weight loss, whose raw row-wise weights are not tabulated.
-        points:
-        - row: unnumbered-3
-          T_C: '998'
-          mass_loss_pct: '100.0'
-          initial_mixture_as_printed: 53.4 wt% K2CO3 + 46.6 wt% SiO2; 66.7 mol% SiO2
-          composition_mol:
-            basis: printed_mole_fraction
-            K2CO3: '0.333'
-            SiO2: '0.667'
-          composition_wt_percent_as_printed:
-            K2CO3: '53.4'
-            SiO2: '46.6'
-          SiO2_mol_percent_as_printed: '66.7'
-          phase: cr
-          point_conditions:
-            temperature_K:
-              state:
-                tag: value
-                value:
-                  kind: point
-                  point: '1271.15'
-              locator: &id039
-                page: 8
-                pdf_page_index: 7
-                published_page: 1700
-                table: II
-                row: unnumbered-3
-                note: 'Table II row unnumbered-3; initial mixture composition as printed: 53.4 wt% K2CO3 + 46.6
-                  wt% SiO2; 66.7 mol% SiO2.'
-              note: Converted from the printed 998 °C for the condition axis.
-            fO2_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id039
-              note: No oxygen fugacity or buffer is stated.
-            total_pressure_Pa:
-              state:
-                tag: unknown
-                reason: not_published
-              locator: *id039
-              note: The source states pCO2 = 1 atm; it does not separately state total pressure.
-            CO2_partial_pressure_Pa:
-              state:
-                tag: value
-                value: '101325'
-              locator: *id039
-              note: Source states the CO2 partial pressure was kept at 1 atm; stored in Pa for this condition field.
-            composition:
-              state:
-                tag: value
-                value:
-                  basis: printed_mole_fraction
-                  amount_basis: mole_fraction
-                  components:
-                  - - K2CO3
-                    - '0.333'
-                  - - SiO2
-                    - '0.667'
-              locator: *id039
-          locator: *id039
     - observation_id: niggli_1913_k2co3_melting_point_niggli
       type: transition_point
       locator: &id042
@@ -2047,224 +325,348 @@ species:
     - observation_id: niggli_1913_table_ii_co2_displaced_schema_gap
       type: thermodynamic_context
       locator: *id040
-      units: mol CO2 displaced per 100 mol SiO2, as printed
+      units: 'Table II column (a): mol per cent of the initial CO2 content; column (b): mol CO2 displaced per 100 mol SiO2, as printed'
       values:
         quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
-        method_class: quoted_attributed
-        attribution: Niggli (1913), present measurements, Table II; calculated from observed weight loss.
-        schema_gap: No exact quantity token accepts mol CO2 per 100 mol SiO2; see the extract-level schema_gaps
-          record.
+        source_status: Niggli's present measurements
+        reduction_note: Columns (a) and (b) are calculated from measured gravimetric CO2 loss, as described on PDF page 7; rowwise raw weights are not tabulated.
+        column_headers_as_printed:
+          column_a: "loss expressed in mol per cent of the initial CO2 content"
+          column_b: "number of mols CO2 displaced by 100 mols SiO2"
+        schema_gap: >-
+          No exact token represents either printed basis: column (a) is mol per cent of initial CO2 content lost,
+          and column (b) is mol CO2 per 100 mol SiO2. See the extract-level schema_gaps record.
         points:
         - row: I
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '89.6'
-          initial_mixture_as_printed: 96.9 wt% K2CO3 + 3.1 wt% SiO2; 6.9 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '6.6'
           SiO2_mol_percent_as_printed: '6.9'
-          linked_mass_loss_row: I
-          locator: *id001
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "I"
         - row: II
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '92.9'
-          initial_mixture_as_printed: 96.2 wt% K2CO3 + 3.8 wt% SiO2; 8.2 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '8.3'
           SiO2_mol_percent_as_printed: '8.2'
-          linked_mass_loss_row: II
-          locator: *id002
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "II"
         - row: III
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '85.5'
-          initial_mixture_as_printed: 95.3 wt% K2CO3 + 4.7 wt% SiO2; 10.2 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '9.7'
           SiO2_mol_percent_as_printed: '10.2'
-          linked_mass_loss_row: III
-          locator: *id003
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "III"
         - row: IV
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '85.4'
-          initial_mixture_as_printed: 94.9 wt% K2CO3 + 5.1 wt% SiO2; 10.9 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '10.5'
           SiO2_mol_percent_as_printed: '10.9'
-          linked_mass_loss_row: IV
-          locator: *id004
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "IV"
         - row: IV
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '90.9'
-          initial_mixture_as_printed: 94.9 wt% K2CO3 + 5.1 wt% SiO2; 10.9 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '11.1'
           SiO2_mol_percent_as_printed: '10.9'
-          linked_mass_loss_row: IV
-          locator: *id005
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "IV"
         - row: V
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '82.4'
-          initial_mixture_as_printed: 92.5 wt% K2CO3 + 7.5 wt% SiO2; 15.7 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '15.4'
           SiO2_mol_percent_as_printed: '15.7'
-          linked_mass_loss_row: V
-          locator: *id007
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "V"
         - row: V
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '88.9'
-          initial_mixture_as_printed: 92.5 wt% K2CO3 + 7.5 wt% SiO2; 15.7 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '16.6'
           SiO2_mol_percent_as_printed: '15.7'
-          linked_mass_loss_row: V
-          locator: *id008
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "V"
         - row: VI
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '83.1'
-          initial_mixture_as_printed: 90.3 wt% K2CO3 + 9.7 wt% SiO2; 19.8 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '20.5'
           SiO2_mol_percent_as_printed: '19.8'
-          linked_mass_loss_row: VI
-          locator: *id010
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "VI"
         - row: VII
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '79.2'
-          initial_mixture_as_printed: 88.1 wt% K2CO3 + 11.9 wt% SiO2; 23.8 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '24.7'
           SiO2_mol_percent_as_printed: '23.8'
-          linked_mass_loss_row: VII
-          locator: *id011
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "VII"
         - row: VII
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '86.4'
-          initial_mixture_as_printed: 88.1 wt% K2CO3 + 11.9 wt% SiO2; 23.8 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '26.9'
           SiO2_mol_percent_as_printed: '23.8'
-          linked_mass_loss_row: VII
-          locator: *id012
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "VII"
         - row: VII
           T_C: '998'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '91.7'
-          initial_mixture_as_printed: 88.1 wt% K2CO3 + 11.9 wt% SiO2; 23.8 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '28.6'
           SiO2_mol_percent_as_printed: '23.8'
-          linked_mass_loss_row: VII
-          locator: *id014
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "VII"
         - row: VIII
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '77.3'
-          initial_mixture_as_printed: 83.1 wt% K2CO3 + 16.9 wt% SiO2; 31.9 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '36.2'
           SiO2_mol_percent_as_printed: '31.9'
-          linked_mass_loss_row: VIII
-          locator: *id015
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "VIII"
         - row: VIII
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '83.4'
-          initial_mixture_as_printed: 83.1 wt% K2CO3 + 16.9 wt% SiO2; 31.9 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '38.9'
           SiO2_mol_percent_as_printed: '31.9'
-          linked_mass_loss_row: VIII
-          locator: *id016
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "VIII"
         - row: IX
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '75.5'
-          initial_mixture_as_printed: 80.4 wt% K2CO3 + 19.6 wt% SiO2; 36.1 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '42.6'
           SiO2_mol_percent_as_printed: '36.1'
-          linked_mass_loss_row: IX
-          locator: *id018
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "IX"
         - row: IX
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '82.1'
-          initial_mixture_as_printed: 80.4 wt% K2CO3 + 19.6 wt% SiO2; 36.1 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '46.3'
           SiO2_mol_percent_as_printed: '36.1'
-          linked_mass_loss_row: IX
-          locator: *id019
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "IX"
         - row: IX
           T_C: '998'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '86.2'
-          initial_mixture_as_printed: 80.4 wt% K2CO3 + 19.6 wt% SiO2; 36.1 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '48.6'
           SiO2_mol_percent_as_printed: '36.1'
-          linked_mass_loss_row: IX
-          locator: *id021
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "IX"
         - row: X
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '75.5'
-          initial_mixture_as_printed: 79.5 wt% K2CO3 + 20.5 wt% SiO2; 37.3 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '44.8'
           SiO2_mol_percent_as_printed: '37.3'
-          linked_mass_loss_row: X
-          locator: *id022
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "X"
         - row: X
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '81.9'
-          initial_mixture_as_printed: 79.5 wt% K2CO3 + 20.5 wt% SiO2; 37.3 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '48.6'
           SiO2_mol_percent_as_printed: '37.3'
-          linked_mass_loss_row: X
-          locator: *id023
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "X"
         - row: X
           T_C: '998'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '86.4'
-          initial_mixture_as_printed: 79.5 wt% K2CO3 + 20.5 wt% SiO2; 37.3 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '51.4'
           SiO2_mol_percent_as_printed: '37.3'
-          linked_mass_loss_row: X
-          locator: *id025
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "X"
         - row: XI
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '69.7'
-          initial_mixture_as_printed: 70.7 wt% K2CO3 + 29.3 wt% SiO2; 48.8 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '66.7'
           SiO2_mol_percent_as_printed: '48.8'
-          linked_mass_loss_row: XI
-          locator: *id026
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "XI"
         - row: XI
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '74.5'
-          initial_mixture_as_printed: 70.7 wt% K2CO3 + 29.3 wt% SiO2; 48.8 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '71.3'
           SiO2_mol_percent_as_printed: '48.8'
-          linked_mass_loss_row: XI
-          locator: *id027
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "XI"
         - row: XI
           T_C: '998'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '79.4'
-          initial_mixture_as_printed: 70.7 wt% K2CO3 + 29.3 wt% SiO2; 48.8 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '75.9'
           SiO2_mol_percent_as_printed: '48.8'
-          linked_mass_loss_row: XI
-          locator: *id029
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "XI"
         - row: XII
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '68.5'
-          initial_mixture_as_printed: 69.7 wt% K2CO3 + 30.3 wt% SiO2; 49.9 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '68.4'
           SiO2_mol_percent_as_printed: '49.9'
-          linked_mass_loss_row: XII
-          locator: *id030
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "XII"
         - row: XII
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '73.2'
-          initial_mixture_as_printed: 69.7 wt% K2CO3 + 30.3 wt% SiO2; 49.9 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '73.0'
           SiO2_mol_percent_as_printed: '49.9'
-          linked_mass_loss_row: XII
-          locator: *id031
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "XII"
         - row: XII
           T_C: '998'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '77.8'
-          initial_mixture_as_printed: 69.7 wt% K2CO3 + 30.3 wt% SiO2; 49.9 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '77.7'
           SiO2_mol_percent_as_printed: '49.9'
-          linked_mass_loss_row: XII
-          locator: *id033
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "XII"
         - row: XIII
           T_C: '898'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '67.4'
-          initial_mixture_as_printed: 67.5 wt% K2CO3 + 32.5 wt% SiO2; 52.6 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '74.8'
           SiO2_mol_percent_as_printed: '52.6'
-          linked_mass_loss_row: XIII
-          locator: *id034
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "XIII"
         - row: XIII
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '71.4'
-          initial_mixture_as_printed: 67.5 wt% K2CO3 + 32.5 wt% SiO2; 52.6 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '79.3'
           SiO2_mol_percent_as_printed: '52.6'
-          linked_mass_loss_row: XIII
-          locator: *id035
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "XIII"
         - row: XIV
           T_C: '998'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '63.7'
-          initial_mixture_as_printed: 61.5 wt% K2CO3 + 38.5 wt% SiO2; 59.1 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '91.9'
           SiO2_mol_percent_as_printed: '59.1'
-          linked_mass_loss_row: XIV
-          locator: *id037
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "XIV"
         - row: XV
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '61.9'
-          initial_mixture_as_printed: 61.0 wt% K2CO3 + 39.0 wt% SiO2; 59.6 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '91.4'
           SiO2_mol_percent_as_printed: '59.6'
-          linked_mass_loss_row: XV
-          locator: *id038
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "XV"
         - row: unnumbered-3
           T_C: '998'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '50.0'
-          initial_mixture_as_printed: 53.4 wt% K2CO3 + 46.6 wt% SiO2; 66.7 mol% SiO2
+          co2_loss_mol_percent_initial_as_printed: '100.0'
           SiO2_mol_percent_as_printed: '66.7'
-          linked_mass_loss_row: unnumbered-3
-          locator: *id039
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: "II"
+            row: "unnumbered-3"
     - observation_id: niggli_1913_lebeau_pure_carbonate_pressure
       type: historical_context
       locator:
@@ -2346,12 +748,12 @@ species:
         basis: Printed width; confidence level not stated.
       values:
         quantity: transition_temperature
-        method_class: quoted_attributed
+        method_class: author_estimate
+        model: "Midpoint estimate from the printed bracket; solid at 1005 °C and fully melted at 1025 °C."
         property_kind: melting_point
         T_C: '1015'
         value_as_printed: 1015 ± 10 °C
         compound_as_printed: K2Si2O5
-        attribution: Niggli's experimental estimate from the printed solid/liquid bracket.
       point_conditions:
         temperature_K:
           state: {tag: value, value: {kind: point, point: '1288.15'}}
@@ -2407,12 +809,17 @@ species:
     - observation_id: niggli_1913_table_vi_co2_displaced_schema_gap
       type: table_context
       locator: *id041
-      units: mol CO2 displaced per 100 mol SiO2, as printed
+      units: 'Table VI displacement: mol CO2 per 100 mol SiO2; CO2 loss: mol percentage loss, both as printed'
       values:
         quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
-        method_class: quoted_attributed
-        attribution: Niggli (1913), present equilibrium determinations, Table VI; rowwise underlying weight measurements are not tabulated.
-        schema_gap: No exact quantity token accepts mol CO2 per 100 mol SiO2; see the extract-level schema_gaps record.
+        source_status: Niggli's present equilibrium determinations
+        reduction_note: Niggli reports the CO2 loss and displaced-mole values from observed weight loss; rowwise raw weights are not tabulated.
+        column_headers_as_printed:
+          displaced_CO2: "mols CO2 displaced by 100 mols SiO2"
+          CO2_loss: "Mol percentage loss of CO2"
+        schema_gap: >-
+          No exact token represents either printed basis: the 956 °C loss values are mol percentage loss of CO2,
+          and the displaced-mole values are mol CO2 per 100 mol SiO2. See the extract-level schema_gaps record.
         system_as_printed: Na2CO3 + SiO2
         conditions_as_printed: The system was investigated at 898 °C and 956 °C under one atmosphere of carbon dioxide (PDF page 22).
         points:
@@ -2429,7 +836,7 @@ species:
         - row: II
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '182'
-          SiO2_mol_percent_as_printed: '8.0'
+          co2_loss_mol_percent_initial_as_printed: '15.8'
           locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: II}
         - row: III
           T_C: '898'
@@ -2439,7 +846,7 @@ species:
         - row: III
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '169'
-          SiO2_mol_percent_as_printed: '10.1'
+          co2_loss_mol_percent_initial_as_printed: '19.1'
           locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: III}
         - row: IV
           T_C: '898'
@@ -2454,7 +861,7 @@ species:
         - row: V
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '160'
-          SiO2_mol_percent_as_printed: '12.5'
+          co2_loss_mol_percent_initial_as_printed: '22.8'
           locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: V}
         - row: VI
           T_C: '898'
@@ -2464,22 +871,22 @@ species:
         - row: VII
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '144'
-          SiO2_mol_percent_as_printed: '22.3'
+          co2_loss_mol_percent_initial_as_printed: '41.7'
           locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: VII}
         - row: VIII
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '140'
-          SiO2_mol_percent_as_printed: '23.2'
+          co2_loss_mol_percent_initial_as_printed: '42.6'
           locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: VIII}
         - row: IX
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '141'
-          SiO2_mol_percent_as_printed: '25.6'
+          co2_loss_mol_percent_initial_as_printed: '48.6'
           locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: IX}
         - row: X
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '138'
-          SiO2_mol_percent_as_printed: '26.1'
+          co2_loss_mol_percent_initial_as_printed: '50.0'
           locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: X}
         - row: XI
           T_C: '956'
@@ -2490,7 +897,7 @@ species:
         - row: XII
           T_C: '956'
           co2_displaced_mol_per_100_mol_sio2_as_printed: '134'
-          SiO2_mol_percent_as_printed: '33.1'
+          co2_loss_mol_percent_initial_as_printed: '66.4'
           locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: XII}
     - observation_id: niggli_1913_table_viii_na_comparison
       type: table_context
