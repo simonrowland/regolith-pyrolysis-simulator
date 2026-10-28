@@ -271,7 +271,7 @@ def test_na_metallothermic_standard_gibbs_matches_liquid_activity_reference():
     # one-sided limit without a finite-offset probe.
     alpha_na2o_segment = next(
         segment
-        for segment in ellingham_fit_segments("Na")
+        for segment in reversed(ellingham_fit_segments("Na"))
         if "Na2O(alpha)" in segment.phase_basis
     )
     melting_temperature_K = 1405.2
@@ -292,19 +292,18 @@ def test_na_metallothermic_standard_gibbs_matches_liquid_activity_reference():
         abs=1e-3,
     )
 
-    # Keep the existing green-path discontinuity explicit until physics ticket
-    # b-959 reconciles the liquid fit at/above Tm with the JANAF alpha limit.
+    # b-959: JANAF alpha and liquid standard potentials coexist at Tm.
     liquid_delta_g_at_tm = ellingham_delta_g_kj_per_mol_o2(
         "Na",
         melting_temperature_K,
     )
     assert liquid_delta_g_at_tm - alpha_delta_g_at_tm == pytest.approx(
-        1.3262736,
+        0.0,
         abs=1e-6,
     )
 
 
-def test_na_standard_state_at_and_above_melting_keeps_ellingham_path():
+def test_na_standard_state_at_and_above_melting_uses_janaf_ellingham_owner():
     melting_temperature_C = 1405.2 - CELSIUS_TO_KELVIN_OFFSET
     for temperature_C in (
         melting_temperature_C,
@@ -325,11 +324,11 @@ def test_na_standard_state_at_and_above_melting_keeps_ellingham_path():
         )
         if temperature_C == 1150.0:
             assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
-                -371.612616
+                -372.763965
             )
 
 
-def test_na_feo_crossover_margin_at_1181_5_c_keeps_green_value():
+def test_na_feo_margin_at_1181_5_c_reflects_janaf_liquid_reground():
     _priority, diagnostic = (
         BuiltinMetallothermicStepProvider._na_thermo_priority(
             ("FeO",),
@@ -338,7 +337,7 @@ def test_na_feo_crossover_margin_at_1181_5_c_keeps_green_value():
         )
     )
     assert diagnostic["margin"]["FeO"] == pytest.approx(
-        -0.001828,
+        0.7894134,
         abs=1e-6,
     )
 
@@ -728,7 +727,7 @@ def test_crossover_temperature_C_has_single_runtime_helper():
     assert source.count("def _crossover_temperature_C(") == 1
     assert BuiltinMetallothermicStepProvider._crossover_temperature_C(
         "Na", "Fe"
-    ) == pytest.approx(1181.5, abs=0.5)
+    ) == pytest.approx(1184.0, abs=0.5)
     assert BuiltinMetallothermicStepProvider._crossover_temperature_C(
         "K", "Fe"
     ) == pytest.approx(836.25, abs=0.5)

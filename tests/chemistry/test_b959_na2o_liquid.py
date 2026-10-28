@@ -2,27 +2,11 @@
 
 import pytest
 
-from simulator.chemistry.ellingham_thermo import ellingham_fit_segments
 from simulator.chemistry.ellingham_thermo import (
     _na_activity_reference_standard_delta_g_kj_per_mol_o2,
+    ellingham_delta_g_kj_per_mol_o2,
+    ellingham_fit_segments,
 )
-
-
-@pytest.mark.parametrize(
-    ("temperature_K", "expected_hex"),
-    [
-        (1200.0, "-0x1.e3d810624dd2fp+8"),
-        (1400.0, "-0x1.8014fdf3b645ap+8"),
-        (1405.2, "-0x1.7c2ee3fe41b9ep+8"),
-        (3001.0, "0x1.5c8dd28d002e4p+8"),
-    ],
-)
-def test_standard_state_owner_move_is_bit_identical(temperature_K, expected_hex):
-    # Temporary numeric identity proof committed before the owner move.
-    # The physics commit replaces these legacy pins with JANAF assertions.
-    assert _na_activity_reference_standard_delta_g_kj_per_mol_o2(
-        temperature_K
-    ).hex() == expected_hex
 
 
 @pytest.mark.parametrize(
@@ -33,8 +17,13 @@ def test_standard_state_owner_move_is_bit_identical(temperature_K, expected_hex)
         # Two Na2O form per O2. At 1423.15 K (1150 C), linear interpolation
         # of the printed 1400/1500 K rows, then doubling, gives -372.763965.
         (1423.15, -372.763965),
+        (1405.2, -381.539720),
         (1500.0, -335.192),
         (1600.0, -286.896),
+        (1800.0, -191.948),
+        (2000.0, -98.976),
+        (2200.0, -7.772),
+        (2600.0, 169.992),
     ],
 )
 def test_liquid_standard_gibbs_matches_janaf_above_melting(
@@ -50,9 +39,31 @@ def test_liquid_and_alpha_standard_gibbs_coexist_at_melting():
     # At a first-order transition the two chemical potentials coincide.
     alpha = next(
         segment
-        for segment in ellingham_fit_segments("Na")
+        for segment in reversed(ellingham_fit_segments("Na"))
         if "Na2O(alpha)" in segment.phase_basis
     )
     assert _na_activity_reference_standard_delta_g_kj_per_mol_o2(
         1405.2
     ) == pytest.approx(alpha.delta_g_kJ_per_mol_O2(1405.2), abs=0.001)
+
+
+def test_na2o_janaf_fusion_enthalpy_and_alpha_rows():
+    segments = ellingham_fit_segments("Na")
+    alpha = next(s for s in segments if s.range_K[1] == 1405.2)
+    liquid = next(s for s in segments if s.range_K[0] == 1405.2)
+    # JANAF Na-013/Na-014 transition enthalpy increments and 1400 K
+    # formation H rows give ΔH_fus=47.696 kJ/mol Na2O (see source owner).
+    assert (liquid.dH_f_kJ_per_mol_O2 - alpha.dH_f_kJ_per_mol_O2) / 2 == (
+        pytest.approx(47.696, abs=1e-9)
+    )
+    # Na-014 alpha ΔfG column: 1300 K -220.358; 1400 K -192.218 kJ/mol.
+    assert ellingham_delta_g_kj_per_mol_o2("Na", 1300) == pytest.approx(
+        -440.716, abs=0.001
+    )
+    assert ellingham_delta_g_kj_per_mol_o2("Na", 1400) == pytest.approx(
+        -384.436, abs=0.001
+    )
+    before_1400 = next(s for s in segments if s.range_K[1] == 1400.0)
+    assert before_1400.delta_g_kJ_per_mol_O2(1400.0) == pytest.approx(
+        alpha.delta_g_kJ_per_mol_O2(1400.0), abs=1e-9
+    )

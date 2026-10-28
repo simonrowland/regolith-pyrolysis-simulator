@@ -220,14 +220,12 @@ def test_evolution_order_sio_rises_under_hard_vacuum(vapor_pressure_data) -> Non
 
 
 def test_crossover_temperature_na_fe_near_mandate() -> None:
-    # Anchor = the JANAF-4th MULTIPHASE Na/Fe crossover from the Chase 1998 primary
-    # ΔG grid (the 2026-07-09 re-ground fit reproduces that grid to <0.5 kJ/mol_O2).
-    # It REPLACES the earlier linear-refit anchor 1173.4 C: the multiphase alkali line
-    # changes slope after the Na boiling point (1156 K), so its intersection with the
-    # Fe line moves +~8 C. Independent JANAF-4th extraction (grok-68889) corroborates
-    # (~1184 C). Mandate CLAUDE.md §4 and chemistry-methods §7.2 updated to match.
+    # JANAF Na-013 liquid rows 1400/1500 K (-192.041/-167.596 kJ/mol)
+    # replace the unconstrained Na liquid fit in b-959. Their intersection
+    # with the Fe-020 rail is near 1184 C, consistent with the independent
+    # JANAF extraction, rather than the old fit's 1181.5 C.
     assert ellingham_graph.crossover_temperature("Na", "Fe") == pytest.approx(
-        1181.5,
+        1184.0,
         abs=0.5,
     )
 

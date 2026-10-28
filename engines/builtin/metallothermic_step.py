@@ -1839,7 +1839,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         """Return the oxide-stability crossover temperature in Celsius.
 
         V1c JANAF refit crossovers used by the alkali-shuttle diagnostic:
-        K/Fe = 836.25 C, Na/Fe = 1181.5 C. Above a pair's crossover, the
+        K/Fe = 836.25 C, Na/Fe about 1183.67 C (b-959 liquid JANAF rows).
+        Above a pair's crossover, the
         reagent oxide is less stable than the target oxide, so reduction is
         thermodynamically disfavored; current recipe gates remain handled
         outside this helper. Returns None when the algebraic root falls
@@ -1919,7 +1920,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         # strongly negative, so C3 may accept Cr2O3 while refusing TiO2.
         # FeO likewise keeps the raw Na/Fe crossover executable: the
         # NaO0.5 activity diagnostic must not turn a standard-state-negative
-        # dispatch above 1181.5 C into an accepted reduction.
+        # dispatch above the Na/Fe crossover into an accepted reduction.
         if "FeO" in margin:
             margin["FeO"] = min(
                 margin["FeO"],
