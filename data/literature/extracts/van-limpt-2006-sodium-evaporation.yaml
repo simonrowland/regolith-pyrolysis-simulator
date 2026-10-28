@@ -1,7 +1,7 @@
 schema_version: literature_extract.v1
 source_id: van-limpt-2006-sodium-evaporation
 source:
-  citation: Van Limpt, H., Beerkens, R. G. C., et al. (2006), Models and experiments for sodium evaporation from sodium-containing silicate melts, Journal of the American Ceramic Society, 89(11), 3449–3457.
+  citation: Van Limpt, H., Beerkens, R. G. C., et al. (2006), Models and experiments for sodium evaporation from sodium-containing silicate melts, Journal of the American Ceramic Society, 89(11), 3446–3455.
   doi: 10.1111/j.1551-2916.2006.01233.x
   year: 2006
   corpus_asset: raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf
@@ -12,24 +12,34 @@ extraction:
   provenance_path: data/literature/extracts/audits/van-limpt-2006-sodium-evaporation.mapping.yaml
 review_status: draft
 schema_gaps:
-  - The reported total sodium rate is a molar areal flux (mol·m-2·s-1); no quantity token has this basis, so it is retained as a typed-refused rate_series observation.
-  - Table II reports total Na2O loss in mg and an extractive-to-gravimetric ratio, not a rate or fraction. No quantity token fits these forms; the six mass-loss rows are typed-refused, and the ratio is retained in context.
-  - Numerical Na(g), NaOH(g) saturation-pressure and Na2O-activity values occur only in Figures 3, 4, 6, and 7 and are not digitized in this wave; the prose's relative Na2O-activity comparison is retained as a typed refusal.
+  - The reported total sodium rate is a molar areal flux (mol·m-2·s-1); simulator/battery/enums.py has no matching quantity token, so its printed values remain unavailable with quantity unknown.
+  - Table II reports total Na2O loss in mg and an extractive-to-gravimetric ratio, not a rate or fraction. simulator/battery/enums.py has no matching quantity token for these forms; the six mass-loss rows remain unavailable with quantity unknown, and the ratio is retained in context.
+  - Numerical Na(g), NaOH(g) saturation-pressure and Na2O-activity values occur only in Figures 3, 4, 6, and 7 and are not digitized in this wave; the prose's relative Na2O-activity comparison remains unavailable with quantity unknown because simulator/battery/enums.py has no matching token for this relative comparison.
 species:
   Na:
     observations:
-    - observation_id: van_limpt_2006_measured_total_na_evaporation_rates
+    - observation_id: van_limpt_2006_measured_total_na_evaporation_rate_at_1400C
       type: rate_series
       locator: {page: 6, note: 'Results V(1), redox-carrier-gas comparison'}
-      regime: transpiration_evaporation
+      regime: transpiration
       units: mol·m-2·s-1
+      derivation:
+        relation: Total sodium molar areal flux reduced from ICP-ES sodium concentrations, carrier-gas volume flow, and experiment duration in the transpiration tests.
+        output_unit: mol·m-2·s-1
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 6, note: ICP-ES concentrations used for the transpiration reduction are not individually printed.}
+      point_conditions:
+        composition: {state: {tag: value, value: {basis: stoichiometric_formula, amount_basis: mole_fraction, components: [[SiO2, '0.6666666666666666666666666667'], [Na2O, '0.3333333333333333333333333333']]}}, locator: {page: 6, note: sodium-disilicate melt named in Results V(1)}}
+        gas_mix: {state: {tag: value, value: 'N2/H2O or air/H2O'}, locator: {page: 6, note: the rate range is reported for the two compared experiments}}
+        carrier_gas_flow_m3n_s: {state: {tag: value, value: '1.6E-4'}, locator: {page: 6, note: 'normalized carrier-gas flow reported for both experiments'}}
+        H2O_partial_pressure_bar: {state: {tag: value, value: '0.25 ± 0.01'}, locator: {page: 6, note: shared carrier-gas condition}}
+        oxygen_partial_pressure_bar_by_gas: {state: {tag: value, value: {N2_H2O: '<0.01', air_H2O: '~0.16'}}, locator: {page: 6, note: atmosphere-specific O2 partial pressures}}
       values:
-        quantity: evaporation_rate
         quantity_label: total sodium molar areal evaporation flux
-        measurement_status: typed_refusal_schema_gap
         phase: l
-        schema_gap: No quantity token accepts total sodium molar areal flux in mol·m-2·s-1.
-        method_class: quoted_attributed
+        schema_gap: simulator/battery/enums.py has no quantity token for total sodium molar areal flux in mol·m-2·s-1.
+        method_class: measured_reduced
         attribution: Author-reported rates calculated from ICP-ES sodium concentrations in collected wash solutions, carrier-gas volume flow, and experiment duration; individual concentrations are not printed.
         melt_composition_as_printed: Na2O·2SiO2 (sodium disilicate)
         carrier_gas_experiments: [N2/H2O, air/H2O]
@@ -42,59 +52,88 @@ species:
         no_total_experiment_pressure: true
         composition_derivation: Formula stoichiometry encoded as mole fractions for the existing composition identity path.
         composition_mol: {basis: stoichiometric_formula, amount_basis: mole_fraction, SiO2: '0.6666666666666666666666666667', Na2O: '0.3333333333333333333333333333'}
-        points:
-        - T_C: '1400'
-          rate_range_mol_m2_s_as_printed: ['6.7 × 10^-5', '7.4 × 10^-5']
-          value_as_printed: '6.7 × 10^-5 to 7.4 × 10^-5'
-          note: The paper does not assign either endpoint to one carrier-gas experiment.
-          point_conditions:
-            composition: {state: {tag: value, value: {basis: stoichiometric_formula, amount_basis: mole_fraction, components: [[SiO2, '0.6666666666666666666666666667'], [Na2O, '0.3333333333333333333333333333']]}}, locator: {page: 6, note: sodium-disilicate melt named in Results V(1)}}
-            gas_mix: {state: {tag: value, value: 'N2/H2O or air/H2O'}, locator: {page: 6, note: the rate range is reported for the two compared experiments}}
-            carrier_gas_flow_m3n_s: {state: {tag: value, value: '1.6E-4'}, locator: {page: 6, note: 'normalized carrier-gas flow reported for both experiments'}}
-            H2O_partial_pressure_bar: {state: {tag: value, value: '0.25 ± 0.01'}, locator: {page: 6, note: shared carrier-gas condition}}
-            oxygen_partial_pressure_bar_by_gas: {state: {tag: value, value: {N2_H2O: '<0.01', air_H2O: '~0.16'}}, locator: {page: 6, note: atmosphere-specific O2 partial pressures}}
-        - T_C_range: ['1450', '1460']
-          value_as_printed: '~1.2 × 10^-4'
-          note: The paper says the two experiments have nearly identical rates.
-          point_conditions:
-            composition: {state: {tag: value, value: {basis: stoichiometric_formula, amount_basis: mole_fraction, components: [[SiO2, '0.6666666666666666666666666667'], [Na2O, '0.3333333333333333333333333333']]}}, locator: {page: 6, note: sodium-disilicate melt named in Results V(1)}}
-            gas_mix: {state: {tag: value, value: 'N2/H2O and air/H2O'}, locator: {page: 6, note: rates are nearly identical for both compared experiments}}
-            carrier_gas_flow_m3n_s: {state: {tag: value, value: '1.6E-4'}, locator: {page: 6, note: 'normalized carrier-gas flow reported for both experiments'}}
-            H2O_partial_pressure_bar: {state: {tag: value, value: '0.25 ± 0.01'}, locator: {page: 6, note: shared carrier-gas condition}}
-            oxygen_partial_pressure_bar_by_gas: {state: {tag: value, value: {N2_H2O: '<0.01', air_H2O: '~0.16'}}, locator: {page: 6, note: atmosphere-specific O2 partial pressures}}
+        T_C: '1400'
+        rate_range_mol_m2_s_as_printed: ['6.7 × 10^-5', '7.4 × 10^-5']
+        value_as_printed: '6.7 × 10^-5 to 7.4 × 10^-5'
+        note: The paper does not assign either endpoint to one carrier-gas experiment.
+    - observation_id: van_limpt_2006_measured_total_na_evaporation_rate_at_1450_1460C
+      type: rate_series
+      locator: {page: 6, note: 'Results V(1), redox-carrier-gas comparison'}
+      regime: transpiration
+      units: mol·m-2·s-1
+      derivation:
+        relation: Total sodium molar areal flux reduced from ICP-ES sodium concentrations, carrier-gas volume flow, and experiment duration in the transpiration tests.
+        output_unit: mol·m-2·s-1
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 6, note: ICP-ES concentrations used for the transpiration reduction are not individually printed.}
+      point_conditions:
+        composition: {state: {tag: value, value: {basis: stoichiometric_formula, amount_basis: mole_fraction, components: [[SiO2, '0.6666666666666666666666666667'], [Na2O, '0.3333333333333333333333333333']]}}, locator: {page: 6, note: sodium-disilicate melt named in Results V(1)}}
+        gas_mix: {state: {tag: value, value: 'N2/H2O and air/H2O'}, locator: {page: 6, note: rates are nearly identical for both compared experiments}}
+        carrier_gas_flow_m3n_s: {state: {tag: value, value: '1.6E-4'}, locator: {page: 6, note: 'normalized carrier-gas flow reported for both experiments'}}
+        H2O_partial_pressure_bar: {state: {tag: value, value: '0.25 ± 0.01'}, locator: {page: 6, note: shared carrier-gas condition}}
+        oxygen_partial_pressure_bar_by_gas: {state: {tag: value, value: {N2_H2O: '<0.01', air_H2O: '~0.16'}}, locator: {page: 6, note: atmosphere-specific O2 partial pressures}}
+      values:
+        quantity_label: total sodium molar areal evaporation flux
+        phase: l
+        schema_gap: simulator/battery/enums.py has no quantity token for total sodium molar areal flux in mol·m-2·s-1.
+        method_class: measured_reduced
+        attribution: Author-reported rates calculated from ICP-ES sodium concentrations in collected wash solutions, carrier-gas volume flow, and experiment duration; individual concentrations are not printed.
+        melt_composition_as_printed: Na2O·2SiO2 (sodium disilicate)
+        carrier_gas_experiments: [N2/H2O, air/H2O]
+        p_H2O_bar_as_printed: '0.25 ± 0.01'
+        p_H2O_uncertainty_note: confidence level not stated
+        p_O2_bar_N2_H2O_as_printed: '<0.01'
+        p_O2_bar_air_H2O_as_printed: '~0.16'
+        normalized_gas_flow_m3n_s_as_printed: '1.6E-4'
+        gas_flow_normalization_as_printed: 'T = 293.15 K and P = 101325 Pa; this is flow normalization, not the experiment pressure.'
+        no_total_experiment_pressure: true
+        composition_derivation: Formula stoichiometry encoded as mole fractions for the existing composition identity path.
+        composition_mol: {basis: stoichiometric_formula, amount_basis: mole_fraction, SiO2: '0.6666666666666666666666666667', Na2O: '0.3333333333333333333333333333'}
+        T_C_range: ['1450', '1460']
+        T_range_K: ['1723.15', '1733.15']
+        value_as_printed: '~1.2 × 10^-4'
+        note: The paper says the two experiments have nearly identical rates.
   Na2O:
     observations:
     - observation_id: van_limpt_2006_p007_na2o_activity_relative_to_original_glass
       type: activity_coefficient
       locator: {page: 7, note: 'Results V(3), measured chemical activities of Na2O'}
-      regime: transpiration_evaporation
+      regime: transpiration
       units: relative percent as printed
+      derivation:
+        relation: Relative Na2O surface activity summary reduced from ICP-ES measurements in the transpiration tests.
+        output_unit: relative percent
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 7, note: Numeric activity points and underlying ICP-ES concentrations are not printed in this comparison.}
       values:
-        quantity: activity
         quantity_label: Na2O activity relative to the original glass sample
-        measurement_status: typed_refusal_relative_to_reference
         phase: l
-        method_class: quoted_attributed
+        method_class: measured_reduced
         attribution: The authors summarize measured Na2O surface activities derived from the transpiration tests; point values are shown only in Figures 6 and 7 and are not digitized here.
-        schema_gap: The paper reports only a relative-to-original-glass comparison, not an absolute Na2O activity value.
+        schema_gap: simulator/battery/enums.py has no quantity token for a relative-to-original-glass Na2O activity comparison.
         value_as_printed: about 10–15% lower
         reference: original glass sample Na2O surface activity
         melt_composition_as_printed: both sodium-disilicate and soda-lime-silicate melts
-        T_C_range_as_printed: ['1400', '1500']
-        duration_as_printed: about 6 h
         atmosphere_as_printed: not specified for this comparison
     - observation_id: van_limpt_2006_p007_t02_sodium_disilicate_mass_balance
       type: mass_loss
       locator: {page: 7, table: 'II'}
-      regime: transpiration_evaporation
+      regime: transpiration
       units: mg and dimensionless
+      derivation:
+        relation: Extractive Na2O-equivalent mass loss reduced from ICP-ES sodium measurements in the transpiration experiments; gravimetric weight loss is the separate direct weighing column.
+        output_unit: mg
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 7, table: 'II', note: Individual ICP-ES sodium measurements used for the extractive column are not printed.}
       values:
-        quantity: mass_loss_fraction
         quantity_label: absolute total Na2O loss mass as printed in mg, not a fraction
-        measurement_status: typed_refusal_schema_gap
         phase: l
-        schema_gap: Total mass loss and a ratio of mass-loss methods have no matching quantity token.
-        method_class: measured_direct
+        schema_gap: simulator/battery/enums.py has no quantity token for absolute total Na2O mass loss in mg.
+        method_class: measured_reduced
+        attribution: Extractive sampling reports Na2O-equivalent mass loss reduced from ICP-ES sodium measurements in the transpiration experiments; the separate gravimetric column is the direct weighing.
         melt_composition_as_printed: sodium-disilicate melts
         composition_mol: {basis: stoichiometric_formula, amount_basis: mole_fraction, SiO2: '0.6666666666666666666666666667', Na2O: '0.3333333333333333333333333333'}
         composition_derivation: Table caption names sodium disilicate; its printed formula is Na2O·2SiO2.
@@ -162,6 +201,6 @@ fidelity_samples:
   - {table_row_number: 6, T_C: '1454', value: '1.00', locator: {page: 7, table: 'II'}}
   - {table_row_number: 7, T_C: '1356', value: '1.21', locator: {page: 7, table: 'II'}}
   locator: {page: 7, table: 'II'}
-- path: species.Na.observations[van_limpt_2006_measured_total_na_evaporation_rates].values.points[1].value_as_printed
+- path: species.Na.observations[van_limpt_2006_measured_total_na_evaporation_rate_at_1450_1460C].values.value_as_printed
   value: '~1.2 × 10^-4'
   locator: {page: 6, note: 'Results V(1), measured rate summary'}
