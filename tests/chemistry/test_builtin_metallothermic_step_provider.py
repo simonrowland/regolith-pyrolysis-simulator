@@ -1882,6 +1882,7 @@ def test_c3_na_shuttle_bakes_out_reaction_product_after_native_na2o(
 
     sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
 
+    assert ledger.origin_attribution_methods_by_account()["process.cleaned_melt"]["Na"] == "pool_ratio"
     na_dosed_mol = reagent_na_before - ledger.mol_by_account(
         "process.reagent_inventory"
     )["Na"]
