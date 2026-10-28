@@ -60,6 +60,19 @@ def test_cooling_row_keeps_a_checked_zero():
     assert point.liquid_fraction == 0
 
 
+@pytest.mark.parametrize('native_fraction,phase_fraction', [
+    (0.0, 0.0), (0.333333, 1 / 3), (1.0, 1.0),
+])
+def test_cooling_row_native_fraction_numeric_pin(native_fraction, phase_fraction):
+    system, phases = _tables(1200, phase_fraction, liquid=phase_fraction > 0)
+    system = system.replace(f'100 {phase_fraction} ', f'100 {native_fraction} ')
+    point = AlphaMELTSBackend()._parse_gate_cooling_row(
+        system, phases, temperature_C=1200, pressure_bar=1, fO2_log=-2,
+    )
+    # Preserve native table rounding even when phase masses imply more digits.
+    assert point.liquid_fraction.hex() == native_fraction.hex()
+
+
 def test_cooling_row_requires_system_and_finite_phase_thermodynamics():
     backend = AlphaMELTSBackend()
     with pytest.raises(ValueError, match='system header'):
