@@ -3697,7 +3697,13 @@ def test_closed_all_ferrous_vapor_activity_uses_ledger_split_at_iw_bound(
     bound_notice, = (n for n in notices if n['code'] == 'FE_FEO_SATURATION_BOUND')
     assert bound_notice['bound'] == 'lower'
     assert bound_notice['fO2_log'] == potential
-    assert 'provider' not in summary['high_t_melt_activity']
+    # Activity activation has its own domain below the separate vapour cap.
+    assert vapor_pressure_module.openimcc_binding_selected_by_inputs(
+        temperature_K=1873.15, controls={}, quantity_class='activity')
+    assert not vapor_pressure_module.openimcc_binding_selected_by_inputs(
+        temperature_K=1873.15, controls={}, quantity_class='vapour')
+    assert summary['high_t_melt_activity']['provider'] == 'openimcc'
+    assert summary['high_t_melt_activity']['above_vaporock_cap'] is False
 
 
 def test_closed_vapor_activity_uses_actual_ferric_inventory(vapor_pressure_data):
