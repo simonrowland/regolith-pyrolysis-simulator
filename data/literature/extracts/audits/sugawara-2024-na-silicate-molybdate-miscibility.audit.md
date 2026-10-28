@@ -88,3 +88,19 @@ as an empty cell. Numeric zeroes are kept as printed.
   The comparator only sees observations; all source table rows in this extract
   are deliberately context, so this is an empty comparison rather than a
   fidelity claim.
+
+## Verification
+
+- Focused extraction test and YAML flow-scalar comma guard: 18 passed.
+- Mutation check: changing the first rendered Table 1 SiO2 value from `43.50`
+  to `43.51` made the focused render assertion fail; the committed extract was
+  then restored and the focused test and comma guard passed again.
+- The combined literature, comma-guard, and focused run completed 655 passed
+  and 3 failed. The failures were the repo-wide validator, coverage-pending,
+  and merge-smoke tests; each exceeded the existing 300-second per-test
+  timeout while loading the full corpus through PyYAML. The focused
+  `test_repo_extracts_validate_green` check passed separately with the focused
+  extraction test in 157 seconds before this resource-contended run.
+- No battery-store regeneration was performed. Expected store delta: zero
+  observations; the migration carries four context rows and queues the source
+  document as unavailable because the current schema has no matching types.
