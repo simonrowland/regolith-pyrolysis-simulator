@@ -3719,8 +3719,8 @@ def test_magemin_live_adapter_path_fO2_changes_shadow_response():
     This intentionally drives the production adapter path
     (``_build_ig_bulk_vector`` + ``_resolve_buffer``). P3-F real-binary probes
     showed MAGEMin's qfm buffer changes GAM[O] only when ig O is nonzero; the
-    adapter provisions O from explicit Fe2O3 or from the total-iron-as-FeO
-    inventory when no ferric split is reported.
+    adapter takes O only from the owner's explicit Fe2O3 decomposition or
+    an explicit O input, preserving the prepared oxide inventory.
     """
     binary = _LIVE_MAGEMIN_BINARY
     reduced = _run_magemin_adapter_buffer_probe(binary, fO2_log=-12.0)
