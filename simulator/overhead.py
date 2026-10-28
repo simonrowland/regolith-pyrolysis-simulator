@@ -967,9 +967,135 @@ class OverheadGasModel:
                 overload_notice={
                     **flow.overload_notice,
                     'predicted_pressure_bar': pressure_bar,
+                    'requested_pressure_bar': flow.upstream_pressure_bar,
+                    'resolved_pressure_bar': pressure_bar,
                 },
             )
         return flow
+
+    def _solve_overloaded_evaporation_flux(
+        self,
+        melt: MeltState,
+        *,
+        equilibrium_partials_Pa: Mapping[str, float],
+        p_downstream_bar: float,
+        fixed_inlet_kg_hr: float = 0.0,
+        flux_at_partials: Callable[[Mapping[str, float]], EvaporationFlux],
+    ) -> tuple[EvaporationFlux, float]:
+        """Solve evaporation back-pressure for an already overloaded pipe."""
+        partials_by_species = {}
+        for species, raw_pressure in equilibrium_partials_Pa.items():
+            pressure = float(raw_pressure)
+            if not math.isfinite(pressure) or pressure < 0.0:
+                raise OverheadConfigurationError(
+                    'overloaded evaporation requires finite nonnegative partial pressures'
+                )
+            if pressure > 0.0:
+                partials_by_species[str(species)] = pressure
+        equilibrium_pressure_Pa = sum(partials_by_species.values())
+        if (
+            not partials_by_species
+            or not math.isfinite(equilibrium_pressure_Pa)
+            or equilibrium_pressure_Pa <= 0.0
+        ):
+            raise OverheadConfigurationError(
+                'overloaded evaporation requires finite equilibrium partial pressures'
+            )
+
+        setpoint_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)
+        downstream_pressure_bar = float(p_downstream_bar)
+        if not math.isfinite(downstream_pressure_bar) or downstream_pressure_bar < 0.0:
+            raise OverheadConfigurationError(
+                'overloaded evaporation requires a finite nonnegative downstream pressure'
+            )
+        downstream_Pa = downstream_pressure_bar * 1.0e5
+        fixed_inlet_kg_hr = float(fixed_inlet_kg_hr)
+        if not math.isfinite(fixed_inlet_kg_hr) or fixed_inlet_kg_hr < 0.0:
+            raise OverheadConfigurationError(
+                'overloaded evaporation requires a finite nonnegative fixed inlet'
+            )
+        fraction_by_species = {
+            species: pressure / equilibrium_pressure_Pa
+            for species, pressure in partials_by_species.items()
+        }
+
+        def evaluate(pressure_Pa: float) -> tuple[EvaporationFlux, float]:
+            trial_partials_Pa = {
+                species: fraction * pressure_Pa
+                for species, fraction in fraction_by_species.items()
+            }
+            flux = flux_at_partials(trial_partials_Pa)
+            outflow_kg_hr = self._pipe_conductance(
+                pressure_Pa,
+                float(melt.temperature_C),
+                p_downstream_Pa=downstream_Pa,
+                species_kg_for_M_avg=flux.species_kg_hr,
+            ) * 3600.0
+            inlet_kg_hr = float(flux.total_kg_hr) + fixed_inlet_kg_hr
+            return flux, inlet_kg_hr - outflow_kg_hr
+
+        lower_flux, lower_residual = evaluate(setpoint_Pa)
+        # Premise: the provider returns a series-resistance evaporation rate
+        # whose species partial pressures scale with the admitted no-flow
+        # equilibrium mixture; increasing total P_h lowers that rate. Any
+        # already-admitted inlet/holdup drain remains fixed during these
+        # provider-only trials. The pipe law raises outflow as
+        # k(P_h²-P₂²), so the residual has one root between the requested
+        # setpoint and the no-flow pressure sum(P_eq,i) when evaporation is
+        # the only inlet. If a separate admitted inlet remains at that upper
+        # bound, double P_h until its flow also brackets the root. Units:
+        # both terms are kg/hr; the pipe owner converts Pa² through its
+        # existing conductance to kg/s, then seconds to hours. At the
+        # no-overload limit the root is the setpoint, and the caller leaves
+        # the old path untouched without invoking this solver.
+        if lower_residual <= 0.0:
+            return lower_flux, setpoint_Pa
+        if equilibrium_pressure_Pa <= setpoint_Pa:
+            raise OverheadConfigurationError(
+                'overloaded evaporation has no setpoint-to-equilibrium pressure bracket'
+            )
+
+        upper_Pa = equilibrium_pressure_Pa
+        _, upper_residual = evaluate(upper_Pa)
+        for _ in range(50):
+            if upper_residual <= 0.0:
+                break
+            upper_Pa *= 2.0
+            if not math.isfinite(upper_Pa):
+                break
+            _, upper_residual = evaluate(upper_Pa)
+        else:
+            upper_residual = math.inf
+        if upper_residual > 0.0:
+            raise OverheadConfigurationError(
+                'overloaded evaporation did not reach a finite pipe-flow bracket'
+            )
+
+        for _ in range(50):
+            pressure_Pa = (setpoint_Pa + upper_Pa) / 2.0
+            flux, residual = evaluate(pressure_Pa)
+            residual_tolerance_kg_hr = max(
+                1.0e-12,
+                1.0e-9 * max(float(flux.total_kg_hr), abs(residual)),
+            )
+            pressure_tolerance_Pa = max(1.0e-6, 1.0e-10 * pressure_Pa)
+            if (
+                abs(residual) <= residual_tolerance_kg_hr
+                or upper_Pa - setpoint_Pa <= pressure_tolerance_Pa
+            ):
+                return flux, pressure_Pa
+            if residual > 0.0:
+                setpoint_Pa = pressure_Pa
+            else:
+                upper_Pa = pressure_Pa
+
+        pressure_Pa = (setpoint_Pa + upper_Pa) / 2.0
+        flux, residual = evaluate(pressure_Pa)
+        if abs(residual) > max(1.0e-12, 1.0e-9 * float(flux.total_kg_hr)):
+            raise OverheadConfigurationError(
+                'overloaded evaporation pressure solve did not converge'
+            )
+        return flux, pressure_Pa
 
     def _resolve_liner_temperature_value(
         self,
@@ -1211,6 +1337,15 @@ class OverheadGasModel:
                 actual_O2_mol_hr=actual_O2_mol_hr,  # mol/hr — melt/offgas O2 molar flow
                 mre_anode_O2_mol_hr=mre_anode_O2_mol_hr,  # mol/hr — MRE anode O2 flow
             )
+            if (
+                effective_transport_capacity is not None
+                and effective_transport_capacity.binding_cause
+                == 'pressure_driven_pipe'
+            ):
+                gas.pressure_mbar = max(
+                    gas.pressure_mbar,
+                    effective_transport_capacity.upstream_pressure_bar * 1000.0,
+                )
             return gas
 
         # ── Overhead pressure ───────────────────────────────────────

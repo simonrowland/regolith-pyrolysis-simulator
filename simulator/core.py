@@ -15669,6 +15669,83 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         effective_transport_capacity = (
             self._controlled_o2_transport_capacity(inlet_flux)
         )
+        if (
+            effective_transport_capacity is not None
+            and effective_transport_capacity.binding_cause == 'pressure_driven_pipe'
+            and effective_transport_capacity.overload_notice is not None
+        ):
+            pressure_overlay = dict(
+                getattr(self, '_last_vapour_batch_flux_overlay', {}) or {}
+            )
+            equilibrium_partials_Pa = dict(
+                pressure_overlay.get('selected_runtime_pa_by_species', {}) or {}
+            )
+            if not equilibrium_partials_Pa:
+                from simulator.evaporation import EvaporationFluxRefusal
+
+                raise EvaporationFluxRefusal(
+                    'missing_vapour_batch_flux_pressures_Pa',
+                    {
+                        'reason': 'missing_vapour_batch_flux_pressures_Pa',
+                        'detail': (
+                            'pressure-driven overload requires the admitted '
+                            'equilibrium partial-pressure map'
+                        ),
+                        'evaporation_flux_kg_hr': dict(
+                            evap_flux.species_kg_hr
+                        ),
+                    },
+                )
+            degraded_before = copy.deepcopy(self._degraded_path_engagement)
+
+            def evaporation_flux_at_partials(partials_Pa):
+                return self._apply_analytic_evaporation_depletion(
+                    self._calculate_evaporation(
+                        equilibrium,
+                        overhead_partials_override_Pa=partials_Pa,
+                    )
+                )
+
+            try:
+                evap_flux, resolved_pressure_Pa = (
+                    self.overhead_model._solve_overloaded_evaporation_flux(
+                        self.melt,
+                        equilibrium_partials_Pa=equilibrium_partials_Pa,
+                        p_downstream_bar=(
+                            self._headspace_downstream_pressure_bar(
+                                effective_transport_capacity
+                            )
+                        ),
+                        fixed_inlet_kg_hr=max(
+                            0.0,
+                            effective_transport_capacity.demand_flux_kg_hr
+                            - evap_flux.total_kg_hr,
+                        ),
+                        flux_at_partials=evaporation_flux_at_partials,
+                    )
+                )
+            finally:
+                self._degraded_path_engagement = degraded_before
+            inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
+            effective_transport_capacity = (
+                self._controlled_o2_transport_capacity(inlet_flux)
+            )
+            if (
+                effective_transport_capacity is not None
+                and effective_transport_capacity.binding_cause == 'pressure_driven_pipe'
+                and not math.isclose(
+                    effective_transport_capacity.upstream_pressure_bar * 1.0e5,
+                    resolved_pressure_Pa,
+                    rel_tol=1.0e-9,
+                    abs_tol=1.0e-6,
+                )
+            ):
+                from simulator.overhead import OverheadConfigurationError
+
+                raise OverheadConfigurationError(
+                    'resolved evaporation pressure does not match pipe pressure'
+                )
+            overhead_flux = evap_flux
         # The joint inlet already includes the pending solid-host gas. Read
         # prior holdup before committing that source into the same account.
         self._commit_pending_subsolidus_release()

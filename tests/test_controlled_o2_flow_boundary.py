@@ -222,3 +222,33 @@ def test_pressure_driven_flash_uses_one_pressure_for_pipe_and_condenser(atmosphe
     assert configured["species_partial_pressures_mbar"] == pytest.approx(
         {"Na": flow.upstream_pressure_bar * 1000.0},
     )
+
+
+def test_113_kg_hr_flash_solves_same_hour_pressure_to_pipe_flow():
+    model = OverheadGasModel()
+    melt = SimpleNamespace(p_total_mbar=0.2, temperature_C=1150.0)
+    equilibrium_pressure_Pa = 1.0e7
+
+    def provider_at_partials(partials_Pa):
+        remaining_fraction = max(
+            0.0,
+            1.0 - partials_Pa["Na"] / equilibrium_pressure_Pa,
+        )
+        return _flux({"Na": 113.0 * remaining_fraction})
+
+    flux, pressure_Pa = model._solve_overloaded_evaporation_flux(
+        melt,
+        equilibrium_partials_Pa={"Na": equilibrium_pressure_Pa},
+        p_downstream_bar=0.0,
+        flux_at_partials=provider_at_partials,
+    )
+    outflow_kg_hr = model._pipe_conductance(
+        pressure_Pa,
+        melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg=flux.species_kg_hr,
+    ) * 3600.0
+
+    assert pressure_Pa > melt.p_total_mbar * 100.0
+    assert 0.0 < flux.total_kg_hr < 113.0
+    assert flux.total_kg_hr == pytest.approx(outflow_kg_hr, rel=1.0e-9)

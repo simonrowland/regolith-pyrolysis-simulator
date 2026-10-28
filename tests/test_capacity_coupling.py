@@ -18,7 +18,6 @@ from engines.builtin.overhead_bleed import (
     compressible_pressure_capacity_fraction,
 )
 from simulator.accounting import resolve_species_formula
-from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.capacity_coupling import (
     CapacityCouplingRefusalError,
     CapacityShadowRefusal,
@@ -1298,58 +1297,66 @@ def test_default_off_c0_cover_does_not_apply_pipe_cap():
     )
 
 
-def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
-    """Ca/Ti ceiling flux stays live on a hot campaign the C0 cap does not scale."""
+def test_non_overloaded_hour_is_byte_identical_to_legacy_path(monkeypatch):
+    def run_hour(disable_pressure_solver: bool) -> bytes:
+        sim = _real_capacity_sim()
+        sim.start_campaign(CampaignPhase.C0)
+        sim.melt.temperature_C = 1600.0
+        if disable_pressure_solver:
+            monkeypatch.setattr(
+                sim.overhead_model,
+                "_solve_overloaded_evaporation_flux",
+                lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                    AssertionError("non-overloaded hour entered pressure solve")
+                ),
+            )
+        return repr(asdict(sim.step())).encode()
+
+    legacy_path = run_hour(disable_pressure_solver=True)
+    pressure_solver_available = run_hour(disable_pressure_solver=False)
+
+    assert pressure_solver_available == legacy_path
+
+
+def test_hot_non_c0_campaign_uses_same_hour_resolved_backpressure(monkeypatch):
+    """An overloaded hot campaign evaluates evaporation at its resolved pressure."""
     sim = _real_capacity_sim()
     sim.start_campaign(CampaignPhase.C4)
     sim.melt.temperature_C = 1600.0
+    provider_partials = []
+    calculate_evaporation = sim._calculate_evaporation
+
+    def observe_evaporation(equilibrium, **kwargs):
+        partials = kwargs.get("overhead_partials_override_Pa")
+        if partials is not None:
+            provider_partials.append(dict(partials))
+        return calculate_evaporation(equilibrium, **kwargs)
+
+    monkeypatch.setattr(sim, "_calculate_evaporation", observe_evaporation)
 
     snapshot = sim.step()
 
-    ceiling_flux_species = {"Ca", "CaO_gas", "Ti", "TiO", "TiO2_gas"}
-    status = snapshot.evap_flux.alpha_authority_status_by_species
-    assert ceiling_flux_species <= set(status)
-    assert {
-        status[species] for species in ceiling_flux_species
-    } == {ANALYTICAL_UPPER_BOUND_ALPHA_STATUS}
-    assert sim._alpha_authority_status_by_species_engaged == status
+    assert snapshot.evap_flux.total_kg_hr == pytest.approx(0.0)
     assert sim.melt.campaign == CampaignPhase.C4
-    bakeout = getattr(sim, "_last_subsolidus_bakeout", None) or {}
-    assert "transport_cap" not in bakeout
     assert snapshot.overhead.transport_saturation_pct == pytest.approx(100.0)
     notice = snapshot.overhead.transport_overload_notice
     assert notice["overload_ratio"] > 1.0
     assert notice["authority_level"] == "extrapolated"
+    assert notice["requested_pressure_bar"] == pytest.approx(
+        sim.melt.p_total_mbar / 1000.0
+    )
+    assert notice["resolved_pressure_bar"] == pytest.approx(
+        notice["predicted_pressure_bar"]
+    )
     assert notice["predicted_pressure_bar"] > sim.melt.p_total_mbar / 1000.0
-
-    reasons = [transition.reason for transition in sim.atom_ledger.transitions]
-    reason_set = set(reasons)
-    for required in (
-        "evaporate_Ca",
-        "evaporate_CaO_gas",
-        "evaporate_Ti",
-        "evaporate_TiO",
-        "evaporate_TiO2_gas",
-        "condense_Ca",
-    ):
-        assert required in reason_set, required
-    assert {
-        "condense_SiO",
-        "condense_Al2O",
-        "condense_AlO",
-        "condense_CaO_gas",
-        "condense_CrO",
-        "condense_MgO_gas",
-        "condense_SiO2_gas",
-        "condense_TiO",
-        "condense_TiO2_gas",
-    } <= reason_set
-    assert tuple(reasons[-5:]) == (
-        "condense_TiO",
-        "evaporate_TiO2_gas",
-        "condense_TiO2_gas",
-        "fe_redox_respeciation",
-        "overhead_bleed",
+    assert provider_partials
+    assert sum(provider_partials[-1].values()) == pytest.approx(
+        notice["resolved_pressure_bar"] * 1.0e5,
+        rel=1.0e-9,
+        abs=1.0e-6,
+    )
+    assert snapshot.overhead.pressure_mbar >= (
+        notice["resolved_pressure_bar"] * 1000.0
     )
 
 

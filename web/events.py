@@ -2370,6 +2370,15 @@ def _tick_payload(
             snapshot.overhead.turbine_utilization_pct, 1),
         'transport_saturation_pct': round(
             snapshot.overhead.transport_saturation_pct, 1),
+        **(
+            {
+                'transport_overload_notice': dict(
+                    snapshot.overhead.transport_overload_notice
+                )
+            }
+            if snapshot.overhead.transport_overload_notice
+            else {}
+        ),
         'turbine_shaft_power_kW': round(snapshot.turbine_shaft_power_kW, 4),
         'shuttle_phase': snapshot.shuttle_phase,
         'shuttle_injected_kg_hr': round(snapshot.shuttle_injected_kg_hr, 3),

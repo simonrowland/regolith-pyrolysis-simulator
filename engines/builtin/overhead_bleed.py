@@ -46,6 +46,8 @@ class TransportOverloadNotice(TypedDict):
     certified_band: dict[str, float]
     overload_ratio: float | Literal["infinite"]
     predicted_pressure_bar: NotRequired[float]
+    requested_pressure_bar: NotRequired[float]
+    resolved_pressure_bar: NotRequired[float]
 
 
 def transport_overload_notice(
