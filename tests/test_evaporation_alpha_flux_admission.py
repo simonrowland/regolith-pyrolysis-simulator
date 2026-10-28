@@ -85,6 +85,65 @@ OTHER_PROXY_TAG_STILL_ADMITTED = {
 }
 
 
+def _alpha_witness(species, alpha):
+    return BuiltinEvaporationFluxProvider().dispatch(IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"Cr2O3": 10.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1700.0,
+        pressure_bar=0.01,
+        fO2_log=None,
+        control_inputs={
+            CONTROL_FLUX_PRESSURES_KEY: {species: 100.0},
+            "overhead_pressure_pa": 1000.0,
+            "carrier_gas": "N2",
+            "molar_mass_kg_mol": {species: 0.084},
+            "stoich_by_species": {species: {
+                "parent_oxide": "Cr2O3", "oxide_per_product_kg": 1.0,
+            }},
+            "available_oxide_kg": {species: 10.0},
+            "melt_surface_area_m2": 0.2,
+            "alpha": alpha,
+        },
+    ))
+
+
+def test_cro2_predicts_with_proxy_authority_by_default():
+    result = _alpha_witness("CrO2", _measured_alpha_control_view(
+        _load_evaporation_alpha_by_species(_raw_data())
+    ))
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"]["CrO2"] > 0.0
+    assert result.diagnostic["alpha_used_by_species"]["CrO2"] == 0.9
+    assert result.diagnostic["unmeasured_alpha_fallback_species"] == ["CrO2"]
+    evaluation = result.diagnostic["alpha_s_evaluation_by_species"]["CrO2"]
+    assert evaluation["alpha_authority_status"] == "proxy/bridge"
+    assert "metals_cr_family" in evaluation["source"]
+    assert "no CrO2-specific alpha" in evaluation["source"]
+
+
+def test_absent_alpha_predicts_explicit_upper_bound_by_default():
+    result = _alpha_witness("CrO2", {})
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"]["CrO2"] > 0.0
+    assert result.diagnostic["alpha_used_by_species"]["CrO2"] == 1.0
+    assert result.diagnostic["unmeasured_alpha_fallback_species"] == ["CrO2"]
+    evaluation = result.diagnostic["alpha_s_evaluation_by_species"]["CrO2"]
+    assert evaluation["alpha_authority_status"] == "analytical_upper_bound"
+    assert "upper bound" in evaluation["source"]
+
+
+def test_measured_alpha_witness_unchanged():
+    loaded = _load_evaporation_alpha_by_species(_raw_data())
+    result = _alpha_witness("K", loaded)
+    explicit = _alpha_witness("K", {"K": 0.13})  # Fedkin 2006 KEMS anchor.
+    assert result.diagnostic["alpha_used_by_species"]["K"] == 0.13
+    assert result.diagnostic["evaporation_flux_kg_hr"] == explicit.diagnostic["evaporation_flux_kg_hr"]
+    assert "unmeasured_alpha_fallback_species" not in result.diagnostic
+
+
 def _raw_data() -> dict:
     return yaml.safe_load(VAPOR_PRESSURES_PATH.read_text())
 
