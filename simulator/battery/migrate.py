@@ -17965,28 +17965,29 @@ class Migrator:
                     for key, value in raw_point_conditions.items()
                 },
             }
-        if composition_located is not None:
-            point_conditions = {
-                **(point_conditions or {}),
-                "composition": composition_located,
-            }
-        elif catalogue_composition is not None:
-            point_conditions = {
-                **(point_conditions or {}),
-                "composition": catalogue_composition,
-            }
-        elif projected_oxide_map and not composition_role_refusal:
-            # A refused composition_role is queued and left unstamped (b716).
-            point_conditions = {
-                **(point_conditions or {}),
-                "composition": Located(
-                    State.of(wt_pct_to_mole_fraction(projected_oxide_map)),
-                    locator=projected_oxide_locator or locator,
-                    inference=wt_pct_to_mole_fraction_derivation(
-                        projected_oxide_map, projected_oxide_locator or locator
+        if "composition" not in (point_conditions or {}):
+            if composition_located is not None:
+                point_conditions = {
+                    **(point_conditions or {}),
+                    "composition": composition_located,
+                }
+            elif catalogue_composition is not None:
+                point_conditions = {
+                    **(point_conditions or {}),
+                    "composition": catalogue_composition,
+                }
+            elif projected_oxide_map and not composition_role_refusal:
+                # A refused composition_role is queued and left unstamped (b716).
+                point_conditions = {
+                    **(point_conditions or {}),
+                    "composition": Located(
+                        State.of(wt_pct_to_mole_fraction(projected_oxide_map)),
+                        locator=projected_oxide_locator or locator,
+                        inference=wt_pct_to_mole_fraction_derivation(
+                            projected_oxide_map, projected_oxide_locator or locator
+                        ),
                     ),
-                ),
-            }
+                }
         if malformed_composition_amount is not None:
             point_conditions = {
                 **(point_conditions or {}),
