@@ -4,6 +4,7 @@ import io
 import math
 import inspect
 import os
+import resource
 import signal
 import subprocess
 import sys
@@ -118,6 +119,11 @@ class _StringifiableModel:
 def _load_data(filename):
     with open(DATA_DIR / filename) as f:
         return yaml.safe_load(f) or {}
+
+
+def _process_and_reaped_child_cpu_seconds():
+    children = resource.getrusage(resource.RUSAGE_CHILDREN)
+    return time.process_time() + children.ru_utime + children.ru_stime
 
 
 def _select_python_api_for_test(backend: AlphaMELTSBackend) -> None:
@@ -9948,7 +9954,7 @@ def test_project_local_alphamelts_populates_full_table_suite_when_installed():
 
 
 @pytest.mark.live_engine
-def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
+def test_project_local_alphamelts_cold_c0_step_returns_when_installed(capsys):
     backend = AlphaMELTSBackend()
     try:
         available = backend.initialize({'mode': 'subprocess'})
@@ -9966,26 +9972,43 @@ def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C0)
 
-    started = time.monotonic()
+    cpu_started = _process_and_reaped_child_cpu_seconds()
+    wall_started = time.monotonic()
     try:
         snapshot = sim.step()
     except AlphaMELTSSubprocessContractError as exc:
         if getattr(exc, "backend_status_reason", None) == "timeout":
             pytest.skip("AlphaMELTS live subprocess timed out")
         raise
-    elapsed_s = time.monotonic() - started
+    wall_elapsed_s = time.monotonic() - wall_started
+    cpu_elapsed_s = (
+        _process_and_reaped_child_cpu_seconds() - cpu_started
+    )
+    wall_cpu_ratio = (
+        wall_elapsed_s / cpu_elapsed_s if cpu_elapsed_s > 0.0 else math.inf
+    )
+    with capsys.disabled():
+        print(
+            "cold C0 step timing: "
+            f"cpu={cpu_elapsed_s:.2f}s wall={wall_elapsed_s:.2f}s "
+            f"wall/cpu={wall_cpu_ratio:.2f}x",
+            flush=True,
+        )
 
     assert snapshot.hour == 1
-    # Bound covers a true cold start: the A-CX-02 fix instance-scoped the
-    # ThermoEngine health cache (process-global reuse masked stale health), so
-    # a fresh backend legitimately re-probes engine health (~4 s) before the
-    # step. Warm-worker pools reuse instances and never pay this.
-    # 2026-07-23 B1 budget re-derivation: the composed vapor package adds
-    # per-species certified-range guards + suppression-fit evaluation to the
-    # cold C0 step's first equilibrium; measured quiesced 30.8 s (subset-3)
-    # and 32.6 s (gate-1 under load). Budget = measured ~32 s x 1.4 headroom
-    # ~= 45 s; still a COLD-path-only cost that warm pools never pay.
-    assert elapsed_s < 45.0
+    # RUSAGE_CHILDREN sees solver CPU only after wait: the subprocess transport
+    # reaps each child before returning from communicate() in
+    # simulator/melt_backend/alphamelts.py:563-578. Provisional premise: this
+    # serialized, CPU-bound solve uses CPU close to its whole-step wall time.
+    # Historical measurements were 30.8 s quiesced and 32.6 s under load; use
+    # the 32.6 s maximum as a provisional CPU baseline, then add 1.5x headroom
+    # (32.6 x 1.5 = 48.9, rounded to 50 s). Under this premise, a second full
+    # solver pass is about 65.2 s and exceeds the cap. Replace this estimate
+    # with the controller's multi-run Studio-2 CPU measurements.
+    assert cpu_elapsed_s < 50.0, (
+        f"cold C0 CPU time {cpu_elapsed_s:.2f}s exceeded 50.0s; "
+        f"wall={wall_elapsed_s:.2f}s ({wall_cpu_ratio:.2f}x wall/CPU)"
+    )
 
 
 @pytest.mark.live_engine
