@@ -274,6 +274,58 @@ def test_gate_order_steps_down_before_hold_or_floor(
             assert solved['numerical_path_warning'] == 'original solved path warning'
 
 
+def test_retry_recovery_preserves_step_down_notice(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim._register_freeze_gate_liquid_fraction_providers()
+    magemin, alpha = sim._chem_registry.gate_provider_order
+    calls = []
+
+    def primary(request):
+        calls.append('magemin')
+        if len(calls) == 1:
+            return IntentResult(intent=request.intent, status='not_converged', diagnostic={
+                'backend_status_reason': 'engine_worker_timeout',
+            })
+        return IntentResult(intent=request.intent, status='ok', diagnostic={
+            'solidus_T_C': 1000, 'liquidus_T_C': 1300,
+        })
+
+    def alternate(request):
+        calls.append('alphamelts')
+        return IntentResult(intent=request.intent, status='not_converged', diagnostic={
+            'backend_status_reason': 'incomplete_cooling_path',
+            'backend_diagnostics': {
+                'physical_overhead_pressure_bar': .009,
+                'condensed_phase_reference_pressure_bar': 1,
+                'numerical_path_warning': 'incomplete native path',
+            },
+        })
+
+    monkeypatch.setattr(magemin, 'dispatch', primary)
+    monkeypatch.setattr(alpha, 'dispatch', alternate)
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
+    assert calls == ['magemin', 'alphamelts', 'magemin']
+    assert curve['source'] == 'gate_liquid_fraction:fallback:magemin-shadow'
+    assert (curve['solidus_T_C'], curve['liquidus_T_C']) == (1000, 1300)
+    notice = curve['gate_provider_step_down']
+    assert notice['requested_provider_order'] == ['magemin-shadow', 'alphamelts-diagnostic']
+    assert notice['realized_provider'] == 'magemin-shadow'
+    assert [p['provider'] for p in notice['failed_providers']] == [
+        'magemin-shadow', 'alphamelts-diagnostic',
+    ]
+    assert 'engine_worker_timeout' in notice['failed_providers'][0]['reason']
+    assert 'incomplete_cooling_path' in notice['failed_providers'][1]['reason']
+    assert curve['alphamelts_reference_pressure'] == {
+        'physical_overhead_pressure_bar': .009,
+        'condensed_phase_reference_pressure_bar': 1,
+        'numerical_path_warning': 'incomplete native path',
+    }
+
+
 def test_magemin_success_does_not_call_alpha(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):

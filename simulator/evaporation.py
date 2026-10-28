@@ -2749,6 +2749,8 @@ class EvaporationMixin:
                     f'gate provider registration failed: {type(exc).__name__}',
                 )
                 reasons.append(f'gate provider registration failed: {exc}')
+        step_down = None
+        failed_providers = []
         for attempt in range(2):
             try:
                 result = self._dispatch_only(
@@ -2776,12 +2778,22 @@ class EvaporationMixin:
                     or 'unavailable'
                 )
                 warnings = list(getattr(result, 'warnings', ()) or ())
+            if diagnostic.get('gate_provider_step_down'):
+                step_down = diagnostic['gate_provider_step_down']
+                failed_providers.extend(step_down['failed_providers'])
             if not gate_curve_provider_timed_out(diagnostic) or attempt == 1:
                 break
 
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
         source = 'gate_liquid_fraction'
         fallback_provider = diagnostic.get('kernel_fallback_used')
+        if step_down:
+            # Retry recovery changes the curve provider, not the work already attempted.
+            diagnostic['gate_provider_step_down'] = {
+                **step_down,
+                'failed_providers': failed_providers,
+                'realized_provider': fallback_provider if status == 'ok' else None,
+            }
         if fallback_provider:
             source = f'gate_liquid_fraction:fallback:{fallback_provider}'
         notices = {}
