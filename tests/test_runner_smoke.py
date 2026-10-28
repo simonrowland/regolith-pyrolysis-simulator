@@ -2036,8 +2036,9 @@ def test_runner_cli_reports_known_refusal_on_stderr(tmp_path):
     assert result.returncode == 1
     payload = json.loads(output.read_text())
     assert payload["status"] == "refused"
-    assert result.stderr == (
-        f"refused: {payload['error_message'] or payload['reason']}\n"
+    # Engines and libraries may also write to stderr; the runner's own line is last.
+    assert result.stderr.splitlines()[-1] == (
+        f"refused: {payload['error_message'] or payload['reason']}"
     )
 
 
