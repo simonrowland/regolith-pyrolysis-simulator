@@ -20,12 +20,16 @@ sources:
       sample: values.sample
       temperature_C: values.T_C
       duration_min: values.duration_min_as_published
-      residue_oxide_wt_pct: values.composition_wt_pct
+      residue_oxide_wt_pct: values.printed_residue_oxide_wt_pct
       layout_check: rendered_page_row_and_column_assignment
     evidence_class: measured_direct
     phase_measured: glass
     quench_statement: quenched_by_cutting_power; chemical_preservation_not_stated
 excluded_by_controller_scope:
   printed_tables: [S2, S3, S4, S5, S6, S7, S8, S9, S10, S11]
-  printed_epma_rows: 488
+  printed_epma_rows: 608
+  printed_epma_rows_by_table_group:
+    S2-S9: 488
+    S10: 67
+    S11: 53
   reason: individual spot profiles are reserved for a later task; do not average them into run summaries

@@ -18,7 +18,7 @@ schema_gaps:
 - Table S1 initial/final sample weights have no standalone mass-measurement quantity token; retained as measured-direct
   typed refusal, with mass-loss fractions linked to those weights.
 - A complete multicomponent residue-composition vector has no value field in the current migrator; each run is retained
-  as a typed-refused residue_composition_vs_time row with all nine oxide values in composition_wt_pct.
+  as a typed-refused residue_composition_vs_time row; all nine printed oxide cells remain under printed_residue_oxide_wt_pct.
 fidelity_samples:
 - path: species.unknown.observations[zhang_si_table_s1_published_weights].values.runs[0].mass_before_mg
   value: 40.4
@@ -26,13 +26,13 @@ fidelity_samples:
     page: 9
     table: S1
     row: Bas1400C0m1
-- path: species.unknown.observations[zhang_2021_table1_bas1400c15m_residue_composition].values.composition_wt_pct.composition_wt_pct.Na2O
+- path: species.unknown.observations[zhang_2021_table1_bas1400c15m_residue_composition].values.printed_residue_oxide_wt_pct.composition_wt_pct.Na2O
   value: 0.66
   locator:
     page: 71
     table: '1'
     row: Bas1400C15m
-- path: species.unknown.observations[zhang_2021_table1_bas1200c40h_residue_composition].values.composition_wt_pct.composition_wt_pct.Rb2O
+- path: species.unknown.observations[zhang_2021_table1_bas1200c40h_residue_composition].values.printed_residue_oxide_wt_pct.composition_wt_pct.Rb2O
   value: 0.67
   locator:
     page: 71
@@ -56,11 +56,12 @@ scope_assessment:
   - species-resolved evaporation mass balance
   figure_read_candidates:
   - 'Fig. S6 and Figs. S7-S15: spatial Na, K, Rb concentration profiles; no figure-only values transcribed.'
-  note: Table S1 provides 12 whole-sample before/after masses. The main article Table 1 provides 12 run-level residue
+  note: >-
+    Table S1 provides 12 whole-sample before/after masses. The main article Table 1 provides 12 run-level residue
     compositions, stored as printed with its Table 1 locators; complete composition vectors are typed-refused by
-    the current value schema. SI Tables S2-S11 contain 488 individual EPMA spot analyses for spatial profiles; per
-    controller ruling, those spot values are not transcribed or averaged in this extract. No Na-specific flux or
-    Na(g)/Na pressure is inferred.
+    the current value schema. SI Tables S2-S11 contain 608 individual EPMA spot analyses for spatial profiles
+    (S2–S9: 488; S10: 67; S11: 53); per controller ruling, those spot values are not transcribed or averaged in this
+    extract. No Na-specific flux or Na(g)/Na pressure is inferred.
 species:
   unknown:
     observations:
@@ -196,9 +197,9 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
           locator:
             page: 74
             table: '4'
@@ -208,15 +209,15 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
         T_C: 1400
         sample: Bas1400C0m1
         duration_min_as_published: 0
-        composition_wt_pct:
+        printed_residue_oxide_wt_pct:
           composition_wt_pct:
             Na2O: 1.9
             MgO: 7.11
@@ -231,7 +232,6 @@ species:
         note: Composition vector as printed in main article Table 1; no value schema is available for the complete
           vector.
         zero_time_procedure: '1200°C: held 5 min before quench; 1400°C: quenched upon reaching 1400°C'
-        total_pressure_Pa: '0.0001'
         starting_glass_wt_pct: &id004
           Na2O: 2.27
           MgO: 7.09
@@ -247,7 +247,7 @@ species:
         procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
           upon reaching target)
         locator:
-          page: 68
+          page: 9
           section: 2.2 Vacuum evaporation experiments
       method: electron probe microanalysis (EPMA)
     - observation_id: zhang_2021_table1_bas1400c0m2_residue_composition
@@ -276,9 +276,9 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
           locator:
             page: 74
             table: '4'
@@ -288,15 +288,15 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
         T_C: 1400
         sample: Bas1400C0m2
         duration_min_as_published: 0
-        composition_wt_pct:
+        printed_residue_oxide_wt_pct:
           composition_wt_pct:
             Na2O: 1.82
             MgO: 7.08
@@ -311,14 +311,13 @@ species:
         note: Composition vector as printed in main article Table 1; no value schema is available for the complete
           vector.
         zero_time_procedure: '1200°C: held 5 min before quench; 1400°C: quenched upon reaching 1400°C'
-        total_pressure_Pa: '0.0001'
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
         procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
           upon reaching target)
         locator:
-          page: 68
+          page: 9
           section: 2.2 Vacuum evaporation experiments
       method: electron probe microanalysis (EPMA)
     - observation_id: zhang_2021_table1_bas1400c15m_residue_composition
@@ -347,9 +346,9 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
           locator:
             page: 74
             table: '4'
@@ -359,15 +358,15 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
         T_C: 1400
         sample: Bas1400C15m
         duration_min_as_published: 15
-        composition_wt_pct:
+        printed_residue_oxide_wt_pct:
           composition_wt_pct:
             Na2O: 0.66
             MgO: 7.38
@@ -381,14 +380,13 @@ species:
           locator: *id005
         note: Composition vector as printed in main article Table 1; no value schema is available for the complete
           vector.
-        total_pressure_Pa: '0.0001'
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
         procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
           upon reaching target)
         locator:
-          page: 68
+          page: 9
           section: 2.2 Vacuum evaporation experiments
       method: electron probe microanalysis (EPMA)
     - observation_id: zhang_2021_table1_bas1400c30m_residue_composition
@@ -417,9 +415,9 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
           locator:
             page: 74
             table: '4'
@@ -429,15 +427,15 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
         T_C: 1400
         sample: Bas1400C30m
         duration_min_as_published: 30
-        composition_wt_pct:
+        printed_residue_oxide_wt_pct:
           composition_wt_pct:
             Na2O: 0.29
             MgO: 7.45
@@ -451,14 +449,13 @@ species:
           locator: *id006
         note: Composition vector as printed in main article Table 1; no value schema is available for the complete
           vector.
-        total_pressure_Pa: '0.0001'
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
         procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
           upon reaching target)
         locator:
-          page: 68
+          page: 9
           section: 2.2 Vacuum evaporation experiments
       method: electron probe microanalysis (EPMA)
     - observation_id: zhang_2021_table1_bas1400c60m_residue_composition
@@ -487,9 +484,9 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
           locator:
             page: 74
             table: '4'
@@ -499,15 +496,15 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
         T_C: 1400
         sample: Bas1400C60m
         duration_min_as_published: 60
-        composition_wt_pct:
+        printed_residue_oxide_wt_pct:
           composition_wt_pct:
             Na2O: 0.01
             MgO: 7.61
@@ -521,14 +518,13 @@ species:
           locator: *id007
         note: Composition vector as printed in main article Table 1; no value schema is available for the complete
           vector.
-        total_pressure_Pa: '0.0001'
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
         procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
           upon reaching target)
         locator:
-          page: 68
+          page: 9
           section: 2.2 Vacuum evaporation experiments
       method: electron probe microanalysis (EPMA)
     - observation_id: zhang_2021_table1_bas1400c90m_residue_composition
@@ -557,9 +553,9 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
           locator:
             page: 74
             table: '4'
@@ -569,15 +565,15 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
         T_C: 1400
         sample: Bas1400C90m
         duration_min_as_published: 90
-        composition_wt_pct:
+        printed_residue_oxide_wt_pct:
           composition_wt_pct:
             Na2O: b.d.l.
             MgO: 7.65
@@ -591,14 +587,13 @@ species:
           locator: *id008
         note: Composition vector as printed in main article Table 1; no value schema is available for the complete
           vector.
-        total_pressure_Pa: '0.0001'
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
         procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
           upon reaching target)
         locator:
-          page: 68
+          page: 9
           section: 2.2 Vacuum evaporation experiments
       method: electron probe microanalysis (EPMA)
     - observation_id: zhang_2021_table1_bas1200c0h1_residue_composition
@@ -627,9 +622,9 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
           locator:
             page: 74
             table: '4'
@@ -639,15 +634,15 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
         T_C: 1200
         sample: Bas1200C0h1
         duration_min_as_published: 0
-        composition_wt_pct:
+        printed_residue_oxide_wt_pct:
           composition_wt_pct:
             Na2O: 2.0
             MgO: 6.63
@@ -662,14 +657,13 @@ species:
         note: Composition vector as printed in main article Table 1; no value schema is available for the complete
           vector.
         zero_time_procedure: '1200°C: held 5 min before quench; 1400°C: quenched upon reaching 1400°C'
-        total_pressure_Pa: '0.0001'
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
         procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
           upon reaching target)
         locator:
-          page: 68
+          page: 9
           section: 2.2 Vacuum evaporation experiments
       method: electron probe microanalysis (EPMA)
     - observation_id: zhang_2021_table1_bas1200c0h2_residue_composition
@@ -698,9 +692,9 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
           locator:
             page: 74
             table: '4'
@@ -710,15 +704,15 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
         T_C: 1200
         sample: Bas1200C0h2
         duration_min_as_published: 0
-        composition_wt_pct:
+        printed_residue_oxide_wt_pct:
           composition_wt_pct:
             Na2O: 2.3
             MgO: 6.46
@@ -733,14 +727,13 @@ species:
         note: Composition vector as printed in main article Table 1; no value schema is available for the complete
           vector.
         zero_time_procedure: '1200°C: held 5 min before quench; 1400°C: quenched upon reaching 1400°C'
-        total_pressure_Pa: '0.0001'
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
         procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
           upon reaching target)
         locator:
-          page: 68
+          page: 9
           section: 2.2 Vacuum evaporation experiments
       method: electron probe microanalysis (EPMA)
     - observation_id: zhang_2021_table1_bas1200c1h_residue_composition
@@ -769,9 +762,9 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
           locator:
             page: 74
             table: '4'
@@ -781,15 +774,15 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
         T_C: 1200
         sample: Bas1200C1h
         duration_min_as_published: 55
-        composition_wt_pct:
+        printed_residue_oxide_wt_pct:
           composition_wt_pct:
             Na2O: 1.99
             MgO: 7.0
@@ -803,14 +796,13 @@ species:
           locator: *id011
         note: Composition vector as printed in main article Table 1; no value schema is available for the complete
           vector.
-        total_pressure_Pa: '0.0001'
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
         procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
           upon reaching target)
         locator:
-          page: 68
+          page: 9
           section: 2.2 Vacuum evaporation experiments
       method: electron probe microanalysis (EPMA)
     - observation_id: zhang_2021_table1_bas1200c4h_residue_composition
@@ -839,9 +831,9 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
           locator:
             page: 74
             table: '4'
@@ -851,15 +843,15 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
         T_C: 1200
         sample: Bas1200C4h
         duration_min_as_published: 235
-        composition_wt_pct:
+        printed_residue_oxide_wt_pct:
           composition_wt_pct:
             Na2O: 1.08
             MgO: 7.19
@@ -873,14 +865,13 @@ species:
           locator: *id012
         note: Composition vector as printed in main article Table 1; no value schema is available for the complete
           vector.
-        total_pressure_Pa: '0.0001'
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
         procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
           upon reaching target)
         locator:
-          page: 68
+          page: 9
           section: 2.2 Vacuum evaporation experiments
       method: electron probe microanalysis (EPMA)
     - observation_id: zhang_2021_table1_bas1200c10h_residue_composition
@@ -909,9 +900,9 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
           locator:
             page: 74
             table: '4'
@@ -921,15 +912,15 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
         T_C: 1200
         sample: Bas1200C10h
         duration_min_as_published: 595
-        composition_wt_pct:
+        printed_residue_oxide_wt_pct:
           composition_wt_pct:
             Na2O: 0.69
             MgO: 7.33
@@ -943,14 +934,13 @@ species:
           locator: *id013
         note: Composition vector as printed in main article Table 1; no value schema is available for the complete
           vector.
-        total_pressure_Pa: '0.0001'
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
         procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
           upon reaching target)
         locator:
-          page: 68
+          page: 9
           section: 2.2 Vacuum evaporation experiments
       method: electron probe microanalysis (EPMA)
     - observation_id: zhang_2021_table1_bas1200c40h_residue_composition
@@ -979,9 +969,9 @@ species:
           state:
             tag: value
             value:
-              kind: point
-              point: '0.0001'
-              approximate: true
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
           locator:
             page: 74
             table: '4'
@@ -991,15 +981,15 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
         T_C: 1200
         sample: Bas1200C40h
         duration_min_as_published: 2395
-        composition_wt_pct:
+        printed_residue_oxide_wt_pct:
           composition_wt_pct:
             Na2O: 0.1
             MgO: 7.61
@@ -1013,14 +1003,13 @@ species:
           locator: *id014
         note: Composition vector as printed in main article Table 1; no value schema is available for the complete
           vector.
-        total_pressure_Pa: '0.0001'
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
         procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
           upon reaching target)
         locator:
-          page: 68
+          page: 9
           section: 2.2 Vacuum evaporation experiments
       method: electron probe microanalysis (EPMA)
     - observation_id: zhang_si_table_s1_bas1400c0m1_mass_loss
@@ -1067,7 +1056,7 @@ species:
               point: '0.0001'
               approximate: true
           locator: &id016
-            page: 68
+            page: 8
             section: 2.2 Vacuum evaporation experiments
             note: About 10^-6 mbar
         fO2_Pa:
@@ -1075,8 +1064,8 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
             note: No absolute fO2 printed for the vacuum runs
       values:
         quantity: mass_loss_fraction
@@ -1136,8 +1125,8 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
             note: No absolute fO2 printed for the vacuum runs
       values:
         quantity: mass_loss_fraction
@@ -1197,8 +1186,8 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
             note: No absolute fO2 printed for the vacuum runs
       values:
         quantity: mass_loss_fraction
@@ -1258,8 +1247,8 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
             note: No absolute fO2 printed for the vacuum runs
       values:
         quantity: mass_loss_fraction
@@ -1319,8 +1308,8 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
             note: No absolute fO2 printed for the vacuum runs
       values:
         quantity: mass_loss_fraction
@@ -1380,8 +1369,8 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
             note: No absolute fO2 printed for the vacuum runs
       values:
         quantity: mass_loss_fraction
@@ -1441,8 +1430,8 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
             note: No absolute fO2 printed for the vacuum runs
       values:
         quantity: mass_loss_fraction
@@ -1502,8 +1491,8 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
             note: No absolute fO2 printed for the vacuum runs
       values:
         quantity: mass_loss_fraction
@@ -1563,8 +1552,8 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
             note: No absolute fO2 printed for the vacuum runs
       values:
         quantity: mass_loss_fraction
@@ -1624,8 +1613,8 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
             note: No absolute fO2 printed for the vacuum runs
       values:
         quantity: mass_loss_fraction
@@ -1685,8 +1674,8 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
             note: No absolute fO2 printed for the vacuum runs
       values:
         quantity: mass_loss_fraction
@@ -1746,8 +1735,8 @@ species:
             tag: unknown
             reason: not_published_for_vacuum_run
           locator:
-            page: 74
-            table: '4'
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
             note: No absolute fO2 printed for the vacuum runs
       values:
         quantity: mass_loss_fraction
