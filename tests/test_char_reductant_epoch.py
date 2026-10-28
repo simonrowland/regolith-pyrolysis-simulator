@@ -114,7 +114,8 @@ def test_ci_commits_refractory_char_account_from_sephton_partition() -> None:
     # Magnitude pin: Alexander 0.5075 nascent + tar coke − Boudouard at
     # Stage-0 1050 C. Self-parity above is necessary; this catches a
     # silent class-constant move (B4).
-    assert char_mol == pytest.approx(1305.7985635282805)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    assert char_mol == pytest.approx(1303.9765202893107)
     assert char_mol > f_ref * resolve_species_formula(
         "carbonaceous_organic", sim.species_formula_registry
     ).atom_moles(
@@ -218,10 +219,8 @@ def test_c0_bubbler_dose_reaches_char_even_when_melt_is_at_target() -> None:
     char_before = _committed_char_mol(sim)
     sim.melt.temperature_C = 1600.0
     sim.melt.campaign = CampaignPhase.C0
-    sim._refresh_oxygen_reservoir_without_exchange(
-        melt_intrinsic_fO2_log=-8.0,
-        reference_T_K=1873.15,
-    )
+    from tests.chemistry.conftest import _seed_melt_redox
+    _seed_melt_redox(sim, -8.0)
     sim.campaign_mgr.overrides.setdefault("C0", {}).update({
         "o2_bubbler_kg_per_hr": char_before * OXYGEN_MOLAR_MASS_KG_PER_MOL,
         "o2_bubbler_eta_absorb_default": 1.0,
@@ -405,6 +404,9 @@ def test_c0_diagnostic_does_not_resurrect_consumed_char() -> None:
 
 def test_lunar_mare_has_zero_solid_char_account() -> None:
     sim = _build_sim("lunar_mare_low_ti")
+    # Isolate the organics-free char control from declared feedstock Fe metal.
+    sim.feedstocks["lunar_mare_low_ti"].pop("iron_speciation")
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     assert _committed_char_mol(sim) == pytest.approx(0.0)
     assert SOLID_CHAR_CARBON_ACCOUNT not in {
         acc

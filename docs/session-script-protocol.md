@@ -222,6 +222,9 @@ If the simulator is complete, the command's primary frame type is `complete`:
 Successful non-step command frames have `frame_type` matching the verb.
 `snapshot` includes a read-only snapshot projection:
 
+The pre-advance snapshot also includes `redox_source_breakdown`, carrying
+initialization redox notices through the same per-hour summary reader.
+
 ```jsonc
 {
   "seq": 4,

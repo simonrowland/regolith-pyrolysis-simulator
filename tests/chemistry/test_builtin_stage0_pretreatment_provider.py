@@ -1174,7 +1174,8 @@ def test_full_batch_stage0_kernel_routes_to_declared_accounts_lunar(
     assert not salt
     # 2026-08-05 MC-1 trace wiring d1b4f5d: lunar low-Ti now carries
     # 0.7190121804730926 kg feedstock S into the declared Stage-0 matte account.
-    assert matte == pytest.approx({"S": 0.7190121804730926})
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    assert matte == pytest.approx({"S": 0.7191769332259184})
 
 
 def test_full_batch_stage0_kernel_credits_mars_perchlorate_to_declared_accounts(

@@ -2941,6 +2941,7 @@ def _internal_analytical_vapor_pressure_adapter(
             equilibrium,
             simulation_hour=simulation_hour,
             observation_pO2_bar=po2_bar,
+            intrinsic_fO2_log_override=fO2_log_used,
         )
     else:
         core._refresh_vapor_pressures_from_kernel(
@@ -2948,6 +2949,7 @@ def _internal_analytical_vapor_pressure_adapter(
             include_diagnostic_shadows=False,
             simulation_hour=simulation_hour,
             observation_pO2_bar=po2_bar,
+            intrinsic_fO2_log_override=fO2_log_used,
         )
     core_diagnostic = dict(core._last_vapor_pressure_diagnostic)
     core_flags: list[dict[str, Any]] = []

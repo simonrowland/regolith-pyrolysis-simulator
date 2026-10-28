@@ -5,8 +5,6 @@ from types import SimpleNamespace
 
 import pytest
 
-import simulator.core as core_module
-import simulator.fe_redox as fe_redox_module
 from engines.builtin.electrolysis_step import BuiltinElectrolysisStepProvider
 from simulator.core import PyrolysisSimulator
 from simulator.fe_redox import (
@@ -41,94 +39,272 @@ KRESS91_MOL_FRACTIONS = {
 }
 
 
-def _no_iron_redox_diagnostic_sim() -> SimpleNamespace:
-    return SimpleNamespace(
-        melt=SimpleNamespace(
-            oxygen_reservoir=SimpleNamespace(melt_intrinsic_fO2_log=-9.0),
-            melt_fO2_log=-9.0,
-        ),
-        overhead=SimpleNamespace(pressure_mbar=0.0),
-        _melt_headspace_composition_mbar=None,
-        _melt_oxide_wt_pct=lambda: {},
-        _vacuum_floor_bar=lambda: 1.0e-9,
-        _oxygen_numerical_floor_bar=lambda: 1.0e-9,
-        _feot_equivalent_wt_pct=lambda _comp: 0.0,
-    )
+def test_initial_feot_split_conserves_iron_and_normalizes_without_oxygen_import():
+    from simulator.fe_redox import split_feot_composition, RedoxState, FE_FEO_BUFFER_STANDARD
+    from simulator.state import MOLAR_MASS
 
-
-def test_legacy_iw_current_outputs_are_bit_identical_at_pinned_temperatures() -> None:
-    """Pin both legacy IW call paths before consolidating their shared line.
-
-    Mutation caught: changing the legacy IW coefficients in either resolver
-    or diagnostic moves at least one pinned hexadecimal float result.
-    """
-    expected_hex = {
-        -1.0: "-0x1.2000000000000p+3",
-        0.0: "-0x1.2000000000000p+3",
-        1873.15: "-0x1.fd6049b57f6fep+2",
-        2500.0: "-0x1.14395810624dcp+2",
-        4000.0: "-0x1.deb851eb851e0p-3",
+    feedstock = {
+        'composition_wt_pct': {'SiO2': 80.0, 'FeO': 20.0},
+        'intrinsic_redox': {
+            'delta_iw': -1.0, 'formation_temperature_K': 1673.15,
+            'source': 'test fixture', 'locator': {'page': 1},
+            'estimated': True,
+        },
     }
-    for temperature_K, expected in expected_hex.items():
-        assert intrinsic_melt_fO2({"FeO": 1.0}, temperature_K).hex() == expected
-        diagnostic = PyrolysisSimulator._compute_fe_redox_split_diagnostic(
-            _no_iron_redox_diagnostic_sim(),
-            temperature_K,
-        )
-        assert diagnostic["iw_log"].hex() == expected
+    diagnostic = split_feot_composition(feedstock['composition_wt_pct'], 1673.15,
+        redox_state=RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -1.0))
+    comp = diagnostic['composition_wt_pct']
+    factor = diagnostic['renormalization_factor']
+    assert sum(comp.values()) == pytest.approx(100.0, abs=1e-12)
+    assert comp['Fe2O3'] > 0.0
+    assert comp['SiO2'] == 80.0 * factor
+    iron = comp['FeO'] / MOLAR_MASS['FeO'] + 2 * comp['Fe2O3'] / MOLAR_MASS['Fe2O3']
+    assert iron == pytest.approx(factor * 20.0 / MOLAR_MASS['FeO'], rel=2e-15)
+    from simulator.fe_redox import intrinsic_melt_fO2
+    recovered = intrinsic_melt_fO2(comp, 1673.15)
+    assert recovered == pytest.approx(feo_iw_log10_fO2_bar(1673.15) - 1.0, abs=2e-14)
+    assert diagnostic['condition'] == 'condition_stated'
+    assert feedstock['composition_wt_pct'] == {'SiO2': 80.0, 'FeO': 20.0}
 
 
-def test_legacy_iw_nonfinite_outputs_match_green_pins() -> None:
-    """Pin the distinct nonfinite results from origin/work-v064-green."""
-    expected = (
-        (math.nan, "0x0.0p+0", "-0x1.2000000000000p+3"),
-        (math.inf, "0x0.0p+0", "0x1.a47ae147ae148p+2"),
-        (-math.inf, "-0x1.2000000000000p+3", "-0x1.2000000000000p+3"),
+def test_measured_initial_split_is_preserved_without_kress_reanchoring():
+    from simulator.fe_redox import initialize_feedstock_iron
+
+    feedstock = {'composition_wt_pct': {'SiO2': 80.0, 'FeO': 18.0, 'Fe2O3': 2.0},
+                 'elemental_composition_wt_pct': {'Fe': 0.5}}
+    initialized, diagnostic = initialize_feedstock_iron(feedstock)
+    assert initialized == feedstock
+    assert diagnostic['method'] == 'declared_split'
+
+
+def test_missing_initial_anchor_uses_flagged_unclassified_prior():
+    from simulator.fe_redox import initialize_feedstock_iron
+
+    from simulator.fe_redox import FE_FEO_BUFFER_STANDARD, split_feot_composition
+
+    feed = {'composition_wt_pct': {'SiO2': 80.0, 'FeO': 20.0}}
+    prepared, diagnostic = initialize_feedstock_iron(feed)
+    assert diagnostic['class_prior'] == 'unclassified'
+    assert diagnostic['seed_basis'] == 'class_prior'
+    assert diagnostic['seed_authority'].value == 'model_assumed'
+    assert diagnostic['anchor']['delta_iw'] == 0.0
+    assert diagnostic['anchor']['buffer'] == FE_FEO_BUFFER_STANDARD
+    assert diagnostic['anchor']['interval'] == [-10.0, 10.0]
+    assert 'class_prior_unmeasured' in diagnostic['certification_gaps']
+    # Existing public split owner defines the historical predicted default.
+    expected = split_feot_composition(feed['composition_wt_pct'],
+                                     diagnostic['formation_temperature_K'])
+    assert diagnostic['fO2_log'] == expected['fO2_log']
+    assert prepared['composition_wt_pct']['Fe2O3'] > 0.0
+    assert initialize_feedstock_iron(prepared) == (prepared, diagnostic)
+
+
+def test_exhausted_ferric_inventory_has_an_activity_corrected_iw_lower_bound():
+    from simulator.fe_redox import kress91_intrinsic_state, calphad_ferrous_feo_activity_diagnostic
+    comp = {'SiO2': 80.0, 'FeO': 20.0}
+    T_K = 1873.15
+    activity = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=comp, T_K=T_K, pressure_bar=0.01,
+        fO2_log=feo_iw_log10_fO2_bar(T_K), fe3_over_sigma_fe=0.0)['a_FeO_authoritative']
+    from simulator.fe_redox import holzheid_stoich_feo_gamma_band
+    assert activity == pytest.approx(min(1.0,
+        melt_mol_fractions_for_kress91(comp)['FeOt'] *
+        holzheid_stoich_feo_gamma_band(T_K)['central']))
+    result = kress91_intrinsic_state(
+        feo_mol=1.0, fe2o3_mol=0.0,
+        mol_fractions=melt_mol_fractions_for_kress91(comp),
+        composition_wt_pct=comp, T_K=T_K, pressure_bar=0.01,
+        exchange_fO2_log=-9.0)
+    # The activity is stoichiometric FeO; Eq. 9's pure reference is wustite.
+    multiplier = holzheid_stoich_feo_gamma_band(T_K)['conversion_multiplier']
+    assert result['fO2_log'] == feo_iw_log10_fO2_bar(T_K, a_feo=activity/multiplier)
+    assert result['bound'] == 'lower'
+    assert 'FE_FEO_SATURATION_BOUND' in result['flags']
+    assert result['fO2_log'] != -9.0
+
+
+def test_exhausted_ferric_inventory_without_activity_is_a_typed_refusal():
+    from simulator.fe_redox import kress91_intrinsic_state
+    with pytest.raises(Kress91InvalidControls, match='FeO activity'):
+        kress91_intrinsic_state(feo_mol=1.0, fe2o3_mol=0.0,
+            mol_fractions=KRESS91_MOL_FRACTIONS, T_K=1873.15,
+            pressure_bar=0.01, exchange_fO2_log=-9.0)
+
+
+def test_closed_all_ferric_activity_keeps_zero_ferrous_inventory():
+    from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
+
+    result = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt={'SiO2': 80.0, 'FeO': 0.0, 'Fe2O3': 20.0},
+        fO2_log=-2.0, T_K=1873.15, pressure_bar=0.01, closed_ledger=True,
     )
-    for temperature_K, intrinsic_hex, diagnostic_hex in expected:
-        intrinsic = intrinsic_melt_fO2({"FeO": 1.0}, temperature_K)
-        assert intrinsic.hex() == intrinsic_hex
-        diagnostic = PyrolysisSimulator._compute_fe_redox_split_diagnostic(
-            _no_iron_redox_diagnostic_sim(),
-            temperature_K,
-        )
-        assert diagnostic["iw_log"].hex() == diagnostic_hex
-        assert diagnostic["native_fe_saturation"] is True
+    assert result['a_FeO_authoritative'] == 0.0
+    assert result['kress91_split']['fe3_over_sigma_fe'] == 1.0
+    assert result['kress91_split']['fe2o3_over_feo_molar'] is None
 
 
-def test_legacy_iw_callers_use_the_shared_owner(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Catch restoring either caller's inline legacy IW expression."""
-    calls: list[tuple[float, float]] = []
+def test_lab_feot_split_collapse_round_trip_and_stated_iw_condition():
+    from simulator.fe_redox import (split_feot_composition, collapse_feot_composition,
+                                    RedoxState, FE_FEO_BUFFER_STANDARD)
+    comp = {'SiO2': 80.0, 'FeO': 20.0}
+    T_K = 1873.15  # Lab condition: IW-1 at 1600 C.
+    result = split_feot_composition(comp, T_K,
+        redox_state=RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -1.0))
+    assert collapse_feot_composition(result['composition_wt_pct']) == pytest.approx(comp, abs=2e-14)
+    expected = kress91_fe3_over_sigma_fe(fO2_log=feo_iw_log10_fO2_bar(T_K)-1,
+        mol_fractions=melt_mol_fractions_for_kress91(comp), T_K=T_K, pressure_bar=1e-9)
+    assert result['fe3_over_sigma_fe'] == expected
+    assert result['condition'] == 'condition_stated'
+    assert result['temperature_band']['authoritative']
+    defaulted = split_feot_composition(comp, 2373.15)
+    assert defaulted['condition'] == 'condition_defaulted'
+    assert defaulted['certification_gaps'] == ['intrinsic_delta_iw']
+    assert defaulted['temperature_band']['extrapolation']
 
-    def owner_sentinel(
-        temperature_K: float,
-        *,
-        vacuum_floor_bar: float,
-    ) -> float:
-        calls.append((temperature_K, vacuum_floor_bar))
-        return -4.25
 
-    monkeypatch.setattr(
-        fe_redox_module,
-        "legacy_iw_log10_fO2_bar",
-        owner_sentinel,
+@pytest.mark.parametrize('T_K', [1473.15, 1673.15, 1873.15, 2373.15])
+@pytest.mark.parametrize('pressure_bar', [1e-9, 0.01, 1.0])
+@pytest.mark.parametrize('fO2_log', [-18.0, -9.0, -3.0])
+@pytest.mark.parametrize('alkali', [0.0, 0.04])
+def test_intrinsic_kress91_inverse_round_trip(T_K, pressure_bar, fO2_log, alkali):
+    from simulator.fe_redox import kress91_intrinsic_state
+
+    basis = dict(KRESS91_MOL_FRACTIONS, Na2O=alkali, SiO2=0.48 - alkali)
+    split = kress91_split(
+        fO2_log=fO2_log, mol_fractions=basis, T_K=T_K, pressure_bar=pressure_bar,
     )
-    monkeypatch.setattr(
-        core_module,
-        "legacy_iw_log10_fO2_bar",
-        owner_sentinel,
+    state = kress91_intrinsic_state(
+        feo_mol=1.0, fe2o3_mol=split['ratio'], mol_fractions=basis,
+        T_K=T_K, pressure_bar=pressure_bar, exchange_fO2_log=-9.0,
+    )
+    assert state['fO2_log'] == pytest.approx(fO2_log, abs=2e-14)
+    assert not state['exchange_bounded']
+    assert ('OUT_OF_CERTIFIED_BAND' in state['flags']) == (T_K > 1903.15)
+
+
+@pytest.mark.parametrize('T_K', [1473.15, 1873.15, 2073.15])
+@pytest.mark.parametrize('total_fe_mol', [1.0, 1000.0])
+def test_intrinsic_kress91_pressure_boundary_is_exact(T_K, total_fe_mol):
+    from simulator.fe_redox import kress91_intrinsic_state, kress91_oxygen_demand_mol
+
+    pressure_bar = 0.01
+    ceiling = math.log10(pressure_bar)
+    uptake = kress91_oxygen_demand_mol(
+        feo_mol=total_fe_mol, fe2o3_mol=0.0,
+        fO2_log=ceiling, mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=T_K, pressure_bar=pressure_bar,
+    )
+    # 2 FeO + 1/2 O2 -> Fe2O3: each mol O2 funds 4 mol FeO -> 2 mol
+    # Fe2O3. These mol coefficients conserve Fe and O at any inventory scale.
+    state = kress91_intrinsic_state(
+        feo_mol=total_fe_mol - 4.0 * uptake, fe2o3_mol=2.0 * uptake,
+        mol_fractions=KRESS91_MOL_FRACTIONS, T_K=T_K,
+        pressure_bar=pressure_bar, exchange_fO2_log=ceiling,
+    )
+    assert state['fO2_log'] == ceiling
+    assert not state['exchange_bounded']
+
+
+@pytest.mark.parametrize('temperature_C', [1630., 1630.0001, 1750.])
+def test_kress91_ceiling_emits_typed_notice_without_clamping(temperature_C):
+    from simulator.fe_redox import kress91_intrinsic_state
+
+    T_K = temperature_C + 273.15
+    split = kress91_split(fO2_log=-9., mol_fractions=KRESS91_MOL_FRACTIONS,
+                          T_K=T_K, pressure_bar=0.01)
+    state = kress91_intrinsic_state(
+        feo_mol=1., fe2o3_mol=split['ratio'],
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=T_K, pressure_bar=.01, exchange_fO2_log=-9.)
+    assert state['fO2_log'] == pytest.approx(-9., abs=2e-14)
+    notices = state['notices']
+    assert split.get('notices', []) == notices
+    if temperature_C > 1630.:
+        assert notices[0]['flag'] == 'KRESS91_OUT_OF_CALIBRATION_BAND'
+        assert notices[0]['max_temperature_C'] == 1630.
+        assert notices[0]['temperature_C'] == pytest.approx(temperature_C)
+        assert notices[0]['authority'] == 'extrapolated'
+    else:
+        assert notices == []
+        assert 'notices' not in split
+
+
+@pytest.mark.parametrize('feo_mol, fe2o3_mol', [(1.0, 0.0), (0.0, 1.0)])
+@pytest.mark.parametrize('exchange, expected', [(-5.0, -5.0), (0.0, -2.0)])
+def test_intrinsic_kress91_ends_follow_exchange(feo_mol, fe2o3_mol, exchange, expected):
+    from simulator.fe_redox import kress91_intrinsic_state
+
+    if feo_mol > 0.0:
+        # A reducing endpoint needs an activity-grounded stability bound;
+        # the gas pressure alone cannot establish that bound (d-147).
+        with pytest.raises(Kress91InvalidControls, match='FeO activity'):
+            kress91_intrinsic_state(
+                feo_mol=feo_mol, fe2o3_mol=fe2o3_mol,
+                mol_fractions=KRESS91_MOL_FRACTIONS, T_K=1873.15,
+                pressure_bar=0.01, exchange_fO2_log=exchange)
+        return
+
+    state = kress91_intrinsic_state(
+        feo_mol=feo_mol, fe2o3_mol=fe2o3_mol,
+        mol_fractions=KRESS91_MOL_FRACTIONS, T_K=1873.15,
+        pressure_bar=0.01, exchange_fO2_log=exchange,
+    )
+    assert state['fO2_log'] == expected
+    assert state['exchange_bounded']
+    assert 'EXCHANGE_BOUNDED' in state['flags']
+    assert state['unclamped_fO2_log'] == exchange
+    assert state['pressure_ceiling_fO2_log'] == -2.0
+    assert ('REDOX_PRESSURE_CEILING' in state['flags']) == (exchange > -2.0)
+
+
+@pytest.mark.parametrize('kind', ['absolute', 'buffer_offset'])
+@pytest.mark.parametrize('temperature_K', [1873.15, 2373.15])
+def test_intrinsic_kress91_preserves_imposed_state(kind, temperature_K):
+    from simulator.fe_redox import (
+        FE_FEO_BUFFER_STANDARD, RedoxState, _non_absolute_redox_state_kwargs,
+        kress91_intrinsic_state,
     )
 
-    intrinsic = fe_redox_module.intrinsic_melt_fO2({"FeO": 1.0}, 2000.0)
-    diagnostic = PyrolysisSimulator._compute_fe_redox_split_diagnostic(
-        _no_iron_redox_diagnostic_sim(),
-        2000.0,
+    imposed = (RedoxState.absolute(-7.0) if kind == 'absolute' else
+               RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.5))
+    identity = imposed.cache_identity()
+    kwargs = _non_absolute_redox_state_kwargs(imposed)
+    state = kress91_intrinsic_state(
+        feo_mol=0.0, fe2o3_mol=1.0, mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=temperature_K, pressure_bar=0.01, exchange_fO2_log=-5.0,
+        redox_state=imposed,
     )
+    assert state['fO2_log'] == imposed.log_fO2_at(temperature_K)
+    assert not state['exchange_bounded']
+    assert state['flags'] == []
+    assert imposed.cache_identity() == identity
+    assert _non_absolute_redox_state_kwargs(imposed) == kwargs
 
-    assert intrinsic == diagnostic["iw_log"] == -4.25
-    assert calls == [(2000.0, 1.0e-9), (2000.0, 1.0e-9)]
+
+@pytest.mark.parametrize('ferric_mol', [0.0, 1.0, 50.0])
+def test_finite_headspace_exchange_cannot_cross_equilibrium(ferric_mol):
+    from simulator.fe_redox import _kress91_exchange_uptake_mol, kress91_intrinsic_state
+
+    feo_mol = 100.0 - 2.0 * ferric_mol
+    head_o2_mol = 10.0
+
+    def gas_potential(remaining_o2):
+        # Ideal gas at fixed T/V: p is proportional to actual O2 mol.
+        return math.log10(max(remaining_o2 / 1000.0, 1e-9))
+
+    uptake = _kress91_exchange_uptake_mol(
+        feo_mol=feo_mol, fe2o3_mol=ferric_mol,
+        mol_fractions=KRESS91_MOL_FRACTIONS, T_K=1673.15,
+        pressure_bar=0.01, head_o2_mol=head_o2_mol,
+        available_o2_mol=head_o2_mol, gas_log_fO2=gas_potential,
+    )
+    assert -ferric_mol / 2.0 < uptake < head_o2_mol
+    liquid = kress91_intrinsic_state(
+        feo_mol=feo_mol - 4.0 * uptake, fe2o3_mol=ferric_mol + 2.0 * uptake,
+        mol_fractions=KRESS91_MOL_FRACTIONS, T_K=1673.15,
+        pressure_bar=0.01, exchange_fO2_log=gas_potential(head_o2_mol - uptake),
+    )
+    assert liquid['fO2_log'] == pytest.approx(gas_potential(head_o2_mol - uptake), abs=1e-9)
 
 
 @pytest.mark.parametrize('pressure_bar', [0.0, -1.0])
@@ -588,6 +764,7 @@ def test_core_fe_redox_diagnostic_nonfinite_pressure_reaches_validator(
     )
     sim.overhead = SimpleNamespace(pressure_mbar=pressure_mbar)
     sim._melt_oxide_wt_pct = lambda: _FERROUS_ACTIVITY_COMP_WT
+    sim._current_melt_redox_fO2_log = lambda: -7.75
 
     with pytest.raises(Kress91InvalidControls, match='pressure_bar'):
         sim._compute_fe_redox_split_diagnostic(temperature_K=1873.15)

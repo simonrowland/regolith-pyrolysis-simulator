@@ -101,11 +101,17 @@ SCENARIO_FLUX_LEDGER_PINS = {
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
-        "ledger_sha256": "3cef2f00197f17daeaebfc535f79ae2bed243fca379203c2fd65b92ab3c1b25d",
+        # b-899 one-redox-state rebaseline:
+        # 3cef2f00197f17daeaebfc535f79ae2bed243fca379203c2fd65b92ab3c1b25d ->
+        # 16d1322a8e97739dfc118cf598d684b52a5cb4df022a623d072bee31d12763a8
+        "ledger_sha256": "16d1322a8e97739dfc118cf598d684b52a5cb4df022a623d072bee31d12763a8",
     },
     "ci_carbonaceous_chondrite_C2B_12h": {
         "flux_maps_sha256": "d827049039f82a8b65a9b0f52e637cf3bc5d1e0dec7d6198edf901a5e3dcae7d",
-        "ledger_sha256": "fe7c19dbc6195a7f115e8cac385d539f84cf0a3670c35415ee058a5f41a56348",
+        # b-899 one-redox-state rebaseline:
+        # fe7c19dbc6195a7f115e8cac385d539f84cf0a3670c35415ee058a5f41a56348 ->
+        # f69e328d3019a763ecb7092df1a0c17a46615dcf6eb3c19d76d894259121d1bb
+        "ledger_sha256": "f69e328d3019a763ecb7092df1a0c17a46615dcf6eb3c19d76d894259121d1bb",
     },
 }
 
@@ -972,12 +978,30 @@ def test_o2_bubbler_refusal_is_visible_in_runner_envelope_without_advancing():
     assert payload["status"] == "refused"
     assert payload["reason"] == "negative_rate_kg_per_hr"
     assert payload["run_metadata"]["hours_completed"] == 0
+    notice = payload['run_metadata']['feedstock_iron_notice']
+    assert notice['method'] == 'imposed_fO2'
+    assert 'measured_feedstock_iron_split' in notice['certification_gaps']
     assert payload["run_metadata"]["refusal_diagnostic"] == {
         "status": "refused",
         "reason": "negative_rate_kg_per_hr",
         "rate_kg_per_hr": -1.0,
         "injected_mol": 0.0,
     }
+
+
+def test_runner_exports_feedstock_initialization_gaps_without_an_equilibrium_tick():
+    run = PyrolysisRun(feedstock_id='lunar_mare_low_ti', campaign='C0', hours=0)
+    session = run._start_session()
+    sim = session.simulator
+    before = sim.atom_ledger.mol_by_account()
+    payload = run._run_session(session)
+    notice = payload['run_metadata']['feedstock_iron_notice']
+    assert notice == json.loads(json.dumps(sim._feedstock_iron_initialization))
+    assert notice['method'] == 'imposed_fO2'
+    assert set(notice['certification_gaps']) >= {
+        'formation_temperature_K', 'measured_feedstock_iron_split',
+    }
+    assert sim.atom_ledger.mol_by_account() == before
 
 
 @pytest.mark.parametrize(
@@ -2449,7 +2473,7 @@ def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
         campaign="C5",
         hours=1,
         c5_enabled=True,
-        mre_target_species="CaO",
+        mre_target_species="FeO",
         mre_max_voltage_V=2.5,
         run_metadata_overrides={
             "started_at_utc": "2026-05-15T00:00:00Z",

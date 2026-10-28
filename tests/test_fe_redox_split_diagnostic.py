@@ -13,6 +13,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import CampaignPhase
+from tests.chemistry.conftest import _seed_melt_redox
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -110,24 +111,30 @@ def test_fe_redox_split_snapshot_field_is_diagnostic_only() -> None:
     )
 
 
-def test_fe_redox_split_reads_oxygen_reservoir_not_stale_mirror() -> None:
+def test_fe_redox_split_reads_ledger_not_stale_mirrors() -> None:
     sim = _make_sim("lunar_mare_low_ti")
+    expected = sim._current_melt_redox_fO2_log()
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -5.25
     sim.melt.fO2_log = -11.0
     sim.melt.melt_fO2_log = -11.0
 
     split = sim._compute_fe_redox_split_diagnostic()
 
-    assert split["fO2_log"] == pytest.approx(-5.25)
+    assert split["fO2_log"] == expected
     assert split["status"] == "ok"
 
 
 def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
-    sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
+    from tests.chemistry.conftest import _native_fe_saturating_feedstocks
+
+    sim = _make_sim("lunar_mare_low_ti")
+    sim.feedstocks = _native_fe_saturating_feedstocks(
+        sim.feedstocks, "lunar_mare_low_ti")
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.melt.temperature_C = 1750.0
     _seed_redox_liquidus_curve(sim)
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim.melt.fO2_log = -10.0
-    sim.melt.melt_fO2_log = -10.0
+    sim._vacuum_floor_bar = lambda: 1e-20
+    sim._headspace_transport_pO2_bar_from_ledger = lambda *args, **kwargs: 1e-20
 
     before_feo_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt")["FeO"]
     before_tap = dict(sim.atom_ledger.kg_by_account("terminal.drain_tap_material"))
@@ -138,8 +145,10 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
     # 2026-08-05 MC-1 trace wiring d1b4f5d: feedstock-native Co/Ni are already
     # in the drain tap before the Fe split; the migration contract is no Fe yet.
     assert before_tap == pytest.approx({
-        "Co": 0.035950609023654635,
-        "Ni": 0.20543205156374078,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Co": 0.01598451769137197,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Ni": 0.09134010109355412,
     })
     assert "Fe" not in before_tap
 
@@ -204,22 +213,16 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
 def test_native_fe_authoritative_extent_ignores_diagnostic_payload(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
-    _seed_redox_liquidus_curve(sim)
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim.melt.fO2_log = -10.0
-    sim.melt.melt_fO2_log = -10.0
-    pre_poison_split = sim._compute_fe_redox_split_diagnostic()
-    native_frac = max(
-        0.0,
-        float(pre_poison_split.get("native_fe_frac", 0.0) or 0.0),
-    )
-    cleaned_melt_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
-    feo_mol = max(0.0, float(cleaned_melt_mol.get("FeO", 0.0) or 0.0))
-    expected_native_fe_mol = min(
-        feo_mol,
-        sim._cleaned_melt_fe_atom_mol() * native_frac,
-    )
+    from tests.test_native_fe_equilibrium import _reducing_sim
+
+    sim = _reducing_sim()
+    # The corrected coexistence bound lies below the normal 1e-9 bar floor.
+    # Give this authority-vs-diagnostic test a favorable gas receiver explicitly;
+    # finite-gas blocking is covered by test_native_fe_equilibrium.
+    monkeypatch.setattr(sim, '_vacuum_floor_bar', lambda: 1e-20)
+    monkeypatch.setattr(sim, '_headspace_transport_pO2_bar_from_ledger',
+                        lambda *args, **kwargs: 1e-20)
+    expected_native_fe_mol = sim._compute_native_fe_saturation_extent()['native_fe_mol']
     assert expected_native_fe_mol > 0.0
 
     def poisoned_diagnostic(*_args: Any, **_kwargs: Any) -> dict[str, Any]:

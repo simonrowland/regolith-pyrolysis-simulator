@@ -104,7 +104,8 @@ SIO_ANCHOR_HOUR = 6
 # mass-balance artifact (AtomLedger closes). Pin = executed probe value;
 # never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
 # b-850: alkali composite vapour rows now use the parent-oxide activity.
-EXPECTED_SIO_DECADE_DRIFT = 0.2090602025512069
+# d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+EXPECTED_SIO_DECADE_DRIFT = 0.3762853310452042
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
@@ -117,7 +118,8 @@ def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
     anchor = hour_trace[SIO_ANCHOR_HOUR]
     p_sio_finite = anchor["p_SiO_Pa"]
     temperature_C = anchor["temperature_C"]
-    fO2_log_iw = sim._compute_intrinsic_melt_fO2(temperature_C + 273.15)
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
+    fO2_log_iw = feo_iw_log10_fO2_bar(temperature_C + 273.15)
     iw_result = sim._chem_kernel.dispatch(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=temperature_C,

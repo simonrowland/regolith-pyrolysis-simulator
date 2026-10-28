@@ -19,10 +19,13 @@ from simulator.chemistry.kernel.dto import (
     IntentRequest,
     IntentResult,
     LedgerTransitionProposal,
+    ProviderAccountView,
 )
+from simulator.account_ids import MELT_RESIDENT_ACCOUNTS, METAL_PHASE_ACCOUNT
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
+    fe0_comproportionation_extent,
     kress91_fe3_over_sigma_fe,
     kress91_temperature_band_case,
     melt_mol_fractions_for_kress91,
@@ -51,7 +54,8 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
 
     name = "builtin-fe-redox-respeciation"
     DECLARED_ACCOUNTS = frozenset({
-        CLEANED_MELT_ACCOUNT,
+        *MELT_RESIDENT_ACCOUNTS,
+        METAL_PHASE_ACCOUNT,
         OXYGEN_ACCOUNT,
         FO2_BUFFER_ACCOUNT,
     })
@@ -119,10 +123,17 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
             "temperature_band_status": temperature_band.get("status"),
             "temperature_band_source": temperature_band.get("source"),
             "temperature_band_authoritative": bool(temperature_band.get("authoritative")),
-            "flags": ["OUT_OF_CERTIFIED_BAND"] if temperature_band.get("extrapolation") else [],
+            "flags": (
+                ["OUT_OF_CERTIFIED_BAND", temperature_band.get("case")]
+                if temperature_band.get("extrapolation") else []
+            ),
+            **({"authority": "extrapolated"}
+               if temperature_band.get("extrapolation") else {}),
         }
         if not bool(temperature_band.get("authoritative")) and (
-            temperature_band.get("case") != "1630C_2100C_extrapolation_experimentally_confirmed"
+            temperature_band.get("case") in {
+                "below_1200C_extrapolation", "non_finite_temperature",
+            }
         ):
             return IntentResult(
                 intent=ChemistryIntent.FE_REDOX_RESPECIATION,
@@ -143,6 +154,29 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         cleaned_melt = dict(accounts.get(CLEANED_MELT_ACCOUNT, {}) or {})
         feo_mol = max(0.0, float(cleaned_melt.get("FeO", 0.0) or 0.0))
         fe2o3_mol = max(0.0, float(cleaned_melt.get("Fe2O3", 0.0) or 0.0))
+        if controls.get('reaction') == 'fe0_comproportionation':
+            metal = max(0.0, float(accounts.get(METAL_PHASE_ACCOUNT, {}).get('Fe', 0.0)))
+            extent = fe0_comproportionation_extent(
+                metal, fe2o3_mol, feo_mol=feo_mol,
+                comp_wt=composition_wt_pct_from_account_view(
+                    request.account_view, CLEANED_MELT_ACCOUNT),
+                T_K=T_K, pressure_bar=pressure_bar)
+            n = extent['extent_mol']
+            proposal = None
+            if n > NOOP_MOL:
+                debits = {METAL_PHASE_ACCOUNT: {'Fe': n}, CLEANED_MELT_ACCOUNT: {'Fe2O3': n}}
+                credits = {CLEANED_MELT_ACCOUNT: {'FeO': extent['feo_credit_mol']}}
+                proposal = LedgerTransitionProposal(
+                    debits=debits, credits=credits, reason='fe0_comproportionation',
+                    atom_balance_proof=build_atom_balance_proof(
+                        debits, credits, request.account_view.species_formula_registry,
+                        resolve_species_formula),
+                )
+            return IntentResult(
+                intent=ChemistryIntent.FE_REDOX_RESPECIATION, status='ok',
+                transition=proposal, control_audit=control_audit,
+                diagnostic={**band_diagnostic, **extent, 'reaction': 'fe0_comproportionation'},
+            )
         total_fe_mol = feo_mol + 2.0 * fe2o3_mol
         if total_fe_mol <= NOOP_MOL:
             return IntentResult(
@@ -161,10 +195,17 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                 },
             )
 
+        from simulator.accounting.account_views import merge_species_amounts_from_accounts
+
+        # Provenance-isolated spent oxide is physically in the same melt.
+        # Only this thermodynamic basis is combined; Fe/O2 funding and
+        # transition accounts continue to use the original account view.
+        basis_view = ProviderAccountView(
+            accounts={CLEANED_MELT_ACCOUNT: merge_species_amounts_from_accounts(
+                accounts, MELT_RESIDENT_ACCOUNTS)},
+            species_formula_registry=request.account_view.species_formula_registry)
         comp_wt = composition_wt_pct_from_account_view(
-            request.account_view,
-            CLEANED_MELT_ACCOUNT,
-        )
+            basis_view, CLEANED_MELT_ACCOUNT)
         mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
         if not mol_fractions:
             return IntentResult(

@@ -2,6 +2,39 @@
 
 The simulator is intended to compare feedstock families, not optimize one idealized lunar composition. Different bodies offer different product streams, pressure environments, volatile hazards, and energy tradeoffs.
 
+## Initial iron speciation
+
+Optional `iron_speciation` observations carry `value`, an ordered `interval`,
+`source: {reference: ..., page: ...}`, `method`, and `authority` (`measured`,
+`literature_typical`, or `model_assumed`). Methods are `mossbauer`, `xanes`,
+`wet_chemistry_titration`, `fmr_is_feo`, `vsm_saturation_magnetization`,
+`sato_zirconia_cell`, and `literature_typical`.
+
+Use `fe3_over_sum_fe` for ferric atoms divided by **all** iron atoms, including
+declared metal, or a printed `feo_wt_pct` / `fe2o3_wt_pct` pair. These take
+precedence over the formation-buffer prediction. `fe0_metal_wt_pct` is elemental
+metallic Fe mass, with `form: nanophase | meteoritic_fe_ni | native`; optional
+`metal_composition_wt_pct: {Ni: ..., Co: ...}` gives mass percentages within
+that alloy. Existing elemental trace inventories fund those Ni/Co shares when
+present. FeOt includes the metallic iron on an unsplit total-Fe assay; an
+explicit FeO/Fe2O3 analysis already describes the separate oxides.
+
+Alternatively store raw `is_over_feo` and the source sample's `feo_wt_pct`.
+The redox owner converts these to 4–33 nm npFe⁰ using the cited Morris relation;
+coarser native or meteoritic metal remains unconstrained. Lunar family proxies
+are labelled `literature_typical`; their maturity intervals describe sample
+spread, not batch measurement precision. Carbon, sulfur, and perchlorates
+continue to use their existing composition inventory fields.
+
+`intrinsic_redox` carries `delta_iw`, `interval`, `buffer`, the buffer's
+`buffer_source`, and the offset's `source` / `locator`. The conventional
+`solid_iron_wustite_sato1973` buffer is evaluated from Sato et al. (1973), p.1067
+Eq.5, then converted once to the code's liquid-wüstite reference. Its
+850–1300 °C range is explicit; extrapolated formation temperatures are flagged.
+Results and hourly snapshots expose the ferric seed's typed `seed_authority`;
+metal authority is recorded separately. First liquid contact reacts
+Fe⁰ + Fe₂O₃ → 3 FeO through the existing redox reaction provider and atom ledger.
+
 ## Lunar Feedstocks
 
 Lunar mare and highland materials are the baseline cases. They are useful for studying oxygen, Fe extraction, SiO suppression, glass preservation, Mg recovery, refractory residues, and MRE pretreatment.
@@ -49,12 +82,33 @@ simulator projects only these cleaned silicate melt oxides into
 `Na2O`, `K2O`, `Cr2O3`, `MnO`, `P2O5`, `NiO`, and `CoO`.
 
 Apollo-derived lunar bulk chemistry usually reports total iron as `FeO` or
-`FeO_T`, not as a separate `FeO`/`Fe2O3` assay. The simulator keeps lunar
-entries unflagged and uses their canonical `FeO` value as ferrous iron for
-process calculations by modelling choice; this does not claim the source
-measured that ferrous split. No ferric component or native/nanophase metal is
-inferred from the lunar reporting convention, and lunar data remains as
-reported.
+`FeO_T`, not as a separate `FeO`/`Fe2O3` assay. When a measured split is
+unavailable, the simulator predicts that split once at load using Kress91
+and the feedstock's intrinsic redox and formation-temperature anchors in
+`data/feedstocks.yaml`. It renormalizes the complete analysis to the batch
+mass without importing oxygen. The run reports the predicted split and any
+defaulted anchor as certification gaps. The ledger split then determines
+the melt's redox state. This fallback does not infer metallic iron or claim
+a measured ferric split; the source analysis remains unchanged.
+
+**Batch-mass convention (owner-visible).** A declared unsplit `FeO` assay is
+treated as total iron expressed as FeO (FeOt), then re-split using the cited
+Kress & Carmichael (1991), REF-001, relation and the feedstock's stated anchor
+([doi:10.1007/BF00307328](https://doi.org/10.1007/BF00307328)). The citation
+supports the ferric/ferrous relation; preserving the requested batch mass is
+the simulator's accounting convention. Ferric iron adds oxygen to the
+reconstructed analysis, so the complete batch, including iron-free species,
+is renormalized. If the original complete analysis has mass A and ferric
+oxygen adds dA, an originally normalized non-iron mass scales by A/(A+dA).
+For the FeO 95 / Na2CO3 5 default-anchor example, the factor is
+0.9994940904872219: 50.0 kg Na2CO3 becomes 49.974704524361094 kg in a
+1000 kg batch. Stage 0 cleanup carbon demand uses this same correction;
+any carbon supplied beyond the corrected demand remains additive inventory.
+
+The alternative is to preserve the declared non-iron masses and let the total
+batch mass increase by the added ferric oxygen. That alternative is not the
+current convention. Changing this owner-visible choice requires an owner
+ruling.
 
 Other raw components are preserved in the batch inventory instead of being
 silently dropped. Examples include `H2O`, `C`, `S`, `SO3`, `Cl`, `ClO4`,

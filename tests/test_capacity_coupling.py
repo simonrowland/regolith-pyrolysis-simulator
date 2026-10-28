@@ -724,6 +724,7 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     sim = _real_capacity_sim()
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1600.0
+    sim._re_reference_melt_fO2_to_temperature(1873.15)
     equilibrium = sim._get_equilibrium()
     effective_source = _pre_rg_effective_pressure_source(
         sim.vapor_pressures, equilibrium
@@ -820,7 +821,8 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             assert catalog_pa < pure_component_probe_pa[species_id]
             # Physical OOR can land near the pre-rg seam; pin the live value
             # so a future regression that re-inflates heating OOR is visible.
-            assert catalog_pa == pytest.approx(0.7101916366096568, rel=1.0e-9)
+            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+            assert catalog_pa == pytest.approx(0.7154959534800683, rel=1.0e-9)
         else:
             assert not answer.extra.get("out_of_range", False)
             assert within_probe_band(species_id, catalog_pa, probe_pa)
@@ -1107,11 +1109,13 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (
-        "condense_TiO",
-        "evaporate_TiO2_gas",
         "condense_TiO2_gas",
         "fe_redox_respeciation",
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "oxygen_reservoir_exchange",
         "overhead_bleed",
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "metal_phase_stratification_diagnostic",
     )
     assert "evaporate_Fe" in ca_ti_reasons
     assert "condense_Fe" in ca_ti_reasons
@@ -1905,14 +1909,13 @@ def test_binding_cold_train_does_not_turn_redox_no_capacity_into_fo2_move(
     )
     assert isinstance(capacity, FiniteCapacity)
     sim.melt.temperature_C = 1600.0
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
-    sim.melt.oxygen_reservoir.reference_T_K = 1873.15
-    sim._sync_oxygen_reservoir_mirror()
+    from tests.chemistry.conftest import _seed_melt_redox
+    _seed_melt_redox(sim, -9.0)
     before_transitions = len(sim.atom_ledger.transitions)
     monkeypatch.setattr(
         sim,
-        "_melt_redox_capacity_mol_per_ln_fO2",
-        lambda **_kwargs: 0.0,
+        "_melt_redox_temperature_shift_is_liquid",
+        lambda *_args, **_kwargs: False,
     )
 
     reservoir = sim._apply_oxygen_reservoir_redox_source_terms(

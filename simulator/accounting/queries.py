@@ -28,6 +28,7 @@ from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
 )
+from simulator.accounting.ledger import _merge_species_amounts_from_accounts
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.vapour_rail.instrumentation import (
     FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL,
@@ -455,9 +456,14 @@ class AccountingQueries:
         self,
         accounts: tuple[str, ...] | list[str],
     ) -> dict[str, float]:
-        species_kg: dict[str, float] = {}
-        for account in accounts:
-            _merge_masses(species_kg, self.ledger.project_account_kg(str(account)))
+        account_names = tuple(str(account) for account in accounts)
+        balances = {
+            account: self.ledger.project_account_kg(account)
+            for account in account_names
+        }
+        species_kg = _merge_species_amounts_from_accounts(
+            balances, account_names,
+        )
         return {
             species: kg
             for species, kg in sorted(species_kg.items())
@@ -2637,19 +2643,6 @@ def _oxygen_atom_mol_for_balances(
         sum(_oxygen_atom_mol_by_species(species_mol, registry).values())
         for species_mol in balances.values()
     )
-
-
-def _merge_species_mol_from_accounts(
-    balances: Mapping[str, Mapping[str, float]],
-    accounts: tuple[str, ...] | list[str],
-) -> dict[str, float]:
-    merged: dict[str, float] = {}
-    for account in accounts:
-        for species, mol in (balances.get(str(account), {}) or {}).items():
-            amount = float(mol)
-            if amount:
-                merged[str(species)] = merged.get(str(species), 0.0) + amount
-    return dict(sorted(merged.items()))
 
 
 def _plume_position_reading(

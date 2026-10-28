@@ -842,7 +842,14 @@ def test_intact_oxide_vapor_allows_zero_o2_stoich():
     sim = PyrolysisSimulator(
         backend,
         {"campaigns": {}},
-        {"feo": {"label": "FeO", "composition_wt_pct": {"FeO": 100.0}}},
+        {"feo": {
+            "label": "FeO", "composition_wt_pct": {"FeO": 100.0, "Fe2O3": 0.0},
+            "composition_basis": {
+                oxide: {"method": "defined pure FeO fixture",
+                        "source": "test_intact_oxide_vapor_allows_zero_o2_stoich"}
+                for oxide in ("FeO", "Fe2O3")
+            },
+        }},
         {
             "metals": {},
             "oxide_vapors": {
@@ -1205,7 +1212,7 @@ def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
 
     reservoir = sim._apply_oxygen_reservoir_exchange()
 
-    assert reservoir.exchange_transition_name == "oxygen_reservoir_exchange"
+    assert reservoir.exchange_transition_name == "fe_redox_respeciation"
     assert reservoir.exchange_clamped is False
     assert reservoir.exchange_direction in {
         "melt_to_headspace",
@@ -1213,7 +1220,7 @@ def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
     }
     transitions = [
         t for t in sim.atom_ledger.transitions
-        if t.name == "oxygen_reservoir_exchange"
+        if t.name == "fe_redox_respeciation"
     ]
     assert transitions
     transitions[-1].validate_conservation(sim.atom_ledger.registry)
@@ -1221,7 +1228,7 @@ def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
         lot.account
         for lot in transitions[-1].debits + transitions[-1].credits
     }
-    assert touched == {"reservoir.fo2_buffer", "process.overhead_gas"}
+    assert touched == {"process.cleaned_melt", "process.overhead_gas"}
 
     after_gap = abs(
         math.log10(reservoir.headspace_transport_pO2_bar)

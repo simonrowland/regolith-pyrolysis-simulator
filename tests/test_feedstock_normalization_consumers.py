@@ -8,12 +8,14 @@ import pytest
 import yaml
 
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.additive_calculations import k_shuttle_potassium_additive_kg
 from simulator.core import PyrolysisSimulator
 from simulator.equipment import EquipmentDesigner
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.objective import compute_objectives
+from simulator import equipment as equipment_module
 from web import routes as web_routes
 
 
@@ -75,6 +77,17 @@ def normalized(feedstocks: dict) -> dict[str, float]:
 
 
 @pytest.fixture
+def prepared_components(feedstocks: dict) -> dict[str, float]:
+    sim = _sim(feedstocks)
+    feedstock = feedstocks[FEEDSTOCK_KEY]
+    required_c = PyrolysisSimulator._carbon_reductant_required_kg(
+        feedstock, MASS_KG
+    )
+    sim.load_batch(FEEDSTOCK_KEY, MASS_KG, additives_kg={"C": required_c})
+    return dict(sim.inventory.raw_components_kg)
+
+
+@pytest.fixture
 def client(tmp_path):
     optimizer_job_runner.reset_runner_cache()
     app = Flask(__name__)
@@ -131,12 +144,29 @@ def test_normalized_helper_rejects_negative_declared_component() -> None:
 
 def test_volatiles_train_uses_normalized_composition(
     feedstocks: dict,
-    normalized: dict[str, float],
+    prepared_components: dict[str, float],
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    observed: dict[str, float] = {}
+    normalize = equipment_module.normalized_feedstock_component_masses_kg
+
+    def capture_components(feedstock: dict, mass_kg: float) -> dict[str, float]:
+        components = normalize(feedstock, mass_kg)
+        observed.update(components)
+        return components
+
+    monkeypatch.setattr(
+        equipment_module,
+        "normalized_feedstock_component_masses_kg",
+        capture_components,
+    )
     spec = EquipmentDesigner().size_volatiles_train(MASS_KG, feedstocks[FEEDSTOCK_KEY])
     expected_volatile_kg = sum(
-        normalized.get(species, 0.0) for species in ("Na2O", "K2O", "H2O", "S", "Cl")
+        prepared_components.get(species, 0.0)
+        for species in ("Na2O", "K2O", "H2O", "S", "Cl")
     )
+    assert observed.get("FeO", 0.0) == pytest.approx(prepared_components["FeO"])
+    assert observed.get("Fe2O3", 0.0) == pytest.approx(prepared_components["Fe2O3"])
     raw_volatile_kg = MASS_KG * (
         feedstocks[FEEDSTOCK_KEY]["composition_wt_pct"]["Na2O"]
         + feedstocks[FEEDSTOCK_KEY]["composition_wt_pct"]["K2O"]
@@ -149,33 +179,37 @@ def test_volatiles_train_uses_normalized_composition(
 def test_additive_calc_uses_normalized_oxide_kg(
     client,
     feedstocks: dict,
-    normalized: dict[str, float],
+    prepared_components: dict[str, float],
 ) -> None:
     response = client.get(f"/api/additive-calc/{FEEDSTOCK_KEY}?mass_kg={MASS_KG}")
 
     assert response.status_code == 200
     payload = response.get_json()
-    expected_k = normalized["FeO"] * (2 * 39.10 / 71.84) * 0.25 * 1.2
-    raw_k = (
-        MASS_KG
-        * feedstocks[FEEDSTOCK_KEY]["composition_wt_pct"]["FeO"]
-        / 100.0
-        * (2 * 39.10 / 71.84)
-        * 0.25
-        * 1.2
+    expected_k = round(
+        k_shuttle_potassium_additive_kg(
+            prepared_components["FeO"], prepared_components["Fe2O3"]
+        ),
+        1,
     )
-    assert payload["K"] == pytest.approx(round(expected_k, 1))
+    raw_k = round(
+        k_shuttle_potassium_additive_kg(
+            MASS_KG * feedstocks[FEEDSTOCK_KEY]["composition_wt_pct"]["FeO"] / 100.0,
+            MASS_KG * feedstocks[FEEDSTOCK_KEY]["composition_wt_pct"].get("Fe2O3", 0.0) / 100.0,
+        ),
+        1,
+    )
+    assert payload["K"] == pytest.approx(expected_k)
     assert payload["K"] != pytest.approx(raw_k)
 
 
 def test_composition_target_scoring_uses_normalized_feedstock_input_mol(
     feedstocks: dict,
-    normalized: dict[str, float],
+    prepared_components: dict[str, float],
 ) -> None:
     registry = _sim(feedstocks)._registry_for_feedstock(feedstocks[FEEDSTOCK_KEY])
     input_fe_mol = sum(
         _element_mol(species, kg, "Fe", registry)
-        for species, kg in normalized.items()
+        for species, kg in prepared_components.items()
     )
     captured_fe_kg = input_fe_mol * resolve_species_formula("Fe").molar_mass_kg_per_mol()
     profile = {

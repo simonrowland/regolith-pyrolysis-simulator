@@ -17,7 +17,7 @@ from simulator.chemistry.kernel.validation import (
     validate_atom_balance,
     validate_proposal_accounts,
 )
-from tests.chemistry.conftest import _atom_check, _build_sim
+from tests.chemistry.conftest import _atom_check, _build_sim, _native_fe_saturating_feedstocks
 
 
 DECLARED_ACCOUNTS = frozenset({
@@ -32,20 +32,16 @@ METALLIC_TAP_DECLARED_ACCOUNTS = frozenset({
 })
 PINNED_NATIVE_FE_MIGRATION_GOLDENS = {
     "lunar_mare_low_ti": {
-        # 2026-08-05 MC-1 trace wiring d1b4f5d: Co/Ni/S/Cl passengers shift
-        # the lunar cleaned-melt basis; migration routing assertions below stay.
-        "native_fe_mol": 1607.3611432553353,
-        "native_vapor_Fe_kg": 0.1682078458614615,
+        # Bounded-band synthetic oxides retain this feedstock's trace passengers.
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "native_fe_mol": 2610.8088053950983,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "native_vapor_Fe_kg": 0.8166966240070305,
     },
     "mars_basalt": {
-        # Recomputed after 9de6ffb8: counterfactual tracing attributes the
-        # move to the corrected Stage-0 carbonate-decomposition sigmoid width
-        # (one thermodynamic e-fold; old-width emulation reproduces the prior
-        # golden within tolerance) — NOT the carbon-partition change,
-        # which changes cleaned-melt CaO and therefore FeO activity.  The
-        # regression below proves this remains the FeO-saturation path: the
-        # later metallic-tap fold never touches process.metal_phase here.
-        "native_fe_mol": 1683.5583423071594,
+        # The same oxide fixture preserves Mars cleanup and transport inputs.
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "native_fe_mol": 2702.180260411209,
     },
 }
 
@@ -254,14 +250,13 @@ def _native_fe_saturating_sim(
     sim = _build_sim(
         feedstock_id,
         vapor_pressure_data,
-        feedstocks_data,
+        _native_fe_saturating_feedstocks(feedstocks_data, feedstock_id),
         setpoints_data,
         additives_kg=additives,
     )
-    sim.melt.temperature_C = 1600.0
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim.melt.fO2_log = -10.0
-    sim.melt.melt_fO2_log = -10.0
+    sim.melt.temperature_C = 1750.0
+    sim._vacuum_floor_bar = lambda: 1e-20
+    sim._headspace_transport_pO2_bar_from_ledger = lambda *args, **kwargs: 1e-20
     return sim
 
 
