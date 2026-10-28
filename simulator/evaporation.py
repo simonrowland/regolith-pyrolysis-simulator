@@ -3497,25 +3497,31 @@ class EvaporationMixin:
             stoich = self._evaporation_stoich(species, sp_data)
             stoich_by_species[species] = dict(stoich)
             # Mirrors core.py::_project_cleaned_melt_from_atom_ledger:
-            # cleaned_melt + spent_reductant_residue define the projection.
-            ledger_oxide_kg = (
-                float(cleaned_melt_kg.get(parent_oxide, 0.0))
+            # cleaned_melt + spent_reductant_residue define the projection,
+            # while evaporation debits cleaned_melt only.
+            cleaned_oxide_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
+            projected_ledger_oxide_kg = (
+                cleaned_oxide_kg
                 + float(spent_reductant_residue_kg.get(parent_oxide, 0.0))
             )
             projection_oxide_kg = float(self.melt.composition_kg.get(
                 parent_oxide, 0.0))
-            scale_kg = max(abs(ledger_oxide_kg), abs(projection_oxide_kg), 1.0)
+            scale_kg = max(
+                abs(projected_ledger_oxide_kg), abs(projection_oxide_kg), 1.0
+            )
             divergence_pct = (
-                abs(ledger_oxide_kg - projection_oxide_kg) / scale_kg * 100.0
+                abs(projected_ledger_oxide_kg - projection_oxide_kg)
+                / scale_kg
+                * 100.0
             )
             if divergence_pct > projection_parity_tolerance_pct:
                 raise AccountingError(
                     "cleaned_melt projection stale for parent oxide "
-                    f"{parent_oxide!r}: atom_ledger={ledger_oxide_kg:.17g} kg "
+                    f"{parent_oxide!r}: atom_ledger={projected_ledger_oxide_kg:.17g} kg "
                     f"melt_projection={projection_oxide_kg:.17g} kg "
                     f"divergence_pct={divergence_pct:.17g}"
                 )
-            available_oxide_kg[species] = ledger_oxide_kg
+            available_oxide_kg[species] = cleaned_oxide_kg
 
         return molar_masses_kg_mol, stoich_by_species, available_oxide_kg
 
@@ -4813,6 +4819,10 @@ class EvaporationMixin:
             if isinstance(state, Mapping)
         }
 
+    def _mark_overhead_na_origin_pool(self) -> None:
+        """Declare headspace sodium origins well-mixed for partial withdrawals."""
+        self.atom_ledger.mark_amalgamated_pool('process.overhead_gas', ('Na',))
+
     def _credit_evaporation_transition(
         self,
         species: str,
@@ -4920,6 +4930,9 @@ class EvaporationMixin:
             diagnostic=diagnostic,
             control_inputs=control_inputs,
         )
+        # The well-mixed headspace makes Na origins indistinguishable;
+        # the ledger attributes partial gas withdrawals pro rata.
+        self._mark_overhead_na_origin_pool()
         if apply_evaporative_redox_source_terms:
             self._apply_evaporative_redox_source_terms(
                 transition,

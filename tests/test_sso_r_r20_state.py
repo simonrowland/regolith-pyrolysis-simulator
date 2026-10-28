@@ -1763,7 +1763,7 @@ def test_c6_primary_source_term_from_transition_and_back_reduction_nets_zero(
     )
 
 
-def test_c3_na_spent_residue_credit_does_not_cancel_reduction_source() -> None:
+def test_c3_na_melt_credit_does_not_cancel_reduction_source() -> None:
     sim = _make_sim(additives_kg={"Na": 12.0})
     sim._init_shuttle_inventory(CampaignPhase.C3_NA)
     sim.melt.campaign = CampaignPhase.C3_NA
@@ -1796,8 +1796,8 @@ def test_c3_na_spent_residue_credit_does_not_cancel_reduction_source() -> None:
     )
 
     assert feo_mol > 0.0
-    assert residue_na2o_mol == pytest.approx(feo_mol)
-    assert cleaned_na2o_mol == pytest.approx(0.0)
+    assert residue_na2o_mol == pytest.approx(0.0)
+    assert cleaned_na2o_mol == pytest.approx(feo_mol)
     assert sim._redox_source_breakdown_diagnostic()[
         "terms_mol_o2_equiv_by_label"
     ][label] == pytest.approx(-0.5 * feo_mol)

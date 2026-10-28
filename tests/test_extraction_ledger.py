@@ -5,7 +5,6 @@ from unittest.mock import patch
 
 import pytest
 
-from engines.builtin.metallothermic_step import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
@@ -861,7 +860,7 @@ def test_na_shuttle_metals_are_reported_from_process_metal_phase():
     sim._shuttle_inject_Na()
 
     sim.atom_ledger.assert_balanced()
-    assert sim.atom_ledger.kg_by_account(SPENT_REDUCTANT_RESIDUE_ACCOUNT).get(
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
         "Na2O", 0.0
     ) > 0.0
     assert "Na2O" not in sim.atom_ledger.kg_by_account(

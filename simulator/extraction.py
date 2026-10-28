@@ -1344,6 +1344,8 @@ class ExtractionMixin:
                     species, {}
                 )
             )
+            if species == 'Na':
+                self._mark_overhead_na_origin_pool()
             credited_condensed_kg = self._dispatch_condensation_route(
                 species,
                 condensed_kg,
@@ -2839,7 +2841,7 @@ class ExtractionMixin:
         Stoichiometry (TiO₂ reaction):
             91.95 g Na + 79.87 g TiO₂ → 123.96 g Na₂O + 47.87 g Ti
             1 kg Na → 0.869 kg TiO₂ reduced
-                    → 1.348 kg melt-resident spent-residue Na₂O
+                    → 1.348 kg dissolved Na₂O in the cleaned melt
                     → 0.521 kg Ti produced
 
         Na₂O solubility limit: 8-12 wt% in the silicate melt.
@@ -2906,6 +2908,9 @@ class ExtractionMixin:
                 'dt_hr': 1.0,
             },
         )
+        # As for K and Mg, dissolved feedstock/reagent Na is well mixed;
+        # partial bakeout withdrawals retain their live origin proportions.
+        self.atom_ledger.mark_amalgamated_pool('process.cleaned_melt', ('Na',))
         self._record_stage_routed_metal_credits('C3', transition)
         self._apply_transition_redox_source_terms(
             transition,
