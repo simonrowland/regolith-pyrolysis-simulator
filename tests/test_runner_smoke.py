@@ -2013,6 +2013,34 @@ def test_runner_cli_entry_point_writes_output_file(tmp_path):
     assert payload["run_metadata"]["hours_completed"] == 2
 
 
+def test_runner_cli_reports_known_refusal_on_stderr(tmp_path):
+    output = tmp_path / "refused.json"
+    repo_root = Path(__file__).resolve().parent.parent
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "simulator.runner",
+            "--feedstock=lunar_mare_low_ti",
+            "--campaign=C0",
+            "--hours=1",
+            '--runtime-campaign-overrides={"C0":{"o2_bubbler_kg_per_hr":-1}}',
+            f"--output={output}",
+        ],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    payload = json.loads(output.read_text())
+    assert payload["status"] == "refused"
+    assert result.stderr == (
+        f"refused: {payload['error_message'] or payload['reason']}\n"
+    )
+
+
 def test_runner_cli_rejects_zero_mass_with_named_failure(tmp_path):
     output = tmp_path / "zero-mass.json"
     repo_root = Path(__file__).resolve().parent.parent
