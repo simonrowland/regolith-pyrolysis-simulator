@@ -2343,6 +2343,12 @@ _HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
 _HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
 _FEO_WUSTITE_FORMULA = "Fe(1-x)O"
 _FEO_STOICHIOMETRIC_FORMULA = "FeO"
+_DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
+_DISTIN_N_FE2_PLUS_FACTORS = {
+    Decimal("2058.15"): Decimal("0.9787"),
+    Decimal("2153.15"): Decimal("0.9861"),
+    Decimal("2233.15"): Decimal("0.9968"),
+}
 _KELVIN_FROM_CELSIUS = Decimal("273.15")
 _IRON_SATURATED_FEO_MISSING_INPUT = "iron-saturated FeO conversion missing input:"
 # Cold and hot ends of the Holzheid and Distin rows this conversion scores.
@@ -2702,6 +2708,64 @@ def _iron_saturated_feo_comparison(
 
         if engine.value not in MELT_ACTIVITY_ENGINES:
             return None
+    if (
+        engine is Engine.OPENIMCC
+        and reference.source_id == _DISTIN_SOURCE_ID
+        and quantity is Quantity.ACTIVITY
+    ):
+        temperature_K = temperature_of(identity)
+        factor = (
+            None
+            if temperature_K is None
+            else _DISTIN_N_FE2_PLUS_FACTORS.get(temperature_K)
+        )
+        if factor is None:
+            missing = (
+                f"temperature_K={temperature_K} has no Distin N_Fe2+^0 factor"
+            )
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(quantity,),
+                reason=f"{_IRON_SATURATED_FEO_MISSING_INPUT} {missing}",
+                origin=reference.observation_id,
+                band=missing,
+            )
+            return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
+        # Premise: Distin's measured activity uses Fe-saturated nonstoichiometric
+        # liquid oxide; openimcc predicts the FeO(l) component on its stoichiometric
+        # reference. Algebra: μ_FeO(stoich)=μ_FeO(source)+RT ln N_Fe2+^0, so
+        # a_FeO(stoich)=N_Fe2+^0·a_FeO(source). Unit check: N_Fe2+^0 is
+        # dimensionless, and its log10 is a dex shift. Sanity: at 1880 C,
+        # 0.952×0.9861=0.9388 and log10(0.9861)=-0.0061 dex.
+        converted = reference.value.point * factor
+        log10_shift_dex = factor.log10()
+        stoichiometric = replace(
+            standard_state,
+            endmember=replace(
+                standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
+            ),
+            component_basis=_FEO_STOICHIOMETRIC_FORMULA,
+        )
+        notice = Notice(
+            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+            affected_quantities=(quantity,),
+            reason=(
+                "reference_converted_via_iron_saturation; "
+                "method=a_FeO(stoich)=N_Fe2+^0*a_FeO(source); "
+                f"factor={factor}; log10_shift={_display_decimal(log10_shift_dex, '0.0001')} "
+                f"dex; source_value={reference.value.point}; "
+                f"converted_value={converted}; T={temperature_K} K; "
+                "N_Fe2+^0 source=openimcc-species feo-liquid-candidate.md"
+            ),
+            origin=reference.observation_id,
+        )
+        return replace(
+            reference,
+            identity=replace(identity, reference_state=State.of(stoichiometric)),
+            value=replace(reference.value, point=converted),
+            notices=union_notices(reference.notices, (notice,)),
+        )
     temperature_K = temperature_of(identity)
     if temperature_K is None:
         if engine is None:
@@ -6245,6 +6309,163 @@ def _openimcc_redox_result_evidence(
     return authority, band, notices
 
 
+def _distin_has_fe_metal_saturation(
+    observation: Observation, experiment: Experiment | None
+) -> bool:
+    if observation.source_id != _DISTIN_SOURCE_ID or experiment is None:
+        return False
+    condition = experiment.fe_metal_saturated
+    return (
+        condition is not None
+        and condition.state.is_value
+        and condition.state.value is True
+    )
+
+
+def _predict_distin_closed_feo_activity(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+) -> EnginePrediction:
+    def refused(reason: RefusalReason, detail: Mapping[str, object]) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            refusal_reason=reason,
+            refusal_detail=detail,
+            identity=identity,
+        )
+
+    composition_state = identity.composition
+    if composition_state is None or not composition_state.is_value:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "distin_closed_redox_composition_missing"},
+        )
+    composition = composition_state.value
+    if composition.amount_basis is not AmountBasis.MOLE_FRACTION:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {
+                "reason": "distin_closed_redox_composition_basis_unsupported",
+                "amount_basis": composition.amount_basis.value,
+            },
+        )
+    temperature_K = temperature_of(identity)
+    if temperature_K is None:
+        return refused(
+            RefusalReason.IDENTITY_UNKNOWN,
+            {"reason": "distin_closed_redox_temperature_missing"},
+        )
+    try:
+        inventory = _oxide_element_inventory(
+            dict(composition.components),
+            amount_basis=composition.amount_basis,
+        )
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        return refused(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_redox_composition", "detail": str(exc)},
+        )
+    if inventory.get("Fe", 0.0) <= 0.0:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "distin_closed_redox_total_iron_missing"},
+        )
+    # The +1 mol reference excess is tested against the +0.5/+1/+2 mol
+    # engine-level invariance for the Distin 1880 C row.
+    inventory["Fe"] = inventory.get("Fe", 0.0) + 1.0
+    try:
+        import openimcc
+        import openimcc.redox as openimcc_redox
+    except ImportError as exc:
+        return refused(
+            RefusalReason.OPENIMCC_NOT_IMPORTABLE,
+            {
+                "reason": RefusalReason.OPENIMCC_NOT_IMPORTABLE.value,
+                "detail": str(exc),
+            },
+        )
+    try:
+        result = openimcc_redox.evaluate_redox(
+            inventory, float(temperature_K), "closed"
+        )
+    except openimcc.ImccRefusal as exc:
+        return refused(
+            RefusalReason.METRIC_DOMAIN,
+            {"reason": "openimcc_closed_redox_refused", "detail": str(exc)},
+        )
+    if result.metal_buffered is not True:
+        return refused(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "openimcc_fe_metal_saturation_inactive",
+                "metal_buffered": bool(result.metal_buffered),
+                "flags": list(result.flags),
+            },
+        )
+    try:
+        activity = float(result.parent_activity["FeO"])
+        fo2_log = float(result.lambda_ln_f_o2) / math.log(10.0)
+    except (KeyError, TypeError, ValueError, ArithmeticError) as exc:
+        return refused(
+            RefusalReason.METRIC_DOMAIN,
+            {"reason": "openimcc_closed_redox_output_missing", "detail": str(exc)},
+        )
+    if not math.isfinite(activity) or activity <= 0.0 or not math.isfinite(fo2_log):
+        return refused(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "openimcc_closed_redox_output_nonfinite",
+                "a_FeO": activity,
+                "log10_fO2_bar": fo2_log,
+            },
+        )
+    authority, band, notices = _openimcc_redox_result_evidence(
+        result, Quantity.ACTIVITY
+    )
+    from simulator.battery.fo2_ladder import ResolvedFo2, fo2_tier_notice
+
+    oxygen_notice = fo2_tier_notice(
+        Quantity.ACTIVITY,
+        ResolvedFo2(
+            fo2_log,
+            3,
+            "openimcc_closed_fe_metal_saturation",
+            False,
+        ),
+    )
+    prediction_identity = replace(
+        identity,
+        fO2_Pa=State.of(log10_fo2_to_pa(Decimal(str(fo2_log)))),
+    )
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="openimcc.redox.evaluate_redox:closed_fe_metal_saturation",
+        ),
+        value=as_decimal(str(activity)),
+        unit="dimensionless",
+        authority=authority,
+        notices=(*notices, oxygen_notice),
+        coefficient_sources=(
+            f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
+        ),
+        lineage_complete=False,
+        certified_band={"temperature_K": band},
+        identity=prediction_identity,
+        requested_composition=composition_state,
+        version="openimcc-redox-closed-fe-metal-saturation",
+    )
+
+
 def _predict_fe_redox(
     engine: Engine,
     observation: Observation,
@@ -8833,6 +9054,52 @@ def predict_with_engine(
             refusal_reason=attempt.refusal_reason,
             refusal_detail=attempt.refusal_detail,
             identity=identity,
+        )
+
+    distin_feo_activity = (
+        observation.source_id == _DISTIN_SOURCE_ID
+        and quantity is Quantity.ACTIVITY
+        and formula.strip().casefold() == "feo"
+    )
+    if distin_feo_activity and engine is Engine.INTERNAL_ANALYTICAL:
+        # The internal ladder can derive fO2 from Distin's reported a_FeO,
+        # but using that same observation as the activity target is circular.
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={
+                "reason": "distin_activity_requires_joint_fe_metal_solve",
+                "missing_evidence": "independent Fe-saturation fO2 and a_FeO solve",
+            },
+            identity=identity,
+            requested_composition=identity.composition,
+        )
+    if distin_feo_activity and engine is Engine.OPENIMCC:
+        if not _distin_has_fe_metal_saturation(observation, experiment):
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                authority=Authority.REFUSED,
+                coefficient_sources=sources,
+                refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+                refusal_detail={
+                    "reason": "distin_fe_metal_saturation_not_established",
+                    "missing_evidence": "typed Fe-metal-saturation experiment condition",
+                },
+                identity=identity,
+                requested_composition=identity.composition,
+            )
+        return _predict_distin_closed_feo_activity(
+            engine,
+            observation,
+            identity,
+            channel,
+            sources,
         )
 
     wt: dict[str, float] | None = None

@@ -395,6 +395,8 @@ PHASE_MAP: dict[str, Phase] = {
     "liquid sodium": Phase.L,
     "liquid iron oxide": Phase.L,
     "liquid iron oxide in equilibrium with iron": Phase.L,
+    # Distin Table I's printed species phase is a liquid FeO-SiO2 slag.
+    "liquid feo-sio2 slag": Phase.L,
     "aq": Phase.AQ,
     "glass": Phase.GLASS,
     "quenched silicate glass": Phase.GLASS,
@@ -1573,6 +1575,12 @@ def _located_from_plain(payload: object, cast) -> Located:
         locator=_locator_from_plain(payload.get("locator")),
         inference=inference,
     )
+
+
+def _boolean_from_plain(value: object) -> bool:
+    if not isinstance(value, bool):
+        raise ValueError("expected a boolean source value")
+    return value
 
 
 def _polymorph_from_plain(value: object) -> Polymorph:
@@ -2765,6 +2773,11 @@ def _experiment_from_plain(
         if payload.get("equipment_context_id") is None
         else str(payload["equipment_context_id"]),
         thermal_schedule=_thermal_schedule_from_plain(payload.get("thermal_schedule")),
+        fe_metal_saturated=None
+        if payload.get("fe_metal_saturated") is None
+        else _located_from_plain(
+            payload["fe_metal_saturated"], _boolean_from_plain
+        ),
     )
 
 
