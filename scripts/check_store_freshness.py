@@ -263,14 +263,6 @@ CODE_INPUTS = (
 #     initial_charge_only. Regen on this tree (battery_migrate exit 1,
 #     observations 128946, queue 88695, hard issues 3278) left every store
 #     file byte-identical.
-#   dbf438ba8: b-899 one melt redox state from the iron ledger. Its only
-#     migrate-input path is simulator/battery/residue.py, where the Hashimoto
-#     residue projection collapses Fe2O3 onto the printed FeOt basis
-#     (collapse_feot_composition) at prediction time; migration does not run
-#     that path. The landing train's full regen of b140 (b-899 + b-926 +
-#     openimcc 66ec4a3, studio-3) produced no store change (observations=126296
-#     queue=80926 hard_issues=3334; j01 7/7). This acknowledges STORE outputs
-#     only; the residue scoring change is covered by the commit's tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "19f472447", "67678d3d4", "0c5b7486a",
     "f53dcec23", "826f5848e", "bff436549", "25796706a", "8adec237c", "9196346ee",
@@ -297,7 +289,6 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "7e0508bb5", "b37e28bac", "297df02b9",
     "2458a9f46",
     "3b4e68626",
-    "dbf438ba8",
 })
 
 
