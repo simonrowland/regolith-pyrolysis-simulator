@@ -298,6 +298,45 @@ def test_missing_fusion_input_refuses_without_static_fallback(monkeypatch):
     assert caught.value.diagnostic["source"] == "NIST-JANAF"
 
 
+@pytest.mark.parametrize("temperature_K", [1100.0, 1200.0, 1300.0, 1400.0, 1405.2, 1473.15])
+def test_na_mre_uses_existing_liquid_activity_standard(temperature_K):
+    from simulator.chemistry import melt_activity
+    from simulator.physical_constants import FARADAY
+
+    ref = mre_ladder.mre_decomposition_voltage_reference("Na2O", temperature_K=temperature_K)
+    expected_g = melt_activity._na_activity_reference_standard_delta_g_kj_per_mol_o2(temperature_K)
+    assert ref.voltage == -expected_g * 1000.0 / (4.0 * FARADAY)
+    if temperature_K < 1405.2:
+        assert ref.voltage != ref.raw_graph_voltage_V
+        assert ref.authoritative is False
+        assert "metastable_liquid_standard" in ref.status
+        assert "certified_band_K=[1405.2,2600.0]" in ref.status
+    else:
+        assert ref.voltage == ref.raw_graph_voltage_V
+        assert ref.status == "ok"
+
+
+def test_na_mre_tracks_liquid_standard_owner_and_refuses_missing_input(monkeypatch):
+    from simulator.chemistry import melt_activity
+    from simulator.electrolysis import MREElectrolysisRefusal
+    from simulator.physical_constants import FARADAY
+
+    monkeypatch.setattr(melt_activity, "_na_activity_reference_standard_delta_g_kj_per_mol_o2",
+                        lambda _temperature: -400.0)
+    ref = mre_ladder.mre_decomposition_voltage_reference("Na2O", temperature_K=1200.0)
+    assert ref.voltage == 400000.0 / (4.0 * FARADAY)
+
+    def missing(_temperature):
+        raise ValueError("Na-015: JANAF liquid rows missing")
+
+    monkeypatch.setattr(melt_activity, "_na_activity_reference_standard_delta_g_kj_per_mol_o2", missing)
+    with pytest.raises(MREElectrolysisRefusal) as caught:
+        mre_ladder.mre_decomposition_voltage_reference("Na2O", temperature_K=1200.0)
+    assert caught.value.reason == "mre_liquid_standard_missing_input"
+    assert caught.value.diagnostic["oxide"] == "Na2O"
+    assert "Na-015" in caught.value.diagnostic["missing_input"]
+
+
 def test_missing_fusion_input_import_is_safe_and_provider_refuses(monkeypatch):
     import subprocess
     import sys

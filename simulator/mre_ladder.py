@@ -10,9 +10,11 @@ from typing import Any
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_CONDENSED,
     ellingham_fit_extrapolation,
+    ellingham_fit_segments,
     ellingham_metal_phase_kind,
     ellingham_segment_for_temperature,
 )
+from simulator.chemistry import melt_activity
 from simulator.physical_constants import FARADAY
 from simulator.reference_data.janaf import janaf_fusion_energy, _fusion_table_points
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -173,55 +175,77 @@ def mre_decomposition_voltage_reference(
                 if oxide == "MnO":
                     authoritative = False
                     status = MRE_MN_DIAGNOSTIC_STATUS
-                if (
-                    oxide in _LIQUID_FRAME_FUSION_OXIDES
-                    and f"{oxide}(l)" not in segment.phase_basis
-                ):
-                    fusion_key = "SiO2(II)" if oxide == "SiO2" else oxide
-                    try:
-                        fusion = janaf_fusion_energy(fusion_key, T_K)
-                    except ValueError as exc:
-                        # Evaluation-time import: electrolysis consumes this
-                        # owner, so importing its refusal class eagerly cycles.
-                        from simulator.electrolysis import MREElectrolysisRefusal
-
-                        raise MREElectrolysisRefusal(
-                            "mre_liquid_standard_missing_input",
-                            {
-                                "oxide": oxide,
-                                "temperature_K": T_K,
-                                "source": "NIST-JANAF",
-                                "fusion_key": fusion_key,
-                                "missing_input": str(exc),
-                            },
-                        ) from exc
-                    # Premise: mu_l = mu_cr + dG_fus on the pure-liquid
-                    # activity standard. For n_ox mol oxide per mol O2,
-                    # dG_liq = dG_cr + n_ox*dG_fus, hence E_liq = E_cr
-                    # - n_ox*dG_fus*1000/(4F). kJ/mol oxide * mol oxide/mol
-                    # O2 * 1000 J/kJ / (4 mol e-/mol O2 * C/mol e-) = V.
-                    # Chase 1998 JANAF Cr-014/Cr-015, 1800 K: dG_fus =
-                    # -628.733 - (-666.534) = 37.801 kJ/mol, giving a
-                    # 65.297 mV drop. At the cr/l crossing the drop is zero.
-                    voltage -= (
-                        segment.n_ox * float(fusion.delta_g_fus_kJ_per_mol)
-                        * 1000.0 / (4.0 * FARADAY)
-                    )
-                    # Below the stable-liquid band, this is a metastable
-                    # liquid-standard extension, not certified liquid data.
-                    liquid_points, _ = _fusion_table_points(fusion.liquid_table)
-                    liquid_low = max(
-                        fusion.melting_temperature_K,
-                        fusion.accepted_melting_temperature_K,
-                    )
-                    if T_K < liquid_low:
+                fusion_key = "SiO2(II)" if oxide == "SiO2" else oxide
+                try:
+                    if oxide == "Na2O" and "Na2O(l)" not in segment.phase_basis:
+                        # The activity owner includes the Na polymorph/metal
+                        # bridge; applying a second fusion correction here
+                        # would double-count it. Its dG is already kJ/mol O2:
+                        # -dG*1000/(4F) gives J/C = V, matching the graph
+                        # rail when the liquid branch is reached.
+                        liquid_delta_g = (
+                            melt_activity._na_activity_reference_standard_delta_g_kj_per_mol_o2(T_K)
+                        )
+                        voltage = -liquid_delta_g * 1000.0 / (4.0 * FARADAY)
+                        liquid_bands = [
+                            row.range_K for row in ellingham_fit_segments("Na")
+                            if "Na2O(l)" in row.phase_basis
+                        ]
                         authoritative = False
                         status = (
                             "out_of_domain:metastable_liquid_standard;"
                             "authority_level=extrapolated;"
-                            f"certified_band_K=[{liquid_low},{liquid_points[-1][0]}];"
-                            f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+                            f"certified_band_K=[{min(band[0] for band in liquid_bands)},"
+                            f"{max(band[1] for band in liquid_bands)}];"
+                            "source=NaO0.5_liquid_standard"
                         )
+                    elif (
+                        oxide in _LIQUID_FRAME_FUSION_OXIDES
+                        and f"{oxide}(l)" not in segment.phase_basis
+                    ):
+                        fusion = janaf_fusion_energy(fusion_key, T_K)
+                        # Premise: mu_l = mu_cr + dG_fus on the pure-liquid
+                        # activity standard. For n_ox mol oxide per mol O2,
+                        # dG_liq = dG_cr + n_ox*dG_fus, hence E_liq = E_cr
+                        # - n_ox*dG_fus*1000/(4F). kJ/mol oxide * mol oxide/mol
+                        # O2 * 1000 J/kJ / (4 mol e-/mol O2 * C/mol e-) = V.
+                        # Chase 1998 JANAF Cr-014/Cr-015, 1800 K: dG_fus =
+                        # -628.733 - (-666.534) = 37.801 kJ/mol, giving a
+                        # 65.297 mV drop. At the cr/l crossing the drop is zero.
+                        voltage -= (
+                            segment.n_ox * float(fusion.delta_g_fus_kJ_per_mol)
+                            * 1000.0 / (4.0 * FARADAY)
+                        )
+                        # Below the stable-liquid band, this is a metastable
+                        # liquid-standard extension, not certified liquid data.
+                        liquid_points, _ = _fusion_table_points(fusion.liquid_table)
+                        liquid_low = max(
+                            fusion.melting_temperature_K,
+                            fusion.accepted_melting_temperature_K,
+                        )
+                        if T_K < liquid_low:
+                            authoritative = False
+                            status = (
+                                "out_of_domain:metastable_liquid_standard;"
+                                "authority_level=extrapolated;"
+                                f"certified_band_K=[{liquid_low},{liquid_points[-1][0]}];"
+                                f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+                            )
+                except ValueError as exc:
+                    # Evaluation-time import: electrolysis consumes this
+                    # owner, so importing its refusal class eagerly cycles.
+                    from simulator.electrolysis import MREElectrolysisRefusal
+
+                    raise MREElectrolysisRefusal(
+                        "mre_liquid_standard_missing_input",
+                        {
+                            "oxide": oxide,
+                            "temperature_K": T_K,
+                            "source": "NIST-JANAF",
+                            "fusion_key": fusion_key,
+                            "missing_input": str(exc),
+                        },
+                    ) from exc
                 reason = _UNRESOLVED_STANDARD_STATE_REASON.get(oxide)
                 if reason is not None:
                     authoritative = False
