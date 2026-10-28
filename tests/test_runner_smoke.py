@@ -1119,6 +1119,56 @@ def test_c3_alkali_recipe_dose_routes_to_credit_line_not_additives():
     assert undosed["run_metadata"]["additives_kg"] == {}
 
 
+def test_staged_c3_current_k_and_bakeout_behavior_is_pinned():
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=34,
+        mass_kg=1.0,
+        setpoints_patch={
+            "campaigns": {
+                "C3": {"alkali_dosing": {"Na_kg": 0.110, "K_kg": 0.023}}
+            }
+        },
+    )
+    session = run._start_session()
+    payload = run._run_session(session)
+    sim = session.simulator
+
+    c3_snapshots = [
+        snapshot
+        for snapshot in sim.record.snapshots
+        if snapshot.campaign in {CampaignPhase.C3_K, CampaignPhase.C3_NA}
+    ]
+    assert [snapshot.campaign for snapshot in c3_snapshots] == [
+        CampaignPhase.C3_NA,
+        CampaignPhase.C3_NA,
+        CampaignPhase.C3_NA,
+    ]
+    assert [snapshot.shuttle_phase for snapshot in c3_snapshots] == [
+        "inject",
+        "inject",
+        "inject",
+    ]
+    metadata = payload["run_metadata"]
+    assert metadata["c3_alkali_credit_dose_kg_by_species"]["K"] == pytest.approx(
+        0.023
+    )
+    assert metadata["c3_alkali_credit_drawn_kg_by_species"]["K"] == pytest.approx(
+        0.0
+    )
+    assert payload["shuttle_refusal_history"] == []
+
+    recycled_na_kg = AccountingQueries(sim).recycled_to_reagent_kg_cumulative()[
+        "Na"
+    ]
+    gross_na_draw_kg = metadata["c3_alkali_credit_drawn_kg_by_species"]["Na"]
+    assert recycled_na_kg / gross_na_draw_kg == pytest.approx(
+        0.011085595572037659,
+        abs=1e-10,
+    )
+
+
 def test_c3_alkali_dose_deadband_does_not_route_tiny_continuous_draws():
     setpoints = {
         "campaigns": {
