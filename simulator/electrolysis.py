@@ -90,7 +90,9 @@ from simulator.feedstock_composition import iron_oxide_values
 from simulator.core import (
     MOLAR_MASS, OXIDE_TO_METAL, FARADAY, GAS_CONSTANT, MeltState,
 )
-from simulator.mre_ladder import DECOMP_VOLTAGES, mre_decomposition_voltage_reference
+from simulator.mre_ladder import (
+    DECOMP_VOLTAGES, mre_decomposition_voltage_reference, _mre_raw_graph_requirement,
+)
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -958,14 +960,7 @@ class ElectrolysisModel:
                 reference is not None
                 and reference.raw_graph_voltage_V is not None
             ):
-                # The Nernst activity/pO2 shift is identical for the selected
-                # fallback and raw graph E0.  Replacing E0 therefore shifts the
-                # full requirement by exactly (E0_raw - E0_fallback).
-                raw_requirement_V = (
-                    E_nernst
-                    + reference.raw_graph_voltage_V
-                    - reference.voltage
-                )
+                raw_requirement_V = _mre_raw_graph_requirement(reference, E_nernst)
                 raw_margin_V = voltage_V - raw_requirement_V
                 result['mre_raw_graph_requirement_V_by_oxide'][oxide] = (
                     raw_requirement_V

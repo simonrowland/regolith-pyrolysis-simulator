@@ -191,6 +191,16 @@ def mre_decomposition_voltage_reference(
     )
 
 
+def _mre_raw_graph_requirement(
+    reference: MREDecompositionVoltageReference,
+    effective_requirement_V: float,
+) -> float | None:
+    """Apply the same Nernst shift to the graph and selected reference."""
+    if reference.raw_graph_voltage_V is None:
+        return None
+    return effective_requirement_V + reference.raw_graph_voltage_V - reference.voltage
+
+
 def _reference_metadata(
     reference: MREDecompositionVoltageReference,
 ) -> dict[str, Any]:
