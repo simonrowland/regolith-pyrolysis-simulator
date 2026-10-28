@@ -64,6 +64,7 @@ from engines.builtin._common import (
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+    PROXY_BRIDGE_ALPHA_STATUS,
 )
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
@@ -72,7 +73,12 @@ from simulator.config_flags import bool_feature_flag
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
-_DEFAULT_EVAPORATION_ALPHA = 1.0
+_DEFAULT_EVAPORATION_ALPHA = {
+    "form": "scalar",
+    "value": 1.0,
+    ALPHA_AUTHORITY_STATUS_FIELD: ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+    "source": "Hertz-Knudsen-Langmuir alpha=1 upper bound; no species-specific alpha available",
+}
 _NONTRIVIAL_FLUX_KG_HR = 1.0e-12
 DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA = 0.0
 DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
@@ -245,75 +251,14 @@ def _evaluate_alpha_control(
     if (
         isinstance(alpha_spec, Mapping)
         and alpha_spec.get(ALPHA_AUTHORITY_STATUS_FIELD)
-        == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+        in {PROXY_BRIDGE_ALPHA_STATUS, ANALYTICAL_UPPER_BOUND_ALPHA_STATUS}
     ):
-        evaluation[ALPHA_AUTHORITY_STATUS_FIELD] = (
-            ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
-        )
+        evaluation.update({
+            key: alpha_spec[key]
+            for key in (ALPHA_AUTHORITY_STATUS_FIELD, "source", "authority_reason")
+            if key in alpha_spec
+        })
     return value, evaluation
-
-
-def _alpha_is_unmeasured(
-    species: str, alpha_by_species: Mapping[str, Any]
-) -> bool:
-    return species not in alpha_by_species and "*" not in alpha_by_species
-
-
-def _unmeasured_alpha_fallback_permitted(
-    species: str,
-    *,
-    allow_unmeasured_alpha_fallback: bool,
-    unmeasured_alpha_fallback_species_allowlist: set[str] | None,
-) -> bool:
-    return bool(allow_unmeasured_alpha_fallback) and (
-        unmeasured_alpha_fallback_species_allowlist is None
-        or species in unmeasured_alpha_fallback_species_allowlist
-    )
-
-
-def _missing_alpha_record(
-    *,
-    P_eq_Pa: float,
-    P_bulk_Pa: float,
-    baseline_alpha_1_rate_kg_hr: float,
-) -> dict[str, float | str]:
-    return {
-        "policy": "fail_loud_missing_alpha",
-        "fallback_control": "chemistry_kernel.allow_unmeasured_alpha_fallback",
-        "P_eq_Pa": P_eq_Pa,
-        "P_bulk_Pa": P_bulk_Pa,
-        "baseline_alpha_1_rate_kg_hr": baseline_alpha_1_rate_kg_hr,
-    }
-
-
-def _attach_missing_alpha_records(
-    diagnostic: dict[str, Any],
-    missing_alpha: Mapping[str, Mapping[str, float | str]],
-    stoich_by_species: Mapping[str, Any],
-) -> None:
-    if not missing_alpha:
-        return
-    species_refusals: dict[str, dict[str, float | str]] = {
-        str(species): dict(refusal)
-        for species, refusal in (
-            diagnostic.get("species_refusals") or {}
-        ).items()
-        if isinstance(refusal, Mapping)
-    }
-    for species, refusal in missing_alpha.items():
-        species_refusals[str(species)] = {
-            **dict(refusal),
-            "status": "refused",
-            "reason": "missing_evaporation_alpha",
-            "disposition": "retained_in_condensed_parent_oxide",
-            "parent_oxide": str(
-                (stoich_by_species.get(species) or {}).get(
-                    "parent_oxide", "unknown"
-                )
-            ),
-        }
-    diagnostic["missing_alpha"] = dict(missing_alpha)
-    diagnostic["species_refusals"] = species_refusals
 
 
 def _coerce_alpha_envelope_by_species(alpha_envelope_control) -> dict[str, tuple[float, float]]:
@@ -1406,23 +1351,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         alpha_envelope_by_species = _coerce_alpha_envelope_by_species(
             controls.get("alpha_envelope")
         )
-        allow_unmeasured_alpha_fallback = bool(
-            controls.get("allow_unmeasured_alpha_fallback", False)
-        )
-        fallback_species_raw = controls.get(
-            "unmeasured_alpha_fallback_species"
-        )
-        if fallback_species_raw is None:
-            unmeasured_alpha_fallback_species_allowlist = None
-        elif isinstance(fallback_species_raw, (str, bytes)):
-            unmeasured_alpha_fallback_species_allowlist = {
-                str(fallback_species_raw)
-            }
-        else:
-            unmeasured_alpha_fallback_species_allowlist = {
-                str(species) for species in fallback_species_raw
-            }
-        missing_alpha: dict[str, dict[str, float | str]] = {}
         active_gas_transport_species: list[str] = []
         if (
             gas_resistance_enabled
@@ -1436,11 +1364,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     continue
                 if species in hkl_upper_bound_transport_species:
                     continue
-                # α=1 is the Hertz-Knudsen ceiling used only as a marked
-                # screening bound; record the same missing_alpha payload.
-                alpha_is_unmeasured = _alpha_is_unmeasured(
-                    species, alpha_by_species
-                )
                 alpha_spec = alpha_by_species.get(
                     species,
                     alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
@@ -1465,8 +1388,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     )
                     if available_parent_kg <= 1.0e-12:
                         continue
-                else:
-                    available_parent_kg = 0.0
                 M_kg_mol = molar_masses_kg_mol.get(species)
                 if M_kg_mol is None or M_kg_mol <= 0.0:
                     molar_mass_g_mol = MOLAR_MASS.get(species)
@@ -1485,26 +1406,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 )
                 if hkl_upper_bound_rate_kg_hr <= _NONTRIVIAL_FLUX_KG_HR:
                     continue
-                if (
-                    alpha_is_unmeasured
-                    and not _unmeasured_alpha_fallback_permitted(
-                        species,
-                        allow_unmeasured_alpha_fallback=(
-                            allow_unmeasured_alpha_fallback
-                        ),
-                        unmeasured_alpha_fallback_species_allowlist=(
-                            unmeasured_alpha_fallback_species_allowlist
-                        ),
-                    )
-                    and available_parent_kg > 1.0e-12
-                ):
-                    missing_alpha[species] = _missing_alpha_record(
-                        P_eq_Pa=P_eq_Pa,
-                        P_bulk_Pa=P_bulk_Pa,
-                        baseline_alpha_1_rate_kg_hr=(
-                            hkl_upper_bound_rate_kg_hr
-                        ),
-                    )
                 active_gas_transport_species.append(species)
         melt_surface_renewal_raw = series_config.get(
             "melt_surface_renewal_base_kg_s_m2_pa",
@@ -1589,21 +1490,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 and continuum_extrapolation is None
             ):
                 domain_diagnostic = dict(domain_refusal)
-                _attach_missing_alpha_records(
-                    domain_diagnostic,
-                    missing_alpha,
-                    stoich_by_species,
-                )
                 domain_warnings = [
                     "viscous_p_bulk_transport_out_of_domain: "
                     "evaporation flux not evaluated in transitional Kn",
                 ]
-                if missing_alpha:
-                    domain_warnings.append(
-                        "per-species evaporation refusal; retained condensed "
-                        "because evaporation_alpha is missing: "
-                        + ", ".join(sorted(missing_alpha))
-                    )
                 return IntentResult(
                     intent=ChemistryIntent.EVAPORATION_FLUX,
                     status="refused",
@@ -1673,17 +1563,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             delta_p_Pa = max(0.0, P_eq_Pa - P_bulk_Pa)
             if delta_p_Pa <= 0:
                 continue
-            alpha_is_unmeasured = _alpha_is_unmeasured(
-                species, alpha_by_species
-            )
-            alpha_fallback_permitted = _unmeasured_alpha_fallback_permitted(
-                species,
-                allow_unmeasured_alpha_fallback=(
-                    allow_unmeasured_alpha_fallback
-                ),
-                unmeasured_alpha_fallback_species_allowlist=(
-                    unmeasured_alpha_fallback_species_allowlist
-                ),
+            alpha_is_unmeasured = (
+                species not in alpha_by_species and "*" not in alpha_by_species
             )
             alpha_spec = alpha_by_species.get(
                 species,
@@ -1700,27 +1581,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 ALPHA_AUTHORITY_STATUS_FIELD
             )
 
-            baseline_alpha_1 = _series_resistance_evaporation_flux_kg_m2_s(
-                species=species,
-                P_eq_pa=P_eq_Pa,
-                P_bulk_pa=P_bulk_Pa,
-                T_surface_K=T_K,
-                molar_mass_kg_mol=M_kg_mol,
-                alpha_i=1.0,
-                knudsen_number=math.inf,
-                pipe_diameter_m=pipe_diameter_m,
-                overhead_pressure_pa=overhead_pressure_pa,
-                axial_stir_factor=axial_stir_factor,
-                radial_stir_factor=radial_stir_factor,
-                cold_skull_envelope=cold_skull_envelope,
-                carrier_gas=carrier_gas,
-                T_gas_K=gas_temperature_K,
-                gas_resistance_enabled=False,
-                melt_resistance_enabled=False,
-            )
-            baseline_rate_kg_hr = (
-                baseline_alpha_1.flux_kg_s_m2 * melt_surface_area_m2 * 3600.0
-            )
             available_parent_kg = float(available_oxide_kg.get(species, 0.0) or 0.0)
             if (
                 domain_refusal is not None
@@ -1728,20 +1588,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 and available_parent_kg <= 1.0e-12
             ):
                 continue
-            if (
-                alpha_is_unmeasured
-                and not alpha_fallback_permitted
-                and available_parent_kg > 1.0e-12
-                and baseline_rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR
-            ):
-                missing_alpha[species] = _missing_alpha_record(
-                    P_eq_Pa=P_eq_Pa,
-                    P_bulk_Pa=P_bulk_Pa,
-                    baseline_alpha_1_rate_kg_hr=baseline_rate_kg_hr,
-                )
-                continue
-
-            if alpha_is_unmeasured and alpha_fallback_permitted:
+            if alpha_is_unmeasured or alpha_authority_status == PROXY_BRIDGE_ALPHA_STATUS:
                 unmeasured_alpha_fallback_species.append(species)
 
             alpha_used_by_species[species] = alpha
@@ -1789,7 +1636,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             series_diagnostic = series_flux.as_diagnostic()
             if continuum_extrapolation is not None and uses_gas_resistance:
                 series_diagnostic["continuum_extrapolation_notice"] = dict(continuum_extrapolation)
-            if alpha_authority_status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS:
+            if alpha_authority_status is not None:
                 series_diagnostic[ALPHA_AUTHORITY_STATUS_FIELD] = (
                     alpha_authority_status
                 )
@@ -1820,10 +1667,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             rate_kg_hr = J_kg_s_m2 * melt_surface_area_m2 * 3600.0
 
             if rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR:
-                if (
-                    alpha_authority_status
-                    == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
-                ):
+                if alpha_authority_status is not None:
                     alpha_authority_status_by_species[species] = (
                         alpha_authority_status
                     )
@@ -1871,24 +1715,15 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             diagnostic["alpha_authority_status_by_species"] = (
                 alpha_authority_status_by_species
             )
-        _attach_missing_alpha_records(
-            diagnostic, missing_alpha, stoich_by_species
-        )
         if unmeasured_alpha_fallback_species:
             diagnostic["unmeasured_alpha_fallback_species"] = sorted(
                 unmeasured_alpha_fallback_species
             )
         warning_messages: list[str] = []
-        if missing_alpha:
-            warning_messages.append(
-                "per-species evaporation refusal; retained condensed because "
-                "evaporation_alpha is missing: "
-                + ", ".join(sorted(missing_alpha))
-            )
         if unmeasured_alpha_fallback_species:
             warning_messages.append(
-                "WARNING: alpha=1.0 prototype fallback used for unmeasured "
-                "evaporation species: "
+                "WARNING: unmeasured evaporation alpha predicted with flagged "
+                "proxy/bridge or alpha=1 upper bound: "
                 + ", ".join(sorted(unmeasured_alpha_fallback_species))
             )
         if missing_transport_parameters:

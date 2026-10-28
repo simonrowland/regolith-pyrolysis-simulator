@@ -27,7 +27,6 @@ from simulator.furnace_materials import (
 )
 from simulator.thermal_window import resolve_thermal_preheat_interval
 from simulator.accounting import OverdraftError, resolve_species_formula
-from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
@@ -6248,7 +6247,6 @@ def _cache_trace_payload(
         compact_alpha_authority = {
             str(species): str(status)
             for species, status in alpha_authority_status_by_species.items()
-            if status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
         }
         if compact_alpha_authority:
             payload["alpha_authority_status_by_species"] = (

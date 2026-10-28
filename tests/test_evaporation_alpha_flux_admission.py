@@ -1,27 +1,4 @@
-"""b-314: a tier-2 ``broad_proxy_not_intrinsic`` alpha row is proxy evidence,
-not a measurement — it must not satisfy the flux path's measured-alpha
-requirement.
-
-Pre-fix, ``_load_evaporation_alpha_by_species`` returned CrO2's inherited
-``0.9`` as a bare float, so ``engines.builtin.evaporation_flux``'s
-presence-based ``_alpha_is_unmeasured`` admitted it and the SC-67 fail-loud
-``missing_alpha`` refusal never fired: the guard was bypassed by supplying
-the thing it tests for.
-
-The fix has three parts, all on the simulator side of the provider seam:
-
-1. The loader emits tagged rows as provenance-carrying mappings
-   (``alpha_proxy_tag``), never bare numbers — so no consumer can mistake
-   the proxy for a measured coefficient.
-2. The full map (proxy rows included) still feeds the pressure gate
-   (``_legacy_evaporation_shadow_pressure_map``): the species' pressure
-   must reach the provider or the refusal could never fire — dropping the
-   row from the loader map was tried and silently removed the species from
-   the flux-driving pressure path instead (same defect class, one layer up).
-3. The provider-facing ``_measured_alpha_control_view`` strips tagged rows
-   so the SC-67 unmeasured-alpha refusal (or the explicitly gated
-   ``allow_unmeasured_alpha_fallback`` prototype path) fires.
-"""
+"""Broad-proxy and absent-alpha evaporation predictions carry their authority."""
 
 from pathlib import Path
 
@@ -34,7 +11,6 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.evaporation import (
     _legacy_evaporation_shadow_pressure_map,
     _load_evaporation_alpha_by_species,
-    _measured_alpha_control_view,
 )
 from simulator.evaporation_classes import (
     BROAD_PROXY_NOT_INTRINSIC_TAG,
@@ -85,6 +61,63 @@ OTHER_PROXY_TAG_STILL_ADMITTED = {
 }
 
 
+def _alpha_witness(species, alpha):
+    return BuiltinEvaporationFluxProvider().dispatch(IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"Cr2O3": 10.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=0.01,
+        fO2_log=None,
+        control_inputs={
+            CONTROL_FLUX_PRESSURES_KEY: {species: 100.0},
+            "overhead_pressure_pa": 1000.0,
+            "carrier_gas": "N2",
+            "molar_mass_kg_mol": {species: 0.084},
+            "stoich_by_species": {species: {
+                "parent_oxide": "Cr2O3", "oxide_per_product_kg": 1.0,
+            }},
+            "available_oxide_kg": {species: 10.0},
+            "melt_surface_area_m2": 0.2,
+            "alpha": alpha,
+        },
+    ))
+
+
+def test_cro2_predicts_with_proxy_authority_by_default():
+    result = _alpha_witness("CrO2", _load_evaporation_alpha_by_species(_raw_data()))
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"]["CrO2"] > 0.0
+    assert result.diagnostic["alpha_used_by_species"]["CrO2"] == 0.9
+    assert result.diagnostic["unmeasured_alpha_fallback_species"] == ["CrO2"]
+    evaluation = result.diagnostic["alpha_s_evaluation_by_species"]["CrO2"]
+    assert evaluation["alpha_authority_status"] == "proxy/bridge"
+    assert "metals_cr_family" in evaluation["source"]
+    assert "no CrO2-specific alpha" in evaluation["source"]
+
+
+def test_absent_alpha_predicts_explicit_upper_bound_by_default():
+    result = _alpha_witness("CrO2", {})
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"]["CrO2"] > 0.0
+    assert result.diagnostic["alpha_used_by_species"]["CrO2"] == 1.0
+    assert result.diagnostic["unmeasured_alpha_fallback_species"] == ["CrO2"]
+    evaluation = result.diagnostic["alpha_s_evaluation_by_species"]["CrO2"]
+    assert evaluation["alpha_authority_status"] == "analytical_upper_bound"
+    assert "upper bound" in evaluation["source"]
+
+
+def test_measured_alpha_witness_unchanged():
+    loaded = _load_evaporation_alpha_by_species(_raw_data())
+    result = _alpha_witness("K", loaded)
+    explicit = _alpha_witness("K", {"K": 0.13})  # Fedkin 2006 KEMS anchor.
+    assert result.diagnostic["alpha_used_by_species"]["K"] == 0.13
+    assert result.diagnostic["evaporation_flux_kg_hr"] == explicit.diagnostic["evaporation_flux_kg_hr"]
+    assert "unmeasured_alpha_fallback_species" not in result.diagnostic
+
+
 def _raw_data() -> dict:
     return yaml.safe_load(VAPOR_PRESSURES_PATH.read_text())
 
@@ -107,29 +140,20 @@ def test_proxy_rows_carry_provenance_not_bare_floats():
     assert alpha_by_species["CrO2"]["value"] == pytest.approx(0.9)
 
 
-def test_measured_view_strips_proxy_rows_for_flux_admission():
-    """Every row tagged ``broad_proxy_not_intrinsic`` is stripped from the
-    provider-facing measured view so the SC-67 unmeasured-alpha refusal
-    fires instead of a proxy number satisfying the gate."""
-    measured = _measured_alpha_control_view(
-        _load_evaporation_alpha_by_species(_raw_data())
-    )
-    admitted = BROAD_PROXY_SPECIES & set(measured)
-    assert not admitted, (
-        f"tag {BROAD_PROXY_NOT_INTRINSIC_TAG!r} rows must not satisfy the "
-        f"measured-alpha requirement, but loaded: {sorted(admitted)}"
-    )
-    # Sanity: the tags are still present in the data (the tag, not the
-    # species, drives stripping — deleting the row would also pass the
-    # assertion above but for the wrong reason).
-    raw_text = VAPOR_PRESSURES_PATH.read_text()
-    assert raw_text.count(f"tag: {BROAD_PROXY_NOT_INTRINSIC_TAG}") >= len(
-        BROAD_PROXY_SPECIES
-    )
+def test_all_broad_proxy_species_remain_executable_and_flagged():
+    loaded = _load_evaporation_alpha_by_species(_raw_data())
+    assert BROAD_PROXY_SPECIES <= loaded.keys()
+    for species in BROAD_PROXY_SPECIES:
+        result = _alpha_witness(species, loaded)
+        assert result.diagnostic["evaporation_flux_kg_hr"][species] > 0.0
+        assert result.diagnostic["alpha_authority_status_by_species"][species] == "proxy/bridge"
+        evaluation = result.diagnostic["alpha_s_evaluation_by_species"][species]
+        assert evaluation["source"] == loaded[species]["source"]
+        assert evaluation["authority_reason"] == BROAD_PROXY_NOT_INTRINSIC_TAG
 
 
-def test_stripping_is_data_driven_not_hardcoded():
-    """The class fix: a synthetic tagged row is marked and stripped even for
+def test_proxy_tagging_is_data_driven_not_hardcoded():
+    """The class fix: a synthetic tagged row is marked even for
     a species no production data carries, and removing the tag re-admits
     the row as a plain value."""
     data = {"metals": {"TestSpecies": {
@@ -144,13 +168,13 @@ def test_stripping_is_data_driven_not_hardcoded():
     assert loaded["TestSpecies"]["alpha_proxy_tag"] == (
         BROAD_PROXY_NOT_INTRINSIC_TAG
     )
-    assert "TestSpecies" not in _measured_alpha_control_view(loaded)
+    assert loaded["TestSpecies"]["value"] == 0.9
     untagged = {"metals": {"TestSpecies": {
         "evaporation_alpha": {"value": 0.9, "source": "synthetic"},
     }}}
     loaded_untagged = _load_evaporation_alpha_by_species(untagged)
     assert loaded_untagged["TestSpecies"] == 0.9
-    assert _measured_alpha_control_view(loaded_untagged)["TestSpecies"] == 0.9
+    assert loaded_untagged["TestSpecies"] == 0.9
 
 
 def test_pressure_gate_keeps_proxy_species():
@@ -166,10 +190,14 @@ def test_pressure_gate_keeps_proxy_species():
     assert shadow == pytest.approx({"CrO2": 3.7e-9, "AlO": 1.0, "Fe": 2.0})
 
 
+
+def test_pressure_gate_keeps_species_without_any_alpha_row():
+    assert _legacy_evaporation_shadow_pressure_map(
+        {}, {"CrO2": 100.0}, read_context="test",
+    ) == {"CrO2": 100.0}
+
 def test_untagged_rows_still_admitted_with_values():
-    measured = _measured_alpha_control_view(
-        _load_evaporation_alpha_by_species(_raw_data())
-    )
+    measured = _load_evaporation_alpha_by_species(_raw_data())
     for species in UNTAGGED_BARE_STILL_ADMITTED:
         assert species in measured, species
     assert measured["Cr"] == pytest.approx(0.9)
@@ -186,9 +214,7 @@ def test_other_proxy_tag_rows_stay_admitted_scope_marker():
     """Scope marker for the sweep: other structured proxy tags are NOT
     wired by b-314 (several are owner-ratified). If the owner later widens
     the wiring, this test is the deliberate place that must change."""
-    measured = _measured_alpha_control_view(
-        _load_evaporation_alpha_by_species(_raw_data())
-    )
+    measured = _load_evaporation_alpha_by_species(_raw_data())
     missing = OTHER_PROXY_TAG_STILL_ADMITTED - set(measured)
     assert not missing, f"unexpectedly stripped: {sorted(missing)}"
 
@@ -196,9 +222,7 @@ def test_other_proxy_tag_rows_stay_admitted_scope_marker():
 def test_flux_dormant_rows_keep_declared_zero():
     """Declared dormancy (``flux_dormant: true``) is a data declaration, not
     an absence: dormant rows keep their explicit 0.0."""
-    measured = _measured_alpha_control_view(
-        _load_evaporation_alpha_by_species(_raw_data())
-    )
+    measured = _load_evaporation_alpha_by_species(_raw_data())
     for species in ("FeO_association_gas", "NiO_gas", "MnO_gas", "CoO_gas"):
         assert measured.get(species) == 0.0, species
 
@@ -208,7 +232,7 @@ def test_no_data_rows_still_absent():
     data = {"metals": {"Ghost": {"evaporation_alpha": {"status": "no_data"}}}}
     loaded = _load_evaporation_alpha_by_species(data)
     assert "Ghost" not in loaded
-    assert "Ghost" not in _measured_alpha_control_view(loaded)
+    assert "Ghost" not in loaded
 
 
 def test_predicate_shapes():
@@ -222,14 +246,8 @@ def test_predicate_shapes():
     assert not is_broad_proxy_not_intrinsic_row("broad_proxy_not_intrinsic")
 
 
-def test_sc67_refusal_fires_for_cro2_with_real_loader_map():
-    """End-to-end with the REAL loader output through the production control
-    view: CrO2 enters missing_alpha and its species_refusals record names
-    missing_evaporation_alpha, while Na (admitted, provenance-carrying)
-    still evaporates."""
-    alpha_by_species = _measured_alpha_control_view(
-        _load_evaporation_alpha_by_species(_raw_data())
-    )
+def test_cro2_proxy_and_sodium_upper_bound_both_evaporate():
+    alpha_by_species = _load_evaporation_alpha_by_species(_raw_data())
     request = IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
         account_view=ProviderAccountView(
@@ -267,24 +285,14 @@ def test_sc67_refusal_fires_for_cro2_with_real_loader_map():
 
     assert result.status == "ok"
     assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] > 0.0
-    assert "CrO2" not in result.diagnostic["evaporation_flux_kg_hr"]
-    assert set(result.diagnostic["missing_alpha"]) == {"CrO2"}
-    refusal = result.diagnostic["species_refusals"]["CrO2"]
-    assert refusal["policy"] == "fail_loud_missing_alpha"
-    assert refusal["reason"] == "missing_evaporation_alpha"
-    assert refusal["status"] == "refused"
-    assert refusal["disposition"] == "retained_in_condensed_parent_oxide"
-    assert refusal["parent_oxide"] == "Cr2O3"
-    assert "per-species evaporation refusal" in result.warnings[0]
+    assert result.diagnostic["evaporation_flux_kg_hr"]["CrO2"] > 0.0
+    assert "missing_alpha" not in result.diagnostic
+    assert result.diagnostic["alpha_authority_status_by_species"]["CrO2"] == "proxy/bridge"
+    assert result.diagnostic["alpha_authority_status_by_species"]["Na"] == "analytical_upper_bound"
 
 
-def test_fallback_path_marks_proxy_species_when_explicitly_enabled():
-    """With ``allow_unmeasured_alpha_fallback`` explicitly set, a stripped
-    proxy species takes the marked alpha=1.0 prototype fallback — recorded
-    in ``unmeasured_alpha_fallback_species``, never silently measured."""
-    alpha_by_species = _measured_alpha_control_view(
-        _load_evaporation_alpha_by_species(_raw_data())
-    )
+def test_legacy_opt_in_preserves_proxy_coefficient():
+    alpha_by_species = _load_evaporation_alpha_by_species(_raw_data())
     request = IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
         account_view=ProviderAccountView(
@@ -320,4 +328,4 @@ def test_fallback_path_marks_proxy_species_when_explicitly_enabled():
     assert "missing_alpha" not in result.diagnostic
     assert result.diagnostic["evaporation_flux_kg_hr"]["CrO2"] > 0.0
     assert result.diagnostic["unmeasured_alpha_fallback_species"] == ["CrO2"]
-    assert result.diagnostic["alpha_used_by_species"]["CrO2"] == 1.0
+    assert result.diagnostic["alpha_used_by_species"]["CrO2"] == 0.9

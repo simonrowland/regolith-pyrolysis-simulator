@@ -20,6 +20,7 @@ def _real_path_record(
     *,
     proof_grade: str | None,
     alpha_ceiling_species: tuple[str, ...] = (),
+    alpha_statuses: dict[str, str] | None = None,
 ) -> study.StudyRecord:
     trace = {
         "backend_name": "alphamelts",
@@ -31,13 +32,13 @@ def _real_path_record(
     }
     if proof_grade is not None:
         trace["proof_grade"] = proof_grade
-    if alpha_ceiling_species:
+    engaged = alpha_statuses or {
+        species: "analytical_upper_bound" for species in alpha_ceiling_species
+    }
+    if engaged:
         run_execution = SimpleNamespace(
             simulator=SimpleNamespace(
-                _alpha_authority_status_by_species_engaged={
-                    species: "analytical_upper_bound"
-                    for species in alpha_ceiling_species
-                }
+                _alpha_authority_status_by_species_engaged=engaged
             ),
             session=SimpleNamespace(
                 _config=SimpleNamespace(backend_name="alphamelts")
@@ -51,10 +52,7 @@ def _real_path_record(
             reduced_real_cache={},
         )
         trace.update(evaluate_module._cache_trace_payload(run_execution, None))
-        assert trace["alpha_authority_status_by_species"] == {
-            species: "analytical_upper_bound"
-            for species in alpha_ceiling_species
-        }
+        assert trace["alpha_authority_status_by_species"] == engaged
     reference = RunReference(
         status="ok",
         trace=trace,
@@ -182,6 +180,21 @@ def test_optimizer_tier_label_preserves_positive_alpha_ceiling_through_study_rec
     assert label["certification_allowed"] is False
     assert label["canonical"]["certification_allowed"] is False
     assert label["alpha_ceiling_species"] == ["Ca", "Ti"]
+
+
+@pytest.mark.parametrize("with_ceiling", [False, True])
+def test_proxy_alpha_survives_cache_study_and_report_projection(with_ceiling) -> None:
+    statuses = {"CrO2": "proxy/bridge", "K": "measured"}
+    if with_ceiling:
+        statuses["Na"] = "analytical_upper_bound"
+    record = _real_path_record(proof_grade=None, alpha_statuses=statuses)
+    serialized = json.loads(json.dumps(dict(record.result_blob)))
+    assert serialized["alpha_authority_status_by_species"] == statuses
+    label = _optimizer_tier_label(record.trace_summary, serialized)
+    assert label["alpha_authority_status_by_species"] == statuses
+    assert label["ux_label"] == "UNVERIFIED"
+    assert label["certification_allowed"] is False
+    assert label["canonical"]["certification_allowed"] is False
 
 
 def test_optimizer_tier_label_does_not_veto_unevaporated_ceiling_spec() -> None:

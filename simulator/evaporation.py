@@ -9,7 +9,11 @@ from collections.abc import Mapping
 from numbers import Real
 from typing import Any, NamedTuple
 
-from simulator.alpha_kinetics import parse_alpha_contract
+from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUS_FIELD,
+    PROXY_BRIDGE_ALPHA_STATUS,
+    parse_alpha_contract,
+)
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.chemistry.melt_activity import single_cation_mole_fractions
@@ -719,18 +723,7 @@ def _assert_runtime_alpha_source_not_vaporock(
 
 
 def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, Any]:
-    """Load executable alpha specs, preserving dormant pressure-only carriers.
-
-    b-314: a row tagged ``broad_proxy_not_intrinsic`` (tier-2 proxy inherited
-    from another measurement family) is not an intrinsic melt alpha. It stays
-    in this map — the pressure-gating path
-    (``_legacy_evaporation_shadow_pressure_map``) and class diagnostics consume
-    it — but as a provenance-carrying mapping marked with
-    ``alpha_proxy_tag``, never a bare number indistinguishable from a
-    measured coefficient. The provider-facing measured view
-    (``_measured_alpha_control_view``) strips these rows so the SC-67
-    unmeasured-alpha refusal fires instead of a proxy satisfying the gate.
-    """
+    """Load alpha specs, retaining tagged proxy provenance and dormant zeros."""
 
     from simulator.evaporation_classes import (
         BROAD_PROXY_NOT_INTRINSIC_TAG,
@@ -763,6 +756,8 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, A
                     else {"form": "scalar", "value": value}
                 )
                 payload["alpha_proxy_tag"] = BROAD_PROXY_NOT_INTRINSIC_TAG
+                payload[ALPHA_AUTHORITY_STATUS_FIELD] = PROXY_BRIDGE_ALPHA_STATUS
+                payload["authority_reason"] = BROAD_PROXY_NOT_INTRINSIC_TAG
                 if alpha_data.get("tier") is not None:
                     payload["alpha_proxy_tier"] = alpha_data.get("tier")
                 if alpha_data.get("source"):
@@ -771,34 +766,6 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, A
                 continue
             alpha_by_species[species] = value
     return alpha_by_species
-
-
-def _measured_alpha_control_view(
-    alpha_by_species: Mapping[str, Any],
-) -> dict[str, Any]:
-    """Provider-facing alpha map with tier-2 broad-proxy rows removed (b-314).
-
-    A row carrying ``alpha_proxy_tag == broad_proxy_not_intrinsic`` is proxy
-    evidence, not a measured intrinsic melt alpha; it must not satisfy the
-    provider's presence-based measured-alpha test
-    (``engines.builtin.evaporation_flux._alpha_is_unmeasured``). Removing it
-    here lets the SC-67 ``missing_alpha`` refusal (or the explicitly gated
-    ``allow_unmeasured_alpha_fallback`` prototype path) fire instead of the
-    proxy driving flux as if it were a measurement. The full loader map —
-    proxy rows included, tag-carrying — remains the pressure-gating and
-    diagnostic view.
-    """
-
-    from simulator.evaporation_classes import BROAD_PROXY_NOT_INTRINSIC_TAG
-
-    return {
-        str(species): spec
-        for species, spec in alpha_by_species.items()
-        if not (
-            isinstance(spec, Mapping)
-            and spec.get("alpha_proxy_tag") == BROAD_PROXY_NOT_INTRINSIC_TAG
-        )
-    }
 
 
 def _load_hkl_upper_bound_transport_species(
@@ -828,17 +795,16 @@ def _legacy_evaporation_shadow_pressure_map(
     *,
     read_context: str | None = None,
 ) -> dict[str, float]:
-    """Independent pre-RG shadow projection after the legacy alpha gate."""
+    """Keep finite backend pressures, including carriers with unknown alpha.
 
-    alpha_by_species = _load_evaporation_alpha_by_species(vapor_pressure_data)
-    return {
-        species_id: pressure_pa
-        for species_id, pressure_pa in finite_live_pressure_map(
-            live_pressures_Pa,
-            read_context=read_context,
-        ).items()
-        if species_id in alpha_by_species
-    }
+    Alpha authority belongs to the flux provider: a missing coefficient must
+    reach its explicitly flagged HKL upper-bound path.
+    """
+
+    return finite_live_pressure_map(
+        live_pressures_Pa,
+        read_context=read_context,
+    )
 
 
 def _evaporation_legacy_shadow_pressure_map(
@@ -1497,14 +1463,7 @@ class EvaporationMixin:
         if str(kernel_result.status) != 'ok':
             reason = str(diagnostic.get('reason') or '').strip()
             # A primary refusal wins; secondary records remain diagnostic context.
-            if 'missing_alpha' in diagnostic and not reason:
-                missing = ', '.join(sorted(diagnostic['missing_alpha']))
-                reason = (
-                    "missing evaporation_alpha for sampled species: "
-                    f"{missing}; set chemistry_kernel.allow_unmeasured_alpha_fallback "
-                    "for alpha=1.0 prototype fallback"
-                )
-            elif 'missing_transport_parameters' in diagnostic and not reason:
+            if 'missing_transport_parameters' in diagnostic and not reason:
                 missing = ', '.join(
                     sorted(diagnostic['missing_transport_parameters'])
                 )
@@ -3944,17 +3903,12 @@ class EvaporationMixin:
             'evaporation_series_resistance': dict(
                 kernel_config.get('evaporation_series_resistance', {}) or {}
             ),
-            'alpha': _measured_alpha_control_view(
-                _load_evaporation_alpha_by_species(self.vapor_pressures)
-            ),
+            'alpha': _load_evaporation_alpha_by_species(self.vapor_pressures),
             'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
                 self.vapor_pressures
             ),
             'hkl_upper_bound_transport_species': (
                 _load_hkl_upper_bound_transport_species(self.vapor_pressures)
-            ),
-            'allow_unmeasured_alpha_fallback': kernel_config.get(
-                'allow_unmeasured_alpha_fallback', False
             ),
             'campaign_name': str(
                 getattr(
@@ -3977,10 +3931,6 @@ class EvaporationMixin:
                 controls['vapour_batch_flux_shadow_outcome'] = (
                     vapour_batch_flux_overlay['shadow_outcome']
                 )
-        if 'unmeasured_alpha_fallback_species' in kernel_config:
-            controls['unmeasured_alpha_fallback_species'] = tuple(
-                kernel_config['unmeasured_alpha_fallback_species'] or ()
-            )
         return controls, molar_masses_kg_mol
 
     def _project_evaporation_overhead_source_mol_hr(

@@ -1862,12 +1862,7 @@ def test_sso2_owner_recipe_patch_is_named_allowlisted_fe_then_sio() -> None:
 
 
 def _sso2_sim_alpha_fallback_disabled(*, hours: int = 3):
-    """Same SSO-2 owner recipe with the prototype alpha fallback left at its
-    production default (disabled) — the refusal-direction leg of the b-314
-    both-directions pin. Steps hour by hour and collects each hour's
-    missing-alpha refusal records, because the last-diagnostic slot is
-    volatile (later pipeline stages overwrite it) and a species only appears
-    in an hour where its pressure is positive."""
+    """Run the SSO-2 recipe without the legacy alpha opt-in controls."""
     from simulator.optimize import sso2_evidence as _sso2
     from simulator.runner import PyrolysisRun
     from simulator.session import SimSession
@@ -1942,70 +1937,42 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert evidence["metal_product_path"]["Fe_kg"] == pytest.approx(0.0)
     assert evidence["metal_product_path"]["product_ledger_Fe_kg"] > 0.0
     fallback = evidence["prototype_alpha_fallback_provenance"]
-    # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4) made the typed VapourBatch
-    # the eligibility authority: CrO2's policy-only alpha row is a missing
-    # channel contract, not an executable alpha value.
-    # 0c6d9811 (b-314) then wired the broad_proxy_not_intrinsic predicate into
-    # flux admission: CrO2's tier-2 proxy (inherited from Cr metal) no longer
-    # satisfies the measured-alpha requirement, so the explicitly gated
-    # alpha=1.0 prototype fallback — which SSO-2 opts into for exactly this
-    # trace species — now engages instead of the proxy silently driving flux
-    # as if it were a measurement.  The engagement is the designed visible
-    # signal; the evidence surface must report it, not hide it.
+    # CrO2 is predicted using the Cr proxy, but 0.5 Cr2O3 + 0.25 O2 -> CrO2
+    # consumes overhead O2. With no O2 inventory, depletion commits no CrO2;
+    # provider fallback warnings and committed-run authority have distinct scopes.
+    assert "CrO2" not in execution.simulator._alpha_authority_status_by_species_engaged
+    assert not any(
+        transition.reason == "evaporate_CrO2"
+        for transition in execution.simulator.atom_ledger.transitions
+    )
+    assert fallback["total_engagement_count"] > 0
     assert fallback == {
         "severity": "warning",
         "status": "engaged",
-        "policy": "alpha=1.0 prototype fallback",
+        "policy": "proxy/bridge or alpha=1 upper bound",
         "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
         "permitted_species": ["CrO2"],
         "engaged_species": ["CrO2"],
-        "total_engagement_count": 9,
+        "total_engagement_count": execution.simulator._degraded_path_engagement_summary()[
+            "unmeasured_alpha_evaporation_fallback"
+        ]["total_count"],
     }
     report = _markdown_report(evidence, execution)
     assert "WARNING prototype_alpha_fallback" in report
-    assert "alpha=1.0 prototype fallback" in report
+    assert "proxy/bridge or alpha=1 upper bound" in report
     assert "status=`engaged`" in report
     assert "permitted_species=`CrO2`" in report
     assert "engaged_species=`CrO2`" in report
-    assert "engagement_count=`9`" in report
+    assert f"engagement_count=`{fallback['total_engagement_count']}`" in report
 
-    # Refusal direction of the same b-314 pin: with the fallback control at
-    # its production default (disabled), the same recipe must NOT engage the
-    # prototype path and must NOT flux CrO2 on the strength of an unmeasured
-    # alpha — the SC-67 fail-loud refusal names CrO2 in missing_alpha. The
-    # engagement pinned above is therefore strictly the deliberate,
-    # allowlisted, evidence-reported opt-in, never absence resolving toward
-    # the confident answer. (Allowlist boundedness is pinned on the engaged
-    # side by _unmeasured_alpha_fallback_notice itself: it raises if any
-    # non-permitted species engages, and the engaged run's own diagnostic
-    # still records CrO — unmeasured but NOT allowlisted — in missing_alpha.)
-    refusal_sim, refusal_missing_by_hour = _sso2_sim_alpha_fallback_disabled(
-        hours=3
-    )
-    refusal_sim.setpoints.setdefault("chemistry_kernel", {})[
-        "unmeasured_alpha_fallback_species"
-    ] = ["CrO2"]
-    refusal_missing = {}
-    for hourly in refusal_missing_by_hour:
-        refusal_missing.update(hourly)
-    assert "CrO2" in refusal_missing
-    assert refusal_missing["CrO2"]["policy"] == "fail_loud_missing_alpha"
-    # No CrO2 flux transition may exist anywhere in the refusal run.
+    # Legacy opt-in controls cannot remove a flagged CrO2 prediction.
+    default_sim, missing_by_hour = _sso2_sim_alpha_fallback_disabled(hours=3)
+    assert all("CrO2" not in hourly for hourly in missing_by_hour)
     assert not any(
         transition.reason == "evaporate_CrO2"
-        for transition in refusal_sim.atom_ledger.transitions
+        for transition in default_sim.atom_ledger.transitions
     )
-    from simulator.optimize.sso2_evidence import _unmeasured_alpha_fallback_notice
-
-    assert _unmeasured_alpha_fallback_notice(refusal_sim) == {
-        "severity": "warning",
-        "status": "not_engaged",
-        "policy": "alpha=1.0 prototype fallback",
-        "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
-        "permitted_species": ["CrO2"],
-        "engaged_species": [],
-        "total_engagement_count": 0,
-    }
+    assert "CrO2" not in default_sim._alpha_authority_status_by_species_engaged
 
 
 def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
@@ -2024,7 +1991,7 @@ def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
     assert _unmeasured_alpha_fallback_notice(generic_sim) == {
         "severity": "warning",
         "status": "not_engaged",
-        "policy": "alpha=1.0 prototype fallback",
+        "policy": "proxy/bridge or alpha=1 upper bound",
         "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
         "permitted_species": ["CrO2"],
         "engaged_species": [],
@@ -2042,8 +2009,9 @@ def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
             "unmeasured_alpha_evaporation_fallback": {"total_count": 1}
         },
     )
-    with pytest.raises(RuntimeError, match="escaped its trace-species scope: CrO"):
-        _unmeasured_alpha_fallback_notice(scoped_sim)
+    notice = _unmeasured_alpha_fallback_notice(scoped_sim)
+    assert notice["engaged_species"] == []
+    assert notice["status"] == "not_engaged"
 
 
 def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:
