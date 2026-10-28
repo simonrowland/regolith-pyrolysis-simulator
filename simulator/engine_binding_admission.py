@@ -108,11 +108,12 @@ class _BindingAdmissionRefusalScope(Enum):
         "live computation and its value are unaffected.",
     )
     SELECTED_BINDING_ONLY = (
-        "cross-process cache replay and capture for the selected binding only",
+        "cross-process cache replay and capture for the selected "
+        "binding only",
         "this disables cross-process cache replay and capture for the "
         "selected binding only. In-process gate-curve memo reuse remains "
-        "available for a fingerprinted primary producer. Live computation "
-        "and its value are unaffected.",
+        "available when primary producer evidence supports it. Live "
+        "computation and its value are unaffected.",
     )
 
     @property
@@ -387,6 +388,7 @@ def _live_selected_binding_eligibility(
     *,
     artifact: str,
     provider_role: str | None,
+    primary_producer_evidence: str | None = None,
 ) -> bool:
     try:
         identities = selected_binding_identities(
@@ -401,6 +403,8 @@ def _live_selected_binding_eligibility(
             identity,
             "binding dependency selection unverifiable",
             scope=_BindingAdmissionRefusalScope.SELECTED_BINDING_ONLY,
+            producer_evidence=primary_producer_evidence,
+            memo_provider_role=provider_role,
         )
     eligible = True
     for identity in identities:
@@ -412,6 +416,8 @@ def _live_selected_binding_eligibility(
                 identity,
                 "install provenance unverifiable",
                 scope=_BindingAdmissionRefusalScope.SELECTED_BINDING_ONLY,
+                producer_evidence=primary_producer_evidence,
+                memo_provider_role=provider_role,
             )
             eligible = False
             continue
@@ -420,6 +426,8 @@ def _live_selected_binding_eligibility(
             identity,
             provenance,
             refusal_scope=_BindingAdmissionRefusalScope.SELECTED_BINDING_ONLY,
+            producer_evidence=primary_producer_evidence,
+            memo_provider_role=provider_role,
         ):
             eligible = False
     return eligible
@@ -461,19 +469,21 @@ def _gate_curve_evidence(
     *,
     eligible: bool,
 ) -> GateCurveEvidence:
-    if _selected_producer_digest(identity, provenance) is None:
-        return GateCurveEvidence(
-            "evidence-unavailable",
-            eligible,
-            identity,
-            provenance,
-        )
     return GateCurveEvidence(
-        admission_fingerprint(identity, provenance),
+        _gate_curve_producer_evidence(identity, provenance),
         eligible,
         identity,
         provenance,
     )
+
+
+def _gate_curve_producer_evidence(
+    identity: BindingIdentity,
+    provenance: Mapping[str, Any],
+) -> str:
+    if _selected_producer_digest(identity, provenance) is None:
+        return "evidence-unavailable"
+    return admission_fingerprint(identity, provenance)
 
 
 def _unresolved_gate_curve_evidence(
@@ -511,15 +521,32 @@ def _live_binding_cache_evidence(
 ) -> GateCurveEvidence:
     backend = getattr(sim, "backend", None)
 
-    def selected_bindings_eligible() -> bool:
+    def selected_bindings_eligible(
+        primary_producer_evidence: str | None = None,
+    ) -> bool:
         return (
             _live_selected_binding_eligibility(
                 sim,
                 artifact=artifact,
                 provider_role=provider_role,
+                primary_producer_evidence=primary_producer_evidence,
             )
             if include_selected_bindings
             else True
+        )
+
+    def unresolved_evidence_with_selected_bindings() -> GateCurveEvidence:
+        evidence = _unresolved_gate_curve_evidence(
+            sim,
+            provider_role,
+            eligible=True,
+        )
+        selected = selected_bindings_eligible(evidence.producer_evidence)
+        return GateCurveEvidence(
+            evidence.producer_evidence,
+            selected,
+            evidence.identity,
+            evidence.provenance,
         )
 
     if cached_real or (
@@ -528,10 +555,7 @@ def _live_binding_cache_evidence(
     ):
         config = getattr(backend, "config", None)
         if config is None:
-            eligible = selected_bindings_eligible()
-            return _unresolved_gate_curve_evidence(
-                sim, provider_role, eligible=eligible
-            )
+            return unresolved_evidence_with_selected_bindings()
         identity = (
             binding_identity_for_gate_fallback()
             if provider_role == "fallback"
@@ -552,6 +576,10 @@ def _live_binding_cache_evidence(
                 False,
                 identity,
             )
+        primary_producer_evidence = _gate_curve_producer_evidence(
+            identity,
+            provenance,
+        )
         primary_eligible = False
         if include_selected_bindings:
             published = getattr(backend, "_admitted_bindings", {}).get(
@@ -583,24 +611,36 @@ def _live_binding_cache_evidence(
                     try:
                         authorize_binding(identity, provenance)
                     except EngineBindingAdmissionError:
-                        primary_eligible = live_cache_eligibility(
-                            sim, identity, provenance
+                        primary_eligible = _live_cache_eligibility(
+                            sim,
+                            identity,
+                            provenance,
+                            refusal_scope=(
+                                _BindingAdmissionRefusalScope.GATE_CURVE_MEMO
+                            ),
+                            producer_evidence=primary_producer_evidence,
+                            memo_provider_role=provider_role,
                         )
-                    selected = selected_bindings_eligible()
+                    selected = selected_bindings_eligible(
+                        primary_producer_evidence
+                    )
                     return _gate_curve_evidence(
                         sim,
                         identity,
                         provenance,
                         eligible=primary_eligible and selected,
                     )
-            primary_eligible = live_cache_eligibility(
+            primary_eligible = _live_cache_eligibility(
                 sim,
                 identity,
                 provenance,
                 published_fingerprint=published,
                 require_published_fingerprint=True,
+                refusal_scope=_BindingAdmissionRefusalScope.GATE_CURVE_MEMO,
+                producer_evidence=primary_producer_evidence,
+                memo_provider_role=provider_role,
             )
-        selected = selected_bindings_eligible()
+        selected = selected_bindings_eligible(primary_producer_evidence)
         return _gate_curve_evidence(
             sim,
             identity,
@@ -627,22 +667,13 @@ def _live_binding_cache_evidence(
         )
         live_backend = backend
         if provider is None or live_backend is None:
-            eligible = selected_bindings_eligible()
-            return _unresolved_gate_curve_evidence(
-                sim, provider_role, eligible=eligible
-            )
+            return unresolved_evidence_with_selected_bindings()
         try:
             identity = binding_identity_for_backend(live_backend)
         except Exception:  # noqa: BLE001 - an unknown identity cannot be cached
-            eligible = selected_bindings_eligible()
-            return _unresolved_gate_curve_evidence(
-                sim, provider_role, eligible=eligible
-            )
+            return unresolved_evidence_with_selected_bindings()
         if identity is None:
-            eligible = selected_bindings_eligible()
-            return _unresolved_gate_curve_evidence(
-                sim, provider_role, eligible=eligible
-            )
+            return unresolved_evidence_with_selected_bindings()
         try:
             provenance = current_backend_provenance(identity, live_backend)
         except Exception:  # noqa: BLE001 - live compute stays fail-open
@@ -658,6 +689,10 @@ def _live_binding_cache_evidence(
                 False,
                 identity,
             )
+        primary_producer_evidence = _gate_curve_producer_evidence(
+            identity,
+            provenance,
+        )
         initialized = bool(getattr(provider, "_backend_initialised", False))
         checker = getattr(live_backend, "is_available", None)
         initialized = initialized and callable(checker) and bool(checker())
@@ -666,8 +701,13 @@ def _live_binding_cache_evidence(
             try:
                 authorize_binding(identity, provenance)
             except EngineBindingAdmissionError:
-                primary_eligible = live_cache_eligibility(
-                    sim, identity, provenance
+                primary_eligible = _live_cache_eligibility(
+                    sim,
+                    identity,
+                    provenance,
+                    refusal_scope=_BindingAdmissionRefusalScope.GATE_CURVE_MEMO,
+                    producer_evidence=primary_producer_evidence,
+                    memo_provider_role=provider_role,
                 )
         elif include_selected_bindings:
             publish_live_backend_admission(live_backend)
@@ -676,14 +716,17 @@ def _live_binding_cache_evidence(
                 "_engine_binding_admission_fingerprint",
                 None,
             )
-            primary_eligible = live_cache_eligibility(
+            primary_eligible = _live_cache_eligibility(
                 sim,
                 identity,
                 provenance,
                 published_fingerprint=published,
                 require_published_fingerprint=True,
+                refusal_scope=_BindingAdmissionRefusalScope.GATE_CURVE_MEMO,
+                producer_evidence=primary_producer_evidence,
+                memo_provider_role=provider_role,
             )
-        selected = selected_bindings_eligible()
+        selected = selected_bindings_eligible(primary_producer_evidence)
         return _gate_curve_evidence(
             sim,
             identity,
@@ -694,15 +737,9 @@ def _live_binding_cache_evidence(
     try:
         identity = binding_identity_for_backend(backend)
     except Exception:  # noqa: BLE001 - an unknown identity cannot be cached
-        eligible = selected_bindings_eligible()
-        return _unresolved_gate_curve_evidence(
-            sim, provider_role, eligible=eligible
-        )
+        return unresolved_evidence_with_selected_bindings()
     if identity is None:
-        eligible = selected_bindings_eligible()
-        return _unresolved_gate_curve_evidence(
-            sim, provider_role, eligible=eligible
-        )
+        return unresolved_evidence_with_selected_bindings()
     try:
         provenance = current_backend_provenance(identity, backend)
     except Exception:  # noqa: BLE001 - live compute stays fail-open
@@ -718,8 +755,12 @@ def _live_binding_cache_evidence(
             False,
             identity,
         )
+    primary_producer_evidence = _gate_curve_producer_evidence(
+        identity,
+        provenance,
+    )
     primary_eligible = (
-        live_cache_eligibility(
+        _live_cache_eligibility(
             sim,
             identity,
             provenance,
@@ -729,11 +770,14 @@ def _live_binding_cache_evidence(
                 None,
             ),
             require_published_fingerprint=True,
+            refusal_scope=_BindingAdmissionRefusalScope.GATE_CURVE_MEMO,
+            producer_evidence=primary_producer_evidence,
+            memo_provider_role=provider_role,
         )
         if include_selected_bindings
         else False
     )
-    selected = selected_bindings_eligible()
+    selected = selected_bindings_eligible(primary_producer_evidence)
     return _gate_curve_evidence(
         sim,
         identity,
@@ -825,6 +869,7 @@ def write_gate_curve_memo_record(
     """Write one origin-bearing runtime record for production or a fixture."""
 
     from simulator.reduced_real_determinism import (
+        _gate_curve_provider_role,
         _is_cacheable_gate_curve,
         gate_curve_memo_record,
         uncacheable_replay_disposition,
@@ -851,6 +896,8 @@ def write_gate_curve_memo_record(
             "unproven gate producer; register its adapter; in-process reuse "
             "of this producer's gate curves is off",
             scope=_BindingAdmissionRefusalScope.GATE_CURVE_MEMO,
+            producer_evidence=evidence.producer_evidence,
+            memo_provider_role=_gate_curve_provider_role(curve),
         )
     redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
     origin = write_gate_curve_memo_origin(
@@ -926,26 +973,11 @@ def gate_curve_memo_origin_matches(
     ) != normalize_magemin_default(configuration):
         return False
     producer_evidence = origin.get("producer_evidence")
-    if producer_evidence == "no-external-install":
-        from simulator.melt_backend.base import InternalAnalyticalBackend
-        from simulator.chemistry.kernel import ChemistryIntent
-        from simulator.reduced_real_determinism import (
-            _resolved_backend_for_cache_identity,
-        )
-
-        if not isinstance(
-            _resolved_backend_for_cache_identity(
-                sim,
-                ChemistryIntent.GATE_LIQUID_FRACTION,
-                _gate_curve_provider_role(curve),
-            ),
-            InternalAnalyticalBackend,
-        ):
-            return False
-    elif (
-        not isinstance(producer_evidence, str)
-        or len(producer_evidence) != 64
-        or any(character not in "0123456789abcdef" for character in producer_evidence)
+    provider_role = _gate_curve_provider_role(curve)
+    if not _gate_curve_memo_evidence_can_support_reuse(
+        sim,
+        producer_evidence,
+        provider_role=provider_role,
     ):
         return False
     if not fresh_evidence:
@@ -956,6 +988,37 @@ def gate_curve_memo_origin_matches(
         include_selected_bindings=True,
     )
     return current.producer_evidence == producer_evidence
+
+
+def _gate_curve_memo_evidence_can_support_reuse(
+    sim: Any,
+    producer_evidence: Any,
+    *,
+    provider_role: str | None,
+) -> bool:
+    if producer_evidence == "no-external-install":
+        from simulator.melt_backend.base import InternalAnalyticalBackend
+        from simulator.chemistry.kernel import ChemistryIntent
+        from simulator.reduced_real_determinism import (
+            _resolved_backend_for_cache_identity,
+        )
+
+        try:
+            backend = _resolved_backend_for_cache_identity(
+                sim,
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+                provider_role,
+            )
+        except Exception:  # noqa: BLE001 - unresolved producer is not reusable
+            return False
+        return isinstance(backend, InternalAnalyticalBackend)
+    return (
+        isinstance(producer_evidence, str)
+        and len(producer_evidence) == 64
+        and all(
+            character in "0123456789abcdef" for character in producer_evidence
+        )
+    )
 
 
 def gate_curve_memo_eligibility(sim: Any, curve: Mapping[str, Any]) -> bool:
@@ -1643,6 +1706,8 @@ def _live_cache_eligibility(
     published_fingerprint: str | None = None,
     require_published_fingerprint: bool = False,
     refusal_scope: _BindingAdmissionRefusalScope,
+    producer_evidence: str | None = None,
+    memo_provider_role: str | None = None,
 ) -> bool:
     try:
         authorize_binding(
@@ -1668,6 +1733,8 @@ def _live_cache_eligibility(
             identity,
             exc.reason,
             scope=refusal_scope,
+            producer_evidence=producer_evidence,
+            memo_provider_role=memo_provider_role,
         )
     return True
 
@@ -1678,14 +1745,32 @@ def _record_live_cache_refusal(
     reason: str,
     *,
     scope: _BindingAdmissionRefusalScope,
+    producer_evidence: str | None = None,
+    memo_provider_role: str | None = None,
 ) -> bool:
+    memo_reusable = _gate_curve_memo_evidence_can_support_reuse(
+        sim,
+        producer_evidence,
+        provider_role=memo_provider_role,
+    )
+    if (
+        scope is _BindingAdmissionRefusalScope.GATE_CURVE_MEMO
+        and memo_reusable
+    ):
+        scope = _BindingAdmissionRefusalScope.CROSS_PROCESS_CACHE_ONLY
+    elif (
+        scope is _BindingAdmissionRefusalScope.SELECTED_BINDING_ONLY
+        and not memo_reusable
+    ):
+        scope = _BindingAdmissionRefusalScope.GATE_CURVE_MEMO
     notices = getattr(sim, "_engine_binding_admission_notices", None)
     if not isinstance(notices, list):
         notices = []
         sim._engine_binding_admission_notices = notices
     key = identity.as_dict()
     if not any(
-        notice.get("identity") == key and notice.get("governs") == scope.governs
+        notice.get("identity") == key
+        and notice.get("governs") == scope.governs
         for notice in notices
         if isinstance(notice, Mapping)
     ):

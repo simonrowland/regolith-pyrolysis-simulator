@@ -1224,6 +1224,7 @@ def test_selected_binding_refusal_notice_preserves_primary_memo_scope(
         sim,
         artifact="freeze_gate_curve",
         provider_role=None,
+        primary_producer_evidence=primary_fingerprint,
     )
 
     notice = binding_admission_run_notice(sim)
