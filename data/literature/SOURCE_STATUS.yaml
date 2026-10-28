@@ -11,15 +11,15 @@ counts:
   sources: 2223
   by_stage:
     located: 209
-    inbox: 1402
-    in_progress: 172
+    inbox: 1400
+    in_progress: 174
     ingested_partial: 112
     ingested_complete: 58
     wired: 0
     unknown: 270
 anti_loss:
   corpus_uncommitted:
-    count: 961
+    count: 983
     ids:
     - REQ-repair-extract-fact-loss-from-regolith-main-2026-10-04.md
     - ledger/mail-in-2026-09-22-regolith-main-coord-seq43.json
@@ -945,6 +945,8 @@ anti_loss:
     - text/brewer-margrave-1952-alkali-oxides-ucrl1864/mineru-redo/p017-p017-pipeline-ocr/brewer-margrave-1952-alkali-oxides-ucrl1864-p017-p017/ocr/brewer-margrave-1952-alkali-oxides-ucrl1864-p017-p017_content_list.json
     - text/brewer-margrave-1952-alkali-oxides-ucrl1864/pdftotext-layout.txt
     - text/fujisawa-1994-na-sn-carbonate-thermodynamics/tesseract-layout.txt
+    - text/halter-mysen-2004-na-silicate-speciation/mineru/p003-p003/out/halter-mysen-2004-na-silicate-speciation-p003-p003/vlm/halter-mysen-2004-na-silicate-speciation-p003-p003.md
+    - text/halter-mysen-2004-na-silicate-speciation/mineru/p003-p003/out/halter-mysen-2004-na-silicate-speciation-p003-p003/vlm/halter-mysen-2004-na-silicate-speciation-p003-p003_content_list.json
     - text/itoh-yokokawa-1984-sodium-activity-nas/pdftotext-layout.txt
     - text/jacquet-2026-alkali-recondensation/mineru/p005-p005/out/jacquet-2026-alkali-recondensation-p005-p005/vlm/jacquet-2026-alkali-recondensation-p005-p005.md
     - text/jacquet-2026-alkali-recondensation/mineru/p005-p005/out/jacquet-2026-alkali-recondensation-p005-p005/vlm/jacquet-2026-alkali-recondensation-p005-p005_content_list.json
@@ -959,6 +961,8 @@ anti_loss:
     - text/kelley-1953-alkali-aluminosilicate-thermodynamics/mineru/p022-p041/out/kelley-1953-alkali-aluminosilicate-thermodynamics-p022-p041/vlm/kelley-1953-alkali-aluminosilicate-thermodynamics-p022-p041.md
     - text/kelley-1953-alkali-aluminosilicate-thermodynamics/mineru/p022-p041/out/kelley-1953-alkali-aluminosilicate-thermodynamics-p022-p041/vlm/kelley-1953-alkali-aluminosilicate-thermodynamics-p022-p041_content_list.json
     - text/li-2005-na-al-phosphate-fe-activities/mineru-redo/p003-p003-pdftotext.txt
+    - text/li-2005-na-al-phosphate-fe-activities/mineru/p003-p003/out/li-2005-na-al-phosphate-fe-activities-p003-p003/vlm/li-2005-na-al-phosphate-fe-activities-p003-p003.md
+    - text/li-2005-na-al-phosphate-fe-activities/mineru/p003-p003/out/li-2005-na-al-phosphate-fe-activities-p003-p003/vlm/li-2005-na-al-phosphate-fe-activities-p003-p003_content_list.json
     - text/masuda-tanaka-1979-vacuum-condensates/mineru/p001-p008/out/masuda-tanaka-1979-vacuum-condensates-p001-p008/vlm/masuda-tanaka-1979-vacuum-condensates-p001-p008.md
     - text/masuda-tanaka-1979-vacuum-condensates/mineru/p001-p008/out/masuda-tanaka-1979-vacuum-condensates-p001-p008/vlm/masuda-tanaka-1979-vacuum-condensates-p001-p008_content_list.json
     - text/masuda-tanaka-1979-vacuum-condensates/mineru/p009-p016/out/masuda-tanaka-1979-vacuum-condensates-p009-p016/vlm/masuda-tanaka-1979-vacuum-condensates-p009-p016.md
@@ -967,14 +971,28 @@ anti_loss:
     - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p002-p041/out/powell-1971-alkali-sulfate-metasilicate-vapour-p002-p041/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p002-p041_content_list.json
     - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p042-p081/out/powell-1971-alkali-sulfate-metasilicate-vapour-p042-p081/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p042-p081.md
     - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p042-p081/out/powell-1971-alkali-sulfate-metasilicate-vapour-p042-p081/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p042-p081_content_list.json
+    - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p082-p101/out/powell-1971-alkali-sulfate-metasilicate-vapour-p082-p101/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p082-p101.md
+    - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p082-p101/out/powell-1971-alkali-sulfate-metasilicate-vapour-p082-p101/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p082-p101_content_list.json
+    - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p102-p111/out/powell-1971-alkali-sulfate-metasilicate-vapour-p102-p111/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p102-p111.md
+    - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p102-p111/out/powell-1971-alkali-sulfate-metasilicate-vapour-p102-p111/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p102-p111_content_list.json
+    - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p112-p121/out/powell-1971-alkali-sulfate-metasilicate-vapour-p112-p121/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p112-p121.md
+    - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p112-p121/out/powell-1971-alkali-sulfate-metasilicate-vapour-p112-p121/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p112-p121_content_list.json
+    - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p122-p161/out/powell-1971-alkali-sulfate-metasilicate-vapour-p122-p161/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p122-p161.md
+    - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p122-p161/out/powell-1971-alkali-sulfate-metasilicate-vapour-p122-p161/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p122-p161_content_list.json
+    - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p162-p169/out/powell-1971-alkali-sulfate-metasilicate-vapour-p162-p169/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p162-p169.md
+    - text/powell-1971-alkali-sulfate-metasilicate-vapour/mineru/p162-p169/out/powell-1971-alkali-sulfate-metasilicate-vapour-p162-p169/vlm/powell-1971-alkali-sulfate-metasilicate-vapour-p162-p169_content_list.json
     - text/schumm-1981-alkali-aluminosilicate-thermochemical-tables/mineru/p006-p010/out/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p006-p010/vlm/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p006-p010.md
     - text/schumm-1981-alkali-aluminosilicate-thermochemical-tables/mineru/p006-p010/out/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p006-p010/vlm/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p006-p010_content_list.json
     - text/schumm-1981-alkali-aluminosilicate-thermochemical-tables/mineru/p011-p020/out/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p011-p020/vlm/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p011-p020.md
     - text/schumm-1981-alkali-aluminosilicate-thermochemical-tables/mineru/p011-p020/out/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p011-p020/vlm/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p011-p020_content_list.json
+    - text/schumm-1981-alkali-aluminosilicate-thermochemical-tables/mineru/p021-p030/out/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p021-p030/vlm/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p021-p030.md
+    - text/schumm-1981-alkali-aluminosilicate-thermochemical-tables/mineru/p021-p030/out/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p021-p030/vlm/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p021-p030_content_list.json
     - text/schumm-1981-alkali-aluminosilicate-thermochemical-tables/mineru/p031-p040/out/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p031-p040/vlm/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p031-p040.md
     - text/schumm-1981-alkali-aluminosilicate-thermochemical-tables/mineru/p031-p040/out/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p031-p040/vlm/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p031-p040_content_list.json
     - text/schumm-1981-alkali-aluminosilicate-thermochemical-tables/mineru/p041-p056/out/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p041-p056/vlm/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p041-p056.md
     - text/schumm-1981-alkali-aluminosilicate-thermochemical-tables/mineru/p041-p056/out/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p041-p056/vlm/schumm-1981-alkali-aluminosilicate-thermochemical-tables-p041-p056_content_list.json
+    - text/seto-2010-na2o-activity-glass-emf-summary/mineru/p002-p002/out/seto-2010-na2o-activity-glass-emf-summary-p002-p002/vlm/seto-2010-na2o-activity-glass-emf-summary-p002-p002.md
+    - text/seto-2010-na2o-activity-glass-emf-summary/mineru/p002-p002/out/seto-2010-na2o-activity-glass-emf-summary-p002-p002/vlm/seto-2010-na2o-activity-glass-emf-summary-p002-p002_content_list.json
     - text/shornikov-2000-na-zno-phosphate-vaporization/tesseract-layout.txt
     - text/toplis-carroll-1995-fe-ti-oxide-fo2/mineru-redo/p013-rot180/p013-rot180.png
     - text/vanlimpt-2011-boron-evaporation-part1/mineru/p002-p002/out/vanlimpt-2011-boron-evaporation-part1-p002-p002/vlm/vanlimpt-2011-boron-evaporation-part1-p002-p002.md
@@ -982,6 +1000,10 @@ anti_loss:
     - text/vanlimpt-2011-boron-evaporation-part1/mineru/p007-p007/out/vanlimpt-2011-boron-evaporation-part1-p007-p007/vlm/vanlimpt-2011-boron-evaporation-part1-p007-p007.md
     - text/vanlimpt-2011-boron-evaporation-part1/mineru/p007-p007/out/vanlimpt-2011-boron-evaporation-part1-p007-p007/vlm/vanlimpt-2011-boron-evaporation-part1-p007-p007_content_list.json
     - text/wang-2017-sodium-stannate-formation-emf/html-text.txt
+    - text/zhang-2011-boron-sodium-f-free-evaporation/mineru/p002-p003/out/zhang-2011-boron-sodium-f-free-evaporation-p002-p003/vlm/zhang-2011-boron-sodium-f-free-evaporation-p002-p003.md
+    - text/zhang-2011-boron-sodium-f-free-evaporation/mineru/p002-p003/out/zhang-2011-boron-sodium-f-free-evaporation-p002-p003/vlm/zhang-2011-boron-sodium-f-free-evaporation-p002-p003_content_list.json
+    - text/zhang-2011-boron-sodium-f-free-evaporation/mineru/p008-p008/out/zhang-2011-boron-sodium-f-free-evaporation-p008-p008/vlm/zhang-2011-boron-sodium-f-free-evaporation-p008-p008.md
+    - text/zhang-2011-boron-sodium-f-free-evaporation/mineru/p008-p008/out/zhang-2011-boron-sodium-f-free-evaporation-p008-p008/vlm/zhang-2011-boron-sodium-f-free-evaporation-p008-p008_content_list.json
   corpus_unpushed:
     count: 8
     ids:
@@ -995,7 +1017,7 @@ anti_loss:
     - 47f287c968f5ff395ee02d576f791832fe76c84f
   extract_mirror_parity:
     simulator_only:
-      count: 146
+      count: 148
       ids:
       - 1997jonesthermo
       - abdeyazdan-2026-na-sn-si-phase-thermodynamics
@@ -1048,6 +1070,7 @@ anti_loss:
       - gorojovsky-wood-2026-sulfur-crustal
       - haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
       - inoue-suito-1982-vanadium-mgo-saturated-slag
+      - jacquet-2026-alkali-recondensation
       - janz-1979-nsrds61-part2-molten-salt-properties
       - jayasuriya-2004-iron-mossbauer
       - johnston-1965-sodium-disilicate-redox
@@ -1074,6 +1097,7 @@ anti_loss:
       - lopatin-2021-ce-ti-zr-kems-ru
       - lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
       - mamiya-2000-sio-disproportionation
+      - masuda-tanaka-1979-vacuum-condensates
       - matzen-2017-ni-olivine-composition
       - matzen-2022-martian-basalt-redox
       - mccready-1948-sodium-silicate
@@ -1144,7 +1168,7 @@ anti_loss:
       - zhang-2021-acsesc-si
       - zhang-2024-alkali-evaporation-ti-thesis
     corpus_only:
-      count: 122
+      count: 121
       ids:
       - 1997jonesthermo-jones-1997
       - allen-1994-reduction-lunar-mare-soil
@@ -1263,13 +1287,12 @@ anti_loss:
       - yakovlev-2018-cai-isotope-fractionation
       - yakovlev-2018-hasp-mg-si-volatility
       - yakovlev-2018-meteoritic-kems
-      - yakovlev-2021-chondrule-alkali
       - yakovlev-2024-cai-vaporization
       - yakovleva-2019-mg-si-isotope-fractionation
       - yang-2025-na2o-cao-silica-thermodynamics
       - yu-hewins-1997-lpsc28-1613
     byte_mismatch:
-      count: 169
+      count: 170
       ids:
       - 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
       - adamkovicova-1980-casio3-heat-of-fusion
@@ -1437,6 +1460,7 @@ anti_loss:
       - vanbuchem-2025-lavatmos2
       - visscher-fegley-2013-debris-disks
       - wimpenny-2019-zn-isotope-evaporation-extreme-t
+      - yakovlev-2021-chondrule-alkali
       - yam1983
       - zaitsev-2000-ms2000-045
       - zigo-1987-gehlenite-fusion
@@ -13232,13 +13256,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: jacquet-2026-alkali-recondensation
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/jacquet-2026-alkali-recondensation/SOURCE.md
-    - raw/jacquet-2026-alkali-recondensation/jacquet-2026-alkali-recondensation.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/jacquet-2026-alkali-recondensation.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -23202,13 +23225,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: masuda-tanaka-1979-vacuum-condensates
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/masuda-tanaka-1979-vacuum-condensates/SOURCE.md
-    - raw/masuda-tanaka-1979-vacuum-condensates/masuda-tanaka-1979-vacuum-condensates.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/masuda-tanaka-1979-vacuum-condensates.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -38208,7 +38230,7 @@ sources:
   evidence:
     decided_by: in_progress
     artefacts:
-    - extracts/yakovlev-2021-chondrule-alkali.yaml
+    - data/literature/extracts/yakovlev-2021-chondrule-alkali.yaml
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0

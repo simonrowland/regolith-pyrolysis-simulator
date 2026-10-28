@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 464
-  extracts: 462
+  sources: 467
+  extracts: 465
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 74
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 462
+  extracts_without_pdf: 465
   alias_groups_needing_resolution: 52
 gaps:
   pdfs_without_extract: []
@@ -132,6 +132,7 @@ gaps:
   - ivanova-2018-spinel-rich-cai-evaporation
   - ivtan-cro2-g
   - ivtan-mno-coo-thermo
+  - jacquet-2026-alkali-recondensation
   - jaggi-2021-mercury-atmosphere
   - janaf-4th
   - janz-1979-nsrds61-part2-molten-salt-properties
@@ -272,6 +273,7 @@ gaps:
   - lpsc-2024-bennu-pyrolysis-vandam
   - lunarsurface-2020-5029
   - mamiya-2000-sio-disproportionation
+  - masuda-tanaka-1979-vacuum-condensates
   - mathieu-2009-sodium-solubility-thesis
   - matzen-2017-ni-olivine-composition
   - matzen-2022-martian-basalt-redox
@@ -471,6 +473,7 @@ gaps:
   - woermann-1969-mg-fe-ti-oxides
   - xiao-reuter-holappa-2000-chromium-slag-oxidation-review
   - xu-2026-excess-oxygen-magma
+  - yakovlev-2021-chondrule-alkali
   - yam1983
   - yamaguchi-1984-na2o-activity-sodium-beta-alumina
   - yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
@@ -7536,6 +7539,64 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
+    commit: 734f4e8025bff4081a392198c77e87eb11902737
+- source_id: jacquet-2026-alkali-recondensation
+  aliases: []
+  citation: Jacquet, E., Marrocchi, Y., and Charnoz, S. (2026), Alkali recondensation into chondrules,
+    Icarus 449:116970.
+  doi: 10.1016/j.icarus.2026.116970
+  report_number: null
+  identifier: 10.1016/j.icarus.2026.116970
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/jacquet-2026-alkali-recondensation.yaml
+    review_status: draft
+    rows: 10
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/jacquet-2026-alkali-recondensation/jacquet-2026-alkali-recondensation.pdf
+      present: true
+      sha256: e11c3626bb3a2c00bcc358021b0903d8f72d8eaa54e554dfeda6fcc605242d68
+      matches_simulator: null
+    sidecar:
+      path: raw/jacquet-2026-alkali-recondensation/sidecar.yaml
+      present: true
+    text:
+      path: text/jacquet-2026-alkali-recondensation
+      exists: true
+      file_count: 123
+    tables:
+      path: tables/jacquet-2026-alkali-recondensation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/jacquet-2026-alkali-recondensation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/jacquet-2026-alkali-recondensation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 734f4e8025bff4081a392198c77e87eb11902737
 - source_id: jaggi-2021-mercury-atmosphere
   aliases: []
@@ -14613,7 +14674,7 @@ sources:
     text:
       path: text/li-2005-na-al-phosphate-fe-activities
       exists: true
-      file_count: 29
+      file_count: 42
     tables:
       path: tables/li-2005-na-al-phosphate-fe-activities
       exists: false
@@ -15617,6 +15678,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/mamiya-2000-sio-disproportionation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 734f4e8025bff4081a392198c77e87eb11902737
+- source_id: masuda-tanaka-1979-vacuum-condensates
+  aliases: []
+  citation: Masuda, A. and Tanaka, T. (1979). Experimental Studies on Behaviors of Major and Minor Lithophile
+    Elements in Vaporization Under Evacuated Condition. Meteoritics, 14(1), 13–28.
+  doi: 10.1111/j.1945-5100.1979.tb00475.x
+  report_number: null
+  identifier: 10.1111/j.1945-5100.1979.tb00475.x
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/masuda-tanaka-1979-vacuum-condensates.yaml
+    review_status: draft
+    rows: 13
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/masuda-tanaka-1979-vacuum-condensates/masuda-tanaka-1979-vacuum-condensates.pdf
+      present: true
+      sha256: 12c19c532d1c5a89e348de7145790f9602b240c037506fe11ac166e1d80e93a9
+      matches_simulator: null
+    sidecar:
+      path: raw/masuda-tanaka-1979-vacuum-condensates/sidecar.yaml
+      present: true
+    text:
+      path: text/masuda-tanaka-1979-vacuum-condensates
+      exists: true
+      file_count: 27
+    tables:
+      path: tables/masuda-tanaka-1979-vacuum-condensates
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/masuda-tanaka-1979-vacuum-condensates.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/masuda-tanaka-1979-vacuum-condensates.yaml
       present: false
       error: null
       last_stage: null
@@ -21228,7 +21347,7 @@ sources:
     text:
       path: text/seto-2010-na2o-activity-glass-emf-summary
       exists: true
-      file_count: 1
+      file_count: 11
     tables:
       path: tables/seto-2010-na2o-activity-glass-emf-summary
       exists: false
@@ -27385,6 +27504,64 @@ sources:
       last_stage: null
       date: null
     commit: 734f4e8025bff4081a392198c77e87eb11902737
+- source_id: yakovlev-2021-chondrule-alkali
+  aliases: []
+  citation: Yakovlev, O. I., & Shornikov, S. I. (2021). Experimental Data of Alkali Component Evaporation
+    from Chondrule Melts. Experiment in Geosciences 27(1), 25–28.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/yakovlev-2021-chondrule-alkali.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/yakovlev-2021-chondrule-alkali/yakovlev-2021-chondrule-alkali.pdf
+      present: true
+      sha256: d766a39acd8b6ace1dec780d40eee5d4489df41b393984b0f4aa223bc0e2d063
+      matches_simulator: null
+    sidecar:
+      path: raw/yakovlev-2021-chondrule-alkali/sidecar.yaml
+      present: true
+    text:
+      path: text/yakovlev-2021-chondrule-alkali
+      exists: true
+      file_count: 26
+    tables:
+      path: tables/yakovlev-2021-chondrule-alkali
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/yakovlev-2021-chondrule-alkali.yaml
+      present: true
+      matches_simulator: false
+    ledger:
+      path: ledger/yakovlev-2021-chondrule-alkali.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-05'
+    commit: 734f4e8025bff4081a392198c77e87eb11902737
 - source_id: yam1983
   aliases: []
   citation: Yamaguchi, S., Imai, A. & Goto, K.S. (1983), "Measurement of Activity of Na2O in Na2O-SiO2
@@ -27838,7 +28015,7 @@ sources:
     text:
       path: text/zhang-2011-boron-sodium-f-free-evaporation
       exists: true
-      file_count: 1
+      file_count: 28
     tables:
       path: tables/zhang-2011-boron-sodium-f-free-evaporation
       exists: false
