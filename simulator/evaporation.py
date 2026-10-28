@@ -4630,6 +4630,10 @@ class EvaporationMixin:
             if isinstance(state, Mapping)
         }
 
+    def _mark_overhead_na_origin_pool(self) -> None:
+        """Declare headspace sodium origins well-mixed for partial withdrawals."""
+        self.atom_ledger.mark_amalgamated_pool('process.overhead_gas', ('Na',))
+
     def _credit_evaporation_transition(
         self,
         species: str,
@@ -4739,7 +4743,7 @@ class EvaporationMixin:
         )
         # The well-mixed headspace makes Na origins indistinguishable;
         # the ledger attributes partial gas withdrawals pro rata.
-        self.atom_ledger.mark_amalgamated_pool('process.overhead_gas', ('Na',))
+        self._mark_overhead_na_origin_pool()
         if apply_evaporative_redox_source_terms:
             self._apply_evaporative_redox_source_terms(
                 transition,

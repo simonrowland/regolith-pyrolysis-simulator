@@ -1360,6 +1360,8 @@ class ExtractionMixin:
                     species, {}
                 )
             )
+            if species == 'Na':
+                self._mark_overhead_na_origin_pool()
             credited_condensed_kg = self._dispatch_condensation_route(
                 species,
                 condensed_kg,

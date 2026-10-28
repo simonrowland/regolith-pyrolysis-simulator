@@ -1524,6 +1524,54 @@ def test_condensation_proposal_ignores_tier_one_phase_context_fields(
     assert actual_transition == expected_transition
 
 
+@pytest.mark.xdist_group("serial")
+def test_mre_partial_na_gas_capture_attributes_origins_pro_rata(
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    na_kg_per_mol = resolve_species_formula(
+        "Na", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    gas_kg = 2.0 * na_kg_per_mol
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"Na": 1.0},
+        source="MRE sodium gas from feedstock",
+        material_origin="feedstock",
+    )
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"Na": 1.0},
+        source="MRE sodium gas from reductant",
+        material_origin="reagent",
+    )
+    monkeypatch.setattr(
+        sim.condensation_model,
+        "route",
+        lambda _flux, _melt: CondensationRouteResult(
+            remaining_by_species={"Na": gas_kg / 2.0}
+        ),
+    )
+
+    route = sim._route_mre_gas_products_to_condensation({"Na": gas_kg})
+
+    origins = sim.atom_ledger.origin_atom_moles_by_account()[
+        "process.overhead_gas"
+    ]["Na"]
+    assert route["Na"]["credited_condensed_kg"] == pytest.approx(
+        gas_kg / 2.0
+    )
+    assert origins == pytest.approx({"feedstock": 0.5, "reagent": 0.5})
+    assert sim.atom_ledger.origin_attribution_methods_by_account()[
+        "process.overhead_gas"
+    ]["Na"] == "pool_ratio"
+
+
 def test_evaporation_caller_counts_condensation_degraded_path_engagement(
     vapor_pressure_data,
     feedstocks_data,
