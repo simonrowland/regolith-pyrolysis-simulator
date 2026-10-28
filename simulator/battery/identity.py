@@ -60,6 +60,10 @@ Ambiguity resolutions:
 - Standard pressure is compared only where the quantity needs it. 1 bar
   and 100000 Pa are equal *after* ``bar_to_pa``; they are not guessed
   from a bare ``1``. 1 atm (101325 Pa) stays distinct from 0.1 MPa.
+  A crystal pure-standard H, Cp, or S row that leaves the axis unstated
+  compares as 1 bar (``assumed_crystal_standard_pressure_Pa``). Gas,
+  liquid, glass, and every quantity where pressure is an input still
+  treat that hole as unknown.
 - Decimal comparison is numeric (``Decimal.__eq__``), so ``1e5`` equals
   ``100000``. 1643 K does not equal 1643.15 K; no rounding band.
 - ``canonicalize_with_recorded_conversion`` applies only the unit helpers
@@ -107,6 +111,7 @@ from simulator.battery.enums import (
 from simulator.battery.records import (
     Composition,
     Reaction,
+    ReactionTerm,
     Species,
     StandardState,
     State,
@@ -638,7 +643,7 @@ def parse_valence_basis(
 @dataclass(frozen=True)
 class Identity:
     quantity: State[Quantity] | Quantity
-    species: Species
+    species: Species | None
     subtype: State[str] | None = None
     per: State[PerBasis] | None = None
     temperature_K: State[Decimal] | None = None
@@ -739,6 +744,55 @@ class IdentityEqualOutcome:
         return self.kind is IdentityEqualKind.EQUAL
 
 
+def _format_enthalpy_increment_subtype(
+    reference_temperature_K: Decimal,
+    *,
+    reference_phase: str | None = None,
+    reference_polymorph: str | None = None,
+) -> str:
+    temperature_text = format(as_decimal(reference_temperature_K).normalize(), "f")
+    subtype = f"H(T)-H({temperature_text} K)"
+    if reference_phase:
+        subtype += f"; reference phase: {reference_phase}"
+    if reference_polymorph:
+        subtype += f"; reference polymorph: {reference_polymorph}"
+    return subtype
+
+
+_ENTHALPY_INCREMENT_SUBTYPE_RE = re.compile(
+    r"^H\(T\)-H\((?P<temperature>\d+(?:\.\d+)?) K\)"
+    r"(?:; reference phase: (?P<phase>[^;]+))?"
+    r"(?:; reference polymorph: (?P<polymorph>[^;]+))?$"
+)
+
+
+def _parse_enthalpy_increment_subtype(
+    subtype: str,
+) -> tuple[Decimal, str | None, str | None] | None:
+    """Invert ``_format_enthalpy_increment_subtype``.
+
+    Returns the declared reference temperature, phase, and polymorph.
+    None when the sentence is not one the formatter writes: the anchor
+    is then unknown, not a nearby default.
+    """
+
+    if not isinstance(subtype, str):
+        return None
+    match = _ENTHALPY_INCREMENT_SUBTYPE_RE.fullmatch(subtype)
+    if match is None:
+        return None
+    temperature = as_decimal(match.group("temperature"))
+    if not temperature.is_finite() or temperature <= 0:
+        return None
+    phase = match.group("phase")
+    polymorph = match.group("polymorph")
+    return (
+        temperature,
+        None if phase is None else phase.strip(),
+        None if polymorph is None else polymorph.strip(),
+    )
+
+
 def profile_for(identity: Identity) -> QuantityProfile:
     """Closed compared-axis profile for the declared quantity.
 
@@ -759,8 +813,39 @@ def profile_for(identity: Identity) -> QuantityProfile:
     def na(*names: str) -> None:
         permitted_na.update(names)
 
-    # Always compared: quantity + species (+ polymorph via species).
-    if q in FORMATION_QUANTITIES:
+    # Reaction K uses its complete stoichiometry instead of a species anchor.
+    if q is Quantity.LOG10_K_REACTION:
+        req("reaction", "temperature_K")
+        reaction_state = identity.reaction
+        reaction = (
+            reaction_state.value
+            if reaction_state is not None
+            and reaction_state.is_value
+            and isinstance(reaction_state.value, Reaction)
+            else None
+        )
+        if reaction is None or any(
+            phase_token(term.species) in {None, Phase.G}
+            for term in reaction.terms
+        ):
+            req("standard_pressure_Pa")
+        else:
+            na("standard_pressure_Pa")
+        na(
+            "per",
+            "formation_elements",
+            "reference_state",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "exposure",
+            "sample_mass_kg",
+            "wall",
+            "reservoir",
+            "subtype",
+        )
+    elif q in FORMATION_QUANTITIES:
         req("per", "temperature_K", "standard_pressure_Pa", "reaction", "formation_elements")
         na(
             "composition",
@@ -794,6 +879,10 @@ def profile_for(identity: Identity) -> QuantityProfile:
         )
     elif q in PURE_STANDARD_THERMO:
         req("per", "temperature_K", "standard_pressure_Pa")
+        # The axis stays required. identity_equal fills an unstated crystal
+        # pressure with assumed_crystal_standard_pressure_Pa before comparing,
+        # so census and compile_residual see the same 1 bar the attempt uses.
+        # Gas, liquid, glass, and a stated pressure are not filled.
         if q is Quantity.H_MINUS_H298:
             req("subtype")  # reference T lives in subtype
         else:
@@ -1291,6 +1380,32 @@ def quantity_token(identity: Identity) -> Quantity | None:
     return None
 
 
+def assumed_crystal_standard_pressure_Pa(identity: Identity) -> Decimal | None:
+    """1 bar when a crystal pure-standard H, Cp, or S leaves pressure unstated.
+
+    This is the only owner of that assumption. ``identity_equal`` and the
+    pure-phase attempt both call it, so a census and a residual keep the
+    value and the notice the attempt already records.
+
+    Gas, liquid, and glass return None. Liquid and glass are in
+    ``CONDENSED_PHASES``, but the pure-phase engines are crystal-only and
+    refuse them before any 1 bar call. A stated pressure, including a
+    stated pressure other than 1 bar, also returns None: the caller
+    compares or passes that pressure through. Formation and vapour
+    quantities are not in ``PURE_STANDARD_THERMO``, so an unstated
+    pressure there stays unknown.
+    """
+
+    if quantity_token(identity) not in PURE_STANDARD_THERMO:
+        return None
+    if phase_token(identity.species) is not Phase.CR:
+        return None
+    state = identity.standard_pressure_Pa
+    if state is None or (isinstance(state, State) and state.is_unknown):
+        return PA_PER_BAR_DEC
+    return None
+
+
 def _axis_state(identity: Identity, name: str) -> State[Any] | None:
     return getattr(identity, name)
 
@@ -1449,6 +1564,47 @@ def _species_axis_compare(
     if outcome.kind is IdentityEqualKind.IDENTITY_MISMATCH:
         return _mismatch(name)
     return outcome
+
+
+def _reaction_constant_state_compare(
+    left: State[Reaction] | None, right: State[Reaction] | None
+) -> IdentityEqualOutcome:
+    if (
+        left is None
+        or right is None
+        or not left.is_value
+        or not right.is_value
+    ):
+        return _state_compare("reaction", left, right, required=True)
+    if not isinstance(left.value, Reaction) or not isinstance(right.value, Reaction):
+        return IdentityEqualOutcome(
+            IdentityEqualKind.INVALID_IDENTITY,
+            ("reaction",),
+            "reaction axis must contain a Reaction",
+        )
+
+    def compare_terms(left_term: object, right_term: object) -> IdentityEqualOutcome:
+        if not isinstance(left_term, ReactionTerm) or not isinstance(
+            right_term, ReactionTerm
+        ):
+            return _mismatch("reaction")
+        if left_term.coefficient != right_term.coefficient:
+            return _mismatch("reaction")
+        species = _species_axis_compare(
+            "reaction", left_term.species, right_term.species
+        )
+        if species.kind is not IdentityEqualKind.EQUAL:
+            return species
+        return _state_compare(
+            "reaction.standard_state",
+            left_term.standard_state,
+            right_term.standard_state,
+            required=True,
+        )
+
+    return _multiset_compare(
+        "reaction", left.value.terms, right.value.terms, compare_terms
+    )
 
 
 def _multiset_compare(
@@ -1735,6 +1891,10 @@ def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
 def _reservoir_rule(identity: Identity) -> IdentityEqualOutcome | None:
     if quantity_token(identity) is not Quantity.P_SAT:
         return None
+    if identity.species is None:
+        return IdentityEqualOutcome(
+            IdentityEqualKind.IDENTITY_UNKNOWN, ("species",)
+        )
     reservoir = identity.reservoir
     if reservoir is None or not reservoir.is_value or reservoir.value is None:
         return None
@@ -1803,14 +1963,19 @@ def _identity_equal(
         return IdentityEqualOutcome(
             IdentityEqualKind.IDENTITY_MISMATCH, ("quantity",)
         )
-    species_outcome = _species_equal(
-        left.species,
-        right.species,
-        allow_unknown_phase=allow_unknown_species_phase,
-        allow_unknown_polymorph=allow_unknown_species_polymorph,
-    )
-    if species_outcome.kind is not IdentityEqualKind.EQUAL:
-        return species_outcome
+    if left_q is not Quantity.LOG10_K_REACTION:
+        if left.species is None or right.species is None:
+            return IdentityEqualOutcome(
+                IdentityEqualKind.IDENTITY_UNKNOWN, ("species",)
+            )
+        species_outcome = _species_equal(
+            left.species,
+            right.species,
+            allow_unknown_phase=allow_unknown_species_phase,
+            allow_unknown_polymorph=allow_unknown_species_polymorph,
+        )
+        if species_outcome.kind is not IdentityEqualKind.EQUAL:
+            return species_outcome
 
     profile = _comparison_profile(left, right)
     if knudsen_residue_extent and left_q is Quantity.RESIDUE_COMPONENT_COMPOSITION:
@@ -1838,6 +2003,13 @@ def _identity_equal(
             continue
         left_axis = _axis_state(left, name)
         right_axis = _axis_state(right, name)
+        if name == "standard_pressure_Pa":
+            left_assumed = assumed_crystal_standard_pressure_Pa(left)
+            right_assumed = assumed_crystal_standard_pressure_Pa(right)
+            if left_assumed is not None:
+                left_axis = State.of(left_assumed)
+            if right_assumed is not None:
+                right_axis = State.of(right_assumed)
         if (
             name == "exposure"
             and left_axis is not None
@@ -1866,6 +2038,8 @@ def _identity_equal(
                 )
                 if outcome.kind is not IdentityEqualKind.EQUAL:
                     break
+        elif name == "reaction" and left_q is Quantity.LOG10_K_REACTION:
+            outcome = _reaction_constant_state_compare(left_axis, right_axis)
         else:
             outcome = _state_compare(
                 name,

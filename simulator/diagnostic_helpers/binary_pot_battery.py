@@ -33,6 +33,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from decimal import Decimal
+from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
@@ -1088,6 +1089,18 @@ def engine_flags_from_result(
     from engines.alphamelts.domain import (
         _ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX,
     )
+
+    gas_only = diagnostics.get("fo2_gas_only")
+    if isinstance(gas_only, Mapping):
+        reason = gas_only.get("notice")
+        if isinstance(reason, str) and reason:
+            notices.append(
+                {
+                    "kind": NoticeKind.ENGINE_MODEL_CAVEAT.value,
+                    "authority": None,
+                    "reason": reason,
+                }
+            )
 
     for warning in getattr(result, "warnings", None) or ():
         if (
@@ -3464,7 +3477,8 @@ def _crash_cell_from_returncode(
         status, refusal, engine_reason = (
             "refusal",
             REFUSAL_ENGINE_CRASH,
-            f"{sig_name} (returncode {returncode})",
+            f"{sig_name} (returncode {returncode})"
+            + (f": {stderr[-4000:]}" if stderr else ""),
         )
         engine_status = REFUSAL_ENGINE_CRASH
         exit_signal = sig
@@ -3622,6 +3636,9 @@ def _close_isolated_cell_workers() -> None:
 
 
 atexit.register(_close_isolated_cell_workers)
+# Run before multiprocessing's exit handler joins live children. Ordinary
+# atexit cleanup can otherwise be ordered after that unbounded join.
+Finalize(None, _close_isolated_cell_workers, exitpriority=10)
 
 
 def _run_cell_in_subprocess(

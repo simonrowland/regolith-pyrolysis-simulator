@@ -18,6 +18,7 @@ Ambiguity resolutions (simplest-correct; not owner questions):
 
 from __future__ import annotations
 
+from decimal import Decimal
 from enum import StrEnum
 
 from simulator.state_types import StateTag
@@ -66,6 +67,7 @@ class Quantity(StrEnum):
     FUGACITY = "fugacity"
     P_REFERENCE = "p_reference"
     LOG10_KF = "log10_Kf"
+    LOG10_K_REACTION = "log10_K_reaction"
     LOG10_K_STAR = "log10_K_star"
     ACTIVITY = "activity"
     ACTIVITY_COEFFICIENT = "activity_coefficient"
@@ -254,6 +256,7 @@ class NoticeKind(StrEnum):
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
     # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
     ADMISSION_DEFAULTED = "admission_defaulted"
+    VALIDATION_HARD_ISSUE_LABEL = "validation_hard_issue_label"
     FIGURE_ONLY = "figure_only"
     REACTIVE_CELL_NOT_MODELLED = "reactive_cell_not_modelled"
     # t-1123a: printed point sits between printed liquidus positions; scored as
@@ -374,6 +377,9 @@ class Polymorph(StrEnum):
     ZOISITE = "zoisite"
     WOLLASTONITE = "wollastonite"
     CYCLOWOLLASTONITE = "cyclowollastonite"
+    # ThermoEngine pWo. Distinct from cyclowollastonite: that token is the
+    # B1544 printed name and does not select pWo.
+    PSEUDOWOLLASTONITE = "pseudowollastonite"
     LIME = "lime"
     PERICLASE = "periclase"
     DICKITE = "dickite"
@@ -517,6 +523,17 @@ class ValueKind(StrEnum):
     UNAVAILABLE = "unavailable"
 
 
+class BoundDirection(StrEnum):
+    LOWER = "lower"
+    UPPER = "upper"
+
+
+class BoundInclusivity(StrEnum):
+    INCLUDED = "included"
+    EXCLUDED = "excluded"
+    UNKNOWN = "unknown"
+
+
 class UncertaintyKind(StrEnum):
     PRINTED = "printed"
     DERIVED = "derived"
@@ -547,6 +564,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.FUGACITY: "Pa",
     Quantity.P_REFERENCE: "Pa",
     Quantity.LOG10_KF: "dimensionless",
+    Quantity.LOG10_K_REACTION: "dimensionless",
     Quantity.LOG10_K_STAR: "dimensionless",
     Quantity.ACTIVITY: "dimensionless",
     Quantity.ACTIVITY_COEFFICIENT: "dimensionless",
@@ -640,8 +658,29 @@ PRINTED_CAPACITY_QUANTITIES = frozenset(
 PHASE_ROW_QUANTITIES = PHASE_COMPOSITION_QUANTITIES | PRINTED_CAPACITY_QUANTITIES
 # Closed subtype tokens on a printed phase-composition row. Equilibrium
 # ratios (Darken–Gurry r, pCO2/pCO) reuse EQUILIBRIUM_PHASE_COMPOSITION
-# with a free-text basis and are not in this set.
-PHASE_BASIS_TOKENS = frozenset({"wt_percent", "mole_fraction"})
+# with a free-text basis and are not in this set. ppm_mass is the printed
+# mass-ppm scale; it is not a weight percent and is not stored converted.
+PHASE_BASIS_TOKENS = frozenset({"wt_percent", "mole_fraction", "ppm_mass"})
+
+# 1 wt% = 1 mass part per 100. 1 ppm by mass = 1 mass part per 1_000_000.
+# 1e6 / 1e2 = 1e4, so 1 wt% = 10_000 ppm and wt% = ppm / 1e4.
+# Unit check: ppm_mass / 1e4 = (mass fraction × 1e6) / 1e4
+#   = mass fraction × 1e2 = wt%.
+# Sanity: 2500 ppm = 0.25 wt%; 10000 ppm = 1 wt%.
+_PPM_MASS_PER_WT_PERCENT = Decimal("10000")
+
+
+def ppm_mass_to_wt_percent(ppm: Decimal) -> Decimal:
+    """Scale a mass-ppm amount onto weight percent.
+
+    This is the only conversion. A stored phase-composition point stays the
+    printed ppm with subtype ppm_mass. A scorer that holds an engine wt% map
+    refuses the row; it does not call this on the stored point.
+    """
+
+    return ppm / _PPM_MASS_PER_WT_PERCENT
+
+
 KINETIC_YIELD_QUANTITIES = frozenset(
     {
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,

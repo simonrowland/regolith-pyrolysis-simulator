@@ -77,6 +77,7 @@ from simulator.battery.migrate import (
     source_derivation_from_source,
     _derivation_inputs_requirement_error,
     load_migrated_context,
+    QUANTITY_SOURCE_FIELDS,
     map_phase,
     map_quantity,
     parse_quantity_suffix,
@@ -696,8 +697,10 @@ def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
             )
             - 1
         ) < Decimal("1e-24")
+    # The unavailable-value exemption removes two missing-derivation issues;
+    # the separate derived_from lineage issues remain required.
     assert Counter(issue.reason.value for issue in result.validation.hard_issues) == Counter(
-        {"conditional_field": 4}
+        {"conditional_field": 2}
     )
 
     expected = {
@@ -4191,12 +4194,21 @@ def test_g08_model_derived_keeps_table_destination(tmp_path: Path) -> None:
 
 def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
-    extract["species"]["Na"]["observations"][0]["values"]["method_class"] = "model_derived"
-    extract["species"]["Na"]["observations"][0]["values"].pop("series", None)
+    row = extract["species"]["Na"]["observations"][0]
+    row["type"] = "density"
+    row["units"] = "kg/m3"
+    values = row["values"]
+    values.clear()
+    values["quantity"] = "density"
+    values["method_class"] = "model_derived"
+    values["density_kg_m3"] = 1.0
+    values["admission_status"] = "typed_refusal"
     root = _write_min_tree(tmp_path, extract)
     result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
     assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.admission.status is AdmissionStatus.REJECTED
     assert not obs.derived_from
     assert obs.derivation is None
     report = validate_corpus(
@@ -4213,6 +4225,43 @@ def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -
     assert any(
         "derived_from" in (e.axes or ()) or "derivation" in (e.axes or ())
         for e in result.queue
+    )
+
+
+def test_unavailable_model_derived_value_keeps_supplied_derivation_references(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    values = row["values"]
+    row["type"] = "rate_series"
+    row["units"] = "mol/s/m2 as printed"
+    values.pop("series", None)
+    values.update(
+        {
+            "quantity": "evaporation_rate",
+            "method_class": "model_derived",
+            "evaporation_rate": "4.6e-06",
+            "derivation": {
+                "relation": "explicit source calculation",
+                "inputs": ["pdf:missing-model-output"],
+                "parameters": [],
+                "output_unit": "kg/s",
+            },
+        }
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.UNAVAILABLE
+    assert observation.derivation is not None
+    assert observation.derivation.relation == "explicit source calculation"
+    assert observation.derivation.inputs == ("pdf:missing-model-output",)
+    assert result.validation is not None
+    assert any(
+        issue.path == f"observation[{observation.observation_id}].derivation.inputs"
+        and issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        for issue in result.validation.hard_issues
     )
 
 
@@ -4274,6 +4323,11 @@ def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) 
     root = _write_min_tree(tmp_path / "tree", extract)
     result = migrate(root, write=False)
     out = tmp_path / "issues.tsv"
+    assert result.validation is not None
+    grouped_issues = result.validation.hard_issues_by_observation
+    assert sum(len(issues) for issues in grouped_issues.values()) == len(
+        result.validation.hard_issues
+    )
 
     written = dump_hard_issues(root, out)
     with out.open(encoding="utf-8", newline="") as stream:
@@ -6798,16 +6852,11 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         if "alpha_times_Gamma" in item:
             return _num(item["alpha_times_Gamma"])
         return None
-    if q_token == "evaporation_rate":
-        candidates = [
-            (key, value)
-            for key, value in item.items()
-            if isinstance(key, str)
-            and (key == q_token or key.startswith(f"{q_token}_"))
-        ]
-        if len(candidates) != 1:
-            return None
-        return _num(candidates[0][1])
+    if q_token in {"evaporation_rate", "mass_loss_rate"}:
+        selection = select_declared_source(
+            Quantity(q_token), units or None, item
+        )
+        return selection.amount if selection.value.kind is ValueKind.POINT else None
     if q_token == "mass_loss_areal_density":
         amount = _num(item.get("mass_loss_areal_density"))
         converted, _relation = convert_areal_mass_to_kg_per_m2(amount, units)
@@ -7233,12 +7282,10 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # mirror; the KEMS owner extract retains the cells (Fedkin et al. 2006, Table 3,
     # p. 212, DOI 10.1016/j.gca.2005.08.014).
     assert census.get("evaporation_coefficient_alpha") == 22
-    # Re-pinned with the d-032 store regen. _series_census skips a source with no
-    # extracts-v2 sibling, and the pre-regen store was missing 26 sources' derived
-    # files, so their series went uncounted: evaporation_rate 21->25,
-    # mass_loss_fraction 9->19, n_numeric 209->223. The counts moved because the
-    # data became visible, not because a check was relaxed - mismatches stays 0.
-    assert census.get("evaporation_rate") == 25
+    # Shaw's 21 mol/s/m2 flux cells need geometric area; Nagahara's four m/s
+    # recession rates need both material density and exposed area to map to kg/s.
+    # The production converter refuses both because those inputs are absent.
+    assert census.get("evaporation_rate", 0) == 0
     # Re-pinned after the loader-survival regeneration: Richter +50 measured
     # mass_loss_pct / 100 singleton series; mismatches remains 0.
     assert census.get("mass_loss_fraction") == 69
@@ -7302,15 +7349,12 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "isotope_delta": 22
     }
     # Family car (F39-F50): Bonnand, Bruand, Matzen et al. (2020) adds 14 printed
-    # Fe3+/Fe2+ ratio series. Measured with _series_census on a regenerated store
-    # of the family car re-merge: fe3_fe2_ratio 38->52 and n_numeric 3136->3150,
-    # no other category or source moved, mismatches stays 0. The count moved
-    # because the data became visible, not because a check was relaxed.
+    # Fe3+/Fe2+ ratio series. The 25 noncanonical rate series cells are unavailable.
     assert per_source.get(
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 52
-    assert n_numeric == 3150, (n_numeric, census, n_unavailable)
+    assert n_numeric == 3125, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
@@ -7354,14 +7398,200 @@ def test_residue_point_condition_values_keep_their_printed_types() -> None:
     assert condition.state.value == nominal_pressure
 
 
-def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
+def test_j01_declared_quantity_refuses_area_normalized_rate_without_area() -> None:
     selection = select_declared_source(
         Quantity.EVAPORATION_RATE,
-        "mol/s/m2",
+        "mol/s/m2 as printed",
         {"evaporation_rate_1200C": "4.6e-06"},
     )
-    assert selection.amount == as_decimal("4.6e-06")
+    assert selection.value.kind is ValueKind.UNAVAILABLE
     assert selection.field_name == "evaporation_rate_1200C"
+    assert selection.value.unavailable_reason == "sample_area_not_printed"
+
+
+def test_j01_declared_quantity_refuses_regolith_specific_rate_without_mass() -> None:
+    selection = select_declared_source(
+        Quantity.EVAPORATION_RATE,
+        "g/h/g of regolith as printed",
+        {"evaporation_rate": "1.38"},
+    )
+    assert selection.value.kind is ValueKind.UNAVAILABLE
+    assert selection.field_name == "evaporation_rate"
+    assert selection.value.unavailable_reason == "sample_mass_not_printed"
+
+
+def test_rate_census_oracle_uses_production_unit_conversion() -> None:
+    assert _census_expected_point(
+        {"evaporation_rate": "4.6e-06"},
+        "evaporation_rate",
+        "mol/s/m2 as printed",
+    ) is None
+    assert _census_expected_point(
+        {"evaporation_rate": "2"}, "evaporation_rate", "kg/s"
+    ) == as_decimal("2")
+    assert _census_expected_point(
+        {"mass_loss_rate": "19"},
+        "mass_loss_rate",
+        "as printed; Table 2 does not state the rate unit",
+    ) is None
+
+
+@pytest.mark.parametrize(
+    ("quantity", "units", "field", "reason"),
+    [
+        (
+            Quantity.EVAPORATION_RATE,
+            "mol/s/m2 as printed",
+            "evaporation_rate",
+            "sample_area_not_printed",
+        ),
+        (
+            Quantity.EVAPORATION_RATE,
+            "g/h/g of regolith as printed",
+            "evaporation_rate",
+            "sample_mass_not_printed",
+        ),
+        (
+            Quantity.EVAPORATION_RATE,
+            "mol cm^-2 s^-1",
+            "evaporation_rate",
+            "exposed_area_not_printed",
+        ),
+        (
+            Quantity.EVAPORATION_RATE,
+            "m/sec for evaporation_rate; cm^-2 for densities",
+            "evaporation_rate",
+            "exposed_area_not_printed",
+        ),
+        (
+            Quantity.MASS_LOSS_RATE,
+            "as printed; Table 2 does not state the rate unit",
+            "mass_loss_rate",
+            "rate_unit_not_stated",
+        ),
+    ],
+)
+def test_rate_refusal_reason_names_the_missing_input(
+    quantity: Quantity, units: str, field: str, reason: str
+) -> None:
+    selection = select_declared_source(quantity, units, {field: "1"})
+
+    assert selection.value.kind is ValueKind.UNAVAILABLE
+    assert selection.value.unavailable_reason == reason
+
+
+def test_dacko_mass_loss_rates_without_units_migrate_as_unavailable(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path,
+        "ta-dacko-conradt-low-p-transpiration.yaml",
+        write=False,
+    )
+    rates = [
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.MASS_LOSS_RATE
+    ]
+    assert len(rates) == 18
+    assert all(rate.value.kind is ValueKind.UNAVAILABLE for rate in rates)
+    assert {rate.value.unavailable_reason for rate in rates} == {
+        "rate_unit_not_stated"
+    }
+    assert sum(
+        rate.evidence.class_.is_value
+        and rate.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        for rate in rates
+    ) == 9
+
+
+def test_area_and_velocity_evaporation_rates_migrate_as_unavailable(
+    tmp_path: Path,
+) -> None:
+    for index, name in enumerate(
+        (
+            "mendybaev-2018-cmas-evaporation.yaml",
+            "nagahara-ozawa-1999-forsterite-surface-microstructures.yaml",
+        )
+    ):
+        result = _migrate_real_extract(tmp_path / str(index), name, write=False)
+        rates = [
+            observation
+            for observation in result.observations.values()
+            if quantity_token(observation.identity) is Quantity.EVAPORATION_RATE
+        ]
+        assert len(rates) == 4, name
+        assert all(rate.value.kind is ValueKind.UNAVAILABLE for rate in rates), name
+        assert all(
+            rate.value.unavailable_reason == "exposed_area_not_printed"
+            for rate in rates
+        ), name
+
+
+def test_density_source_converts_g_per_cm3_and_refuses_unknown_unit() -> None:
+    from simulator.battery.migrate import conversion_derivation
+
+    selection = select_declared_source(
+        Quantity.DENSITY,
+        "g/cm3 as printed",
+        {"density_g_cm3": "3.03"},
+    )
+    assert selection.value.kind is ValueKind.POINT
+    assert selection.amount == as_decimal("3030")
+    assert selection.unit_trail == "g_per_cm3_to_kg_per_m3"
+    conversion = conversion_derivation(selection.unit_trail, "3.03", None)
+    assert conversion is not None
+    assert conversion.output_unit == "kg_per_m3"
+
+    refused = select_declared_source(
+        Quantity.DENSITY,
+        "lb/ft3 as printed",
+        {"density_g_cm3": "3.03"},
+    )
+    assert refused.value.kind is ValueKind.UNAVAILABLE
+    assert refused.field_name == "density_g_cm3"
+    assert "unmapped density unit" in (refused.reason or "")
+
+
+def test_evolved_gas_yield_units_convert_to_mol_per_initial_kg() -> None:
+    from simulator.accounting.formulas import parse_formula
+    from simulator.battery.migrate import conversion_derivation
+
+    water = select_declared_source(
+        Quantity.EVOLVED_GAS_YIELD,
+        "wt.% as printed",
+        {"evolved_gas_yield_H2O": "2.3"},
+    )
+    water_molar_mass = as_decimal(
+        str(parse_formula("H2O").molar_mass_kg_per_mol())
+    )
+    assert water.value.kind is ValueKind.POINT
+    assert water.amount == as_decimal("0.023") / water_molar_mass
+    water_derivation = conversion_derivation(water.unit_trail, "2.3", None)
+    assert water_derivation is not None
+    assert water_derivation.output_unit == "mol_species_per_initial_kg"
+
+    carbon_dioxide = select_declared_source(
+        Quantity.EVOLVED_GAS_YIELD,
+        "µg/g as printed",
+        {"evolved_gas_yield_CO2": "225"},
+    )
+    co2_molar_mass = as_decimal(
+        str(parse_formula("CO2").molar_mass_kg_per_mol())
+    )
+    assert carbon_dioxide.value.kind is ValueKind.POINT
+    assert carbon_dioxide.amount == as_decimal("0.000225") / co2_molar_mass
+
+    legacy_field = select_declared_source(
+        Quantity.EVOLVED_GAS_YIELD,
+        "µg/g as printed",
+        {"yield_ug_g": "4.98", "gas_species": "H2"},
+    )
+    h2_molar_mass = as_decimal(
+        str(parse_formula("H2").molar_mass_kg_per_mol())
+    )
+    assert legacy_field.value.kind is ValueKind.POINT
+    assert legacy_field.amount == as_decimal("0.00000498") / h2_molar_mass
 
 
 def test_equal_temperature_range_is_a_point_but_true_range_is_not() -> None:
@@ -7496,6 +7726,39 @@ def test_borisov_combined_iron_composition_migrates_without_a_redox_split(
         assert observation.identity.temperature_K.value == as_decimal(expected_temperature)
         assert observation.point_conditions is not None
         assert "fO2_log" in observation.point_conditions
+
+
+def test_borisov_compilation_rows_locate_unprinted_reduction_inputs() -> None:
+    extract = REPO_ROOT / "data/literature/extracts/borisov-2018-compilation.yaml"
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "borisov-2018-compilation"
+    ]
+    assert len(rows) == 435
+    assert migrator.result.validation is not None
+    assert not [
+        issue
+        for issue in migrator.result.validation.hard_issues
+        if issue.detail == "derived observation requires derived_from"
+        and any(observation.observation_id in issue.path for observation in rows)
+    ]
+    for observation in rows:
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        derivation = observation.derivation
+        assert derivation is not None
+        assert "recalculated" in derivation.relation.lower()
+        assert observation.locator.table == "Supplementary Table 2"
+        assert observation.locator.record is not None
+        assert derivation.has_located_unprinted_raw_inputs
+        assert derivation.raw_inputs is not None
+        assert derivation.raw_inputs.locator is not None
+        assert derivation.raw_inputs.locator.table == "Supplementary Table 2"
+        assert derivation.raw_inputs.locator.record == observation.locator.record
 
 
 def test_unknown_mole_fraction_component_is_queued_and_withholds_composition() -> None:
@@ -8601,6 +8864,172 @@ def test_l01_map_quantity_direct_witnesses() -> None:
 )
 def test_l02_empirical_quantity_aliases_are_closed(alias: str, expected: Quantity) -> None:
     assert QUANTITY_ALIASES[alias] is expected
+
+
+def test_adamkovicova_crystal_cooling_is_the_enthalpy_increment() -> None:
+    """Table I cooling is H(T)-H(298 K). Eq. (1) Hrel is that column plus ΔHsol."""
+
+    extract = REPO_ROOT / "data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml"
+    document = yaml.safe_load(extract.read_text(encoding="utf-8"))
+    observations = document["species"]["CaSiO3"]["observations"]
+    cooling = next(
+        row
+        for row in observations
+        if row["observation_id"] == "adamkovicova_1980_table1_solid_cooling_measured"
+    )
+    # Table I, pdftotext lines 154-159. 448.8 - 139.6 = 309.2, the printed mean −ΔHsol.
+    assert [point["minus_delta_H_cool_kJ_mol-1"] for point in cooling["values"]["points"]] == [
+        139.6, 150.6, 157.1, 165.0, 173.9, 183.3,
+    ]
+    crystal_hrel = next(
+        row
+        for row in observations
+        if row["observation_id"] == "adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced"
+    )
+    melt_hrel = next(
+        row
+        for row in observations
+        if row["observation_id"] == "adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced"
+    )
+    assert [point["H_rel_kJ_mol-1"] for point in crystal_hrel["values"]["points"]] == [
+        448.8, 459.8, 466.3, 474.2, 483.1, 492.5,
+    ]
+    assert [point["H_rel_kJ_mol-1"] for point in melt_hrel["values"]["points"]] == [
+        557.6, 559.4, 561.2, 567.8, 577.9,
+    ]
+    assert "H_rel_kJ_mol-1" not in QUANTITY_SOURCE_FIELDS[Quantity.H_MINUS_H298]
+
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    assert not migrator.result.validation.hard_issues
+
+    source_id = "adamkovicova-1980-casio3-heat-of-fusion"
+    by_stem = {
+        observation.observation_id.removeprefix(f"{source_id}::").split(":h=", 1)[0]: observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == source_id
+    }
+    expected_cooling = {
+        "adamkovicova_1980_table1_solid_cooling_measured::T=1506": "139.6",
+        "adamkovicova_1980_table1_solid_cooling_measured::T=1576": "150.6",
+        "adamkovicova_1980_table1_solid_cooling_measured::T=1630": "157.1",
+        "adamkovicova_1980_table1_solid_cooling_measured::T=1678": "165.0",
+        "adamkovicova_1980_table1_solid_cooling_measured::T=1730": "173.9",
+        "adamkovicova_1980_table1_solid_cooling_measured::T=1780": "183.3",
+    }
+    for row_id, value in expected_cooling.items():
+        observation = by_stem[row_id]
+        assert observation.identity.quantity.value is Quantity.H_MINUS_H298
+        assert observation.identity.species.phase.value is Phase.CR
+        assert observation.identity.species.polymorph.value is Polymorph.PSEUDOWOLLASTONITE
+        assert observation.identity.per.value is PerBasis.MOL_SPECIES
+        assert observation.identity.subtype.value == "H(T)-H(298 K)"
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == Decimal(value)
+        assert observation.derivation is not None
+        assert observation.derivation.relation == "negative_cooling_enthalpy_to_H_minus_H298"
+        temperature = Decimal(row_id.rsplit("=", 1)[1])
+        assert observation.identity.temperature_K.is_value
+        assert observation.identity.temperature_K.value == temperature
+        located = observation.point_conditions["temperature_K"]
+        assert located.state.is_value
+        assert located.state.value == temperature
+        assert located.locator == observation.locator
+    assert not any(
+        entry.observation_id in {
+            by_stem[row_id].observation_id for row_id in expected_cooling
+        }
+        and "quantity" in (entry.axes or ())
+        for entry in migrator.result.queue
+    )
+
+    hrel_stems = [
+        stem
+        for stem in by_stem
+        if "relative_enthalpy_measured_reduced::T=" in stem
+    ]
+    assert len(hrel_stems) == 11
+    for stem in hrel_stems:
+        observation = by_stem[stem]
+        assert observation.identity.quantity.tag is StateTag.UNKNOWN
+        assert "relative_enthalpy" in (observation.identity.quantity.reason or "")
+        assert observation.identity.quantity.value is not Quantity.H_MINUS_H298
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.identity.species.phase.value is not Phase.L
+        subtype = observation.identity.subtype
+        assert subtype is None or not subtype.is_value or subtype.value != "H(T)-H(298 K)"
+
+    melt_cooling = [
+        observation
+        for stem, observation in by_stem.items()
+        if stem.startswith("adamkovicova_1980_table3_melt_cooling_measured::T=")
+    ]
+    assert len(melt_cooling) == 5
+    assert all(
+        observation.identity.quantity.tag is StateTag.UNKNOWN
+        and "sample_dependent_enthalpy_change_on_cooling"
+        in (observation.identity.quantity.reason or "")
+        and observation.value.kind is ValueKind.UNAVAILABLE
+        and (
+            observation.identity.species.phase.value is not Phase.L
+            if observation.identity.species.phase.is_value
+            else True
+        )
+        for observation in melt_cooling
+    )
+    melt_note = next(
+        row
+        for row in observations
+        if row["observation_id"] == "adamkovicova_1980_table3_melt_cooling_measured"
+    )["values"]["note"]
+    assert "glass" in melt_note
+    assert "not liquid H(T)-H(298 K)" in melt_note
+
+    located_rows = [
+        observation
+        for observation in by_stem.values()
+        if "::T=" in observation.observation_id
+    ]
+    assert located_rows
+    assert all(
+        observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].state.value
+        == observation.identity.temperature_K.value
+        and observation.point_conditions["temperature_K"].locator is not None
+        for observation in located_rows
+    )
+
+    cp_rows = {
+        observation.observation_id.removeprefix(f"{source_id}::"): observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == source_id
+        and "melt_heat_capacity" in observation.observation_id
+    }
+    assert {
+        row_id: observation.value.point
+        for row_id, observation in cp_rows.items()
+    } == {
+        "adamkovicova_1980_melt_heat_capacity_stated": Decimal("149.85000"),
+        "adamkovicova_1980_prior_melt_heat_capacity_0_15073_quote": Decimal("150.73000"),
+        "adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote": Decimal("146.54000"),
+    }
+    assert all(
+        observation.identity.quantity.value is Quantity.CP
+        and observation.identity.species.phase.value is Phase.L
+        and observation.identity.per.value is PerBasis.MOL_SPECIES
+        for observation in cp_rows.values()
+    )
+    fit_rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == source_id
+        and "relative_enthalpy_fit_eq" in observation.observation_id
+    ]
+    assert len(fit_rows) == 2
+    assert all(observation.identity.quantity.is_unknown for observation in fit_rows)
 
 
 def test_l02_empirical_quantity_aliases_map_numeric_witnesses() -> None:
@@ -10931,6 +11360,59 @@ def test_thermochemical_calorie_to_kilojoule_conversion_is_independently_pinned(
     assert named.unit_trail == "thermochemical_cal_to_kJ_exact"
 
 
+def test_calorie_conventions_remain_distinct_and_unknown_variants_refuse() -> None:
+    from simulator.battery.migrate import (
+        CALORIE_15_C_J,
+        INTERNATIONAL_TABLE_CALORIE_J,
+        THERMOCHEMICAL_CALORIE_J,
+    )
+
+    assert THERMOCHEMICAL_CALORIE_J == Decimal("4.184")
+    assert CALORIE_15_C_J == Decimal("4.1855")
+    assert INTERNATIONAL_TABLE_CALORIE_J == Decimal("4.1868")
+
+    cal15_energy = _convert_compilation_amount(
+        Decimal("2"), Quantity.H_MINUS_H298, "cal.15 mole−1"
+    )
+    assert cal15_energy == (Decimal("0.0083710"), "calorie_15C_to_kJ_exact")
+    cal15_cp = _convert_compilation_amount(
+        Decimal("2"), Quantity.CP, "cal.15 mole−1 °C−1"
+    )
+    assert cal15_cp == (Decimal("8.3710"), "calorie_15C_to_J_exact")
+    cal15_cp_kelvin = _convert_compilation_amount(
+        Decimal("2"), Quantity.CP, "cal.15 mole−1 K−1"
+    )
+    assert cal15_cp_kelvin == cal15_cp
+
+    assert _convert_compilation_amount(
+        Decimal("1"), Quantity.CP, "cal/mol/K"
+    ) == (Decimal("4.184"), "thermochemical_calorie_to_J_exact")
+    assert _convert_compilation_amount(
+        Decimal("1"), Quantity.H_MINUS_H298, "cal_IT/mol"
+    ) == (Decimal("0.0041868"), "international_table_calorie_to_kJ_exact")
+    assert _convert_compilation_amount(
+        Decimal("1"), Quantity.H_MINUS_H298, "cal.16 mole−1"
+    ) is None
+    assert _convert_compilation_amount(
+        Decimal("448.8"), Quantity.H_MINUS_H298, "kJ mol−1 CaSiO3"
+    ) == (Decimal("448.8"), "identity:kJ_per_mol")
+    assert _convert_compilation_amount(
+        Decimal("0.14985"), Quantity.CP, "kJ mol−1 K−1 CaSiO3"
+    ) == (Decimal("149.85000"), "kJ_to_J_exact")
+    unknown = select_declared_source(
+        Quantity.H_MINUS_H298,
+        None,
+        {
+            "enthalpy_increment": "1",
+            "units": {"enthalpy_increment": "cal.16 mole−1"},
+        },
+    )
+    assert unknown.value.kind is ValueKind.UNAVAILABLE
+    assert unknown.value.unavailable_reason == (
+        "unsupported printed unit for enthalpy_increment"
+    )
+
+
 def test_g1_delta_fh_migrate_refuses_blank_units_and_admits_declared_point(
     tmp_path: Path,
 ) -> None:
@@ -11409,6 +11891,45 @@ def test_g5_compilation_column_explode_migrate(tmp_path: Path) -> None:
         "gibbs_function" in (entry.why or "")
         for entry in result.queue
         if "page-0003" in (entry.observation_id or "")
+    )
+
+
+def test_h298_compilation_migration_emits_printed_anchor_and_basis(
+    tmp_path: Path,
+) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(root, "pankratz-1984-usbm-b677", "table-0007.json")
+    _copy_compilation_record(root, "pankratz-1987-usbm-b689", "page-0003.json")
+    _copy_compilation_record(root, "pankratz-1994-usbm-b696", "page-0006.json")
+    _copy_compilation_record(
+        root,
+        "robie-waldbaum-1968-usgs-b1259",
+        "b1259-ht-0001-silver-reference-state.json",
+    )
+
+    result = migrate(root, write=False)
+    expected_sources = {
+        "pankratz-1984-usbm-b677",
+        "pankratz-1987-usbm-b689",
+        "pankratz-1994-usbm-b696",
+        "robie-waldbaum-1968-usgs-b1259",
+    }
+    h_rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id in expected_sources
+        and quantity_token(obs.identity) is Quantity.H_MINUS_H298
+    ]
+    assert {obs.source_id for obs in h_rows} == expected_sources
+    assert all(
+        obs.identity.subtype.is_value
+        and obs.identity.subtype.value == "H(T)-H(298.15 K)"
+        for obs in h_rows
+    )
+    assert all(
+        obs.identity.per.is_value
+        and obs.identity.per.value is PerBasis.MOL_SPECIES
+        for obs in h_rows
     )
 
 
@@ -13357,6 +13878,116 @@ def test_d032_context_rows_carried_not_observed(tmp_path: Path) -> None:
     assert not any(oid.endswith("::na_bench_note") for oid in observations)
 
 
+def test_shaw_lms1_quoted_density_is_attributed_context(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "sublimation-kinetics-2023-minerals.yaml", write=False
+    )
+    context_id = (
+        "sublimation-kinetics-2023-minerals::context::"
+        "shaw_2023_lms1_quoted_spec_density"
+    )
+    assert context_id not in result.observations
+    row = next(
+        row
+        for rows in result.context_by_work.values()
+        for row in rows
+        if row.get("context_id") == context_id
+    )
+    assert row["type"] == "characterization"
+    assert row["values"]["method_class"] == "quoted_attributed"
+    assert row["values"]["attribution"].startswith("Isachenkov et al. 2022")
+    assert row["values"]["value_as_published"] == "3.03 g/cm3"
+    assert row["values"]["density_kg_m3"] == 3030
+
+
+def test_shaw_hkl_unavailable_points_do_not_require_derivation(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.migrate import write_report
+
+    result = _migrate_real_extract(
+        tmp_path, "sublimation-kinetics-2023-minerals.yaml", write=False
+    )
+    parent_ids = (
+        "shaw_2023_table2_fe_hkl_flux",
+        "shaw_2023_table2_na_hkl_flux",
+        "shaw_2023_table2_k_hkl_flux",
+    )
+    points = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            observation.observation_id.startswith(
+                f"sublimation-kinetics-2023-minerals::{parent_id}::"
+            )
+            for parent_id in parent_ids
+        )
+    ]
+    assert len(points) == 21
+    assert all(point.value.kind is ValueKind.UNAVAILABLE for point in points)
+    assert all(point.derivation is None for point in points)
+    derivation_paths = {
+        f"observation[{point.observation_id}].derivation" for point in points
+    }
+    assert result.validation is not None
+    assert not any(
+        issue.path in derivation_paths for issue in result.validation.hard_issues
+    )
+    report_path = tmp_path / "migration-report.md"
+    write_report(result, report_path)
+    assert (
+        "| `unavailable_missing_input:sample_area_not_printed` | 21 |"
+        in report_path.read_text(encoding="utf-8")
+    )
+
+
+def test_real_condensed_density_points_are_at_least_100_kg_per_m3(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import CONDENSED_PHASES
+
+    extracts = REPO_ROOT / "data" / "literature" / "extracts"
+    density_sources: list[str] = []
+    for source_path in sorted(extracts.glob("*.yaml")):
+        source_text = source_path.read_text(encoding="utf-8")
+        if re.search(r"quantity:\s*['\"]?density(?:['\"]|\b)", source_text) is None:
+            continue
+        source = yaml.safe_load(source_text)
+        if not isinstance(source, dict):
+            continue
+        for body in (source.get("species") or {}).values():
+            if not isinstance(body, dict):
+                continue
+            rows = (body.get("observations") or []) + (body.get("context") or [])
+            if any(
+                isinstance(row, dict)
+                and isinstance(row.get("values"), dict)
+                and row["values"].get("quantity") == "density"
+                for row in rows
+            ):
+                density_sources.append(source_path.name)
+                break
+
+    assert density_sources
+    migrated_density_rows = []
+    for index, name in enumerate(density_sources):
+        result = _migrate_real_extract(tmp_path / str(index), name, write=False)
+        migrated_density_rows.extend(
+            observation
+            for observation in result.observations.values()
+            if quantity_token(observation.identity) is Quantity.DENSITY
+        )
+    assert migrated_density_rows
+    for observation in migrated_density_rows:
+        phase = observation.identity.species.phase
+        if (
+            phase.is_value
+            and phase.value in CONDENSED_PHASES
+            and observation.value.kind is ValueKind.POINT
+        ):
+            assert observation.value.point >= Decimal("100"), observation.observation_id
+
+
 def test_d036_equipment_fk_resolves_through_context_row(tmp_path: Path) -> None:
     """d-036 ruling: boulliung's declared experiment reaches
     ``boulliung_2025_ssas_apparatus_and_run_conditions`` BY REFERENCE.
@@ -14501,6 +15132,313 @@ def test_residue_component_quantity_aliases_keep_printed_values_and_missing_cell
         assert "null" in (missing.reason or "")
 
 
+def test_residue_identity_uses_only_printed_fo2_from_row_or_experiment(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.identity import profile_for
+
+    log_fO2 = {
+        "state": {"tag": "value", "value": "-0.68"},
+        "locator": {
+            "source_path": "raw/sugawara-1999-fixture.pdf",
+            "page": 5,
+            "published_page": 429,
+            "table": "2",
+            "row_label": "m48313",
+            "column_header": "Log fO2",
+        },
+    }
+
+    def migrate_fixture(*, row_fO2: bool, experiment_fO2: bool, label: str):
+        document = deepcopy(FIXTURE_EXTRACT)
+        document["source_id"] = "sugawara-1999-residue-fixture"
+        document["source"]["citation"] = "Sugawara-like synthetic residue row"
+        document["experiments"] = [
+            {
+                "experiment_id": "m48313",
+                "conditions": {"log_fO2": deepcopy(log_fO2)}
+                if experiment_fO2
+                else {},
+            }
+        ]
+        observation = {
+            "observation_id": f"residue-{label}",
+            "experiment": "m48313",
+            "type": "residue_component_composition",
+            "locator": {
+                "source_path": "raw/sugawara-1999-fixture.pdf",
+                "page": 5,
+                "published_page": 429,
+                "table": "2",
+                "row_label": "m48313",
+            },
+            "units": "wt%",
+            "phase": "glass",
+            "values": {
+                "quantity": "residue_component_composition",
+                "method_class": "measured_direct",
+                "FeO_wt_pct": "12.59",
+                "T_C": "1199",
+                "duration_h_as_published": "48",
+                "total_pressure_atm": "1",
+                "composition_wt_pct": {
+                    "SiO2": "43.47",
+                    "Al2O3": "14.43",
+                    "FeO": "20.34",
+                    "MgO": "5.70",
+                    "CaO": "14.11",
+                    "Na2O": "1.95",
+                },
+            },
+        }
+        if row_fO2:
+            observation["point_conditions"] = {
+                "fO2_log": deepcopy(log_fO2),
+            }
+        document["species"] = {"FeO": {"observations": [observation]}}
+        return _migrate_real_extract(
+            tmp_path / label,
+            "sugawara-1999-residue-fixture.yaml",
+            extract_doc=document,
+        )
+
+    expected_pa = Decimal("20892.96130854039483122233736")
+    for label, row_fO2, experiment_fO2 in (
+        ("row", True, False),
+        ("experiment", False, True),
+    ):
+        result = migrate_fixture(
+            row_fO2=row_fO2, experiment_fO2=experiment_fO2, label=label
+        )
+        observation = next(
+            row
+            for row in result.observations.values()
+            if row.source_id == "sugawara-1999-residue-fixture"
+            and row.identity.quantity.is_value
+            and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        )
+        assert observation.identity.fO2_Pa.is_value
+        assert observation.identity.fO2_Pa.value == expected_pa
+        assert observation.identity.temperature_K.value == Decimal("1472.15")
+        printed_condition = observation.point_conditions["fO2_log"]
+        assert printed_condition.state.value == Decimal("-0.68")
+        assert printed_condition.locator.table == "2"
+        assert "fO2_Pa" in profile_for(observation.identity).required
+
+    missing = migrate_fixture(
+        row_fO2=False, experiment_fO2=False, label="unprinted"
+    )
+    observation = next(
+        row
+        for row in missing.observations.values()
+        if row.source_id == "sugawara-1999-residue-fixture"
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    assert observation.identity.fO2_Pa.is_unknown
+    assert observation.identity.temperature_K.value == Decimal("1472.15")
+    outcome = identity_equal(observation.identity, observation.identity)
+    assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "fO2_Pa" in outcome.fields
+
+
+def test_residue_series_resolves_printed_oxygen_once_at_final_identity(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import Quantity
+
+    log_fO2 = {
+        "state": {"tag": "value", "value": "-0.68"},
+        "locator": {"page": 5, "table": "2", "column_header": "Log fO2"},
+    }
+
+    def migrate_series(
+        label: str,
+        *,
+        row_conditions: dict | None = None,
+        experiment_conditions: dict | None = None,
+        unbuffered: bool = False,
+        parent_ratio: bool = False,
+    ):
+        document = deepcopy(FIXTURE_EXTRACT)
+        document["source_id"] = "sugawara-1999-residue-series-fixture"
+        document["source"]["citation"] = "Sugawara-like synthetic residue series"
+        document["experiments"] = [
+            {
+                "experiment_id": "m48313",
+                "conditions": experiment_conditions or {},
+            }
+        ]
+        values = {
+            "quantity": "residue_component_composition",
+            "method_class": "measured_direct",
+            "series": [
+                {
+                    "T_C": "1199",
+                    "t_min": "48",
+                    "run_id": "m48313",
+                    "residue_ppm": "12.59",
+                    "point_conditions": row_conditions or {},
+                }
+            ],
+        }
+        if parent_ratio:
+            values.update(
+                {
+                    "po2_over_pK_as_published": "0.226",
+                    "P_K_atm_as_published": "1e-6",
+                    "oxygen_partial_pressure": {
+                        "value": "9e-7",
+                        "units": "atm",
+                        "locator": {"page": 5, "table": "2"},
+                    },
+                }
+            )
+        if unbuffered:
+            values["fO2_control"] = {"during_run": "none"}
+        document["species"] = {
+            "FeO": {
+                "observations": [
+                    {
+                        "observation_id": f"residue-series-{label}",
+                        "experiment": "m48313",
+                        "type": "residue_component_composition",
+                        "locator": {
+                            "source_path": "raw/sugawara-1999-fixture.pdf",
+                            "page": 5,
+                            "table": "2",
+                        },
+                        "phase": "glass",
+                        "units": "ppm",
+                        "values": values,
+                    }
+                ]
+            }
+        }
+        result = _migrate_real_extract(
+            tmp_path / label,
+            "sugawara-1999-residue-series-fixture.yaml",
+            extract_doc=document,
+        )
+        return next(
+            observation
+            for observation in result.observations.values()
+            if observation.identity.quantity.is_value
+            and observation.identity.quantity.value
+            is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and observation.point_conditions is not None
+            and "time_min" in observation.point_conditions
+        )
+
+    row_log = migrate_series(
+        "row-log", row_conditions={"fO2_log": deepcopy(log_fO2)}
+    )
+    assert row_log.identity.fO2_Pa.value == Decimal(
+        "20892.96130854039483122233736"
+    )
+
+    row_pressure = migrate_series(
+        "row-pressure",
+        row_conditions={
+            "oxygen_partial_pressure": {
+                "value": "0.2",
+                "units": "bar",
+                "locator": {"page": 5, "table": "2"},
+            }
+        },
+    )
+    assert row_pressure.identity.fO2_Pa.value == Decimal("20000")
+
+    inherited_log = migrate_series(
+        "experiment-log",
+        experiment_conditions={"log_fO2": deepcopy(log_fO2)},
+    )
+    assert inherited_log.identity.fO2_Pa.value == Decimal(
+        "20892.96130854039483122233736"
+    )
+
+    atm_log_fO2 = {
+        "state": {"tag": "value", "value": "-13.9"},
+        "units": "log10(atm)",
+        "locator": {"page": 5, "table": "2", "column_header": "Log fO2"},
+    }
+    expected_atm_pa = Decimal("1.275606173500439925962071498E-9")
+    row_atm_log = migrate_series(
+        "row-atm-log", row_conditions={"fO2_log": deepcopy(atm_log_fO2)}
+    )
+    experiment_atm_log = migrate_series(
+        "experiment-atm-log",
+        experiment_conditions={"log_fO2": deepcopy(atm_log_fO2)},
+    )
+    assert row_atm_log.identity.fO2_Pa.value == expected_atm_pa
+    assert experiment_atm_log.identity.fO2_Pa.value == expected_atm_pa
+
+    unbuffered_row_log = migrate_series(
+        "unbuffered-row-log",
+        row_conditions={"fO2_log": deepcopy(log_fO2)},
+        unbuffered=True,
+    )
+    assert unbuffered_row_log.identity.fO2_Pa.value == Decimal(
+        "20892.96130854039483122233736"
+    )
+
+    no_oxygen = migrate_series("no-oxygen")
+    assert no_oxygen.identity.fO2_Pa.is_unknown
+
+    parent_ratio = migrate_series("parent-ratio", parent_ratio=True)
+    assert parent_ratio.identity.fO2_Pa.is_unknown
+    assert "fO2_Pa" not in (parent_ratio.point_conditions or {})
+
+
+def test_residue_identity_rejects_disagreeing_derived_ratio_oxygen(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import Quantity
+
+    document = deepcopy(FIXTURE_EXTRACT)
+    document["source_id"] = "residue-rejected-derived-oxygen-fixture"
+    document["experiments"] = [{"experiment_id": "run-1", "conditions": {}}]
+    document["species"] = {
+        "FeO": {
+            "observations": [
+                {
+                    "observation_id": "residue-derived-ratio",
+                    "experiment": "run-1",
+                    "type": "residue_component_composition",
+                    "locator": {"page": 5, "table": "2"},
+                    "phase": "glass",
+                    "units": "wt%",
+                    "values": {
+                        "quantity": "residue_component_composition",
+                        "method_class": "measured_direct",
+                        "FeO_wt_pct": "12.59",
+                        "T_C": "1199",
+                        "po2_over_pK_as_published": "0.226",
+                        "P_K_atm_as_published": "1e-6",
+                        "oxygen_partial_pressure": {
+                            "value": "9e-7",
+                            "units": "atm",
+                            "locator": {"page": 5, "table": "2"},
+                        },
+                    },
+                }
+            ]
+        }
+    }
+    result = _migrate_real_extract(
+        tmp_path,
+        "residue-rejected-derived-oxygen-fixture.yaml",
+        extract_doc=document,
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    assert observation.identity.fO2_Pa.is_unknown
+
+
 def test_hashimoto_row_left_live_diagnostics_are_final(
     tmp_path: Path,
 ) -> None:
@@ -15225,12 +16163,78 @@ def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path
                 "observation_id": "na_heat_content",
                 "type": "heat_capacity_and_heat_content_series",
                 "locator": {"table": "3", "row": "Na"},
-                "phase": "cr",
+                "phase": "l",
+                "per": "mol_species",
                 "units": "kJ/mol",
                 "values": {
                     "quantity": "H_minus_H298",
                     "enthalpy_increment": 2.0,
                     "T_K": 500,
+                    "standard_pressure_Pa": 100000,
+                },
+            },
+            {
+                "observation_id": "na_heat_content_reference",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "3", "row": "Na"},
+                "phase": "l",
+                "per": "mol_species",
+                "standard_state": "heat content relative to 298.15 K",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 3.0,
+                    "T_K": 600,
+                    "standard_pressure_Pa": 100000,
+                },
+            },
+            {
+                "observation_id": "na_heat_content_reference_phase",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "3", "row": "Na"},
+                "phase": "l",
+                "per": "mol_species",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 4.0,
+                    "T_K": 700,
+                    "standard_pressure_Pa": 100000,
+                    "method": "The enthalpy reference is the glass at 298.15 K.",
+                },
+            },
+            {
+                "observation_id": "na_heat_content_column_reference",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {
+                    "table": "3",
+                    "row": "Na",
+                    "column": "H_T-H_298",
+                },
+                "phase": "l",
+                "per": "mol_species",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 5.0,
+                    "T_K": 800,
+                    "standard_pressure_Pa": 100000,
+                },
+            },
+            {
+                "observation_id": "na_heat_content_printed_relation",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "3", "row": "Na"},
+                "phase": "l",
+                "per": "mol_species",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 6.0,
+                    "T_K": 900,
+                    "standard_pressure_Pa": 100000,
+                    "quantity_as_printed": "H1373(L) minus H298(S)",
+                    "printed_relation": "H1373(L) − H298(S) = 209.5",
                 },
             },
         ]
@@ -15270,6 +16274,78 @@ def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path
     assert quantity_token(heat_content.identity) is Quantity.H_MINUS_H298
     assert heat_content.value.kind is ValueKind.POINT
     assert heat_content.value.point == Decimal("2.0")
+    assert heat_content.identity.subtype is not None
+    assert heat_content.identity.subtype.is_unknown
+    incomplete = identity_equal(heat_content.identity, heat_content.identity)
+    assert incomplete.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert incomplete.fields == ("subtype",)
+
+    reference = by_id["na_heat_content_reference"]
+    assert reference.identity.subtype is not None
+    assert reference.identity.subtype.value == "H(T)-H(298.15 K)"
+    assert (
+        identity_equal(reference.identity, reference.identity).kind
+        is IdentityEqualKind.EQUAL
+    )
+
+    reference_phase = by_id["na_heat_content_reference_phase"]
+    assert reference_phase.identity.subtype is not None
+    assert reference_phase.identity.subtype.value == (
+        "H(T)-H(298.15 K); reference phase: glass"
+    )
+
+    column_reference = by_id["na_heat_content_column_reference"]
+    assert column_reference.identity.subtype is not None
+    assert column_reference.identity.subtype.value == "H(T)-H(298 K)"
+
+    printed_relation = by_id["na_heat_content_printed_relation"]
+    assert printed_relation.identity.subtype is not None
+    assert printed_relation.identity.subtype.value == (
+        "H(T)-H(298 K); reference phase: solid"
+    )
+
+    from simulator.battery.migrate import _enthalpy_increment_subtype
+
+    assert _enthalpy_increment_subtype(
+        {"locator": {"column": "H_T-H_298"}},
+        {"series": [{"T_K": 298.15, "enthalpy_increment": 0}]},
+    ) == "H(T)-H(298.15 K)"
+
+
+@pytest.mark.parametrize(
+    ("obs", "values"),
+    [
+        (
+            {"reference_phase": "liquid"},
+            {
+                "reference_temperature_K": 298,
+                "quantity_as_printed": "H1373(L) minus H298(S)",
+            },
+        ),
+        (
+            {},
+            {
+                "reference_temperature_K": 298,
+                "quantity_as_printed": "H1373(L) minus H298(S)",
+                "printed_relation": "H1373(L) minus H298(L) = 209.5",
+            },
+        ),
+        (
+            {},
+            {
+                "method": "Reference is the glass at 298 K.",
+                "quantity_as_printed": "H1373(L) minus H298(S)",
+            },
+        ),
+    ],
+    ids=("explicit-vs-relation", "relation-vs-relation", "method-vs-relation"),
+)
+def test_enthalpy_increment_conflicting_reference_phases_remain_unknown(
+    obs: dict[str, object], values: dict[str, object]
+) -> None:
+    from simulator.battery.migrate import _enthalpy_increment_subtype
+
+    assert _enthalpy_increment_subtype(obs, values) is None
 
 
 def test_fusion_temperature_join_preserves_matching_melting_point(tmp_path: Path) -> None:

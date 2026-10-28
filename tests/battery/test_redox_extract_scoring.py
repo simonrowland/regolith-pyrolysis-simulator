@@ -552,22 +552,34 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert len(source_rows) == 435
     for row in source_rows:
         values = row["values"]
-        inference = values["inference"]
-        assert inference["relation"] == values["ratio_derivation"]
-        assert inference["inputs"] == ["log10_Fe3_over_Fe2_as_published"]
-        original = inference["parameters"][0][1]
+        derivation = row["derivation"]
+        conversion = "x = log10(Fe3+/Fe2+) -> ratio = 10^x, dimensionless; x = 0 -> 1."
+        original = derivation["parameters"][0][1]
         assert original["state"]["value"] == values["log10_Fe3_over_Fe2_as_published"]
         assert original["locator"] == row["locator"]
+        assert derivation["relation"].endswith(conversion)
+        assert derivation["output_unit"] == "dimensionless"
+        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+        assert (
+            derivation["raw_inputs"]["locator"]["record"]
+            == row["locator"]["record"]
+        )
         observation = result.observations[f"{extract.stem}::{row['observation_id']}"]
         assert observation.derivation is not None
-        conversion = observation.derivation.parameters[0][1].inference
-        assert conversion is not None
-        assert conversion.relation == values["ratio_derivation"]
+        assert observation.derivation.has_located_unprinted_raw_inputs
+        assert observation.derivation.output_unit == "dimensionless"
+        migrated_original = observation.derivation.parameters[0][1]
+        assert migrated_original.state.value == Decimal(
+            values["log10_Fe3_over_Fe2_as_published"]
+        )
+        assert migrated_original.locator is not None
+        assert migrated_original.locator.table == row["locator"]["table"]
+        assert migrated_original.locator.record == row["locator"]["record"]
+        assert observation.derivation.relation.endswith(conversion)
 
     hard_issue_details = [issue.detail for issue in result.validation.hard_issues]
-    assert hard_issue_details.count("derived observation requires derived_from") == 435
-    assert "derived observation requires derivation" not in hard_issue_details
-    assert set(hard_issue_details) == {"derived observation requires derived_from"}
+    assert hard_issue_details.count("derived observation requires derived_from") == 0
+    assert hard_issue_details == []
 
     origins = {
         observation_id: "extracts/borisov-2018-compilation.yaml"
