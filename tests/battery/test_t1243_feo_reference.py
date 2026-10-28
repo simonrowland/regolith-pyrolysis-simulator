@@ -23,7 +23,6 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
-    FO2Channel,
     MetricOperation,
     NoticeKind,
     Phase,
@@ -46,7 +45,6 @@ from simulator.battery.migrate import (
     load_yaml,
 )
 from simulator.battery.records import (
-    FO2Control,
     Located,
     Notice,
     StandardState,
@@ -543,7 +541,9 @@ def test_distin_scored_refusal_by_engine_without_typed_fe_saturation(migration) 
     context = replace(
         context,
         experiments={
-            experiment_id: replace(experiment, fO2_control=None)
+            experiment_id: replace(
+                experiment, fO2_control=None, fe_metal_saturated=None
+            )
             for experiment_id, experiment in context.experiments.items()
         },
     )
@@ -576,12 +576,12 @@ def test_distin_scored_refusal_by_engine_without_typed_fe_saturation(migration) 
             elif engine is Engine.OPENIMCC:
                 assert (
                     residual.refusal.detail["reason"]
-                    == "distin_fe_metal_saturation_not_stated"
+                    == "distin_fe_metal_saturation_not_established"
                 )
 
 
 def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
-    """A typed source Fe condition enables the d-305 closed redox solve."""
+    """An inferred typed source condition enables the d-305 closed solve."""
     rows = tuple(row for row in _feo_rows(migration) if row.source_id == _DISTIN)
     assert len(rows) == 24
     assert all(
@@ -592,13 +592,12 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
     context = _context(migration)
     for experiment_id in {row.experiment_id for row in rows}:
         experiment = context.experiments[experiment_id]
-        control = experiment.fO2_control
-        assert isinstance(control, FO2Control)
-        assert control.channel.is_value
-        assert control.channel.value is FO2Channel.BUFFER
-        assert control.buffer is not None
-        assert control.buffer.locator is not None
-        assert control.buffer.locator.page == 74
+        condition = experiment.fe_metal_saturated
+        assert condition is not None
+        assert condition.state.is_value and condition.state.value is True
+        assert condition.locator is not None and condition.locator.page == 73
+        assert condition.inference is not None
+        assert condition.inference.relation == "extract_inference"
 
     residuals = []
     for observation in rows:
@@ -651,16 +650,20 @@ def test_distin_printed_facts_and_inferred_fe_saturation_are_separate(migration)
     assert extract["source_evidence"]["liquid_iron_contact"] == {
         "text": (
             "In this method, liquid iron was levitated in contact with liquid "
-            "'FeO'-SiO2 slags and samples of slag and metal in equilibrium were "
+            "'FeO'-SiO2 slags and samples of slag and metal at equilibrium were "
             "withdrawn for analysis."
         ),
-        "locator": {"page": 73, "section": "Introduction"},
+        "locator": {"page": 73},
     }
     assert extract["source_evidence"]["atmosphere"]["text"] == (
         "Melts were equilibrated in helium or argon + helium atmospheres of the "
         "same composition and flow rate as previously employed, so that the "
         "temperatures of equilibration were 1785°, 1880° and 1960°C."
     )
+    assert extract["source_evidence"]["atmosphere"]["locator"] == {
+        "page": 74,
+        "section": "Experimental",
+    }
     assert extract["source_tables"]["experimental_results"]["standard_state"][
         "text"
     ] == (
@@ -668,6 +671,9 @@ def test_distin_printed_facts_and_inferred_fe_saturation_are_separate(migration)
         "of the iron in equilibrium with the slag to that in equilibrium with "
         "pure 'FeO' at the same temperature."
     )
+    assert extract["source_tables"]["experimental_results"]["standard_state"][
+        "locator"
+    ] == {"page": 74, "section": "Experimental"}
 
     result = migration
     experiment = result.experiments[
