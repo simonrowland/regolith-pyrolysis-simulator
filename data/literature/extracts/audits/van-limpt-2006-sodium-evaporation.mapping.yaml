@@ -1,0 +1,64 @@
+source_id: van-limpt-2006-sodium-evaporation
+input_order:
+  primary: MinerU markdown and content-list tables, then pdftotext-layout
+  pdf_role: backup render only for row/column assignment and the reported-rate prose check
+tables:
+- printed_table: I
+  page: 4
+  caption: Calculated diffusion coefficients of NaOH
+  disposition: excluded_context
+  reason: Calculated gas diffusion coefficients are outside the requested evaporation-rate, vapor-pressure, and melt-activity quantities.
+- printed_table: II
+  page: 7
+  caption: Mass balances for 6 transpiration experiments with sodium-disilicate melts
+  extract_observation: van_limpt_2006_p007_t02_sodium_disilicate_mass_balance
+  disposition: typed_refused_schema_gap
+  schema_gap: Total Na2O loss in mg and extractive/gravimetric ratio have no matching quantity token.
+  printed_row_count: 6
+  draft_table_key: p007-t02
+  manual_draft_correction: MinerU initially marked the first numeric row as a header; render confirms it is data row 1. The scratch draft was corrected to six body rows before comparison.
+  row_assignment_check: PDF page 7 render confirms the four headers and every row-column assignment; MinerU/pdftotext numeric characters agree for all 24 cells.
+  cell_audit:
+  - {row: 1, pdf_table_row: 2, temperature_C: '1416', extractive_weight_loss_mg: '112', gravimetric_weight_loss_mg: '125', ratio: '0.90', source_reads: 'MinerU + pdftotext', render: confirmed}
+  - {row: 2, pdf_table_row: 3, temperature_C: '1437', extractive_weight_loss_mg: '146', gravimetric_weight_loss_mg: '153', ratio: '0.96', source_reads: 'MinerU + pdftotext', render: confirmed}
+  - {row: 3, pdf_table_row: 4, temperature_C: '1439', extractive_weight_loss_mg: '166', gravimetric_weight_loss_mg: '170', ratio: '0.98', source_reads: 'MinerU + pdftotext', render: confirmed}
+  - {row: 4, pdf_table_row: 5, temperature_C: '1354', extractive_weight_loss_mg: '69', gravimetric_weight_loss_mg: '79', ratio: '0.87', source_reads: 'MinerU + pdftotext', render: confirmed}
+  - {row: 5, pdf_table_row: 6, temperature_C: '1454', extractive_weight_loss_mg: '188', gravimetric_weight_loss_mg: '188', ratio: '1.00', source_reads: 'MinerU + pdftotext', render: confirmed}
+  - {row: 6, pdf_table_row: 7, temperature_C: '1356', extractive_weight_loss_mg: '85', gravimetric_weight_loss_mg: '71', ratio: '1.21', source_reads: 'MinerU + pdftotext', render: confirmed}
+prose_measurements:
+- page: 6
+  locator: Results V(1), carrier-gas comparison
+  source_reads: MinerU and pdftotext agree on the digits and exponents; PDF page 6 render confirms the printed sentence.
+  values_as_printed:
+    at_1400_C: '6.7 × 10^-5 to 7.4 × 10^-5 mol·(m2·s)^-1'
+    at_1450_to_1460_C: '~1.2 × 10^-4 mol·(m2·s)^-1'
+  interpretation: The paper does not assign the 1400 C range endpoints to the two carrier gas experiments; the higher-temperature rates are stated to be nearly identical.
+  conditions_as_printed:
+    H2O_partial_pressure_bar: '0.25 ± 0.01'
+    H2O_uncertainty_notice: confidence level not stated
+    N2_H2O_O2_partial_pressure_bar: '<0.01'
+    air_H2O_O2_partial_pressure_bar: '~0.16'
+    normalized_gas_flow_m3n_s: '1.6E-4'
+    total_experiment_pressure: not_printed
+    caveat: 101325 Pa is printed as the gas-flow normalization reference, not as the experiment total pressure.
+  disposition: typed_refused_schema_gap
+relative_activity_statement:
+  page: 7
+  locator: Results V(3), measured chemical activities of Na2O
+  source_reads: MinerU and pdftotext agree on the relative range; page 7 render confirms the prose statement.
+  value_as_printed: about 10–15% lower
+  reference: original glass sample Na2O surface activity
+  scope_as_printed: both sodium-disilicate and soda-lime-silicate melts, experiments of about 6 h at 1400–1500 °C
+  conditions_not_assigned: atmosphere and individual temperatures are not tied to this summarized relative comparison in the prose.
+  evidence_class: quoted_attributed
+  reason: The relative activity summary is calculated from measured evaporation results, but the numeric activity points and their inputs occur in figures and are not stored here.
+  disposition: typed_refused_relative_to_reference
+figure_read_candidates:
+- {figure: '3', page: 6, candidate: measured NaOH saturation pressure versus square-root water pressure; no points digitized}
+- {figure: '4', page: 6, candidate: measured Na(g) saturation pressure versus temperature; no points digitized}
+- {figure: '5', page: 8, candidate: cumulative Na2O release versus time for eight runs A-H; the chart's condition grid was not transcribed}
+- {figure: '6', page: 8, candidate: measured and modeled Na2O activity in sodium disilicate; no points digitized}
+- {figure: '7', page: 8, candidate: measured and modeled Na2O activity in soda-lime-silicate; no points digitized}
+- {figure: '8', page: 9, candidate: measured/model activity comparison; no points digitized}
+printed_activity_values: No absolute activity values in prose or tables; relative statement above is retained, and all numeric activity markers are figure-only.
+compare_scope: The comparator checks the six extractive-loss row values (the canonical value field). All other numeric cells in Table II are included in cell_audit and independently agree between MinerU and pdftotext; page-render layout verification covers their cell assignments.

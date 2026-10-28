@@ -1,0 +1,167 @@
+schema_version: literature_extract.v1
+source_id: van-limpt-2006-sodium-evaporation
+source:
+  citation: Van Limpt, H., Beerkens, R. G. C., et al. (2006), Models and experiments for sodium evaporation from sodium-containing silicate melts, Journal of the American Ceramic Society, 89(11), 3449–3457.
+  doi: 10.1111/j.1551-2916.2006.01233.x
+  year: 2006
+  corpus_asset: raw/van-limpt-2006-sodium-evaporation/van-limpt-2006-sodium-evaporation.pdf
+extraction:
+  method: Machine-text transcription from MinerU and pdftotext; Table II layout and reported rate summary checked against page renders.
+  date: '2026-10-28'
+  worker: w1028naD-vanlimpt06-na-evap
+  provenance_path: data/literature/extracts/audits/van-limpt-2006-sodium-evaporation.mapping.yaml
+review_status: draft
+schema_gaps:
+  - The reported total sodium rate is a molar areal flux (mol·m-2·s-1); no quantity token has this basis, so it is retained as a typed-refused rate_series observation.
+  - Table II reports total Na2O loss in mg and an extractive-to-gravimetric ratio, not a rate or fraction. No quantity token fits these forms; the six mass-loss rows are typed-refused, and the ratio is retained in context.
+  - Numerical Na(g), NaOH(g) saturation-pressure and Na2O-activity values occur only in Figures 3, 4, 6, and 7 and are not digitized in this wave; the prose's relative Na2O-activity comparison is retained as a typed refusal.
+species:
+  Na:
+    observations:
+    - observation_id: van_limpt_2006_measured_total_na_evaporation_rates
+      type: rate_series
+      locator: {page: 6, note: 'Results V(1), redox-carrier-gas comparison'}
+      regime: transpiration_evaporation
+      units: mol·m-2·s-1
+      values:
+        quantity: evaporation_rate
+        quantity_label: total sodium molar areal evaporation flux
+        measurement_status: typed_refusal_schema_gap
+        phase: l
+        schema_gap: No quantity token accepts total sodium molar areal flux in mol·m-2·s-1.
+        method_class: quoted_attributed
+        attribution: Author-reported rates calculated from ICP-ES sodium concentrations in collected wash solutions, carrier-gas volume flow, and experiment duration; individual concentrations are not printed.
+        melt_composition_as_printed: Na2O·2SiO2 (sodium disilicate)
+        carrier_gas_experiments: [N2/H2O, air/H2O]
+        p_H2O_bar_as_printed: '0.25 ± 0.01'
+        p_H2O_uncertainty_note: confidence level not stated
+        p_O2_bar_N2_H2O_as_printed: '<0.01'
+        p_O2_bar_air_H2O_as_printed: '~0.16'
+        normalized_gas_flow_m3n_s_as_printed: '1.6E-4'
+        gas_flow_normalization_as_printed: 'T = 293.15 K and P = 101325 Pa; this is flow normalization, not the experiment pressure.'
+        no_total_experiment_pressure: true
+        composition_derivation: Formula stoichiometry encoded as mole fractions for the existing composition identity path.
+        composition_mol: {basis: stoichiometric_formula, amount_basis: mole_fraction, SiO2: '0.6666666666666666666666666667', Na2O: '0.3333333333333333333333333333'}
+        points:
+        - T_C: '1400'
+          rate_range_mol_m2_s_as_printed: ['6.7 × 10^-5', '7.4 × 10^-5']
+          value_as_printed: '6.7 × 10^-5 to 7.4 × 10^-5'
+          note: The paper does not assign either endpoint to one carrier-gas experiment.
+          point_conditions:
+            composition: {state: {tag: value, value: {basis: stoichiometric_formula, amount_basis: mole_fraction, components: [[SiO2, '0.6666666666666666666666666667'], [Na2O, '0.3333333333333333333333333333']]}}, locator: {page: 6, note: sodium-disilicate melt named in Results V(1)}}
+            gas_mix: {state: {tag: value, value: 'N2/H2O or air/H2O'}, locator: {page: 6, note: the rate range is reported for the two compared experiments}}
+            carrier_gas_flow_m3n_s: {state: {tag: value, value: '1.6E-4'}, locator: {page: 6, note: 'normalized carrier-gas flow reported for both experiments'}}
+            H2O_partial_pressure_bar: {state: {tag: value, value: '0.25 ± 0.01'}, locator: {page: 6, note: shared carrier-gas condition}}
+            oxygen_partial_pressure_bar_by_gas: {state: {tag: value, value: {N2_H2O: '<0.01', air_H2O: '~0.16'}}, locator: {page: 6, note: atmosphere-specific O2 partial pressures}}
+        - T_C_range: ['1450', '1460']
+          value_as_printed: '~1.2 × 10^-4'
+          note: The paper says the two experiments have nearly identical rates.
+          point_conditions:
+            composition: {state: {tag: value, value: {basis: stoichiometric_formula, amount_basis: mole_fraction, components: [[SiO2, '0.6666666666666666666666666667'], [Na2O, '0.3333333333333333333333333333']]}}, locator: {page: 6, note: sodium-disilicate melt named in Results V(1)}}
+            gas_mix: {state: {tag: value, value: 'N2/H2O and air/H2O'}, locator: {page: 6, note: rates are nearly identical for both compared experiments}}
+            carrier_gas_flow_m3n_s: {state: {tag: value, value: '1.6E-4'}, locator: {page: 6, note: 'normalized carrier-gas flow reported for both experiments'}}
+            H2O_partial_pressure_bar: {state: {tag: value, value: '0.25 ± 0.01'}, locator: {page: 6, note: shared carrier-gas condition}}
+            oxygen_partial_pressure_bar_by_gas: {state: {tag: value, value: {N2_H2O: '<0.01', air_H2O: '~0.16'}}, locator: {page: 6, note: atmosphere-specific O2 partial pressures}}
+  Na2O:
+    observations:
+    - observation_id: van_limpt_2006_p007_na2o_activity_relative_to_original_glass
+      type: activity_coefficient
+      locator: {page: 7, note: 'Results V(3), measured chemical activities of Na2O'}
+      regime: transpiration_evaporation
+      units: relative percent as printed
+      values:
+        quantity: activity
+        quantity_label: Na2O activity relative to the original glass sample
+        measurement_status: typed_refusal_relative_to_reference
+        phase: l
+        method_class: quoted_attributed
+        attribution: The authors summarize measured Na2O surface activities derived from the transpiration tests; point values are shown only in Figures 6 and 7 and are not digitized here.
+        schema_gap: The paper reports only a relative-to-original-glass comparison, not an absolute Na2O activity value.
+        value_as_printed: about 10–15% lower
+        reference: original glass sample Na2O surface activity
+        melt_composition_as_printed: both sodium-disilicate and soda-lime-silicate melts
+        T_C_range_as_printed: ['1400', '1500']
+        duration_as_printed: about 6 h
+        atmosphere_as_printed: not specified for this comparison
+    - observation_id: van_limpt_2006_p007_t02_sodium_disilicate_mass_balance
+      type: mass_loss
+      locator: {page: 7, table: 'II'}
+      regime: transpiration_evaporation
+      units: mg and dimensionless
+      values:
+        quantity: mass_loss_fraction
+        quantity_label: absolute total Na2O loss mass as printed in mg, not a fraction
+        measurement_status: typed_refusal_schema_gap
+        phase: l
+        schema_gap: Total mass loss and a ratio of mass-loss methods have no matching quantity token.
+        method_class: measured_direct
+        melt_composition_as_printed: sodium-disilicate melts
+        composition_mol: {basis: stoichiometric_formula, amount_basis: mole_fraction, SiO2: '0.6666666666666666666666666667', Na2O: '0.3333333333333333333333333333'}
+        composition_derivation: Table caption names sodium disilicate; its printed formula is Na2O·2SiO2.
+        printed_row_count: 6
+        printed_columns:
+          temperature_during_experiment: °C
+          extractive_sampling_weight_loss: mg
+          gravimetric_weight_loss: mg
+          extractive_to_gravimetric_ratio: dimensionless
+        points:
+        - {table_row_number: 2, T_C: '1416', value: '112', extractive_weight_loss_mg: '112', gravimetric_weight_loss_mg: '125', locator: {page: 7, table: 'II'}, point_conditions: {composition: {state: {tag: value, value: {basis: stoichiometric_formula, amount_basis: mole_fraction, components: [[SiO2, '0.6666666666666666666666666667'], [Na2O, '0.3333333333333333333333333333']]}}, locator: {page: 7, table: 'II'}}}}
+        - {table_row_number: 3, T_C: '1437', value: '146', extractive_weight_loss_mg: '146', gravimetric_weight_loss_mg: '153', locator: {page: 7, table: 'II'}, point_conditions: {composition: {state: {tag: value, value: {basis: stoichiometric_formula, amount_basis: mole_fraction, components: [[SiO2, '0.6666666666666666666666666667'], [Na2O, '0.3333333333333333333333333333']]}}, locator: {page: 7, table: 'II'}}}}
+        - {table_row_number: 4, T_C: '1439', value: '166', extractive_weight_loss_mg: '166', gravimetric_weight_loss_mg: '170', locator: {page: 7, table: 'II'}, point_conditions: {composition: {state: {tag: value, value: {basis: stoichiometric_formula, amount_basis: mole_fraction, components: [[SiO2, '0.6666666666666666666666666667'], [Na2O, '0.3333333333333333333333333333']]}}, locator: {page: 7, table: 'II'}}}}
+        - {table_row_number: 5, T_C: '1354', value: '69', extractive_weight_loss_mg: '69', gravimetric_weight_loss_mg: '79', locator: {page: 7, table: 'II'}, point_conditions: {composition: {state: {tag: value, value: {basis: stoichiometric_formula, amount_basis: mole_fraction, components: [[SiO2, '0.6666666666666666666666666667'], [Na2O, '0.3333333333333333333333333333']]}}, locator: {page: 7, table: 'II'}}}}
+        - {table_row_number: 6, T_C: '1454', value: '188', extractive_weight_loss_mg: '188', gravimetric_weight_loss_mg: '188', locator: {page: 7, table: 'II'}, point_conditions: {composition: {state: {tag: value, value: {basis: stoichiometric_formula, amount_basis: mole_fraction, components: [[SiO2, '0.6666666666666666666666666667'], [Na2O, '0.3333333333333333333333333333']]}}, locator: {page: 7, table: 'II'}}}}
+        - {table_row_number: 7, T_C: '1356', value: '85', extractive_weight_loss_mg: '85', gravimetric_weight_loss_mg: '71', locator: {page: 7, table: 'II'}, point_conditions: {composition: {state: {tag: value, value: {basis: stoichiometric_formula, amount_basis: mole_fraction, components: [[SiO2, '0.6666666666666666666666666667'], [Na2O, '0.3333333333333333333333333333']]}}, locator: {page: 7, table: 'II'}}}}
+    context:
+    - observation_id: van_limpt_2006_p007_t02_extractive_gravimetric_ratio
+      type: calculated_table_column
+      locator: {page: 7, table: 'II'}
+      units: dimensionless
+      values:
+        quantity: extractive_to_gravimetric_total_mass_ratio
+        measurement_status: typed_refusal_schema_gap
+        schema_gap: No quantity token fits this ratio of two total mass losses.
+        method_class: measured_reduced
+        derivation: Ratio of the two measured mass-loss columns, as printed in the Table II header.
+        derived_from: [van_limpt_2006_p007_t02_sodium_disilicate_mass_balance]
+        points:
+        - {table_row_number: 2, T_C: '1416', value: '0.90', locator: {page: 7, table: 'II'}}
+        - {table_row_number: 3, T_C: '1437', value: '0.96', locator: {page: 7, table: 'II'}}
+        - {table_row_number: 4, T_C: '1439', value: '0.98', locator: {page: 7, table: 'II'}}
+        - {table_row_number: 5, T_C: '1354', value: '0.87', locator: {page: 7, table: 'II'}}
+        - {table_row_number: 6, T_C: '1454', value: '1.00', locator: {page: 7, table: 'II'}}
+        - {table_row_number: 7, T_C: '1356', value: '1.21', locator: {page: 7, table: 'II'}}
+    - observation_id: van_limpt_2006_p007_reported_weight_loss_fit
+      type: fitted_relation
+      locator: {page: 7, note: 'Results V(2), six-experiment mass-balance comparison'}
+      units: as printed
+      values:
+        quantity: gravimetric_to_extractive_mass_loss_fit
+        method_class: model_derived
+        relation_as_printed: 'm_gravimetric = (1.02 ± 0.04) × m_extractive'
+        derived_from: [van_limpt_2006_p007_t02_sodium_disilicate_mass_balance]
+        schema_gap: No quantity token fits this fitted relation between two total mass losses.
+fidelity_samples:
+- path: species.Na2O.observations[van_limpt_2006_p007_t02_sodium_disilicate_mass_balance].values.points[0].value
+  value: '112'
+  locator: {page: 7, table: 'II'}
+- path: species.Na2O.observations[van_limpt_2006_p007_t02_sodium_disilicate_mass_balance].values.points[4].gravimetric_weight_loss_mg
+  value: '188'
+  locator: {page: 7, table: 'II'}
+- path: species.Na2O.observations[van_limpt_2006_p007_t02_sodium_disilicate_mass_balance].values.points[2].value
+  value: '166'
+  locator: {page: 7, table: 'II'}
+- species: Na2O
+  observation_id: van_limpt_2006_p007_t02_extractive_gravimetric_ratio
+  observable: calculated_table_column
+  field: points
+  value:
+  - {table_row_number: 2, T_C: '1416', value: '0.90', locator: {page: 7, table: 'II'}}
+  - {table_row_number: 3, T_C: '1437', value: '0.96', locator: {page: 7, table: 'II'}}
+  - {table_row_number: 4, T_C: '1439', value: '0.98', locator: {page: 7, table: 'II'}}
+  - {table_row_number: 5, T_C: '1354', value: '0.87', locator: {page: 7, table: 'II'}}
+  - {table_row_number: 6, T_C: '1454', value: '1.00', locator: {page: 7, table: 'II'}}
+  - {table_row_number: 7, T_C: '1356', value: '1.21', locator: {page: 7, table: 'II'}}
+  locator: {page: 7, table: 'II'}
+- path: species.Na.observations[van_limpt_2006_measured_total_na_evaporation_rates].values.points[1].value_as_printed
+  value: '~1.2 × 10^-4'
+  locator: {page: 6, note: 'Results V(1), measured rate summary'}
