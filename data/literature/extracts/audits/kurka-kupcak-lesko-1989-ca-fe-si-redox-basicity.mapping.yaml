@@ -1,0 +1,83 @@
+source_id: kurka-kupcak-lesko-1989-ca-fe-si-redox-basicity
+input_order:
+  primary: MinerU table blocks and markdown, then pdftotext-layout machine text
+  backup: PDF page renders only for the table layout, flagged numeric agreement, and source locators
+tables:
+  - page: 4
+    pdf_page_index: 3
+    table: '1'
+    caption: Equilibrium composition of the investigated melts
+    printed_data_rows: 16
+    columns:
+      1:
+        printed_header: Point
+        role: point identifier; not a scored value
+      2:
+        printed_header: t/°C
+        role: T_C condition on every component and redox observation
+      3:
+        printed_header: x(CaO)
+        role: row-specific melt composition and inputs to basicity context
+      4:
+        printed_header: x(SiO2)
+        role: row-specific melt composition and inputs to basicity context
+      5:
+        printed_header: x(FeO)
+        role: measured FeO equilibrium phase component; Fe2+ count input to reduction
+        species: FeO
+        quantity: equilibrium_phase_composition
+        basis: mole_fraction
+        method_class: measured_direct
+      6:
+        printed_header: x(Fe2O3)
+        role: measured Fe2O3 equilibrium phase component; Fe3+ count input to reduction
+        species: Fe2O3
+        quantity: equilibrium_phase_composition
+        basis: mole_fraction
+        method_class: measured_direct
+    measured_output:
+      type: concentration_series
+      species: Fe
+      quantity: valence_ratio
+      valence_basis:
+        numerator_oxidation_states: [3]
+        denominator_kind: total_element
+        denominator_oxidation_state: null
+        value_form: fraction
+      method_class: measured_reduced
+      relation: f3 = 2*x(Fe2O3)/(2*x(Fe2O3)+x(FeO)); f2 = 1-f3
+      lineage: Each row references its two measured oxide-component observations in derived_from and derivation.inputs.
+      as_reported_form: j = x(Fe2O3)/(x(Fe2O3)+x(FeO)); retained with the result, not assigned an ionic valence basis.
+      phase: glass
+      quench_statement: not_stated; water quench on PDF p. 635
+    conditions:
+      atmosphere: air
+      fO2: p(O2)/p° = 0.21; p° = 101325 Pa; absolute pO2 is 21278.25 Pa
+      temperature: each Table 1 row; experimental accuracy ±2 °C from PDF p. 635
+      total_pressure_Pa: unknown; no furnace total pressure is printed
+      composition: all four Table 1 oxide mole fractions, on each row
+    row_groups:
+      - temperature_C: 1400
+        point_ids: [1, 2, 5]
+        data_rows: [1, 2, 3]
+      - temperature_C: 1500
+        point_ids: [1, 2, 3, 5]
+        data_rows: [4, 5, 6, 7]
+      - temperature_C: 1600
+        point_ids: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        data_rows: [8, 9, 10, 11, 12, 13, 14, 15, 16]
+context:
+  - data: k = x(CaO)/x(SiO2) for each Table 1 composition row
+    type: composition
+    disposition: context only; the closed quantity/type registries have no basicity-index quantity
+  - data: paper's regression equation (2)
+    disposition: model fit to the same Table 1 data; not an independent observation
+  - data: Figures 2 and 3 redox/activity curves
+    disposition: figure-read candidate only; no figure values extracted
+excluded:
+  - table: '2'
+    page: 6
+    reason: interaction energies quoted from reference [14], not measured redox rows
+  - equation: '3'
+    page: 5
+    reason: approximate enthalpy slope calculation, outside the measured redox table
