@@ -66,7 +66,17 @@ def test_harness_runs_end_to_end_on_tiny_fixture(tmp_path, monkeypatch):
     assert (output_dir / "paired-decisions.csv").is_file()
     assert (output_dir / "reference-anchor-results.csv").is_file()
     assert (output_dir / "live-vaporock-check.csv").is_file()
-    assert result["metadata"]["reference_anchor"]["shared_magma_count"] == 288
+    anchor = result["metadata"]["reference_anchor"]
+    assert anchor["shared_magma_count"] == 288
+    assert anchor["alkali_in_domain_count"] == 72
+    assert "Na/K" in anchor["alkali_population_label"]
+    assert "in-domain" in anchor["alkali_population_label"]
+    assert anchor["alkali_in_domain_imcc_rmse_dex"] is not None
+    assert anchor["alkali_exclusion_delta_dex"] is not None
+    saved_metadata = json.loads(
+        (output_dir / "run-metadata.json").read_text(encoding="utf-8")
+    )
+    assert saved_metadata["reference_anchor"] == anchor
     assert "Literal SF04 basalt empirical points: **0**" in (
         output_dir / "report.md"
     ).read_text(encoding="utf-8")
