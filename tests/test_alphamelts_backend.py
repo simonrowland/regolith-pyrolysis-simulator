@@ -10402,7 +10402,7 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeyp
     assert sim._backend_accepts_kwarg('vapor_transport_floor_bar')
 
     def native_solve(**kwargs):
-        assert kwargs['fO2_log'] == pytest.approx(expected_intrinsic_fO2_log)
+        assert kwargs['fO2_log'] == expected_intrinsic_fO2_log
         assert backend._vapor_transport_pO2_admission == 'environment'
         backend._vapor_pressures_via_vaporock_or_antoine(
             T_C=kwargs['temperature_C'],
