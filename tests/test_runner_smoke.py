@@ -802,6 +802,7 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "evap_plane_selectivity",
     "mre_uncertified_yield",
     "mre_ellingham_ladder_diagnostic",
+    "mre_decomposition_voltage_status_by_oxide",
     "fe_redox_split",
     "stage_3_capture",
     "redox_source_breakdown",
