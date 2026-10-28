@@ -19,6 +19,20 @@ from simulator.session import SimSession
 from simulator.state import CampaignPhase, EnergyRecord, MeltState, MOLAR_MASS
 
 
+def test_default_reference_metadata_refactor_pin():
+    import hashlib
+    import json
+    from engines.builtin.electrolysis_step import MRE_DECOMP_VOLTAGE_PROVENANCE
+
+    for value, digest in (
+        (MRE_DECOMP_VOLTAGE_PROVENANCE,
+         "f1c021f78ee2c59123a4c2f1ca34492458a1be74a0a288ff2f88f61beaa25f08"),
+        (mre_ladder.MRE_VOLTAGE_LADDER_FALLBACK,
+         "c819e9613adc6c0081d24c4a5d51faad6892da99497c74354ff75e73afb4864b"),
+    ):
+        assert hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest() == digest
+
+
 def _repo_setpoints() -> dict:
     repo_root = Path(__file__).resolve().parent.parent
     return yaml.safe_load((repo_root / "data" / "setpoints.yaml").read_text())
