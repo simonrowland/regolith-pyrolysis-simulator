@@ -9,6 +9,41 @@ import pytest
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.ledger import AccountPolicy, KNOWN_LEDGER_ACCOUNTS, AtomLedger
 from simulator.accounting.ledger_api import LEDGER_SCHEMA_VERSION, LedgerAPI
+from simulator.accounting.queries import AccountingQueries
+
+
+def test_terminal_rump_class_projection_preserves_numeric_pin():
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        "process.cleaned_melt", {"SiO2": 2.0, "CaO": 1.0},
+        material_origin="feedstock",
+    )
+    classes = AccountingQueries(SimpleNamespace(atom_ledger=ledger)).terminal_rump_by_class()
+    # Pre-consolidation output at 8e9bd1c9f; taxonomy edits must preserve
+    # the existing major-oxide projections bit for bit.
+    assert {key: value.hex() for key, value in classes.items()} == {
+        "refractory_oxides": "0x1.cb61fe21d96eap-5",
+        "silicate_residual": "0x1.ec332f01754b0p-4",
+        "unextracted_metals": "0x0.0p+0",
+        "other": "0x0.0p+0",
+    }
+
+
+@pytest.mark.xfail(strict=True, reason="b-895: refractory trace oxides classified as other")
+@pytest.mark.parametrize("species", ["Y2O3", "Sc2O3", "ZrO2", "HfO2", "ThO2", "UO2"])
+@pytest.mark.parametrize("account", ["process.cleaned_melt", "terminal.slag"])
+def test_terminal_rump_classifies_refractory_trace_oxides(species, account):
+    ledger = AtomLedger()
+    ledger.load_external_mol(account, {species: 1.0}, material_origin="feedstock")
+    before = ledger.close_report()
+    classes = AccountingQueries(SimpleNamespace(atom_ledger=ledger)).terminal_rump_by_class()
+    assert classes == {
+        "refractory_oxides": ledger.projected_total_kg_by_account(account),
+        "silicate_residual": 0.0,
+        "unextracted_metals": 0.0,
+        "other": 0.0,
+    }
+    assert ledger.close_report() == before
 
 
 def _api() -> LedgerAPI:
