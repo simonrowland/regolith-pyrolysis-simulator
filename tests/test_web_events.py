@@ -2659,6 +2659,16 @@ def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch
             _clear_simulation_state(sid)
 
 
+def test_fused_silica_clamp_regression_uses_exact_material_floor():
+    import inspect
+
+    source = inspect.getsource(
+        test_web_start_event_applies_furnace_material_after_recipe_patch
+    )
+    assert "pytest.approx(1200)" not in source
+    assert source.count("== FURNACE_MAX_T_BOUNDS_C[0]") == 2
+
+
 @pytest.mark.parametrize(
     ("override", "message_field"),
     [
