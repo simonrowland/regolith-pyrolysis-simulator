@@ -358,12 +358,8 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     # Offgas species masses and their Cr equivalents come from the same live
     # terminal.offgas projection used by the headless full-run path.
     _PINNED_CRO_OFFGAS_KG = 0.0
-    # t-1457 d-252 C0 contract: the full-run trajectory shifts the terminal Cr-bearing offgas;
-    # the move enters at 375537bff with the residual Cr2O3 re-pin below (CrO offgas stays 0).
-    # 2026-10-26 d-268/d-287: Stage 3 bypasses alkali-rich hours and admits
-    # C2A parcels after purity clears; Cr shifts from rump to train CrO3
-    # (3.3280300206015765 -> 3.138949790025742 kg Cr2O3).
-    _PINNED_CR_OFFGAS_EQ_KG = 0.0006508441394888279
+    # 2026-10-28 c3 (d-268/d-287): Stage-3 routing reaches the iron-buffer saturation branch two hours earlier (h139 vs h141); the released O2 admits two more hours of CrO3 (+0.0099 kg in the train). The earlier 0.13 kg move was a carrier-order redox defect, fixed in this branch.
+    _PINNED_CR_OFFGAS_EQ_KG = 3.309271740035906e-5
     cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _CR_MASS_FRACTION_IN_CR2O3
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
@@ -377,12 +373,8 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         + float(offgas_kg.get("CrO2", 0.0) or 0.0) * (_CR_MW / _CRO2_MW)
         + float(offgas_kg.get("CrO3", 0.0) or 0.0) * (_CR_MW / _CRO3_MW)
     )
-    # 2026-10-26 attribution: most of the Cr leaving the rump is captured as
-    # CrO3 in the condensation train under d-268/d-287 Stage-3 routing.
-    # t-1457 d-252 C0 contract (200 C/h ramp, 1 mbar dry Ar, computed exit): the full-run trajectory shifts.
-    # Bisected along the golden car: the move enters at 375537bff; every later car item is bit-identical.
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.138949790025742, rel=1e-9)
-    assert cr_ingot_kg == pytest.approx(0.17, abs=0.005)
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.320967420348823, rel=1e-9)
+    assert cr_ingot_kg == pytest.approx(0.18, abs=0.005)
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
     assert cr_offgas_eq_kg == pytest.approx(_PINNED_CR_OFFGAS_EQ_KG, rel=1e-6)
