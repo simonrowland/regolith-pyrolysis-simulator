@@ -4,7 +4,7 @@ source:
   citation: "Shornikov, S. I., and Archakov, I. Yu. (2000). Mass Spectrometric Study of Thermodynamic Properties and Vaporization Processes in the Na2O–ZnO–P2O5 System. Glastech. Ber. Glass Sci. Technol., 73 C2, 58–65."
   year: 2000
 extraction:
-  method: context-only source transcription from MinerU and tesseract OCR; no numerical Na(g) pressure or flux data are printed in tables or figures
+  method: context-only source transcription from MinerU and tesseract OCR; three figures digitised with two independent calibrated reads; no numerical Na(g) pressure or flux data are printed in tables or figures
   date: '2026-10-27'
   worker: codex-resume-76909-1793146109
   figure_read_candidates:
@@ -19,7 +19,7 @@ extraction:
     standard_state_as_printed: pure oxides forming the ternary system
     series_as_printed: '1 Na2O; 2 ZnO; 3 P2O5'
     temperature_K: 1100
-    note: Na2O is series 1; figure values are not digitised.
+    note: Na2O is series 1; 8 points read and verified.
   - candidate_id: shornikov_2000_fig2_evaporation_composition
     figure: '2'
     page: 63
@@ -30,7 +30,7 @@ extraction:
     units: mole %
     temperature_as_printed: not stated in the figure or caption
     series_as_printed: '1 Na2O·ZnO·P2O5; 2 4Na2O·6ZnO·5P2O5'
-    note: Initial melt compositions are shown changing during evaporation; figure values are not digitised.
+    note: Initial melt compositions are shown changing during evaporation; 18 points read and verified.
   - candidate_id: shornikov_2000_fig3_melt_formation_gibbs_energy
     figure: '3'
     page: 63
@@ -41,7 +41,7 @@ extraction:
     units: dimensionless ΔG_T/RT; x composition in mole %
     reference_states_as_printed: pure oxide components; the text names these as standard states
     series_as_printed: '1 Na4P2O7-Zn2P2O7, present study at 1100 K; 2 Sn2P2O7-Zn2P2O7, prior data at 1300 K'
-    note: Gibbs energies of melt formation; figure values are not digitised.
+    note: Gibbs energies of melt formation; 9 points read and verified.
   figures_reviewed:
   - figure: '1'
     page: 60
@@ -137,7 +137,7 @@ species:
           standard_state_as_printed: pure oxides forming the ternary system
           series_as_printed: '1 Na2O; 2 ZnO; 3 P2O5'
           temperature_K: 1100
-          note: Na2O is series 1; figure values are not digitised.
+          note: Na2O is series 1; 8 points read and verified.
         - candidate_id: shornikov_2000_fig2_evaporation_composition
           figure: '2'
           page: 63
@@ -148,7 +148,7 @@ species:
           units: mole %
           temperature_as_printed: not stated in the figure or caption
           series_as_printed: '1 Na2O·ZnO·P2O5; 2 4Na2O·6ZnO·5P2O5'
-          note: Initial melt compositions are shown changing during evaporation; figure values are not digitised.
+          note: Initial melt compositions are shown changing during evaporation; 18 points read and verified.
         - candidate_id: shornikov_2000_fig3_melt_formation_gibbs_energy
           figure: '3'
           page: 63
@@ -159,5 +159,844 @@ species:
           units: dimensionless ΔG_T/RT; x composition in mole %
           reference_states_as_printed: pure oxide components; the text names these as standard states
           series_as_printed: '1 Na4P2O7-Zn2P2O7, present study at 1100 K; 2 Sn2P2O7-Zn2P2O7, prior data at 1300 K'
-          note: Gibbs energies of melt formation; figure values are not digitised.
+          note: Gibbs energies of melt formation; 9 points read and verified.
         note: Figures 1-3 do not plot Na(g) partial pressure or evaporation flux; the broader candidate inventory covers scorable data on the melt_activity, residue_composition, and thermochemistry rails.
+    - observation_id: shornikov_2000_fig1c_1_na2o_01_context
+      type: figure_read_point
+      locator:
+        figure: 1(c)
+        page: 60
+        pdf_page_index: 2
+      units: 'x: mole %; y: log a_i(i); raster pixels'
+      values:
+        quantity: log_activity
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O
+        x_value: 33.23
+        x_unit: mole %
+        y_value: -14.17
+        y_unit: log a_i(i)
+        uncertainty:
+          x: 0.96
+          y: 0.19
+          basis: tick rms + class half-width; square/circle/triangle median outer half-extent 40.0 px (x), 40.0 px (y)
+        pixel_center:
+          x: 3499.0
+          y: 8777.5
+        temperature_K: 1100
+        standard_state_as_printed: pure oxides which form the ternary system
+    - observation_id: shornikov_2000_fig1c_1_na2o_02_context
+      type: figure_read_point
+      locator:
+        figure: 1(c)
+        page: 60
+        pdf_page_index: 2
+      units: 'x: mole %; y: log a_i(i); raster pixels'
+      values:
+        quantity: log_activity
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O
+        x_value: 39.91
+        x_unit: mole %
+        y_value: -14.3
+        y_unit: log a_i(i)
+        uncertainty:
+          x: 0.96
+          y: 0.19
+          basis: tick rms + class half-width; square/circle/triangle median outer half-extent 40.0 px (x), 40.0 px (y)
+        pixel_center:
+          x: 3787.0
+          y: 8806.0
+        temperature_K: 1100
+        standard_state_as_printed: pure oxides which form the ternary system
+    - observation_id: shornikov_2000_fig1c_2_zno_01_context
+      type: figure_read_point
+      locator:
+        figure: 1(c)
+        page: 60
+        pdf_page_index: 2
+      units: 'x: mole %; y: log a_i(i); raster pixels'
+      values:
+        quantity: log_activity
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 ZnO
+        x_value: 33.13
+        x_unit: mole %
+        y_value: -4.11
+        y_unit: log a_i(i)
+        uncertainty:
+          x: 1.08
+          y: 0.21
+          basis: tick rms + class half-width; square/circle/triangle median outer half-extent 45.0 px (x), 45.0 px (y)
+        pixel_center:
+          x: 3494.63
+          y: 6494.31
+        temperature_K: 1100
+        standard_state_as_printed: pure oxides which form the ternary system
+    - observation_id: shornikov_2000_fig1c_2_zno_02_context
+      type: figure_read_point
+      locator:
+        figure: 1(c)
+        page: 60
+        pdf_page_index: 2
+      units: 'x: mole %; y: log a_i(i); raster pixels'
+      values:
+        quantity: log_activity
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 ZnO
+        x_value: 39.75
+        x_unit: mole %
+        y_value: -3.7
+        y_unit: log a_i(i)
+        uncertainty:
+          x: 1.08
+          y: 0.21
+          basis: tick rms + class half-width; square/circle/triangle median outer half-extent 45.0 px (x), 45.0 px (y)
+        pixel_center:
+          x: 3780.0
+          y: 6400.7
+        temperature_K: 1100
+        standard_state_as_printed: pure oxides which form the ternary system
+    - observation_id: shornikov_2000_fig1c_2_zno_03_context
+      type: figure_read_point
+      locator:
+        figure: 1(c)
+        page: 60
+        pdf_page_index: 2
+      units: 'x: mole %; y: log a_i(i); raster pixels'
+      values:
+        quantity: log_activity
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 ZnO
+        x_value: 66.67
+        x_unit: mole %
+        y_value: -2.7
+        y_unit: log a_i(i)
+        uncertainty:
+          x: 1.08
+          y: 0.21
+          basis: tick rms + class half-width; square/circle/triangle median outer half-extent 45.0 px (x), 45.0 px (y)
+        pixel_center:
+          x: 4941.3
+          y: 6174.76
+        temperature_K: 1100
+        standard_state_as_printed: pure oxides which form the ternary system
+    - observation_id: shornikov_2000_fig1c_3_p2o5_01_context
+      type: figure_read_point
+      locator:
+        figure: 1(c)
+        page: 60
+        pdf_page_index: 2
+      units: 'x: mole %; y: log a_i(i); raster pixels'
+      values:
+        quantity: log_activity
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 3 P2O5
+        x_value: 33.21
+        x_unit: mole %
+        y_value: -5.87
+        y_unit: log a_i(i)
+        uncertainty:
+          x: 1.41
+          y: 0.29
+          basis: tick rms + class half-width; square/circle/triangle median outer half-extent 59.6 px (x), 63.0 px (y)
+        pixel_center:
+          x: 3497.85
+          y: 6894.25
+        temperature_K: 1100
+        standard_state_as_printed: pure oxides which form the ternary system
+    - observation_id: shornikov_2000_fig1c_3_p2o5_02_context
+      type: figure_read_point
+      locator:
+        figure: 1(c)
+        page: 60
+        pdf_page_index: 2
+      units: 'x: mole %; y: log a_i(i); raster pixels'
+      values:
+        quantity: log_activity
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 3 P2O5
+        x_value: 39.81
+        x_unit: mole %
+        y_value: -5.52
+        y_unit: log a_i(i)
+        uncertainty:
+          x: 1.41
+          y: 0.29
+          basis: tick rms + class half-width; square/circle/triangle median outer half-extent 59.6 px (x), 63.0 px (y)
+        pixel_center:
+          x: 3782.73
+          y: 6813.93
+        temperature_K: 1100
+        standard_state_as_printed: pure oxides which form the ternary system
+    - observation_id: shornikov_2000_fig1c_3_p2o5_03_context
+      type: figure_read_point
+      locator:
+        figure: 1(c)
+        page: 60
+        pdf_page_index: 2
+      units: 'x: mole %; y: log a_i(i); raster pixels'
+      values:
+        quantity: log_activity
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 3 P2O5
+        x_value: 66.76
+        x_unit: mole %
+        y_value: -4.69
+        y_unit: log a_i(i)
+        uncertainty:
+          x: 1.41
+          y: 0.29
+          basis: tick rms + class half-width; square/circle/triangle median outer half-extent 59.6 px (x), 63.0 px (y)
+        pixel_center:
+          x: 4945.23
+          y: 6626.06
+        temperature_K: 1100
+        standard_state_as_printed: pure oxides which form the ternary system
+    - observation_id: shornikov_2000_fig2_1_01_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O·ZnO·P2O5
+        x_value: 33.35
+        x_unit: mole %
+        y_value: 33.29
+        y_unit: mole %
+        uncertainty:
+          x: 0.33
+          y: 0.75
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 4478.0
+          y: 2740.0
+    - observation_id: shornikov_2000_fig2_1_02_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O·ZnO·P2O5
+        x_value: 34.62
+        x_unit: mole %
+        y_value: 30.67
+        y_unit: mole %
+        uncertainty:
+          x: 0.33
+          y: 0.75
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 4724.63
+          y: 2961.53
+    - observation_id: shornikov_2000_fig2_1_03_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O·ZnO·P2O5
+        x_value: 35.21
+        x_unit: mole %
+        y_value: 29.47
+        y_unit: mole %
+        uncertainty:
+          x: 0.33
+          y: 0.75
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 4839.16
+          y: 3062.92
+    - observation_id: shornikov_2000_fig2_1_04_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O·ZnO·P2O5
+        x_value: 36.32
+        x_unit: mole %
+        y_value: 27.17
+        y_unit: mole %
+        uncertainty:
+          x: 0.33
+          y: 0.75
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 5054.0
+          y: 3257.0
+    - observation_id: shornikov_2000_fig2_1_05_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O·ZnO·P2O5
+        x_value: 36.73
+        x_unit: mole %
+        y_value: 26.34
+        y_unit: mole %
+        uncertainty:
+          x: 0.33
+          y: 0.75
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 5133.82
+          y: 3326.53
+    - observation_id: shornikov_2000_fig2_1_06_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O·ZnO·P2O5
+        x_value: 37.26
+        x_unit: mole %
+        y_value: 25.28
+        y_unit: mole %
+        uncertainty:
+          x: 0.33
+          y: 0.75
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 5238.5
+          y: 3416.5
+    - observation_id: shornikov_2000_fig2_1_07_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O·ZnO·P2O5
+        x_value: 37.67
+        x_unit: mole %
+        y_value: 24.36
+        y_unit: mole %
+        uncertainty:
+          x: 0.33
+          y: 0.75
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 5316.5
+          y: 3494.0
+    - observation_id: shornikov_2000_fig2_1_08_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O·ZnO·P2O5
+        x_value: 39.21
+        x_unit: mole %
+        y_value: 21.08
+        y_unit: mole %
+        uncertainty:
+          x: 0.33
+          y: 0.75
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 5617.34
+          y: 3770.73
+    - observation_id: shornikov_2000_fig2_1_09_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O·ZnO·P2O5
+        x_value: 40.36
+        x_unit: mole %
+        y_value: 18.37
+        y_unit: mole %
+        uncertainty:
+          x: 0.33
+          y: 0.75
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 5840.18
+          y: 3999.18
+    - observation_id: shornikov_2000_fig2_1_10_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O·ZnO·P2O5
+        x_value: 41.82
+        x_unit: mole %
+        y_value: 14.86
+        y_unit: mole %
+        uncertainty:
+          x: 0.33
+          y: 0.75
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 6123.29
+          y: 4295.59
+    - observation_id: shornikov_2000_fig2_1_11_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na2O·ZnO·P2O5
+        x_value: 45.01
+        x_unit: mole %
+        y_value: 7.58
+        y_unit: mole %
+        uncertainty:
+          x: 0.33
+          y: 0.75
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 6744.21
+          y: 4910.26
+    - observation_id: shornikov_2000_fig2_2_01_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 4Na2O·6ZnO·5P2O5
+        x_value: 26.69
+        x_unit: mole %
+        y_value: 39.97
+        y_unit: mole %
+        uncertainty:
+          x: 0.34
+          y: 0.77
+          basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+        pixel_center:
+          x: 3182.0
+          y: 2177.0
+    - observation_id: shornikov_2000_fig2_2_02_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 4Na2O·6ZnO·5P2O5
+        x_value: 27.08
+        x_unit: mole %
+        y_value: 39.23
+        y_unit: mole %
+        uncertainty:
+          x: 0.34
+          y: 0.77
+          basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+        pixel_center:
+          x: 3259.0
+          y: 2239.0
+    - observation_id: shornikov_2000_fig2_2_03_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 4Na2O·6ZnO·5P2O5
+        x_value: 29.83
+        x_unit: mole %
+        y_value: 34.57
+        y_unit: mole %
+        uncertainty:
+          x: 0.34
+          y: 0.77
+          basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+        pixel_center:
+          x: 3794.0
+          y: 2632.0
+    - observation_id: shornikov_2000_fig2_2_04_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 4Na2O·6ZnO·5P2O5
+        x_value: 31.66
+        x_unit: mole %
+        y_value: 29.4
+        y_unit: mole %
+        uncertainty:
+          x: 0.34
+          y: 0.77
+          basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+        pixel_center:
+          x: 4149.0
+          y: 3069.0
+    - observation_id: shornikov_2000_fig2_2_05_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 4Na2O·6ZnO·5P2O5
+        x_value: 32.39
+        x_unit: mole %
+        y_value: 26.69
+        y_unit: mole %
+        uncertainty:
+          x: 0.34
+          y: 0.77
+          basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+        pixel_center:
+          x: 4290.0
+          y: 3297.0
+    - observation_id: shornikov_2000_fig2_2_06_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 4Na2O·6ZnO·5P2O5
+        x_value: 35.46
+        x_unit: mole %
+        y_value: 21.62
+        y_unit: mole %
+        uncertainty:
+          x: 0.34
+          y: 0.77
+          basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+        pixel_center:
+          x: 4888.0
+          y: 3725.0
+    - observation_id: shornikov_2000_fig2_2_07_context
+      type: figure_read_point
+      locator:
+        figure: '2'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: mole %; raster pixels'
+      values:
+        quantity: mole_fraction
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 4Na2O·6ZnO·5P2O5
+        x_value: 35.96
+        x_unit: mole %
+        y_value: 20.19
+        y_unit: mole %
+        uncertainty:
+          x: 0.34
+          y: 0.77
+          basis: tick rms + class half-width 65.0 px (x), 65.0 px (y)
+        pixel_center:
+          x: 4984.0
+          y: 3846.0
+    - observation_id: shornikov_2000_fig3_1_01_context
+      type: figure_read_point
+      locator:
+        figure: '3'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+      values:
+        quantity: dimensionless_gibbs_energy_of_formation
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na4P2O7–Zn2P2O7
+        x_value: -0.03
+        x_unit: mole %
+        y_value: -31.94
+        y_unit: ΔG_T / RT
+        uncertainty:
+          x: 0.9
+          y: 0.57
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 2918.82
+          y: 10666.47
+        temperature_K: 1100
+        standard_state_as_printed: pure oxide components (named as standard states in the text)
+    - observation_id: shornikov_2000_fig3_1_02_context
+      type: figure_read_point
+      locator:
+        figure: '3'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+      values:
+        quantity: dimensionless_gibbs_energy_of_formation
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na4P2O7–Zn2P2O7
+        x_value: 33.23
+        x_unit: mole %
+        y_value: -18.51
+        y_unit: ΔG_T / RT
+        uncertainty:
+          x: 0.9
+          y: 0.57
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 5333.84
+          y: 9144.74
+        temperature_K: 1100
+        standard_state_as_printed: pure oxide components (named as standard states in the text)
+    - observation_id: shornikov_2000_fig3_1_03_context
+      type: figure_read_point
+      locator:
+        figure: '3'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+      values:
+        quantity: dimensionless_gibbs_energy_of_formation
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na4P2O7–Zn2P2O7
+        x_value: 39.88
+        x_unit: mole %
+        y_value: -16.38
+        y_unit: ΔG_T / RT
+        uncertainty:
+          x: 0.9
+          y: 0.57
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 5817.15
+          y: 8903.0
+        temperature_K: 1100
+        standard_state_as_printed: pure oxide components (named as standard states in the text)
+    - observation_id: shornikov_2000_fig3_1_04_context
+      type: figure_read_point
+      locator:
+        figure: '3'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+      values:
+        quantity: dimensionless_gibbs_energy_of_formation
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 1 Na4P2O7–Zn2P2O7
+        x_value: 66.57
+        x_unit: mole %
+        y_value: -8.69
+        y_unit: ΔG_T / RT
+        uncertainty:
+          x: 0.9
+          y: 0.57
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 7755.33
+          y: 8032.47
+        temperature_K: 1100
+        standard_state_as_printed: pure oxide components (named as standard states in the text)
+    - observation_id: shornikov_2000_fig3_2_01_context
+      type: figure_read_point
+      locator:
+        figure: '3'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+      values:
+        quantity: dimensionless_gibbs_energy_of_formation
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 Sn2P2O7–Zn2P2O7 prior [13]
+        x_value: 6.49
+        x_unit: mole %
+        y_value: -10.61
+        y_unit: ΔG_T / RT
+        uncertainty:
+          x: 0.9
+          y: 0.57
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 3392.0
+          y: 8250.0
+        temperature_K: 1300
+        standard_state_as_printed: pure oxide components (named as standard states in the text)
+    - observation_id: shornikov_2000_fig3_2_02_context
+      type: figure_read_point
+      locator:
+        figure: '3'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+      values:
+        quantity: dimensionless_gibbs_energy_of_formation
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 Sn2P2O7–Zn2P2O7 prior [13]
+        x_value: 13.17
+        x_unit: mole %
+        y_value: -11.24
+        y_unit: ΔG_T / RT
+        uncertainty:
+          x: 0.9
+          y: 0.57
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 3877.0
+          y: 8321.0
+        temperature_K: 1300
+        standard_state_as_printed: pure oxide components (named as standard states in the text)
+    - observation_id: shornikov_2000_fig3_2_03_context
+      type: figure_read_point
+      locator:
+        figure: '3'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+      values:
+        quantity: dimensionless_gibbs_energy_of_formation
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 Sn2P2O7–Zn2P2O7 prior [13]
+        x_value: 19.78
+        x_unit: mole %
+        y_value: -11.55
+        y_unit: ΔG_T / RT
+        uncertainty:
+          x: 0.9
+          y: 0.57
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 4357.0
+          y: 8356.0
+        temperature_K: 1300
+        standard_state_as_printed: pure oxide components (named as standard states in the text)
+    - observation_id: shornikov_2000_fig3_2_04_context
+      type: figure_read_point
+      locator:
+        figure: '3'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+      values:
+        quantity: dimensionless_gibbs_energy_of_formation
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 Sn2P2O7–Zn2P2O7 prior [13]
+        x_value: 26.48
+        x_unit: mole %
+        y_value: -11.66
+        y_unit: ΔG_T / RT
+        uncertainty:
+          x: 0.9
+          y: 0.57
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 4844.0
+          y: 8369.0
+        temperature_K: 1300
+        standard_state_as_printed: pure oxide components (named as standard states in the text)
+    - observation_id: shornikov_2000_fig3_2_05_context
+      type: figure_read_point
+      locator:
+        figure: '3'
+        page: 63
+        pdf_page_index: 5
+      units: 'x: mole %; y: ΔG_T / RT; raster pixels'
+      values:
+        quantity: dimensionless_gibbs_energy_of_formation
+        method_class: figure_only
+        evidence_class: figure_only
+        series: 2 Sn2P2O7–Zn2P2O7 prior [13]
+        x_value: 66.57
+        x_unit: mole %
+        y_value: -6.04
+        y_unit: ΔG_T / RT
+        uncertainty:
+          x: 0.9
+          y: 0.57
+          basis: tick rms + class half-width 63.0 px (x), 63.0 px (y)
+        pixel_center:
+          x: 7755.0
+          y: 7732.0
+        temperature_K: 1300
+        standard_state_as_printed: pure oxide components (named as standard states in the text)
