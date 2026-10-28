@@ -332,13 +332,21 @@ def test_b2131_cao_logkf_maps_mol_species_at_one_bar(tmp_path: Path) -> None:
     assert attempt.refusal_detail["reason"] == "ellingham-phase-or-polymorph-not-in-fit"
 
 
-def test_b689_ags_gas_stays_missing_mol_basis(tmp_path: Path) -> None:
+def test_b689_ags_h298_basis_does_not_spread_to_cp(tmp_path: Path) -> None:
     result = _migrate_record(tmp_path, B689, "page-0003.json")
     enthalpy = _observation(result, B689, "page-0003", Quantity.H_MINUS_H298)
-    assert _per_is_unknown(enthalpy)
+    # Green declares the 298.15 K, mol-species basis for B689 H(T)-H(298.15 K).
+    assert enthalpy.identity.per.value is PerBasis.MOL_SPECIES
+    assert enthalpy.identity.subtype.value == "H(T)-H(298.15 K)"
     cell = _cell_at(enthalpy, "298.15")
     attempt = _attempt(Engine.VAPOROCK, cell)
     assert attempt.refusal_detail["reason"] == _MISSING_GAS
+
+    # That H298 declaration must not assign a mol-species basis to B689 Cp.
+    heat_capacity = _observation(result, B689, "page-0003", Quantity.CP)
+    assert _per_is_unknown(heat_capacity)
+    cp_attempt = _attempt(Engine.VAPOROCK, _cell_at(heat_capacity, "298.15"))
+    assert cp_attempt.refusal_detail["reason"] == _MISSING_GAS
 
 
 def test_b696_ago_gas_stays_missing_mol_basis(tmp_path: Path) -> None:
