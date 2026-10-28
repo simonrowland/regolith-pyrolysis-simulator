@@ -9,6 +9,23 @@ from simulator.chemistry.melt_activity import (
 
 
 @pytest.mark.parametrize(
+    ("temperature_K", "expected_hex"),
+    [
+        (1200.0, "-0x1.e3d810624dd2fp+8"),
+        (1400.0, "-0x1.8014fdf3b645ap+8"),
+        (1405.2, "-0x1.7c2ee3fe41b9ep+8"),
+        (3001.0, "0x1.5c8dd28d002e4p+8"),
+    ],
+)
+def test_standard_state_owner_move_is_bit_identical(temperature_K, expected_hex):
+    # Temporary numeric identity proof committed before the owner move.
+    # The physics commit replaces these legacy pins with JANAF assertions.
+    assert _na_activity_reference_standard_delta_g_kj_per_mol_o2(
+        temperature_K
+    ).hex() == expected_hex
+
+
+@pytest.mark.parametrize(
     ("temperature_K", "expected_kj_per_mol_o2"),
     [
         # Chase 1998, JANAF Na-013, formation Gibbs column, kJ/mol Na2O:
