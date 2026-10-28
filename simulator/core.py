@@ -10966,7 +10966,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         raw, processed_components).values()),
             )
             melt = self._melt_from_anhydrous_silicate(
-                feedstock, mass_kg, cleaned_mass_kg=cleaned_mass_kg)
+                feedstock, mass_kg, raw=raw, cleaned_mass_kg=cleaned_mass_kg)
         else:
             melt = self._melt_from_raw_inventory(raw)
             processed_components = set()
@@ -11999,6 +11999,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         feedstock: Mapping[str, Any],
         batch_mass_kg: float,
         *,
+        raw: Mapping[str, float],
         cleaned_mass_kg: Optional[float] = None,
     ) -> Dict[str, float]:
         stage0 = feedstock.get('anhydrous_silicate_after_degassing') or {}
@@ -12008,8 +12009,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if cleaned_mass_kg is None
             else cleaned_mass_kg
         )
-        melt = cls._component_masses_from_wt_pct(comp, cleaned_mass)
-        normalize_component_masses_kg(melt, cleaned_mass)
+        retained = {
+            oxide: float(raw.get(oxide, 0.0))
+            for oxide in ('Na2O', 'K2O')
+            if oxide in raw or oxide in feedstock.get('composition_wt_pct', {})
+        }
+        # This projection has no alkali-removal reaction: the normalized bulk
+        # owns declared Na2O/K2O, and the dry surrogate describes the remainder.
+        # For cleaned mass M and retained alkali A [kg], m_i=(M-A)*w_i/sum(w).
+        # Thus sum(m_i)+A=M [kg]; A=0 recovers the original projection.
+        # Sanity: data/feedstocks.yaml, comet_nucleus bulk row, gives
+        # 1000 kg * 0.32/100 = 3.2 kg Na2O, independent of the dry surrogate.
+        projected_mass = cleaned_mass - sum(retained.values())
+        comp = {oxide: value for oxide, value in comp.items() if oxide not in retained}
+        melt = cls._component_masses_from_wt_pct(comp, projected_mass)
+        normalize_component_masses_kg(melt, projected_mass)
+        melt.update(retained)
         return {
             oxide: float(melt.get(oxide, 0.0))
             for oxide in OXIDE_SPECIES

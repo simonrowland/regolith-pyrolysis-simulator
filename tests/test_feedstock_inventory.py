@@ -621,12 +621,14 @@ def test_carbonaceous_stage0_uses_anhydrous_silicate_handoff():
     assert inv.stage0_profile == "carbonaceous_degas_cleanup"
     assert inv.cleaned_melt_source == "anhydrous_silicate_after_degassing"
     assert inv.stage0_temp_range_C == (20.0, 1050.0)
-    assert sim.melt.composition_kg["SiO2"] == pytest.approx(286.004663)
-    assert sim.melt.composition_kg["FeO"] == pytest.approx(238.337219)
+    # Reserving the bulk Na2O leaves less mass for the dry surrogate.
+    assert sim.melt.composition_kg["Na2O"] == pytest.approx(inv.raw_components_kg["Na2O"])
+    assert sim.melt.composition_kg["SiO2"] == pytest.approx(283.135051115)
+    assert sim.melt.composition_kg["FeO"] == pytest.approx(235.945875929)
     assert "H2O" not in sim.melt.composition_kg
     assert "C" not in sim.melt.composition_kg
     assert "S" not in sim.melt.composition_kg
-    assert sim.melt.composition_kg["NiO"] == pytest.approx(15.889148)
+    assert sim.melt.composition_kg["NiO"] == pytest.approx(15.729725062)
 
     assert inv.gas_volatiles_kg["H2O"] > 154.241645
     assert "C" not in inv.gas_volatiles_kg
