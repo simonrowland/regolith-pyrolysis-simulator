@@ -1,0 +1,34 @@
+source_id: beerkens-2003-sulfate-decomposition-na2o-activity
+input_order:
+  - MinerU content-list table blocks and markdown
+  - pdftotext-layout text layer
+  - Rendered PDF only for locator and table-layout checks
+printed_tables:
+  - printed_table: I
+    page: 3
+    scope: Maximum sulfur solubility; not a sodium oxide activity table
+    body_rows: 5
+  - printed_table: II
+    page: 6
+    scope: Sulfite solubility; not a sodium oxide activity table
+    body_rows: 5
+activity_records:
+  - observation_id: beerkens_2003_model_glass_activity_temperature_fit
+    page: 6
+    table: null
+    source_form: fitted a(Na2O) temperature expression
+    disposition: context_only_schema_gap
+  - observation_id: beerkens_2003_float_glass_activity_temperature_fit
+    page: 6
+    table: null
+    source_form: fitted a(Na2O) temperature expression
+    disposition: context_only_schema_gap
+  - observation_id: beerkens_2003_float_glass_activity_at_1673K
+    page: 6
+    table: null
+    source_form: approximate scalar activity in prose
+    disposition: activity_coefficient
+    audit_method: MinerU prose and pdftotext agree; render confirms value and row context
+excluded:
+  - figure: 5
+    reason: Comparison values appear only as plotted points and are figure-read candidates, not extracted data.
