@@ -4604,9 +4604,10 @@ def test_web_payloads_preserve_full_precision_mass_balance_error(
 
 
 @pytest.mark.parametrize("pressure_mbar", [0.0004, 0.0])
-def test_tick_payload_preserves_overhead_pressure_value(pressure_mbar):
+def test_tick_payload_preserves_pressure_values(pressure_mbar):
     sim, snapshot = _sim_with_mass_balance_snapshot(0.0)
     snapshot.overhead.pressure_mbar = pressure_mbar
+    sim.melt.p_total_mbar = pressure_mbar
 
     payload = _tick_payload(
         sim=sim,
@@ -4615,12 +4616,19 @@ def test_tick_payload_preserves_overhead_pressure_value(pressure_mbar):
         backend_status="internal-analytical",
         backend_authoritative=False,
     )
-    serialized = json.loads(json.dumps({"pressure_mbar": payload["pressure_mbar"]}))
+    serialized = json.loads(json.dumps({
+        "pressure_mbar": payload["pressure_mbar"],
+        "p_total_mbar": payload["p_total_mbar"],
+    }))
 
     assert type(payload["pressure_mbar"]) is float
     assert payload["pressure_mbar"] == pressure_mbar
     assert type(serialized["pressure_mbar"]) is float
     assert serialized["pressure_mbar"] == pressure_mbar
+    assert type(payload["p_total_mbar"]) is float
+    assert payload["p_total_mbar"] == pressure_mbar
+    assert type(serialized["p_total_mbar"]) is float
+    assert serialized["p_total_mbar"] == pressure_mbar
 
 
 def test_tick_payload_exposes_non_authoritative_backend_domain_gate():
