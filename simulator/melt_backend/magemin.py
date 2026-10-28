@@ -1773,11 +1773,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             if isinstance(mode_deficit, Mapping):
                 mode_sum = float(mode_deficit['mode_sum'])
                 deficit = float(mode_deficit['deficit'])
+                # Native control failure takes precedence over incomplete Mode
+                # evidence: preserve its numerical reason for gate hold/floor.
+                # A deficit alone remains out_of_domain; record it in both cases.
+                if result_status == 'ok':
+                    result_status = 'out_of_domain'
+                    result_diagnostics.update({
+                        'backend_status': result_status,
+                        'backend_status_reason': MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
+                    })
                 result_diagnostics.update({
-                    'backend_status': 'out_of_domain',
-                    'backend_status_reason': (
-                        MAGEMIN_MODE_VECTOR_MASS_DEFICIT
-                    ),
+                    MAGEMIN_MODE_VECTOR_MASS_DEFICIT: True,
                     'magemin_mode_vector_raw_sum': mode_sum,
                     'magemin_mode_vector_deficit': deficit,
                     'magemin_mode_vector_input_components': {
@@ -1806,7 +1812,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     temperature_C=temperature_C,
                     pressure_bar=pressure_bar,
                     fO2_log=result_fO2_log,
-                    status='out_of_domain',
+                    status=result_status,
                     warnings=[*all_warnings, message],
                     diagnostics=result_diagnostics,
                 )

@@ -1615,12 +1615,15 @@ def test_magemin_plante_mode_deficit_is_typed_out_of_domain(monkeypatch):
 
     def fake_run(args, **kwargs):
         calls.append((args, kwargs))
+        output = Path(kwargs['cwd']) / 'output'
+        output.mkdir(exist_ok=True)
+        (output / '_matlab_output.txt').write_text('log10(fO2) -9.0\n')
         return subprocess.CompletedProcess(
             args,
             0,
             stdout=(
-                'Phase :      cpx       ol       ol       ne      trd\n'
-                'Mode  :  0.00000  0.00025  0.00010  0.00047  0.66605\n'
+                'Phase :      cpx       ol       ol       ne      trd qfm\n'
+                'Mode  :  0.00000  0.00025  0.00010  0.00047  0.66605 0.0\n'
             ),
             stderr='',
         )

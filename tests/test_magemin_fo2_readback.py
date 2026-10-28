@@ -180,28 +180,47 @@ def test_corrective_resolve_shares_budget_and_requires_fresh_output(
 
 
 @pytest.mark.parametrize('prior_good', [False, True])
-@pytest.mark.parametrize('requested', [-8.0, -12.0])
-def test_live_buffer_loss_reaches_existing_gate_hold_or_floor(
-    live_backend, monkeypatch, prior_good, requested,
+@pytest.mark.parametrize('requested,native,phases,modes', [
+    (-8.0, None, None, None),
+    (-12.0, None, None, None),
+    (-9.0, '-inf', 'liq', '0.9'),
+    (-9.0, '-8.5', 'liq qfm', '0.89 0.01'),
+])
+def test_control_failure_reaches_existing_gate_hold_or_floor(
+    live_backend, monkeypatch, prior_good, requested, native, phases, modes,
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     from tests.chemistry.test_declared_liquid_fraction_provider import _sim
     from tests.binding_admission_fixtures import register_synthetic_gate_curve_producer
+    from engines.magemin.provider import MAGEMinShadowProvider
 
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     register_synthetic_gate_curve_producer(sim)
+    if native is not None:
+        def run(_args, *, cwd, **kwargs):
+            output = Path(cwd) / 'output'
+            output.mkdir(exist_ok=True)
+            (output / '_matlab_output.txt').write_text(f'log10(fO2) {native}\n')
+            return SimpleNamespace(returncode=0, stderr='', stdout=(
+                f'Status : 0 [success]\nPhase : {phases}\nMode : {modes}\n'
+            ))
+
+        monkeypatch.setattr(magemin_module.subprocess, 'run', run)
     failed = live_backend.find_liquidus_solidus(
         projected_oxide_wt_pct=_C5, fO2_log=requested, pressure_bar=0.05,
         min_T_C=1500.0, max_T_C=1550.0, scan_step_C=50.0,
     )
     good = prior_good
+    projected = MAGEMinShadowProvider._project_equilibrium(
+        failed, mode='subprocess', engine_version='test',
+    ).as_diagnostic()
 
     def dispatch(*_args, **_kwargs):
         if good:
             return SimpleNamespace(status='ok', diagnostic={
                 'solidus_T_C': 1000.0, 'liquidus_T_C': 1300.0,
             }, warnings=())
-        return SimpleNamespace(status=failed.status, diagnostic=failed.diagnostics,
+        return SimpleNamespace(status=failed.status, diagnostic=projected,
                                warnings=tuple(failed.warnings))
 
     monkeypatch.setattr(sim, '_dispatch_only', dispatch)
@@ -216,3 +235,11 @@ def test_live_buffer_loss_reaches_existing_gate_hold_or_floor(
     assert notice['qualification'] == (
         'held_last_good_curve' if prior_good else 'first_call_kress91_floor_prediction'
     )
+    if native is not None:
+        diagnostics = failed.diagnostics
+        assert diagnostics['backend_status_reason'] == 'engine_not_converged'
+        assert diagnostics['magemin_mode_vector_mass_deficit'] is True
+        assert diagnostics['magemin_mode_vector_deficit'] == pytest.approx(0.1)
+        assert diagnostics['authoritative_for_requested_conditions'] is False
+        assert diagnostics['solved_fO2_log'] == (None if native == '-inf' else -8.5)
+        assert any('mass deficit=' in warning for warning in failed.warnings)
