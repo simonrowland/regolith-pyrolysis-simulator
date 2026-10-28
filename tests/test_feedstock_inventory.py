@@ -17,6 +17,7 @@ from simulator.accounting.completeness import (
     vapor_contract_completeness,
 )
 from simulator.feedstock_guard import BlockedFeedstockError, is_blocked_feedstock
+from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import CampaignPhase, DecisionType, MOLAR_MASS
 
@@ -501,6 +502,59 @@ def test_lunar_eac1a_unreported_loi_residual_routes_to_terminal_slag_without_ren
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0)
 
 
+@pytest.mark.parametrize("mass_kg", [250.0, 1000.0])
+def test_comet_stage0_preserves_declared_bulk_sodium_atoms(mass_kg):
+    feedstocks = yaml.safe_load(
+        (Path(__file__).parent.parent / "data" / "feedstocks.yaml").read_text()
+    )
+    feedstock = feedstocks["comet_nucleus"]
+    assert feedstock["composition_wt_pct"]["Na2O"] == 0.32
+    # Neither comet nor CI declares K2O; do not infer an abundance from CI.
+    assert "K2O" not in feedstock["composition_wt_pct"]
+    assert "K2O" not in feedstocks["ci_carbonaceous_chondrite"]["composition_wt_pct"]
+    sim = _sim(feedstocks)
+    sim.load_batch("comet_nucleus", mass_kg=mass_kg)
+
+    expected_kg = normalized_feedstock_component_masses_kg(feedstock, mass_kg)["Na2O"]
+    assert expected_kg == pytest.approx(mass_kg * 0.0032)
+    assert sim.inventory.melt_oxide_kg["Na2O"] == pytest.approx(expected_kg)
+    expected_atoms = resolve_species_formula("Na2O").atom_moles(_mol("Na2O", expected_kg))
+    actual_na = sum(
+        sim.atom_ledger.atom_moles_by_account(account).get("Na", 0.0)
+        for account in sim.atom_ledger.mol_by_account()
+        if not account.startswith("reservoir.")
+    )
+    assert actual_na == pytest.approx(expected_atoms["Na"])
+    assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
+
+
+@pytest.mark.parametrize("oxide,element", [("Na2O", "Na"), ("K2O", "K")])
+@pytest.mark.parametrize("dry_alkali_wt_pct", [None, 10.0])
+def test_anhydrous_handoff_bulk_owns_declared_alkali_atoms(oxide, element, dry_alkali_wt_pct):
+    dry_composition = {"SiO2": 100.0}
+    if dry_alkali_wt_pct is not None:
+        dry_composition[oxide] = dry_alkali_wt_pct
+    feedstock = {
+        "composition_wt_pct": {"SiO2": 79.0, "H2O": 20.0, oxide: 1.0},
+        "stage0_profile": "carbonaceous_degas_cleanup",
+        "stage0_temp_range_C": [20.0, 1050.0],
+        "anhydrous_silicate_after_degassing": {"composition_wt_pct": dry_composition},
+    }
+    sim = _sim({"alkali": feedstock})
+    sim.load_batch("alkali", mass_kg=1000.0)
+
+    assert sim.inventory.melt_oxide_kg[oxide] == pytest.approx(10.0)
+    assert sim.inventory.melt_oxide_kg["SiO2"] == pytest.approx(790.0)
+    expected_atoms = resolve_species_formula(oxide).atom_moles(_mol(oxide, 10.0))
+    actual_atoms = sum(
+        sim.atom_ledger.atom_moles_by_account(account).get(element, 0.0)
+        for account in sim.atom_ledger.mol_by_account()
+        if not account.startswith("reservoir.")
+    )
+    assert actual_atoms == pytest.approx(expected_atoms[element])
+    assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
+
+
 def test_carbonaceous_stage0_uses_anhydrous_silicate_handoff():
     sim = _sim(
         {
@@ -567,12 +621,14 @@ def test_carbonaceous_stage0_uses_anhydrous_silicate_handoff():
     assert inv.stage0_profile == "carbonaceous_degas_cleanup"
     assert inv.cleaned_melt_source == "anhydrous_silicate_after_degassing"
     assert inv.stage0_temp_range_C == (20.0, 1050.0)
-    assert sim.melt.composition_kg["SiO2"] == pytest.approx(286.004663)
-    assert sim.melt.composition_kg["FeO"] == pytest.approx(238.337219)
+    # Reserving the bulk Na2O leaves less mass for the dry surrogate.
+    assert sim.melt.composition_kg["Na2O"] == pytest.approx(inv.raw_components_kg["Na2O"])
+    assert sim.melt.composition_kg["SiO2"] == pytest.approx(283.135051115)
+    assert sim.melt.composition_kg["FeO"] == pytest.approx(235.945875929)
     assert "H2O" not in sim.melt.composition_kg
     assert "C" not in sim.melt.composition_kg
     assert "S" not in sim.melt.composition_kg
-    assert sim.melt.composition_kg["NiO"] == pytest.approx(15.889148)
+    assert sim.melt.composition_kg["NiO"] == pytest.approx(15.729725062)
 
     assert inv.gas_volatiles_kg["H2O"] > 154.241645
     assert "C" not in inv.gas_volatiles_kg
