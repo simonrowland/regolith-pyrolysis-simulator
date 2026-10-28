@@ -356,6 +356,7 @@ class _DeadlineRaceClock:
     def __init__(self):
         self.now = 0.0
         self.waits = []
+        self.on_wait = None
 
     def monotonic(self):
         return self.now
@@ -376,6 +377,8 @@ class _DeadlineRaceEvent:
         if self.signaled:
             return True
         self.clock.waits.append(timeout)
+        if self.clock.on_wait is not None:
+            self.clock.on_wait()
         self.clock.now += timeout or 0.0
         return self.signaled
 
@@ -904,7 +907,7 @@ def test_start_partial_reader_keeps_old_connection_across_respawn(monkeypatch):
 
 
 def test_call_receipt_abort_uses_effective_per_call_timeout(monkeypatch):
-    worker, _clock, discarded = _deadline_race_worker(
+    worker, clock, discarded = _deadline_race_worker(
         monkeypatch,
         timeout_s=1.0,
         ready_at=0.5,
@@ -916,16 +919,7 @@ def test_call_receipt_abort_uses_effective_per_call_timeout(monkeypatch):
     )
     abort_event = _DeadlineRaceEvent(_DeadlineRaceClock())
     worker._pool_call_abort_event = abort_event
-    connection = worker.connection
-    real_poll = connection.poll
-
-    def poll_then_abort(timeout):
-        ready = real_poll(timeout)
-        if ready:
-            abort_event.set()
-        return ready
-
-    connection.poll = poll_then_abort
+    clock.on_wait = abort_event.set
 
     with pytest.raises(EngineWorkerTimeout) as caught:
         worker.call({}, timeout_s=1.0)
