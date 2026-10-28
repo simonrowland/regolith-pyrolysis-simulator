@@ -188573,9 +188573,9 @@
           "gate_authority": {
             "kind": "real",
             "fallback_status": "not_engaged",
-            "source": "kress91_liquid_calibration_floor",
-            "solidus_T_C": 1200.0,
-            "liquidus_T_C": 1200.000001
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 918.75,
+            "liquidus_T_C": 1370.3125
           },
           "transition_name": "fe_redox_respeciation",
           "residual_attribution": "evaporative_internal_o_unbacked",
@@ -188617,9 +188617,9 @@
             "gate_authority": {
               "kind": "real",
               "fallback_status": "not_engaged",
-              "source": "kress91_liquid_calibration_floor",
-              "solidus_T_C": 1200.0,
-              "liquidus_T_C": 1200.000001
+              "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+              "solidus_T_C": 918.75,
+              "liquidus_T_C": 1370.3125
             },
             "residual_attribution": "headspace_o2_unavailable",
             "ferric_divergence_after": {
@@ -188661,9 +188661,9 @@
             "gate_authority": {
               "kind": "real",
               "fallback_status": "not_engaged",
-              "source": "kress91_liquid_calibration_floor",
-              "solidus_T_C": 1200.0,
-              "liquidus_T_C": 1200.000001
+              "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+              "solidus_T_C": 918.75,
+              "liquidus_T_C": 1370.3125
             },
             "transition_name": "fe_redox_respeciation",
             "residual_attribution": "evaporative_internal_o_unbacked",
@@ -188701,32 +188701,45 @@
           "provider": "magemin",
           "redox": {
             "status": "ok",
-            "source": "kress91_liquid_calibration_floor",
-            "solidus_T_C": 1200.0,
-            "liquidus_T_C": 1200.000001,
-            "gate_provider_refusal": {
-              "provider": "magemin",
-              "status": "out_of_domain",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 918.75,
+            "liquidus_T_C": 1370.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
               "reason": "composition_projected",
-              "qualification": "numerical_failure_kress91_floor_prediction",
               "authority": "extrapolated",
               "certified_band": {
-                "sio2_wt_pct": [
-                  30.0,
-                  80.0
-                ],
-                "min_T_C": 1200.0,
-                "max_T_C": 1630.0,
-                "source": "REF-001 Kress91 1200-1630 C calibration band"
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
               },
-              "warnings": [
-                "MAGEMin: database 'ig' merged FeO->FeOt+O, Fe2O3->FeOt+O",
-                "MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5",
-                "MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
-                "non-monotone frac_M(T) would require smoothing: 1900.000 C gives raw 0.904459 below 1850.000 C value 1",
-                "composition_projected bulk has no projected liquidus; status=not_converged"
-              ],
-              "provider_outcome": "numerical_failure",
+              "dropped_components": [
+                {
+                  "component": "MnO",
+                  "mass_fraction": 0.0020586722189210776
+                },
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.0010293361094605388
+                }
+              ]
+            },
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
               "provider_diagnostic": {
                 "liquidus_T_K": null,
                 "liquidus_T_C": null,
@@ -188876,16 +188889,62 @@
                 "kernel_fallback_used": "magemin-shadow",
                 "kernel_fallback_requested_provider": "none",
                 "kernel_fallback_reason": "no_authoritative_provider"
-              }
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O, Fe2O3->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                "non-monotone frac_M(T) would require smoothing: 1900.000 C gives raw 0.904459 below 1850.000 C value 1",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "held_last_good_curve",
+              "authority": "extrapolated (held)",
+              "failure_hour": 13,
+              "failure_temperature_C": 1600.0,
+              "computed_hour": 5,
+              "composition_distance_wt_pct": 0.00900268820927149
             }
           },
           "evaporation": {},
           "liquid_fraction": {
             "status": "ok",
-            "source": "kress91_liquid_calibration_floor",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
             "liquid_fraction": 1.0,
-            "solidus_T_C": 1200.0,
-            "liquidus_T_C": 1200.000001
+            "solidus_T_C": 918.75,
+            "liquidus_T_C": 1370.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "MnO",
+                  "mass_fraction": 0.0020586722189210776
+                },
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.0010293361094605388
+                }
+              ]
+            }
           }
         }
       },
