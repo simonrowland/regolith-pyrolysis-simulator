@@ -2118,7 +2118,10 @@ def _solve_vapor_engine_cell_oxygen_balance(
     # root is a second Brent solve of a nearby pressure map, so successive
     # anchors reproduce to a few xtol rather than to xtol itself. t-1545's
     # Na reference moves that floor to 4.51e-12 dex on the dry Na2O-K2O-SiO2
-    # fixed point at 1800 K (the step changes sign and stops shrinking).
+    # fixed point at 1800 K. The 1e-11 gate returns at iter 6, gap
+    # 4.5075e-12, same sign and still shrinking. The sign flip is iter 8,
+    # gap 5.435e-12, which this gate does not reach. The pre-t-1545 residual
+    # at 1e-12 is 0.
     # 1e-11 dex accepts that solver noise and still rejects a 1e-6 dex miss.
     fixed_point_tolerance_dex = 1e-11
     iteration_count = max_fixed_point_iterations if fixed_point_activities else 1

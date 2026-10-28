@@ -1027,7 +1027,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
 
     # d-252's 1 mbar Ar cover and 200 C/h ramp move this first step from
     # 1600 C to 1400 C. The old hard-vacuum step was 1.39e6% over transport
-    # capacity; the new Ar-film diffusion-limited value is 2.47%.
+    # capacity; the new Ar-film diffusion-limited value is 1.39%.
     # Physics seq 1003 classifies Ti below the 1e-12 kg/hr negligibility
     # threshold here, so it is absent from snapshot flux/status and is a
     # legitimate no-flux carrier for this pin.
@@ -1035,10 +1035,11 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
-    # t-1545: the 1400 C step's non-P mass is 93.6% Na. Na falls 0.262451 dex
-    # (endpoint Antoine at 1673.15 K is -0.264419 dex; the +0.001968 dex is
-    # shared with Na2/Na2O_gas and is not an Fe or fO2 rescaling). Fe and
-    # every non-Na species stay bitwise identical, including the Fe redox split.
+    # t-1545: the 1400 C step's non-P mass is 93.6% Na. Na falls 0.262451 dex.
+    # The endpoint Antoine at 1673.15 K is -0.264419 dex, so +0.001968 dex is
+    # the gap between the Na rate and that endpoint. It is not a Na2/Na2O_gas
+    # share: a dimer at twice the Antoine would pull sodium further down.
+    # Fe redox reasons are unchanged.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
         0.03696635706065208, rel=1e-12, abs=1e-12
     )
