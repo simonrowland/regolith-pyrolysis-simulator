@@ -563,20 +563,22 @@ def test_c0_prediction_flags_unmet_evacuation_and_remaining_load_gas():
 
     assert prediction["evacuation_bound_unmet"] is True
     assert prediction["evacuation_max_hold_hr"] == 25.0
+    # The prepared CI assay changes the load-time gas inventory; the unchanged
+    # forecast applies its selected-temperature capacity and 25 h limit.
     assert prediction["evacuation_bound_unmet_hr"] == pytest.approx(
-        31.135503658452762
+        31.057175103219322
     )
     assert prediction["evacuation_unreleased_gas_mass_kg"] == pytest.approx(
-        98.10306159203087
+        97.8562606678263
     )
     assert prediction["evacuation_unreleased_gas_inventory_kg"] == pytest.approx(
         {
-            "CH4": 1.5071132259442865,
-            "CO": 4.633943479528104,
-            "CO2": 6.298982890899267,
-            "H2": 1.5666077480278489,
-            "H2O": 82.98988248121516,
-            "N2": 1.106531766416202,
+            "CH4": 1.5033217343128549,
+            "CO": 4.622285723746583,
+            "CO2": 6.2831363436682794,
+            "H2": 1.562666584176234,
+            "H2O": 82.78110225189705,
+            "N2": 1.1037480300252942,
         }
     )
 
