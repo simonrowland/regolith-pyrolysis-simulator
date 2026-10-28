@@ -5105,8 +5105,14 @@ def _typed_refusal_execution(reason: str) -> SimpleNamespace:
 
 
 def _typed_refusal_cases() -> tuple[tuple[str, str, Exception | None, object | None], ...]:
+    from simulator.melt_backend.liquidus import _LiquidusFinderBudgetExceeded
+
     campaign_pressure = CampaignPressureSetpointRefusal(
         {"status": "refused", "detail": "empty pN2 operating band"}
+    )
+    compute_timeout = _LiquidusFinderBudgetExceeded(
+        "liquidus finder budget expired",
+        diagnostics={"budget": "liquidus_aggregate"},
     )
     return (
         (
@@ -5161,6 +5167,12 @@ def _typed_refusal_cases() -> tuple[tuple[str, str, Exception | None, object | N
             "transport_regime",
             "invalid_transport_regime_input",
             TransportRegimeRefusal("invalid_transport_regime_input", "bad Kn"),
+            None,
+        ),
+        (
+            "engine_compute_timeout",
+            "engine_compute_timeout",
+            compute_timeout,
             None,
         ),
     )
