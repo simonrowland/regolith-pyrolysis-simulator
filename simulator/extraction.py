@@ -637,7 +637,7 @@ class ExtractionMixin:
         if not union_species:
             return {}
         drift: Dict[str, float] = {}
-        for species in union_species:
+        for species in sorted(union_species, key=str):
             total_projected_kg = self._condensed_species_projected_kg(species)
             tracked_metal_kg = metal_projection_by_species.get(species, 0.0)
             projected_train_kg = max(
@@ -666,7 +666,7 @@ class ExtractionMixin:
                 for key in metal_projection_by_route
                 if key[0] == species
             }
-            for key in route_keys:
+            for key in sorted(route_keys, key=lambda item: (item[0], item[1])):
                 raw_ledger_kg = self._stage_routed_metal_ledger_kg.get(
                     key, 0.0
                 )
@@ -2017,7 +2017,7 @@ class ExtractionMixin:
         # destinations stay in process.metal_phase; only true condenser
         # destinations receive a stage UI projection.
         mre_metal_deltas_kg: Dict[str, float] = {}
-        for metal in produced_metals:
+        for metal in sorted(produced_metals, key=str):
             delta_kg = (
                 self._ledger_account_species_kg(
                     'process.metal_phase', metal)

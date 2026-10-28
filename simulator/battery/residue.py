@@ -2652,7 +2652,9 @@ def _hashimoto_integrate_geometry(
     exhausted_atoms = _atom_totals(exhausted_mol, {})
     initial_atoms = _atom_totals(initial_inventory_mol, {})
     closure: dict[str, float] = {}
-    for element in set(initial_atoms) | set(final_atoms) | set(exhausted_atoms):
+    for element in sorted(
+        set(initial_atoms) | set(final_atoms) | set(exhausted_atoms), key=str
+    ):
         residual = (
             initial_atoms.get(element, 0.0)
             - final_atoms.get(element, 0.0)

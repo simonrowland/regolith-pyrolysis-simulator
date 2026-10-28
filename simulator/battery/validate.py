@@ -639,7 +639,7 @@ def _check_identity(
             )
         )
     profile = profile_for(identity)
-    for name in profile.required:
+    for name in sorted(profile.required, key=str):
         state = getattr(identity, name)
         if state is None:
             # archival: missing required axis is unknown, not a hard refuse of

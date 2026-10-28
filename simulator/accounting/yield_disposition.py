@@ -1217,8 +1217,11 @@ def _campaign_retained_pool(
             cumulative_inputs["cleanup"][key]
             - cumulative_withdrawals["cleanup"][key],
         )
-        for key in set(cumulative_inputs["cleanup"])
-        | set(cumulative_withdrawals["cleanup"])
+        for key in sorted(
+            set(cumulative_inputs["cleanup"])
+            | set(cumulative_withdrawals["cleanup"]),
+            key=str,
+        )
     }
     return (
         {

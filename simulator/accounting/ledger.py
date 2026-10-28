@@ -332,7 +332,7 @@ class AtomLedger:
         self._unresolved_origin_atom_moles: dict[str, dict[str, float]] = {}
         self._origin_attribution_methods: dict[str, dict[str, str]] = {}
         self._external_origin_atom_moles: dict[str, dict[str, float]] = {
-            origin: {} for origin in MATERIAL_ORIGINS
+            origin: {} for origin in sorted(MATERIAL_ORIGINS, key=str)
         }
         self._gross_account_flows: dict[str, dict[str, Any]] = {
             direction: {
@@ -868,7 +868,7 @@ class AtomLedger:
             account = str(lot.account)
             physical_atoms = lot.atom_moles_for(self.registry)
             origin_allocation: dict[str, dict[str, float]] = {
-                origin: {} for origin in MATERIAL_ORIGINS
+                origin: {} for origin in sorted(MATERIAL_ORIGINS, key=str)
             }
             unresolved_allocation: dict[str, float] = {}
             methods: dict[str, str] = {}
@@ -977,7 +977,7 @@ class AtomLedger:
                                 f"debit={amount:.12g}, "
                                 f"available={available:.12g} mol-atoms"
                             ) from exc
-                        for origin in MATERIAL_ORIGINS:
+                        for origin in sorted(MATERIAL_ORIGINS, key=str):
                             origin_amount = float(pool_withdrawal.get(origin, 0.0))
                             if origin_amount > 0.0:
                                 origin_allocation[origin][element] = origin_amount
@@ -999,7 +999,7 @@ class AtomLedger:
 
                 methods[element] = str(method)
                 debit_methods[element].add(str(method))
-                for origin in MATERIAL_ORIGINS:
+                for origin in sorted(MATERIAL_ORIGINS, key=str):
                     debited = max(
                         0.0,
                         float(origin_allocation[origin].get(element, 0.0)),
@@ -1109,7 +1109,7 @@ class AtomLedger:
         for lot, physical_atoms in zip(transition.credits, credit_atoms):
             account = str(lot.account)
             allocation: dict[str, dict[str, float]] = {
-                origin: {} for origin in MATERIAL_ORIGINS
+                origin: {} for origin in sorted(MATERIAL_ORIGINS, key=str)
             }
             unresolved_allocation: dict[str, float] = {}
             methods: dict[str, str] = {}
@@ -1117,7 +1117,7 @@ class AtomLedger:
                 element = str(element)
                 total_credit = float(total_credit_atoms.get(element, 0.0))
                 fraction = float(amount) / total_credit if total_credit > 0.0 else 0.0
-                for origin in MATERIAL_ORIGINS:
+                for origin in sorted(MATERIAL_ORIGINS, key=str):
                     origin_amount = float(
                         debit_origin_totals[origin].get(element, 0.0)
                     ) * fraction

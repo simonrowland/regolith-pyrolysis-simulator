@@ -200,10 +200,10 @@ class ColdTrainParameters:
             )
         rating = {
             name: None if self.rating.get(name) is None else _finite_positive(self.rating[name], name)
-            for name in _COLD_TRAIN_RATING_NAMES
+            for name in sorted(_COLD_TRAIN_RATING_NAMES, key=str)
         }
-        orifice = {name: _finite_positive(self.orifice[name], name) for name in _COLD_TRAIN_ORIFICE_NAMES}
-        relief = {name: _finite_positive(self.relief[name], name) for name in _COLD_TRAIN_RELIEF_NAMES}
+        orifice = {name: _finite_positive(self.orifice[name], name) for name in sorted(_COLD_TRAIN_ORIFICE_NAMES, key=str)}
+        relief = {name: _finite_positive(self.relief[name], name) for name in sorted(_COLD_TRAIN_RELIEF_NAMES, key=str)}
         y = _fraction(self.liquid_yield, "liquid_yield")
         x = _unit_interval(self.expander_bypass_fraction, "expander_bypass_fraction")
         if x + y > 1.0:
