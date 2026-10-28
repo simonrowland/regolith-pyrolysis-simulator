@@ -1593,7 +1593,9 @@ _CELL_ATOMIC_MASS_G_MOL = {"O": 15.999, "W": 183.84, "Mo": 95.95}
 def _cell_janaf_gibbs_points(table_id: str) -> tuple[Any, str]:
     """Load JANAF ΔfG° points through the hash-checked compilation loader."""
 
-    from simulator.battery.generators.janaf import _fusion_table_points
+    from simulator.reference_data.janaf import (
+        _fusion_table_points,
+    )
 
     return _fusion_table_points(table_id)
 
@@ -1618,7 +1620,9 @@ def _cell_oxide_thermodynamics(
         load_table_document,
         table_formula_normalised_value,
     )
-    from simulator.battery.generators.janaf import _interpolate_formation_gibbs
+    from simulator.reference_data.janaf import (
+        _interpolate_formation_gibbs,
+    )
 
     if cell_material not in _CELL_OXIDE_GAS_TABLES:
         raise _OxygenBalanceRefusal(

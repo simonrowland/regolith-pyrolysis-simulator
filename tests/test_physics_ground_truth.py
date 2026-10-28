@@ -81,8 +81,10 @@ def test_nio_mre_rung_is_phase_correct_graph_authority() -> None:
     assert liquid_reference is not None
     assert solid_reference.authority == "ellingham_graph"
     assert liquid_reference.authority == "ellingham_graph"
-    assert solid_reference.authoritative is True
-    assert liquid_reference.authoritative is True
+    assert solid_reference.authoritative is False
+    assert "unresolved_standard_state" in solid_reference.status
+    assert liquid_reference.authoritative is False
+    assert "unresolved_standard_state" in liquid_reference.status
     assert "Ni(s)" in (solid_reference.ellingham_phase_basis or "")
     assert "Ni(l)" in (liquid_reference.ellingham_phase_basis or "")
     assert liquid_reference.voltage == pytest.approx(0.386419, abs=1e-6)

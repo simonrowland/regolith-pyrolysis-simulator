@@ -2849,6 +2849,9 @@ def build_per_hour_summary(
         **_mre_ellingham_ladder_diagnostic_observables(snapshot),
         **fe_redox_split_observables,
     }
+    voltage_status = snapshot.mre_decomposition_voltage_status_by_oxide
+    if voltage_status:
+        summary["mre_decomposition_voltage_status_by_oxide"] = dict(voltage_status)
     if fe_redox_split_observables and hasattr(sim, "_stage3_fe_wt_pct_diagnostic"):
         stage3 = sim._stage3_fe_wt_pct_diagnostic()
         summary["stage_3_capture"] = {

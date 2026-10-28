@@ -19,6 +19,20 @@ from simulator.session import SimSession
 from simulator.state import CampaignPhase, EnergyRecord, MeltState, MOLAR_MASS
 
 
+def test_default_reference_metadata_refactor_pin():
+    import hashlib
+    import json
+    from engines.builtin.electrolysis_step import MRE_DECOMP_VOLTAGE_PROVENANCE
+
+    for value, digest in (
+        (MRE_DECOMP_VOLTAGE_PROVENANCE,
+         "f1c021f78ee2c59123a4c2f1ca34492458a1be74a0a288ff2f88f61beaa25f08"),
+        (mre_ladder.MRE_VOLTAGE_LADDER_FALLBACK,
+         "c819e9613adc6c0081d24c4a5d51faad6892da99497c74354ff75e73afb4864b"),
+    ):
+        assert hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest() == digest
+
+
 def _repo_setpoints() -> dict:
     repo_root = Path(__file__).resolve().parent.parent
     return yaml.safe_load((repo_root / "data" / "setpoints.yaml").read_text())
@@ -109,12 +123,12 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         0.386419,
         0.408926,
         0.804340,
-        1.118868,
+        1.059135,
         1.254731,
         1.491058,
-        1.575521,
+        1.555530,
         1.792604,
-        1.857324,
+        1.824432,
         2.208316,
     ], abs=1e-6)
     assert [entry["min_hold_hours"] for entry in sequence] == [
@@ -131,10 +145,12 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         10,
     ]
     assert sequence[1]["voltage_authority"] == "ellingham_graph"
-    assert sequence[1]["voltage_authoritative"] is True
+    assert sequence[1]["voltage_authoritative"] is False
+    assert "unresolved_standard_state" in sequence[1]["voltage_status"]
     assert sequence[5]["voltage_authority"] == "ellingham_graph"
     assert sequence[5]["voltage_authoritative"] is False
-    assert sequence[5]["voltage_status"] == mre_ladder.MRE_MN_DIAGNOSTIC_STATUS
+    assert sequence[5]["voltage_status"].startswith(mre_ladder.MRE_MN_DIAGNOSTIC_STATUS)
+    assert "unresolved_standard_state" in sequence[5]["voltage_status"]
     assert all(
         entry["voltage_authority"] == "ellingham_graph"
         for idx, entry in enumerate(sequence)
@@ -159,7 +175,7 @@ def test_unusable_mre_yaml_blocks_use_documented_fallback(setpoints):
     )
 
 
-def test_authoritative_mre_voltage_reference_matches_ellingham_graph():
+def test_mre_voltage_reference_converts_solid_ellingham_graph_to_liquid():
     cr = mre_ladder.mre_decomposition_voltage_reference(
         "Cr2O3",
         temperature_K=1873.15,
@@ -173,8 +189,8 @@ def test_authoritative_mre_voltage_reference_matches_ellingham_graph():
     assert ti is not None
     assert cr.authority == "ellingham_graph"
     assert ti.authority == "ellingham_graph"
-    assert cr.voltage == pytest.approx(1.119, abs=0.001)
-    assert ti.voltage == pytest.approx(1.576, abs=0.001)
+    assert cr.voltage == pytest.approx(1.059, abs=0.001)
+    assert ti.voltage == pytest.approx(1.556, abs=0.001)
 
     standard_oxides = [
         "FeO",
@@ -220,14 +236,13 @@ def test_authoritative_mre_voltage_reference_matches_ellingham_graph():
         "MgO",
         temperature_K=1873.15,
     )
-    assert al_low == pytest.approx(1.885517, abs=1e-6)
+    assert al_low == pytest.approx(1.849597, abs=1e-6)
     assert mg_low == pytest.approx(1.845957, abs=1e-6)
-    assert al_high == pytest.approx(1.857324, abs=1e-6)
+    assert al_high == pytest.approx(1.824432, abs=1e-6)
     assert mg_high == pytest.approx(1.792604, abs=1e-6)
     assert mg_high < al_high
 
 
-@pytest.mark.xfail(strict=True, reason="b-848: Cr2O3 liquid-standard fusion correction is missing")
 def test_cr2o3_mre_voltage_includes_fusion_correction_at_1500_c():
     ref = mre_ladder.mre_decomposition_voltage_reference(
         "Cr2O3",
@@ -239,6 +254,187 @@ def test_cr2o3_mre_voltage_includes_fusion_correction_at_1500_c():
     assert ref.voltage == pytest.approx(ref.raw_graph_voltage_V - 0.067, abs=0.001)
 
 
+@pytest.mark.parametrize(
+    ("oxide", "drop_V"),
+    [
+        ("FeO", 0.013129620),
+        ("Cr2O3", 0.089830409),
+        ("Al2O3", 0.052968901),
+        ("TiO2", 0.047013177),
+        ("SiO2", 0.002357829),
+    ],
+)
+def test_mre_liquid_standard_correction_and_metastable_notice(oxide, drop_V):
+    # Independent JANAF table-pair sweep at 1473.15 K, b848-build.md:
+    # Fe-018/019, Cr-014/015, Al-096/100, O-043/044, O-037/038.
+    ref = mre_ladder.mre_decomposition_voltage_reference(oxide, temperature_K=1473.15)
+    assert ref.raw_graph_voltage_V - ref.voltage == pytest.approx(drop_V, abs=1e-9)
+    assert ref.authoritative is False
+    assert "metastable_liquid_standard" in ref.status
+    assert "authority_level=extrapolated" in ref.status
+    assert "certified_band_K=[" in ref.status
+    # The source-frame voltage is provenance; the gate shares liquid E0.
+    assert mre_ladder._mre_raw_graph_requirement(ref, ref.voltage) == ref.voltage
+
+
+@pytest.mark.parametrize("oxide", ["FeO", "SiO2"])
+def test_already_liquid_mre_segments_need_no_fusion_correction(oxide):
+    ref = mre_ladder.mre_decomposition_voltage_reference(oxide, temperature_K=1873.15)
+    assert ref.voltage == ref.raw_graph_voltage_V
+    assert ref.status == "ok"
+
+
+def test_missing_fusion_input_refuses_without_static_fallback(monkeypatch):
+    from simulator.electrolysis import MREElectrolysisRefusal
+
+    def missing(*_args):
+        raise ValueError("Cr-015: JANAF table values are missing")
+
+    monkeypatch.setattr(mre_ladder, "janaf_fusion_energy", missing)
+    with pytest.raises(MREElectrolysisRefusal) as caught:
+        mre_ladder.mre_decomposition_voltage_reference("Cr2O3", temperature_K=1773.15)
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason == "mre_liquid_standard_missing_input"
+    assert caught.value.diagnostic["missing_input"] == "Cr-015: JANAF table values are missing"
+    assert caught.value.diagnostic["oxide"] == "Cr2O3"
+    assert caught.value.diagnostic["source"] == "NIST-JANAF"
+
+
+@pytest.mark.parametrize("temperature_K", [1100.0, 1200.0, 1300.0, 1400.0, 1405.2, 1473.15])
+def test_na_mre_uses_existing_liquid_activity_standard(temperature_K):
+    from simulator.chemistry import melt_activity
+    from simulator.physical_constants import FARADAY
+
+    ref = mre_ladder.mre_decomposition_voltage_reference("Na2O", temperature_K=temperature_K)
+    expected_g = melt_activity._na_activity_reference_standard_delta_g_kj_per_mol_o2(temperature_K)
+    assert ref.voltage == -expected_g * 1000.0 / (4.0 * FARADAY)
+    if temperature_K < 1405.2:
+        assert ref.voltage != ref.raw_graph_voltage_V
+        assert ref.authoritative is False
+        assert "metastable_liquid_standard" in ref.status
+        assert "certified_band_K=[1405.2,2600.0]" in ref.status
+    else:
+        assert ref.voltage == ref.raw_graph_voltage_V
+        assert ref.status == "ok"
+
+
+def test_na_mre_tracks_liquid_standard_owner_and_refuses_missing_input(monkeypatch):
+    from simulator.chemistry import melt_activity
+    from simulator.electrolysis import MREElectrolysisRefusal
+    from simulator.physical_constants import FARADAY
+
+    monkeypatch.setattr(melt_activity, "_na_activity_reference_standard_delta_g_kj_per_mol_o2",
+                        lambda _temperature: -400.0)
+    ref = mre_ladder.mre_decomposition_voltage_reference("Na2O", temperature_K=1200.0)
+    assert ref.voltage == 400000.0 / (4.0 * FARADAY)
+
+    def missing(_temperature):
+        raise ValueError("Na-015: JANAF liquid rows missing")
+
+    monkeypatch.setattr(melt_activity, "_na_activity_reference_standard_delta_g_kj_per_mol_o2", missing)
+    with pytest.raises(MREElectrolysisRefusal) as caught:
+        mre_ladder.mre_decomposition_voltage_reference("Na2O", temperature_K=1200.0)
+    assert caught.value.reason == "mre_liquid_standard_missing_input"
+    assert caught.value.diagnostic["oxide"] == "Na2O"
+    assert "Na-015" in caught.value.diagnostic["missing_input"]
+
+
+@pytest.mark.parametrize("campaign", [CampaignPhase.C5, CampaignPhase.MRE_BASELINE])
+@pytest.mark.parametrize("oxide,temperature_K", [("Cr2O3", 1773.15), ("Na2O", 1200.0), ("MgO", 1773.15)])
+def test_mre_voltage_notices_reach_operator_snapshot_and_report(campaign, oxide, temperature_K):
+    sim = _sim({"campaigns": {}, "mre_voltage_sequence": {"sequence": [
+        {"species": oxide, "decomposition_V": "canonical", "min_hold_hours": 0},
+    ]}})
+    sim.melt.temperature_C = temperature_K - 273.15
+    sim.melt.campaign = campaign
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = oxide
+    sim.melt.mre_max_voltage_V = 3.0
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    _seed_cleaned_melt_kg(sim, {oxide: 10.0})
+    sim._commanded_pO2_bar = lambda: 1.0
+
+    sim._step_mre()
+
+    expected = mre_ladder.mre_decomposition_voltage_reference(oxide, temperature_K=temperature_K).status
+    assert "out_of_domain:" in expected
+    assert sim._mre_decomposition_voltage_status_by_oxide == {oxide: expected}
+    snapshot = sim._make_snapshot()
+    assert snapshot.mre_decomposition_voltage_status_by_oxide == {oxide: expected}
+    summary = build_per_hour_summary(sim, snapshot)
+    assert summary["mre_decomposition_voltage_status_by_oxide"] == {oxide: expected}
+    sim._mre_decomposition_voltage_status_by_oxide.clear()
+    assert snapshot.mre_decomposition_voltage_status_by_oxide == {oxide: expected}
+
+
+def test_mre_voltage_notices_restore_on_terminal_refusal():
+    from simulator.electrolysis import MREElectrolysisRefusal, MRE_RAW_MARGIN_REFUSAL
+
+    sim = _sim({"campaigns": {}})
+    sim.melt.campaign = CampaignPhase.MRE_BASELINE
+    sim.melt.temperature_C = 1500.0
+    sim._mre_voltage_sequence = [{"voltage": 2.0, "species": ["Cr2O3"], "min_hold_hours": 0}]
+    _seed_cleaned_melt_kg(sim, {"Cr2O3": 10.0})
+    sim._mre_decomposition_voltage_status_by_oxide = {"previous": "retained"}
+    sim._commanded_pO2_bar = lambda: 1.0
+    sim._dispatch_only = lambda *_args, **_kwargs: SimpleNamespace(
+        status="refused", transition=None, diagnostic={
+            "reason_refused": MRE_RAW_MARGIN_REFUSAL,
+            "mre_decomposition_voltage_status_by_oxide": {"Cr2O3": "attempted"},
+        },
+    )
+    with pytest.raises(MREElectrolysisRefusal):
+        sim._step_mre()
+    assert sim._mre_decomposition_voltage_status_by_oxide == {"previous": "retained"}
+
+
+def test_missing_fusion_input_import_is_safe_and_provider_refuses(monkeypatch):
+    import subprocess
+    import sys
+    from simulator.electrolysis import MREElectrolysisRefusal
+    import engines.builtin.electrolysis_step as provider_module
+
+    def missing(*_args):
+        raise ValueError("Cr-015: JANAF table values are missing")
+
+    proc = subprocess.run(
+        [sys.executable, "-c", """
+import importlib
+from unittest.mock import patch
+import simulator.mre_ladder as ladder
+import engines.builtin.electrolysis_step as provider
+with patch('simulator.reference_data.janaf.janaf_fusion_energy',
+           side_effect=ValueError('Cr-015: JANAF table values are missing')):
+    importlib.reload(ladder)
+    importlib.reload(provider)
+    try:
+        ladder.mre_decomposition_voltage_reference('Cr2O3', temperature_K=1773.15)
+    except Exception as exc:
+        assert exc.terminal_refusal
+        assert exc.reason == 'mre_liquid_standard_missing_input'
+    else:
+        raise AssertionError('missing input was accepted')
+"""], capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stderr
+    monkeypatch.setattr(mre_ladder, "janaf_fusion_energy", missing)
+    request = IntentRequest(
+        intent=ChemistryIntent.ELECTROLYSIS_STEP,
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        control_inputs={"voltage_V": 3.0, "current_A": 100.0,
+                        "dt_hr": 1.0, "pO2_bar": 1.0, "allowed_oxides": ["Cr2O3"]},
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"Cr2O3": 1.0}},
+            species_formula_registry={},
+        ),
+    )
+    with pytest.raises(MREElectrolysisRefusal) as caught:
+        provider_module.BuiltinElectrolysisStepProvider().dispatch(request)
+    assert caught.value.reason == "mre_liquid_standard_missing_input"
+    assert "Cr-015" in caught.value.diagnostic["missing_input"]
+
+
 def test_mre_reference_carries_gas_phase_basis_for_mg_anchor():
     ref = mre_ladder.mre_decomposition_voltage_reference(
         "MgO",
@@ -247,7 +443,8 @@ def test_mre_reference_carries_gas_phase_basis_for_mg_anchor():
 
     assert ref is not None
     assert ref.authority == "ellingham_graph"
-    assert ref.authoritative is True
+    assert ref.authoritative is False
+    assert "unresolved_standard_state" in ref.status
     assert ref.voltage == pytest.approx(1.81928, abs=1e-5)
     assert ref.metal_product_phase == "gas"
     assert "Mg(g)" in str(ref.ellingham_phase_basis)
@@ -262,7 +459,8 @@ def test_mn_graph_voltage_is_diagnostic_for_mre_consumption():
     assert ref is not None
     assert ref.authority == "ellingham_graph"
     assert ref.authoritative is False
-    assert ref.status == mre_ladder.MRE_MN_DIAGNOSTIC_STATUS
+    assert ref.status.startswith(mre_ladder.MRE_MN_DIAGNOSTIC_STATUS)
+    assert "unresolved_standard_state" in ref.status
 
 
 def test_nio_mre_voltage_uses_phase_correct_graph_row():
@@ -271,8 +469,8 @@ def test_nio_mre_voltage_uses_phase_correct_graph_row():
     assert ref is not None
     assert ref.voltage == pytest.approx(0.386419, abs=1e-6)
     assert ref.authority == "ellingham_graph"
-    assert ref.authoritative is True
-    assert ref.status == "ok"
+    assert ref.authoritative is False
+    assert "unresolved_standard_state" in ref.status
     assert "Ni(l)" in str(ref.ellingham_phase_basis)
 
 
@@ -296,7 +494,8 @@ def test_graph_mre_voltage_refuses_extrapolated_or_nonphysical_authority(
     assert ref.voltage == pytest.approx(mre_ladder.DECOMP_VOLTAGES["FeO"])
     assert ref.authority == "ellingham_fallback"
     assert ref.authoritative is False
-    assert ref.status == status
+    assert ref.status.startswith(status)
+    assert "static_fallback_oxide_phase_unstated" in ref.status
     if temperature_K == 500.0:
         assert ref.raw_graph_voltage_V is not None
         assert ref.raw_graph_voltage_V > ref.voltage
@@ -326,7 +525,8 @@ def test_graph_mre_voltage_refuses_nonfinite_delta_g(monkeypatch):
     assert ref.voltage == pytest.approx(mre_ladder.DECOMP_VOLTAGES["FeO"])
     assert ref.authority == "ellingham_fallback"
     assert ref.authoritative is False
-    assert ref.status == "ellingham_nonfinite_refused:delta_g"
+    assert ref.status.startswith("ellingham_nonfinite_refused:delta_g")
+    assert "static_fallback_oxide_phase_unstated" in ref.status
 
 
 def test_published_ladder_former_copy_sites_resolve_from_single_source():
@@ -392,7 +592,7 @@ def test_parse_ladder_from_setpoints_matches_repo_yaml_shape():
     assert _species_names(sequence)[:3] == ["K2O", "NiO", "Na2O"]
     assert _species_names(sequence)[6:8] == ["SiO2", "TiO2"]
     assert sequence[6]["voltage"] == pytest.approx(1.491058, abs=1e-6)
-    assert sequence[7]["voltage"] == pytest.approx(1.575521, abs=1e-6)
+    assert sequence[7]["voltage"] == pytest.approx(1.555530, abs=1e-6)
 
 
 def test_max_voltage_for_target_uses_ladder_ground_truth():
@@ -403,7 +603,7 @@ def test_max_voltage_for_target_uses_ladder_ground_truth():
         abs=1e-6,
     )
     assert mre_ladder.max_voltage_for_target("TiO2", sequence) == pytest.approx(
-        1.575521,
+        1.555530,
         abs=1e-6,
     )
     assert mre_ladder.max_voltage_for_target("CaO", sequence) == pytest.approx(
@@ -589,7 +789,8 @@ def test_c5_ellingham_ladder_diagnostic_emits_and_flags_synthetic_reordering(
     class FakeSegment:
         def __init__(self, species: str):
             self.species = species
-            self.phase_basis = f"{species}(l) + O2 -> oxide; test"
+            oxide = {"Fe": "FeO", "Cr": "Cr2O3", "Si": "SiO2"}.get(species, species)
+            self.phase_basis = f"{species}(l) + O2 -> {oxide}(l); test"
 
         def delta_g_kJ_per_mol_O2(self, temperature_K: float) -> float:
             return fake_delta_g(self.species, temperature_K)
@@ -775,9 +976,10 @@ def test_c5_ladder_summary_records_non_authoritative_voltage_fallback():
     assert feo["voltage_authoritative"] is False
     assert non_authoritative["authoritative"] is False
     assert non_authoritative["authority"] == "ellingham_fallback"
-    assert non_authoritative["status"] == (
+    assert non_authoritative["status"].startswith(
         "ellingham_fallback:ellingham_nonpositive_refused:voltage"
     )
+    assert "static_fallback_oxide_phase_unstated" in non_authoritative["status"]
 
 
 def test_c5_disabled_keeps_ellingham_ladder_diagnostic_empty_in_snapshot():
@@ -794,10 +996,15 @@ def test_c5_disabled_keeps_ellingham_ladder_diagnostic_empty_in_snapshot():
     sim.melt.campaign = CampaignPhase.C5
     sim.melt.c5_enabled = False
     sim._mre_ellingham_ladder_diagnostic = {"schema": "stale"}
+    sim._mre_decomposition_voltage_status_by_oxide = {"Cr2O3": "stale"}
 
     sim._step_mre()
 
     assert sim._mre_ellingham_ladder_diagnostic == {}
+    assert sim._mre_decomposition_voltage_status_by_oxide == {}
+    snapshot = sim._make_snapshot()
+    assert snapshot.mre_decomposition_voltage_status_by_oxide == {}
+    assert "mre_decomposition_voltage_status_by_oxide" not in build_per_hour_summary(sim, snapshot)
     assert sim._make_snapshot().mre_ellingham_ladder_diagnostic == {}
 
 

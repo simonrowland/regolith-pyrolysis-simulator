@@ -6313,6 +6313,7 @@ def test_unstated_fusion_polymorph_refuses_incomplete_janaf_candidates(
         return original_points(table_id)
 
     monkeypatch.setattr(janaf, "_fusion_table_points", missing_stable_candidate)
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_table_points", missing_stable_candidate)
     experiment = F.tabulation_experiment()
     identity = _fusion_identity(
         Quantity.ENTHALPY_OF_FUSION,
@@ -6396,6 +6397,7 @@ def test_missing_nonlocal_alumina_candidate_node_refuses_stability_selection(
         return incomplete
 
     monkeypatch.setattr(janaf, "load_table_document", missing_alumina_node)
+    monkeypatch.setattr("simulator.reference_data.janaf.load_table_document", missing_alumina_node)
     janaf._fusion_table_points.cache_clear()
     janaf._janaf_pure_solid_table_temperature_range.cache_clear()
 

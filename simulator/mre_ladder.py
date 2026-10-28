@@ -10,10 +10,13 @@ from typing import Any
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_CONDENSED,
     ellingham_fit_extrapolation,
+    ellingham_fit_segments,
     ellingham_metal_phase_kind,
     ellingham_segment_for_temperature,
 )
+from simulator.chemistry import melt_activity
 from simulator.physical_constants import FARADAY
+from simulator.reference_data.janaf import janaf_fusion_energy, _fusion_table_points
 from simulator.scalar_boundary import is_declared_real_scalar
 
 # Static decomposition voltages at ~1873 K / ~1600 C (V).
@@ -61,6 +64,17 @@ MRE_DECLARED_AUTHORITY = "operator_declared"
 MRE_MN_DIAGNOSTIC_STATUS = (
     "diagnostic_reconstructed_mn_row_not_authoritative_for_mre"
 )
+
+# b-852 controller ruling: do not convert these until the gamma standard is
+# established, or until liquid Gibbs data exist. Retain values with notices.
+_UNRESOLVED_STANDARD_STATE_REASON = {
+    "MgO": "activity-coefficient standard state unresolved (b-852)",
+    "CaO": "activity-coefficient standard state unresolved (b-852)",
+    "MnO": "activity-coefficient standard state unresolved (b-852)",
+    "K2O": "liquid-oxide Gibbs data unavailable",
+    "NiO": "liquid-oxide Gibbs data unavailable",
+}
+_LIQUID_FRAME_FUSION_OXIDES = frozenset({"FeO", "Cr2O3", "Al2O3", "TiO2", "SiO2"})
 
 MRE_ELLINGHAM_METAL_BY_OXIDE = {
     "NiO": "Ni",
@@ -161,6 +175,85 @@ def mre_decomposition_voltage_reference(
                 if oxide == "MnO":
                     authoritative = False
                     status = MRE_MN_DIAGNOSTIC_STATUS
+                fusion_key = "SiO2(II)" if oxide == "SiO2" else oxide
+                try:
+                    if oxide == "Na2O" and "Na2O(l)" not in segment.phase_basis:
+                        # The activity owner includes the Na polymorph/metal
+                        # bridge; applying a second fusion correction here
+                        # would double-count it. Its dG is already kJ/mol O2:
+                        # -dG*1000/(4F) gives J/C = V, matching the graph
+                        # rail when the liquid branch is reached.
+                        liquid_delta_g = (
+                            melt_activity._na_activity_reference_standard_delta_g_kj_per_mol_o2(T_K)
+                        )
+                        voltage = -liquid_delta_g * 1000.0 / (4.0 * FARADAY)
+                        liquid_bands = [
+                            row.range_K for row in ellingham_fit_segments("Na")
+                            if "Na2O(l)" in row.phase_basis
+                        ]
+                        authoritative = False
+                        status = (
+                            "out_of_domain:metastable_liquid_standard;"
+                            "authority_level=extrapolated;"
+                            f"certified_band_K=[{min(band[0] for band in liquid_bands)},"
+                            f"{max(band[1] for band in liquid_bands)}];"
+                            "source=NaO0.5_liquid_standard"
+                        )
+                    elif (
+                        oxide in _LIQUID_FRAME_FUSION_OXIDES
+                        and f"{oxide}(l)" not in segment.phase_basis
+                    ):
+                        fusion = janaf_fusion_energy(fusion_key, T_K)
+                        # Premise: mu_l = mu_cr + dG_fus on the pure-liquid
+                        # activity standard. For n_ox mol oxide per mol O2,
+                        # dG_liq = dG_cr + n_ox*dG_fus, hence E_liq = E_cr
+                        # - n_ox*dG_fus*1000/(4F). kJ/mol oxide * mol oxide/mol
+                        # O2 * 1000 J/kJ / (4 mol e-/mol O2 * C/mol e-) = V.
+                        # Chase 1998 JANAF Cr-014/Cr-015, 1800 K: dG_fus =
+                        # -628.733 - (-666.534) = 37.801 kJ/mol, giving a
+                        # 65.297 mV drop. At the cr/l crossing the drop is zero.
+                        voltage -= (
+                            segment.n_ox * float(fusion.delta_g_fus_kJ_per_mol)
+                            * 1000.0 / (4.0 * FARADAY)
+                        )
+                        # Below the stable-liquid band, this is a metastable
+                        # liquid-standard extension, not certified liquid data.
+                        liquid_points, _ = _fusion_table_points(fusion.liquid_table)
+                        liquid_low = max(
+                            fusion.melting_temperature_K,
+                            fusion.accepted_melting_temperature_K,
+                        )
+                        if T_K < liquid_low:
+                            authoritative = False
+                            status = (
+                                "out_of_domain:metastable_liquid_standard;"
+                                "authority_level=extrapolated;"
+                                f"certified_band_K=[{liquid_low},{liquid_points[-1][0]}];"
+                                f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+                            )
+                except ValueError as exc:
+                    # Evaluation-time import: electrolysis consumes this
+                    # owner, so importing its refusal class eagerly cycles.
+                    from simulator.electrolysis import MREElectrolysisRefusal
+
+                    raise MREElectrolysisRefusal(
+                        "mre_liquid_standard_missing_input",
+                        {
+                            "oxide": oxide,
+                            "temperature_K": T_K,
+                            "source": "NIST-JANAF",
+                            "fusion_key": fusion_key,
+                            "missing_input": str(exc),
+                        },
+                    ) from exc
+                reason = _UNRESOLVED_STANDARD_STATE_REASON.get(oxide)
+                if reason is not None:
+                    authoritative = False
+                    notice = (
+                        f"out_of_domain:unresolved_standard_state:{reason};"
+                        "authority_level=unresolved;certified_band_K=none"
+                    )
+                    status = notice if status == "ok" else f"{status};{notice}"
                 return MREDecompositionVoltageReference(
                     oxide=oxide,
                     voltage=voltage,
@@ -183,12 +276,35 @@ def mre_decomposition_voltage_reference(
         temperature_K=T_K,
         authority=MRE_GRAPH_FALLBACK_AUTHORITY,
         authoritative=False,
-        status=failure_status or "ellingham_query_failed:unknown",
+        status=(
+            (failure_status or "ellingham_query_failed:unknown")
+            + ";out_of_domain:static_fallback_oxide_phase_unstated;"
+            "authority_level=unresolved;certified_band_K=none"
+        ),
         ellingham_species=metal_species,
         raw_graph_voltage_V=raw_graph_voltage_V,
         metal_product_phase=metal_product_phase or ELLINGHAM_METAL_PHASE_CONDENSED,
         ellingham_phase_basis=ellingham_phase_basis,
     )
+
+
+def _mre_raw_graph_requirement(
+    reference: MREDecompositionVoltageReference,
+    effective_requirement_V: float,
+) -> float | None:
+    """Apply the same Nernst shift to the graph and selected reference."""
+    if reference.raw_graph_voltage_V is None:
+        return None
+    # Graph E0 has already been put on the activity's liquid standard. Keep
+    # the crystalline source voltage as provenance only; putting it back into
+    # a yield gate would undo the fusion correction. The raw/fallback guard
+    # still compares graph and static E0 when a graph query was refused.
+    if (
+        reference.authority == MRE_GRAPH_AUTHORITY
+        and reference.raw_graph_voltage_V != reference.voltage
+    ):
+        return effective_requirement_V
+    return effective_requirement_V + reference.raw_graph_voltage_V - reference.voltage
 
 
 def _reference_metadata(
@@ -248,9 +364,11 @@ def _fallback_ladder(
     return tuple(entries)
 
 
-MRE_VOLTAGE_LADDER_FALLBACK = _fallback_ladder(
-    temperature_K=MRE_REFERENCE_TEMPERATURE_K,
-)
+def __getattr__(name: str):
+    # The compatibility export is evaluated only when requested, never at import.
+    if name == "MRE_VOLTAGE_LADDER_FALLBACK":
+        return _fallback_ladder(temperature_K=MRE_REFERENCE_TEMPERATURE_K)
+    raise AttributeError(name)
 
 MRE_DEFAULT_MIN_HOLD_HOURS = 3
 C5_LIMITED_MRE_CURRENT_A = 1000.0

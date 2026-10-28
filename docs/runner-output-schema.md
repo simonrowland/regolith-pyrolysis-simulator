@@ -902,6 +902,11 @@ incident, stuck, re-evaporated, and net continuous flux and has
     `_mre_uncertified_yield_observables` when
     `HourSnapshot.mre_uncertified_yield` is non-empty; a JSON-safe copy of
     that uncertified-MRE yield bookkeeping summary.
+  * `mre_decomposition_voltage_status_by_oxide` -- emitted when the MRE
+    provider reports a per-oxide decomposition-voltage status map for the
+    hour (`engines/builtin/electrolysis_step.py`): for each oxide, whether
+    the voltage is on the liquid standard state or carries a notice
+    (b-848). Absent on non-MRE hours.
   * `mre_ellingham_ladder_diagnostic` -- emitted by
      `_mre_ellingham_ladder_diagnostic_observables` when C5 ladder execution
      has a read-only, uncertified Ellingham/Nernst ladder cross-check payload.
