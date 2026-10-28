@@ -23,6 +23,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.config import load_config_bundle
 from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import (
     DECOMP_VOLTAGES,
@@ -42,12 +43,12 @@ from simulator.state import (
 from web.events import _completion_payload
 
 
-def _sim(feedstocks):
+def _sim(feedstocks, setpoints=None):
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        setpoints if setpoints is not None else {"campaigns": {}},
         feedstocks,
         {"metals": {}, "oxide_vapors": {}},
     )
@@ -300,7 +301,8 @@ def test_c2a_staged_rump_expectation_keeps_ca_and_al():
                 "label": "Oxide",
                 "composition_wt_pct": {"CaO": 40.0, "Al2O3": 60.0},
             }
-        }
+        },
+        setpoints=load_config_bundle().setpoints,
     )
     sim.load_batch("oxide", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -320,7 +322,8 @@ def test_c6_rump_expectation_treats_thermited_al_as_target():
                 "label": "Oxide",
                 "composition_wt_pct": {"CaO": 90.0, "Al2O3": 10.0},
             }
-        }
+        },
+        setpoints=load_config_bundle().setpoints,
     )
     sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"Mg": 1000.0})
     sim.start_campaign(CampaignPhase.C6)
@@ -343,9 +346,10 @@ def test_c5_branch_one_rump_expectation_honors_c5_targets():
                 "label": "Oxide",
                 "composition_wt_pct": {"CaO": 100.0},
             }
-        }
+        },
+        setpoints=load_config_bundle().setpoints,
     )
-    sim.setpoints["campaigns"]["C5"] = {"c5_targets": ["Ca"]}
+    sim.setpoints["campaigns"]["C5"]["c5_targets"] = ["Ca"]
     sim.load_batch("oxide", mass_kg=10.0)
     _enable_c5_mre(sim, target_species="CaO", max_voltage_V=2.5)
     sim.record.branch = "one"

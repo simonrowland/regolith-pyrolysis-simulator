@@ -40,7 +40,10 @@ from simulator.backends import (
     requires_stage0_subprocess,
     resolve_backend,
 )
-from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.campaigns import (
+    CampaignPressureSetpointRefusal,
+    CampaignSetpointMissingRefusal,
+)
 from simulator.chemistry.kernel import OXYGEN_SINK_CHANNEL_MODE_KEY, ProposalRejected
 from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
@@ -213,6 +216,7 @@ _RUN_REFERENCE_CANONICAL_FIELDS = (
 )
 _TYPED_PHYSICS_REFUSAL_EXCEPTION_CLASSES = (
     CampaignPressureSetpointRefusal,
+    CampaignSetpointMissingRefusal,
     CertifiedPointRefusedError,
     KnudsenRegimeRefusal,
     TransportRegimeRefusal,

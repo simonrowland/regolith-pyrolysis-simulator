@@ -59,6 +59,7 @@ from simulator.feedstock_composition import iron_oxide_values
 from simulator.campaigns import (
     CampaignManager,
     CampaignPressureSetpointRefusal,
+    CampaignSetpointMissingRefusal,
     c0_exit_run_notice,
 )
 from simulator.accounting import AccountingQueries, UnknownSpeciesError
@@ -1090,7 +1091,10 @@ class PyrolysisRun:
             session = SimSession()
             try:
                 session.start(self._session_config())
-            except CampaignPressureSetpointRefusal as exc:
+            except (
+                CampaignPressureSetpointRefusal,
+                CampaignSetpointMissingRefusal,
+            ) as exc:
                 execution = RunExecutor().execute_session(
                     session,
                     hours=int(self.hours),

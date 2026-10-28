@@ -171,7 +171,7 @@ def _simulator_shell(melt: MeltState, setpoints: dict) -> PyrolysisSimulator:
 
 
 def test_c2a_staged_c3_na_cool_cleanup_does_not_poison_reused_manager():
-    manager = CampaignManager({"campaigns": {}})
+    manager = CampaignManager(_setpoints())
     record = BatchRecord(path="A_staged")
 
     assert manager.get_next_campaign(
@@ -314,9 +314,19 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     monkeypatch.setenv("REGOLITH_DEBUG_FEEDSTOCKS", "1")
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    mre_baseline = _setpoints()["campaigns"]["mre_baseline"]
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        {
+            "campaigns": {
+                "mre_baseline": {
+                    "pO2_mbar_default": mre_baseline["pO2_mbar_default"],
+                    "p_total_mbar_default": mre_baseline[
+                        "p_total_mbar_default"
+                    ],
+                }
+            }
+        },
         load_visible_feedstocks(),
         {"metals": {}, "oxide_vapors": {}},
     )
@@ -362,9 +372,17 @@ def test_c5_step_noops_when_c5_disabled(monkeypatch):
     monkeypatch.setenv("REGOLITH_DEBUG_FEEDSTOCKS", "1")
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    c5 = _setpoints()["campaigns"]["C5"]
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        {
+            "campaigns": {
+                "C5": {
+                    "pO2_mbar_default": c5["pO2_mbar_default"],
+                    "p_total_mbar_default": c5["p_total_mbar_default"],
+                }
+            }
+        },
         load_visible_feedstocks(),
         {"metals": {}, "oxide_vapors": {}},
     )
