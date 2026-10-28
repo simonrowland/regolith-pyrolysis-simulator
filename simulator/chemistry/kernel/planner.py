@@ -668,7 +668,10 @@ class ChemistryKernel:
     def _dispatch_gate_provider_order(self, **controls) -> IntentResult:
         from simulator.melt_backend.liquidus import LiquidusSampleError
         from simulator.engine_pool import EngineWorkerTimeout
-        from simulator.reduced_real_determinism import gate_curve_provider_diagnostic_reasons
+        from simulator.reduced_real_determinism import (
+            gate_curve_provider_diagnostic_reasons,
+            gate_curve_provider_has_terminal_input,
+        )
 
         attempts = []
         order = self._registry.gate_provider_order
@@ -703,8 +706,7 @@ class ChemistryKernel:
                 'diagnostic': diagnostic,
             })
             # Missing/invalid controls remain typed terminal failures.
-            if any(reason in {'missing_input', 'invalid_input', 'invalid_fo2_log',
-                              'invalid_pressure_bar', 'non_finite_composition'} for reason in reasons):
+            if gate_curve_provider_has_terminal_input(reasons):
                 break
         if attempts:
             # Exhausting the alternate must preserve d-298/d-299's original

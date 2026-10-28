@@ -42,7 +42,7 @@ import tempfile
 import time
 import traceback
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
@@ -104,7 +104,7 @@ from simulator.melt_backend.liquidus import (
     DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
     EquilibriumCrystallizationPathResult,
     LiquidFractionPathPoint,
-    LIQUIDUS_LIQUID_EPSILON,
+    _equilibrium_path_from_cooling,
     LiquidusSampleError,
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
@@ -2298,21 +2298,14 @@ class _MELTSBackendSupport(MeltBackend):
                                  'last_completed_temperature_C': points[-1].temperature_C if points else None,
                                  'completed_rows': len(points)},
                 )
-        liquidus = next((hot.temperature_C for hot, cold in zip(points, points[1:])
-                         if cold.liquid_fraction < 1 - LIQUIDUS_LIQUID_EPSILON), None)
-        if liquidus is None:
-            return EquilibriumCrystallizationPathResult(
-                status='not_converged', diagnostics={'reason': 'liquidus_not_bracketed'},
-            )
-        diagnostics.update(solidus_bracket_C=[points[-1].temperature_C, points[-2].temperature_C],
-                           liquidus_bracket_C=[liquidus-step_C, liquidus],
-                           completed_rows=len(points), cooling_step_C=step_C)
+        bounds = _equilibrium_path_from_cooling(tuple(points), step_C=step_C)
+        if bounds.status != 'ok':
+            return bounds
+        diagnostics.update(bounds.diagnostics)
         if 'accepted, but non-optimal' in result.stdout:
             diagnostics['numerical_path_warning'] = 'accepted, but non-optimal equilibria'
-        return EquilibriumCrystallizationPathResult(
-            liquidus_T_C=liquidus, solidus_T_C=points[-1].temperature_C,
-            liquid_fraction=1, status='ok',
-            liquid_fraction_path=tuple(reversed(points)), diagnostics=diagnostics,
+        return replace(
+            bounds, diagnostics=diagnostics,
             warnings=(*path_warnings, *((diagnostics['numerical_path_warning'],)
                                       if 'numerical_path_warning' in diagnostics else ())),
         )

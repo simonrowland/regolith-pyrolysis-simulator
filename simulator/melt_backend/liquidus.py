@@ -346,6 +346,29 @@ class EquilibriumCrystallizationPathResult:
                 raise ValueError('EC status=ok requires liquid_fraction')
 
 
+def _equilibrium_path_from_cooling(
+    points: tuple[LiquidFractionPathPoint, ...],
+    *,
+    step_C: float,
+) -> EquilibriumCrystallizationPathResult:
+    """Select numerical bounds from a completed, checked descending path."""
+    liquidus = next((hot.temperature_C for hot, cold in zip(points, points[1:])
+                     if cold.liquid_fraction < 1 - LIQUIDUS_LIQUID_EPSILON), None)
+    if liquidus is None:
+        return EquilibriumCrystallizationPathResult(
+            status='not_converged', diagnostics={'reason': 'liquidus_not_bracketed'},
+        )
+    return EquilibriumCrystallizationPathResult(
+        liquidus_T_C=liquidus, solidus_T_C=points[-1].temperature_C,
+        liquid_fraction=1, status='ok', liquid_fraction_path=tuple(reversed(points)),
+        diagnostics={
+            'solidus_bracket_C': [points[-1].temperature_C, points[-2].temperature_C],
+            'liquidus_bracket_C': [liquidus-step_C, liquidus],
+            'completed_rows': len(points), 'cooling_step_C': step_C,
+        },
+    )
+
+
 def find_liquidus_solidus_by_fraction(
     sample_fraction: Callable[..., float],
     *,
