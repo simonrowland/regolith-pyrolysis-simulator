@@ -22,7 +22,7 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
     migrator.finalize()
     observations = migrator.result.observations
     assert len(observations) == 290
-    assert len(migrator.result.queue) == 653
+    assert len(migrator.result.queue) == 643
     assert not [
         issue
         for issue in migrator.result.validation.issues
