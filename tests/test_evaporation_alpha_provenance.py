@@ -517,6 +517,9 @@ def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
         "Ti": "analytical_upper_bound",
     }
 
+    # The same diagnostic replay must retain an engaged broad proxy too.
+    serialized_flux["alpha_authority_status_by_species"]["CrO2"] = "proxy/bridge"
+
     knudsen = {
         "gas_temperature_C": 1000.0,
         "carrier_gas": "N2",
@@ -554,6 +557,7 @@ def test_ca_ti_alpha_ceiling_survives_flux_serialization_replay_and_honesty():
 
     assert replay["alpha_authority_status_by_species"] == {
         "Ca": "analytical_upper_bound",
+        "CrO2": "proxy/bridge",
         "Ti": "analytical_upper_bound",
     }
     for name in species:
