@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Phase, Quantity
+from simulator.battery.enums import EvidenceClass, Phase, Quantity
 from tests.battery.factories import migrate_one_extract
 
 
@@ -32,7 +32,22 @@ def _assert_source_pins(document: dict) -> None:
         "intercept_as_printed": "9.50",
     }
     assert point["values"]["activity"] == 1.7e-8
-    assert all(row["locator"]["page"] == 6 for row in (*contexts, *observations))
+    assert [row["locator"]["page"] for row in contexts] == [5, 5]
+    assert [row["locator"]["page"] for row in observations] == [6]
+    assert [row["locator"]["published_page"] for row in (*contexts, *observations)] == [1897, 1897, 1898]
+    assert point["locator"]["section"] == "VI. Results for the Sodium Oxide Activity"
+    assert point["values"]["evidence_class"] == "measured_tabulated"
+    assert "attribution" not in point["values"]
+    assert "Ka = exp(-78616/T + 28.195)" in point["values"]["derivation_as_published"]
+    assert point["point_conditions"]["pO2_Pa"]["state"]["value"] == 33000
+    assert point["point_conditions"]["pSO2_Pa"]["state"]["value"] == 66600
+    assert contexts[0]["values"]["standard_state_as_published"].endswith("PDF p. 1 / published p. 1893, §II).")
+    assert [row["values"]["temperature_range_K_as_published"] for row in contexts] == [
+        "between about 1600 and 1800 K",
+        "between about 1600 and 1800 K",
+    ]
+    assert point["values"]["estimated_error_component_1_as_published"] == "15-20 %"
+    assert point["values"]["estimated_error_component_2_as_published"] == "15 %"
     assert [row["observation_id"] for row in (*contexts, *observations)] == [
         "beerkens_2003_model_glass_activity_temperature_fit",
         "beerkens_2003_float_glass_activity_temperature_fit",
@@ -71,10 +86,15 @@ def test_beerkens_activity_identity_survives_isolated_migration() -> None:
     assert scalar.identity.species.phase.value is Phase.L
     assert scalar.value.point == Decimal("1.7E-8")
     assert scalar.value.approximate
+    assert scalar.evidence.class_.value is EvidenceClass.MEASURED_TABULATED
+    assert scalar.point_conditions["pO2_Pa"].state.value == Decimal("33000")
+    assert scalar.point_conditions["pSO2_Pa"].state.value == Decimal("66600")
     assert scalar.identity.temperature_K.is_value
     assert scalar.identity.temperature_K.value == Decimal("1673")
     assert scalar.identity.composition.is_value
-    assert Decimal("0.12") < dict(scalar.identity.composition.value.components)["Na2O"] < Decimal("0.13")
+    assert dict(scalar.identity.composition.value.components)["Na2O"] == Decimal(
+        "0.1297636248391307182437973734"
+    )
     assert migrator.result.validation.hard_issues == ()
     assert sum(len(rows) for rows in migrator.result.context_by_work.values()) == 2
     assert all(row.identity.quantity.is_value for row in migrator.result.observations.values())

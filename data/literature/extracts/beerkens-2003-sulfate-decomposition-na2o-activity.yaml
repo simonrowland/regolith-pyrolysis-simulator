@@ -16,25 +16,25 @@ fidelity_samples:
     value:
       inverse_temperature_coefficient_as_printed: '-43552'
       intercept_as_printed: '8.33'
-    locator: {page: 6, published_page: 1898, section: 'VI. Results for the Sodium Oxide Activity'}
+    locator: {page: 5, published_page: 1897, section: 'VI. Results for the Sodium Oxide Activity'}
   - species: Na2O
     observation_id: beerkens_2003_float_glass_activity_temperature_fit
     field: fit
     value:
       inverse_temperature_coefficient_as_printed: '-46000'
       intercept_as_printed: '9.50'
-    locator: {page: 6, published_page: 1898, section: 'VI. Results for the Sodium Oxide Activity'}
+    locator: {page: 5, published_page: 1897, section: 'VI. Results for the Sodium Oxide Activity'}
   - species: Na2O
     observation_id: beerkens_2003_float_glass_activity_at_1673K
     field: activity
     value: 1.7e-8
-    locator: {page: 6, published_page: 1898, section: 'VII. Discussion'}
+    locator: {page: 6, published_page: 1898, section: 'VI. Results for the Sodium Oxide Activity'}
 species:
   Na2O:
     context:
       - observation_id: beerkens_2003_model_glass_activity_temperature_fit
         type: thermodynamic_example
-        locator: {page: 6, published_page: 1898, section: 'VI. Results for the Sodium Oxide Activity'}
+        locator: {page: 5, published_page: 1897, section: 'VI. Results for the Sodium Oxide Activity'}
         units: dimensionless activity; T in K
         values:
           quantity: fitted Na2O activity as a function of temperature
@@ -44,11 +44,11 @@ species:
             intercept_as_printed: '8.33'
           equation_as_published: a(Na2O) = exp(-43552/T + 8.33)
           melt_composition_as_published: model glass, SiO2-Na2O-CaO (74-16-10 wt%)
-          temperature_range_K_as_published: 'about 1600-1800'
-          standard_state_as_published: Pure Na2O in its most stable phase at the same temperature.
+          temperature_range_K_as_published: between about 1600 and 1800 K
+          standard_state_as_published: Pure Na2O in its most stable phase at the same temperature (PDF p. 1 / published p. 1893, §II).
       - observation_id: beerkens_2003_float_glass_activity_temperature_fit
         type: thermodynamic_example
-        locator: {page: 6, published_page: 1898, section: 'VI. Results for the Sodium Oxide Activity'}
+        locator: {page: 5, published_page: 1897, section: 'VI. Results for the Sodium Oxide Activity'}
         units: dimensionless activity; T in K
         values:
           quantity: fitted Na2O activity as a function of temperature
@@ -58,27 +58,33 @@ species:
             intercept_as_printed: '9.50'
           equation_as_published: a(Na2O) = exp(-46000/T + 9.50)
           melt_composition_as_published: float glass; exact composition not restated with this fit
-          temperature_range_K_as_published: 'about 1600-1800'
-          standard_state_as_published: Pure Na2O in its most stable phase at the same temperature.
+          temperature_range_K_as_published: between about 1600 and 1800 K
+          standard_state_as_published: Pure Na2O in its most stable phase at the same temperature (PDF p. 1 / published p. 1893, §II).
     observations:
       - observation_id: beerkens_2003_float_glass_activity_at_1673K
         type: activity_coefficient
-        locator: {page: 6, published_page: 1898, section: 'VII. Discussion'}
+        locator: {page: 6, published_page: 1898, section: 'VI. Results for the Sodium Oxide Activity'}
         T_K: '1673'
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
-          attribution: Beerkens et al. (2003), this study
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
           activity: 1.7e-8
           approximate: true
           printed_activity_as_published: about 1.7 × 10^-8
-          derivation_as_published: Derived from sulfate-decomposition equilibrium data and the sulfate-saturated melt results using the known Ka value.
+          derivation_as_published: 'Using Eq. (15), a(Na2O) = Ka × Rc / (p(SO2) × p(O2)^0.5), with Ka from Eq. (3): Ka = exp(-78616/T + 28.195) (T in K). The printed inputs are a(Na2SO4) = 1, p(SO2) = 0.666 bar, and p(O2) = 0.33 bar.'
           estimated_maximum_error_as_published: 30%-40%
-          derivation_inputs: Not linked as parent observations in this activity-only extract.
+          estimated_error_component_1_as_published: 15-20 %
+          estimated_error_component_2_as_published: 15 %
           composition_role: datum_state
           composition_mass_percent: {SiO2: '72.2', Na2O: '13.4', CaO: '9.5', MgO: '2.2', Al2O3: '1.5', K2O: '0.9'}
         point_conditions:
+          pO2_Pa:
+            state: {tag: value, value: 33000}
+            locator: {page: 6, published_page: 1898, section: 'VI. Results for the Sodium Oxide Activity', note: 'p(O2) = 0.33 bar as printed; converted to Pa.'}
+          pSO2_Pa:
+            state: {tag: value, value: 66600}
+            locator: {page: 6, published_page: 1898, section: 'VI. Results for the Sodium Oxide Activity', note: 'p(SO2) = 0.666 bar as printed; converted to Pa.'}
           composition:
             state: {tag: value, value: {basis: oxide_weight_percent_as_published, amount_basis: mass_percent, components: [[SiO2, '72.2'], [Na2O, '13.4'], [CaO, '9.5'], [MgO, '2.2'], [Al2O3, '1.5'], [K2O, '0.9']]}}
             locator: {page: 4, published_page: 1896, note: 'Float-glass composition reported on p. 1896; the activity is for float glass.'}
