@@ -1396,6 +1396,62 @@ def test_minimal_extract_valid():
     assert errs == []
 
 
+def test_itoh_yokokawa_1984_absolute_activity_render_pins_and_migrates(
+    tmp_path: Path,
+) -> None:
+    """Eq. (5)'s printed log activity stays typed-refused without exponentiation."""
+    from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.migrate import to_plain
+
+    name = "itoh-yokokawa-1984-sodium-activity-nas.yaml"
+    source = EXTRACTS / name
+    doc = yaml.safe_load(source.read_text(encoding="utf-8"))
+    observations = doc["species"]["Na2O"]["observations"]
+    assert len(observations) == 1
+    row = observations[0]
+    assert row["values"]["log10_activity_as_published"] == "-9.0"
+    assert row["values"]["T_K"] == "1300"
+    assert row["values"]["point_conditions"]["composition"]["state"]["value"][
+        "components"
+    ] == [["Na2O", "0.33"], ["SiO2", "0.67"]]
+    assert row["standard_state"]["state"]["value"]["endmember"]["formula"] == "Na2O"
+    assert row["standard_state"]["state"]["value"]["endmember"]["phase"]["value"] == "cr"
+    assert row["values"]["admission_status"] == "typed_refusal"
+    assert "no log10-activity value token" in row["values"]["reason"] or (
+        "accept linear activity only" in row["values"]["reason"]
+    )
+    assert row["values"]["point_conditions"]["total_pressure_Pa"]["state"]["tag"] == "unknown"
+    assert row["values"]["point_conditions"]["fO2_log"]["state"]["tag"] == "unknown"
+    sample = doc["fidelity_samples"][0]
+    assert not vle.check_fidelity_sample_matches(doc, sample)
+    mutated = copy.deepcopy(doc)
+    mutated["species"]["Na2O"]["observations"][0]["values"][
+        "log10_activity_as_published"
+    ] = "-9.1"
+    assert "mismatch" in " ".join(vle.check_fidelity_sample_matches(mutated, sample))
+
+    result = _migrate_real_extract(tmp_path, name, extract_doc=doc)
+    assert len(result.observations) == 1
+    migrated = to_plain(next(iter(result.observations.values())))
+    assert migrated["identity"]["quantity"]["value"] == "activity"
+    assert migrated["admission"]["status"] == "rejected"
+    assert migrated["value"]["kind"] == "unavailable"
+    assert migrated["identity"]["temperature_K"]["value"] == "1300"
+    assert migrated["identity"]["composition"]["tag"] == "value"
+    assert dict(migrated["identity"]["composition"]["value"]["components"]) == {
+        "Na2O": "0.33",
+        "SiO2": "0.67",
+    }
+    reference_state = migrated["identity"]["reference_state"]
+    assert reference_state["tag"] == "value"
+    assert reference_state["value"]["convention"] == "raoultian_pure_endmember"
+    assert reference_state["value"]["endmember"]["formula"] == "Na2O"
+    assert migrated["identity"]["total_pressure_Pa"]["tag"] == "unknown"
+    assert migrated["identity"]["fO2_Pa"]["tag"] == "unknown"
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+
+
 @pytest.mark.parametrize(
     ("numerator", "denominator", "basis"),
     [
