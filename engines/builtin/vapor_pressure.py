@@ -2902,6 +2902,26 @@ def require_antoine_source_certified_temperature(
     )
 
 
+def _antoine_source_temperature_notice(species, row, coefficient_block, temperature_K, *, consumer):
+    """Retain the strict source-band diagnostic while allowing finite fits."""
+    try:
+        require_antoine_source_certified_temperature(
+            species, row, coefficient_block, temperature_K, consumer=consumer,
+        )
+    except VaporPressureRangeError as exc:
+        band = (
+            vapor_pressure_source_equation_range_K(row, coefficient_block, temperature_K=temperature_K)
+            or vapor_pressure_valid_range_K(row, coefficient_block, temperature_K=temperature_K)
+            or row["total_source_certified_range_K"]
+        )
+        return _vapor_pressure_temperature_extrapolation_notice(
+            temperature_K=temperature_K,
+            valid_range_K=band,
+            reason=str(exc),
+        )
+    return None
+
+
 def _require_finite_vapor_value(
     value: float,
     *,
@@ -3307,32 +3327,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         vapor_pressure_authority_limits[species] = (
                             reconstructed_vapor_limit
                         )
-                certified_range = _range_tuple(
-                    antoine.get("source_certified_range_K")
-                    or sp_data.get("source_certified_range_K")
-                )
-                if (
-                    str(sp_data.get("extrapolation_policy", "")).lower()
-                    == "refuse"
-                    and certified_range is not None
-                    and T_K < certified_range[0]
-                ):
-                    warnings.append(
-                        "metal_vapor_pressure_out_of_source_certified_range: "
-                        f"species={species} consumer=builtin_condensed_rail "
-                        f"temperature_K={T_K:.3f} "
-                        "source_certified_range_K="
-                        f"[{certified_range[0]:g}, {certified_range[1]:g}]"
-                    )
-                    continue
                 if reconstructed_vapor_limit is None:
-                    require_antoine_source_certified_temperature(
-                        species,
-                        sp_data,
-                        coefficient_block,
-                        T_K,
+                    source_notice = _antoine_source_temperature_notice(
+                        species, sp_data, coefficient_block, T_K,
                         consumer="builtin_condensed_rail",
                     )
+                    if source_notice is not None:
+                        metal_extrapolations[species] = source_notice
+                        warnings.append(source_notice["reason"])
                     valid_range = (
                         compiled_reference_evaluator.valid_temperature_K
                         if compiled_reference_evaluator is not None
@@ -3346,7 +3348,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         valid_low = float(valid_range[0])
                         valid_high = float(valid_range[1])
                         if T_K < valid_low or T_K > valid_high:
-                            metal_extrapolations[species] = (
+                            metal_extrapolations.setdefault(species,
                                 _vapor_pressure_temperature_extrapolation_notice(
                                     temperature_K=T_K,
                                     valid_range_K=(valid_low, valid_high),
@@ -4002,6 +4004,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="P_eq_Pa",
             )
+            if species in metal_extrapolations:
+                metal_extrapolations[species]["computed_pressure_Pa"] = P_eq_Pa
             if _publishes_vapor_pressure(
                 P_eq_Pa,
                 retain_subthreshold=retain_high_t_openimcc_carriers,

@@ -361,7 +361,7 @@ def test_internal_analytical_noncertifying_pseudo_fallback_is_typed(
     assert result.diagnostics["silent_zero_notes"] == sim._silent_zero_notes
 
 
-def test_internal_analytical_source_certified_range_refusal_is_typed(
+def test_internal_analytical_source_range_continues_but_missing_activity_refuses(
     monkeypatch,
 ):
     from engines.builtin.vapor_pressure import FIT_TARGET_PSEUDO_VAPOROCK
@@ -384,9 +384,12 @@ def test_internal_analytical_source_certified_range_refusal_is_typed(
     assert result.vapor_pressures_Pa == {}
     note, = result.diagnostics["silent_zero_notes"]
     assert note["species"] == "Mg"
-    assert note["zero_because"] == ZeroBecause.REFUSED_UPSTREAM.value
+    assert note["zero_because"] == ZeroBecause.MISSING_ACTIVITY.value
     assert note["doctrine_category"] == CATEGORY_REFUSE
-    assert note["field"] == "source_certified_range_K"
+    assert note["field"] == "oxide_activity"
+    notice = result.diagnostics["extrapolated_beyond_valid_range_K"]["Mg"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["certified_band"] == {"temperature_K": (1100., 1200.)}
     assert any(
         warning.startswith("metal_vapor_pressure_out_of_source_certified_range:")
         for warning in result.warnings

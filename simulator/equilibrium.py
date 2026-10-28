@@ -377,6 +377,7 @@ class EquilibriumMixin:
             FIT_TARGET_STANDARD_REACTION,
             GAS_RAIL_STANDARD_REACTION_KEY,
             RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY,
+            _antoine_source_temperature_notice,
             _gas_rail_standard_reaction_block,
             _is_noncertifying_pseudo_vapor_pressure_runtime,
             _liquid_oxide_standard_reaction_block,
@@ -387,6 +388,7 @@ class EquilibriumMixin:
             _range_tuple,
             _require_finite_vapor_value,
             _standard_reaction_pressure_Pa,
+            _vapor_pressure_temperature_extrapolation_notice,
             physical_melt_dissociation_pO2_bar,
             reject_noncertifying_vapor_pressure_row,
             require_antoine_source_certified_temperature,
@@ -804,42 +806,14 @@ class EquilibriumMixin:
                         vapor_pressure_authority_limits[species] = (
                             reconstructed_vapor_limit
                         )
-                certified_range = (
-                    antoine.get("source_certified_range_K")
-                    or sp_data.get("source_certified_range_K")
-                )
-                if (
-                    str(sp_data.get("extrapolation_policy", "")).lower()
-                    == "refuse"
-                    and isinstance(certified_range, (list, tuple))
-                    and len(certified_range) == 2
-                    and T_K < float(certified_range[0])
-                ):
-                    omission_notice = (
-                        "metal_vapor_pressure_out_of_source_certified_range: "
-                        f"species={species} consumer=legacy_condensed_rail "
-                        f"temperature_K={T_K:.3f} "
-                        "source_certified_range_K="
-                        f"[{float(certified_range[0]):g}, "
-                        f"{float(certified_range[1]):g}]"
-                    )
-                    warnings.append(omission_notice)
-                    _sz_omit(
-                        species,
-                        ZeroBecause.REFUSED_UPSTREAM,
-                        field='source_certified_range_K',
-                        detail=omission_notice,
-                        category=CATEGORY_REFUSE,
-                    )
-                    continue
                 if reconstructed_vapor_limit is None:
-                    require_antoine_source_certified_temperature(
-                        species,
-                        sp_data,
-                        coefficient_block,
-                        T_K,
+                    source_notice = _antoine_source_temperature_notice(
+                        species, sp_data, coefficient_block, T_K,
                         consumer="legacy_condensed_rail",
                     )
+                    if source_notice is not None:
+                        metal_extrapolations[species] = source_notice
+                        warnings.append(source_notice["reason"])
                     valid_range = (
                         compiled_reference_evaluator.valid_temperature_K
                         if compiled_reference_evaluator is not None
@@ -851,10 +825,11 @@ class EquilibriumMixin:
                         valid_low = float(valid_range[0])
                         valid_high = float(valid_range[1])
                         if T_K < valid_low or T_K > valid_high:
-                            metal_extrapolations[species] = {
-                                'temperature_K': T_K,
-                                'valid_range_K': (valid_low, valid_high),
-                            }
+                            metal_extrapolations.setdefault(species,
+                                _vapor_pressure_temperature_extrapolation_notice(
+                                    temperature_K=T_K, valid_range_K=(valid_low, valid_high),
+                                    reason='metal_vapor_pressure_out_of_validated_range',
+                                ))
                             warnings.append(
                                 f"{species} metal Antoine fit extrapolated beyond "
                                 f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
@@ -1339,6 +1314,8 @@ class EquilibriumMixin:
                 field="P_effective_Pa",
             )
 
+            if species in metal_extrapolations:
+                metal_extrapolations[species]["computed_pressure_Pa"] = P_effective_Pa
             if P_effective_Pa > 1e-15:
                 vapor_pressures[species] = P_effective_Pa
                 ellingham_limit = ellingham_extrapolations.get(species)
@@ -1562,6 +1539,7 @@ class EquilibriumMixin:
                 'component_basis': 'raoultian_pure_endmember',
             },
             'activity_provenance': activity_provenance,
+            'extrapolated_beyond_valid_range_K': metal_extrapolations,
             'a_FeO_calphad': feo_activity_diagnostic,
             'ellingham_authority': ellingham_authority_diagnostic(
                 ellingham_extrapolations,
