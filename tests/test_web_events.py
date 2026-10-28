@@ -2650,9 +2650,14 @@ def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch
         state, _ = _current_simulation_state(new_sids.pop())
         assert state is not None
         sim = state["session"].simulator
-        assert sim.campaign_mgr.furnace_max_T_C == pytest.approx(1200)
+        from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
+
+        assert sim.campaign_mgr.furnace_max_T_C == FURNACE_MAX_T_BOUNDS_C[0]
         assert state["recipe_inputs"]["furnace_material_id"] == "fused_silica"
-        assert state["recipe_inputs"]["furnace_max_T_C"] == pytest.approx(1200)
+        assert (
+            state["recipe_inputs"]["furnace_max_T_C"]
+            == FURNACE_MAX_T_BOUNDS_C[0]
+        )
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
