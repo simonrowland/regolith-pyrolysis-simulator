@@ -1,0 +1,223 @@
+source_id: shornikov-2018-spinel-solid-solutions
+source:
+  citation: >-
+    Shornikov, S. I. (2018). Mass Spectrometry Study of the Thermodynamic
+    Properties of Spinel Solid Solutions. Russian Journal of Physical Chemistry A,
+    92(8), 1447–1456.
+  doi: 10.1134/S0036024418080253
+  year: 2018
+  corpus_asset: raw/shornikov-2018-spinel-solid-solutions/shornikov-2018-spinel-solid-solutions.pdf
+extraction:
+  method: MinerU and pdftotext transcription, reconciled with page renders for flagged cells
+  date: '2026-10-28'
+  worker: w1028cond-shor18cond
+review_status: draft
+experiment_conditions:
+  - key: method
+    state:
+      tag: value
+      value: knudsen_effusion
+    locator:
+      page: 4
+      published_page: 1450
+      section: Experimental
+  - key: sample.container
+    state:
+      tag: value
+      value: molybdenum cell
+    locator:
+      page: 4
+      published_page: 1450
+      section: Experimental
+  - key: sample.initial_composition
+    state:
+      tag: value
+      value:
+        basis: stoichiometric MgAl2O4 oxide components
+        amount_basis: mole_fraction
+        components:
+          - [MgO, '0.5']
+          - [Al2O3, '0.5']
+    locator:
+      page: 4
+      published_page: 1450
+      section: Experimental
+      note: Stoichiometric MgAl2O4, linked as the starting charge.
+  - key: pressure_environment.total_pressure_Pa
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 4
+      published_page: 1450
+      section: Experimental
+      note: No total or ambient pressure is reported.
+  - key: pressure_environment.sweep_gas
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 4
+      published_page: 1450
+      section: Experimental
+      note: No sweep or carrier gas is stated.
+  - key: thermal_schedule.total_duration_s
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 4
+      published_page: 1450
+      section: Experimental
+      note: Stationary evaporation is stated but no run duration is reported.
+  - key: apparatus.geometry.orifice_diameter_m
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 5
+      published_page: 1451
+      section: Results
+      note: The orifice is discussed but its diameter is not reported.
+tables:
+  - page: 6
+    published_page: 1452
+    table: '1'
+    table_index: 1
+    draft_key: p006-t01
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: quoted_attributed
+    attribution: "Shornikov and Yakovlev (2018), Table 1 (authors' KEMS results)"
+    unit: atm
+    phase: gas
+    per: mol_species
+    experiment: shornikov_2018_mo_cell_kems
+    method: Hertz–Knudsen relation, Eqs. (17)–(18)
+    rows: all
+    temperature:
+      value: 2100
+      unit: K
+    row_axis:
+      column: 1
+      quantity: Al2O3 mole percent as printed
+      binary_composition_basis: MgO–Al2O3
+    conditions:
+      - key: pressure_kind
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          published_page: 1450
+          section: Experimental
+          note: The paper identifies KEMS in a molybdenum cell but does not identify vacuum, chamber background, carrier gas, or a total-pressure category.
+      - key: fO2_Pa
+        source: Table 1 column 8, matched by x_Al2O3
+        note: The Table 1 pO2 output row keeps fO2 unknown to avoid self-conditioning.
+      - key: composition
+        source: Table 1 column 1
+        note: MgO is the printed binary complement to x_Al2O3.
+    values:
+      - {column: 2, species: Mg}
+      - {column: 3, species: MgO}
+      - {column: 4, species: Al}
+      - {column: 5, species: AlO}
+      - {column: 6, species: Al2O}
+      - {column: 7, species: O}
+      - {column: 8, species: O2}
+      - {column: 9, species: MgAlO}
+    evidence_note: >-
+      The pressure values are reduced from integrated ion-current inputs using
+      Eqs. (17)–(18); those raw current inputs are not tabulated, so the stored
+      author results are attributed rather than presented as reductions with
+      unstored parents.
+  - page: 6
+    published_page: 1452
+    table: '2'
+    table_index: 2
+    draft_key: p006-t02
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: model_derived
+    unit: atm
+    phase: gas
+    per: mol_species
+    rows: all
+    temperature:
+      value: 2100
+      unit: K
+    row_axis:
+      column: 1
+      quantity: Al2O3 mole percent as printed
+    values:
+      - column: 2
+        species: O
+        equation: Eqs. (22)–(23)
+        stored_in_extract: true
+      - column: 3
+        species: O
+        equation: Eq. (28)
+        stored_in_extract: false
+      - column: 4
+        species: O
+        equation: Eq. (29)
+        stored_in_extract: false
+      - column: 5
+        species: O
+        equation: Eq. (30)
+        stored_in_extract: false
+      - column: 6
+        species: O
+        equation: Eq. (31)
+        stored_in_extract: false
+    conditions:
+      - key: fO2_Pa
+        source: Table 1 pO2 matched by x_Al2O3, not the calculated Table 2 pressures
+      - key: pressure_kind
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          published_page: 1450
+          section: Experimental
+          note: The paper identifies KEMS in a molybdenum cell but does not identify vacuum, chamber background, carrier gas, or a total-pressure category.
+  - page: 8
+    published_page: 1454
+    table: '3'
+    table_index: 3
+    draft_key: p008-t03
+    type: activity
+    quantity: activity
+    unit: dimensionless
+    phase: cr
+    rows: all
+    temperature:
+      value: 2100
+      unit: K
+    row_axis:
+      column: 1
+      quantity: Al2O3 mole percent as printed
+    values:
+      - {column: 2, species: MgO, equation: Eq. (27), evidence_class: measured_reduced}
+      - {column: 3, species: MgO, equation: Eq. (41), evidence_class: measured_reduced}
+      - {column: 4, species: Al2O3, equation: Eq. (28), evidence_class: measured_reduced}
+      - {column: 5, species: Al2O3, equation: Eq. (29), evidence_class: measured_reduced}
+      - {column: 6, species: Al2O3, equation: Eq. (42), evidence_class: measured_reduced}
+    conditions:
+      - key: fO2_Pa
+        source: Table 1 pO2 matched by x_Al2O3
+      - key: pressure_kind
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          published_page: 1450
+          section: Experimental
+          note: The paper identifies KEMS in a molybdenum cell but does not identify vacuum, chamber background, carrier gas, or a total-pressure category.
+render_verified:
+  - {page: 8, table: '3', row: 3, column: 3, printed: '3.50 × 10^-1*', value: '3.50 × 10^-1'}
+  - {page: 8, table: '3', row: 14, column: 5, printed: '1.00*', value: '1.00'}
+  - {page: 8, table: '3', row: 14, column: 6, printed: '1.00*', value: '1.00'}
