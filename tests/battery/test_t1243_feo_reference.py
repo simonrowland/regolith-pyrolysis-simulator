@@ -9,6 +9,7 @@ write the battery store.
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import replace
 from decimal import Decimal
 from functools import lru_cache
@@ -517,12 +518,12 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
 
 
 def test_distin_activity_refuses_without_source_oxygen_potential(migration) -> None:
-    """d-305: keep all 24 Distin rows refused until t-1571 can score them.
+    """Pin the pre-change refusal for a Distin row without the Fe buffer condition.
 
     Table I prints FeO, Fe2O3, SiO2 and an oxygen-in-metal activity ratio,
-    but no fO2. Fixing fO2 or dropping Fe2O3 would be an unruled derivation;
-    scoring needs an engine that imposes Fe-metal saturation and solves fO2
-    and a_FeO jointly from the full bulk composition.
+    but no fO2. With the explicit Fe-metal saturation condition removed, the
+    pre-change activity request still refuses rather than treating the
+    measured activity as an imposed oxygen potential.
     """
     observation = next(
         row
@@ -534,6 +535,7 @@ def test_distin_activity_refuses_without_source_oxygen_potential(migration) -> N
         observation, engine=Engine.INTERNAL_ANALYTICAL
     )
     experiment = migration.experiments[converted.experiment_id]
+    experiment = replace(experiment, fO2_control=None)
     generated = activity_request_for_engine(
         experiment, converted, Engine.INTERNAL_ANALYTICAL.value
     )
@@ -557,6 +559,42 @@ def test_distin_activity_refuses_without_source_oxygen_potential(migration) -> N
     assert refusal.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert refusal.refusal_detail["reason"] == "missing_evidence"
     assert refusal.refusal_detail["gaps"][0]["waypoint"] == "oxygen_condition"
+
+
+def test_pinned_openimcc_closed_redox_is_invariant_to_added_fe(migration) -> None:
+    redox = pytest.importorskip("openimcc.redox")
+    from simulator.accounting.formulas import parse_formula
+    from simulator.melt_backend.openimcc_bridge import imported_openimcc_commit
+
+    assert imported_openimcc_commit() == "66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"
+    observation = next(
+        row
+        for row in _feo_rows(migration)
+        if row.source_id == _DISTIN
+        and row.observation_id.endswith("distin1971_t1_1880_1_4")
+    )
+    identity = observation.identity
+    assert identity.composition is not None and identity.composition.is_value
+    composition = identity.composition.value
+    inventory: dict[str, float] = {}
+    for oxide, amount in composition.components:
+        formula = parse_formula(oxide, species=oxide)
+        for element, atom_moles in formula.atom_moles(float(amount)).items():
+            inventory[element] = inventory.get(element, 0.0) + atom_moles
+
+    activities = []
+    for excess_fe_mol in (0.5, 1.0, 2.0):
+        closed_inventory = dict(inventory)
+        closed_inventory["Fe"] = closed_inventory.get("Fe", 0.0) + excess_fe_mol
+        result = redox.evaluate_redox(
+            closed_inventory, float(temperature_of(identity)), "closed"
+        )
+        assert result.metal_buffered is True
+        activity = float(result.parent_activity["FeO"])
+        assert math.isfinite(activity) and activity > 0.0
+        activities.append(activity)
+
+    assert max(activities) - min(activities) <= 1e-10
 
 
 def _fingerprint(residual) -> tuple:
