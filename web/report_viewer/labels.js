@@ -70,7 +70,7 @@
     if (totalKg < 0) return null;
     if (totalKg === 0) return "empty";
     if (totalKg > 0 && totalKg < 0.01) return "trace (<0.01 kg)";
-    return fmtNum(totalKg, "kg");
+    return null;
   }
 
   function exactValue(value, unit = "") {

@@ -144,7 +144,9 @@ def test_stage_purity_panel_renders_emitted_grade_breakdowns_and_activity() -> N
     assert "Condenser stage purity" not in html
     assert "Stage 1" in html
     assert "Iron condenser" in html
-    assert _headline_value(html, "Total classified product mass") == "1.271 kg"
+    assert 'title="1.271 kg">1.271 kg' in _headline_value(
+        html, "Total classified product mass"
+    )
     assert _headline_value(html, "Purity fraction") == "0.9992"
     assert "MIXED" in html
     assert "trace · &lt;0.01 kg total" not in _verdict_line(html)

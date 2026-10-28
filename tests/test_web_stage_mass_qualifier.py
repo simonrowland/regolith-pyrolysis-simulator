@@ -76,7 +76,7 @@ def _visible(markup: str) -> str:
     return " ".join(unescape(re.sub(r"<[^>]+>", " ", markup)).split())
 
 
-def _stage_mass_outputs(surfaces: dict[str, str]) -> tuple[str, str, str]:
+def _stage_mass_markup(surfaces: dict[str, str]) -> tuple[str, str, str]:
     overview = re.search(
         r'<td class="num">(.*?)</td><td class="num">', surfaces["overview"], re.DOTALL
     )
@@ -91,7 +91,11 @@ def _stage_mass_outputs(surfaces: dict[str, str]) -> tuple[str, str, str]:
         re.DOTALL,
     )
     assert overview and p4 and p15
-    return tuple(_visible(match.group(1)) for match in (overview, p4, p15))
+    return tuple(match.group(1) for match in (overview, p4, p15))
+
+
+def _stage_mass_outputs(surfaces: dict[str, str]) -> tuple[str, str, str]:
+    return tuple(_visible(markup) for markup in _stage_mass_markup(surfaces))
 
 
 def test_stage_mass_qualifier_is_consistent_across_surfaces() -> None:
@@ -104,3 +108,16 @@ def test_stage_mass_qualifier_is_consistent_across_surfaces() -> None:
     for total, surfaces in rendered.items():
         assert _stage_mass_outputs(surfaces) == (expected[total],) * 3
     assert "backend's empty-stage classification" in _visible(rendered[0.0]["p15"])
+
+
+def test_ordinary_stage_mass_keeps_surface_format_and_exact_value_access() -> None:
+    total = 0.013945179804933578
+    surfaces = _render_surfaces(total)
+
+    assert _stage_mass_outputs(surfaces) == (
+        "0.0139 kg",
+        "0.01395 kg",
+        "0.01395 kg",
+    )
+    tooltip = f'title="{total} kg"'
+    assert all(tooltip in markup for markup in _stage_mass_markup(surfaces))
