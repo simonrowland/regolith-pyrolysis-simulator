@@ -1491,8 +1491,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         transition and fails closed (see the module "Authority posture"
         note).  The result is only meaningful to a shadow comparator.
 
-        On library error returns an empty result with a warning rather
-        than raising.
+        On ordinary library errors returns an empty result with a warning.
+        Compute timeouts raise ``_LiquidusFinderBudgetExceeded`` so callers
+        cannot treat an unfinished solve as a completed alternate result.
         """
         # The subprocess bridge has no Python module (the binary is the
         # bridge); the other bridges do.  Either way the backend must be
@@ -1680,13 +1681,19 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     # Slot contention is transient; retry once with the same
                     # bounded slot guard before reporting the timeout.
                     timeout_retry_used = True
-        except EngineWorkerTimeout:
-            # A hang is a control-plane event, not an equilibrium refusal.
-            # The pool has already killed the slot; preserve the typed signal
-            # so the caller can retry while the next call respawns it.
-            raise
+        except TimeoutError as exc:
+            raise _LiquidusFinderBudgetExceeded(
+                f'MAGEMin equilibrate timed out: {exc}',
+                diagnostics={
+                    'reason': 'engine_timeout',
+                    'backend': 'MAGEMin',
+                    'backend_failure_exception': type(exc).__name__,
+                    'backend_failure_message': str(exc),
+                },
+            ) from exc
         except _MAGEMinEngineCallError as exc:
-            if call_timeout_s is not None and exc.exception_type in {
+            if exc.exception_type in {
+                'EngineWorkerTimeout',
                 'TimeoutError',
                 'TimeoutExpired',
                 'MAGEMinAggregateBudgetExceeded',
@@ -3739,9 +3746,20 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     matlab_text = (
                         matlab_path.read_text() if matlab_path.exists() else ''
                     )
+        except _MAGEMinEngineCallError as exc:
+            if exc.exception_type in {
+                'MAGEMinSubprocessSlotTimeout',
+                'MAGEMinAggregateBudgetExceeded',
+                'TimeoutError',
+                'TimeoutExpired',
+            }:
+                raise TimeoutError(
+                    f'MAGEMin pure-phase probe timed out: {exc}'
+                ) from exc
+            raise
         except subprocess.TimeoutExpired as exc:
-            raise PurePhaseAccessError(
-                f'MAGEMin binary timed out after {timeout_s:g}s'
+            raise TimeoutError(
+                f'MAGEMin pure-phase probe timed out after {timeout_s:g}s'
             ) from exc
         except OSError as exc:
             raise PurePhaseAccessError(

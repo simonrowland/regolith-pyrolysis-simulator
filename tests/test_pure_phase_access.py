@@ -241,6 +241,40 @@ def test_magemin_uninitialized_backend_refuses():
         )
 
 
+def test_magemin_pure_phase_timeout_remains_a_timeout(monkeypatch, tmp_path):
+    import subprocess
+    from contextlib import nullcontext
+
+    import simulator.melt_backend.magemin as magemin_module
+
+    backend = MAGEMinBackend()
+    backend._binary_path = tmp_path / "MAGEMin"
+    backend._database = "ig"
+    backend._config = {"timeout_s": 0.25}
+    monkeypatch.setattr(
+        backend,
+        "_resolve_buffer",
+        lambda **_kwargs: ("QFM", 0.0, []),
+    )
+    monkeypatch.setattr(
+        magemin_module,
+        "_magemin_subprocess_slot",
+        lambda _timeout: nullcontext(),
+    )
+
+    def timeout_run(args, *, timeout, **_kwargs):
+        raise subprocess.TimeoutExpired(args, timeout)
+
+    monkeypatch.setattr(magemin_module.subprocess, "run", timeout_run)
+
+    with pytest.raises(TimeoutError, match="pure-phase probe timed out"):
+        backend._run_pure_phase_probe(
+            bulk_wt_ig={"MgO": 100.0},
+            temperature_C=1000.0,
+            pressure_kbar=0.001,
+        )
+
+
 # --- MAGEMin: KLB1 bulk-echo guard -----------------------------------------
 
 

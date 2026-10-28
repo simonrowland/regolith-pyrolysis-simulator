@@ -4870,8 +4870,16 @@ def test_failed_enthalpy_call_at_t_ref_is_named_on_the_cp_fallback() -> None:
             self.absences = ()
             self.warnings = ()
 
-    def at_temperature(temperature_K: float, *, fail: bool, with_cp: bool):
+    def at_temperature(
+        temperature_K: float,
+        *,
+        fail: bool,
+        with_cp: bool,
+        timeout: bool = False,
+    ):
         if abs(temperature_K - 298.0) < 1e-9:
+            if timeout:
+                raise TimeoutError("t-ref timed out")
             if fail:
                 raise RuntimeError("t-ref down")
             return _Props(None, None)
@@ -4901,6 +4909,18 @@ def test_failed_enthalpy_call_at_t_ref_is_named_on_the_cp_fallback() -> None:
     assert "after a failed H call" not in quiet.notices[0].reason
     assert "term=engine-Cp after a failed H call" in failed.notices[0].reason
     assert "RuntimeError: t-ref down" in failed.notices[0].reason
+
+    with pytest.raises(TimeoutError, match="t-ref timed out"):
+        predict_thermo_attempt(
+            Engine.MAGEMIN,
+            observation,
+            pure_phase=lambda engine, symbol, temperature_K, pressure_bar: at_temperature(
+                temperature_K,
+                fail=False,
+                with_cp=True,
+                timeout=True,
+            ),
+        )
 
     refused = predict_thermo_attempt(
         Engine.MAGEMIN,

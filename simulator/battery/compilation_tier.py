@@ -1537,6 +1537,8 @@ def _pure_phase_attempt(
             second = caller(engine, symbol, _H298_K, pressure_bar)
         elif quantity is Quantity.H_MINUS_H298:
             second = props
+    except TimeoutError:
+        raise
     except PurePhaseAccessError as exc:
         return _refuse(
             RefusalReason.ATTEMPTED_UNAVAILABLE,
@@ -1576,6 +1578,8 @@ def _pure_phase_attempt(
         else:
             try:
                 fetched = caller(engine, symbol, t_ref_float, pressure_bar)
+            except TimeoutError:
+                raise
             except (
                 PurePhaseAccessError,
                 ImportError,
