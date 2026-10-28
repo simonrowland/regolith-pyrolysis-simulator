@@ -6190,6 +6190,61 @@ def _reported_engine_fe3_fe2_ratio(cell: object) -> Decimal | object | None:
     return None
 
 
+def _oxide_element_inventory(
+    amounts: Mapping[str, object], *, amount_basis: AmountBasis
+) -> dict[str, float]:
+    """Expand oxide amounts into element moles for the pinned openimcc solver."""
+    from simulator.accounting.formulas import parse_formula
+
+    inventory: dict[str, float] = {}
+    for oxide, amount in amounts.items():
+        formula = parse_formula(oxide, species=oxide)
+        formula_amount = float(amount)
+        if amount_basis is AmountBasis.MASS_PERCENT:
+            formula_amount /= formula.molar_mass_g_mol
+        for element, atom_moles in formula.atom_moles(formula_amount).items():
+            inventory[element] = inventory.get(element, 0.0) + atom_moles
+    return inventory
+
+
+def _openimcc_redox_result_evidence(
+    result: object, quantity: Quantity
+) -> tuple[Authority, tuple[Decimal, Decimal], tuple[Notice, ...]]:
+    """Carry openimcc redox range and model flags onto the battery result."""
+    extrapolated_rows = tuple(result.extrapolated_redox_rows)
+    authority = Authority.EXTRAPOLATED if extrapolated_rows else Authority.BRIDGE
+    band = tuple(
+        Decimal(str(value))
+        for value in result.active_row_band_intersection_K
+    )
+    notices: tuple[Notice, ...] = ()
+    if extrapolated_rows:
+        notices = (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason=(
+                    "openimcc_redox_pack_extrapolation; rows="
+                    f"{', '.join(extrapolated_rows)}; "
+                    f"flags={', '.join(result.flags)}"
+                ),
+                origin="openimcc.evaluate_redox",
+                band=f"[{band[0]:g}, {band[1]:g}] K",
+                authority=authority,
+            ),
+        )
+    notices += tuple(
+        Notice(
+            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+            affected_quantities=(quantity,),
+            reason=str(flag),
+            origin="openimcc.evaluate_redox",
+        )
+        for flag in result.flags
+    )
+    return authority, band, notices
+
+
 def _predict_fe_redox(
     engine: Engine,
     observation: Observation,
@@ -6312,16 +6367,10 @@ def _predict_fe_redox(
     if engine is Engine.OPENIMCC:
         assert fo2_log is not None
         try:
-            from simulator.accounting.formulas import parse_formula
-
-            inventory: dict[str, float] = {}
-            for oxide, weight_percent in material.composition_wt.items():
-                formula = parse_formula(oxide, species=oxide)
-                oxide_moles = weight_percent / formula.molar_mass_g_mol
-                for element, atom_moles in formula.atom_moles(oxide_moles).items():
-                    inventory[element] = (
-                        inventory.get(element, 0.0) + atom_moles
-                    )
+            inventory = _oxide_element_inventory(
+                material.composition_wt,
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
         except (KeyError, TypeError, ValueError, OverflowError) as exc:
             return refused(
                 RefusalReason.INVALID_IDENTITY,
@@ -6361,39 +6410,8 @@ def _predict_fe_redox(
                 {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
             )
 
-        extrapolated_rows = tuple(result.extrapolated_redox_rows)
-        authority = (
-            Authority.EXTRAPOLATED if extrapolated_rows else Authority.BRIDGE
-        )
-        band = tuple(
-            Decimal(str(value))
-            for value in result.active_row_band_intersection_K
-        )
-        notices: tuple[Notice, ...] = ()
-        if extrapolated_rows:
-            band_text = f"[{band[0]:g}, {band[1]:g}] K"
-            notices = (
-                Notice(
-                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                    affected_quantities=(Quantity.FE3_FE2_RATIO,),
-                    reason=(
-                        "openimcc_redox_pack_extrapolation; rows="
-                        f"{', '.join(extrapolated_rows)}; "
-                        f"flags={', '.join(result.flags)}"
-                    ),
-                    origin="openimcc.evaluate_redox",
-                    band=band_text,
-                    authority=authority,
-                ),
-            )
-        notices += tuple(
-            Notice(
-                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-                affected_quantities=(Quantity.FE3_FE2_RATIO,),
-                reason=str(flag),
-                origin="openimcc.evaluate_redox",
-            )
-            for flag in result.flags
+        authority, band, notices = _openimcc_redox_result_evidence(
+            result, Quantity.FE3_FE2_RATIO
         )
         prediction_identity = replace(
             identity,
