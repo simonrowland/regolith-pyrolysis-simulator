@@ -1,0 +1,35 @@
+source_id: yakovleva-2022-alkali-chondrule-evaporation
+table_1:
+  locator: {page: 2, published_page: 402, table: '1'}
+  printed_rows: 9 oxide rows x 5 composition columns
+  stored_context_rows: 5
+  values: retain printed wt% strings and em dashes; no normalization or conversion
+  compilation_sources:
+    compositions_1_2: Richter et al. (2011)
+    compositions_3_4: Yakovlev et al. (1973)
+    composition_5: Yakovlev et al. (1987)
+  audit:
+    method: MinerU HTML table and born-digital pdftotext text layer agree on all numeric cells; Table 1 row/column assignment visually checked against the page render.
+    numeric_cells: 42
+    mineru_pdftotext_agreement: 42/42
+    render_checks: Table 1 column headers and all row/column assignments checked on PDF page 2; no digit disagreement or flagged numeric cells.
+    count_reconciliation: 9 printed oxide rows; five composition columns; 45 printed cells including three em dashes, 42 numeric values.
+figures_not_transcribed:
+  - figure: '6'
+    locator: {page: 7, published_page: 407}
+    axes: x K2O/(K2O + Na2O), wt%; y pK/pNa, linear dimensionless ratio
+    series: ['1: calculated, 35 wt% SiO2', '2: calculated, 55 wt% SiO2', '3: Saratov chondrules, Yakovlev et al. (1987)']
+    conditions: 1200°C; no time condition printed
+    approximate_symbols_in_caption: 0
+  - figure: '7'
+    locator: {page: 7, published_page: 407}
+    axes: x T, °C; y pK/pNa, linear dimensionless ratio
+    series: ['1: calculated, 35 wt% SiO2 and K2O/Na2O ≈ 3/4', '2: calculated, 55 wt% SiO2 and K2O/Na2O ≈ 3/4', '3: Saratov chondrules, Yakovlev et al. (1987)']
+    conditions: temperature axis 1100–1400°C; no time condition printed
+    approximate_symbols_in_caption: 1
+  - figure: '8'
+    locator: {page: 8, published_page: 408}
+    axes: x T, °C; y log pi, bar
+    series: ['1: Na', '2: K', '3: Fe', '4: SiO', '5: Mg']; Saratov chondrule melt, composition 5 in Table 1
+    conditions: evaporation; displayed temperature axis 1100–1700°C; no time condition printed
+    approximate_symbols_in_caption: 0

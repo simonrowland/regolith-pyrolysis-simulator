@@ -5331,3 +5331,31 @@ def test_offer10_extract_locators_use_physical_pdf_pages() -> None:
         "pdf_page_index": 11,
         "figure": "6",
     }
+
+
+def test_yakovleva_2022_table1_context_survives_migration(tmp_path):
+    """Printed starting compositions remain unscored context, pinned to Table 1."""
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    result = _migrate_real_extract(
+        tmp_path, "yakovleva-2022-alkali-chondrule-evaporation.yaml"
+    )
+    assert not result.observations
+    assert not result.validation.issues
+    (rows,) = result.context_by_work.values()
+    assert len(rows) == 6  # five composition columns plus figure-candidate note
+    compositions = rows[:5]
+    assert [row["locator"] for row in compositions] == [
+        {"published_page": 402, "table": "1"}
+    ] * 5
+    assert [row["values"]["sample_label"] for row in compositions] == [
+        "Composition 1 (IIAB1)",
+        "Composition 2 (IIAB2)",
+        "Composition 3 (granite)",
+        "Composition 4 (basalt)",
+        "Composition 5 (pyroxene chondrules of the Saratov chondrite)",
+    ]
+    # Exact printed cells checked on the PDF page render, published p. 402.
+    assert compositions[0]["values"]["SiO2"] == "59.9"
+    assert compositions[2]["values"]["FeO"] == "–"
+    assert compositions[4]["values"]["K2O"] == "0.4"
