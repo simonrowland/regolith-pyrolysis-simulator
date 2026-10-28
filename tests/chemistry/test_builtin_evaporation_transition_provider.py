@@ -33,6 +33,7 @@ import pytest
 from engines.builtin.evaporation_transition import (
     BuiltinEvaporationTransitionProvider,
 )
+from simulator.accounting import OriginUnresolvedError, resolve_species_formula
 from simulator.chemistry.kernel import (
     AtomBalanceError,
     ChemistryIntent,
@@ -71,6 +72,53 @@ def _dispatch_bound_proposal(kernel, proposal):
 # module-level group would fuse with magemin_fullrun into a separate
 # "magemin_fullrun_serial" scope that co-runs against the real group.
 pytestmark = [pytest.mark.serial]
+
+
+def test_overhead_na_withdrawal_preserves_mixed_origins(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    ledger = sim.atom_ledger
+    for origin, mol in (("feedstock", 1.0), ("reagent", 6.0)):
+        ledger.load_external_mol(
+            "process.overhead_gas", {"Na": mol}, material_origin=origin,
+        )
+    sim.melt.temperature_C = 1600.0
+    na_molar_mass = resolve_species_formula("Na", ledger.registry).molar_mass_kg_per_mol()
+    _, transition = sim._credit_evaporation_transition(
+        "Na", na_molar_mass, na_molar_mass, sim.vapor_pressures["metals"]["Na"],
+        apply_evaporative_redox_source_terms=False, return_transition=True,
+    )
+    assert transition is not None
+
+    # The new 1 mol feedstock Na makes a 2:6 feedstock/reagent gas pool.
+    # Withdrawing half of that physical pool must carry 1:3 mol by origin.
+    withdrawal = ledger.move(
+        "test_partial_na_capture", "process.overhead_gas",
+        "process.condensation_train", {"Na": 4.0 * na_molar_mass},
+    )
+    origins = withdrawal.debits[0].origin_atom_moles
+    assert origins["feedstock"]["Na"] == pytest.approx(1.0)
+    assert origins["reagent"]["Na"] == pytest.approx(3.0)
+    assert withdrawal.debits[0].attribution_method_by_element["Na"] == "pool_ratio"
+    assert ledger.origin_atom_moles_by_account()["process.overhead_gas"]["Na"] == pytest.approx(
+        {"feedstock": 1.0, "reagent": 3.0}
+    )
+
+    # Declaring Na must leave the guard intact for every undeclared element.
+    for origin, mol in (("feedstock", 1.0), ("reagent", 3.0)):
+        ledger.load_external_mol(
+            "process.overhead_gas", {"K": mol}, material_origin=origin,
+        )
+    k_molar_mass = resolve_species_formula("K", ledger.registry).molar_mass_kg_per_mol()
+    with pytest.raises(OriginUnresolvedError, match="explicitly amalgamated pool"):
+        ledger.move(
+            "test_undeclared_k_capture", "process.overhead_gas",
+            "process.condensation_train", {"K": 2.0 * k_molar_mass},
+        )
+    ledger.assert_balanced()
 
 # ---------------------------------------------------------------------------
 # 1. Capability profile
