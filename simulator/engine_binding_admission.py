@@ -1625,10 +1625,13 @@ def _record_live_cache_refusal(
                 "kind": "engine_binding_not_admitted",
                 "identity": key,
                 "reason": reason,
+                "governs": "cross-process cache replay and capture only",
                 "message": (
-                    "binding not admitted on this host "
-                    f"({reason}); replay and capture disabled; "
-                    "run scripts/assess_engine_bindings.py"
+                    "Engine binding not admitted on this host "
+                    f"({reason}); this only disables cross-process cache "
+                    "replay and capture. Live computation and its value are "
+                    "unaffected. To admit, run "
+                    "scripts/assess_engine_bindings.py"
                 ),
             }
         )
