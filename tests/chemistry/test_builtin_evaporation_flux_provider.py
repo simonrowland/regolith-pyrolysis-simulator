@@ -698,7 +698,7 @@ def test_evaporation_aux_uses_atom_ledger_for_parent_oxide_availability(
 
 
 @pytest.mark.xdist_group("serial")
-def test_evaporation_aux_includes_spent_reductant_residue_projection_domain(
+def test_evaporation_aux_excludes_spent_residue_from_debit_availability(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     sim = _build_sim(
@@ -737,7 +737,8 @@ def test_evaporation_aux_includes_spent_reductant_residue_projection_domain(
         SPENT_REDUCTANT_RESIDUE_ACCOUNT
     )["Na2O"]
 
-    assert available_oxide_kg["Na"] == pytest.approx(
+    assert available_oxide_kg["Na"] == pytest.approx(cleaned_melt_na2o_kg)
+    assert sim.melt.composition_kg["Na2O"] == pytest.approx(
         cleaned_melt_na2o_kg + spent_residue_na2o_kg
     )
 
