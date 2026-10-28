@@ -523,6 +523,8 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             if not self._backend_initialised:
                 try:
                     self._backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
+                except TimeoutError:
+                    raise
                 except Exception:
                     pass
                 self._backend_initialised = True
@@ -538,6 +540,13 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     self, _enqueue_backend_close, close, os.getpid()
                 )
             backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
+        except TimeoutError:
+            if backend_finalizer is not None:
+                try:
+                    backend_finalizer()
+                except Exception:
+                    pass
+            raise
         except Exception:
             if backend_finalizer is not None:
                 try:

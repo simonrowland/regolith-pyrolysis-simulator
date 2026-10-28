@@ -2013,6 +2013,7 @@ def test_sso2_native_fe_split_is_stable_when_liquidus_budget_expires(
 ) -> None:
     from engines.magemin.provider import MAGEMinShadowProvider
     from simulator.melt_backend.liquidus import (
+        _LiquidusFinderBudgetExceeded,
         find_liquidus_solidus_by_fraction,
     )
 
@@ -2027,8 +2028,8 @@ def test_sso2_native_fe_split_is_stable_when_liquidus_budget_expires(
 
         def find_liquidus_solidus(self, **_kwargs):
             # This is the production finder with a declared budget too small
-            # for its first deadline check. It deterministically returns the
-            # same typed aggregate-budget refusal every time.
+            # for its first deadline check. It deterministically raises the
+            # same typed run refusal every time.
             return find_liquidus_solidus_by_fraction(
                 lambda _temperature_C: 1.0,
                 budget_s=1.0e-12,
@@ -2041,23 +2042,10 @@ def test_sso2_native_fe_split_is_stable_when_liquidus_budget_expires(
         lambda _provider: budget_backend,
     )
 
-    execution = build_sso2_owner_recipe_execution(hours=9)
-    evidence = sso2_owner_recipe_evidence(execution)
-    partition = evidence["fe_drain_vapor_partition_dependency"]
+    with pytest.raises(_LiquidusFinderBudgetExceeded) as expired:
+        build_sso2_owner_recipe_execution(hours=9)
 
-    assert partition["native_fe_saturation_split_count"] == 0
-    fallback = execution.simulator._melt_redox_liquidus_gate_fallback_summary()
-    budget_notices = [
-        item
-        for item in fallback.get("recent", ())
-        if item.get("liquidus_status") == "not_converged"
-    ]
-    assert budget_notices
-    assert all(
-        item.get("kind") == "liquidus_budget_exceeded"
-        and item.get("reason") == "aggregate_budget_exceeded"
-        for item in budget_notices
-    )
+    assert expired.value.diagnostics["reason"] == "aggregate_budget_exceeded"
 
 
 def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:

@@ -5148,11 +5148,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             except EvaporationFluxRefusal:
                 raise
             except liquidus_provider_failures as exc:
-                # These are the declared liquidus-provider failures:
-                # ProviderUnavailableError, LiquidusSampleError, the typed
-                # ThermoEngine failures, and EngineWorkerTimeout. They retain
-                # their classified floor fallback. EvaporationFluxRefusal is
-                # a composition-projected refusal; MeltCompositionError,
+                if isinstance(exc, TimeoutError):
+                    # A hard wall is a run refusal. Letting it become the
+                    # liquidus floor would make redox/saturation decisions
+                    # depend on worker load.
+                    raise
+                # Non-timeout ProviderUnavailableError, LiquidusSampleError,
+                # and typed ThermoEngine failures retain their classified
+                # floor fallback. EvaporationFluxRefusal is a composition-
+                # projected refusal; MeltCompositionError,
                 # IntentResultStatusError, and programming errors propagate.
                 reason = str(exc)
                 liquidus_status = _liquidus_status_from_freeze_gate_exception(

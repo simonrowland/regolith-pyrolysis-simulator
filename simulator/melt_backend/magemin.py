@@ -138,6 +138,7 @@ from simulator.engine_pool import (
 )
 from simulator.melt_backend.liquidus import (
     DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
+    _LiquidusFinderBudgetExceeded,
     LiquidusSampleError,
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
@@ -1405,6 +1406,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     size=pool_size,
                 )
             except EngineWorkerRemoteError as exc:
+                if exc.exc_name in {
+                    'EngineWorkerTimeout',
+                    'TimeoutError',
+                    'TimeoutExpired',
+                }:
+                    raise TimeoutError(
+                        f'MAGEMin warm worker startup timed out: {exc.detail}'
+                    ) from exc
                 self._warn(
                     'MAGEMin warm pool failed to initialize: '
                     f'{exc.detail}'
@@ -1662,6 +1671,21 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             # so the caller can retry while the next call respawns it.
             raise
         except _MAGEMinEngineCallError as exc:
+            if call_timeout_s is not None and exc.exception_type in {
+                'TimeoutError',
+                'TimeoutExpired',
+                'MAGEMinAggregateBudgetExceeded',
+                'MAGEMinSubprocessSlotTimeout',
+            }:
+                raise _LiquidusFinderBudgetExceeded(
+                    f'MAGEMin liquidus sample timed out: {exc}',
+                    diagnostics={
+                        'reason': 'engine_timeout',
+                        'backend': 'MAGEMin',
+                        'backend_failure_exception': exc.exception_type,
+                        'backend_failure_message': exc.engine_message,
+                    },
+                ) from exc
             # MAGEMin is present but the minimisation did not produce a
             # usable result.
             message = f'MAGEMin equilibrate failed: {exc}'
@@ -2675,6 +2699,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 try:
                     return fn(**call_kwargs)
                 except Exception as exc:  # noqa: BLE001 - third-party call
+                    if isinstance(exc, TimeoutError):
+                        raise
                     if self._binary_path is not None:
                         return self._call_magemin_subprocess_after_bridge_failure(
                             bulk_projection=bulk_projection,
@@ -2723,6 +2749,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             try:
                 return single_point_minimization(*call_args)
             except Exception as exc:  # noqa: BLE001 - third-party call
+                if isinstance(exc, TimeoutError):
+                    raise
                 if self._binary_path is not None:
                     return self._call_magemin_subprocess_after_bridge_failure(
                         bulk_projection=bulk_projection,

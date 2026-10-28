@@ -41,6 +41,7 @@ from engines.magemin import (
 import engines.magemin.provider as provider_module
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+from simulator.engine_pool import EngineWorkerTimeout
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
     REDOX_STATE_REFERENCE_T_K,
@@ -412,6 +413,23 @@ def test_liquidus_finder_keyerror_propagates():
                 'process.cleaned_melt': {'SiO2': 1.0},
             },
         )
+
+
+def test_backend_initialization_timeout_propagates(monkeypatch):
+    class TimedOutBackend:
+        def initialize(self, _config):
+            raise EngineWorkerTimeout(
+                'MAGEMin startup', 0.1, phase='initialization'
+            )
+
+    monkeypatch.setattr(provider_module, '_ensure_close_reaper', lambda: None)
+    provider = MAGEMinShadowProvider(backend=TimedOutBackend())
+    provider._backend_initialised = False
+
+    with pytest.raises(EngineWorkerTimeout, match='MAGEMin startup'):
+        provider._ensure_backend()
+
+    assert provider._backend_initialised is False
 
 
 def test_provider_parity_accepts_equal_optional_fo2_state_points() -> None:

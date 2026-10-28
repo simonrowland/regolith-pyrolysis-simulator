@@ -1900,26 +1900,20 @@ def test_magemin_liquidus_finder_honors_aggregate_budget_config(monkeypatch):
         warnings.simplefilter("ignore", UserWarning)
         assert backend.initialize({"liquidus_finder_budget_s": 0.05}) is True
 
-    result = backend.find_liquidus_solidus(
-        composition_mol={"SiO2": 1.0, "MgO": 1.0},
-        fO2_log=-8.0,
-        pressure_bar=1e-6,
-        min_T_C=800.0,
-        max_T_C=1500.0,
-        scan_step_C=100.0,
-        tolerance_C=1.0,
-    )
+    with pytest.raises(liquidus_module._LiquidusFinderBudgetExceeded) as expired:
+        backend.find_liquidus_solidus(
+            composition_mol={"SiO2": 1.0, "MgO": 1.0},
+            fO2_log=-8.0,
+            pressure_bar=1e-6,
+            min_T_C=800.0,
+            max_T_C=1500.0,
+            scan_step_C=100.0,
+            tolerance_C=1.0,
+        )
 
-    assert result.status == "not_converged"
-    assert len(result.samples) == 1
-    assert any(
-        "liquidus finder exceeded aggregate budget 0.05s after 1 calls"
-        in warning
-        for warning in result.warnings
-    )
-    assert result.diagnostics["reason"] == "aggregate_budget_exceeded"
-    assert result.diagnostics["call_count"] == 1
-    assert result.diagnostics["last_T_C"] == pytest.approx(800.0)
+    assert expired.value.diagnostics["reason"] == "aggregate_budget_exceeded"
+    assert expired.value.diagnostics["call_count"] == 1
+    assert expired.value.diagnostics["last_T_C"] == pytest.approx(800.0)
 
 
 def test_magemin_liquidus_finder_rejects_none_budget(monkeypatch):
@@ -1947,6 +1941,33 @@ def test_magemin_liquidus_finder_rejects_none_budget(monkeypatch):
     assert result.diagnostics.get("budget_reason") == (
         "invalid_liquidus_finder_budget"
     )
+
+
+def test_magemin_warm_worker_startup_timeout_propagates(monkeypatch):
+    import simulator.melt_backend.magemin as magemin_module
+
+    _disable_configured_magemin_path(monkeypatch)
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_locate_binary",
+        staticmethod(lambda _explicit: Path("/fake/MAGEMin")),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_import_magemin_bridge",
+        lambda self, *, requested: ("subprocess", None),
+    )
+
+    def timed_out_pool(*_args, **_kwargs):
+        raise EngineWorkerRemoteError(
+            "TimeoutError", "warm worker startup timed out", "trace"
+        )
+
+    monkeypatch.setattr(magemin_module, "EngineWorkerPool", timed_out_pool)
+    backend = MAGEMinBackend()
+
+    with pytest.raises(TimeoutError, match="warm worker startup timed out"):
+        backend.initialize({})
 
 
 @pytest.mark.parametrize(
@@ -2066,31 +2087,21 @@ def test_magemin_liquidus_subprocess_path_preserves_budget_diagnostics(
     backend._database = "ig"
     backend._magemin_module = None
 
-    result = backend.find_liquidus_solidus(
-        composition_mol={"SiO2": 1.0, "MgO": 1.0},
-        fO2_log=-8.0,
-        pressure_bar=1e-6,
-        min_T_C=800.0,
-        max_T_C=1500.0,
-        scan_step_C=100.0,
-        tolerance_C=1.0,
-    )
+    with pytest.raises(liquidus_module._LiquidusFinderBudgetExceeded) as expired:
+        backend.find_liquidus_solidus(
+            composition_mol={"SiO2": 1.0, "MgO": 1.0},
+            fO2_log=-8.0,
+            pressure_bar=1e-6,
+            min_T_C=800.0,
+            max_T_C=1500.0,
+            scan_step_C=100.0,
+            tolerance_C=1.0,
+        )
 
-    assert result.status == "not_converged"
     assert seen_timeouts == [pytest.approx(0.05)]
-    assert any(
-        "liquidus finder exceeded aggregate budget 0.05s after 0 calls"
-        in warning
-        for warning in result.warnings
-    )
-    assert result.diagnostics["reason"] == "aggregate_budget_exceeded"
-    assert result.diagnostics["call_count"] == 0
-    assert result.diagnostics["last_T_C"] == pytest.approx(800.0)
-    assert result.diagnostics["budget_s"] == pytest.approx(0.05)
-    assert result.diagnostics["elapsed_s"] == pytest.approx(0.05)
-    assert not any(
-        warning.startswith("liquidus finder failed:")
-        for warning in result.warnings
+    assert expired.value.diagnostics["reason"] == "engine_timeout"
+    assert expired.value.diagnostics["backend_failure_exception"] == (
+        "TimeoutExpired"
     )
 
 
@@ -2977,6 +2988,33 @@ def test_magemin_remote_engine_lifecycle_error_returns_typed_not_converged():
     )
     assert result.diagnostics['backend_failure_message'] == (
         'subprocess slot timed out'
+    )
+
+
+def test_magemin_liquidus_refuses_subprocess_slot_timeout():
+    from simulator.melt_backend.magemin import _MAGEMinEngineLifecycleError
+
+    backend = _make_pooled_subprocess_backend(
+        EngineWorkerRemoteError(
+            _MAGEMinEngineLifecycleError.__name__,
+            'MAGEMinSubprocessSlotTimeout: subprocess slot timed out',
+            'Traceback: _magemin_subprocess_slot -> timeout',
+        )
+    )
+
+    with pytest.raises(liquidus_module._LiquidusFinderBudgetExceeded) as expired:
+        backend.find_liquidus_solidus(
+            composition_mol={'SiO2': 1.0},
+            fO2_log=-8.0,
+            pressure_bar=1.0,
+            min_T_C=800.0,
+            max_T_C=1000.0,
+            scan_step_C=100.0,
+        )
+
+    assert expired.value.diagnostics['reason'] == 'engine_timeout'
+    assert expired.value.diagnostics['backend_failure_exception'] == (
+        'MAGEMinSubprocessSlotTimeout'
     )
 
 

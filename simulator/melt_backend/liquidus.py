@@ -363,11 +363,13 @@ def find_liquidus_solidus_by_fraction(
     """Bracket and bisect solidus/liquidus on monotone melt fraction.
 
     ``budget_s`` defaults to ``None`` (unbounded). Callers that must bound
-    aggregate wall time — MAGEMin in particular — pass a finite budget
-    explicitly (see ``DEFAULT_LIQUIDUS_FINDER_BUDGET_S``). Remaining budget
-    is threaded into each sample as ``remaining_budget_s`` when the
-    callable accepts it, so engine call timeouts can be clamped to the
-    residual rather than only checking the budget between calls.
+    aggregate wall time — MAGEMin in particular — pass a finite hang guard
+    explicitly (see ``DEFAULT_LIQUIDUS_FINDER_BUDGET_S``). The scan grid and
+    bisection limits determine the evaluation count; a wall-clock expiry
+    raises ``_LiquidusFinderBudgetExceeded`` and never returns a different
+    curve or convergence status. Remaining budget is threaded into each
+    sample as ``remaining_budget_s`` when the callable accepts it, so engine
+    call timeouts can be clamped to the residual.
     """
     from engines.alphamelts.thermoengine import (
         DECLARED_THERMOENGINE_FAILURE_TYPES,
@@ -456,19 +458,34 @@ def find_liquidus_solidus_by_fraction(
 
     def check_budget() -> None:
         if deadline is not None and time.monotonic() >= deadline:
-            raise _LiquidusFinderBudgetExceeded(budget_warning())
+            raise _LiquidusFinderBudgetExceeded(
+                budget_warning(),
+                diagnostics=_budget_diagnostics(),
+            )
 
     def _raise_budget_if_engine_exhausted(exc: BaseException) -> None:
-        """Promote residual-timeout / cancel failures to typed budget exhaustion.
+        """Promote engine timeouts and exhausted residuals to run refusal.
 
         Between-call budget checks alone lose structure when the *engine*
         path burns the residual (subprocess timeout clamped to remaining,
-        or a cancel for a non-positive residual). Without this promotion
-        those paths surface as generic ``liquidus finder failed: …`` with
-        empty diagnostics, while the in-process post-sample check still
-        emits ``reason=aggregate_budget_exceeded``. Exhaustion must be
-        equally legible on every execution path.
+        or a cancel for a non-positive residual). A typed engine timeout is
+        a run refusal even when the aggregate residual remains positive.
+        Otherwise a worker wall could silently select the liquidus-floor
+        branch instead of completing the same deterministic evaluation path.
         """
+        if isinstance(exc, TimeoutError):
+            diagnostics = {
+                'reason': 'engine_timeout',
+                'exception_class': type(exc).__name__,
+                'exception_message': str(exc),
+            }
+            if deadline is not None:
+                diagnostics.update(_budget_diagnostics())
+                diagnostics['reason'] = 'engine_timeout'
+            raise _LiquidusFinderBudgetExceeded(
+                f'liquidus sample timed out: {exc}',
+                diagnostics=diagnostics,
+            ) from exc
         if deadline is None:
             return
         message = str(exc).lower()
@@ -480,14 +497,20 @@ def find_liquidus_solidus_by_fraction(
             or 'aggregate budget' in message
         )
         if residual_exhausted or explicit_cancel or time.monotonic() >= deadline:
-            raise _LiquidusFinderBudgetExceeded(budget_warning()) from exc
+            raise _LiquidusFinderBudgetExceeded(
+                budget_warning(),
+                diagnostics=_budget_diagnostics(),
+            ) from exc
 
     def sample(T_C: float) -> MeltFractionSample:
         nonlocal last_T_C
         check_budget()
         remaining = remaining_budget_s()
         if remaining is not None and remaining <= 0.0:
-            raise _LiquidusFinderBudgetExceeded(budget_warning())
+            raise _LiquidusFinderBudgetExceeded(
+                budget_warning(),
+                diagnostics=_budget_diagnostics(),
+            )
         last_T_C = float(T_C)
         temperature_C = float(T_C)
         if temperature_C in raw_fraction_by_temperature:
@@ -516,6 +539,16 @@ def find_liquidus_solidus_by_fraction(
                 if projected is None:
                     raise
                 raise projected from exc
+            except TimeoutError as exc:
+                _raise_budget_if_engine_exhausted(exc)
+                raise _LiquidusFinderBudgetExceeded(
+                    f'liquidus sample timed out: {exc}',
+                    diagnostics={
+                        'reason': 'engine_timeout',
+                        'exception_class': type(exc).__name__,
+                        'exception_message': str(exc),
+                    },
+                ) from exc
             raw_fraction_by_temperature[temperature_C] = raw
         frac = _clamp_fraction(raw)
         point = _monotone_point(
@@ -585,14 +618,6 @@ def find_liquidus_solidus_by_fraction(
             max_iterations=max_bisection_iterations,
         )
         iterations += liquidus_iterations
-    except _LiquidusFinderBudgetExceeded as exc:
-        return LiquidusSolidusResult(
-            status='not_converged',
-            warnings=tuple([*smoothing_warnings, str(exc)]),
-            samples=tuple(samples),
-            iterations=iterations,
-            diagnostics=_budget_diagnostics(),
-        )
     except LiquidusSampleError as exc:
         return LiquidusSolidusResult(
             status=exc.status,
@@ -1182,7 +1207,16 @@ def _declared_float(value: Any, name: str) -> float:
 
 
 class _LiquidusFinderBudgetExceeded(RuntimeError):
-    pass
+    """Hard wall expiry that refuses the liquidus run instead of branching."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        diagnostics: Mapping[str, Any] | None = None,
+    ) -> None:
+        self.diagnostics = dict(diagnostics or {})
+        super().__init__(str(message))
 
 
 __all__ = (
