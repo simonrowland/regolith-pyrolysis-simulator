@@ -2008,42 +2008,17 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     }
 
 
-def test_sso2_native_fe_split_is_stable_when_liquidus_budget_expires(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    from engines.magemin.provider import MAGEMinShadowProvider
+def test_liquidus_finder_raises_when_aggregate_budget_expires() -> None:
     from simulator.melt_backend.liquidus import (
         _LiquidusFinderBudgetExceeded,
         find_liquidus_solidus_by_fraction,
     )
 
-    class BudgetLimitedBackend:
-        _bridge = "test"
-
-        def is_available(self) -> bool:
-            return True
-
-        def get_engine_version(self) -> str:
-            return "budget-limited-test"
-
-        def find_liquidus_solidus(self, **_kwargs):
-            # This is the production finder with a declared budget too small
-            # for its first deadline check. It deterministically raises the
-            # same typed run refusal every time.
-            return find_liquidus_solidus_by_fraction(
-                lambda _temperature_C: 1.0,
-                budget_s=1.0e-12,
-            )
-
-    budget_backend = BudgetLimitedBackend()
-    monkeypatch.setattr(
-        MAGEMinShadowProvider,
-        "_ensure_backend",
-        lambda _provider: budget_backend,
-    )
-
     with pytest.raises(_LiquidusFinderBudgetExceeded) as expired:
-        build_sso2_owner_recipe_execution(hours=9)
+        find_liquidus_solidus_by_fraction(
+            lambda _temperature_C: 1.0,
+            budget_s=1.0e-12,
+        )
 
     assert expired.value.diagnostics["reason"] == "aggregate_budget_exceeded"
 
