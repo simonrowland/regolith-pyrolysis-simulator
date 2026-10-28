@@ -9,6 +9,8 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
+
 from simulator.battery.enums import AmountBasis, NoticeKind, Quantity
 from simulator.battery.migrate import migrate, wt_pct_to_mole_fraction
 from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
@@ -125,6 +127,9 @@ def test_closed_starting_bulk_becomes_identity_not_the_glass(tmp_path: Path) -> 
     )
     reasons = [notice.reason for notice in observation.notices]
     assert not any(reason.startswith("open_system_starting_bulk:") for reason in reasons)
+    assert not any(
+        reason.startswith("anhydrous_starting_bulk_omits_h2o:") for reason in reasons
+    )
     assert any(
         notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
         for notice in observation.notices
@@ -166,6 +171,31 @@ def test_open_crucible_text_is_a_typed_notice(tmp_path: Path) -> None:
     )
 
 
+def test_anhydrous_note_flags_omitted_water(tmp_path: Path) -> None:
+    sample = _initial()
+    sample["initial_composition"]["locator"]["note"] = (
+        "Table 1 starting material, wt%, normalized to 100% anhydrous."
+    )
+    observation = _migrate_fixture(tmp_path, _extract(sample))
+    composition = observation.identity.composition
+    assert composition is not None and composition.is_value
+    assert composition.value.components == _starting_mole_fraction().components
+    assert "H2O" not in dict(composition.value.components)
+    notices = [
+        notice
+        for notice in observation.notices
+        if notice.reason.startswith("anhydrous_starting_bulk_omits_h2o:")
+    ]
+    assert len(notices) == 1
+    assert "identity.composition omits H2O" in notices[0].reason
+    assert notices[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert notices[0].band == "anhydrous_starting_bulk_omits_h2o"
+    assert not any(
+        notice.reason.startswith("open_system_starting_bulk:")
+        for notice in observation.notices
+    )
+
+
 def test_missing_starting_bulk_stays_missing(tmp_path: Path) -> None:
     observation = _migrate_fixture(tmp_path, _extract({}))
     composition = observation.identity.composition
@@ -176,21 +206,8 @@ def test_dash_in_starting_bulk_is_not_zero(tmp_path: Path) -> None:
     oxides = tuple(
         (name, "-" if name == "MnO" else amount) for name, amount in _OXIDES
     )
-    try:
-        observation = _migrate_fixture(tmp_path, _extract(_initial(oxides)))
-    except (ArithmeticError, ValueError, TypeError):
-        return
-    composition = observation.identity.composition
-    if composition is None or not composition.is_value:
-        return
-    amounts = dict(composition.value.components)
-    assert amounts.get("MnO") != Decimal("0")
-    without_mno = {
-        "FeO" if name == "FeOT" else name
-        for name, _amount in _OXIDES
-        if name != "MnO"
-    }
-    assert set(amounts) != without_mno
+    with pytest.raises((ArithmeticError, ValueError, TypeError)):
+        _migrate_fixture(tmp_path, _extract(_initial(oxides)))
 
 
 def test_residue_row_does_not_take_the_starting_bulk(tmp_path: Path) -> None:
@@ -237,7 +254,16 @@ def test_cacciatore_starting_bulk_reaches_every_glass_row(tmp_path: Path) -> Non
             notice.reason.startswith("open_system_starting_bulk:")
             for notice in observation.notices
         )
+        anhydrous = [
+            notice
+            for notice in observation.notices
+            if notice.reason.startswith("anhydrous_starting_bulk_omits_h2o:")
+        ]
+        assert len(anhydrous) == 1
+        assert "identity.composition omits H2O" in anhydrous[0].reason
+        assert anhydrous[0].band == "anhydrous_starting_bulk_omits_h2o"
         composition = observation.identity.composition.value
+        assert "H2O" not in {name for name, _amount in composition.components}
         assert composition.amount_basis is AmountBasis.MOLE_FRACTION
         assert observation.value.point not in {
             amount for _name, amount in composition.components
@@ -294,6 +320,26 @@ def _table1_wt(observation) -> tuple[tuple[str, str], ...]:
         weights[oxide] = str(parameter.state.value)
     assert weights
     return tuple(weights.items())
+
+
+def test_gorojovsky_rows_do_not_gain_the_anhydrous_notice() -> None:
+    from simulator.battery.migrate import Migrator
+
+    extract = REPO / "data/literature/extracts/gorojovsky-wood-2026-sulfur-crustal.yaml"
+    migrator = Migrator(root=REPO, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    ]
+    assert len(rows) == 936
+    assert not any(
+        notice.reason.startswith("anhydrous_starting_bulk_omits_h2o:")
+        for observation in rows
+        for notice in observation.notices
+    )
 
 
 def test_wang_2001_residue_keeps_the_starting_charge_contextual() -> None:

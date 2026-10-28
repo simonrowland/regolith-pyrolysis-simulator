@@ -4590,6 +4590,10 @@ _OPEN_SYSTEM_METHOD_TOKENS = frozenset(
     }
 )
 _OPEN_SYSTEM_STARTING_BULK_BAND = "open_system_starting_bulk"
+# The printed locator note, not the source id. "normalized to 100% anhydrous"
+# means the charge was hydrous and the stored vector has no H2O.
+_ANHYDROUS_NORMALIZATION_NOTE = "normalized to 100% anhydrous"
+_ANHYDROUS_STARTING_BULK_BAND = "anhydrous_starting_bulk_omits_h2o"
 _OPEN_SYSTEM_PRINTED_CAUSES = (
     ("volatile loss", "volatile loss"),
     ("open crucible", "open crucible"),
@@ -4646,6 +4650,21 @@ def _open_system_starting_bulk_causes(experiment: Experiment) -> tuple[str, ...]
     return tuple(dict.fromkeys(causes))
 
 
+def _printed_anhydrous_normalization(locator: Locator | None) -> bool:
+    """The printed note says this vector was scaled to an anhydrous 100%.
+
+    The signal is that note. H2O is not inserted: it is not an engine oxide
+    in ``_COMPOSITION_COMPONENTS``, and ``wt_pct_to_mole_fraction`` would
+    raise and drop the bulk.
+    """
+
+    note = locator.note if locator is not None else None
+    return (
+        isinstance(note, str)
+        and _ANHYDROUS_NORMALIZATION_NOTE in note.casefold()
+    )
+
+
 def _is_printed_phase_mass_stamp(state: object) -> bool:
     """The mass-percent copy of a printed map. Engines do not read it as moles."""
 
@@ -4685,7 +4704,9 @@ def _apply_equilibrium_starting_bulk(
     observation's component amount is the analysed phase and is not read
     here. An open system (printed volatile loss, an open crucible,
     evaporation, or a flux) still carries that bulk, with a typed notice:
-    predict and flag, never a silent use and never a refusal. A missing or
+    predict and flag, never a silent use and never a refusal. A printed
+    anhydrous normalization still carries the oxide bulk and says that
+    identity.composition omits H2O. A missing or
     unusable start, including a dash or blank the loader did not accept as
     a component, stays missing. Residue quantities do not call this.
     """
@@ -4734,6 +4755,21 @@ def _apply_equilibrium_starting_bulk(
                 ),
                 origin=origin,
                 band=_OPEN_SYSTEM_STARTING_BULK_BAND,
+                authority=Authority.EXTRAPOLATED,
+            )
+        )
+    if _printed_anhydrous_normalization(initial.locator):
+        notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.EQUILIBRIUM_PHASE_COMPOSITION,),
+                reason=(
+                    "anhydrous_starting_bulk_omits_h2o: "
+                    "identity.composition omits H2O; the printed starting "
+                    "vector is normalized to 100% anhydrous"
+                ),
+                origin=origin,
+                band=_ANHYDROUS_STARTING_BULK_BAND,
                 authority=Authority.EXTRAPOLATED,
             )
         )
