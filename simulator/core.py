@@ -10661,13 +10661,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _stage0_sulfate_carbon_order(
         self, hosts: Mapping[str, float], *, to_sulfide: bool,
     ) -> list[str]:
-        from engines.builtin.foulant_disposition import _parse_dg_points
+        from engines.builtin.foulant_disposition import _dg_source_confidence, _parse_dg_points
         from simulator.chemistry.organics_pyrolysis import carbon_delta_g_co_kj_per_mol_o2
 
         temperature_K = float(self.inventory.stage0_temp_range_C[1]) + 273.15
         registry = self._load_foulant_registry_cached()
         scores: dict[str, float] = {}
         rows: dict[str, str] = {}
+        sources: dict[str, dict[str, Any]] = {}
         flags = ['sulfate_carbon_standard_state_gas_activities']
         for host in sorted(hosts):
             entry = registry.carriers.get(host)
@@ -10682,7 +10683,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 flags.append('sulfate_carbon_missing_dG_canonical_order')
                 continue
             rows[host] = str(pointer)
-            if not points[0][0] <= temperature_K <= points[-1][0]:
+            extrapolated = _dg_source_confidence(
+                'partly_grounded', temperature_K, points,
+            ) == 'out_of_domain'
+            sources[host] = {
+                'source': row.get('source'),
+                'source_band_K': [points[0][0], points[-1][0]],
+                'authority_level': 'extrapolated' if extrapolated else 'bridge',
+            }
+            if extrapolated:
                 flags.append('sulfate_carbon_dG_extrapolated')
             lower, upper = points[0], points[1]
             for lower, upper in zip(points, points[1:]):
@@ -10723,6 +10732,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'temperature_K': temperature_K,
             'dG_kJ_per_mol_C': scores,
             'dG_rows': rows,
+            'dG_sources': sources,
             'host_order': order,
             'notice_flags': sorted(set(flags)),
         })

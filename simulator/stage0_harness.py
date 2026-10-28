@@ -381,10 +381,10 @@ def _diagnostic_events(
         })
         return events
 
-    if carrier:
+    if carrier or family == "sulfate_carbon_allocation":
         group = _resolve_group(carrier, family, registry)
         events.append({
-            "carrier": carrier,
+            **({"carrier": carrier} if carrier else {}),
             "reaction_family": family,
             "group": group,
             "disposition": "projected",
