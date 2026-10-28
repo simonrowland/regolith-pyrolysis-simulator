@@ -189,9 +189,36 @@ def test_silica_glass_capture_is_unavailable_when_stage_3_is_missing():
     assert silica['stage_3_capture_kg'] is None
     assert silica['class_total_kg'] is None
     assert silica['flag']['status'] == 'unavailable'
-    assert silica['flag']['reason']
+    assert silica['flag']['reason'] == 'stage_3_missing'
     assert silica['stage_3_kg_by_species'] == {}
     assert result['glass']['class_total_kg'] is None
+    assert result['glass']['pure_silica_glass_kg'] is None
+
+
+@pytest.mark.parametrize(
+    ('stage_3', 'reason'),
+    [
+        (SimpleNamespace(), 'stage_3_collection_missing'),
+        (SimpleNamespace(collected_kg=None), 'stage_3_collection_missing'),
+        (SimpleNamespace(collected_kg=[]), 'stage_3_collection_malformed'),
+    ],
+)
+def test_silica_glass_capture_is_unavailable_when_stage_3_collection_is_unknown(
+    stage_3, reason
+):
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[None, None, None, stage_3]),
+        atom_ledger=None,
+    )
+    result = classify_products(sim)
+
+    silica = result['pure_silica_glass']
+    assert silica['stage_3_capture_kg'] is None
+    assert silica['class_total_kg'] is None
+    assert silica['flag']['status'] == 'unavailable'
+    assert silica['flag']['reason'] == reason
+    assert result['glass']['pure_silica_glass_kg'] is None
 
 
 def test_silica_glass_capture_is_zero_when_stage_3_exists_with_no_collection():

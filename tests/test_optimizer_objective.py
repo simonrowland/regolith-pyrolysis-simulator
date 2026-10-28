@@ -382,7 +382,7 @@ def test_missing_stage_3_capture_refuses_silica_objective_with_reason() -> None:
     )
     assert evidence["value_status"] == "unavailable"
     assert evidence["certification_flag"]["status"] == "unavailable"
-    assert evidence["certification_flag"]["reason"]
+    assert evidence["certification_flag"]["reason"] == "stage_3_missing"
 
 
 def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:
