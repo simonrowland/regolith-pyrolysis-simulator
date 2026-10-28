@@ -676,9 +676,13 @@ def test_distin_printed_facts_and_inferred_fe_saturation_are_separate(migration)
     ] == {"page": 74, "section": "Experimental"}
 
     result = migration
-    experiment = result.experiments[
-        f"{_DISTIN}::experiment::distin1971-1880c"
-    ]
+    observation = next(
+        row
+        for row in _feo_rows(result)
+        if row.source_id == _DISTIN
+        and row.observation_id.endswith("distin1971_t1_1880_1_4")
+    )
+    experiment = result.experiments[observation.experiment_id]
     condition = getattr(experiment, "fe_metal_saturated", None)
     assert condition is not None
     assert condition.state.is_value and condition.state.value is True
