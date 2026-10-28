@@ -108,15 +108,53 @@ def _all_declared_requirements(
         for requirement in _project_requirements(project)
     ]
     for requirements_file in sorted(requirements_root.glob("requirements*.txt")):
+        # Pip files allow blank lines, full-line comments (including indentation),
+        # and inline comments introduced by whitespace before '#'. Join '\\'
+        # continuations before interpreting declarations. Skip requirement-file
+        # directives (-r/--requirement, -c/--constraint), editable installs
+        # (-e/--editable), and other option lines such as --index-url,
+        # --extra-index-url, --find-links, and --trusted-host: these configure pip
+        # but do not declare a dependency pin.
+        logical_requirement = ""
+        logical_start_line = None
         for line_number, raw_line in enumerate(
             requirements_file.read_text().splitlines(), start=1
         ):
-            requirement = re.split(r"\s+#", raw_line, maxsplit=1)[0].strip()
+            if not raw_line.strip() or raw_line.lstrip().startswith("#"):
+                continue
+            uncommented = re.sub(r"\s+#.*$", "", raw_line)
+            if not uncommented.strip():
+                continue
+
+            if logical_start_line is None:
+                logical_start_line = line_number
+            piece = uncommented.lstrip()
+            stripped_piece = piece.rstrip()
+            continued = stripped_piece.endswith("\\")
+            if continued:
+                piece = piece[: len(stripped_piece) - 1]
+            logical_requirement += piece
+            if continued:
+                continue
+
+            requirement = logical_requirement.strip()
             if requirement and not requirement.startswith("-"):
                 requirements.append(
                     (
                         requirement,
-                        f"{requirements_file.name}:{line_number}",
+                        f"{requirements_file.name}:{logical_start_line}",
+                    )
+                )
+            logical_requirement = ""
+            logical_start_line = None
+
+        if logical_start_line is not None:
+            requirement = logical_requirement.strip()
+            if requirement and not requirement.startswith("-"):
+                requirements.append(
+                    (
+                        requirement,
+                        f"{requirements_file.name}:{logical_start_line}",
                     )
                 )
     return requirements
@@ -125,7 +163,14 @@ def _all_declared_requirements(
 def test_requirements_file_git_revision_mismatch_is_rejected(tmp_path: Path) -> None:
     requirements_file = tmp_path / "requirements.txt"
     requirements_file.write_text(
-        "synthetic-dep @ git+https://example.com/synthetic-dep@declared-rev\n"
+        "    # PetThermoTools, Thermobar, PySulfSat and VapoRock are installed\n"
+        "\n"
+        "--index-url https://example.com/simple\n"
+        "-r other-requirements.txt\n"
+        "-c constraints.txt\n"
+        "-e .\n"
+        "synthetic-dep @ git+https://example.com/synthetic-dep@declared-\\\n"
+        "    rev # continued revision\n"
     )
     lock = tomllib.loads(
         """
@@ -135,10 +180,18 @@ def test_requirements_file_git_revision_mismatch_is_rejected(tmp_path: Path) -> 
         source = { git = "https://example.com/synthetic-dep?rev=locked-rev#locked-rev" }
         """
     )
+    project = {"dependencies": [], "optional-dependencies": {}}
+
+    assert _all_declared_requirements(project, tmp_path) == [
+        (
+            "synthetic-dep @ git+https://example.com/synthetic-dep@declared-rev",
+            "requirements.txt:7",
+        )
+    ]
 
     with pytest.raises(AssertionError) as error:
         _assert_git_dependency_revisions_match(
-            {"dependencies": [], "optional-dependencies": {}}, lock, tmp_path
+            project, lock, tmp_path
         )
 
     message = str(error.value)
@@ -148,19 +201,16 @@ def test_requirements_file_git_revision_mismatch_is_rejected(tmp_path: Path) -> 
     assert "locked-rev" in message
 
 
-def test_declared_version_requirements_match_uv_lock() -> None:
+def _assert_declared_versions_match_uv_lock(
+    project: dict, lock: dict, requirements_root: Path = ROOT
+) -> None:
     try:
-        from packaging.requirements import Requirement
+        from packaging.requirements import InvalidRequirement, Requirement
         from packaging.specifiers import SpecifierSet
         from packaging.utils import canonicalize_name
         from packaging.version import Version
     except ImportError as error:
         pytest.skip(f"version pin check skipped: packaging is not available ({error})")
-
-    with (ROOT / "pyproject.toml").open("rb") as project_file:
-        project = tomllib.load(project_file)["project"]
-    with (ROOT / "uv.lock").open("rb") as lock_file:
-        lock = tomllib.load(lock_file)
 
     locked_versions = defaultdict(list)
     for package in lock.get("package", []):
@@ -169,8 +219,16 @@ def test_declared_version_requirements_match_uv_lock() -> None:
         )
 
     mismatches = []
-    for raw_requirement, origin in _all_declared_requirements(project):
-        requirement = Requirement(raw_requirement)
+    for raw_requirement, origin in _all_declared_requirements(
+        project, requirements_root
+    ):
+        try:
+            requirement = Requirement(raw_requirement)
+        except InvalidRequirement as error:
+            mismatches.append(
+                f"{origin}: invalid requirement {raw_requirement!r}: {error}"
+            )
+            continue
         if not any(
             specifier.operator in {">=", "=="}
             for specifier in requirement.specifier
@@ -192,3 +250,25 @@ def test_declared_version_requirements_match_uv_lock() -> None:
             )
 
     assert not mismatches, "Dependency version mismatch:\n" + "\n".join(mismatches)
+
+
+def test_requirements_file_invalid_requirement_names_its_line(tmp_path: Path) -> None:
+    (tmp_path / "requirements.txt").write_text("this is not a valid requirement\n")
+
+    with pytest.raises(
+        AssertionError, match=r"requirements\.txt:1: invalid requirement"
+    ):
+        _assert_declared_versions_match_uv_lock(
+            {"dependencies": [], "optional-dependencies": {}},
+            {"package": []},
+            tmp_path,
+        )
+
+
+def test_declared_version_requirements_match_uv_lock() -> None:
+    with (ROOT / "pyproject.toml").open("rb") as project_file:
+        project = tomllib.load(project_file)["project"]
+    with (ROOT / "uv.lock").open("rb") as lock_file:
+        lock = tomllib.load(lock_file)
+
+    _assert_declared_versions_match_uv_lock(project, lock)
