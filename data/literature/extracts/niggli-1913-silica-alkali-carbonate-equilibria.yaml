@@ -7,16 +7,17 @@ source:
   year: 1913
   corpus_asset: raw/niggli-1913-silica-alkali-carbonate-equilibria/niggli-1913-silica-alkali-carbonate-equilibria.pdf
 extraction:
-  method: MinerU table drafts and pdftotext-layout were reconciled against page renders for all cells in Table II;
-    rendered page 8 settles the digit and column mismatches. The reported percentage loss is Niggli's calculation
-    from gravimetric CO2 loss; the individual raw weighing inputs are not tabulated, so it is attributed to the
-    paper rather than represented as an independently migrated raw measurement.
+  method: MinerU table drafts and pdftotext-layout were reconciled against page renders for all cells in Tables II
+    and VI. The reported Table II percentage loss is Niggli's calculation from gravimetric CO2 loss; the individual
+    raw weighing inputs are not tabulated, so it is attributed to the paper rather than represented as an independently
+    migrated raw measurement.
   date: '2026-10-28'
   worker: w1028naH-niggli13
   review_status: draft
-  scope_note: This stage contains Table II's potassium-system measured equilibrium CO2-loss data and its auxiliary
-    displaced-moles values. The printed binary-mixture mole fraction is completed from the stated K2CO3 + SiO2 basis
-    for identity mapping; all printed wt% and SiO2 mol% values are retained separately.
+  scope_note: Table II contains potassium-system measured equilibrium CO2-loss data and auxiliary displaced-moles
+    values; Table VI contains the soda-system measured displaced-moles data. Table II's printed binary-mixture mole
+    fraction is completed from the stated K2CO3 + SiO2 basis for identity mapping; printed composition bases remain
+    separately recorded.
 schema_gaps:
 - locator: &id040
     page: 8
@@ -29,6 +30,17 @@ schema_gaps:
     (simulator/battery/migrate.py:11461-11527). The values are retained in the typed context record, not mapped
     to a near-miss yield token.
   values_retained_in: species.K2CO3.context[niggli_1913_table_ii_co2_displaced_schema_gap].values.points
+- locator: &id041
+    page: 23
+    pdf_page_index: 22
+    published_page: 1715
+    table: VI
+  quantity_as_printed: number of mols CO2 displaced by 100 mols SiO2
+  reason: No quantity token has the exact printed molar basis. Quantity.EVOLVED_GAS_YIELD is stored in mol_species_per_initial_kg
+    (simulator/battery/enums.py:614); the specific_gas_yield alias does not accept this mol-per-100-mol-SiO2 unit
+    (simulator/battery/migrate.py:11461-11527). The values are retained in the typed context record, not mapped
+    to a near-miss yield token.
+  values_retained_in: species.Na2CO3.context[niggli_1913_table_vi_co2_displaced_schema_gap].values.points
 fidelity_samples:
 - path: species.K2CO3.observations[niggli_1913_table_ii_potassium_co2_loss].values.points[0].mass_loss_pct
   value: '6.6'
@@ -2018,3 +2030,94 @@ species:
           SiO2_mol_percent_as_printed: '66.7'
           linked_mass_loss_row: unnumbered-3
           locator: *id039
+  Na2CO3:
+    observations: []
+    context:
+    - observation_id: niggli_1913_table_vi_co2_displaced_schema_gap
+      type: table_context
+      locator: *id041
+      units: mol CO2 displaced per 100 mol SiO2, as printed
+      values:
+        quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+        method_class: quoted_attributed
+        attribution: Niggli (1913), present equilibrium determinations, Table VI; rowwise underlying weight measurements are not tabulated.
+        schema_gap: No exact quantity token accepts mol CO2 per 100 mol SiO2; see the extract-level schema_gaps record.
+        system_as_printed: Na2CO3 + SiO2
+        conditions_as_printed: The system was investigated at 898 °C and 956 °C under one atmosphere of carbon dioxide (PDF page 22).
+        points:
+        - row: I
+          T_C: '898'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '174'
+          SiO2_mol_percent_as_printed: '7.1'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: I}
+        - row: II
+          T_C: '898'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '165'
+          SiO2_mol_percent_as_printed: '8.0'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: II}
+        - row: II
+          T_C: '956'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '182'
+          SiO2_mol_percent_as_printed: '8.0'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: II}
+        - row: III
+          T_C: '898'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '151'
+          SiO2_mol_percent_as_printed: '10.1'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: III}
+        - row: III
+          T_C: '956'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '169'
+          SiO2_mol_percent_as_printed: '10.1'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: III}
+        - row: IV
+          T_C: '898'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '139'
+          SiO2_mol_percent_as_printed: '12.3'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: IV}
+        - row: V
+          T_C: '898'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '137'
+          SiO2_mol_percent_as_printed: '12.5'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: V}
+        - row: V
+          T_C: '956'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '160'
+          SiO2_mol_percent_as_printed: '12.5'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: V}
+        - row: VI
+          T_C: '898'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '135'
+          SiO2_mol_percent_as_printed: '16.1'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: VI}
+        - row: VII
+          T_C: '956'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '144'
+          SiO2_mol_percent_as_printed: '22.3'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: VII}
+        - row: VIII
+          T_C: '956'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '140'
+          SiO2_mol_percent_as_printed: '23.2'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: VIII}
+        - row: IX
+          T_C: '956'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '141'
+          SiO2_mol_percent_as_printed: '25.6'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: IX}
+        - row: X
+          T_C: '956'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '138'
+          SiO2_mol_percent_as_printed: '26.1'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: X}
+        - row: XI
+          T_C: '956'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '135'
+          SiO2_mol_percent_as_printed: '30.0'
+          footnote: Mean of two experiments.
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: XI}
+        - row: XII
+          T_C: '956'
+          co2_displaced_mol_per_100_mol_sio2_as_printed: '134'
+          SiO2_mol_percent_as_printed: '33.1'
+          locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: XII}

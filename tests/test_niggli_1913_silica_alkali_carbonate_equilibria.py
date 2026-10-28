@@ -44,6 +44,29 @@ def test_table_ii_render_pins_and_migrates_every_measured_co2_loss_point():
     assert len(raw_points) + len(solid_points) == 30  # 18 charges, 30 numeric (a) cells.
     assert len(raw_points) == 29 and len(solid_points) == 1
 
+    # PDF page 23 render: Table VI's soda-system displacement column is retained
+    # as typed context because its printed molar basis has no exact quantity token.
+    table_vi = document["species"]["Na2CO3"]["context"][0]["values"]["points"]
+    assert len(table_vi) == 15  # 14 printed mixture rows; 15 measured cells.
+    assert (table_vi[0]["row"], table_vi[0]["T_C"], table_vi[0]["co2_displaced_mol_per_100_mol_sio2_as_printed"]) == (
+        "I",
+        "898",
+        "174",
+    )
+    assert (table_vi[2]["row"], table_vi[2]["T_C"], table_vi[2]["co2_displaced_mol_per_100_mol_sio2_as_printed"]) == (
+        "II",
+        "956",
+        "182",
+    )
+    assert (table_vi[-1]["row"], table_vi[-1]["T_C"], table_vi[-1]["co2_displaced_mol_per_100_mol_sio2_as_printed"]) == (
+        "XII",
+        "956",
+        "134",
+    )
+    assert all(point["locator"]["page"] == 23 for point in table_vi)
+    assert all(point["locator"]["table"] == "VI" for point in table_vi)
+    assert table_vi[0]["SiO2_mol_percent_as_printed"] == "7.1"
+
     # PDF page 8 render: Table II column (a), three different rows/temperatures.
     assert raw_points[0]["locator"]["page"] == 8
     assert (raw_points[0]["row"], raw_points[0]["T_C"], raw_points[0]["mass_loss_pct"]) == (
