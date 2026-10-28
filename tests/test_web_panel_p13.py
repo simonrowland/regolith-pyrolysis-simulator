@@ -8,6 +8,12 @@ from typing import Any
 
 import pytest
 
+from simulator.accounting.run_artifact import build_run_artifact
+from simulator.transport_constants import (
+    FREE_MOLECULAR_KNUDSEN_MIN,
+    VISCOUS_KNUDSEN_MAX,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 VIEWER = ROOT / "web" / "report_viewer"
@@ -182,6 +188,8 @@ def _present_summary() -> dict:
         },
         "regime": "viscous",
         "Kn": 0.0038201,
+        "VISCOUS_KNUDSEN_MAX": VISCOUS_KNUDSEN_MAX,
+        "FREE_MOLECULAR_KNUDSEN_MIN": FREE_MOLECULAR_KNUDSEN_MIN,
         "transport_formula_id": "bernoulli_swept_v2",
         "mre_ellingham_ladder_diagnostic": {
             "declared_rung_V": 4.75,
@@ -864,15 +872,11 @@ def test_p13_meter_value_tracks_emitted_kn(kn: float, visible_kn: str) -> None:
 
     assert float(meter["value"]) == kn
     # P2: visible Kn fact must track the emitted value, not only the <meter>.
-    # Clamping display text to 10 while leaving meter.value raw must fail here.
     assert f'<div class="sec-p13-fact">Kn {visible_kn}</div>' in flow
-    if kn > 10:
-        assert '<div class="sec-p13-fact">Kn 10</div>' not in flow
-    # Emitter thresholds: VISCOUS_KNUDSEN_MAX=0.01, FREE_MOLECULAR_KNUDSEN_MIN=10.
-    assert meter["min"] == "0"
-    assert meter["max"] == "10"
-    assert meter["low"] == "0.01"
-    assert meter["high"] == "10"
+    assert float(meter["min"]) == 0.0
+    assert float(meter["max"]) == FREE_MOLECULAR_KNUDSEN_MIN
+    assert float(meter["low"]) == VISCOUS_KNUDSEN_MAX
+    assert float(meter["high"]) == FREE_MOLECULAR_KNUDSEN_MIN
 
 
 def test_p13_transitional_meter_does_not_saturate_at_ballistic_endpoint() -> None:
@@ -886,11 +890,43 @@ def test_p13_transitional_meter_does_not_saturate_at_ballistic_endpoint() -> Non
     assert _class_inner(flow, "sec-p13-headline") == "transitional"
     assert float(meter["value"]) == 7.188791553197268
     assert float(meter["value"]) < float(meter["max"])
-    # Pin the ballistic endpoint exactly (max="100" would leave value < max and
-    # still paint free-molecular Kn mid-scale).
-    assert meter["max"] == "10"
-    assert meter["high"] == "10"
-    assert meter["low"] == "0.01"
+    assert float(meter["max"]) == FREE_MOLECULAR_KNUDSEN_MIN
+    assert float(meter["high"]) == FREE_MOLECULAR_KNUDSEN_MIN
+    assert float(meter["low"]) == VISCOUS_KNUDSEN_MAX
+
+
+def test_p13_gauge_bounds_come_from_run_artifact_backend_constants() -> None:
+    artifact = build_run_artifact(
+        {
+            "status": "ok",
+            "per_hour_summary": [
+                {"hour": 1, "Kn": 0.25, "regime": "transitional"}
+            ],
+        },
+        run_id="p13-gauge-bounds",
+    )
+    summary = artifact["timesteps"][0]["summary"]
+    assert summary["VISCOUS_KNUDSEN_MAX"] == VISCOUS_KNUDSEN_MAX
+    assert summary["FREE_MOLECULAR_KNUDSEN_MIN"] == FREE_MOLECULAR_KNUDSEN_MIN
+
+    html = _run_panel(artifact)["rendered"]
+    meter = _meter_attributes(_tile(html, "flow", "mre"))
+    assert float(meter["low"]) == VISCOUS_KNUDSEN_MAX
+    assert float(meter["high"]) == FREE_MOLECULAR_KNUDSEN_MIN
+    assert float(meter["max"]) == FREE_MOLECULAR_KNUDSEN_MIN
+
+    source = (VIEWER / "panels" / "p13-status-strip.js").read_text()
+    assert re.search(r"(?<![\w.])(?:0\.01|10(?:\.0)?)(?![\w.])", source) is None
+
+
+def test_p13_gauge_waits_for_artifact_bounds() -> None:
+    html = _run_panel(
+        {"timesteps": [{"summary": {"Kn": 0.25, "regime": "transitional"}}]}
+    )["rendered"]
+    flow = _tile(html, "flow", "mre")
+
+    assert "gauge bounds not emitted" in flow
+    assert "<meter" not in flow
 
 
 @pytest.mark.parametrize(

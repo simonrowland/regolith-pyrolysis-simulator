@@ -8,7 +8,11 @@ import pytest
 import yaml
 
 import simulator.campaigns as campaigns_module
-from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
+from simulator.campaigns import (
+    CampaignManager,
+    CampaignPressureSetpointRefusal,
+    CampaignSetpointMissingRefusal,
+)
 from simulator.core import Atmosphere, CampaignPhase, MeltState
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun
@@ -80,21 +84,55 @@ def _n2_lab_schedule() -> dict:
         (CampaignPhase.C4, 0.2, 0.2, Atmosphere.CONTROLLED_O2),
         (CampaignPhase.C5, 50.0, 50.0, Atmosphere.O2_BACKPRESSURE),
         (CampaignPhase.C6, 0.2, 0.2, Atmosphere.CONTROLLED_O2),
+        (
+            CampaignPhase.C7_CA_ALUMINOTHERMIC,
+            0.0,
+            0.05,
+            Atmosphere.HARD_VACUUM,
+        ),
         (CampaignPhase.MRE_BASELINE, 50.0, 50.0, Atmosphere.O2_BACKPRESSURE),
     ],
 )
-def test_configure_campaign_pressure_defaults_match_legacy_constants(
+def test_configure_campaign_pressure_defaults_remain_pinned_to_yaml(
     campaign: CampaignPhase,
     pO2_mbar: float,
     p_total_mbar: float,
     atmosphere: Atmosphere,
 ):
     melt = MeltState()
-    CampaignManager(_setpoints()).configure_campaign(melt, campaign)
+    manager = CampaignManager(_setpoints())
+    manager.configure_campaign(melt, campaign)
+    config = manager._campaign_config(campaign)
 
     assert melt.pO2_mbar == pytest.approx(pO2_mbar)
     assert melt.p_total_mbar == pytest.approx(p_total_mbar)
     assert melt.atmosphere is atmosphere
+    assert config["pO2_mbar_default"] == pytest.approx(pO2_mbar)
+    assert config["p_total_mbar_default"] == pytest.approx(p_total_mbar)
+
+
+@pytest.mark.parametrize(
+    ("campaign", "hold_temperature_C"),
+    [
+        (CampaignPhase.C6, 1400.0),
+        (CampaignPhase.C7_CA_ALUMINOTHERMIC, 1200.0),
+    ],
+)
+def test_c6_c7_default_hold_targets_remain_pinned_to_yaml(
+    campaign: CampaignPhase,
+    hold_temperature_C: float,
+) -> None:
+    manager = CampaignManager(_setpoints())
+    config = manager._campaign_config(campaign)
+
+    target, _ramp = manager.get_temp_target(
+        campaign,
+        0,
+        MeltState(campaign=campaign),
+    )
+
+    assert target == pytest.approx(hold_temperature_C)
+    assert config["default_hold_T_C"] == pytest.approx(hold_temperature_C)
 
 
 def test_c6_continuum_derivation_uses_selected_static_hold_temperature():
@@ -460,6 +498,77 @@ def test_present_but_nonnumeric_campaign_pressure_default_raises():
 
     with pytest.raises(ValueError, match="Invalid numeric campaign setpoint"):
         CampaignManager(setpoints).configure_campaign(MeltState(), CampaignPhase.C2B)
+
+
+@pytest.mark.parametrize(
+    ("campaign", "setpoint_key"),
+    [
+        (CampaignPhase.C2B, "pO2_mbar_default"),
+        (CampaignPhase.C2A_STAGED, "p_total_mbar_default"),
+    ],
+)
+def test_missing_campaign_pressure_default_refuses_as_missing_input(
+    campaign: CampaignPhase,
+    setpoint_key: str,
+) -> None:
+    setpoints = deepcopy(_setpoints())
+    config_key = CampaignManager(setpoints)._campaign_config_key(campaign)
+    setpoints["campaigns"][config_key].pop(setpoint_key)
+
+    with pytest.raises(CampaignSetpointMissingRefusal) as exc_info:
+        CampaignManager(setpoints).configure_campaign(MeltState(), campaign)
+
+    assert exc_info.value.reason == "campaign_setpoint_missing"
+    assert exc_info.value.diagnostic["setpoint"] == (
+        f"{config_key}.{setpoint_key}"
+    )
+
+
+def test_missing_campaign_pressure_default_is_a_structured_run_refusal() -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    config = run._session_config()
+    config.setpoints["campaigns"]["C0"].pop("p_total_mbar_default")
+
+    execution = RunExecutor().execute(config)
+
+    assert execution.status == "refused"
+    assert execution.reason == "campaign_setpoint_missing"
+    assert execution.refusal_diagnostic["setpoint"] == (
+        "C0.p_total_mbar_default"
+    )
+
+
+@pytest.mark.parametrize(
+    ("campaign", "config_key"),
+    [
+        (CampaignPhase.C6, "C6"),
+        (CampaignPhase.C7_CA_ALUMINOTHERMIC, "C7"),
+    ],
+)
+def test_missing_campaign_hold_default_refuses_as_missing_input(
+    campaign: CampaignPhase,
+    config_key: str,
+) -> None:
+    setpoints = deepcopy(_setpoints())
+    setpoints["campaigns"][config_key].pop("default_hold_T_C")
+
+    with pytest.raises(CampaignSetpointMissingRefusal) as exc_info:
+        CampaignManager(setpoints).get_temp_target(
+            campaign,
+            0,
+            MeltState(campaign=campaign),
+        )
+
+    assert exc_info.value.reason == "campaign_setpoint_missing"
+    assert exc_info.value.diagnostic["setpoint"] == (
+        f"{config_key}.default_hold_T_C"
+    )
 
 
 def test_mre_baseline_pressure_defaults_are_yaml_sourced_and_decoupled():
