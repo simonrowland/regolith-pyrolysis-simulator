@@ -137,7 +137,7 @@ species:
             locator: {page: 4, table: 'II', note: x(SiO2)=0.45}
         values:
           quantity_label: 'ΔG(Na2O), partial molar Gibbs energy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
@@ -146,9 +146,7 @@ species:
           value_as_printed: '54.4±3.8'
           confidence_interval_95_as_printed: '±3.8'
           footnote_as_printed: a
-          derivation_note: >-
-            Calculated from the temperature dependence of measured Table I EMF values by least squares; Table II reports the
-            partial Gibbs energy relative to the reference melt.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_gibbs_x0p50
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.50; partial molar Gibbs energy relative to the reference melt'}
@@ -164,7 +162,7 @@ species:
             locator: {page: 4, table: 'II', note: x(SiO2)=0.50}
         values:
           quantity_label: 'ΔG(Na2O), partial molar Gibbs energy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
@@ -172,7 +170,7 @@ species:
           composition_mol: {Na2O: '0.50', SiO2: '0.50'}
           value_as_printed: '35.8±5.1'
           confidence_interval_95_as_printed: '±5.1'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_gibbs_x0p55
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.55; partial molar Gibbs energy relative to the reference melt'}
@@ -188,7 +186,7 @@ species:
             locator: {page: 4, table: 'II', note: x(SiO2)=0.55}
         values:
           quantity_label: 'ΔG(Na2O), partial molar Gibbs energy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
@@ -196,7 +194,7 @@ species:
           composition_mol: {Na2O: '0.45', SiO2: '0.55'}
           value_as_printed: '15.0±2.1'
           confidence_interval_95_as_printed: '±2.1'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_gibbs_x0p60
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.60; reference melt row'}
@@ -212,14 +210,14 @@ species:
             locator: {page: 4, table: 'II', note: x(SiO2)=0.60}
         values:
           quantity_label: 'ΔG(Na2O), partial molar Gibbs energy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
           composition_basis: mole_fraction
           composition_mol: {Na2O: '0.40', SiO2: '0.60'}
           value_as_printed: '0'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_gibbs_x0p65
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.65; partial molar Gibbs energy relative to the reference melt'}
@@ -235,7 +233,7 @@ species:
             locator: {page: 4, table: 'II', note: x(SiO2)=0.65}
         values:
           quantity_label: 'ΔG(Na2O), partial molar Gibbs energy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
@@ -243,7 +241,7 @@ species:
           composition_mol: {Na2O: '0.35', SiO2: '0.65'}
           value_as_printed: '-18.3±3.7'
           confidence_interval_95_as_printed: '±3.7'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_gibbs_x0p70
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.70; partial molar Gibbs energy relative to the reference melt'}
@@ -259,7 +257,7 @@ species:
             locator: {page: 4, table: 'II', note: x(SiO2)=0.70}
         values:
           quantity_label: 'ΔG(Na2O), partial molar Gibbs energy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
@@ -267,7 +265,7 @@ species:
           composition_mol: {Na2O: '0.30', SiO2: '0.70'}
           value_as_printed: '-25.2±4.4'
           confidence_interval_95_as_printed: '±4.4'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_gibbs_x0p75
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.75; partial molar Gibbs energy relative to the reference melt'}
@@ -283,7 +281,7 @@ species:
             locator: {page: 4, table: 'II', note: x(SiO2)=0.75}
         values:
           quantity_label: 'ΔG(Na2O), partial molar Gibbs energy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
@@ -291,7 +289,7 @@ species:
           composition_mol: {Na2O: '0.25', SiO2: '0.75'}
           value_as_printed: '-33.8±1.7'
           confidence_interval_95_as_printed: '±1.7'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_entropy_x0p45
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.45; partial molar entropy relative to the reference melt'}
@@ -303,7 +301,7 @@ species:
         point_conditions: *kupcak_1992_pc045
         values:
           quantity_label: 'ΔS(Na2O), partial molar entropy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
@@ -314,7 +312,7 @@ species:
           composition_mol: {Na2O: '0.55', SiO2: '0.45'}
           value_as_printed: '-19±17'
           confidence_interval_95_as_printed: '±17'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_entropy_x0p50
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.50; partial molar entropy relative to the reference melt'}
@@ -326,7 +324,7 @@ species:
         units: J K^-1 mol^-1 as printed
         values:
           quantity_label: 'ΔS(Na2O), partial molar entropy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
@@ -335,7 +333,7 @@ species:
           composition_mol: {Na2O: '0.50', SiO2: '0.50'}
           value_as_printed: '-55±52'
           confidence_interval_95_as_printed: '±52'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_entropy_x0p55
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.55; partial molar entropy relative to the reference melt'}
@@ -347,7 +345,7 @@ species:
         units: J K^-1 mol^-1 as printed
         values:
           quantity_label: 'ΔS(Na2O), partial molar entropy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
@@ -356,7 +354,7 @@ species:
           composition_mol: {Na2O: '0.45', SiO2: '0.55'}
           value_as_printed: '4±12'
           confidence_interval_95_as_printed: '±12'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_entropy_x0p60
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.60; reference melt row'}
@@ -368,7 +366,7 @@ species:
         units: J K^-1 mol^-1 as printed
         values:
           quantity_label: 'ΔS(Na2O), partial molar entropy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
@@ -376,7 +374,7 @@ species:
           composition_basis: mole_fraction
           composition_mol: {Na2O: '0.40', SiO2: '0.60'}
           value_as_printed: '0'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_entropy_x0p65
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.65; partial molar entropy relative to the reference melt'}
@@ -388,7 +386,7 @@ species:
         units: J K^-1 mol^-1 as printed
         values:
           quantity_label: 'ΔS(Na2O), partial molar entropy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
@@ -397,7 +395,7 @@ species:
           composition_mol: {Na2O: '0.35', SiO2: '0.65'}
           value_as_printed: '-20±22'
           confidence_interval_95_as_printed: '±22'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_entropy_x0p70
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.70; partial molar entropy relative to the reference melt'}
@@ -409,7 +407,7 @@ species:
         units: J K^-1 mol^-1 as printed
         values:
           quantity_label: 'ΔS(Na2O), partial molar entropy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
@@ -418,7 +416,7 @@ species:
           composition_mol: {Na2O: '0.30', SiO2: '0.70'}
           value_as_printed: '-31±41'
           confidence_interval_95_as_printed: '±41'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_entropy_x0p75
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.75; partial molar entropy relative to the reference melt'}
@@ -430,7 +428,7 @@ species:
         units: J K^-1 mol^-1 as printed
         values:
           quantity_label: 'ΔS(Na2O), partial molar entropy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
@@ -439,7 +437,7 @@ species:
           composition_mol: {Na2O: '0.25', SiO2: '0.75'}
           value_as_printed: '-47±13'
           confidence_interval_95_as_printed: '±13'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_enthalpy_x0p45
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.45; partial molar enthalpy relative to the reference melt'}
@@ -452,7 +450,7 @@ species:
         values:
           quantity: partial_molar_enthalpy
           quantity_label: 'ΔH(Na2O), partial molar enthalpy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
@@ -460,7 +458,7 @@ species:
           composition_mol: {Na2O: '0.55', SiO2: '0.45'}
           value_as_printed: '26.4±28.7'
           confidence_interval_95_as_printed: '±28.7'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_enthalpy_x0p50
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.50; partial molar enthalpy relative to the reference melt'}
@@ -473,7 +471,7 @@ species:
         values:
           quantity: partial_molar_enthalpy
           quantity_label: 'ΔH(Na2O), partial molar enthalpy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
@@ -481,7 +479,7 @@ species:
           composition_mol: {Na2O: '0.50', SiO2: '0.50'}
           value_as_printed: '-44.7±81.3'
           confidence_interval_95_as_printed: '±81.3'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_enthalpy_x0p55
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.55; partial molar enthalpy relative to the reference melt'}
@@ -494,7 +492,7 @@ species:
         values:
           quantity: partial_molar_enthalpy
           quantity_label: 'ΔH(Na2O), partial molar enthalpy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
@@ -502,7 +500,7 @@ species:
           composition_mol: {Na2O: '0.45', SiO2: '0.55'}
           value_as_printed: '20.8±19.5'
           confidence_interval_95_as_printed: '±19.5'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_enthalpy_x0p60
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.60; reference melt row'}
@@ -515,14 +513,14 @@ species:
         values:
           quantity: partial_molar_enthalpy
           quantity_label: 'ΔH(Na2O), partial molar enthalpy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
           composition_basis: mole_fraction
           composition_mol: {Na2O: '0.40', SiO2: '0.60'}
           value_as_printed: '0'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_enthalpy_x0p65
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.65; partial molar enthalpy relative to the reference melt'}
@@ -535,7 +533,7 @@ species:
         values:
           quantity: partial_molar_enthalpy
           quantity_label: 'ΔH(Na2O), partial molar enthalpy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
@@ -543,7 +541,7 @@ species:
           composition_mol: {Na2O: '0.35', SiO2: '0.65'}
           value_as_printed: '-47.2±37.3'
           confidence_interval_95_as_printed: '±37.3'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_enthalpy_x0p70
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.70; partial molar enthalpy relative to the reference melt'}
@@ -556,7 +554,7 @@ species:
         values:
           quantity: partial_molar_enthalpy
           quantity_label: 'ΔH(Na2O), partial molar enthalpy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
@@ -564,7 +562,7 @@ species:
           composition_mol: {Na2O: '0.30', SiO2: '0.70'}
           value_as_printed: '-71.5±65.0'
           confidence_interval_95_as_printed: '±65.0'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."
       - observation_id: kupcak_1992_table2_partial_enthalpy_x0p75
         type: gibbs_table
         locator: {page: 4, table: 'II', note: 'x(SiO2)=0.75; partial molar enthalpy relative to the reference melt'}
@@ -577,7 +575,7 @@ species:
         values:
           quantity: partial_molar_enthalpy
           quantity_label: 'ΔH(Na2O), partial molar enthalpy relative to the reference melt'
-          method_class: measured_reduced
+          method_class: measured_tabulated
           status: typed_refusal
           admission_status: typed_refusal
           reason: Relative partial molar value; the absolute reference activity is not printed in this source.
@@ -585,4 +583,4 @@ species:
           composition_mol: {Na2O: '0.25', SiO2: '0.75'}
           value_as_printed: '-103.0±21.0'
           confidence_interval_95_as_printed: '±21.0'
-          derivation_note: Calculated from the temperature dependence of measured Table I EMF values by least squares.
+          derivation_note: "The authors process Table I EMF versus T by least squares; Eq. (3) relates EMF to relative Na2O activity, from which Table II relative partial-molar values are tabulated. Gibbs-Duhem integration gives a(SiO2). Table I source-context row: kupcak_1992_table1_emf_context."

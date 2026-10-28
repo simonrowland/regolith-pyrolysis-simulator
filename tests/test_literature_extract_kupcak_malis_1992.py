@@ -68,6 +68,7 @@ def test_isolated_migration_binds_conditions_and_only_schema_gap_quantities_are_
     }
     source_rows = document["species"]["Na2O"]["observations"]
     assert len(source_rows) == len(migrated) == 21
+    assert all(row["values"]["method_class"] == "measured_tabulated" for row in source_rows)
 
     expected_unknown = {
         row["observation_id"]
@@ -85,6 +86,11 @@ def test_isolated_migration_binds_conditions_and_only_schema_gap_quantities_are_
         row.identity.quantity.is_value
         for observation_id, row in migrated.items()
         if observation_id not in expected_unknown
+    )
+    assert all(
+        row.evidence.class_.is_value
+        and row.evidence.class_.value.value == "measured_tabulated"
+        for row in migrated.values()
     )
     assert all(row.identity.species.phase.is_value for row in migrated.values())
     assert all(row.identity.species.phase.value.value == "l" for row in migrated.values())
@@ -110,9 +116,26 @@ def test_isolated_migration_binds_conditions_and_only_schema_gap_quantities_are_
         assert row.locator.page == 4
         assert row.locator.table == "II"
         assert row.identity.total_pressure_Pa is None or row.identity.total_pressure_Pa.is_unknown
-        assert row.identity.fO2_Pa is None or row.identity.fO2_Pa.is_unknown
+        assert (
+            row.identity.fO2_Pa is None
+            or row.identity.fO2_Pa.is_unknown
+            or row.identity.fO2_Pa.is_not_applicable
+        )
 
     context = document["species"]["Na2O"]["context"][0]
     assert context["locator"]["page"] == 3 and context["locator"]["table"] == "I"
+    migrated_context = [
+        row
+        for rows in migrator.result.context_by_work.values()
+        for row in rows
+        if row.get("context_id") == "kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::context::kupcak_1992_table1_emf_context"
+    ]
+    assert len(migrated_context) == 1
+    assert migrated_context[0]["locator"]["page"] == 3
+    assert migrated_context[0]["locator"]["table"] == "I"
+    assert sum(
+        len(group["pairs_as_printed"])
+        for group in migrated_context[0]["values"]["measurements_as_printed"]
+    ) == 40
     assert "kupcak_1992_table1_emf_context" not in migrated
 
