@@ -1917,6 +1917,17 @@ class EvaporationMixin:
                 'per-component mass fraction'
             )
             return None
+        from simulator.composition_projection import (
+            _projected_liquidus_refusal_reason,
+        )
+
+        refusal = _projected_liquidus_refusal_reason(notice)
+        if refusal is not None:
+            reasons.append(f'{source} {refusal}')
+            self._stash_invalid_projected_liquidus_notice(
+                {**notice, 'reason': refusal},
+            )
+            return None
         projected_source = f'{source}:composition_projected'
         curve = None
         inconsistent = False
@@ -2837,6 +2848,28 @@ class EvaporationMixin:
             )
             if projected is not None:
                 return self._remember_freeze_gate_provider_curve(projected)
+            invalid_notice = getattr(
+                self, '_invalid_projected_liquidus_notice', None,
+            )
+            if isinstance(invalid_notice, Mapping) and str(
+                invalid_notice.get('reason')
+            ).startswith('composition_projected_over_threshold:'):
+                held = self._hold_freeze_gate_provider_curve({
+                    'provider': self._liquid_fraction_provider,
+                    'status': status,
+                    'outcome': status_outcome,
+                    'provider_diagnostic': {
+                        **diagnostic,
+                        'backend_status_reason': invalid_notice['reason'],
+                    },
+                })
+                if held is not None:
+                    held['composition_projected_notice'] = (
+                        self._invalid_projection_bounds_notice(
+                            invalid_notice, bounds_source=str(held['source']),
+                        )
+                    )
+                    return held
             if _diagnostic_names_composition_projected(diagnostic):
                 if not any(
                     'composition_projected' in reason for reason in reasons

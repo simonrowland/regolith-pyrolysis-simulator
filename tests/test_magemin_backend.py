@@ -1786,7 +1786,7 @@ def test_magemin_projected_retry_records_absolute_fo2_per_sample(monkeypatch):
     backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
 
     result = backend.find_liquidus_solidus(
-        composition_kg={"SiO2": 50.0, "MgO": 39.0, "P2O5": 10.0, "MnO": 1.0},
+        composition_kg={"SiO2": 50.0, "MgO": 49.0, "P2O5": 0.5, "MnO": 0.5},
         fO2_log=-9.0,
         pressure_bar=1.0,
         min_T_C=900.0,
@@ -1862,7 +1862,7 @@ def test_magemin_projected_retry_preserves_buffer_offset_per_sample(monkeypatch)
     state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -0.75)
 
     result = backend.find_liquidus_solidus(
-        composition_kg={"SiO2": 50.0, "MgO": 39.0, "P2O5": 10.0, "MnO": 1.0},
+        composition_kg={"SiO2": 50.0, "MgO": 49.0, "P2O5": 0.5, "MnO": 0.5},
         fO2_log=state.log_fO2_at(REDOX_STATE_REFERENCE_T_K),
         redox_state=state,
         pressure_bar=1.0,
@@ -2338,7 +2338,7 @@ def test_magemin_liquidus_of_projected_bulk_stays_composition_projected():
         return {"phases": phases, "converged": True}
 
     backend._call_magemin = fake_call
-    bulk = {"SiO2": 50.0, "MgO": 39.0, "P2O5": 10.0, "MnO": 1.0}
+    bulk = {"SiO2": 50.0, "MgO": 49.0, "P2O5": 0.5, "MnO": 0.5}
     result = backend.find_liquidus_solidus(
         composition_kg=bulk,
         fO2_log=-9.0,
@@ -2360,8 +2360,8 @@ def test_magemin_liquidus_of_projected_bulk_stays_composition_projected():
         row["component"]: row["mass_fraction"]
         for row in notice["dropped_components"]
     }
-    assert fractions["P2O5"] == pytest.approx(0.10)
-    assert fractions["MnO"] == pytest.approx(0.01)
+    assert fractions["P2O5"] == pytest.approx(0.005)
+    assert fractions["MnO"] == pytest.approx(0.005)
     assert notice["authority"] == "extrapolated"
     assert notice["reason"] == "composition_projected"
 
