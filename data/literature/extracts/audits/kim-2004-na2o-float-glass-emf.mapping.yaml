@@ -17,7 +17,12 @@ tables:
     caption: Activities of Na2O in sodium silicate melt
     rows: 9
     columns: {1: temperature_K, 2: measurement_1_EMF_mV, 3: measurement_1_activity, 4: measurement_2_EMF_mV, 5: measurement_2_activity}
-    destination: species.Na2O.observations[kim_2004_table2_silicate_*]
+    activity_destination: species.Na2O.observations[kim_2004_table2_silicate_*]
+    activity_method_class: measured_tabulated
+    emf_destination: species.Na2O.context[kim_2004_table2_silicate_*_emf_input]
+    emf_context_type: electrochemical_measurement_input
+    emf_quantity: electromotive_force
+    emf_units: mV
     render_audit: all 9 temperature and populated EMF/activity cells and their measurement-series columns confirmed on 200 dpi page render
     qa_numeric_agreement: 1.0
   p004-t03:
@@ -25,7 +30,12 @@ tables:
     caption: Activities of Na2O in molten float glass
     rows: 8
     columns: {1: temperature_K, 2: measurement_1_elevating_EMF_mV, 3: measurement_1_elevating_activity, 4: measurement_1_lowering_EMF_mV, 5: measurement_1_lowering_activity, 6: measurement_2_EMF_mV, 7: measurement_2_activity}
-    destination: species.Na2O.observations[kim_2004_table3_glass_*]
+    activity_destination: species.Na2O.observations[kim_2004_table3_glass_*]
+    activity_method_class: measured_tabulated
+    emf_destination: species.Na2O.context[kim_2004_table3_glass_*_emf_input]
+    emf_context_type: electrochemical_measurement_input
+    emf_quantity: electromotive_force
+    emf_units: mV
     composition_binding: Table 1 printed m/o vector divided by 100 on all 12 Table 3 activity points; all nine components retained without renormalization
     render_audit: all 8 temperature and populated EMF/activity cells and their measurement-series columns confirmed on 200 dpi page render
     qa_numeric_agreement: 1.0

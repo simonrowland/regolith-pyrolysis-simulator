@@ -177,10 +177,8 @@ species:
           content_m_o: '0.106'
         - component: TiO2
           content_m_o: '0.035'
-        schema_gap: Cl is not accepted by the existing typed composition component map.
-    observations:
     - observation_id: kim_2004_table2_silicate_1268_emf_input
-      type: electromotive_force
+      type: electrochemical_measurement_input
       experiment: kim_2004_sodium_silicate_check
       locator:
         page: 3
@@ -233,60 +231,8 @@ species:
             page: 2
             section: Experimental
             note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
-    - observation_id: kim_2004_table2_silicate_1268
-      type: activity_coefficient
-      experiment: kim_2004_sodium_silicate_check
-      locator: &id007
-        page: 3
-        table: '2'
-      phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
-      units: dimensionless activity; EMF in mV
-      values:
-        oxygen_partial_pressure:
-          value: '1'
-          units: atm
-          locator:
-            page: 2
-            section: Experimental
-        quantity: activity
-        admission_status: admitted
-        method_class: measured_reduced
-        method: Nernst equation
-        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
-        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
-        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
-        points:
-        - value: '6.745e-10'
-          activity: '6.745e-10'
-          activity_as_printed: 6.745 × 10^-10
-          EMF_mV: '-344.5'
-          T_K: '1268'
-          table_row_number: 3
-          point_conditions:
-            temperature_K: *id003
-            composition: *id004
-            total_pressure_Pa: *id005
-            fO2_Pa: *id006
-          locator: *id007
-          composition_mol:
-            SiO2: '0.657'
-            Na2O: '0.343'
-          phase: null
-          oxygen_partial_pressure:
-            value: '1'
-            units: atm
-            locator: *id008
-      derived_from:
-      - kim_2004_table2_silicate_1268_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table2_silicate_1268_emf_input
-        output_unit: dimensionless activity
     - observation_id: kim_2004_table2_silicate_1272_emf_input
-      type: electromotive_force
+      type: electrochemical_measurement_input
       experiment: kim_2004_sodium_silicate_check
       locator:
         page: 3
@@ -332,60 +278,8 @@ species:
             section: Experimental
             note: Pure oxygen at 1 atm over both electrodes.
         fO2_Pa: *id006
-    - observation_id: kim_2004_table2_silicate_1272
-      type: activity_coefficient
-      experiment: kim_2004_sodium_silicate_check
-      locator: &id012
-        page: 3
-        table: '2'
-      phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
-      units: dimensionless activity; EMF in mV
-      values:
-        oxygen_partial_pressure:
-          value: '1'
-          units: atm
-          locator:
-            page: 2
-            section: Experimental
-        quantity: activity
-        admission_status: admitted
-        method_class: measured_reduced
-        method: Nernst equation
-        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
-        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
-        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
-        points:
-        - value: '8.762e-10'
-          activity: '8.762e-10'
-          activity_as_printed: 8.762 × 10^-10
-          EMF_mV: '-356.1'
-          T_K: '1272'
-          table_row_number: 4
-          point_conditions:
-            temperature_K: *id009
-            composition: *id010
-            total_pressure_Pa: *id011
-            fO2_Pa: *id006
-          locator: *id012
-          composition_mol:
-            SiO2: '0.657'
-            Na2O: '0.343'
-          phase: null
-          oxygen_partial_pressure:
-            value: '1'
-            units: atm
-            locator: *id008
-      derived_from:
-      - kim_2004_table2_silicate_1272_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table2_silicate_1272_emf_input
-        output_unit: dimensionless activity
     - observation_id: kim_2004_table2_silicate_1300_emf_input
-      type: electromotive_force
+      type: electrochemical_measurement_input
       experiment: kim_2004_sodium_silicate_check
       locator:
         page: 3
@@ -431,60 +325,8 @@ species:
             section: Experimental
             note: Pure oxygen at 1 atm over both electrodes.
         fO2_Pa: *id006
-    - observation_id: kim_2004_table2_silicate_1300
-      type: activity_coefficient
-      experiment: kim_2004_sodium_silicate_check
-      locator: &id016
-        page: 3
-        table: '2'
-      phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
-      units: dimensionless activity; EMF in mV
-      values:
-        oxygen_partial_pressure:
-          value: '1'
-          units: atm
-          locator:
-            page: 2
-            section: Experimental
-        quantity: activity
-        admission_status: admitted
-        method_class: measured_reduced
-        method: Nernst equation
-        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
-        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
-        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
-        points:
-        - value: '1.028e-9'
-          activity: '1.028e-9'
-          activity_as_printed: 1.028 × 10^-9
-          EMF_mV: '-346.4'
-          T_K: '1300'
-          table_row_number: 5
-          point_conditions:
-            temperature_K: *id013
-            composition: *id014
-            total_pressure_Pa: *id015
-            fO2_Pa: *id006
-          locator: *id016
-          composition_mol:
-            SiO2: '0.657'
-            Na2O: '0.343'
-          phase: null
-          oxygen_partial_pressure:
-            value: '1'
-            units: atm
-            locator: *id008
-      derived_from:
-      - kim_2004_table2_silicate_1300_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table2_silicate_1300_emf_input
-        output_unit: dimensionless activity
     - observation_id: kim_2004_table2_silicate_1307_emf_input
-      type: electromotive_force
+      type: electrochemical_measurement_input
       experiment: kim_2004_sodium_silicate_check
       locator:
         page: 3
@@ -530,60 +372,8 @@ species:
             section: Experimental
             note: Pure oxygen at 1 atm over both electrodes.
         fO2_Pa: *id006
-    - observation_id: kim_2004_table2_silicate_1307
-      type: activity_coefficient
-      experiment: kim_2004_sodium_silicate_check
-      locator: &id020
-        page: 3
-        table: '2'
-      phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
-      units: dimensionless activity; EMF in mV
-      values:
-        oxygen_partial_pressure:
-          value: '1'
-          units: atm
-          locator:
-            page: 2
-            section: Experimental
-        quantity: activity
-        admission_status: admitted
-        method_class: measured_reduced
-        method: Nernst equation
-        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
-        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
-        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
-        points:
-        - value: '9.898e-10'
-          activity: '9.898e-10'
-          activity_as_printed: 9.898 × 10^-10
-          EMF_mV: '-339.5'
-          T_K: '1307'
-          table_row_number: 6
-          point_conditions:
-            temperature_K: *id017
-            composition: *id018
-            total_pressure_Pa: *id019
-            fO2_Pa: *id006
-          locator: *id020
-          composition_mol:
-            SiO2: '0.657'
-            Na2O: '0.343'
-          phase: null
-          oxygen_partial_pressure:
-            value: '1'
-            units: atm
-            locator: *id008
-      derived_from:
-      - kim_2004_table2_silicate_1307_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table2_silicate_1307_emf_input
-        output_unit: dimensionless activity
     - observation_id: kim_2004_table2_silicate_1325_emf_input
-      type: electromotive_force
+      type: electrochemical_measurement_input
       experiment: kim_2004_sodium_silicate_check
       locator:
         page: 3
@@ -629,60 +419,8 @@ species:
             section: Experimental
             note: Pure oxygen at 1 atm over both electrodes.
         fO2_Pa: *id006
-    - observation_id: kim_2004_table2_silicate_1325
-      type: activity_coefficient
-      experiment: kim_2004_sodium_silicate_check
-      locator: &id024
-        page: 3
-        table: '2'
-      phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
-      units: dimensionless activity; EMF in mV
-      values:
-        oxygen_partial_pressure:
-          value: '1'
-          units: atm
-          locator:
-            page: 2
-            section: Experimental
-        quantity: activity
-        admission_status: admitted
-        method_class: measured_reduced
-        method: Nernst equation
-        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
-        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
-        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
-        points:
-        - value: '1.286e-9'
-          activity: '1.286e-9'
-          activity_as_printed: 1.286 × 10^-9
-          EMF_mV: '-342.7'
-          T_K: '1325'
-          table_row_number: 7
-          point_conditions:
-            temperature_K: *id021
-            composition: *id022
-            total_pressure_Pa: *id023
-            fO2_Pa: *id006
-          locator: *id024
-          composition_mol:
-            SiO2: '0.657'
-            Na2O: '0.343'
-          phase: null
-          oxygen_partial_pressure:
-            value: '1'
-            units: atm
-            locator: *id008
-      derived_from:
-      - kim_2004_table2_silicate_1325_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table2_silicate_1325_emf_input
-        output_unit: dimensionless activity
     - observation_id: kim_2004_table2_silicate_1341_emf_input
-      type: electromotive_force
+      type: electrochemical_measurement_input
       experiment: kim_2004_sodium_silicate_check
       locator:
         page: 3
@@ -728,60 +466,8 @@ species:
             section: Experimental
             note: Pure oxygen at 1 atm over both electrodes.
         fO2_Pa: *id006
-    - observation_id: kim_2004_table2_silicate_1341
-      type: activity_coefficient
-      experiment: kim_2004_sodium_silicate_check
-      locator: &id028
-        page: 3
-        table: '2'
-      phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
-      units: dimensionless activity; EMF in mV
-      values:
-        oxygen_partial_pressure:
-          value: '1'
-          units: atm
-          locator:
-            page: 2
-            section: Experimental
-        quantity: activity
-        admission_status: admitted
-        method_class: measured_reduced
-        method: Nernst equation
-        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
-        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
-        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
-        points:
-        - value: '1.385e-9'
-          activity: '1.385e-9'
-          activity_as_printed: 1.385 × 10^-9
-          EMF_mV: '-336.5'
-          T_K: '1341'
-          table_row_number: 8
-          point_conditions:
-            temperature_K: *id025
-            composition: *id026
-            total_pressure_Pa: *id027
-            fO2_Pa: *id006
-          locator: *id028
-          composition_mol:
-            SiO2: '0.657'
-            Na2O: '0.343'
-          phase: null
-          oxygen_partial_pressure:
-            value: '1'
-            units: atm
-            locator: *id008
-      derived_from:
-      - kim_2004_table2_silicate_1341_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table2_silicate_1341_emf_input
-        output_unit: dimensionless activity
     - observation_id: kim_2004_table2_silicate_1348_emf_input
-      type: electromotive_force
+      type: electrochemical_measurement_input
       experiment: kim_2004_sodium_silicate_check
       locator:
         page: 3
@@ -827,60 +513,8 @@ species:
             section: Experimental
             note: Pure oxygen at 1 atm over both electrodes.
         fO2_Pa: *id006
-    - observation_id: kim_2004_table2_silicate_1348
-      type: activity_coefficient
-      experiment: kim_2004_sodium_silicate_check
-      locator: &id032
-        page: 3
-        table: '2'
-      phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
-      units: dimensionless activity; EMF in mV
-      values:
-        oxygen_partial_pressure:
-          value: '1'
-          units: atm
-          locator:
-            page: 2
-            section: Experimental
-        quantity: activity
-        admission_status: admitted
-        method_class: measured_reduced
-        method: Nernst equation
-        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
-        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
-        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
-        points:
-        - value: '1.548e-9'
-          activity: '1.548e-9'
-          activity_as_printed: 1.548 × 10^-9
-          EMF_mV: '-338.5'
-          T_K: '1348'
-          table_row_number: 9
-          point_conditions:
-            temperature_K: *id029
-            composition: *id030
-            total_pressure_Pa: *id031
-            fO2_Pa: *id006
-          locator: *id032
-          composition_mol:
-            SiO2: '0.657'
-            Na2O: '0.343'
-          phase: null
-          oxygen_partial_pressure:
-            value: '1'
-            units: atm
-            locator: *id008
-      derived_from:
-      - kim_2004_table2_silicate_1348_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table2_silicate_1348_emf_input
-        output_unit: dimensionless activity
     - observation_id: kim_2004_table2_silicate_1373_emf_input
-      type: electromotive_force
+      type: electrochemical_measurement_input
       experiment: kim_2004_sodium_silicate_check
       locator:
         page: 3
@@ -926,60 +560,8 @@ species:
             section: Experimental
             note: Pure oxygen at 1 atm over both electrodes.
         fO2_Pa: *id006
-    - observation_id: kim_2004_table2_silicate_1373
-      type: activity_coefficient
-      experiment: kim_2004_sodium_silicate_check
-      locator: &id036
-        page: 3
-        table: '2'
-      phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
-      units: dimensionless activity; EMF in mV
-      values:
-        oxygen_partial_pressure:
-          value: '1'
-          units: atm
-          locator:
-            page: 2
-            section: Experimental
-        quantity: activity
-        admission_status: admitted
-        method_class: measured_reduced
-        method: Nernst equation
-        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
-        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
-        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
-        points:
-        - value: '1.931e-9'
-          activity: '1.931e-9'
-          activity_as_printed: 1.931 × 10^-9
-          EMF_mV: '-335.5'
-          T_K: '1373'
-          table_row_number: 10
-          point_conditions:
-            temperature_K: *id033
-            composition: *id034
-            total_pressure_Pa: *id035
-            fO2_Pa: *id006
-          locator: *id036
-          composition_mol:
-            SiO2: '0.657'
-            Na2O: '0.343'
-          phase: null
-          oxygen_partial_pressure:
-            value: '1'
-            units: atm
-            locator: *id008
-      derived_from:
-      - kim_2004_table2_silicate_1373_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table2_silicate_1373_emf_input
-        output_unit: dimensionless activity
     - observation_id: kim_2004_table2_silicate_1375_emf_input
-      type: electromotive_force
+      type: electrochemical_measurement_input
       experiment: kim_2004_sodium_silicate_check
       locator:
         page: 3
@@ -1025,60 +607,8 @@ species:
             section: Experimental
             note: Pure oxygen at 1 atm over both electrodes.
         fO2_Pa: *id006
-    - observation_id: kim_2004_table2_silicate_1375
-      type: activity_coefficient
-      experiment: kim_2004_sodium_silicate_check
-      locator: &id040
-        page: 3
-        table: '2'
-      phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
-      units: dimensionless activity; EMF in mV
-      values:
-        oxygen_partial_pressure:
-          value: '1'
-          units: atm
-          locator:
-            page: 2
-            section: Experimental
-        quantity: activity
-        admission_status: admitted
-        method_class: measured_reduced
-        method: Nernst equation
-        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
-        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
-        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
-        points:
-        - value: '1.834e-9'
-          activity: '1.834e-9'
-          activity_as_printed: 1.834 × 10^-9
-          EMF_mV: '-331.2'
-          T_K: '1375'
-          table_row_number: 11
-          point_conditions:
-            temperature_K: *id037
-            composition: *id038
-            total_pressure_Pa: *id039
-            fO2_Pa: *id006
-          locator: *id040
-          composition_mol:
-            SiO2: '0.657'
-            Na2O: '0.343'
-          phase: null
-          oxygen_partial_pressure:
-            value: '1'
-            units: atm
-            locator: *id008
-      derived_from:
-      - kim_2004_table2_silicate_1375_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table2_silicate_1375_emf_input
-        output_unit: dimensionless activity
     - observation_id: kim_2004_table3_glass_1296_emf_input
-      type: electromotive_force
+      type: electrochemical_measurement_input
       experiment: kim_2004_float_glass
       locator:
         page: 4
@@ -1117,6 +647,888 @@ species:
             section: Experimental
             note: Pure oxygen at 1 atm over both electrodes.
         fO2_Pa: *id006
+    - observation_id: kim_2004_table3_glass_1296_lowering_emf_input
+      type: electrochemical_measurement_input
+      experiment: kim_2004_float_glass
+      locator:
+        page: 4
+        table: '3'
+      phase: l
+      units: mV
+      values:
+        quantity: electromotive_force
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
+          to the activity reduction.
+        EMF_mV_as_printed: '-123.4'
+        T_K: '1296'
+      point_conditions:
+        temperature_K: &id045
+          state:
+            tag: value
+            value: '1296'
+          locator:
+            page: 4
+            table: '3'
+        composition: &id046
+          state:
+            tag: unknown
+            reason: Cl in the printed composition has no typed composition component token.
+          locator:
+            page: 2
+            table: '1'
+        total_pressure_Pa: &id047
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 2
+            section: Experimental
+            note: Pure oxygen at 1 atm over both electrodes.
+        fO2_Pa: *id006
+    - observation_id: kim_2004_table3_glass_1302_emf_input
+      type: electrochemical_measurement_input
+      experiment: kim_2004_float_glass
+      locator:
+        page: 4
+        table: '3'
+      phase: l
+      units: mV
+      values:
+        quantity: electromotive_force
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
+          to the activity reduction.
+        EMF_mV_as_printed: '-118.5'
+        T_K: '1302'
+      point_conditions:
+        temperature_K: &id049
+          state:
+            tag: value
+            value: '1302'
+          locator:
+            page: 4
+            table: '3'
+        composition: &id050
+          state:
+            tag: unknown
+            reason: Cl in the printed composition has no typed composition component token.
+          locator:
+            page: 2
+            table: '1'
+        total_pressure_Pa: &id051
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 2
+            section: Experimental
+            note: Pure oxygen at 1 atm over both electrodes.
+        fO2_Pa: *id006
+    - observation_id: kim_2004_table3_glass_1325_emf_input
+      type: electrochemical_measurement_input
+      experiment: kim_2004_float_glass
+      locator:
+        page: 4
+        table: '3'
+      phase: l
+      units: mV
+      values:
+        quantity: electromotive_force
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
+          to the activity reduction.
+        EMF_mV_as_printed: '-110.8'
+        T_K: '1325'
+      point_conditions:
+        temperature_K: &id053
+          state:
+            tag: value
+            value: '1325'
+          locator:
+            page: 4
+            table: '3'
+        composition: &id054
+          state:
+            tag: unknown
+            reason: Cl in the printed composition has no typed composition component token.
+          locator:
+            page: 2
+            table: '1'
+        total_pressure_Pa: &id055
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 2
+            section: Experimental
+            note: Pure oxygen at 1 atm over both electrodes.
+        fO2_Pa: *id006
+    - observation_id: kim_2004_table3_glass_1325_lowering_emf_input
+      type: electrochemical_measurement_input
+      experiment: kim_2004_float_glass
+      locator:
+        page: 4
+        table: '3'
+      phase: l
+      units: mV
+      values:
+        quantity: electromotive_force
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
+          to the activity reduction.
+        EMF_mV_as_printed: '-112.3'
+        T_K: '1325'
+      point_conditions:
+        temperature_K: &id057
+          state:
+            tag: value
+            value: '1325'
+          locator:
+            page: 4
+            table: '3'
+        composition: &id058
+          state:
+            tag: unknown
+            reason: Cl in the printed composition has no typed composition component token.
+          locator:
+            page: 2
+            table: '1'
+        total_pressure_Pa: &id059
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 2
+            section: Experimental
+            note: Pure oxygen at 1 atm over both electrodes.
+        fO2_Pa: *id006
+    - observation_id: kim_2004_table3_glass_1333_emf_input
+      type: electrochemical_measurement_input
+      experiment: kim_2004_float_glass
+      locator:
+        page: 4
+        table: '3'
+      phase: l
+      units: mV
+      values:
+        quantity: electromotive_force
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
+          to the activity reduction.
+        EMF_mV_as_printed: '-108.4'
+        T_K: '1333'
+      point_conditions:
+        temperature_K: &id061
+          state:
+            tag: value
+            value: '1333'
+          locator:
+            page: 4
+            table: '3'
+        composition: &id062
+          state:
+            tag: unknown
+            reason: Cl in the printed composition has no typed composition component token.
+          locator:
+            page: 2
+            table: '1'
+        total_pressure_Pa: &id063
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 2
+            section: Experimental
+            note: Pure oxygen at 1 atm over both electrodes.
+        fO2_Pa: *id006
+    - observation_id: kim_2004_table3_glass_1348_emf_input
+      type: electrochemical_measurement_input
+      experiment: kim_2004_float_glass
+      locator:
+        page: 4
+        table: '3'
+      phase: l
+      units: mV
+      values:
+        quantity: electromotive_force
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
+          to the activity reduction.
+        EMF_mV_as_printed: '-103.2'
+        T_K: '1348'
+      point_conditions:
+        temperature_K: &id065
+          state:
+            tag: value
+            value: '1348'
+          locator:
+            page: 4
+            table: '3'
+        composition: &id066
+          state:
+            tag: unknown
+            reason: Cl in the printed composition has no typed composition component token.
+          locator:
+            page: 2
+            table: '1'
+        total_pressure_Pa: &id067
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 2
+            section: Experimental
+            note: Pure oxygen at 1 atm over both electrodes.
+        fO2_Pa: *id006
+    - observation_id: kim_2004_table3_glass_1348_lowering_emf_input
+      type: electrochemical_measurement_input
+      experiment: kim_2004_float_glass
+      locator:
+        page: 4
+        table: '3'
+      phase: l
+      units: mV
+      values:
+        quantity: electromotive_force
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
+          to the activity reduction.
+        EMF_mV_as_printed: '-106.7'
+        T_K: '1348'
+      point_conditions:
+        temperature_K: &id069
+          state:
+            tag: value
+            value: '1348'
+          locator:
+            page: 4
+            table: '3'
+        composition: &id070
+          state:
+            tag: unknown
+            reason: Cl in the printed composition has no typed composition component token.
+          locator:
+            page: 2
+            table: '1'
+        total_pressure_Pa: &id071
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 2
+            section: Experimental
+            note: Pure oxygen at 1 atm over both electrodes.
+        fO2_Pa: *id006
+    - observation_id: kim_2004_table3_glass_1354_emf_input
+      type: electrochemical_measurement_input
+      experiment: kim_2004_float_glass
+      locator:
+        page: 4
+        table: '3'
+      phase: l
+      units: mV
+      values:
+        quantity: electromotive_force
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
+          to the activity reduction.
+        EMF_mV_as_printed: '-100.6'
+        T_K: '1354'
+      point_conditions:
+        temperature_K: &id073
+          state:
+            tag: value
+            value: '1354'
+          locator:
+            page: 4
+            table: '3'
+        composition: &id074
+          state:
+            tag: unknown
+            reason: Cl in the printed composition has no typed composition component token.
+          locator:
+            page: 2
+            table: '1'
+        total_pressure_Pa: &id075
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 2
+            section: Experimental
+            note: Pure oxygen at 1 atm over both electrodes.
+        fO2_Pa: *id006
+    - observation_id: kim_2004_table3_glass_1365_emf_input
+      type: electrochemical_measurement_input
+      experiment: kim_2004_float_glass
+      locator:
+        page: 4
+        table: '3'
+      phase: l
+      units: mV
+      values:
+        quantity: electromotive_force
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
+          to the activity reduction.
+        EMF_mV_as_printed: '-97.4'
+        T_K: '1365'
+      point_conditions:
+        temperature_K: &id077
+          state:
+            tag: value
+            value: '1365'
+          locator:
+            page: 4
+            table: '3'
+        composition: &id078
+          state:
+            tag: unknown
+            reason: Cl in the printed composition has no typed composition component token.
+          locator:
+            page: 2
+            table: '1'
+        total_pressure_Pa: &id079
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 2
+            section: Experimental
+            note: Pure oxygen at 1 atm over both electrodes.
+        fO2_Pa: *id006
+    - observation_id: kim_2004_table3_glass_1365_lowering_emf_input
+      type: electrochemical_measurement_input
+      experiment: kim_2004_float_glass
+      locator:
+        page: 4
+        table: '3'
+      phase: l
+      units: mV
+      values:
+        quantity: electromotive_force
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
+          to the activity reduction.
+        EMF_mV_as_printed: '-98.4'
+        T_K: '1365'
+      point_conditions:
+        temperature_K: &id081
+          state:
+            tag: value
+            value: '1365'
+          locator:
+            page: 4
+            table: '3'
+        composition: &id082
+          state:
+            tag: unknown
+            reason: Cl in the printed composition has no typed composition component token.
+          locator:
+            page: 2
+            table: '1'
+        total_pressure_Pa: &id083
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 2
+            section: Experimental
+            note: Pure oxygen at 1 atm over both electrodes.
+        fO2_Pa: *id006
+    - observation_id: kim_2004_table3_glass_1370_emf_input
+      type: electrochemical_measurement_input
+      experiment: kim_2004_float_glass
+      locator:
+        page: 4
+        table: '3'
+      phase: l
+      units: mV
+      values:
+        quantity: electromotive_force
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
+          to the activity reduction.
+        EMF_mV_as_printed: '-95.2'
+        T_K: '1370'
+      point_conditions:
+        temperature_K: &id085
+          state:
+            tag: value
+            value: '1370'
+          locator:
+            page: 4
+            table: '3'
+        composition: &id086
+          state:
+            tag: unknown
+            reason: Cl in the printed composition has no typed composition component token.
+          locator:
+            page: 2
+            table: '1'
+        total_pressure_Pa: &id087
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 2
+            section: Experimental
+            note: Pure oxygen at 1 atm over both electrodes.
+        fO2_Pa: *id006
+    observations:
+    - observation_id: kim_2004_table2_silicate_1268
+      type: activity_coefficient
+      experiment: kim_2004_sodium_silicate_check
+      locator: &id007
+        page: 3
+        table: '2'
+      phase: l
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      units: dimensionless activity; EMF in mV
+      values:
+        oxygen_partial_pressure:
+          value: '1'
+          units: atm
+          locator:
+            page: 2
+            section: Experimental
+        quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table2_silicate_1268_emf_input
+        admission_status: admitted
+        method_class: measured_tabulated
+        method: Nernst equation
+        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
+        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
+        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
+        points:
+        - value: '6.745e-10'
+          activity: '6.745e-10'
+          activity_as_printed: 6.745 × 10^-10
+          EMF_mV: '-344.5'
+          T_K: '1268'
+          table_row_number: 3
+          point_conditions:
+            temperature_K: *id003
+            composition: *id004
+            total_pressure_Pa: *id005
+            fO2_Pa: *id006
+          locator: *id007
+          composition_mol:
+            SiO2: '0.657'
+            Na2O: '0.343'
+          phase: null
+          oxygen_partial_pressure:
+            value: '1'
+            units: atm
+            locator: *id008
+    - observation_id: kim_2004_table2_silicate_1272
+      type: activity_coefficient
+      experiment: kim_2004_sodium_silicate_check
+      locator: &id012
+        page: 3
+        table: '2'
+      phase: l
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      units: dimensionless activity; EMF in mV
+      values:
+        oxygen_partial_pressure:
+          value: '1'
+          units: atm
+          locator:
+            page: 2
+            section: Experimental
+        quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table2_silicate_1272_emf_input
+        admission_status: admitted
+        method_class: measured_tabulated
+        method: Nernst equation
+        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
+        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
+        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
+        points:
+        - value: '8.762e-10'
+          activity: '8.762e-10'
+          activity_as_printed: 8.762 × 10^-10
+          EMF_mV: '-356.1'
+          T_K: '1272'
+          table_row_number: 4
+          point_conditions:
+            temperature_K: *id009
+            composition: *id010
+            total_pressure_Pa: *id011
+            fO2_Pa: *id006
+          locator: *id012
+          composition_mol:
+            SiO2: '0.657'
+            Na2O: '0.343'
+          phase: null
+          oxygen_partial_pressure:
+            value: '1'
+            units: atm
+            locator: *id008
+    - observation_id: kim_2004_table2_silicate_1300
+      type: activity_coefficient
+      experiment: kim_2004_sodium_silicate_check
+      locator: &id016
+        page: 3
+        table: '2'
+      phase: l
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      units: dimensionless activity; EMF in mV
+      values:
+        oxygen_partial_pressure:
+          value: '1'
+          units: atm
+          locator:
+            page: 2
+            section: Experimental
+        quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table2_silicate_1300_emf_input
+        admission_status: admitted
+        method_class: measured_tabulated
+        method: Nernst equation
+        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
+        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
+        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
+        points:
+        - value: '1.028e-9'
+          activity: '1.028e-9'
+          activity_as_printed: 1.028 × 10^-9
+          EMF_mV: '-346.4'
+          T_K: '1300'
+          table_row_number: 5
+          point_conditions:
+            temperature_K: *id013
+            composition: *id014
+            total_pressure_Pa: *id015
+            fO2_Pa: *id006
+          locator: *id016
+          composition_mol:
+            SiO2: '0.657'
+            Na2O: '0.343'
+          phase: null
+          oxygen_partial_pressure:
+            value: '1'
+            units: atm
+            locator: *id008
+    - observation_id: kim_2004_table2_silicate_1307
+      type: activity_coefficient
+      experiment: kim_2004_sodium_silicate_check
+      locator: &id020
+        page: 3
+        table: '2'
+      phase: l
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      units: dimensionless activity; EMF in mV
+      values:
+        oxygen_partial_pressure:
+          value: '1'
+          units: atm
+          locator:
+            page: 2
+            section: Experimental
+        quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table2_silicate_1307_emf_input
+        admission_status: admitted
+        method_class: measured_tabulated
+        method: Nernst equation
+        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
+        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
+        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
+        points:
+        - value: '9.898e-10'
+          activity: '9.898e-10'
+          activity_as_printed: 9.898 × 10^-10
+          EMF_mV: '-339.5'
+          T_K: '1307'
+          table_row_number: 6
+          point_conditions:
+            temperature_K: *id017
+            composition: *id018
+            total_pressure_Pa: *id019
+            fO2_Pa: *id006
+          locator: *id020
+          composition_mol:
+            SiO2: '0.657'
+            Na2O: '0.343'
+          phase: null
+          oxygen_partial_pressure:
+            value: '1'
+            units: atm
+            locator: *id008
+    - observation_id: kim_2004_table2_silicate_1325
+      type: activity_coefficient
+      experiment: kim_2004_sodium_silicate_check
+      locator: &id024
+        page: 3
+        table: '2'
+      phase: l
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      units: dimensionless activity; EMF in mV
+      values:
+        oxygen_partial_pressure:
+          value: '1'
+          units: atm
+          locator:
+            page: 2
+            section: Experimental
+        quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table2_silicate_1325_emf_input
+        admission_status: admitted
+        method_class: measured_tabulated
+        method: Nernst equation
+        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
+        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
+        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
+        points:
+        - value: '1.286e-9'
+          activity: '1.286e-9'
+          activity_as_printed: 1.286 × 10^-9
+          EMF_mV: '-342.7'
+          T_K: '1325'
+          table_row_number: 7
+          point_conditions:
+            temperature_K: *id021
+            composition: *id022
+            total_pressure_Pa: *id023
+            fO2_Pa: *id006
+          locator: *id024
+          composition_mol:
+            SiO2: '0.657'
+            Na2O: '0.343'
+          phase: null
+          oxygen_partial_pressure:
+            value: '1'
+            units: atm
+            locator: *id008
+    - observation_id: kim_2004_table2_silicate_1341
+      type: activity_coefficient
+      experiment: kim_2004_sodium_silicate_check
+      locator: &id028
+        page: 3
+        table: '2'
+      phase: l
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      units: dimensionless activity; EMF in mV
+      values:
+        oxygen_partial_pressure:
+          value: '1'
+          units: atm
+          locator:
+            page: 2
+            section: Experimental
+        quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table2_silicate_1341_emf_input
+        admission_status: admitted
+        method_class: measured_tabulated
+        method: Nernst equation
+        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
+        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
+        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
+        points:
+        - value: '1.385e-9'
+          activity: '1.385e-9'
+          activity_as_printed: 1.385 × 10^-9
+          EMF_mV: '-336.5'
+          T_K: '1341'
+          table_row_number: 8
+          point_conditions:
+            temperature_K: *id025
+            composition: *id026
+            total_pressure_Pa: *id027
+            fO2_Pa: *id006
+          locator: *id028
+          composition_mol:
+            SiO2: '0.657'
+            Na2O: '0.343'
+          phase: null
+          oxygen_partial_pressure:
+            value: '1'
+            units: atm
+            locator: *id008
+    - observation_id: kim_2004_table2_silicate_1348
+      type: activity_coefficient
+      experiment: kim_2004_sodium_silicate_check
+      locator: &id032
+        page: 3
+        table: '2'
+      phase: l
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      units: dimensionless activity; EMF in mV
+      values:
+        oxygen_partial_pressure:
+          value: '1'
+          units: atm
+          locator:
+            page: 2
+            section: Experimental
+        quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table2_silicate_1348_emf_input
+        admission_status: admitted
+        method_class: measured_tabulated
+        method: Nernst equation
+        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
+        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
+        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
+        points:
+        - value: '1.548e-9'
+          activity: '1.548e-9'
+          activity_as_printed: 1.548 × 10^-9
+          EMF_mV: '-338.5'
+          T_K: '1348'
+          table_row_number: 9
+          point_conditions:
+            temperature_K: *id029
+            composition: *id030
+            total_pressure_Pa: *id031
+            fO2_Pa: *id006
+          locator: *id032
+          composition_mol:
+            SiO2: '0.657'
+            Na2O: '0.343'
+          phase: null
+          oxygen_partial_pressure:
+            value: '1'
+            units: atm
+            locator: *id008
+    - observation_id: kim_2004_table2_silicate_1373
+      type: activity_coefficient
+      experiment: kim_2004_sodium_silicate_check
+      locator: &id036
+        page: 3
+        table: '2'
+      phase: l
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      units: dimensionless activity; EMF in mV
+      values:
+        oxygen_partial_pressure:
+          value: '1'
+          units: atm
+          locator:
+            page: 2
+            section: Experimental
+        quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table2_silicate_1373_emf_input
+        admission_status: admitted
+        method_class: measured_tabulated
+        method: Nernst equation
+        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
+        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
+        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
+        points:
+        - value: '1.931e-9'
+          activity: '1.931e-9'
+          activity_as_printed: 1.931 × 10^-9
+          EMF_mV: '-335.5'
+          T_K: '1373'
+          table_row_number: 10
+          point_conditions:
+            temperature_K: *id033
+            composition: *id034
+            total_pressure_Pa: *id035
+            fO2_Pa: *id006
+          locator: *id036
+          composition_mol:
+            SiO2: '0.657'
+            Na2O: '0.343'
+          phase: null
+          oxygen_partial_pressure:
+            value: '1'
+            units: atm
+            locator: *id008
+    - observation_id: kim_2004_table2_silicate_1375
+      type: activity_coefficient
+      experiment: kim_2004_sodium_silicate_check
+      locator: &id040
+        page: 3
+        table: '2'
+      phase: l
+      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      units: dimensionless activity; EMF in mV
+      values:
+        oxygen_partial_pressure:
+          value: '1'
+          units: atm
+          locator:
+            page: 2
+            section: Experimental
+        quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table2_silicate_1375_emf_input
+        admission_status: admitted
+        method_class: measured_tabulated
+        method: Nernst equation
+        cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
+        reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
+        reference_electrode: 45.6 m/o Na2O–54.4 m/o WO3
+        points:
+        - value: '1.834e-9'
+          activity: '1.834e-9'
+          activity_as_printed: 1.834 × 10^-9
+          EMF_mV: '-331.2'
+          T_K: '1375'
+          table_row_number: 11
+          point_conditions:
+            temperature_K: *id037
+            composition: *id038
+            total_pressure_Pa: *id039
+            fO2_Pa: *id006
+          locator: *id040
+          composition_mol:
+            SiO2: '0.657'
+            Na2O: '0.343'
+          phase: null
+          oxygen_partial_pressure:
+            value: '1'
+            units: atm
+            locator: *id008
     - observation_id: kim_2004_table3_glass_1296
       type: activity_coefficient
       experiment: kim_2004_float_glass
@@ -1134,8 +1546,13 @@ species:
             page: 2
             section: Experimental
         quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table3_glass_1296_emf_input
         admission_status: admitted
-        method_class: measured_reduced
+        method_class: measured_tabulated
         method: Nernst equation
         cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
         reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
@@ -1178,54 +1595,6 @@ species:
             value: '1'
             units: atm
             locator: *id008
-      derived_from:
-      - kim_2004_table3_glass_1296_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table3_glass_1296_emf_input
-        output_unit: dimensionless activity
-    - observation_id: kim_2004_table3_glass_1296_lowering_emf_input
-      type: electromotive_force
-      experiment: kim_2004_float_glass
-      locator:
-        page: 4
-        table: '3'
-      phase: l
-      units: mV
-      values:
-        quantity: electromotive_force
-        method_class: measured_direct
-        admission_status: typed_refusal
-        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
-          to the activity reduction.
-        EMF_mV_as_printed: '-123.4'
-        T_K: '1296'
-      point_conditions:
-        temperature_K: &id045
-          state:
-            tag: value
-            value: '1296'
-          locator:
-            page: 4
-            table: '3'
-        composition: &id046
-          state:
-            tag: unknown
-            reason: Cl in the printed composition has no typed composition component token.
-          locator:
-            page: 2
-            table: '1'
-        total_pressure_Pa: &id047
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 2
-            section: Experimental
-            note: Pure oxygen at 1 atm over both electrodes.
-        fO2_Pa: *id006
     - observation_id: kim_2004_table3_glass_1296_lowering
       type: activity_coefficient
       experiment: kim_2004_float_glass
@@ -1243,8 +1612,13 @@ species:
             page: 2
             section: Experimental
         quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table3_glass_1296_lowering_emf_input
         admission_status: admitted
-        method_class: measured_reduced
+        method_class: measured_tabulated
         series: lowering temperature
         method: Nernst equation
         cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
@@ -1288,54 +1662,6 @@ species:
             value: '1'
             units: atm
             locator: *id008
-      derived_from:
-      - kim_2004_table3_glass_1296_lowering_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table3_glass_1296_lowering_emf_input
-        output_unit: dimensionless activity
-    - observation_id: kim_2004_table3_glass_1302_emf_input
-      type: electromotive_force
-      experiment: kim_2004_float_glass
-      locator:
-        page: 4
-        table: '3'
-      phase: l
-      units: mV
-      values:
-        quantity: electromotive_force
-        method_class: measured_direct
-        admission_status: typed_refusal
-        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
-          to the activity reduction.
-        EMF_mV_as_printed: '-118.5'
-        T_K: '1302'
-      point_conditions:
-        temperature_K: &id049
-          state:
-            tag: value
-            value: '1302'
-          locator:
-            page: 4
-            table: '3'
-        composition: &id050
-          state:
-            tag: unknown
-            reason: Cl in the printed composition has no typed composition component token.
-          locator:
-            page: 2
-            table: '1'
-        total_pressure_Pa: &id051
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 2
-            section: Experimental
-            note: Pure oxygen at 1 atm over both electrodes.
-        fO2_Pa: *id006
     - observation_id: kim_2004_table3_glass_1302
       type: activity_coefficient
       experiment: kim_2004_float_glass
@@ -1353,8 +1679,13 @@ species:
             page: 2
             section: Experimental
         quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table3_glass_1302_emf_input
         admission_status: admitted
-        method_class: measured_reduced
+        method_class: measured_tabulated
         method: Nernst equation
         cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
         reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
@@ -1397,54 +1728,6 @@ species:
             value: '1'
             units: atm
             locator: *id008
-      derived_from:
-      - kim_2004_table3_glass_1302_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table3_glass_1302_emf_input
-        output_unit: dimensionless activity
-    - observation_id: kim_2004_table3_glass_1325_emf_input
-      type: electromotive_force
-      experiment: kim_2004_float_glass
-      locator:
-        page: 4
-        table: '3'
-      phase: l
-      units: mV
-      values:
-        quantity: electromotive_force
-        method_class: measured_direct
-        admission_status: typed_refusal
-        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
-          to the activity reduction.
-        EMF_mV_as_printed: '-110.8'
-        T_K: '1325'
-      point_conditions:
-        temperature_K: &id053
-          state:
-            tag: value
-            value: '1325'
-          locator:
-            page: 4
-            table: '3'
-        composition: &id054
-          state:
-            tag: unknown
-            reason: Cl in the printed composition has no typed composition component token.
-          locator:
-            page: 2
-            table: '1'
-        total_pressure_Pa: &id055
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 2
-            section: Experimental
-            note: Pure oxygen at 1 atm over both electrodes.
-        fO2_Pa: *id006
     - observation_id: kim_2004_table3_glass_1325
       type: activity_coefficient
       experiment: kim_2004_float_glass
@@ -1462,8 +1745,13 @@ species:
             page: 2
             section: Experimental
         quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table3_glass_1325_emf_input
         admission_status: admitted
-        method_class: measured_reduced
+        method_class: measured_tabulated
         method: Nernst equation
         cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
         reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
@@ -1506,54 +1794,6 @@ species:
             value: '1'
             units: atm
             locator: *id008
-      derived_from:
-      - kim_2004_table3_glass_1325_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table3_glass_1325_emf_input
-        output_unit: dimensionless activity
-    - observation_id: kim_2004_table3_glass_1325_lowering_emf_input
-      type: electromotive_force
-      experiment: kim_2004_float_glass
-      locator:
-        page: 4
-        table: '3'
-      phase: l
-      units: mV
-      values:
-        quantity: electromotive_force
-        method_class: measured_direct
-        admission_status: typed_refusal
-        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
-          to the activity reduction.
-        EMF_mV_as_printed: '-112.3'
-        T_K: '1325'
-      point_conditions:
-        temperature_K: &id057
-          state:
-            tag: value
-            value: '1325'
-          locator:
-            page: 4
-            table: '3'
-        composition: &id058
-          state:
-            tag: unknown
-            reason: Cl in the printed composition has no typed composition component token.
-          locator:
-            page: 2
-            table: '1'
-        total_pressure_Pa: &id059
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 2
-            section: Experimental
-            note: Pure oxygen at 1 atm over both electrodes.
-        fO2_Pa: *id006
     - observation_id: kim_2004_table3_glass_1325_lowering
       type: activity_coefficient
       experiment: kim_2004_float_glass
@@ -1571,8 +1811,13 @@ species:
             page: 2
             section: Experimental
         quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table3_glass_1325_lowering_emf_input
         admission_status: admitted
-        method_class: measured_reduced
+        method_class: measured_tabulated
         series: lowering temperature
         method: Nernst equation
         cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
@@ -1616,54 +1861,6 @@ species:
             value: '1'
             units: atm
             locator: *id008
-      derived_from:
-      - kim_2004_table3_glass_1325_lowering_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table3_glass_1325_lowering_emf_input
-        output_unit: dimensionless activity
-    - observation_id: kim_2004_table3_glass_1333_emf_input
-      type: electromotive_force
-      experiment: kim_2004_float_glass
-      locator:
-        page: 4
-        table: '3'
-      phase: l
-      units: mV
-      values:
-        quantity: electromotive_force
-        method_class: measured_direct
-        admission_status: typed_refusal
-        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
-          to the activity reduction.
-        EMF_mV_as_printed: '-108.4'
-        T_K: '1333'
-      point_conditions:
-        temperature_K: &id061
-          state:
-            tag: value
-            value: '1333'
-          locator:
-            page: 4
-            table: '3'
-        composition: &id062
-          state:
-            tag: unknown
-            reason: Cl in the printed composition has no typed composition component token.
-          locator:
-            page: 2
-            table: '1'
-        total_pressure_Pa: &id063
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 2
-            section: Experimental
-            note: Pure oxygen at 1 atm over both electrodes.
-        fO2_Pa: *id006
     - observation_id: kim_2004_table3_glass_1333
       type: activity_coefficient
       experiment: kim_2004_float_glass
@@ -1681,8 +1878,13 @@ species:
             page: 2
             section: Experimental
         quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table3_glass_1333_emf_input
         admission_status: admitted
-        method_class: measured_reduced
+        method_class: measured_tabulated
         method: Nernst equation
         cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
         reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
@@ -1725,54 +1927,6 @@ species:
             value: '1'
             units: atm
             locator: *id008
-      derived_from:
-      - kim_2004_table3_glass_1333_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table3_glass_1333_emf_input
-        output_unit: dimensionless activity
-    - observation_id: kim_2004_table3_glass_1348_emf_input
-      type: electromotive_force
-      experiment: kim_2004_float_glass
-      locator:
-        page: 4
-        table: '3'
-      phase: l
-      units: mV
-      values:
-        quantity: electromotive_force
-        method_class: measured_direct
-        admission_status: typed_refusal
-        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
-          to the activity reduction.
-        EMF_mV_as_printed: '-103.2'
-        T_K: '1348'
-      point_conditions:
-        temperature_K: &id065
-          state:
-            tag: value
-            value: '1348'
-          locator:
-            page: 4
-            table: '3'
-        composition: &id066
-          state:
-            tag: unknown
-            reason: Cl in the printed composition has no typed composition component token.
-          locator:
-            page: 2
-            table: '1'
-        total_pressure_Pa: &id067
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 2
-            section: Experimental
-            note: Pure oxygen at 1 atm over both electrodes.
-        fO2_Pa: *id006
     - observation_id: kim_2004_table3_glass_1348
       type: activity_coefficient
       experiment: kim_2004_float_glass
@@ -1790,8 +1944,13 @@ species:
             page: 2
             section: Experimental
         quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table3_glass_1348_emf_input
         admission_status: admitted
-        method_class: measured_reduced
+        method_class: measured_tabulated
         method: Nernst equation
         cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
         reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
@@ -1834,54 +1993,6 @@ species:
             value: '1'
             units: atm
             locator: *id008
-      derived_from:
-      - kim_2004_table3_glass_1348_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table3_glass_1348_emf_input
-        output_unit: dimensionless activity
-    - observation_id: kim_2004_table3_glass_1348_lowering_emf_input
-      type: electromotive_force
-      experiment: kim_2004_float_glass
-      locator:
-        page: 4
-        table: '3'
-      phase: l
-      units: mV
-      values:
-        quantity: electromotive_force
-        method_class: measured_direct
-        admission_status: typed_refusal
-        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
-          to the activity reduction.
-        EMF_mV_as_printed: '-106.7'
-        T_K: '1348'
-      point_conditions:
-        temperature_K: &id069
-          state:
-            tag: value
-            value: '1348'
-          locator:
-            page: 4
-            table: '3'
-        composition: &id070
-          state:
-            tag: unknown
-            reason: Cl in the printed composition has no typed composition component token.
-          locator:
-            page: 2
-            table: '1'
-        total_pressure_Pa: &id071
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 2
-            section: Experimental
-            note: Pure oxygen at 1 atm over both electrodes.
-        fO2_Pa: *id006
     - observation_id: kim_2004_table3_glass_1348_lowering
       type: activity_coefficient
       experiment: kim_2004_float_glass
@@ -1899,8 +2010,13 @@ species:
             page: 2
             section: Experimental
         quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table3_glass_1348_lowering_emf_input
         admission_status: admitted
-        method_class: measured_reduced
+        method_class: measured_tabulated
         series: lowering temperature
         method: Nernst equation
         cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
@@ -1944,54 +2060,6 @@ species:
             value: '1'
             units: atm
             locator: *id008
-      derived_from:
-      - kim_2004_table3_glass_1348_lowering_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table3_glass_1348_lowering_emf_input
-        output_unit: dimensionless activity
-    - observation_id: kim_2004_table3_glass_1354_emf_input
-      type: electromotive_force
-      experiment: kim_2004_float_glass
-      locator:
-        page: 4
-        table: '3'
-      phase: l
-      units: mV
-      values:
-        quantity: electromotive_force
-        method_class: measured_direct
-        admission_status: typed_refusal
-        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
-          to the activity reduction.
-        EMF_mV_as_printed: '-100.6'
-        T_K: '1354'
-      point_conditions:
-        temperature_K: &id073
-          state:
-            tag: value
-            value: '1354'
-          locator:
-            page: 4
-            table: '3'
-        composition: &id074
-          state:
-            tag: unknown
-            reason: Cl in the printed composition has no typed composition component token.
-          locator:
-            page: 2
-            table: '1'
-        total_pressure_Pa: &id075
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 2
-            section: Experimental
-            note: Pure oxygen at 1 atm over both electrodes.
-        fO2_Pa: *id006
     - observation_id: kim_2004_table3_glass_1354
       type: activity_coefficient
       experiment: kim_2004_float_glass
@@ -2009,8 +2077,13 @@ species:
             page: 2
             section: Experimental
         quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table3_glass_1354_emf_input
         admission_status: admitted
-        method_class: measured_reduced
+        method_class: measured_tabulated
         method: Nernst equation
         cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
         reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
@@ -2053,54 +2126,6 @@ species:
             value: '1'
             units: atm
             locator: *id008
-      derived_from:
-      - kim_2004_table3_glass_1354_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table3_glass_1354_emf_input
-        output_unit: dimensionless activity
-    - observation_id: kim_2004_table3_glass_1365_emf_input
-      type: electromotive_force
-      experiment: kim_2004_float_glass
-      locator:
-        page: 4
-        table: '3'
-      phase: l
-      units: mV
-      values:
-        quantity: electromotive_force
-        method_class: measured_direct
-        admission_status: typed_refusal
-        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
-          to the activity reduction.
-        EMF_mV_as_printed: '-97.4'
-        T_K: '1365'
-      point_conditions:
-        temperature_K: &id077
-          state:
-            tag: value
-            value: '1365'
-          locator:
-            page: 4
-            table: '3'
-        composition: &id078
-          state:
-            tag: unknown
-            reason: Cl in the printed composition has no typed composition component token.
-          locator:
-            page: 2
-            table: '1'
-        total_pressure_Pa: &id079
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 2
-            section: Experimental
-            note: Pure oxygen at 1 atm over both electrodes.
-        fO2_Pa: *id006
     - observation_id: kim_2004_table3_glass_1365
       type: activity_coefficient
       experiment: kim_2004_float_glass
@@ -2118,8 +2143,13 @@ species:
             page: 2
             section: Experimental
         quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table3_glass_1365_emf_input
         admission_status: admitted
-        method_class: measured_reduced
+        method_class: measured_tabulated
         method: Nernst equation
         cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
         reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
@@ -2162,54 +2192,6 @@ species:
             value: '1'
             units: atm
             locator: *id008
-      derived_from:
-      - kim_2004_table3_glass_1365_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table3_glass_1365_emf_input
-        output_unit: dimensionless activity
-    - observation_id: kim_2004_table3_glass_1365_lowering_emf_input
-      type: electromotive_force
-      experiment: kim_2004_float_glass
-      locator:
-        page: 4
-        table: '3'
-      phase: l
-      units: mV
-      values:
-        quantity: electromotive_force
-        method_class: measured_direct
-        admission_status: typed_refusal
-        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
-          to the activity reduction.
-        EMF_mV_as_printed: '-98.4'
-        T_K: '1365'
-      point_conditions:
-        temperature_K: &id081
-          state:
-            tag: value
-            value: '1365'
-          locator:
-            page: 4
-            table: '3'
-        composition: &id082
-          state:
-            tag: unknown
-            reason: Cl in the printed composition has no typed composition component token.
-          locator:
-            page: 2
-            table: '1'
-        total_pressure_Pa: &id083
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 2
-            section: Experimental
-            note: Pure oxygen at 1 atm over both electrodes.
-        fO2_Pa: *id006
     - observation_id: kim_2004_table3_glass_1365_lowering
       type: activity_coefficient
       experiment: kim_2004_float_glass
@@ -2227,8 +2209,13 @@ species:
             page: 2
             section: Experimental
         quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table3_glass_1365_lowering_emf_input
         admission_status: admitted
-        method_class: measured_reduced
+        method_class: measured_tabulated
         series: lowering temperature
         method: Nernst equation
         cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
@@ -2272,54 +2259,6 @@ species:
             value: '1'
             units: atm
             locator: *id008
-      derived_from:
-      - kim_2004_table3_glass_1365_lowering_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table3_glass_1365_lowering_emf_input
-        output_unit: dimensionless activity
-    - observation_id: kim_2004_table3_glass_1370_emf_input
-      type: electromotive_force
-      experiment: kim_2004_float_glass
-      locator:
-        page: 4
-        table: '3'
-      phase: l
-      units: mV
-      values:
-        quantity: electromotive_force
-        method_class: measured_direct
-        admission_status: typed_refusal
-        reason: No electromotive-force quantity token exists in the current schema; retained as the printed input
-          to the activity reduction.
-        EMF_mV_as_printed: '-95.2'
-        T_K: '1370'
-      point_conditions:
-        temperature_K: &id085
-          state:
-            tag: value
-            value: '1370'
-          locator:
-            page: 4
-            table: '3'
-        composition: &id086
-          state:
-            tag: unknown
-            reason: Cl in the printed composition has no typed composition component token.
-          locator:
-            page: 2
-            table: '1'
-        total_pressure_Pa: &id087
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 2
-            section: Experimental
-            note: Pure oxygen at 1 atm over both electrodes.
-        fO2_Pa: *id006
     - observation_id: kim_2004_table3_glass_1370
       type: activity_coefficient
       experiment: kim_2004_float_glass
@@ -2337,8 +2276,13 @@ species:
             page: 2
             section: Experimental
         quantity: activity
+        derivation_note:
+          status: informational_only
+          relation: 'Printed Nernst equation for log aNa2O(T), simplified at the stated equal 1 atm O2 pressures; log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1 from Lin and Elliott [15].'
+          input_context_ids:
+          - kim_2004_table3_glass_1370_emf_input
         admission_status: admitted
-        method_class: measured_reduced
+        method_class: measured_tabulated
         method: Nernst equation
         cell: Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt
         reference_activity_relation_as_printed: log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1; Lin and Elliott [15]
@@ -2381,11 +2325,3 @@ species:
             value: '1'
             units: atm
             locator: *id008
-      derived_from:
-      - kim_2004_table3_glass_1370_emf_input
-      derivation:
-        relation: Na2O activity calculated from the measured EMF by the printed Nernst equation, using the reference-melt
-          activity relation attributed to Lin and Elliott [15].
-        inputs:
-        - kim_2004_table3_glass_1370_emf_input
-        output_unit: dimensionless activity

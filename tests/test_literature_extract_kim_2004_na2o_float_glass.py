@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
 from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import validate_extract_file
 
@@ -67,8 +67,15 @@ def test_kim_2004_tables_migrate_with_render_pins_and_bound_conditions() -> None
         raise AssertionError("a changed render-pinned activity did not fail")
 
     validation_errors = validate_extract_file(EXTRACT)
-    assert len(validation_errors) == 21
-    assert all("got 'electromotive_force'" in error for error in validation_errors)
+    assert validation_errors == []
+    emf_context = [
+        row for row in document["species"]["Na2O"]["context"]
+        if row["values"].get("quantity") == "electromotive_force"
+    ]
+    assert len(emf_context) == 21
+    assert all(row["type"] == "electrochemical_measurement_input" for row in emf_context)
+    assert all(row["units"] == "mV" for row in emf_context)
+    assert all("T_K" in row["values"] for row in emf_context)
 
     migrator = migrate_one_extract(ROOT, EXTRACT)
     migrator.finalize()
@@ -78,8 +85,9 @@ def test_kim_2004_tables_migrate_with_render_pins_and_bound_conditions() -> None
         if row.identity.quantity.is_value and row.identity.quantity.value is Quantity.ACTIVITY
     ]
     emf_rows = [row for row in observations if row.value.kind is ValueKind.UNAVAILABLE]
+    assert len(observations) == 21
     assert len(activity_rows) == 21
-    assert len(emf_rows) == 21
+    assert emf_rows == []
     assert len(migrator.result.validation.hard_issues) == 0
 
     by_id = {
@@ -95,6 +103,8 @@ def test_kim_2004_tables_migrate_with_render_pins_and_bound_conditions() -> None
         row = by_id[observation_id]
         assert row.value.kind is ValueKind.POINT
         assert row.value.point == Decimal(value)
+        assert row.evidence.class_.is_value
+        assert row.evidence.class_.value is EvidenceClass.MEASURED_TABULATED
         assert row.locator.page == (3 if table == "2" else 4)
         assert row.locator.table == table
         assert row.identity.temperature_K.is_value
