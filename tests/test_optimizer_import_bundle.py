@@ -477,6 +477,38 @@ def test_import_accepts_current_schema_version_bundle(tmp_path: Path) -> None:
     assert (imported.path / "study.profile.yaml").is_file()
 
 
+def test_imported_study_summary_preserves_unavailable_glass_in_api(
+    client,
+    tmp_path: Path,
+) -> None:
+    runs_root = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    products = {
+        "glass_kg": None,
+        "glass_status": "unavailable",
+        "glass_status_reason": "stage_3_missing",
+    }
+    bundle = _export_bundle(
+        tmp_path,
+        _members(
+            tmp_path,
+            summary_extra={"save_schema_version": 2, "products": products},
+            manifest_extra={"save_schema_version": 2},
+        ),
+    )
+
+    imported = import_study_bundle(
+        bundle,
+        runs_root,
+        verification_tier=0,
+        evaluator=_evaluator(oxygen=10.0),
+    )
+
+    model = imported_study_model(imported.path, runs_root)
+    assert model["summary"]["products"] == products
+    payload = client.get("/api/optimizer/imported").get_json()
+    assert payload["imported"][0]["summary"]["products"] == products
+
+
 @pytest.mark.parametrize(
     ("margin", "serialized"),
     [(math.inf, "+inf"), (-math.inf, "-inf")],
