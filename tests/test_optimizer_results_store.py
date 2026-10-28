@@ -14,6 +14,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.corpus_version import current_corpus_version
+from simulator.chemistry.kernel.dto import DEGRADING_INTENT_RESULT_STATUSES
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -1316,7 +1317,7 @@ def test_lookup_leaves_empty_objectives_empty_for_infeasible_rows(tmp_path) -> N
                     }
                 ),
             ),
-            "backend_authority_contradicts_status:unavailable",
+            "feasible_result_carries_degrading_backend_status:unavailable",
         ),
         (
             lambda spec: _scored(
@@ -1376,6 +1377,40 @@ def test_store_rejects_inadmissible_cache_writes_reason_coded_and_unwritten(
     assert store.lookup(spec) is None
     with sqlite3.connect(tmp_path / "results.sqlite") as conn:
         assert conn.execute("SELECT count(*) FROM results").fetchone()[0] == 0
+
+
+@pytest.mark.parametrize(
+    "backend_status", sorted(DEGRADING_INTENT_RESULT_STATUSES)
+)
+def test_store_rejects_feasible_rows_with_every_degrading_backend_status(
+    tmp_path,
+    backend_status: str,
+) -> None:
+    """Feasibility contradicts a degrading run status, even if the backend is authoritative.
+
+    The predicate is feasible-vs-degrading: an authoritative backend may
+    refuse work, but that refusal cannot produce a feasible cache row.
+    """
+    spec = _base_spec(backend_name="alphamelts")
+    store = ResultStore(tmp_path / "results.sqlite")
+    scored = _scored(
+        spec,
+        result_blob=_admissible_trace(
+            {
+                "backend_status": backend_status,
+                "backend_authoritative": True,
+            }
+        ),
+    )
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-10-28T00:00:00Z")
+
+    assert (
+        f"feasible_result_carries_degrading_backend_status:{backend_status}"
+        in exc_info.value.reasons
+    )
+    assert store.lookup(spec) is None
 
 
 @pytest.mark.parametrize(
