@@ -1,0 +1,493 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/schreiber-1977-tetravalent-cr-diopside.yaml
+observations:
+- observation_id: schreiber-1977-tetravalent-cr-diopside::schreiber_1977_crii_fraction_blue_diopside_melt::points:h=fe3a405d39a6
+  experiment_id: 38e49dbf5f302e7c282ac3d9e161b1b5ad7b28c733a4ef29dd09ad056c2c2dad::schreiber-1977-tetravalent-cr-diopside
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.00101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-1977-tetravalent-cr-diopside
+  locator:
+    page: 3
+    published_page: 524
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Melt fraction stated before the separate distribution-coefficient citation.
+  read_from: pdf:schreiber-1977-tetravalent-cr-diopside
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00101325'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-8 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000001'
+            locator:
+              page: 3
+              published_page: 524
+              pdf_page_index: 2
+              section: Results and discussion
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 524
+              pdf_page_index: 2
+              section: Results and discussion
+        output_unit: Pa
+        references: []
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper gives no temperature for this melt fraction.
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: 10^-8
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+    composition:
+      state:
+        tag: unknown
+        reason: The sentence does not assign the melt to one composition.
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-1977-tetravalent-cr-diopside
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-1977-tetravalent-cr-diopside::schreiber_1977_criii_fraction_blue_diopside_melt::points:h=a84e6f7ccf5d
+  experiment_id: 38e49dbf5f302e7c282ac3d9e161b1b5ad7b28c733a4ef29dd09ad056c2c2dad::schreiber-1977-tetravalent-cr-diopside
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.00101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-1977-tetravalent-cr-diopside
+  locator:
+    page: 3
+    published_page: 524
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Melt fraction stated before the separate distribution-coefficient citation.
+  read_from: pdf:schreiber-1977-tetravalent-cr-diopside
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00101325'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-8 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000001'
+            locator:
+              page: 3
+              published_page: 524
+              pdf_page_index: 2
+              section: Results and discussion
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 524
+              pdf_page_index: 2
+              section: Results and discussion
+        output_unit: Pa
+        references: []
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The paper gives no temperature for this melt fraction.
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: 10^-8
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+    composition:
+      state:
+        tag: unknown
+        reason: The sentence does not assign the melt to one composition.
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-1977-tetravalent-cr-diopside
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-1977-tetravalent-cr-diopside::schreiber_1977_crvi_fraction_blue_diopside_melt::points:h=86a741fb926b
+  experiment_id: 38e49dbf5f302e7c282ac3d9e161b1b5ad7b28c733a4ef29dd09ad056c2c2dad::experiment::schreiber_1977_redox_glasses_and_diopside
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: interval
+    interval_low: '0.1'
+    interval_high: '0.2'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-1977-tetravalent-cr-diopside
+  locator:
+    page: 3
+    published_page: 524
+    pdf_page_index: 2
+    section: Results and discussion
+  read_from: pdf:schreiber-1977-tetravalent-cr-diopside
+  point_conditions:
+    fO2_log:
+      state:
+        tag: unknown
+        reason: The melt is described as the one from which blue diopside crystallizes in air; no numeric oxygen fugacity
+          is printed for this range.
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The text says the fraction varies with temperature but gives no single temperature for this range.
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+    composition:
+      state:
+        tag: unknown
+        reason: The fraction is stated to depend on temperature and composition and is not assigned to one composition.
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 3
+        published_page: 524
+        pdf_page_index: 2
+        section: Results and discussion
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-1977-tetravalent-cr-diopside
+    parameters: []
+    output_unit: fraction of total Cr
+    references: []

@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=1000:col=H_minus_H298:name=herzenbergite:v=fd05e8960f
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=1000:col=H_minus_H298:name=herzenbergite:v=fd05e8960f:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -14,10 +14,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -79,8 +77,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='9.470'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -110,7 +121,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=1100:col=H_minus_H298:name=herzenbergite:v=de7a3bd71f
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=1100:col=H_minus_H298:name=herzenbergite:v=de7a3bd71f:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -122,10 +134,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -187,8 +197,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='10.840'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -218,7 +241,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=1153:col=H_minus_H298:name=herzenbergite:v=30bc86edb0
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=1153:col=H_minus_H298:name=herzenbergite:v=30bc86edb0:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -230,10 +254,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -295,8 +317,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='11.580'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -326,7 +361,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=1153:col=H_minus_H298:name=herzenbergite:v=cf1c188e90
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=1153:col=H_minus_H298:name=herzenbergite:v=cf1c188e90:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -338,10 +374,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -403,8 +437,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='19.130'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -434,7 +481,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=1200:col=H_minus_H298:name=herzenbergite:v=35ec03e64b
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=1200:col=H_minus_H298:name=herzenbergite:v=35ec03e64b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -446,10 +494,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -511,8 +557,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='19.970'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -542,7 +601,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=herzenbergite:v=900e6181ee
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=herzenbergite:v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -554,10 +614,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -619,8 +677,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -650,7 +721,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=400:col=H_minus_H298:name=herzenbergite:v=3ec5f04259
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=400:col=H_minus_H298:name=herzenbergite:v=3ec5f04259:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -662,10 +734,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -727,8 +797,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='1.210'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -758,7 +841,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=500:col=H_minus_H298:name=herzenbergite:v=48210c725c
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=500:col=H_minus_H298:name=herzenbergite:v=48210c725c:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -770,10 +854,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -835,8 +917,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='2.450'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -866,7 +961,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=600:col=H_minus_H298:name=herzenbergite:v=41852d6973
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=600:col=H_minus_H298:name=herzenbergite:v=41852d6973:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -878,10 +974,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -943,8 +1037,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='3.750'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -974,7 +1081,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=700:col=H_minus_H298:name=herzenbergite:v=2a96c69f1b
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=700:col=H_minus_H298:name=herzenbergite:v=2a96c69f1b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -986,10 +1094,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -1051,8 +1157,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='5.090'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1082,7 +1201,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=800:col=H_minus_H298:name=herzenbergite:v=02eccbb9d8
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=800:col=H_minus_H298:name=herzenbergite:v=02eccbb9d8:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -1094,10 +1214,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -1159,8 +1277,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='6.520'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1190,7 +1321,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=875:col=H_minus_H298:name=herzenbergite:v=2ff75962f6
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=875:col=H_minus_H298:name=herzenbergite:v=2ff75962f6:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -1202,10 +1334,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -1267,8 +1397,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='7.810'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1298,7 +1441,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=875:col=H_minus_H298:name=herzenbergite:v=da90fd7dfc
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=875:col=H_minus_H298:name=herzenbergite:v=da90fd7dfc:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -1310,10 +1454,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -1375,8 +1517,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='7.650'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1406,7 +1561,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=900:col=H_minus_H298:name=herzenbergite:v=872ff387c9
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:H_minus_H298:shared:T=900:col=H_minus_H298:name=herzenbergite:v=872ff387c9:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -1418,10 +1574,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -1483,8 +1637,21 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='8.140'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1514,7 +1681,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:delta_fG:from_the_elements:T=700:col=delta_f_G:name=herzenbergite:v=ff47499120
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:delta_fG:from_the_elements:T=700:col=delta_f_G:name=herzenbergite:v=ff47499120:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -1526,10 +1694,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -1555,10 +1721,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid
-                1153° to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -1652,8 +1816,23 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='-22.926'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69, Sn=B1259 reference-state table p.69/PDF
+          p.75
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1687,7 +1866,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:delta_fG:from_the_elements:T=800:col=delta_f_G:name=herzenbergite:v=90cd76f748
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:delta_fG:from_the_elements:T=800:col=delta_f_G:name=herzenbergite:v=90cd76f748:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -1699,10 +1879,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -1728,10 +1906,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid
-                1153° to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -1825,8 +2001,23 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='-23.337'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69, Sn=B1259 reference-state table p.69/PDF
+          p.75
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1860,7 +2051,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:delta_fH:from_the_elements:T=800:col=delta_f_H:name=herzenbergite:v=2d324b40d8
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:delta_fH:from_the_elements:T=800:col=delta_f_H:name=herzenbergite:v=2d324b40d8:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -1872,10 +2064,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -1901,10 +2091,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid
-                1153° to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -1998,8 +2186,23 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='-41.603'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69, Sn=B1259 reference-state table p.69/PDF
+          p.75
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2033,7 +2236,8 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:log10_Kf:from_the_elements:T=500:col=log_Kf:name=herzenbergite:v=66b0537dc2
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:log10_Kf:from_the_elements:T=500:col=log_Kf:name=herzenbergite:v=66b0537dc2:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -2045,10 +2249,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2074,10 +2276,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid
-                1153° to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -2171,8 +2371,23 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='10.691'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69, Sn=B1259 reference-state table p.69/PDF
+          p.75
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2197,7 +2412,8 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:log10_Kf:from_the_elements:T=800:col=log_Kf:name=herzenbergite:v=dbf33bed26
+    references: []
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:log10_Kf:from_the_elements:T=800:col=log_Kf:name=herzenbergite:v=dbf33bed26:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0065-herzenbergite:tabulation
   identity:
     quantity:
@@ -2209,10 +2425,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid 1153°
-          to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2238,10 +2452,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. Liquid
-                1153° to 1200°K. HERZENBERGITE' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -2335,8 +2547,23 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 90
+        pdf_page_index: 96
+        table: b1259-ht-0065-herzenbergite
+        note: as_published='6.375'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
+          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
+          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+          elemental_reference_state_tables=S=B1259 reference-state table p.63/PDF p.69, Sn=B1259 reference-state table p.69/PDF
+          p.75
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
+        record: b1259-ht-0065-herzenbergite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2361,3 +2588,4 @@ observations:
     - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0065-herzenbergite.json
     parameters: []
     output_unit: dimensionless
+    references: []

@@ -1,0 +1,3303 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/de-abreu-2024-li2o-sio2-thermochemistry.yaml
+observations:
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_figure3_li4sio4_second_order_transition
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li4SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: second_order_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No composition is printed for the Li4SiO4 second-order transition.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '873.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: This work; DTA, Figure 3 caption
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_figure3_li4sio4_second_order_transition
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 9
+    published_page: 311
+    pdf_page_index: 8
+    figure: '3'
+    note: Figure 3 caption; caption identifies the second-order transition.; panel=a
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No composition is printed for the Li4SiO4 second-order transition.
+      locator:
+        page: 9
+        published_page: 311
+        pdf_page_index: 8
+        table: Figure 3
+    temperature_K:
+      state:
+        tag: value
+        value: '873.4'
+      locator:
+        page: 9
+        published_page: 311
+        pdf_page_index: 8
+        figure: '3'
+        note: Figure 3 caption; caption identifies the second-order transition.; panel=a
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2si2o5_S_8
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '122.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: AC [41]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2si2o5_S_8
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 13
+    published_page: 315
+    pdf_page_index: 12
+    table: '5'
+    note: row=Li2Si2O5; column=S°298K
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        note: row=Li2Si2O5; column=S°298K
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2si2o5_delta_fH_6
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2557.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Solution calorimetry [41]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2si2o5_delta_fH_6
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 13
+    published_page: 315
+    pdf_page_index: 12
+    table: '5'
+    note: row=Li2Si2O5; column=ΔH°298K
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        note: row=Li2Si2O5; column=ΔH°298K
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2sio3_S_7
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '79.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: AC [42]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2sio3_S_7
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 13
+    published_page: 315
+    pdf_page_index: 12
+    table: '5'
+    note: row=Li2SiO3; column=S°298K
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        note: row=Li2SiO3; column=S°298K
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2sio3_delta_fH_2
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1646.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Solution calorimetry [41]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2sio3_delta_fH_2
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 13
+    published_page: 315
+    pdf_page_index: 12
+    table: '5'
+    note: row=Li2SiO3; column=ΔH°298K
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        note: row=Li2SiO3; column=ΔH°298K
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2sio3_delta_fH_3
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1655'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: KEM [50]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2sio3_delta_fH_3
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 13
+    published_page: 315
+    pdf_page_index: 12
+    table: '5'
+    note: row=Li2SiO3; column=ΔH°298K
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        note: row=Li2SiO3; column=ΔH°298K
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2sio3_delta_fH_4
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1629'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: KEM [51]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2sio3_delta_fH_4
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 13
+    published_page: 315
+    pdf_page_index: 12
+    table: '5'
+    note: row=Li2SiO3; column=ΔH°298K
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        note: row=Li2SiO3; column=ΔH°298K
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2sio3_delta_fH_5
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1674.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: KEM [52]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li2sio3_delta_fH_5
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 13
+    published_page: 315
+    pdf_page_index: 12
+    table: '5'
+    note: row=Li2SiO3; column=ΔH°298K
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        note: row=Li2SiO3; column=ΔH°298K
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li4sio4_delta_fH_1
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Li4SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2328.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: KEM [49]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table5_li4sio4_delta_fH_1
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 13
+    published_page: 315
+    pdf_page_index: 12
+    table: '5'
+    note: row=Li4SiO4; column=ΔH°298K
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        note: row=Li4SiO4; column=ΔH°298K
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g6_r1
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li4SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1490'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Thermal analysis—[54]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g6_r1
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 14
+    published_page: 316
+    pdf_page_index: 13
+    table: '6'
+    note: row=Liq. ⇌ Li4SiO4; Thermal analysis [54]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + Li4SiO4
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g6
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1490'
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        note: row=Liq. ⇌ Li4SiO4; Thermal analysis [54]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g6_r2
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li4SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1528'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: quenching method—[10]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g6_r2
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 14
+    published_page: 316
+    pdf_page_index: 13
+    table: '6'
+    note: row=Liq. ⇌ Li4SiO4; quenching method [10]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + Li4SiO4
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g6
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1528'
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        note: row=Liq. ⇌ Li4SiO4; quenching method [10]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g6_r3
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li4SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1531'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: DTA—[12]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g6_r3
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 14
+    published_page: 316
+    pdf_page_index: 13
+    table: '6'
+    note: row=Liq. ⇌ Li4SiO4; DTA [12]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + Li4SiO4
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g6
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1531'
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        note: row=Liq. ⇌ Li4SiO4; DTA [12]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g6_r4
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li4SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1531'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: DC—[35]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g6_r4
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 14
+    published_page: 316
+    pdf_page_index: 13
+    table: '6'
+    note: row=Liq. ⇌ Li4SiO4; DC [35]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + Li4SiO4
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g6
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1531'
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        note: row=Liq. ⇌ Li4SiO4; DC [35]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g7_r1
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1453'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Thermal analysis—[54]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g7_r1
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 14
+    published_page: 316
+    pdf_page_index: 13
+    table: '6'
+    note: row=Liq. ⇌ Li2SiO3; Thermal analysis [54]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + Li2SiO3
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g7
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1453'
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        note: row=Liq. ⇌ Li2SiO3; Thermal analysis [54]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g7_r2
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1474'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Thermal analysis—[10]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g7_r2
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 14
+    published_page: 316
+    pdf_page_index: 13
+    table: '6'
+    note: row=Liq. ⇌ Li2SiO3; Thermal analysis [10]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + Li2SiO3
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g7
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1474'
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        note: row=Liq. ⇌ Li2SiO3; Thermal analysis [10]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g7_r3
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1475'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: quenching method—[10]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g7_r3
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 14
+    published_page: 316
+    pdf_page_index: 13
+    table: '6'
+    note: row=Liq. ⇌ Li2SiO3; quenching method [10]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + Li2SiO3
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g7
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1475'
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        note: row=Liq. ⇌ Li2SiO3; quenching method [10]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g7_r4
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1482'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: DTA—[12]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g7_r4
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 14
+    published_page: 316
+    pdf_page_index: 13
+    table: '6'
+    note: row=Liq. ⇌ Li2SiO3; DTA [12]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + Li2SiO3
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g7
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1482'
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        note: row=Liq. ⇌ Li2SiO3; DTA [12]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g7_r5
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1474'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: KEMS—[51]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g7_r5
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 14
+    published_page: 316
+    pdf_page_index: 13
+    table: '6'
+    note: row=Liq. ⇌ Li2SiO3; KEMS [51]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + Li2SiO3
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g7
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1474'
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        note: row=Liq. ⇌ Li2SiO3; KEMS [51]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g7_r6
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1484'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: DTA—[28]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g7_r6
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 14
+    published_page: 316
+    pdf_page_index: 13
+    table: '6'
+    note: row=Liq. ⇌ Li2SiO3; DTA [28]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + Li2SiO3
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g7
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1484'
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        note: row=Liq. ⇌ Li2SiO3; DTA [28]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g8_r1
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: polymorphic_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1203'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: DTA—[56]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g8_r1
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 15
+    published_page: 317
+    pdf_page_index: 14
+    table: '6'
+    note: row=h-Li2Si2O5 ⇌ l-Li2Si2O5; DTA [56]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: h-Li2Si2O5 + l-Li2Si2O5
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g8
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1203'
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        note: row=h-Li2Si2O5 ⇌ l-Li2Si2O5; DTA [56]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g8_r2
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: polymorphic_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1215'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: SC—[41]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g8_r2
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 15
+    published_page: 317
+    pdf_page_index: 14
+    table: '6'
+    note: row=h-Li2Si2O5 ⇌ l-Li2Si2O5; SC [41]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: h-Li2Si2O5 + l-Li2Si2O5
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g8
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1215'
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        note: row=h-Li2Si2O5 ⇌ l-Li2Si2O5; SC [41]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g8_r3
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: polymorphic_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1223'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: DSC—[57]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g8_r3
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 15
+    published_page: 317
+    pdf_page_index: 14
+    table: '6'
+    note: row=h-Li2Si2O5 ⇌ l-Li2Si2O5; DSC [57]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: h-Li2Si2O5 + l-Li2Si2O5
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g8
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1223'
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        note: row=h-Li2Si2O5 ⇌ l-Li2Si2O5; DSC [57]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g9_r1
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1228'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Thermal analysis—[54]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g9_r1
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 15
+    published_page: 317
+    pdf_page_index: 14
+    table: '6'
+    note: row=Liq. ⇌ h-Li2Si2O5; Thermal analysis [54]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + h-Li2Si2O5
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g9
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1228'
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        note: row=Liq. ⇌ h-Li2Si2O5; Thermal analysis [54]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g9_r2
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1305'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Thermal analysis—[55]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g9_r2
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 15
+    published_page: 317
+    pdf_page_index: 14
+    table: '6'
+    note: row=Liq. ⇌ h-Li2Si2O5; Thermal analysis [55]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + h-Li2Si2O5
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g9
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1305'
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        note: row=Liq. ⇌ h-Li2Si2O5; Thermal analysis [55]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g9_r3
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1300'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Quenching method—[10]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g9_r3
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 15
+    published_page: 317
+    pdf_page_index: 14
+    table: '6'
+    note: row=Liq. ⇌ h-Li2Si2O5; Quenching method [10]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + h-Li2Si2O5
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g9
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        note: row=Liq. ⇌ h-Li2Si2O5; Quenching method [10]; column=Temp. (K)
+- observation_id: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g9_r4
+  experiment_id: 10.3390/solids5020020::de-abreu-2024-li2o-sio2-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: congruent
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: No liquid composition is printed for this reaction row.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not report the total pressure for this transition measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1311'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: DSC—[57]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: de-abreu-2024-li2o-sio2-thermochemistry::deabreu2024_table6_g9_r4
+  source_id: de-abreu-2024-li2o-sio2-thermochemistry
+  locator:
+    page: 15
+    published_page: 317
+    pdf_page_index: 14
+    table: '6'
+    note: row=Liq. ⇌ h-Li2Si2O5; DSC [57]; column=Temp. (K)
+  read_from: pdf:de-abreu-2024-li2o-sio2-thermochemistry
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: No liquid composition is printed for this reaction row.
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    liquid_x_SiO2_as_printed:
+      state:
+        tag: unknown
+        reason: Table 6 prints a dash for liquid x(SiO2).
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    full_assemblage:
+      state:
+        tag: value
+        value: Liquid + h-Li2Si2O5
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    assemblage_id:
+      state:
+        tag: value
+        value: deabreu2024_table6_g9
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+    temperature_K:
+      state:
+        tag: value
+        value: '1311'
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        note: row=Liq. ⇌ h-Li2Si2O5; DSC [57]; column=Temp. (K)

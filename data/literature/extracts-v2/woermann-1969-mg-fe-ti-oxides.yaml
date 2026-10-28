@@ -131,6 +131,7 @@ observations:
               section: Abstract
               note: 'Printed melting relation for Mg2TiO4: 1756 °C, incongruent melting'
         output_unit: K
+        references: []
 - observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mgo_tio2_invariant_1620_mgo
   experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_inv_1620
   identity:
@@ -269,6 +270,7 @@ observations:
               table: Liquidus invariant points after Fig. 4
               note: Printed liquid composition at 1620 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -303,6 +305,7 @@ observations:
               pdf_page_index: 0
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -450,6 +453,7 @@ observations:
               table: Liquidus invariant points after Fig. 4
               note: Printed liquid composition at 1620 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -484,6 +488,7 @@ observations:
               pdf_page_index: 0
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -631,6 +636,7 @@ observations:
               table: Liquidus invariant points after Fig. 4
               note: Printed liquid composition at 1630 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -665,6 +671,7 @@ observations:
               pdf_page_index: 0
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -812,6 +819,7 @@ observations:
               table: Liquidus invariant points after Fig. 4
               note: Printed liquid composition at 1630 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -846,6 +854,7 @@ observations:
               pdf_page_index: 0
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -993,6 +1002,7 @@ observations:
               table: Liquidus invariant points after Fig. 4
               note: Printed liquid composition at 1632 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -1027,6 +1037,7 @@ observations:
               pdf_page_index: 0
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -1174,6 +1185,7 @@ observations:
               table: Liquidus invariant points after Fig. 4
               note: Printed liquid composition at 1632 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -1208,6 +1220,7 @@ observations:
               pdf_page_index: 0
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -1355,6 +1368,7 @@ observations:
               table: Liquidus invariant points after Fig. 4
               note: Printed liquid composition at 1756 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -1389,6 +1403,7 @@ observations:
               pdf_page_index: 0
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -1536,6 +1551,7 @@ observations:
               table: Liquidus invariant points after Fig. 4
               note: Printed liquid composition at 1756 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -1570,6 +1586,7 @@ observations:
               pdf_page_index: 0
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -1708,6 +1725,7 @@ observations:
               section: Abstract
               note: 'Printed melting relation for MgTi2O5: 1662 °C, congruent melting'
         output_unit: K
+        references: []
 - observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mgtio3_melting_temperature
   experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_melting_relations
   identity:
@@ -1837,6 +1855,7 @@ observations:
               section: Abstract
               note: 'Printed melting relation for MgTiO3: 1630 °C, incongruent melting'
         output_unit: K
+        references: []
 - observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_ternary_invariant_1530_fe2o3
   experiment_id: 10.2475/001c.125318::experiment::woermann1969_ternary_inv_1530
   identity:
@@ -1885,8 +1904,8 @@ observations:
       tag: value
       value: '20265'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -1975,6 +1994,7 @@ observations:
               table: Liquidus invariant points in MgO-iron oxide-TiO2
               note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -2009,6 +2029,7 @@ observations:
               pdf_page_index: 6
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -2052,6 +2073,7 @@ observations:
               pdf_page_index: 6
               note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
 - observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_ternary_invariant_1530_mgo
   experiment_id: 10.2475/001c.125318::experiment::woermann1969_ternary_inv_1530
   identity:
@@ -2100,8 +2122,8 @@ observations:
       tag: value
       value: '20265'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2190,6 +2212,7 @@ observations:
               table: Liquidus invariant points in MgO-iron oxide-TiO2
               note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -2224,6 +2247,7 @@ observations:
               pdf_page_index: 6
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -2267,6 +2291,7 @@ observations:
               pdf_page_index: 6
               note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
 - observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_ternary_invariant_1530_tio2
   experiment_id: 10.2475/001c.125318::experiment::woermann1969_ternary_inv_1530
   identity:
@@ -2315,8 +2340,8 @@ observations:
       tag: value
       value: '20265'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2405,6 +2430,7 @@ observations:
               table: Liquidus invariant points in MgO-iron oxide-TiO2
               note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -2439,6 +2465,7 @@ observations:
               pdf_page_index: 6
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -2482,6 +2509,7 @@ observations:
               pdf_page_index: 6
               note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
 - observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_ternary_invariant_1596_fe2o3
   experiment_id: 10.2475/001c.125318::experiment::woermann1969_ternary_inv_1596
   identity:
@@ -2530,8 +2558,8 @@ observations:
       tag: value
       value: '20265'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2625,6 +2653,7 @@ observations:
               note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render; the line reads
                 Fe3O2, while its footnote defines total iron oxide as Fe2O3, so this component is stored on the footnote basis
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -2659,6 +2688,7 @@ observations:
               pdf_page_index: 6
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -2702,6 +2732,7 @@ observations:
               pdf_page_index: 6
               note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
 - observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_ternary_invariant_1596_mgo
   experiment_id: 10.2475/001c.125318::experiment::woermann1969_ternary_inv_1596
   identity:
@@ -2750,8 +2781,8 @@ observations:
       tag: value
       value: '20265'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2840,6 +2871,7 @@ observations:
               table: Liquidus invariant points in MgO-iron oxide-TiO2
               note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -2874,6 +2906,7 @@ observations:
               pdf_page_index: 6
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -2917,6 +2950,7 @@ observations:
               pdf_page_index: 6
               note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
 - observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_ternary_invariant_1596_tio2
   experiment_id: 10.2475/001c.125318::experiment::woermann1969_ternary_inv_1596
   identity:
@@ -2965,8 +2999,8 @@ observations:
       tag: value
       value: '20265'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -3055,6 +3089,7 @@ observations:
               table: Liquidus invariant points in MgO-iron oxide-TiO2
               note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render
         output_unit: K
+        references: []
     pO2_Pa:
       state:
         tag: value
@@ -3089,6 +3124,7 @@ observations:
               pdf_page_index: 6
               note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []
     gas_mix:
       state:
         tag: value
@@ -3132,3 +3168,4 @@ observations:
               pdf_page_index: 6
               note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
         output_unit: Pa
+        references: []

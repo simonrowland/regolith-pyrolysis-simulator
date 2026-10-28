@@ -1,0 +1,234 @@
+schema_version: literature_extract.v1
+source_id: shornikov-1999-alumina-silica-vaporization
+source:
+  citation: Shornikov, S. I., Archakov, I. Yu., and Shultz, M. M. (1999). Evaporation and
+    Thermodynamic Properties of the Al2O3–SiO2 System. Doklady Physical Chemistry, 364(4–6),
+    48–50. Translated from Doklady Akademii Nauk, 364(5), 643–646.
+  year: 1999
+  corpus_asset: raw/shornikov-1999-alumina-silica-vaporization/shornikov-1999-alumina-silica-vaporization.pdf
+  corpus_sha256: ade7468d3eda818d71f44702cc47be2162c7855fc6c513c57216f13837d826cb
+extraction:
+  method: No table was emitted. Equations (1) and (3) are quoted as the activity reference.
+    Figures 1–3 were inspected on the 200 dpi page renders and on 300 dpi crops of each figure.
+    MinerU chart tables were ignored. No figure coordinate was stored.
+  date: '2026-10-20'
+  worker: t1372-w2-w9-t1
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables: []
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: sh99_al_sio2_activity_reference
+      type: activity_reference_sentence
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        page: 2
+        equation: '(1)'
+        note: Published page 49 is PDF page 2. The running header prints 49.
+      units: as printed
+      standard_state: Equation (1) integrates ln a(SiO2) from the limit x(Al2O3) = 0 up to
+        x(Al2O3). The paper does not state whether that limit is a solid oxide, a liquid oxide,
+        or a polymorph, and it does not say a pure-silica cell was measured at 2220 K.
+      values:
+        equation_as_printed: ln a(SiO2) = −∫ from x(Al2O3)=0 to x(Al2O3) of x(Al2O3) d ln
+          [a(Al2O3)/a(SiO2)]
+        equation: '(1)'
+        anchor_as_printed: x(Al2O3) = 0
+        phase_as_printed: The paper does not state the phase of the x(Al2O3) = 0 limit.
+        temperature_of_the_activity_figure_K: 2220
+        expected_migration_phase: unknown
+    - observation_id: sh99_al_fig1_ion_currents
+      type: figure_series_refusal
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        page: 2
+        figure: '1'
+        note: 300 dpi crop of Fig. 1. Filled squares lie on curve 1, filled circles on curve
+          2, and curve 3 is a dotted line with no markers. The ordinate is labelled I(i)+,
+          rel. units, with labelled decades 1, 10, 100, and 1000. No tick calibration was
+          made and no coordinate was read.
+      units: relative ion current, as printed
+      values:
+        temperature_K: 2220
+        series_1: (SiO)+ , filled squares, this work
+        series_2: (Al)+ , filled circles, this work
+        series_3: I(SiO)+/I(Al)+ , dotted, no markers
+        decision: refused
+        reason: The ordinate is a relative ion current. The figure prints no partial-pressure
+          scale, so the markers are not stored as pressures or activities. The MinerU line
+          table under Fig. 1 is an invented round grid and was not used.
+    - observation_id: sh99_al_fig2a_curves
+      type: figure_series_refusal
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        page: 2
+        figure: '2'
+        panel: a
+        note: 300 dpi crop of Fig. 2. Panel (a) is four continuous curves and has no data
+          markers. No tick calibration was made.
+      units: activity, as printed
+      values:
+        series:
+        - id: '1'
+          attribution: this work, Knudsen effusion, 2220 K
+          decision: refused
+          reason: Continuous curve. No marker to read.
+        - id: '2'
+          attribution: Dhima, Stafa, and Allibert, High Temp. Sci. 21 (1986) 143–159, at 2073 K
+          decision: refused
+          reason: Cited curve. No marker to read.
+        - id: '3'
+          attribution: ideal associated solution at 2400 K, Shornikov 1998 [2]
+          decision: refused
+          reason: Cited model curve.
+        - id: '4'
+          attribution: Monte Carlo at 2173 K, Bukhtoyarov 1989 [13]
+          decision: refused
+          reason: Cited model curve.
+        mineru_chart_table: ignored
+    - observation_id: sh99_al_liquidus_overlap
+      type: campaign_overlap
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        page: 2
+        paragraph: liquidus plateau
+        note: The sentence is on published page 49, beside Fig. 1.
+      units: as printed
+      values:
+        value_as_printed: 73.7 ± 0.2 mol % Al2O3 at 2220 K
+        decision: context only
+        reason: The same campaign is already stored in shornikov-2000-aluminosilicate-vaporization
+          as 73.67 ± 0.15 mol% Al2O3. This coarser sentence is not scored again.
+  Al2O3:
+    observations: []
+    context:
+    - observation_id: sh99_al_al2o3_activity_reference
+      type: activity_reference_sentence
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        page: 2
+        equation: '(3)'
+        note: Published page 49. The sentence immediately above equation (3) names the standard
+          state. The lower limit 0.263 is the complement of the printed 73.7 mol % Al2O3 liquidus.
+      units: as printed
+      standard_state: The paper says the liquidus point dictated the standard state for a(Al2O3).
+        Equation (3) integrates from x(SiO2) = 0.263. That composition is the liquidus, not a
+        pure oxide. The paper does not name a solid or liquid endmember for this reference.
+      values:
+        sentence_as_printed: The position of the point in the liquidus line also dictated the
+          choice of the standard state for calculations of the activity of aluminum oxide.
+        equation_as_printed: ln a(Al2O3) = −∫ from x(SiO2)=0.263 to x(SiO2) of
+          [x(SiO2)/(1−x(SiO2))] d ln a(SiO2)
+        equation: '(3)'
+        anchor_as_printed: x(SiO2) = 0.263
+        anchor_kind: liquidus composition
+        phase_as_printed: The paper does not name a pure-oxide phase for this reference.
+        expected_migration_phase: unknown
+        schema_gap: A pure-endmember standard state cannot express an activity anchored at
+          x(SiO2) = 0.263. No activity row is stored, so no row carries an invented field.
+    - observation_id: sh99_al_fig2b_curves
+      type: figure_series_refusal
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        page: 2
+        figure: '2'
+        panel: b
+        note: 300 dpi crop of Fig. 2, panel (b). Curves 1–4 are continuous and have no markers
+          of their own.
+      units: activity, as printed
+      values:
+        series_1_to_4: same attributions as Fig. 2 panel (a)
+        decision: refused
+        reason: Continuous curves. Curve 1 is this work at 2220 K and is not traced.
+    - observation_id: sh99_al_fig2b_series5
+      type: figure_series_refusal
+      locator:
+        published_page: 49
+        pdf_page_index: 1
+        page: 2
+        figure: '2'
+        panel: b
+        note: 300 dpi crop. Four filled circles sit on a shallow curve in panel (b), between
+          the labelled curves 1 and 4, from roughly 10 to 30 mol % Al2O3. A fifth filled circle
+          is the legend glyph printed as ● 5 on the right of the panel, near 90 mol % and
+          a(Al2O3) about 0.2. That glyph is not a datum. No tick calibration was made.
+      units: activity, as printed
+      values:
+        marker_count_excluding_legend: 4
+        legend_glyph: one filled circle labelled 5
+        attribution: central atom model at 1873 K, Sastri and Lahiri, Met. Trans. B 16 (1985)
+          325–331 [14]
+        decision: refused
+        reason: The caption assigns symbol 5 to the central atom model [14], not to this work.
+    - observation_id: sh99_al_fig3_curves
+      type: figure_series_refusal
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        page: 3
+        figure: '3'
+        note: 300 dpi crop of Fig. 3 on published page 50. Four continuous curves. The numerals
+          1, 2, 3, and 4 are curve labels. No data marker is on a curve. The MinerU line table
+          is an invented 0/20/40/60/80/100 grid and was not used.
+      units: kJ/mol, as printed
+      values:
+        ordinate_as_printed: ΔfGT, kJ/mol
+        caption_as_printed: Gibbs' energies of formation in the Al2O3–SiO2 system. (1)–(4) are
+          the same as in Fig. 2.
+        decision: refused
+        reason: Continuous curves, and the ordinate is a formation energy along composition.
+          OBSERVATION_TYPES has no type for that curve.
+        schema_gap: quoted_prose_schema_gap
+    - observation_id: sh99_al_melting_overlap
+      type: campaign_overlap
+      locator:
+        published_page: 50
+        pdf_page_index: 2
+        page: 3
+        paragraph: mullite and the 67.6 mol % sample
+        note: Published page 50, left column.
+      units: as printed
+      values:
+        sample_as_printed: initial concentration 67.6 mol % Al2O3 melts at 2160 K
+        mullite_as_printed: melting point of mullite 2180 K, determined by mass spectrometry
+          in this work
+        cited_eutectic_as_printed: 68.9 mol % Al2O3 at 2123 K in Toropov and Galakhov [11]
+        cited_peritectic_as_printed: 36.9 mol % Al2O3 in Risbud and Pask [12]
+        decision: context only
+        reason: shornikov-2000-aluminosilicate-vaporization already stores mullite at 2180 K
+          and the mullite–corundum–liquid eutectic at 2160 K and 67.63 mol% Al2O3. The cited
+          Toropov and Risbud numbers are not this work.
+    - observation_id: sh99_al_cell_and_vapor
+      type: laboratory_conditions
+      locator:
+        published_page: 48
+        pdf_page_index: 0
+        page: 1
+        paragraph: experimental paragraph
+        note: Published page 48, both columns. PDF page 1 carries the journal header.
+      units: as printed
+      T_range_K:
+      - 1720
+      - 2520
+      values:
+        instrument: MI-1201, modified for high-temperature experiments
+        cells: molybdenum effusion cells
+        evaporation_to_effusion_area_ratio: no less than 250
+        pyrometer: EOP-66, better than 10 K
+        ionization_energy_eV: 20.0±0.1
+        vapor_ions_as_printed: (SiO)+, (SiO2)+, (Al)+, (AlO)+, (Al2O)+, (AlO2)+, (Al2O2)+,
+          (O)+, (O2)+; cell ions (MoO)+, (MoO2)+, (MoO3)+
+        bounds_as_printed: (Si)+ and (Mo)+ do not exceed 3% of (SiO)+; (AlSiO)+ does not
+          exceed 0.1% of (SiO)+
+        decision: context only
+        reason: These are experiment bounds. No single composition is paired with the 0.1%
+          or 3% bounds, so they are not a scored concentration series.

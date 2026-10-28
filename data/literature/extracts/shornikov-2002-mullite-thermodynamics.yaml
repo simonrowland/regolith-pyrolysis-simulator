@@ -1,0 +1,394 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2002-mullite-thermodynamics
+source:
+  citation: 'Shornikov, S. I. (2002). Thermodynamic Study of the Mullite Solid Solution Region in the Al2O3–SiO2 System by Mass Spectrometric Techniques. Geochemistry International, 40, Suppl. 1, S46–S60.'
+  year: 2002
+  corpus_asset: raw/shornikov-2002-mullite-thermodynamics/shornikov-2002-mullite-thermodynamics.pdf
+  corpus_sha256: e18f4b66c915978829b1d23f75d1bf76905dcba69345a5ff22264a96baf2e8e0
+extraction:
+  method: 'Manual transcription from the born-digital PDF. Tables 1 and 2 are image-only in the PDF and absent from pdftotext-layout.txt, so the MinerU table tool had no input; all table cells were checked against 600 dpi page renders. Figures are figure-only and deferred.'
+  date: '2026-10-18'
+  worker: codex-fam5-1019
+review_status: draft
+fidelity_samples:
+- species: Al2O3
+  observation_id: shornikov_2002_t2_fusion_present
+  observable: gibbs_table
+  field: delta_H_fus_kJ_mol-1
+  value: 74.84
+  locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '8'}
+species:
+  Al2O3:
+    observations:
+    - observation_id: shornikov_2002_t1_hf_neumann
+      type: gibbs_table
+      locator: {page: 3, published_page: S48, pdf_page_index: 2, table: '1', row: '1'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: 'Neumann [37] (1925)'
+        delta_f_H: -7547.9
+        delta_f_H_as_printed: '−7547.9'
+        note: 'Table 1 column ΔfH°298; formation from elements.'
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t1_s_pankratz
+      type: gibbs_table
+      locator: {page: 3, published_page: S48, pdf_page_index: 2, table: '1', row: '4'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: J/mol K
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        attribution: 'Pankratz et al. [40] (1963)'
+        S: 254.39
+        S_as_printed: '254.39'
+      uncertainty: {reported_status: printed, value_J_per_mol_K: 3.35}
+    - observation_id: shornikov_2002_t1_s_holm_kleppa
+      type: gibbs_table
+      locator: {page: 3, published_page: S48, pdf_page_index: 2, table: '1', row: '8'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: J/mol K
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        attribution: 'Holm and Kleppa [42] (1966)'
+        S: 269.58
+        S_as_printed: '269.58'
+      uncertainty: {reported_status: printed, value_J_per_mol_K: 2.09}
+    - observation_id: shornikov_2002_t1_hf_zenkov
+      type: gibbs_table
+      locator: {page: 3, published_page: S48, pdf_page_index: 2, table: '1', row: '10'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: kJ/mol
+      values: {quantity: delta_fH, method_class: quoted_attributed, attribution: 'Zenkov [44] (1981)', delta_f_H: -6817.8, delta_f_H_as_printed: '−6817.8'}
+      uncertainty: {reported_status: printed, value_kJ_mol-1: 6.8}
+    - observation_id: shornikov_2002_t1_hf_kiseleva
+      type: gibbs_table
+      locator: {page: 3, published_page: S48, pdf_page_index: 2, table: '1', row: '11'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: kJ/mol
+      values: {quantity: delta_fH, method_class: quoted_attributed, attribution: 'Kiseleva et al. [45] (1983)', delta_f_H: -6803.4, delta_f_H_as_printed: '−6803.4'}
+      uncertainty: {reported_status: printed, value_kJ_mol-1: 4.7}
+    - observation_id: shornikov_2002_t1_hf_robie_hemingway
+      type: gibbs_table
+      locator: {page: 4, published_page: S49, pdf_page_index: 3, table: '1', row: '20'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: kJ/mol
+      values: {quantity: delta_fH, method_class: quoted_attributed, attribution: 'Robie and Hemingway [53] (1995)', delta_f_H: -6819.2, delta_f_H_as_printed: '−6819.2'}
+      uncertainty: {reported_status: printed, value_kJ_mol-1: 10.0}
+    - observation_id: shornikov_2002_t1_hf_chase
+      type: gibbs_table
+      locator: {page: 4, published_page: S49, pdf_page_index: 3, table: '1', row: '21'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: kJ/mol
+      values: {quantity: delta_fH, method_class: quoted_attributed, attribution: 'Chase [54] (1998)', delta_f_H: -6819.2, delta_f_H_as_printed: '−6819.2'}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t1_hf_barin
+      type: gibbs_table
+      locator: {page: 4, published_page: S49, pdf_page_index: 3, table: '1', row: '19'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: kJ/mol
+      values: {quantity: delta_fH, method_class: quoted_attributed, attribution: 'Barin et al. [52] (1993)', delta_f_H: -6820.5, delta_f_H_as_printed: '−6820.5'}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t1_hf_kirshen
+      type: gibbs_table
+      locator: {page: 4, published_page: S49, pdf_page_index: 3, table: '1', row: '22'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: kJ/mol
+      values: {quantity: delta_fH, method_class: quoted_attributed, attribution: 'Kirshen et al. [55] (1999)', delta_f_H: -6823.5, delta_f_H_as_printed: '−6823.5'}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t1_s_barin
+      type: gibbs_table
+      locator: {page: 4, published_page: S49, pdf_page_index: 3, table: '1', row: '19'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: J/mol K
+      values: {quantity: S, method_class: quoted_attributed, attribution: 'Barin et al. [52] (1993)', S: 274.89, S_as_printed: '274.89'}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t1_s_robie_hemingway
+      type: gibbs_table
+      locator: {page: 4, published_page: S49, pdf_page_index: 3, table: '1', row: '20'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: J/mol K
+      values: {quantity: S, method_class: quoted_attributed, attribution: 'Robie and Hemingway [53] (1995)', S: 275.00, S_as_printed: '275.00'}
+      uncertainty: {reported_status: printed, value_J_per_mol_K: 5.00}
+    - observation_id: shornikov_2002_t1_s_chase
+      type: gibbs_table
+      locator: {page: 4, published_page: S49, pdf_page_index: 3, table: '1', row: '21'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: J/mol K
+      values: {quantity: S, method_class: quoted_attributed, attribution: 'Chase [54] (1998)', S: 274.25, S_as_printed: '274.25'}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t1_s_kirshen
+      type: gibbs_table
+      locator: {page: 4, published_page: S49, pdf_page_index: 3, table: '1', row: '22'}
+      phase: mullite (3Al2O3·2SiO2)
+      T_range_K: [298, 298]
+      units: J/mol K
+      values: {quantity: S, method_class: quoted_attributed, attribution: 'Kirshen et al. [55] (1999)', S: 274.90, S_as_printed: '274.90'}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t2_melting_beregnoi
+      type: transition_point
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '1'}
+      phase: mullite
+      units: K
+      values: {quantity: transition_temperature, method_class: quoted_attributed, attribution: 'Beregnoi [65] (1970)', T_K: 2123, property_kind: melting_point}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t2_fusion_beregnoi
+      type: gibbs_table
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '1'}
+      phase: mullite fusion
+      T_range_K: [2123, 2123]
+      units: kJ/mol
+      values: {quantity: heat_of_fusion, method_class: quoted_attributed, attribution: 'Beregnoi [65] (1970)', delta_H_fus_kJ_mol-1: 85.69, T_fus_K: 2123}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t2_melting_risbud_pask
+      type: transition_point
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '2'}
+      phase: mullite
+      units: K
+      values: {quantity: transition_temperature, method_class: quoted_attributed, attribution: 'Risbud and Pask [90] (1977), phase diagram [89]', T_K: 2101, property_kind: melting_point, uncertainty_K: 10}
+      uncertainty: {reported_status: printed, value_K: 10}
+    - observation_id: shornikov_2002_t2_fusion_risbud_pask
+      type: gibbs_table
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '2'}
+      phase: mullite fusion
+      T_range_K: [2101, 2101]
+      units: kJ/mol
+      values: {quantity: heat_of_fusion, method_class: quoted_attributed, attribution: 'Risbud and Pask [90] (1977), phase diagram [89]', delta_H_fus_kJ_mol-1: 112.97, T_fus_K: 2101}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t2_melting_galakhov
+      type: transition_point
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '3'}
+      phase: mullite
+      units: K
+      values: {quantity: transition_temperature, method_class: quoted_attributed, attribution: 'Galakhov et al. [91] (1982), immiscibility data', T_K: 2183, property_kind: melting_point, uncertainty_K: 10}
+      uncertainty: {reported_status: printed, value_K: 10}
+    - observation_id: shornikov_2002_t2_fusion_galakhov
+      type: gibbs_table
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '3'}
+      phase: mullite fusion
+      T_range_K: [2183, 2183]
+      units: kJ/mol
+      values: {quantity: heat_of_fusion, method_class: quoted_attributed, attribution: 'Galakhov et al. [91] (1982), immiscibility data', delta_H_fus_kJ_mol-1: 163.18, T_fus_K: 2183}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t2_melting_klug
+      type: transition_point
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '4'}
+      phase: mullite
+      units: K
+      values: {quantity: transition_temperature, method_class: quoted_attributed, attribution: 'Klug et al. [31] (1987), review', T_K: 2123, property_kind: melting_point}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t2_fusion_klug
+      type: gibbs_table
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '4'}
+      phase: mullite fusion
+      T_range_K: [2123, 2123]
+      units: kJ/mol
+      values: {quantity: heat_of_fusion, method_class: quoted_attributed, attribution: 'Klug et al. [31] (1987), review', delta_H_fus_kJ_mol-1: 63.00, T_fus_K: 2123}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t2_melting_liska_danek
+      type: transition_point
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '5'}
+      phase: mullite
+      units: K
+      values: {quantity: transition_temperature, method_class: quoted_attributed, attribution: 'Liska and Danek [92] (1990), review', T_K: 2123, property_kind: melting_point}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t2_fusion_liska_danek
+      type: gibbs_table
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '5'}
+      phase: mullite fusion
+      T_range_K: [2123, 2123]
+      units: kJ/mol
+      values: {quantity: heat_of_fusion, method_class: quoted_attributed, attribution: 'Liska and Danek [92] (1990), review', delta_H_fus_kJ_mol-1: 37.66, T_fus_K: 2123}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t2_melting_bobkova
+      type: transition_point
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '6'}
+      phase: mullite
+      units: K
+      values: {quantity: transition_temperature, method_class: quoted_attributed, attribution: 'Bobkova [93] (1992), review', T_K: 2123, property_kind: melting_point}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t2_fusion_bobkova
+      type: gibbs_table
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '6'}
+      phase: mullite fusion
+      T_range_K: [2123, 2123]
+      units: kJ/mol
+      values: {quantity: heat_of_fusion, method_class: quoted_attributed, attribution: 'Bobkova [93] (1992), review', delta_H_fus_kJ_mol-1: 63.98, T_fus_K: 2123}
+      uncertainty: {reported_status: not_reported}
+    - observation_id: shornikov_2002_t2_melting_shornikov_archakov
+      type: transition_point
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '7'}
+      phase: mullite
+      units: K
+      values: {quantity: transition_temperature, method_class: quoted_attributed, attribution: 'Shornikov and Archakov [94] (2000), mass spectrometric Knudsen effusion', T_K: 2180, property_kind: melting_point, uncertainty_K: 10}
+      uncertainty: {reported_status: printed, value_K: 10}
+    - observation_id: shornikov_2002_t2_fusion_shornikov_archakov
+      type: gibbs_table
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '7'}
+      phase: mullite fusion
+      T_range_K: [2180, 2180]
+      units: kJ/mol
+      values: {quantity: heat_of_fusion, method_class: quoted_attributed, attribution: 'Shornikov and Archakov [94] (2000), mass spectrometric Knudsen effusion', delta_H_fus_kJ_mol-1: 71.70, T_fus_K: 2180}
+      uncertainty: {reported_status: printed, value_kJ_mol-1: 3.10}
+    - observation_id: shornikov_2002_t2_melting_present
+      type: transition_point
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '8'}
+      phase: mullite
+      units: K
+      values: {quantity: transition_temperature, method_class: author_estimate, attribution: this study, T_K: 2180, property_kind: melting_point, uncertainty_K: 10}
+      uncertainty: {reported_status: printed, value_K: 10}
+    - observation_id: shornikov_2002_t2_fusion_present
+      type: gibbs_table
+      locator: {page: 5, published_page: S50, pdf_page_index: 4, table: '2', row: '8'}
+      phase: mullite fusion
+      T_range_K: [2180, 2180]
+      units: kJ/mol
+      values: {quantity: heat_of_fusion, method_class: author_estimate, attribution: this study, delta_H_fus_kJ_mol-1: 74.84, T_fus_K: 2180, note: 'Authors describe this value as estimated from their oxide-formation enthalpy and entropy plus earlier melt thermodynamics.'}
+      uncertainty: {reported_status: printed, value_kJ_mol-1: 1.63}
+    context:
+    - observation_id: shornikov_2002_table1_oxide_formation_inventory
+      type: method
+      locator: {page: 3, published_page: S48–S49, pdf_page_index: 2, table: '1'}
+      units: 'As printed: kJ/mol and J/(mol K)'
+      values:
+        quantity: mullite_formation_from_oxides_table_values
+        method_class: quoted_unattributed
+        reaction_as_printed: '3[Al2O3] + 2[SiO2] ⇌ [3Al2O3·2SiO2]'
+        phase: mullite solid
+        quantity_token_gap: 'ΔfH298, ΔfHT, ΔfS298, ΔfST, and ΔfGT describe formation from oxides and cannot use delta_fH or absolute S; ΔfG°298 column header prints kJ/(mol K), so no compatible token is assigned.'
+        rows_as_printed:
+        - '1 | 298 | ΔfH°298 −7547.9; ΔfH298 −154.05±2.85 | Neumann [37] (1925)'
+        - '2 | 1823 | ΔfGT −4.85±1.26 | Kay and Taylor [38] (1960)'
+        - '3 | 1673–1873 | ΔfHT 22.18±7.45*; ΔfST 15.06±4.20* | Cooper et al. [39] (1961)'
+        - '4 | 298 | S°298 254.39±3.35; ΔfS298 3.80±0.40 | Pankratz et al. [40] (1963)'
+        - '5 | 1700–1900 | ΔfHT −0.87±1.70; ΔfST 2.09±1.20 | Rein and Chipman [41] (1965)'
+        - '6 | 1823 | ΔfGT −4.69±1.39 | Rein and Chipman [41] (1965)'
+        - '7 | 1073–1283 | ΔfHT 0.51±1.93*; ΔfST 2.21±1.64* | Weill [33] (1966)'
+        - '8 | 968±2 | ΔfH298 5.82; ΔfHT 4.55±0.29; S°298 269.58±2.09 | Holm and Kleppa [42] (1966)'
+        - '9 | 803 | ΔfG°298 −6467.8±7.5; ΔfG298 −1.56±0.42; ΔfGT −3.89±0.42 | Ostapenko et al. [43] (1975)'
+        - '10 | 298 | ΔfH°298 −6817.8±6.8; ΔfH298 6.14±1.36; ΔfHT 4.74±1.36 | Zenkov [44] (1981)'
+        - '11 | 973 | ΔfH°298 −6803.4±4.7; ΔfH298 9.02±0.40; ΔfHT 8.14±0.40 | Kiseleva et al. [45] (1983)'
+        - '12 | 1873–2073; ΔfGT value at 1973 | −9.55±2.87** | Dhima et al. [46] (1986)'
+        - '13 | 1833–2033 | ΔfHT 15.90±0.60*; ΔfST 13.80±0.60* | Shornikov et al. [47] (1994)'
+        - '14 | 1173 | ΔfHT 4.20±0.40 | Ayed et al. [48] (1994)'
+        - '15 | 1472–1761 | ΔfHT −0.81±0.27; ΔfST 1.43±0.17 | Zaitsev and Mogutnov [49] (1995)'
+        - '16 | 2200–2400 | ΔfHT 87.77±1.32; ΔfST 45.97±0.77 | Shornikov and Archakov [50] (2001)'
+        - '17 | 2021–2150 | ΔfHT −6.17±2.39**; ΔfST −1.31±1.59** | Bjorkvall and Stolyarova [51] (2001)'
+        - '18 | 1676–2180 | ΔfHT 12.93±0.95; ΔfST 11.64±0.46 | present study'
+        - '19 | 1600–2023 | ΔfH°298 −6820.5; ΔfH298 5.67; ΔfHT 3.49±0.03*; S°298 274.89; ΔfS298 7.83; ΔfST 5.23±0.01*; ΔfG°298 −6443.1; ΔfG298 3.33 | Barin et al. [52] (1993)'
+        - '20 | 1400–1800 | ΔfH°298 −6819.2±10.0; ΔfH298 5.86±2.07; ΔfHT 3.81±0.16*; S°298 275.00±5.00; ΔfS298 7.86±1.00; ΔfST 4.98±0.10*; ΔfG°298 −6441.8±10.0; ΔfG298 3.54±2.07 | Robie and Hemingway [53] (1995)'
+        - '21 | 1700–2180 | ΔfH°298 −6819.2; ΔfH298 5.85; ΔfHT 4.05±0.06*; S°298 274.25; ΔfS298 7.71; ΔfST 5.67±0.03*; ΔfG°298 −6442.0; ΔfG298 3.55 | Chase [54] (1998)'
+        - '22 | 1600–2180 | ΔfH°298 −6823.5; ΔfH298 5.00; ΔfHT 4.56±0.01*; S°298 274.90; ΔfS298 7.90; ΔfST 7.20±0.01*; ΔfG298 2.65 | Kirshen et al. [55] (1999)'
+        note: '* calculated in this study according to cited references by least-squares method; ** evaluated in the present study. The inventories retain printed oxide-formation values without assigning incompatible scoring tokens.'
+    - observation_id: shornikov_2002_experiment_and_samples
+      type: method
+      locator: {page: 6, published_page: S51, pdf_page_index: 5, section: Experimental}
+      units: 'K, atm, mol%'
+      values:
+        quantity: experimental_conditions_and_sample_compositions
+        method_class: measured_direct
+        method: Knudsen-cell mass spectrometric effusion with MI-1201 high-temperature mass spectrometer
+        temperature_range_K: '1676–2327'
+        residual_gas_pressure_atm: '≤10^-10'
+        ionization_potential_V: '20.0'
+        synthesis: '1600 K for 24 h in air; annealed at 1800–2000 K for 1 h in Ar to prevent melting.'
+        starting_Al2O3_mol_percent_by_sample: ['1.19', '3.31', '12.84', '28.20', '60.00', '67.63', '70.21', '84.14']
+        starting_SiO2_composition: {state: unknown, reason: 'not separately reported as a paired composition in the figure caption; not reconstructed'}
+        note: 'Silica powder purity 99.90 wt% SiO2. Values are experimental context, not a scored equilibrium composition.'
+    - observation_id: shornikov_2002_fig1_cp
+      type: figure
+      locator: {page: 2, published_page: S47, pdf_page_index: 1, figure: '1'}
+      units: 'Cp(M), J/(mol K); T, K'
+      values:
+        quantity: cp
+        method_class: figure_only
+        admission_status: figure_only
+        species: mullite
+        phase: mullite solid
+        axes_as_printed: 'Cp(M), J/(mol K) versus T, K'
+        attribution: 'Pankratz and Kelley [40]; Kolosovskii [56]; Bergeron [57]; Barin et al. [52]; Chase [54]; Matveev et al. [58].'
+        caption: 'Temperature dependence of mullite heat capacity: (1) Pankratz and Kelley [40], (2) Kolosovskii [56], (3) Bergeron et al. [57], (4) Barin et al. [52], (5) Chase [54], and (6) Matveev et al. [58].'
+        panel: null
+        series: [{label: '1', markers: 0}, {label: '2', markers: 0}, {label: '3', markers: 0}, {label: '4', markers: 16}, {label: '5', markers: 0}, {label: '6', markers: 15}]
+        digitisation: deferred to a figure pass
+    - observation_id: shornikov_2002_fig2_oxide_formation_gibbs
+      type: figure
+      locator: {page: 2, published_page: S47, pdf_page_index: 1, figure: '2'}
+      units: 'ΔfG_T(M), kJ/mol; T, K'
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: figure_only
+        species: mullite
+        phase: mullite solid
+        reaction_as_printed: '3[Al2O3] + 2[SiO2] ⇌ [3Al2O3·2SiO2]'
+        axes_as_printed: 'ΔfG_T(M), kJ/mol versus T, K'
+        attribution: 'Kay and Taylor [38]; Cooper et al. [39]; Rein and Chipman [41]; Weill [33]; Ostapenko et al. [43]; Allibert et al. [46]; Shornikov et al. [47]; Zaitsev and Mogutnov [49]; Shornikov and Archakov [50]; Bjorkvall and Stolyarova [51]; this paper; Chase [54].'
+        caption: 'Gibbs energy of mullite formation from oxides; series (1)–(3) slag equilibria, (4) cryolite solubility, (5) water solubility, (6)–(11) Knudsen mass spectrometric effusion including this paper, and (12) Chase thermochemical calculation.'
+        panel: null
+        series: [{label: '1', markers: 0}, {label: '2', markers: 0}, {label: '3', markers: 0}, {label: '4', markers: 0}, {label: '5', markers: 0}, {label: '6', markers: 0}, {label: '7', markers: 0}, {label: '8', markers: 0}, {label: '9', markers: 0}, {label: '10', markers: 0}, {label: '11', markers: 0}, {label: '12', markers: 0}]
+        digitisation: deferred to a figure pass
+    - observation_id: shornikov_2002_fig3_sample_compositions
+      type: figure
+      locator: {page: 6, published_page: S51, pdf_page_index: 5, figure: '3'}
+      units: 'x(Al2O3), mol%; T, K'
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: figure_only
+        admission_status: figure_only
+        species: mullite solid solution in Al2O3–SiO2
+        phase: solids and liquid phase fields as printed
+        axes_as_printed: 'x(Al2O3), mol% versus T, K'
+        attribution: 'Phase boundaries from [1] and [14]; sample composition paths from this study.'
+        caption: 'Concentration variations in the sample compositions during evaporation of samples in the Al2O3–SiO2 system.'
+        panel: null
+        series: [{label: 'sample 1', markers: 0}, {label: 'sample 2', markers: 0}, {label: 'sample 3', markers: 0}, {label: 'sample 4', markers: 0}, {label: 'sample 5', markers: 0}, {label: 'sample 6', markers: 0}, {label: 'sample 7', markers: 0}, {label: 'sample 8', markers: 0}]
+        digitisation: deferred to a figure pass
+    - observation_id: shornikov_2002_fig4_partial_pressures
+      type: figure
+      locator: {page: 8, published_page: S53, pdf_page_index: 7, figure: '4'}
+      units: 'log p_i, atm; T, K'
+      values:
+        quantity: p_partial
+        method_class: figure_only
+        admission_status: figure_only
+        species: SiO(g), Al(g), O(g)
+        phase: vapor over Al2O3–SiO2 solid phases
+        axes_as_printed: 'log p_i, atm versus T, K'
+        attribution: 'Silicon dioxide data [79]; present study in subliquidus S–M and M–A ranges; aluminum oxide data [78,83].'
+        caption: 'Partial pressures of vapor: (a) silicon monoxide, (b) atomic aluminum, and (c) oxygen over solid phases; (1) over silicon dioxide [79], (2,3) subliquidus S–M and M–A ranges from this study, and (4,5) over aluminum oxide [78,83].'
+        panel: ['a: SiO', 'b: Al', 'c: O']
+        series: [{label: 'a1', markers: 0}, {label: 'a2', markers: 0}, {label: 'a3', markers: 0}, {label: 'a4', markers: 0}, {label: 'a5', markers: 0}, {label: 'b1', markers: 0}, {label: 'b2', markers: 0}, {label: 'b3', markers: 0}, {label: 'b4', markers: 0}, {label: 'b5', markers: 0}, {label: 'c1', markers: 0}, {label: 'c2', markers: 0}, {label: 'c3', markers: 0}, {label: 'c4', markers: 0}, {label: 'c5', markers: 0}]
+        digitisation: deferred to a figure pass
+    - observation_id: shornikov_2002_fig5_partial_pressures_composition
+      type: figure
+      locator: {page: 8, published_page: S53, pdf_page_index: 7, figure: '5'}
+      units: 'log p_i, atm; composition'
+      values:
+        quantity: p_partial
+        method_class: figure_only
+        admission_status: figure_only
+        species: SiO(g), Al(g), O(g)
+        phase: vapor over Al2O3–SiO2 subsolidus region
+        temperature_K: '1850'
+        axes_as_printed: 'log p_1850(i), atm versus composition across silica–mullite–alumina region'
+        attribution: this study
+        caption: 'Concentration functions of the partial pressures of (1) silicon monoxide, (2) atomic aluminum, and (3) oxygen over the subsolidus region at 1850 K.'
+        panel: null
+        series: [{label: '1 SiO', markers: 0}, {label: '2 Al', markers: 0}, {label: '3 O', markers: 0}]
+        digitisation: deferred to a figure pass

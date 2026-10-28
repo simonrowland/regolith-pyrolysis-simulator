@@ -1,0 +1,1205 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2138/am.2012.3750
+  citation: Ozawa, K., Nagahara, H., Morioka, M., Matsumoto, N., Hutcheon, I. D., Noguchi, T., & Kagi, H. (2012). Kinetics
+    of evaporation of forsterite in vacuum. American Mineralogist, 97, 80–99.
+  source_ids:
+  - ozawa-2012-forsterite-vacuum-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:ozawa-2012-forsterite-vacuum-evaporation
+      role: pdf
+      path: raw/ozawa-2012-forsterite-vacuum-evaporation/ozawa-2012-forsterite-vacuum-evaporation.pdf
+      sha256:
+        tag: value
+        value: 4bb85893e310db589b706dc90464933116e4ba716852a9ffc8b5b53f487f8874
+    - asset_id: pdftotext:ozawa-2012-forsterite-vacuum-evaporation
+      role: pdftotext
+      path: text/ozawa-2012-forsterite-vacuum-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:ozawa-2012-forsterite-vacuum-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2138/am.2012.3750
+experiments:
+- experiment_id: 10.2138/am.2012.3750::experiment::ozawa_2012_forsterite_vacuum_series
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: unknown
+        reason: Runs span 1500 to 1810 °C; each row has its own printed temperature.
+      locator:
+        page: 2
+        published_page: 81
+        pdf_page_index: 1
+        section: Experimental Methods
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 reports per-run pressure and sometimes marks it not measured; no one pressure describes every run.
+      locator:
+        page: 2
+        published_page: 81
+        pdf_page_index: 1
+        section: Experimental Methods
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No independent fO2 measurement or control is reported.
+      locator:
+        page: 2
+        published_page: 81
+        pdf_page_index: 1
+        section: Experimental Methods
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: Free evaporation under continuous evacuation; no sweep gas is reported.
+      locator:
+        page: 2
+        published_page: 81
+        pdf_page_index: 1
+        section: Experimental Methods
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Pressure varied by run; per-run values are in Table 1 and some are not measured.
+      locator:
+        page: 2
+        published_page: 81
+        pdf_page_index: 1
+        section: Experimental Methods
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: Free evaporation under continuous evacuation; no sweep gas is reported.
+      locator:
+        page: 2
+        published_page: 81
+        pdf_page_index: 1
+        section: Experimental Methods
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source describes free evaporation but does not report a gas-kinetic flow-regime classification.
+  work_id: 10.2138/am.2012.3750
+  locator:
+    page: 2
+    published_page: 81
+    pdf_page_index: 1
+    section: Experimental Methods
+- experiment_id: 10.2138/am.2012.3750::ozawa-2012-forsterite-vacuum-evaporation
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2138/am.2012.3750
+  locator:
+    page: 3
+    published_page: 82
+    pdf_page_index: 2
+    table: '1'
+context:
+- observation_id: ozawa_2012_appendix_table1_non_delta_columns
+  type: unscored_measurement_context
+  locator:
+    page: 20
+    published_page: 99
+    pdf_page_index: 19
+    table: Appendix 1
+  units: as printed
+  values:
+    candidate_tokens_checked:
+    - isotope_delta
+    - evaporation_coefficient_alpha
+    - evaporation_rate
+    - mass_loss_fraction
+    no_token_reason: Depth is a length, alpha_min is an isotope fractionation factor rather than an evaporation accommodation
+      coefficient, and tau is dimensionless model time; none has a compatible token in these roles.
+    alpha_isotopic_fractionation_factors:
+    - sample_no: '832'
+      surface: (100)
+      alpha_min_25: 1.0101±0.002
+      alpha_min_26: 1.0215±0.004
+    - sample_no: '831'
+      surface: (010)
+      alpha_min_25: 1.0065±0.0018
+      alpha_min_26: 1.0167±0.0038
+    - sample_no: '887'
+      surface: (001)
+      alpha_min_25: 1.0128±0.002
+      alpha_min_26: 1.0282±0.0044
+    depth_nm:
+    - sample_no: '832'
+      value: '90'
+    - sample_no: '831'
+      value: '60'
+    - sample_no: '887'
+      value: '100'
+    dimensionless_times:
+    - sample_no: '832'
+      tauW: '34.5'
+      tau_steady_25: '8.4'
+      tau_steady_26: '10.6'
+    - sample_no: '831'
+      tauW: '10.3'
+      tau_steady_25: '7.2'
+      tau_steady_26: '9.9'
+    - sample_no: '887'
+      tauW: '28.5'
+      tau_steady_25: '9.1'
+      tau_steady_26: '11.4'
+    table_mass_loss_fraction_note: Appendix Table 1 gives f as 19.5, 15.8, and 50.8 wt% for runs 832, 831, and 887; Table
+      1 reports the same observations rounded to 20, 16, and 51 wt%. No second mass-loss observation is made.
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_appendix_table1_non_delta_columns
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_figure_10_deferred
+  type: deferred_figure
+  locator:
+    page: 15
+    published_page: 94
+    pdf_page_index: 14
+    figure: '10'
+  phase: cr
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: evaporation_rate
+    quantity_as_printed: nominal overall evaporation rate
+    formula: Mg2SiO4
+    phase: cr
+    T_C:
+    - 1770
+    axes_as_printed:
+      x: pit density (mm^-2)
+      y: evaporation rate (m/sec)
+    caption: Relationship between pit density and instantaneous evaporation rate at 1770 °C. Horizontal thick gray dashed
+      lines are nominal overall evaporation rates given in Table 3, and thin dashed lines are regression lines with the method
+      of York (1966) for evaporation enhancement by dislocations.
+    panels:
+    - a
+    - b
+    - c
+    series:
+    - (100)
+    - (010)
+    - (001)
+    - nominal rates and regression lines
+    marker_counts_per_series:
+      (100): 3
+      (010): 3
+      (001): 3
+      lines: 0
+    attribution: Ozawa et al. (2012), figure as printed
+    digitisation: deferred to a figure pass
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_figure_10_deferred
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_figure_11_deferred
+  type: deferred_figure
+  locator:
+    page: 16
+    published_page: 95
+    pdf_page_index: 15
+    figure: '11'
+  phase: cr
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: evaporation_rate
+    quantity_as_printed: nominal overall evaporation rate
+    formula: Mg2SiO4
+    phase: cr
+    T_C:
+    - 1504
+    - 1770
+    axes_as_printed:
+      x: 10000/temperature (K)
+      y: evaporation rate (m/sec)
+    caption: Arrhenius plot for intrinsic evaporation rates of forsterite in vacuum. Activation energies and pre-exponential
+      terms for each crystallographic axes were obtained by fitting three data for (100), four data for (010), five data for
+      (001) above ~1700 °C, and three data for (001) below ~1700 °C (Table 4).
+    panels:
+    - single panel
+    series:
+    - (100)
+    - (010)
+    - (001) above 1700 °C
+    - (001) below 1700 °C
+    - nominal overall rate comparison
+    marker_counts_per_series:
+      (100): 3
+      (010): 4
+      (001) above 1700 °C: 5
+      (001) below 1700 °C: 3
+      comparison lines: 0
+    attribution: Ozawa et al. (2012), figure as printed
+    digitisation: deferred to a figure pass
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_figure_11_deferred
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_figure_1_deferred
+  type: deferred_figure
+  locator:
+    page: 5
+    published_page: 84
+    pdf_page_index: 4
+    figure: '1'
+  phase: cr
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: unavailable
+    quantity_as_printed: surface microstructure
+    formula: Mg2SiO4
+    phase: cr
+    T_C:
+    - 1504
+    - 1598
+    - 1692
+    - 1770
+    axes_as_printed: none; SEM micrographs
+    caption: 'Surface microstructure of forsterite evaporated at 1504 (*1500), 1598 (*1600), 1692 (*1700), and 1770 °C: (a–d)
+      for the (100) surface, (e–h) for (010), and (i–l) for (001) (SEM images). Experimental duration, evaporated fraction,
+      and calculated evaporated thickness are given beneath each image.'
+    panels:
+    - a
+    - b
+    - c
+    - d
+    - e
+    - f
+    - g
+    - h
+    - i
+    - j
+    - k
+    - l
+    series:
+    - (100) surface, four temperatures
+    - (010) surface, four temperatures
+    - (001) surface, four temperatures
+    marker_counts_per_series:
+      each surface series: 0
+      image panels per surface: 4
+    attribution: Ozawa et al. (2012), figure as printed
+    digitisation: deferred to a figure pass
+    schema_gap: No existing quantity token describes this figure's morphology or number-density measurement.
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_figure_1_deferred
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_figure_2_deferred
+  type: deferred_figure
+  locator:
+    page: 6
+    published_page: 85
+    pdf_page_index: 5
+    figure: '2'
+  phase: cr
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: unavailable
+    quantity_as_printed: pit cross-section morphology
+    formula: Mg2SiO4
+    phase: cr
+    T_C:
+    - 1692
+    axes_as_printed: none; schematic cross-sections
+    caption: Cross sections of point-bottomed evaporation pits on the (100) (a) and (001) (b) surfaces at 1692 (*1700) °C,
+      constructed from microscopic observation with transmitted light along edges of evaporated forsterite parallelepiped.
+    panels:
+    - a
+    - b
+    series:
+    - (100) pit
+    - (001) pit
+    marker_counts_per_series:
+      (100) pit: 0
+      (001) pit: 0
+    attribution: Ozawa et al. (2012), figure as printed
+    digitisation: deferred to a figure pass
+    schema_gap: No existing quantity token describes this figure's morphology or number-density measurement.
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_figure_2_deferred
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_figure_3_deferred
+  type: deferred_figure
+  locator:
+    page: 7
+    published_page: 86
+    pdf_page_index: 6
+    figure: '3'
+  phase: cr
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: unavailable
+    quantity_as_printed: pit size, aspect ratio, pit depth, evaporation tunnel length
+    formula: Mg2SiO4
+    phase: cr
+    T_C:
+    - 1500
+    - 1800
+    axes_as_printed:
+      x: temperature (°C)
+      y:
+      - pit size (µm)
+      - aspect ratio
+      - pit depth (µm)
+      - tunnel length (µm)
+    caption: Temperature dependence of morphological parameters for fully grown point-bottomed pits. Pit size (a), aspect
+      ratio (b), depth (c), and tunnel length (d).
+    panels:
+    - a
+    - b
+    - c
+    - d
+    series:
+    - '[100] pit on (100)'
+    - '[010] pit on (010)'
+    - '[001] pit on (001)'
+    marker_counts_per_series:
+      each series in each panel: 5
+    attribution: Ozawa et al. (2012), figure as printed
+    digitisation: deferred to a figure pass
+    schema_gap: No existing quantity token describes this figure's morphology or number-density measurement.
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_figure_3_deferred
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_figure_4_deferred
+  type: deferred_figure
+  locator:
+    page: 8
+    published_page: 87
+    pdf_page_index: 7
+    figure: '4'
+  phase: cr
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: unavailable
+    quantity_as_printed: groove length and opening angle
+    formula: Mg2SiO4
+    phase: cr
+    T_C:
+    - 1500
+    - 1800
+    axes_as_printed:
+      x: temperature (°C)
+      y_a: groove length (µm)
+      y_b: groove opening angle (degree)
+    caption: Temperature dependence of length (a) and opening angle (b) of triangular evaporation grooves on (010) and (001).
+      Measurements were made only for grooves running nearly parallel to the [100] direction.
+    panels:
+    - a
+    - b
+    series:
+    - '[100] on (010)'
+    - '[100] on (001)'
+    marker_counts_per_series:
+      each series in each panel: 5
+    attribution: Ozawa et al. (2012), figure as printed
+    digitisation: deferred to a figure pass
+    schema_gap: No existing quantity token describes this figure's morphology or number-density measurement.
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_figure_4_deferred
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_figure_5_deferred
+  type: deferred_figure
+  locator:
+    page: 9
+    published_page: 88
+    pdf_page_index: 8
+    figure: '5'
+  phase: cr
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: unavailable
+    quantity_as_printed: number density of evaporation pits and grooves
+    formula: Mg2SiO4
+    phase: cr
+    T_C:
+    - 1500
+    - 1770
+    axes_as_printed:
+      a-c: temperature (°C) versus number density (mm^-2)
+      d: evaporated fraction (%) versus number density (mm^-2)
+    caption: Temperature dependence of number of evaporation pits and grooves in 1 mm2 (number density) (a–c) and temporal
+      change of number density of pit and groove at *1700 and 1770 °C (d).
+    panels:
+    - a
+    - b
+    - c
+    - d
+    series:
+    - (100) pit
+    - (100) groove
+    - (010) pit
+    - (010) groove
+    - (001) pit
+    - (001) groove
+    - 1770 °C (100) pit in panel d
+    - 1770 °C (100) groove in panel d
+    - 1770 °C (010) pit in panel d
+    - 1770 °C (010) groove in panel d
+    - 1770 °C (001) pit in panel d
+    - 1770 °C (001) groove in panel d
+    - '*1700 °C (010) pit in panel d'
+    - '*1700 °C (010) groove in panel d'
+    marker_counts_per_series:
+      a (100) pit: 12
+      a (100) groove: 15
+      b (010) pit: 15
+      b (010) groove: 12
+      c (001) pit: 17
+      c (001) groove: 20
+      d 1770 °C (100) pit: 3
+      d 1770 °C (100) groove: 3
+      d 1770 °C (010) pit: 3
+      d 1770 °C (010) groove: 3
+      d 1770 °C (001) pit: 3
+      d 1770 °C (001) groove: 3
+      d *1700 °C (010) pit: 2
+      d *1700 °C (010) groove: 2
+    attribution: Ozawa et al. (2012), figure as printed
+    digitisation: deferred to a figure pass
+    schema_gap: No existing quantity token describes this figure's morphology or number-density measurement.
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_figure_5_deferred
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_figure_6_deferred
+  type: deferred_figure
+  locator:
+    page: 11
+    published_page: 90
+    pdf_page_index: 10
+    figure: '6'
+  phase: cr
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: unavailable
+    quantity_as_printed: surface morphology images
+    formula: Mg2SiO4
+    phase: cr
+    T_C:
+    - 1500
+    - 1600
+    - 1700
+    - 1800
+    axes_as_printed: none; FE-SEM images
+    caption: FE-SEM images of surface morphology indicative of detachment processes of forsterite. Low- (left) and high- (right)
+      magnification images are shown for (100), (010), and (001) at four experimental temperatures.
+    panels:
+    - a
+    - b
+    - c
+    - d
+    - e
+    - f
+    - g
+    - h
+    - i
+    - j
+    - k
+    - l
+    - m
+    - n
+    - o
+    - p
+    - q
+    - r
+    - s
+    - t
+    - u
+    - v
+    - w
+    - x
+    series:
+    - (100) surface
+    - (010) surface
+    - (001) surface
+    marker_counts_per_series:
+      each series: 0
+    attribution: Ozawa et al. (2012), figure as printed
+    digitisation: deferred to a figure pass
+    schema_gap: No existing quantity token describes this figure's morphology or number-density measurement.
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_figure_6_deferred
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_figure_7_deferred
+  type: deferred_figure
+  locator:
+    page: 12
+    published_page: 91
+    pdf_page_index: 11
+    figure: '7'
+  phase: cr
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: unavailable
+    quantity_as_printed: AFM step morphology
+    formula: Mg2SiO4
+    phase: cr
+    T_C:
+    - 1692
+    axes_as_printed: none; AFM morphology panels
+    caption: Unit steps observed with AFM on the rectangular flat-bottomed hollow on (010) evaporated at *1700 °C (897).
+    panels:
+    - a
+    - b
+    series:
+    - AFM step surface
+    marker_counts_per_series:
+      AFM image series: 0
+    attribution: Ozawa et al. (2012), figure as printed
+    digitisation: deferred to a figure pass
+    schema_gap: No existing quantity token describes this figure's morphology or number-density measurement.
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_figure_7_deferred
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_figure_8_deferred
+  type: deferred_figure
+  locator:
+    page: 14
+    published_page: 93
+    pdf_page_index: 13
+    figure: '8'
+  phase: cr
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: evaporation_rate
+    quantity_as_printed: nominal overall evaporation rate
+    formula: Mg2SiO4
+    phase: cr
+    T_C:
+    - 1504
+    - 1810
+    axes_as_printed:
+      x: 10000/temperature (K)
+      y: evaporation rate (m/sec)
+    caption: Arrhenius plot for nominal overall evaporation rates of forsterite in vacuum. (a) Averaged evaporation rates
+      of forsterite synthesized by pulling along the a-axis (Fo-11) and c-axis (Fo-16); (b) results of evaporation experiments
+      on Fo-17 at temperatures above ~1740 °C.
+    panels:
+    - a
+    - b
+    series:
+    - Fo-11 and Fo-16 (100)
+    - Fo-11 and Fo-16 (010)
+    - Fo-11 and Fo-16 (001)
+    - Fo-17 (100)
+    - Fo-17 (010)
+    - Fo-17 (001)
+    - comparison fits and reference rates
+    marker_counts_per_series:
+      each surface series in panel a: 5
+      each surface series in panel b: 4
+      fit/reference lines: 0
+    attribution: Ozawa et al. (2012), figure as printed
+    digitisation: deferred to a figure pass
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_figure_8_deferred
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_figure_9_deferred
+  type: deferred_figure
+  locator:
+    page: 14
+    published_page: 93
+    pdf_page_index: 13
+    figure: '9'
+  phase: cr
+  units: as printed
+  values:
+    method_class: figure_only
+    quantity: evaporation_rate
+    quantity_as_printed: nominal overall evaporation rate
+    formula: Mg2SiO4
+    phase: cr
+    T_C:
+    - 1692
+    axes_as_printed:
+      x: experimental time (hours)
+      y: evaporation rate (m/sec)
+    caption: Change of nominal overall evaporation rates (open circle) and estimated instantaneous evaporation rates (solid
+      circle) with experimental time for (010) surface evaporated at 1692 °C (*1700 °C). The range of nominal overall evaporation
+      rates estimated for (010) at *1700 °C (Table 3) is shown by the dotted region.
+    panels:
+    - single panel
+    series:
+    - average rates, open circles
+    - instantaneous rates, solid circles
+    marker_counts_per_series:
+      average rates: 8
+      instantaneous rates: 4
+    attribution: Ozawa et al. (2012), figure as printed
+    digitisation: deferred to a figure pass
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_figure_9_deferred
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_figure_appendix_figure_1_deferred
+  type: deferred_figure
+  locator:
+    page: 20
+    published_page: 99
+    pdf_page_index: 19
+    figure: Appendix Figure 1
+  phase: cr
+  units: as printed
+  values:
+    method_class: model_derived
+    quantity: unavailable
+    quantity_as_printed: surface roughness versus slice-energy factor alpha_hkl
+    formula: Mg2SiO4
+    phase: cr
+    T_C: null
+    axes_as_printed:
+      x: Esl/RT (alpha_hkl)
+      y: surface roughness
+    caption: Results of Monte Carlo simulation on an anisotropic Kossel crystal under evaporation in vacuum for various values
+      of the ratio between slice energy and evaporation energy (Esl/Ecr). Surface roughness is plotted against slice energy
+      normalized by RT, or alpha factor alpha_hkl = Esl/(RT).
+    panels:
+    - single panel
+    series:
+    - Esl/Ecr = 0.375
+    - Esl/Ecr = 0.67
+    - Esl/Ecr = 0.75
+    - Esl/Ecr = 0.875
+    marker_counts_per_series:
+      each model curve: 0
+    attribution: Ozawa et al. (2012), figure as printed
+    digitisation: deferred to a figure pass
+    schema_gap: No existing quantity token describes this figure's morphology or number-density measurement.
+    model_parameters_as_printed:
+      Esl/Ecr:
+      - '0.375'
+      - '0.67'
+      - '0.75'
+      - '0.875'
+      alpha_hkl_range: 0.5 to 15
+      reaction_affinity_minus_delta_mu_over_RT: '100'
+      Ediff_over_RT: '0.5'
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_figure_appendix_figure_1_deferred
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_rate_law_and_alpha_scope
+  type: equation_context
+  locator:
+    page: 12
+    published_page: 91
+    pdf_page_index: 11
+    equation: 1–2
+  units: as printed
+  values:
+    method_class: model_derived
+    quantity_as_printed: nominal surface-retreat rate and mass-loss geometry equations
+    equation_1_as_printed: J_nom^(hkl) = sum_i^N (a_i/A_0) J_i
+    equation_2_as_printed: Delta w = w0 - w = rho_Fo [a0 b0 c0 - (a0 - integral_0^t J_nom^(100) dt)(b0 - integral_0^t J_nom^(010)
+      dt)(c0 - integral_0^t J_nom^(001) dt)]
+    printed_rate_definition: J_i is the retreat velocity of an evaporating facet; J_nom is the nominal overall evaporation
+      rate (mean retreat rate of a surface).
+    coefficient_disposition: The paper does not report a vapour evaporation coefficient alpha. Alpha_min,25/26 are isotope
+      fractionation factors; alpha_hkl = Esl/(RT) is a roughening parameter, not a vapour accommodation coefficient.
+    alpha_hkl_range_as_printed: 0.5 to 15
+    alpha_hkl_roughening_transition_as_printed: about 3
+    model_energy_ratio_range_as_printed: 0.37 to 0.87
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_rate_law_and_alpha_scope
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_table2_morphology_and_evaporated_thickness
+  type: measured_morphology_context
+  locator:
+    page: 7
+    published_page: 86
+    pdf_page_index: 6
+    table: '2'
+  phase: cr
+  units: as printed
+  values:
+    method_class: measured_direct
+    table_disposition: context-no-token for parts (a)-(c); context-model for part (d)
+    candidate_tokens_checked:
+    - mass_loss_fraction
+    - mass_loss_areal_density
+    - evaporation_rate
+    - evaporation_coefficient_alpha
+    no_token_reason: Part (a) is areal facet-orientation fraction, and parts (b)-(c) are categorical pit/step morphology;
+      no existing quantity token describes them. Part (d) is calculated thickness, which also has no matching quantity token.
+    part_a_areal_fraction_facet_100_parallel_pct:
+    - surface: (100)
+      T_C: '*1500'
+      value: '70'
+      marker: †
+    - surface: (100)
+      T_C: '*1600'
+      value: '13'
+      marker: §
+    - surface: (100)
+      T_C: '*1700'
+      value: '2'
+      marker: §
+    - surface: (100)
+      T_C: '*1800'
+      value: '0.8'
+      marker: §
+    - surface: (010)
+      T_C: '*1500'
+      value: '95'
+      marker: †
+    - surface: (010)
+      T_C: '*1600'
+      value: '87'
+      marker: †
+    - surface: (010)
+      T_C: '*1700'
+      value: '81'
+      marker: §
+    - surface: (010)
+      T_C: '*1800'
+      value: '8'
+      marker: §
+    - surface: (001)
+      T_C: '*1500'
+      value: '28'
+      marker: †
+    - surface: (001)
+      T_C: '*1600'
+      value: '23'
+      marker: †
+    - surface: (001)
+      T_C: '*1700'
+      value: '1'
+      marker: ‡
+    - surface: (001)
+      T_C: '*1800'
+      value: '7'
+      marker: ‡
+    part_b_pit_rim_and_depression:
+      (100):
+      - pit rim only
+      - pit rim + faceted depression
+      - pit rim + faceted depression
+      - pit rim + curved depression
+      (010):
+      - pit rim only
+      - pit rim only
+      - pit rim only
+      - pit rim + faceted depression
+      (001):
+      - no pit rim/curved depression
+      - no pit rim/weakly curved depression
+      - no pit rim/no depression
+      - no pit rim/no depression
+      T_C:
+      - '*1500'
+      - '*1600'
+      - '*1700'
+      - '*1800'
+    part_c_steps_and_bunched_steps:
+      (100):
+      - common
+      - developed
+      - developed
+      - developed
+      (010):
+      - common
+      - developed
+      - developed#
+      - developed
+      (001):
+      - developed
+      - developed
+      - rare**
+      - rare**
+      T_C:
+      - '*1500'
+      - '*1600'
+      - '*1700'
+      - '*1800'
+    part_d_calculated_evaporated_thickness_um:
+      (100):
+      - '16.6'
+      - '68.6'
+      - '107'
+      - '190'
+      (010):
+      - '18.6'
+      - '31.3'
+      - '50.1'
+      - '119'
+      (001):
+      - '47.2'
+      - '110'
+      - '183'
+      - '204'
+      T_C:
+      - '*1500'
+      - '*1600'
+      - '*1700'
+      - '*1800'
+      method_class: model_derived
+      basis: calculated from Table 3 nominal overall evaporation rates
+    footnotes_as_printed:
+      †: facets derived from original surface and unaffected by dislocations
+      ‡: facets created in floors of triangular grooves and diminish with time
+      §: facets created around dislocation outcrops as spreading floors of flat-bottomed pits or triangular grooves
+      '||': elongate I-beam-like streak parallel to [001] and circular dimple along ridges dividing depressions are common
+      '#': AFM shows unit steps about one quarter of the unit cell on floor of flat-bottomed hollows
+      '**': AFM shows unit steps about one half of the unit cell only on bottom of triangular hollows
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_table2_morphology_and_evaporated_thickness
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_table3a_probability_q
+  type: model_fit_context
+  locator:
+    page: 13
+    published_page: 92
+    pdf_page_index: 12
+    table: 3a
+  units: probability Q as printed
+  values:
+    quantity_as_printed: goodness-of-fit probability Q
+    method_class: model_derived
+    rows:
+    - sample: Fo-11
+      T_C: '1504'
+      probability_Q: '0.99'
+      locator:
+        page: 13
+        published_page: 92
+        pdf_page_index: 12
+        table: '3'
+        row: Fo-11 1504
+    - sample: Fo-11
+      T_C: '1598'
+      probability_Q: '0.93'
+      locator:
+        page: 13
+        published_page: 92
+        pdf_page_index: 12
+        table: '3'
+        row: Fo-11 1598
+    - sample: Fo-11
+      T_C: '1692'
+      probability_Q: '0.11'
+      locator:
+        page: 13
+        published_page: 92
+        pdf_page_index: 12
+        table: '3'
+        row: Fo-11 1692
+    - sample: Fo-11
+      T_C: '1786'
+      probability_Q: '0.32'
+      locator:
+        page: 13
+        published_page: 92
+        pdf_page_index: 12
+        table: '3'
+        row: Fo-11 1786
+    - sample: Fo-16
+      T_C: '1504'
+      probability_Q: '0.86'
+      locator:
+        page: 13
+        published_page: 92
+        pdf_page_index: 12
+        table: '3'
+        row: Fo-16 1504
+    - sample: Fo-16
+      T_C: '1598'
+      probability_Q: '0.90'
+      locator:
+        page: 13
+        published_page: 92
+        pdf_page_index: 12
+        table: '3'
+        row: Fo-16 1598
+    - sample: Fo-16
+      T_C: '1692'
+      probability_Q: '0.81'
+      locator:
+        page: 13
+        published_page: 92
+        pdf_page_index: 12
+        table: '3'
+        row: Fo-16 1692
+    - sample: Fo-16
+      T_C: '1786'
+      probability_Q: '0.96'
+      locator:
+        page: 13
+        published_page: 92
+        pdf_page_index: 12
+        table: '3'
+        row: Fo-16 1786
+    - sample: Fo-17
+      T_C: '1770'
+      probability_Q: '0.01'
+      locator:
+        page: 13
+        published_page: 92
+        pdf_page_index: 12
+        table: '3'
+        row: Fo-17 1770
+    dash_reason: The source prints dashes for rows without a Q value; they are unreported, not zero.
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_table3a_probability_q
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_table3b_arrhenius_fits
+  type: model_fit_context
+  locator:
+    page: 13
+    published_page: 92
+    pdf_page_index: 12
+    table: 3b
+  units: J0 in m/s; E in kJ/mol; probability Q
+  values:
+    method_class: model_derived
+    quantity_as_printed: Arrhenius fit pre-exponential terms J0, activation energies E, and goodness-of-fit Q
+    rows:
+    - sample: Fo-11
+      surfaces:
+      - surface: (100)
+        J0_m_per_s_as_printed: 1.6±2.1×10^8
+        E_kJ_per_mol_as_printed: 632±21
+        probability_Q: '0.196'
+      - surface: (010)
+        J0_m_per_s_as_printed: 1.2±2.3×10^8
+        E_kJ_per_mol_as_printed: 637±31
+        probability_Q: '0.266'
+      - surface: (001)
+        J0_m_per_s_as_printed: 8.3±9.4×10^8
+        E_kJ_per_mol_as_printed: 649±19
+        probability_Q: '0.665'
+      locator:
+        page: 13
+        published_page: 92
+        pdf_page_index: 12
+        table: 3b
+        row: Fo-11
+    - sample: Fo-16
+      surfaces:
+      - surface: (100)
+        J0_m_per_s_as_printed: 4.8±4.8×10^10
+        E_kJ_per_mol_as_printed: 718±16
+        probability_Q: '0.510'
+      - surface: (010)
+        J0_m_per_s_as_printed: 4.0±4.4×10^7
+        E_kJ_per_mol_as_printed: 616±17
+        probability_Q: '0.919'
+      - surface: (001)
+        J0_m_per_s_as_printed: 9.3±4.1×10^8
+        E_kJ_per_mol_as_printed: 650±7
+        probability_Q: '0.821'
+      locator:
+        page: 13
+        published_page: 92
+        pdf_page_index: 12
+        table: 3b
+        row: Fo-16
+    - sample: Fo-11 and Fo-16 average
+      surfaces:
+      - surface: (100)
+        J0_m_per_s_as_printed: 2.3±4.2×10^10
+        E_kJ_per_mol_as_printed: 707±30
+        probability_Q: '0.362'
+      - surface: (010)
+        J0_m_per_s_as_printed: 8.3±9.1×10^7
+        E_kJ_per_mol_as_printed: 629±18
+        probability_Q: '0.691'
+      - surface: (001)
+        J0_m_per_s_as_printed: 9.7±4.3×10^8
+        E_kJ_per_mol_as_printed: 651±7
+        probability_Q: '0.906'
+      locator:
+        page: 13
+        published_page: 92
+        pdf_page_index: 12
+        table: 3b
+        row: Fo-11 and Fo-16 average
+    schema_gap: The activation-energy and fit-statistic columns have no matching quantity tokens. J0 is preserved as a fitted
+      parameter in model context, not an observed evaporation rate.
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_table3b_arrhenius_fits
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_table4a_intrinsic_rate_estimates
+  type: model_derived_context
+  locator:
+    page: 16
+    published_page: 95
+    pdf_page_index: 15
+    table: 4a
+  units: m/s as printed
+  values:
+    quantity_as_printed: intrinsic evaporation rate estimates
+    method_class: model_derived
+    surface_order:
+    - (100)
+    - (010)
+    - (001)
+    rows:
+    - T_C: '1504'
+      rates:
+      - 3.4±2.1×10^-11†
+      - 3.0±0.7×10^-11†
+      - 6.1±1.9×10^-11†
+    - T_C: '1598'
+      rates:
+      - 3.4±0.7×10^-10†
+      - 2.1±0.3×10^-10†
+      - 6.4±0.4×10^-10†
+    - T_C: '1692'
+      rates:
+      - –
+      - 8.8±4.7×10^-10‡
+      - 4.4±0.4×10^-9§
+    - T_C: '1735'
+      rates:
+      - –
+      - –
+      - 1.6±0.1×10^-8§
+    - T_C: '1739'
+      rates:
+      - –
+      - –
+      - 1.3±0.2×10^-8§
+    - T_C: '1750'
+      rates:
+      - –
+      - –
+      - 2.1±0.1×10^-8§
+    - T_C: '1770'
+      rates:
+      - 1.9±0.2×10^-8‡
+      - 8.4±1.3×10^-9‡
+      - 2.9±0.2×10^-8§
+    footnotes:
+      †: method 1
+      ‡: method 2
+      §: method 3
+    dash_reason: Dashes are unreported estimates, not zero.
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_table4a_intrinsic_rate_estimates
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite
+- observation_id: ozawa_2012_table4b_intrinsic_arrhenius_fits
+  type: model_fit_context
+  locator:
+    page: 16
+    published_page: 95
+    pdf_page_index: 15
+    table: 4b
+  units: J0 in m/s; E in kJ/mol; probability Q
+  values:
+    method_class: model_derived
+    quantity_as_printed: intrinsic-rate Arrhenius fits
+    surface_order:
+    - (100)
+    - (010)
+    - (001)
+    rows:
+    - range_C: 1500–1770
+      J0_m_per_s:
+      - 1.2±70×10^11
+      - 4.4±6.3×10^8
+      - 1.1±11×10^11
+      E_kJ_per_mol:
+      - 736±10
+      - 655±23
+      - 719±23
+      Q:
+      - '0.78'
+      - '0.6'
+      - '0.005'
+    - range_C: 1500–1700*
+      J0_m_per_s:
+      - –
+      - –
+      - 3.6±5.5×10^8
+      E_kJ_per_mol:
+      - –
+      - –
+      - 636±24
+      Q:
+      - –
+      - –
+      - '0.44'
+    - range_C: 1700–1770*
+      J0_m_per_s:
+      - –
+      - –
+      - 4.5±25×10^12
+      E_kJ_per_mol:
+      - –
+      - –
+      - 788±94
+      Q:
+      - –
+      - –
+      - '0.005'
+    note: The (001) set was split below and above 1700 °C because the all-data fit had low Q.
+  context_id: ozawa-2012-forsterite-vacuum-evaporation::context::ozawa_2012_table4b_intrinsic_arrhenius_fits
+  work_id: 10.2138/am.2012.3750
+  source_id: ozawa-2012-forsterite-vacuum-evaporation
+  species: forsterite

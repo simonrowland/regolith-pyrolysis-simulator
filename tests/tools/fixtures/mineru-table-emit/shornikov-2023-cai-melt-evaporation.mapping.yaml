@@ -1,0 +1,52 @@
+source_id: shornikov-2023-cai-melt-evaporation
+source:
+  citation: >-
+    Shornikov, S. I., and Yakovlev, O. I. (2023). Experimental study of
+    evaporation of the Ca-Al-inclusions of chondrite melts. Experiment in
+    Geosciences, 29(1), 8-10.
+  doi: null
+  year: 2023
+  corpus_asset: raw/shornikov-2023-cai-melt-evaporation/shornikov-2023-cai-melt-evaporation.pdf
+  corpus_sha256: 72aed8e0b15a010ea65269927fc99d061c14444d2412cf8d4be60f1f00a40a75
+extraction:
+  method: mineru_table_draft emit; the table is regrouped as an attributed context record
+  date: '2026-10-18'
+  worker: w4a2-1018
+review_status: draft
+tables:
+  - page: 4
+    table_index: 1
+    type: initial_sample_composition_table
+    quantity: initial_sample_composition
+    unit: 'wt. %'
+    experiment: CAI type A initial composition
+    evidence_class: quoted_attributed
+    attribution: Grossman et al. (2000)
+    species_form: printed_formula
+    value_pairs:
+      - species_column: 1
+        value_column: 2
+  - page: 4
+    table_index: 1
+    type: initial_sample_composition_table
+    quantity: initial_sample_composition
+    unit: 'wt. %'
+    experiment: CAI type B initial composition
+    evidence_class: quoted_attributed
+    attribution: Grossman et al. (2000)
+    species_form: printed_formula
+    value_pairs:
+      - species_column: 1
+        value_column: 3
+  - page: 4
+    table_index: 1
+    type: initial_sample_composition_table
+    quantity: initial_sample_composition
+    unit: 'wt. %'
+    experiment: Murchison initial composition
+    evidence_class: quoted_attributed
+    attribution: Diakonova et al. (1979)
+    species_form: printed_formula
+    value_pairs:
+      - species_column: 1
+        value_column: 4

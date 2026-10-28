@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/shornikov-1994-mullite-kems.yaml
 observations:
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1833k::T=1833.00:h=0216d6d510a6
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1833k::T=1833.00:h=83447e46671d
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -95,14 +95,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 479
+    page: 2
     published_page: 479
     pdf_page_index: 1
     table: '6'
@@ -130,7 +130,7 @@ observations:
         tag: value
         value: '1833'
       locator:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
@@ -146,7 +146,7 @@ observations:
               tag: value
               value: '1559.85'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
@@ -156,21 +156,23 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
               note: Table 6 row a_Al2O3, column 1833 K; value printed as 1.05 ± 0.07
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.00:h=4de074fdc8b4
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.00:h=6fcc778accdc
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=9961674200dc
   derivation:
     relation: as_published
     inputs:
     - pdf:shornikov-1994-mullite-kems
     parameters: []
     output_unit: dimensionless activity, as printed
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -192,7 +194,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1933k::T=1933.00:h=1fe0934af9e0
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1933k::T=1933.00:h=bfb1a9075753
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -285,14 +287,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 479
+    page: 2
     published_page: 479
     pdf_page_index: 1
     table: '6'
@@ -320,7 +322,7 @@ observations:
         tag: value
         value: '1933'
       locator:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
@@ -336,7 +338,7 @@ observations:
               tag: value
               value: '1659.85'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
@@ -346,21 +348,23 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
               note: Table 6 row a_Al2O3, column 1933 K; value printed as 1.01 ± 0.05
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.00:h=90cfcf09c8cf
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.00:h=31123f64689e
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=98a48cb39ee0
   derivation:
     relation: as_published
     inputs:
     - pdf:shornikov-1994-mullite-kems
     parameters: []
     output_unit: dimensionless activity, as printed
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -382,7 +386,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1983k::T=1983.00:h=5a27e7ac6cbe
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1983k::T=1983.00:h=72f72a96ac35
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -475,14 +479,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 479
+    page: 2
     published_page: 479
     pdf_page_index: 1
     table: '6'
@@ -510,7 +514,7 @@ observations:
         tag: value
         value: '1983'
       locator:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
@@ -526,7 +530,7 @@ observations:
               tag: value
               value: '1709.85'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
@@ -536,21 +540,23 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
               note: Table 6 row a_Al2O3, column 1983 K; value printed as 1.01 ± 0.05
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.00:h=e6af00593244
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.00:h=e1727425a5b5
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=de89a1c6cdc9
   derivation:
     relation: as_published
     inputs:
     - pdf:shornikov-1994-mullite-kems
     parameters: []
     output_unit: dimensionless activity, as printed
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -572,7 +578,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_2033k::T=2033.00:h=af3f7c458e52
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_2033k::T=2033.00:h=897e91372c9a
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -665,14 +671,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 479
+    page: 2
     published_page: 479
     pdf_page_index: 1
     table: '6'
@@ -700,7 +706,7 @@ observations:
         tag: value
         value: '2033'
       locator:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
@@ -716,7 +722,7 @@ observations:
               tag: value
               value: '1759.85'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
@@ -726,21 +732,23 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
               note: Table 6 row a_Al2O3, column 2033 K; value printed as 1.01 ± 0.03
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.00:h=d4599ed98706
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.00:h=9df1266de3a4
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=590c83e85efe
   derivation:
     relation: as_published
     inputs:
     - pdf:shornikov-1994-mullite-kems
     parameters: []
     output_unit: dimensionless activity, as printed
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -762,7 +770,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1933k::T=1933.00:h=60b503755c0b
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1933k::T=1933.00:h=e80647f4ab19
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -866,14 +874,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -892,7 +900,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -908,12 +916,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1933'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -929,7 +938,7 @@ observations:
               tag: value
               value: '1659.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -939,12 +948,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -955,7 +965,7 @@ observations:
           tag: value
           value: '0.000000021000000000000003'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -965,12 +975,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -992,7 +1003,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1983k::T=1983.00:h=6e79223cf9ad
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1983k::T=1983.00:h=66e9f065cd74
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1096,14 +1107,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -1122,7 +1133,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -1138,12 +1149,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1983'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -1159,7 +1171,7 @@ observations:
               tag: value
               value: '1709.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -1169,12 +1181,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1185,7 +1198,7 @@ observations:
           tag: value
           value: '0.000000044699999999999997'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -1195,12 +1208,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -1222,7 +1236,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_2033k::T=2033.00:h=40f0f7234c4a
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_2033k::T=2033.00:h=e2fb054f2391
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1326,14 +1340,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -1352,7 +1366,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -1368,12 +1382,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '2033'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -1389,7 +1404,7 @@ observations:
               tag: value
               value: '1759.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -1399,12 +1414,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1415,7 +1431,7 @@ observations:
           tag: value
           value: '0.00000014500000000000001'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -1425,12 +1441,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -1452,7 +1469,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.00:h=4de074fdc8b4
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.00:h=6fcc778accdc
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1556,14 +1573,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -1582,7 +1599,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -1598,12 +1615,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1833'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -1619,7 +1637,7 @@ observations:
               tag: value
               value: '1559.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -1629,12 +1647,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1645,7 +1664,7 @@ observations:
           tag: value
           value: '0.00000000355'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -1655,12 +1674,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -1682,7 +1702,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.00:h=90cfcf09c8cf
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.00:h=31123f64689e
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1786,14 +1806,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -1812,7 +1832,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -1828,12 +1848,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1933'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -1849,7 +1870,7 @@ observations:
               tag: value
               value: '1659.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -1859,12 +1880,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1875,7 +1897,7 @@ observations:
           tag: value
           value: '0.000000032900000000000003'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -1885,12 +1907,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -1912,7 +1935,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.00:h=e6af00593244
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.00:h=e1727425a5b5
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2016,14 +2039,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -2042,7 +2065,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -2058,12 +2081,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1983'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -2079,7 +2103,7 @@ observations:
               tag: value
               value: '1709.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -2089,12 +2113,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2105,7 +2130,7 @@ observations:
           tag: value
           value: '0.000000075'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -2115,12 +2140,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -2142,7 +2168,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.00:h=d4599ed98706
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.00:h=9df1266de3a4
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2246,14 +2272,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -2272,7 +2298,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -2288,12 +2314,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '2033'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -2309,7 +2336,7 @@ observations:
               tag: value
               value: '1759.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -2319,12 +2346,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2335,7 +2363,7 @@ observations:
           tag: value
           value: '0.00000021100000000000002'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -2345,12 +2373,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -2372,7 +2401,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1933k::T=1933.00:h=18ee5f44f0d3
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1933k::T=1933.00:h=a373465fed03
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2476,14 +2505,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -2502,7 +2531,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -2518,12 +2547,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1933'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -2539,7 +2569,7 @@ observations:
               tag: value
               value: '1659.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -2549,12 +2579,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2565,7 +2596,7 @@ observations:
           tag: value
           value: '0.0000000055300000000000005'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -2575,12 +2606,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -2602,7 +2634,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1983k::T=1983.00:h=dae9139a595b
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1983k::T=1983.00:h=22a93274fac2
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2706,14 +2738,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -2732,7 +2764,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -2748,12 +2780,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1983'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -2769,7 +2802,7 @@ observations:
               tag: value
               value: '1709.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -2779,12 +2812,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2795,7 +2829,7 @@ observations:
           tag: value
           value: '0.000000015800000000000003'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -2805,12 +2839,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -2832,7 +2867,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_2033k::T=2033.00:h=8eb99dea8a52
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_2033k::T=2033.00:h=28a408050cce
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2936,14 +2971,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -2962,7 +2997,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -2978,12 +3013,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '2033'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -2999,7 +3035,7 @@ observations:
               tag: value
               value: '1759.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -3009,12 +3045,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3025,7 +3062,7 @@ observations:
           tag: value
           value: '0.0000000421'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -3035,12 +3072,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -3062,7 +3100,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1933k::T=1933.00:h=b9dc41cccc5c
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1933k::T=1933.00:h=af74960aad95
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3166,14 +3204,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -3192,7 +3230,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -3208,12 +3246,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1933'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -3229,7 +3268,7 @@ observations:
               tag: value
               value: '1659.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -3239,12 +3278,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3255,7 +3295,7 @@ observations:
           tag: value
           value: '0.000000000034100000000000004'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -3265,12 +3305,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -3292,7 +3333,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1983k::T=1983.00:h=d24e8d16bb70
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1983k::T=1983.00:h=53567f2e5ce7
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3396,14 +3437,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -3422,7 +3463,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -3438,12 +3479,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1983'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -3459,7 +3501,7 @@ observations:
               tag: value
               value: '1709.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -3469,12 +3511,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3485,7 +3528,7 @@ observations:
           tag: value
           value: '0.000000000141'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -3495,12 +3538,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -3522,7 +3566,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_2033k::T=2033.00:h=48ed0357f63c
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_2033k::T=2033.00:h=76d73131376d
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3626,14 +3670,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -3652,7 +3696,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -3668,12 +3712,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '2033'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -3689,7 +3734,7 @@ observations:
               tag: value
               value: '1759.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -3699,12 +3744,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3715,7 +3761,7 @@ observations:
           tag: value
           value: '0.000000000534'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -3725,12 +3771,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -3752,7 +3799,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.00:h=96ee96960eb1
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.00:h=db25cb5a28c7
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3856,14 +3903,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -3882,7 +3929,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -3898,12 +3945,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1833'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -3919,7 +3967,7 @@ observations:
               tag: value
               value: '1559.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -3929,12 +3977,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_MoO2, column 1833 K; value printed as 0.526 ± 0.050 under p_MoO2 · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3945,7 +3994,7 @@ observations:
           tag: value
           value: '0.00000000526'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -3955,12 +4004,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_MoO2, column 1833 K; value printed as 0.526 ± 0.050 under p_MoO2 · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -3982,7 +4032,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.00:h=5f4934d9373a
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.00:h=097a73887d15
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4086,14 +4136,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -4112,7 +4162,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -4128,12 +4178,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1933'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -4149,7 +4200,7 @@ observations:
               tag: value
               value: '1659.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -4159,12 +4210,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_MoO2, column 1933 K; value printed as 1.91 ± 0.15 under p_MoO2 · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4175,7 +4227,7 @@ observations:
           tag: value
           value: '0.0000000191'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -4185,12 +4237,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_MoO2, column 1933 K; value printed as 1.91 ± 0.15 under p_MoO2 · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -4212,7 +4265,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.00:h=ca69236b2015
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.00:h=db5fc7073d7b
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4316,14 +4369,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -4342,7 +4395,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -4358,12 +4411,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1983'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -4379,7 +4433,7 @@ observations:
               tag: value
               value: '1709.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -4389,12 +4443,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_MoO2, column 1983 K; value printed as 3.40 ± 0.25 under p_MoO2 · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4405,7 +4460,7 @@ observations:
           tag: value
           value: '0.000000034'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -4415,12 +4470,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_MoO2, column 1983 K; value printed as 3.40 ± 0.25 under p_MoO2 · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -4442,7 +4498,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.00:h=e4fc7486ece4
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.00:h=4e1bee6530f5
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4546,14 +4602,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -4572,7 +4628,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -4588,12 +4644,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '2033'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -4609,7 +4666,7 @@ observations:
               tag: value
               value: '1759.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -4619,12 +4676,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_MoO2, column 2033 K; value printed as 5.78 ± 0.30 under p_MoO2 · 10^-8
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4635,7 +4693,7 @@ observations:
           tag: value
           value: '0.0000000578'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -4645,12 +4703,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_MoO2, column 2033 K; value printed as 5.78 ± 0.30 under p_MoO2 · 10^-8
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -4672,7 +4731,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.00:h=4238cad08175
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.00:h=a97456117c28
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4776,14 +4835,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -4802,7 +4861,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -4818,12 +4877,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1833'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -4839,7 +4899,7 @@ observations:
               tag: value
               value: '1559.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -4849,12 +4909,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_MoO3, column 1833 K; value printed as 1.24 ± 0.08 under p_MoO3 · 10^-9
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4865,7 +4926,7 @@ observations:
           tag: value
           value: '0.00000000124'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -4875,12 +4936,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_MoO3, column 1833 K; value printed as 1.24 ± 0.08 under p_MoO3 · 10^-9
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -4902,7 +4964,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.00:h=fafa8bfc1e7e
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.00:h=fe35b2206129
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -5006,14 +5068,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -5032,7 +5094,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -5048,12 +5110,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1933'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -5069,7 +5132,7 @@ observations:
               tag: value
               value: '1659.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -5079,12 +5142,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_MoO3, column 1933 K; value printed as 4.22 ± 0.25 under p_MoO3 · 10^-9
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5095,7 +5159,7 @@ observations:
           tag: value
           value: '0.00000000422'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -5105,12 +5169,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_MoO3, column 1933 K; value printed as 4.22 ± 0.25 under p_MoO3 · 10^-9
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -5132,7 +5197,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.00:h=459b34325a55
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.00:h=e7563bf661d3
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -5236,14 +5301,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -5262,7 +5327,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -5278,12 +5343,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1983'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -5299,7 +5365,7 @@ observations:
               tag: value
               value: '1709.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -5309,12 +5375,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_MoO3, column 1983 K; value printed as 7.64 ± 0.40 under p_MoO3 · 10^-9
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5325,7 +5392,7 @@ observations:
           tag: value
           value: '0.00000000764'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -5335,12 +5402,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_MoO3, column 1983 K; value printed as 7.64 ± 0.40 under p_MoO3 · 10^-9
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -5362,7 +5430,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.00:h=542f6f0a10b0
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.00:h=79d7bb615eb6
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -5466,14 +5534,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -5492,7 +5560,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -5508,12 +5576,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '2033'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -5529,7 +5598,7 @@ observations:
               tag: value
               value: '1759.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -5539,12 +5608,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_MoO3, column 2033 K; value printed as 12.4 ± 0.6 under p_MoO3 · 10^-9
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5555,7 +5625,7 @@ observations:
           tag: value
           value: '0.0000000124'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -5565,12 +5635,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_MoO3, column 2033 K; value printed as 12.4 ± 0.6 under p_MoO3 · 10^-9
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -5592,7 +5663,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1833k::T=1833.00:h=b1a2b51043bb
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1833k::T=1833.00:h=082058c08c35
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -5697,14 +5768,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -5723,7 +5794,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -5739,12 +5810,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1833'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -5760,7 +5832,7 @@ observations:
               tag: value
               value: '1559.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -5770,26 +5842,27 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_O2, column 1833 K; value printed as 0.521 ± 0.050 under p_O2 · 10^-11
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=9961674200dc
   derivation:
     relation: p_O2 calculated from the same-temperature p_O by O2 ⇌ 2O, reaction (2); p. 479. Table 1 identifies MoO2+ and
       MoO3+ but not O+ or O2+, and the text says oxygen pressures were calculated.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
+    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=9961674200dc
     parameters:
     - - original
       - state:
           tag: value
           value: '0.00000000000521'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -5805,7 +5878,7 @@ observations:
                 tag: value
                 value: '0.00000000000521'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
@@ -5815,23 +5888,25 @@ observations:
                 tag: value
                 value: '101325'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
                 note: Table 2 row p_O2, column 1833 K; value printed as 0.521 ± 0.050 under p_O2 · 10^-11
           output_unit: Pa
+          references: []
     - - factor
       - state:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_O2, column 1833 K; value printed as 0.521 ± 0.050 under p_O2 · 10^-11
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -5853,7 +5928,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1933k::T=1933.00:h=dd50e282c25a
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1933k::T=1933.00:h=50fc5f0b48c6
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -5958,14 +6033,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -5984,7 +6059,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -6000,12 +6075,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1933'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -6021,7 +6097,7 @@ observations:
               tag: value
               value: '1659.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -6031,26 +6107,27 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_O2, column 1933 K; value printed as 4.59 ± 0.26 under p_O2 · 10^-11
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=98a48cb39ee0
   derivation:
     relation: p_O2 calculated from the same-temperature p_O by O2 ⇌ 2O, reaction (2); p. 479. Table 1 identifies MoO2+ and
       MoO3+ but not O+ or O2+, and the text says oxygen pressures were calculated.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
+    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=98a48cb39ee0
     parameters:
     - - original
       - state:
           tag: value
           value: '0.0000000000459'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -6066,7 +6143,7 @@ observations:
                 tag: value
                 value: '0.0000000000459'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
@@ -6076,23 +6153,25 @@ observations:
                 tag: value
                 value: '101325'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
                 note: Table 2 row p_O2, column 1933 K; value printed as 4.59 ± 0.26 under p_O2 · 10^-11
           output_unit: Pa
+          references: []
     - - factor
       - state:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_O2, column 1933 K; value printed as 4.59 ± 0.26 under p_O2 · 10^-11
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -6114,7 +6193,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1983k::T=1983.00:h=2fe89daf607b
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1983k::T=1983.00:h=9162f994791e
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6219,14 +6298,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -6245,7 +6324,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -6261,12 +6340,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1983'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -6282,7 +6362,7 @@ observations:
               tag: value
               value: '1709.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -6292,26 +6372,27 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_O2, column 1983 K; value printed as 13.7 ± 0.6 under p_O2 · 10^-11
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=de89a1c6cdc9
   derivation:
     relation: p_O2 calculated from the same-temperature p_O by O2 ⇌ 2O, reaction (2); p. 479. Table 1 identifies MoO2+ and
       MoO3+ but not O+ or O2+, and the text says oxygen pressures were calculated.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
+    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=de89a1c6cdc9
     parameters:
     - - original
       - state:
           tag: value
           value: '0.000000000137'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -6327,7 +6408,7 @@ observations:
                 tag: value
                 value: '0.000000000137'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
@@ -6337,23 +6418,25 @@ observations:
                 tag: value
                 value: '101325'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
                 note: Table 2 row p_O2, column 1983 K; value printed as 13.7 ± 0.6 under p_O2 · 10^-11
           output_unit: Pa
+          references: []
     - - factor
       - state:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_O2, column 1983 K; value printed as 13.7 ± 0.6 under p_O2 · 10^-11
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -6375,7 +6458,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_2033k::T=2033.00:h=cafacf77c076
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_2033k::T=2033.00:h=ba59e5b4bebf
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6480,14 +6563,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -6506,7 +6589,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -6522,12 +6605,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '2033'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -6543,7 +6627,7 @@ observations:
               tag: value
               value: '1759.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -6553,26 +6637,27 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_O2, column 2033 K; value printed as 34.3 ± 1.7 under p_O2 · 10^-11
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=590c83e85efe
   derivation:
     relation: p_O2 calculated from the same-temperature p_O by O2 ⇌ 2O, reaction (2); p. 479. Table 1 identifies MoO2+ and
       MoO3+ but not O+ or O2+, and the text says oxygen pressures were calculated.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
+    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=590c83e85efe
     parameters:
     - - original
       - state:
           tag: value
           value: '0.000000000343'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -6588,7 +6673,7 @@ observations:
                 tag: value
                 value: '0.000000000343'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
@@ -6598,23 +6683,25 @@ observations:
                 tag: value
                 value: '101325'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
                 note: Table 2 row p_O2, column 2033 K; value printed as 34.3 ± 1.7 under p_O2 · 10^-11
           output_unit: Pa
+          references: []
     - - factor
       - state:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_O2, column 2033 K; value printed as 34.3 ± 1.7 under p_O2 · 10^-11
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -6636,7 +6723,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=9961674200dc
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6741,14 +6828,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -6767,7 +6854,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -6783,12 +6870,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1833'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -6804,7 +6892,7 @@ observations:
               tag: value
               value: '1559.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -6814,29 +6902,30 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.00:h=96ee96960eb1
-  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.00:h=4238cad08175
+  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.00:h=db25cb5a28c7
+  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.00:h=a97456117c28
   derivation:
     relation: p_O calculated from the same-temperature MoO3 and MoO2 partial pressures by MoO3 ⇌ MoO2 + O, reaction (1); reaction
       (2) is used downstream to calculate p_O2, not as an input to p_O. The Al/Si reactions (3)–(6) are a consistency check
       reported within about 15%, not calculation inputs; see p. 479.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.00:h=96ee96960eb1
-    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.00:h=4238cad08175
+    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.00:h=db25cb5a28c7
+    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.00:h=a97456117c28
     parameters:
     - - original
       - state:
           tag: value
           value: '0.00000000037500000000000005'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -6852,7 +6941,7 @@ observations:
                 tag: value
                 value: '0.00000000037500000000000005'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
@@ -6862,23 +6951,25 @@ observations:
                 tag: value
                 value: '101325'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
                 note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
           output_unit: Pa
+          references: []
     - - factor
       - state:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -6900,7 +6991,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=98a48cb39ee0
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -7005,14 +7096,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -7031,7 +7122,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -7047,12 +7138,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1933'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -7068,7 +7160,7 @@ observations:
               tag: value
               value: '1659.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -7078,29 +7170,30 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.00:h=5f4934d9373a
-  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.00:h=fafa8bfc1e7e
+  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.00:h=097a73887d15
+  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.00:h=fe35b2206129
   derivation:
     relation: p_O calculated from the same-temperature MoO3 and MoO2 partial pressures by MoO3 ⇌ MoO2 + O, reaction (1); reaction
       (2) is used downstream to calculate p_O2, not as an input to p_O. The Al/Si reactions (3)–(6) are a consistency check
       reported within about 15%, not calculation inputs; see p. 479.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.00:h=5f4934d9373a
-    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.00:h=fafa8bfc1e7e
+    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.00:h=097a73887d15
+    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.00:h=fe35b2206129
     parameters:
     - - original
       - state:
           tag: value
           value: '0.00000000265'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -7116,7 +7209,7 @@ observations:
                 tag: value
                 value: '0.00000000265'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
@@ -7126,23 +7219,25 @@ observations:
                 tag: value
                 value: '101325'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
                 note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
           output_unit: Pa
+          references: []
     - - factor
       - state:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -7164,7 +7259,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=de89a1c6cdc9
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -7269,14 +7364,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -7295,7 +7390,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -7311,12 +7406,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1983'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -7332,7 +7428,7 @@ observations:
               tag: value
               value: '1709.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -7342,29 +7438,30 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.00:h=ca69236b2015
-  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.00:h=459b34325a55
+  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.00:h=db5fc7073d7b
+  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.00:h=e7563bf661d3
   derivation:
     relation: p_O calculated from the same-temperature MoO3 and MoO2 partial pressures by MoO3 ⇌ MoO2 + O, reaction (1); reaction
       (2) is used downstream to calculate p_O2, not as an input to p_O. The Al/Si reactions (3)–(6) are a consistency check
       reported within about 15%, not calculation inputs; see p. 479.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.00:h=ca69236b2015
-    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.00:h=459b34325a55
+    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.00:h=db5fc7073d7b
+    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.00:h=e7563bf661d3
     parameters:
     - - original
       - state:
           tag: value
           value: '0.000000006830000000000001'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -7380,7 +7477,7 @@ observations:
                 tag: value
                 value: '0.000000006830000000000001'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
@@ -7390,23 +7487,25 @@ observations:
                 tag: value
                 value: '101325'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
                 note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
           output_unit: Pa
+          references: []
     - - factor
       - state:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -7428,7 +7527,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=590c83e85efe
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -7533,14 +7632,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -7559,7 +7658,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -7575,12 +7674,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '2033'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -7596,7 +7696,7 @@ observations:
               tag: value
               value: '1759.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -7606,29 +7706,30 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.00:h=e4fc7486ece4
-  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.00:h=542f6f0a10b0
+  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.00:h=4e1bee6530f5
+  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.00:h=79d7bb615eb6
   derivation:
     relation: p_O calculated from the same-temperature MoO3 and MoO2 partial pressures by MoO3 ⇌ MoO2 + O, reaction (1); reaction
       (2) is used downstream to calculate p_O2, not as an input to p_O. The Al/Si reactions (3)–(6) are a consistency check
       reported within about 15%, not calculation inputs; see p. 479.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.00:h=e4fc7486ece4
-    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.00:h=542f6f0a10b0
+    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.00:h=4e1bee6530f5
+    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.00:h=79d7bb615eb6
     parameters:
     - - original
       - state:
           tag: value
           value: '0.000000015800000000000003'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -7644,7 +7745,7 @@ observations:
                 tag: value
                 value: '0.000000015800000000000003'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
@@ -7654,23 +7755,25 @@ observations:
                 tag: value
                 value: '101325'
               locator:
-                page: 478
+                page: 1
                 published_page: 478
                 pdf_page_index: 0
                 table: '2'
                 note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
           output_unit: Pa
+          references: []
     - - factor
       - state:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -7692,7 +7795,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1833k::T=1833.00:h=da45c378f885
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1833k::T=1833.00:h=4a91123ff457
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -7785,14 +7888,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 479
+    page: 2
     published_page: 479
     pdf_page_index: 1
     table: '6'
@@ -7820,7 +7923,7 @@ observations:
         tag: value
         value: '1833'
       locator:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
@@ -7836,7 +7939,7 @@ observations:
               tag: value
               value: '1559.85'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
@@ -7846,21 +7949,23 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
               note: Table 6 row a_SiO2, column 1833 K; value printed as 0.37 ± 0.09
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.00:h=0c083bf8ccd6
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.00:h=4b5665f1328d
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=9961674200dc
   derivation:
     relation: as_published
     inputs:
     - pdf:shornikov-1994-mullite-kems
     parameters: []
     output_unit: dimensionless activity, as printed
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -7882,7 +7987,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1933k::T=1933.00:h=5e4209c62148
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1933k::T=1933.00:h=538efecc8957
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -7975,14 +8080,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 479
+    page: 2
     published_page: 479
     pdf_page_index: 1
     table: '6'
@@ -8010,7 +8115,7 @@ observations:
         tag: value
         value: '1933'
       locator:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
@@ -8026,7 +8131,7 @@ observations:
               tag: value
               value: '1659.85'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
@@ -8036,21 +8141,23 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
               note: Table 6 row a_SiO2, column 1933 K; value printed as 0.19 ± 0.02
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.00:h=eb7c088af742
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.00:h=bb4764d092df
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=98a48cb39ee0
   derivation:
     relation: as_published
     inputs:
     - pdf:shornikov-1994-mullite-kems
     parameters: []
     output_unit: dimensionless activity, as printed
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -8072,7 +8179,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1983k::T=1983.00:h=7d91ade06f5d
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1983k::T=1983.00:h=7aaffe9a1fdb
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -8165,14 +8272,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 479
+    page: 2
     published_page: 479
     pdf_page_index: 1
     table: '6'
@@ -8200,7 +8307,7 @@ observations:
         tag: value
         value: '1983'
       locator:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
@@ -8216,7 +8323,7 @@ observations:
               tag: value
               value: '1709.85'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
@@ -8226,21 +8333,23 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
               note: Table 6 row a_SiO2, column 1983 K; value printed as 0.18 ± 0.02
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.00:h=2e233f99fb9e
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.00:h=965337dddfdf
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=de89a1c6cdc9
   derivation:
     relation: as_published
     inputs:
     - pdf:shornikov-1994-mullite-kems
     parameters: []
     output_unit: dimensionless activity, as printed
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -8262,7 +8371,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_2033k::T=2033.00:h=8973e04a5688
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_2033k::T=2033.00:h=0410cca20706
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -8355,14 +8464,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 479
+    page: 2
     published_page: 479
     pdf_page_index: 1
     table: '6'
@@ -8390,7 +8499,7 @@ observations:
         tag: value
         value: '2033'
       locator:
-        page: 479
+        page: 2
         published_page: 479
         pdf_page_index: 1
         table: '6'
@@ -8406,7 +8515,7 @@ observations:
               tag: value
               value: '1759.85'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
@@ -8416,21 +8525,23 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 479
+              page: 2
               published_page: 479
               pdf_page_index: 1
               table: '6'
               note: Table 6 row a_SiO2, column 2033 K; value printed as 0.17 ± 0.01
         output_unit: K
+        references: []
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.00:h=4f4aec7a1a57
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.00:h=70973599c6e0
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=590c83e85efe
   derivation:
     relation: as_published
     inputs:
     - pdf:shornikov-1994-mullite-kems
     parameters: []
     output_unit: dimensionless activity, as printed
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -8452,7 +8563,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.00:h=0c083bf8ccd6
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.00:h=4b5665f1328d
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -8556,14 +8667,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -8582,7 +8693,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -8598,12 +8709,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1833'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -8619,7 +8731,7 @@ observations:
               tag: value
               value: '1559.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -8629,12 +8741,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -8645,7 +8758,7 @@ observations:
           tag: value
           value: '0.000039500000000000005'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -8655,12 +8768,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -8682,7 +8796,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.00:h=eb7c088af742
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.00:h=bb4764d092df
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -8786,14 +8900,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -8812,7 +8926,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -8828,12 +8942,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1933'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -8849,7 +8964,7 @@ observations:
               tag: value
               value: '1659.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -8859,12 +8974,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -8875,7 +8991,7 @@ observations:
           tag: value
           value: '0.0000408'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -8885,12 +9001,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -8912,7 +9029,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.00:h=2e233f99fb9e
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.00:h=965337dddfdf
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -9016,14 +9133,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -9042,7 +9159,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -9058,12 +9175,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '1983'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -9079,7 +9197,7 @@ observations:
               tag: value
               value: '1709.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -9089,12 +9207,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -9105,7 +9224,7 @@ observations:
           tag: value
           value: '0.00008580000000000001'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -9115,12 +9234,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
@@ -9142,7 +9262,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.00:h=4f4aec7a1a57
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.00:h=70973599c6e0
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -9246,14 +9366,14 @@ observations:
       worker: codex
       date: '2026-09-30'
       evidence:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
   notices: []
   source_id: shornikov-1994-mullite-kems
   locator:
-    page: 478
+    page: 1
     published_page: 478
     pdf_page_index: 0
     table: '2'
@@ -9272,7 +9392,7 @@ observations:
             - '0.4'
           amount_basis: mole_fraction
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -9288,12 +9408,13 @@ observations:
         - derived, not printed compositional analysis
         parameters: []
         output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
         value: '2033'
       locator:
-        page: 478
+        page: 1
         published_page: 478
         pdf_page_index: 0
         table: '2'
@@ -9309,7 +9430,7 @@ observations:
               tag: value
               value: '1759.85'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
@@ -9319,12 +9440,13 @@ observations:
               tag: value
               value: '273.15'
             locator:
-              page: 478
+              page: 1
               published_page: 478
               pdf_page_index: 0
               table: '2'
               note: Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5
         output_unit: K
+        references: []
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -9335,7 +9457,7 @@ observations:
           tag: value
           value: '0.000232'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
@@ -9345,12 +9467,13 @@ observations:
           tag: value
           value: '101325'
         locator:
-          page: 478
+          page: 1
           published_page: 478
           pdf_page_index: 0
           table: '2'
           note: Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5
     output_unit: Pa
+    references: []
   provenance:
     canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
     related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.

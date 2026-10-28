@@ -78,10 +78,14 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 def _synthetic_binding_receipt_for_pt0_store_tests(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    request: pytest.FixtureRequest,
 ) -> None:
     """Give replay mechanics a test-only receipt, never a real engine pin."""
     from tests.binding_admission_fixtures import install_synthetic_binding_receipt
 
+    if request.node.name == 'test_pt0_real_magemin_capped_replay_contract':
+        source = DATA_DIR.parent / 'engines' / 'engines.local.toml'
+        (tmp_path / source.name).write_bytes(source.read_bytes())
     install_synthetic_binding_receipt(
         tmp_path,
         monkeypatch,
@@ -101,7 +105,7 @@ def _pt0_setpoints() -> dict:
     return setpoints
 
 
-def _build_pt0_sim(store: PT0DeterminismStore | None):
+def _build_pt0_sim(store: PT0DeterminismStore | None, *, real_provider=False):
     sim = _build_sim(
         "lunar_mare_low_ti",
         _load_yaml("vapor_pressures.yaml"),
@@ -110,6 +114,12 @@ def _build_pt0_sim(store: PT0DeterminismStore | None):
         additives_kg={"K": 26.0, "Na": 12.0},
     )
     sim.configure_pt0_determinism_store(store)
+    if not real_provider:
+        sim._register_freeze_gate_liquid_fraction_providers()
+        provider = sim._chem_registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+        # Startup availability is not backend identity. Synthetic curve
+        # mechanics register their producer explicitly at the call site.
+        provider._ensure_backend = lambda: SimpleNamespace(is_available=lambda: True)
     return sim
 
 
@@ -555,7 +565,7 @@ def _run_capped_c2a(
     max_hours: int = 1,
     disable_live: bool = False,
 ) -> dict:
-    sim = _build_pt0_sim(store)
+    sim = _build_pt0_sim(store, real_provider=True)
     if disable_live:
         _disable_live_providers(sim)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -3354,6 +3364,36 @@ def test_pt1_projected_gate_notice_replays_into_run_metadata(tmp_path: Path) -> 
     assert metadata["composition_projected_liquidus_notice"]["notices"] == [
         notice
     ]
+
+
+def test_pt1_domain_gate_prediction_replays_with_qualification(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / 'domain-gate-notice.db'
+    capture = PT0DeterminismStore('capture', db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    monkeypatch.setattr(sim, '_dispatch_only', lambda intent, **kw: IntentResult(
+        intent=intent, status='out_of_domain', transition=None,
+        diagnostic={'backend_status_reason': 'silicate_window'},
+    ))
+    curve = sim._melt_redox_liquidus_gate_curve()
+    notice = curve['gate_provider_refusal']
+    assert notice['reason'] == 'silicate_window'
+    assert notice['authority'] == 'extrapolated'
+    assert notice['qualification'] == 'out_of_domain_kress91_floor_prediction'
+    assert notice['certified_band']['sio2_wt_pct'] == [30.0, 80.0]
+    assert notice['certified_band']['min_T_C'] == 1200.0
+    assert notice['certified_band']['max_T_C'] == 1630.0
+    seed_gate_curve_memo_record(sim, curve)
+    capture.capture_gate_curve(
+        sim, fO2_log=sim._compute_intrinsic_melt_fO2(), curve=curve,
+    )
+
+    replay_sim = _build_pt0_sim(PT0DeterminismStore('replay', db_path=db_path))
+    assert replay_sim._melt_redox_liquidus_gate_curve() == curve
+    assert replay_sim._make_snapshot().liquid_fraction_gate['redox'][
+        'gate_provider_refusal'
+    ] == notice
 
 
 def test_pt1_capture_equilibrium_rejects_internal_analytical_provider(

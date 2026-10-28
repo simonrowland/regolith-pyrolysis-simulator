@@ -1,0 +1,31 @@
+# Table 1 is the measured table. Only the printed Fe3+/Fe2+ scalar has a
+# fitting ratio token; the oxide composition vector and equation-derived
+# activity/activity-coefficient columns are retained as structured context.
+source_id: matsuzaki-1997-feo-tio2-sio2-activities
+source:
+  citation: >-
+    Matsuzaki, K. and Ito, K. (1997), “Thermodynamics of FetO-TiO2-SiO2 Melts
+    in Equilibrium with Solid Iron”, ISIJ International 37(6), 562–565.
+  year: 1997
+  doi: 10.2355/isijinternational.37.562
+extraction:
+  method: MinerU table draft emit with all Table 1 values verified against the 600 dpi render.
+  date: '2026-10-21'
+  worker: codex-resume-32763-1792554222
+review_status: draft
+tables:
+  - page: 2
+    table_index: 1
+    published_page: 563
+    type: concentration_series
+    quantity: fe3_fe2_ratio
+    evidence_class: measured_direct
+    unit: dimensionless ratio (Fe3+/Fe2+)
+    phase: FetO-TiO2-SiO2 liquid slag, equilibrated with solid iron and quenched in water
+    rows: all
+    temperature:
+      column: 2
+      unit: K
+    values:
+      - column: 8
+        species: Fe

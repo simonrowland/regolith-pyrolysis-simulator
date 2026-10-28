@@ -44,7 +44,12 @@ from simulator.campaigns import (
     CampaignPressureSetpointRefusal,
     CampaignSetpointMissingRefusal,
 )
-from simulator.chemistry.kernel import OXYGEN_SINK_CHANNEL_MODE_KEY, ProposalRejected
+from simulator.chemistry.kernel import (
+    CHEMISTRY_KERNEL_RUN_INPUT_KEYS,
+    DEFAULT_LIQUID_FRACTION_PROVIDER,
+    OXYGEN_SINK_CHANNEL_MODE_KEY,
+    ProposalRejected,
+)
 from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
     KnudsenRegimeRefusal,
@@ -956,6 +961,18 @@ def evaluate(
 
     status = str(getattr(run_execution, "status", "ok"))
     error_message = str(getattr(run_execution, "error_message", ""))
+    if (
+        status == "refused"
+        and _run_execution_has_environment_failure_disposition(run_execution)
+    ):
+        raise EngineBugAbort(
+            "environment-disposition refusal cannot be scored as candidate "
+            "physics",
+            patch=validated_patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key_value=key,
+        )
     if status == "failed":
         failure_exc = getattr(run_execution, "failure_exception", None)
         if _is_malformed_recipe_error(failure_exc):
@@ -1557,6 +1574,28 @@ def _run_execution_refusal_reason(run_execution: Any) -> str:
         return mapped
     error_message = str(getattr(run_execution, "error_message", "") or "")
     return _reason_from_message(error_message) or "typed_physics_refusal"
+
+
+def _run_execution_has_environment_failure_disposition(
+    run_execution: Any,
+) -> bool:
+    failure_exception = getattr(run_execution, "failure_exception", None)
+    diagnostics = (
+        getattr(run_execution, "refusal_diagnostic", None),
+        getattr(failure_exception, "diagnostic", None),
+    )
+
+    def contains_environment(value: Any) -> bool:
+        if isinstance(value, MappingABC):
+            return (
+                value.get("backend_failure_disposition") == "environment"
+                or any(contains_environment(item) for item in value.values())
+            )
+        if isinstance(value, (list, tuple)):
+            return any(contains_environment(item) for item in value)
+        return False
+
+    return any(contains_environment(item) for item in diagnostics)
 
 
 def _typed_physics_refusal_reason(exc: BaseException) -> str:
@@ -2953,13 +2992,18 @@ def _build_eval_inputs_impl(
         if digest_key not in bundle.digests:
             raise EvaluationInputError(f"missing config digest {digest_key!r}")
 
-    diagnostic_chemistry_kernel = _diagnostic_chemistry_kernel_run_config(
-        run_options["chemistry_kernel"]
+    kernel_run_inputs = _chemistry_kernel_run_config(
+        {
+            'liquid_fraction_provider': (
+                bundle.setpoints.get('chemistry_kernel', {}) or {}
+            ).get('liquid_fraction_provider', DEFAULT_LIQUID_FRACTION_PROVIDER),
+            **run_options["chemistry_kernel"],
+        }
     )
     allow_unmeasured_alpha_fallback = bool(
         run_options["allow_unmeasured_alpha_fallback"]
     )
-    evalspec_chemistry_kernel = dict(diagnostic_chemistry_kernel)
+    evalspec_chemistry_kernel = dict(kernel_run_inputs)
     if allow_unmeasured_alpha_fallback:
         evalspec_chemistry_kernel["allow_unmeasured_alpha_fallback"] = True
     force_builtin_vapor_pressure = bool(run_options["force_builtin_vapor_pressure"])
@@ -2985,7 +3029,7 @@ def _build_eval_inputs_impl(
         c5_enabled=bool(run_options["c5_enabled"]),
         mre_target_species=str(run_options["mre_target_species"]),
         mre_max_voltage_V=float(run_options["mre_max_voltage_V"]),
-        chemistry_kernel=diagnostic_chemistry_kernel,
+        chemistry_kernel=kernel_run_inputs,
         allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
         allow_fallback_vapor=bool(run_options["allow_fallback_vapor"]),
         force_builtin_vapor_pressure=force_builtin_vapor_pressure,
@@ -3542,15 +3586,15 @@ def _vapor_pressure_provider_code_fingerprint(provider_id: str) -> str:
     return digest.hexdigest()
 
 
-def _diagnostic_chemistry_kernel_run_config(
+def _chemistry_kernel_run_config(
     chemistry_kernel: Mapping[str, Any],
 ) -> dict[str, Any]:
     if not isinstance(chemistry_kernel, MappingABC):
         return {}
-    if OXYGEN_SINK_CHANNEL_MODE_KEY not in chemistry_kernel:
-        return {}
     return {
-        OXYGEN_SINK_CHANNEL_MODE_KEY: chemistry_kernel[OXYGEN_SINK_CHANNEL_MODE_KEY]
+        key: chemistry_kernel[key]
+        for key in CHEMISTRY_KERNEL_RUN_INPUT_KEYS
+        if key in chemistry_kernel
     }
 
 

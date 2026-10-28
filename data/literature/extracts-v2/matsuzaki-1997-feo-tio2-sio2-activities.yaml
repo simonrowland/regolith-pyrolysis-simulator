@@ -1,0 +1,3104 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/matsuzaki-1997-feo-tio2-sio2-activities.yaml
+observations:
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r03_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1623'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000004849719410459133019790554018'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.039'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r03_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 1; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 1
+    temperature_K:
+      state:
+        tag: value
+        value: '1623'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 1; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.32'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 1; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r04_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1623'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000004849719410459133019790554018'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.049'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r04_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 2; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 2
+    temperature_K:
+      state:
+        tag: value
+        value: '1623'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 2; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.32'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 2; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r05_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1623'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000004849719410459133019790554018'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.046'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r05_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 3; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 3
+    temperature_K:
+      state:
+        tag: value
+        value: '1623'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 3; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.32'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 3; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r06_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1623'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000004849719410459133019790554018'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.021'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r06_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 4; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 4
+    temperature_K:
+      state:
+        tag: value
+        value: '1623'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 4; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.32'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 4; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r07_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1623'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000004849719410459133019790554018'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.03'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r07_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 5; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 5
+    temperature_K:
+      state:
+        tag: value
+        value: '1623'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 5; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.32'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 5; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r08_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1623'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000002727197640078947350654711441'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.047'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r08_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 6; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 6
+    temperature_K:
+      state:
+        tag: value
+        value: '1623'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 6; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.57'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 6; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r09_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1623'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000002727197640078947350654711441'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.036'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r09_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 7; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 7
+    temperature_K:
+      state:
+        tag: value
+        value: '1623'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 7; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.57'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 7; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r10_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1623'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000002727197640078947350654711441'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.032'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r10_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 8; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 8
+    temperature_K:
+      state:
+        tag: value
+        value: '1623'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 8; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.57'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 8; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r11_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1623'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000002727197640078947350654711441'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.032'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r11_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 9; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 9
+    temperature_K:
+      state:
+        tag: value
+        value: '1623'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 9; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.57'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 9; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r12_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1623'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000002727197640078947350654711441'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.007'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r12_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 10; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 10
+    temperature_K:
+      state:
+        tag: value
+        value: '1623'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 10; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.57'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 10; row_label=1623; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r13_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.00001136885198821464451112620212'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.07'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r13_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 11; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 11
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 11; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.95'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 11; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r14_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.00001136885198821464451112620212'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.061'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r14_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 12; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 12
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 12; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.95'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 12; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r15_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.00001136885198821464451112620212'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.054'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r15_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 13; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 13
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 13; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.95'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 13; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r16_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000006393175292945558099893654084'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.055'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r16_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 14; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 14
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 14; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.2'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 14; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r17_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000006393175292945558099893654084'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.025'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r17_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 15; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 15
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 15; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.2'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 15; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r18_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000006393175292945558099893654084'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.016'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r18_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 16; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 16
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 16; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.2'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 16; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r19_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000004422996670173481665327308098'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.028'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r19_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 17; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 17
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 17; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.36'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 17; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r20_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000004422996670173481665327308098'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.023'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r20_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 18; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 18
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 18; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.36'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 18; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r21_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000004422996670173481665327308098'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.013'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r21_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 19; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 19
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 19; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.36'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 19; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r22_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000002855726505103707832205024188'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.025'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r22_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 20; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 20
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 20; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.55'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 20; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r23_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000002855726505103707832205024188'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.033'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r23_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 21; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 21
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 21; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.55'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 21; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r24_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000002855726505103707832205024188'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.012'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r24_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 22; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 22
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 22; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.55'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 22; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r25_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000001605893027261223238881029216'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.035'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r25_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 23; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 23
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 23; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.8'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 23; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r26_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000001605893027261223238881029216'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.035'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r26_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 24; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 24
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 24; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.8'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 24; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+- observation_id: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r27_c08
+  experiment_id: 10.2355/isijinternational.37.562::experiment::matsuzaki_1997_gas_equilibration
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000001605893027261223238881029216'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.016'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matsuzaki-1997-feo-tio2-sio2-activities::matsuzaki_1997_feo_tio2_sio2_activities_p002_t01_r27_c08
+  source_id: matsuzaki-1997-feo-tio2-sio2-activities
+  locator:
+    page: 2
+    published_page: 563
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 sample 25; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+  read_from: pdf:matsuzaki-1997-feo-tio2-sio2-activities
+  point_conditions:
+    T_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 25
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 25; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.8'
+      locator:
+        page: 2
+        published_page: 563
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 sample 25; row_label=1673; column_header=$Fe^{3+}/Fe^{2+}$   $Fe^{3+}/Fe^{2+}$

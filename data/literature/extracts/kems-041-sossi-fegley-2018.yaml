@@ -20,11 +20,11 @@ source:
   doi: 10.2138/rmg.2018.84.11
   url: https://doi.org/10.2138/rmg.2018.84.11
 extraction:
-  method: OCR MinerU Table 2 full activity-coefficient inventory (28 oxides) + Table 1 index note. Secondary
+  method: OCR MinerU Table 2 full activity-coefficient inventory (28 oxides) + Table 1 index note. Secondary; validated in an internal review, 2026-08-04, ocr-artifacts
     compilation — not primary KEMS co-measured partial pressures.
   date: '2026-08-04'
   worker: mine-multicarrier-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/
+  provenance_path: raw/kems-041-sossi-fegley-2018/kems-041-sossi-fegley-2018.pdf
   table_2_footnote_as_printed: "Notes: A = Al₂O₃; An = Anorthite; C = CaO; Di = Diopside; F = FeO; K = K₂O; M = MgO; P = P₂O₅; S = SiO₂"
   table_2_qualification_as_printed: "These should only be used as guide and the interested reader is referred to the relevant paper for further information as to how the activity coefficients were calculated and how they vary with melt composition, temperature, and oxygen fugacity."
 notes:
@@ -37,7 +37,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Al__AlO_1_5_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -80,7 +80,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_As__AsO_1_5_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -122,8 +122,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -142,7 +143,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Bi__BiO_1_5_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -184,8 +185,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -204,7 +206,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Ca_CaO
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -267,7 +269,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Co_CoO
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -323,7 +325,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Cr_CrO
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -364,7 +366,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Cr__CrO_1_5_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -406,8 +408,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -426,7 +429,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Cu__CuO_0_5_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -478,8 +481,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -498,7 +502,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Fe_FeO
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -580,8 +584,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -600,7 +605,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Ge_GeO
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -641,8 +646,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -661,7 +667,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_GeO2__GeO_2_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -704,8 +710,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 744.0
@@ -734,7 +742,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_In__InO_1_5_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -774,8 +782,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -794,7 +803,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_K__KO_0_5_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -836,8 +845,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -856,7 +866,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Mg_MgO
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -919,7 +929,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Mn_MnO
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -973,8 +983,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -993,7 +1004,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_MoO2__MoO_2_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -1049,8 +1060,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1481.0
@@ -1080,7 +1093,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_MoO3__MoO_3_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -1137,8 +1150,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 800.0
@@ -1167,7 +1182,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Na__NaO_0_5_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -1219,8 +1234,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -1239,7 +1255,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Ni_NiO
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -1309,7 +1325,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_P__PO_2_5_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -1350,8 +1366,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -1370,7 +1387,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Pb_PbO
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -1410,8 +1427,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -1430,7 +1448,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_SiO2__SiO_2_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -1473,8 +1491,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1200.0
@@ -1503,7 +1523,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Sn_SnO
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -1545,8 +1565,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -1565,7 +1586,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_TiO2__TiO_2_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -1608,8 +1629,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1850.0
@@ -1638,7 +1661,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_V__V_2O_3__1900K
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-041-sossi-fegley-2018/tables.md
+        source_path: text/kems-041-sossi-fegley-2018/ocr-repair/kems-041-sossi-fegley-2018.md
         table: '2'
         page: 409
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
@@ -1680,7 +1703,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_V__V_2O_3__2000K_contested
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-041-sossi-fegley-2018/tables.md
+        source_path: text/kems-041-sossi-fegley-2018/ocr-repair/kems-041-sossi-fegley-2018.md
         table: '2'
         page: 409
         paragraph: V2O3 row, 2000 K branch
@@ -1722,7 +1745,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_V__V_2O_3__2100K
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-041-sossi-fegley-2018/tables.md
+        source_path: text/kems-041-sossi-fegley-2018/ocr-repair/kems-041-sossi-fegley-2018.md
         table: '2'
         page: 409
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
@@ -1766,7 +1789,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_WO2__WO_2_
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-041-sossi-fegley-2018/tables.md
+        source_path: text/kems-041-sossi-fegley-2018/ocr-repair/kems-041-sossi-fegley-2018.md
         table: '2'
         page: 409
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
@@ -1825,7 +1848,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_WO3__WO_3__relation_1673K
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-041-sossi-fegley-2018/tables.md
+        source_path: text/kems-041-sossi-fegley-2018/ocr-repair/kems-041-sossi-fegley-2018.md
         table: '2'
         page: 409
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
@@ -1884,7 +1907,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_WO3__WO_3__1923K
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-041-sossi-fegley-2018/tables.md
+        source_path: text/kems-041-sossi-fegley-2018/ocr-repair/kems-041-sossi-fegley-2018.md
         table: '2'
         page: 409
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
@@ -1929,8 +1952,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 407
-        pdf_page_index: 15
+        table_caption_page: 10
+        page: 15
+        published_page: 407
+        pdf_page_index: 14
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1300.0
@@ -1959,7 +1984,7 @@ species:
     - observation_id: sossi_fegley_2018_table2_gamma_Zn_ZnO
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '2'
         paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
       T_range_K:
@@ -2000,8 +2025,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -2021,7 +2047,7 @@ species:
     - observation_id: sossi_fegley_2018_table1_pure_oxide_vapour_speciation_index
       type: gas_species_index
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+        source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '1'
         paragraph: metal bearing gases in the saturated vapour over ~80 pure oxides
       T_range_K:
@@ -2045,8 +2071,9 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 402
-        pdf_page_index: 10
+        page: 10
+        published_page: 402
+        pdf_page_index: 9
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1500.0
@@ -2077,8 +2104,9 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 402
-        pdf_page_index: 10
+        page: 10
+        published_page: 402
+        pdf_page_index: 9
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 367.0
@@ -2109,8 +2137,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1170.0
@@ -2141,8 +2171,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1150.0
@@ -2173,8 +2205,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1900.0
@@ -2205,8 +2239,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 987.0
@@ -2237,8 +2273,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1500.0
@@ -2269,8 +2307,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 873.0
@@ -2302,8 +2342,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1700.0
@@ -2334,8 +2376,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1825.0
@@ -2366,8 +2410,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1578.0
@@ -2398,8 +2444,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1690.0
@@ -2430,8 +2478,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 423.0
@@ -2462,8 +2512,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 298.0
@@ -2494,8 +2546,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1210.0
@@ -2526,8 +2580,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 873.0
@@ -2558,8 +2614,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 2000.0
@@ -2590,8 +2648,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 2000.0
@@ -2622,8 +2682,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1950.0
@@ -2654,8 +2716,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 403
-        pdf_page_index: 11
+        table_caption_page: 10
+        page: 11
+        published_page: 403
+        pdf_page_index: 10
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1543.0
@@ -2686,8 +2750,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1373.0
@@ -2718,8 +2784,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1030.0
@@ -2751,8 +2819,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1013.0
@@ -2783,8 +2853,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 2000.0
@@ -2815,8 +2887,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 2150.0
@@ -2847,8 +2921,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 2000.0
@@ -2879,8 +2955,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 873.0
@@ -2911,8 +2989,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 298.0
@@ -2944,8 +3024,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1778.0
@@ -2976,8 +3058,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1000.0
@@ -3008,8 +3092,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 2000.0
@@ -3040,8 +3126,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1573.0
@@ -3072,8 +3160,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 404
-        pdf_page_index: 12
+        table_caption_page: 10
+        page: 12
+        published_page: 404
+        pdf_page_index: 11
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1535.0
@@ -3104,8 +3194,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 873.0
@@ -3136,8 +3228,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1773.0
@@ -3168,8 +3262,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1773.0
@@ -3201,8 +3297,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1726.0
@@ -3233,8 +3331,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1950.0
@@ -3265,8 +3365,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1400.0
@@ -3297,8 +3399,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1100.0
@@ -3381,8 +3485,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 313.0
@@ -3413,8 +3519,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 810.0
@@ -3445,8 +3553,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1950.0
@@ -3477,8 +3587,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 298.0
@@ -3509,8 +3621,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 327.0
@@ -3541,8 +3655,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1090.0
@@ -3575,8 +3691,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 580.0
@@ -3608,8 +3726,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 405
-        pdf_page_index: 13
+        table_caption_page: 10
+        page: 13
+        published_page: 405
+        pdf_page_index: 12
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 2481.0
@@ -3640,8 +3760,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1950.0
@@ -3672,8 +3794,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1160.0
@@ -3704,8 +3828,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1575.0
@@ -3736,8 +3862,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1573.0
@@ -3768,8 +3896,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 2000.0
@@ -3800,8 +3930,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1782.0
@@ -3832,8 +3964,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1840.0
@@ -3864,8 +3998,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1675.0
@@ -3896,8 +4032,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1837.0
@@ -3928,8 +4066,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 620.0
@@ -3960,8 +4100,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 773.0
@@ -3992,8 +4134,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 657.0
@@ -4024,8 +4168,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 2000.0
@@ -4056,8 +4202,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1600.0
@@ -4088,8 +4236,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 406
-        pdf_page_index: 14
+        table_caption_page: 10
+        page: 14
+        published_page: 406
+        pdf_page_index: 13
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 840.0
@@ -4120,8 +4270,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 407
-        pdf_page_index: 15
+        table_caption_page: 10
+        page: 15
+        published_page: 407
+        pdf_page_index: 14
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1680.0
@@ -4152,8 +4304,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 407
-        pdf_page_index: 15
+        table_caption_page: 10
+        page: 15
+        published_page: 407
+        pdf_page_index: 14
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1839.0
@@ -4184,8 +4338,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 407
-        pdf_page_index: 15
+        table_caption_page: 10
+        page: 15
+        published_page: 407
+        pdf_page_index: 14
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1673.0
@@ -4216,8 +4372,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 407
-        pdf_page_index: 15
+        table_caption_page: 10
+        page: 15
+        published_page: 407
+        pdf_page_index: 14
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1003.0
@@ -4248,8 +4406,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 407
-        pdf_page_index: 15
+        table_caption_page: 10
+        page: 15
+        published_page: 407
+        pdf_page_index: 14
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1400.0
@@ -4280,8 +4440,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 407
-        pdf_page_index: 15
+        table_caption_page: 10
+        page: 15
+        published_page: 407
+        pdf_page_index: 14
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 2000.0
@@ -4312,8 +4474,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 407
-        pdf_page_index: 15
+        table_caption_page: 10
+        page: 15
+        published_page: 407
+        pdf_page_index: 14
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1023.0
@@ -4344,8 +4508,10 @@ species:
       type: gas_species_index
       locator:
         table: 1
-        page: 407
-        pdf_page_index: 15
+        table_caption_page: 10
+        page: 15
+        published_page: 407
+        pdf_page_index: 14
         note: The metal bearing gases in the saturated vapour over 77 pure oxides
       T_range_K:
       - 1700.0
@@ -4375,8 +4541,9 @@ species:
       type: activity_coefficient
       locator:
         table: "3"
-        page: 424
-        pdf_page_index: 32
+        page: 32
+        published_page: 424
+        pdf_page_index: 31
         note: "Qualitative order of element volatilities, from least to most"
       phase: comparison_of_solar_nebula_and_silicate_melt_evaporation
       regime: compiled_qualitative_volatility_order
@@ -4391,8 +4558,9 @@ species:
       type: activity_coefficient
       locator:
         table: "3"
-        page: 424
-        pdf_page_index: 32
+        page: 32
+        published_page: 424
+        pdf_page_index: 31
         note: "Qualitative order of element volatilities, from least to most"
       phase: comparison_of_solar_nebula_and_silicate_melt_evaporation
       regime: compiled_qualitative_volatility_order
@@ -4407,8 +4575,9 @@ species:
       type: activity_coefficient
       locator:
         table: "3"
-        page: 424
-        pdf_page_index: 32
+        page: 32
+        published_page: 424
+        pdf_page_index: 31
         note: "Qualitative order of element volatilities, from least to most"
       phase: comparison_of_solar_nebula_and_silicate_melt_evaporation
       regime: compiled_qualitative_volatility_order
@@ -4425,8 +4594,9 @@ species:
       type: gibbs_table
       locator:
         table: "4"
-        page: 428
-        pdf_page_index: 36
+        page: 36
+        published_page: 428
+        pdf_page_index: 35
         note: "Illustrative elemental fugacities for key volatiles (2000 K, one bar) steam atmosphere"
       T_range_K:
       - 2000.0
@@ -4450,8 +4620,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4471,8 +4642,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4492,8 +4664,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4513,8 +4686,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4534,8 +4708,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4555,8 +4730,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4576,8 +4752,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4597,8 +4774,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4618,8 +4796,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4638,8 +4817,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4659,8 +4839,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4680,8 +4861,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4701,8 +4883,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4722,8 +4905,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4743,8 +4927,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4764,8 +4949,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4785,8 +4971,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4806,8 +4993,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4827,8 +5015,9 @@ species:
       type: activity_coefficient
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Speciation of major gases at these conditions"
       phase: gas
       regime: compiled_speciation_by_environment
@@ -4848,8 +5037,9 @@ species:
       type: gibbs_table
       locator:
         table: "5"
-        page: 431
-        pdf_page_index: 39
+        page: 39
+        published_page: 431
+        pdf_page_index: 38
         note: "Table 5 footer row log fO2"
       units: log10 fO2 as printed
       values:
@@ -5008,19 +5198,19 @@ fidelity_samples:
   value: 0.6–2.3 $^{a}$ 1.2–2.1 $^{b}$ 0.9–1.8 $^{c}$ ≈0.5–2.5 $^{d}$
   note: Table 2 FeO activity coefficient range as printed
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+    source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
     table: '2'
 - path: species.SiO2.observations[sossi_fegley_2018_table2_gamma_SiO2__SiO_2_].values.gamma_range_as_published
   value: 0.9–1.1
   note: Table 2 SiO2 γ 0.9–1.1 CMAS
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+    source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
     table: '2'
 - path: species.TiO2.observations[sossi_fegley_2018_table2_gamma_TiO2__TiO_2_].values.gamma_range_as_published
   value: 1.5–1.7
   note: Table 2 TiO2 γ
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+    source_path: text/kems-041-sossi-fegley-2018/mineru/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
     table: '2'
 
 - species: Al2O3
@@ -5030,8 +5220,9 @@ fidelity_samples:
   value: Al
   locator:
     table: '1'
-    page: 402
-    pdf_page_index: 10
+    page: 10
+    published_page: 402
+    pdf_page_index: 9
     note: bold Al is the most abundant metal-bearing gas over α-Al2O3
 - species: SiO2
   observable: gas_species_index
@@ -5040,9 +5231,11 @@ fidelity_samples:
   value: SiO
   locator:
     table: '1'
-    page: 405
-    pdf_page_index: 13
-    note: bold SiO over cristobalite/SiO2(l)
+    table_caption_page: 10
+    page: 13
+    published_page: 405
+    pdf_page_index: 12
+    note: 'bold SiO over cristobalite/SiO2(l); data cell: SiO'
 - species: As2O3
   observable: gas_species_index
   observation_id: sossi_fegley_2018_table1_As2O3_speciation
@@ -5050,8 +5243,9 @@ fidelity_samples:
   value: As4O6
   locator:
     table: '1'
-    page: 402
-    pdf_page_index: 10
+    page: 10
+    published_page: 402
+    pdf_page_index: 9
     note: bold As4O6 ≫ other As-O gases
 - path: species.PO.observations[sossi_fegley_2018_alias_SF18_Mk86_PO_from_silicate_melt].values
   value:

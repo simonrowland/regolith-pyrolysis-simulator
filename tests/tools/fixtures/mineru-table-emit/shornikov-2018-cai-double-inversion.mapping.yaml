@@ -1,0 +1,108 @@
+source_id: shornikov-2018-cai-double-inversion
+source:
+  citation: >-
+    Shornikov, S. I., and Yakovlev, O. I. (2018). Thermodynamic Study of Double
+    Inversion of MgO and SiO2 Relative Fugacity at CAIs Evaporation. 49th Lunar
+    and Planetary Science Conference, LPI Contribution No. 2083, abstract 1845.
+  year: 2018
+  corpus_asset: raw/shornikov-2018-cai-double-inversion/shornikov-2018-cai-double-inversion.pdf
+  corpus_sha256: 913d26a8ac7de1519cb53c27bba1d8092220dc38450cdc3aedb3731542bd6d0f
+extraction:
+  method: mineru_table_draft emit; rows regrouped as one initial-composition context table
+  date: '2026-10-18'
+  worker: w4a2-1018
+review_status: draft
+tables:
+  - page: 1
+    table_index: 1
+    type: initial_sample_composition_table
+    quantity: initial_sample_composition
+    unit: mol %
+    row_predicate:
+      column: 1
+      equals: 5aN-L
+    evidence_class: measured_tabulated
+    values:
+      - column: 2
+        species: CaO
+      - column: 3
+        species: MgO
+      - column: 4
+        species: Al2O3
+      - column: 5
+        species: SiO2
+  - page: 1
+    table_index: 1
+    type: initial_sample_composition_table
+    quantity: initial_sample_composition
+    unit: mol %
+    row_predicate:
+      column: 1
+      equals: 5aN-3
+    evidence_class: quoted_attributed
+    attribution: '[5, 6]'
+    values:
+      - column: 2
+        species: CaO
+      - column: 3
+        species: MgO
+      - column: 4
+        species: Al2O3
+      - column: 5
+        species: SiO2
+  - page: 1
+    table_index: 1
+    type: initial_sample_composition_table
+    quantity: initial_sample_composition
+    unit: mol %
+    row_predicate:
+      column: 1
+      equals: 5aN-H
+    evidence_class: measured_tabulated
+    values:
+      - column: 2
+        species: CaO
+      - column: 3
+        species: MgO
+      - column: 4
+        species: Al2O3
+      - column: 5
+        species: SiO2
+  - page: 1
+    table_index: 1
+    type: initial_sample_composition_table
+    quantity: initial_sample_composition
+    unit: mol %
+    row_predicate:
+      column: 1
+      equals: CAI4
+    evidence_class: quoted_attributed
+    attribution: '[7]'
+    values:
+      - column: 2
+        species: CaO
+      - column: 3
+        species: MgO
+      - column: 4
+        species: Al2O3
+      - column: 5
+        species: SiO2
+  - page: 1
+    table_index: 1
+    type: initial_sample_composition_table
+    quantity: initial_sample_composition
+    unit: mol %
+    row_predicate:
+      column: 1
+      equals: CAI B
+    evidence_class: quoted_attributed
+    attribution: '[8]'
+    values:
+      - column: 2
+        species: CaO
+      - column: 3
+        species: MgO
+      - column: 4
+        species: Al2O3
+      - column: 5
+        species: SiO2

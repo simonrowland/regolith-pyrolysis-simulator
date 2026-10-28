@@ -1,9 +1,11 @@
 """Shared live quantities for the Studio pin emitter and its invariant tests."""
 
 import json
+from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
+from simulator.config import load_config_bundle
 from simulator.runner import build_sio_yield_report
 from simulator.state import CampaignPhase
 
@@ -32,12 +34,27 @@ def silica_product_kg(products: dict) -> float:
 def sio_wall_report_at_temperature(liner_temperature_c: float):
     """The wall-step regression deliberately exercises unavailable MAGEMin.
 
-    This is a fallback-path test probe, not real-engine golden evidence.
+    The declared analytical gate preserves this probe's Kress-floor inputs.
+    This is an analytical test probe, not real-engine golden evidence.
     Keep it separate from the live-engine evolved-yield/stage-3 probes.
     """
     from simulator.melt_backend.magemin import MAGEMinBackend
 
-    with patch.object(MAGEMinBackend, "initialize", return_value=False):
+    bundle = load_config_bundle()
+    setpoints = {
+        **bundle.setpoints,
+        "chemistry_kernel": {
+            **bundle.setpoints.get("chemistry_kernel", {}),
+            "liquid_fraction_provider": "analytical",
+        },
+    }
+    with (
+        patch.object(MAGEMinBackend, "initialize", return_value=False),
+        patch(
+            "simulator.runner.load_config_bundle",
+            return_value=replace(bundle, setpoints=setpoints),
+        ),
+    ):
         return sio_report_at_wall_temperature(liner_temperature_c)
 
 

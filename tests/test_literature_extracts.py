@@ -13,7 +13,10 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import importlib.util
+import json
 import math
+import os
 import sys
 from collections import Counter
 from decimal import Decimal
@@ -204,7 +207,7 @@ def _assert_ohta_suito_1995_review_pins(extract: dict) -> None:
 
     table_iii_observation_id = "ohta_suito_1995_table3_interaction_parameters"
     expected_table_iii_locator = {
-        "page": 298, "published_page": 298, "pdf_page_index": 3, "table": "III"
+        "page": 4, "published_page": 298, "pdf_page_index": 3, "table": "III"
     }
     table_iii_locators = [
         row["locator"]
@@ -345,6 +348,104 @@ def test_sato_1973_independently_pins_all_table_1_cells_and_equation() -> None:
     source = EXTRACTS / "sato-hickling-mclane-1973-lunar-fo2.yaml"
     extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
     _assert_sato_1973_table_pins(extract)
+
+
+def test_kems_023_table1_crown_columns_full_cell_count_and_render_pins():
+    """Pin the four requested species to Table I, PDF p. 2 / published p. 176."""
+    path = EXTRACTS / "kems-023-demaria-1973.yaml"
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+
+    cells = {}
+    species_counts = Counter()
+    table_rows = set()
+    for species, block in doc["species"].items():
+        for observation in block.get("observations", []):
+            if (
+                observation.get("type") != "psat_series"
+                or observation.get("locator", {}).get("table") != "1"
+            ):
+                continue
+            values = observation.get("values", {})
+            for point in values.get("series", []):
+                if point.get("p_atm") is None:
+                    continue
+                sample = point.get("run") or values.get("sample")
+                key = (species, int(point["T_K"]), str(sample))
+                assert key not in cells
+                cells[key] = Decimal(str(point["p_atm"]))
+                species_counts[species] += 1
+                table_rows.add((species, int(point["T_K"])))
+
+    assert len(cells) == 61
+    assert len(table_rows) == 17
+    assert species_counts == Counter(
+        {"Na": 9, "Fe": 12, "Mg": 10, "SiO": 12, "Ca": 8, "TiO": 7, "Al": 3}
+    )
+    expected_temperatures = {
+        "Mg": {1700, 1800, 1900},
+        "SiO": {1800, 1900, 2000},
+        "Ca": {1900, 2000},
+        "Al": {2100},
+    }
+    actual_temperatures = {
+        species: {
+            temperature
+            for row_species, temperature, _sample in cells
+            if row_species == species
+        }
+        for species in expected_temperatures
+    }
+    assert actual_temperatures == expected_temperatures
+
+    expected = {
+        ("Mg", 1700, "10017"): Decimal("5.6e-8"),
+        ("SiO", 1800, "10017"): Decimal("3.5e-6"),
+        ("Ca", 1900, "10017"): Decimal("6.2e-8"),
+        ("Al", 2100, "10017"): Decimal("2.3e-7"),
+    }
+    assert {key: cells[key] for key in expected} == expected
+
+    expected_pin_paths = {
+        (
+            "species.Mg.observations[demaria_1973_mg_psat_table1_this_work]"
+            ".values.series[0].p_atm"
+        ): expected[("Mg", 1700, "10017")],
+        (
+            "species.SiO.observations[demaria_1973_sio_psat_table1_this_work]"
+            ".values.series[0].p_atm"
+        ): expected[("SiO", 1800, "10017")],
+        (
+            "species.Ca.observations[demaria_1973_ca_psat_table1_this_work]"
+            ".values.series[0].p_atm"
+        ): expected[("Ca", 1900, "10017")],
+        (
+            "species.Al.observations[demaria_1973_al_psat_table1_this_work]"
+            ".values.series[0].p_atm"
+        ): expected[("Al", 2100, "10017")],
+    }
+    pins = {sample["path"]: sample for sample in doc["fidelity_samples"]}
+    for sample_path, expected_value in expected_pin_paths.items():
+        sample = pins[sample_path]
+        assert Decimal(str(sample["value"])) == expected_value
+        assert sample["locator"]["table"] == "1"
+        assert sample["locator"]["published_page"] == 176
+        assert sample["locator"]["pdf_page_index"] == 2
+        assert vle.check_fidelity_sample_matches(doc, sample) == []
+
+    mutated = copy.deepcopy(doc)
+    mg_pin_path = next(path for path in expected_pin_paths if "species.Mg." in path)
+    mutated_pin = next(
+        sample
+        for sample in mutated["fidelity_samples"]
+        if sample["path"] == mg_pin_path
+    )
+    mutated_observation = next(
+        observation
+        for observation in mutated["species"]["Mg"]["observations"]
+        if observation["observation_id"] == "demaria_1973_mg_psat_table1_this_work"
+    )
+    mutated_observation["values"]["series"][0]["p_atm"] = 5.7e-08
+    assert vle.check_fidelity_sample_matches(mutated, mutated_pin)
 
 
 @pytest.mark.parametrize(
@@ -1337,6 +1438,7 @@ def tmp_extracts(tmp_path: Path):
                     "chloride_capacity": ["fixture-source"],
                     "composition_series": ["fixture-source"],
                     "equilibrium_phase_composition": ["fixture-source"],
+                    "distribution_ratio": ["fixture-source"],
                 },
             }
         ),
@@ -1429,6 +1531,90 @@ def test_gas_ratio_validation_rejects_invalid_basis_or_species(
     errors = vle.validate_extract_document(doc, expected_source_id="fixture-source")
 
     assert any("invalid gas ratio" in error for error in errors), errors
+
+
+def test_docs_private_reference_in_nested_prose_and_provenance_path_is_refused():
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["locator"]["note"] = (
+        "See docs-private/research/hidden.md"
+    )
+    doc["extraction"]["provenance_path"] = "docs-private/research/source.md"
+
+    errors = vle.validate_extract_document(
+        doc, path=Path("fixture-source.yaml"), expected_source_id="fixture-source"
+    )
+
+    assert any(
+        "fixture-source.yaml:species.Fe.observations[0].locator.note" in error
+        and "[docs-private-prose]" in error
+        for error in errors
+    )
+    assert any(
+        "fixture-source.yaml: extraction.provenance_path" in error
+        and "repository-portable" in error
+        and "docs-private path refused for provenance_path" in error
+        for error in errors
+    )
+
+
+def test_clean_extract_citation_renders_without_private_path_in_index():
+    spec = importlib.util.spec_from_file_location(
+        "literature_build_index", REPO_ROOT / "data/literature/build_index.py"
+    )
+    assert spec is not None and spec.loader is not None
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+
+    citation = _minimal_extract()["source"]["citation"]
+    counts = dict.fromkeys(
+        (
+            "sources",
+            "extracts",
+            "pdfs_present_in_worktree",
+            "pdfs_tracked_99_kems_langmuir",
+            "pdfs_without_extract",
+            "extracts_without_pdf",
+            "alias_groups_needing_resolution",
+            "extracts_with_private_locators",
+        ),
+        0,
+    )
+    counts.update(sources=1, extracts=1, extracts_without_pdf=1)
+    gap_names = (
+        "pdfs_without_extract",
+        "extracts_without_pdf",
+        "extracts_with_private_locators",
+        "untracked_files",
+        "sidecars_missing_fields",
+        "source_id_collisions",
+    )
+    index = {
+        "counts": counts,
+        "scan": {
+            "root": ".",
+            "corpus_root": ".",
+            "private_roots_scanned": [],
+            "private_roots_not_scanned": [],
+            "hunt_json": None,
+        },
+        "sources": [
+            {
+                "source_id": "fixture-source",
+                "citation": citation,
+                "pdf_status": "ABSENT",
+                "pdf_last_seen": [],
+                "extracts": [],
+                "corpus_status": "unavailable",
+                "corpus": {},
+            }
+        ],
+        "gaps": {name: [] for name in gap_names},
+    }
+
+    rendered = builder.render_md(index)
+
+    assert "docs-private" not in rendered
+    assert citation in rendered
 
 
 def test_refuses_context_container_outside_species_block():
@@ -1558,6 +1744,42 @@ def test_refuses_absolute_locator_path_on_companion(tmp_path: Path, monkeypatch)
         and "/private/tmp/not-portable.pdf" in error
         for error in errors
     )
+
+
+@pytest.mark.parametrize(
+    "companion_yaml",
+    [
+        """schema_version: literature_extract_table.v1
+source_id: fixture-source
+rows:
+- locator:
+    source_path: docs-private/research/repair.md
+""",
+        """schema_version: literature_extract_table.v1
+source_id: fixture-source
+rows:
+- locator:
+    source_path: [docs-private/research/repair.md]
+""",
+        """schema_version: literature_extract_table.v1
+source_id: fixture-source
+rows:
+- locator:
+    source_path: &private_path docs-private/research/repair.md
+- provenance:
+    source_path: *private_path
+""",
+    ],
+    ids=("nested", "list", "alias"),
+)
+def test_refuses_private_path_on_companion(tmp_path: Path, monkeypatch, companion_yaml):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path)
+    path.write_text(companion_yaml, encoding="utf-8")
+
+    errors = vle.validate_extract_file(path)
+
+    assert any("docs-private path refused" in error for error in errors)
 
 
 def test_refuses_companion_table_with_unprefixed_filename(
@@ -2095,6 +2317,57 @@ def test_repo_extracts_validate_green():
     assert errors == [], "\n".join(errors[:20])
 
 
+def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None:
+    path = EXTRACTS / "kems-026-markova-1984.yaml"
+    migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    assert migrator.result.validation.hard_issues == ()
+
+    for panel, experiment_suffix in (
+        ("VI_lherzolite", "VI"),
+        ("V_alumina_basalt", "V"),
+    ):
+        experiment = next(
+            item
+            for item in migrator.result.experiments.values()
+            if item.experiment_id.endswith(f"::experiment::{experiment_suffix}")
+        )
+        assert experiment.sample.mass_kg.state.tag == "unknown"
+        assert experiment.sample.mass_kg.state.value is None
+        total_pressure = experiment.pressure_environment.total_pressure_Pa
+        assert total_pressure.state.tag == "unknown"
+        assert total_pressure.state.value is None
+        assert experiment.apparatus.geometry.orifice_area_m2.state.tag == "unknown"
+        assert experiment.apparatus.geometry.orifice_diameter_m.state.tag == "unknown"
+        assert experiment.apparatus.geometry.orifice_channel_length_m.state.tag == "unknown"
+        assert experiment.thermal_schedule.method.state.value == (
+            "Stepwise heating to complete vaporization with 70-degree temperature increments and 15-minute steps"
+        )
+        assert experiment.thermal_schedule.total_duration_s.state.tag == "unknown"
+        rows = [
+            item
+            for item in migrator.result.observations.values()
+            if f"markova_1984_table2_residual_melt_{panel}" in item.observation_id
+        ]
+        assert rows
+        assert all(item.experiment_id == experiment.experiment_id for item in rows)
+        for item in rows:
+            for axis in ("sample_mass_kg", "total_pressure_Pa"):
+                state = getattr(item.identity, axis)
+                assert state.tag == "unknown"
+                assert state.value is None
+                matches = [
+                    issue
+                    for issue in migrator.result.validation.issues
+                    if issue.path
+                    == f"observation[{item.observation_id}].identity.{axis}"
+                ]
+                assert len(matches) == 1
+                assert matches[0].reason.value == "identity_incomplete"
+                assert "unknown" in matches[0].detail
+
+
 def test_richter_2007_table1_residues_link_to_their_runs() -> None:
     from simulator.battery.enums import Quantity
     from simulator.battery.migrate import Migrator
@@ -2167,21 +2440,27 @@ def _repo_point_rows(filename: str) -> list[tuple[dict, dict]]:
 
 def test_sossi_na_inference_and_ceiling_never_recreate_alpha_range():
     """Na's disagreeing inference and adopted ceiling are not measured ranges."""
-    gamma = _repo_observation(
-        "kems-012-sossi-2019.yaml",
-        "sossi_2019_na_alpha_e_gamma_derived_range",
+    doc = load_cached_safe_yaml(
+        (EXTRACTS / "kems-012-sossi-2019.yaml").read_text(encoding="utf-8")
     )
-    adopted = _repo_observation(
-        "kems-012-sossi-2019.yaml",
-        "sossi_2019_na_alpha_e_authors_adopted_unity",
+    context = next(
+        row
+        for row in doc["species"]["Na"]["context"]
+        if row["observation_id"] == "sossi_2019_narrative_evaporation_model_inferences"
     )
+    rows = {
+        row["source_observation_id"]: row
+        for row in context["values"]
+    }
+    gamma = rows["sossi_2019_na_alpha_e_gamma_derived_range"]["values"]
+    adopted = rows["sossi_2019_na_alpha_e_authors_adopted_unity"]["values"]
 
-    assert "alpha_range" not in gamma["values"]
-    assert gamma["values"]["gamma_derived_alpha_e_inference_at_1400C"] == [0.3, 1.7]
-    assert gamma["values"]["consumer_policy"] == "report_only_not_executable_alpha_range"
-    assert adopted["values"]["alpha_authority_status"] == "analytical_upper_bound"
-    assert adopted["values"]["physical_alpha_upper_bound"] == 1.0
-    assert adopted["values"]["alpha"] == 1.0
+    assert "alpha_range" not in gamma
+    assert gamma["gamma_derived_alpha_e_inference_at_1400C"] == [0.3, 1.7]
+    assert gamma["consumer_policy"] == "report_only_not_executable_alpha_range"
+    assert adopted["alpha_authority_status"] == "analytical_upper_bound"
+    assert adopted["physical_alpha_upper_bound"] == 1.0
+    assert adopted["alpha"] == 1.0
 
 
 def test_wetzel_duplicate_is_typed_as_solid_film_growth():
@@ -2270,15 +2549,21 @@ def test_recovered_qualitative_sequences_cannot_become_numeric_rates():
 
 
 def test_stolyarova_wilson_numbers_are_gibbs_model_parameters_only():
-    observation = _repo_observation(
-        "kems-016-stolyarova-1992.yaml",
-        "stolyarova_1992_binary_wilson_model_parameters_table2",
+    extract = load_cached_safe_yaml(
+        (EXTRACTS / "kems-016-stolyarova-1992.yaml").read_text()
+    )
+    observation = next(
+        context
+        for species in extract["species"].values()
+        for context in species.get("context", [])
+        if context["observation_id"]
+        == "stolyarova_1992_binary_wilson_model_parameters_table2"
     )
     al_si = next(
         row for row in observation["values"]["parameters"]
         if row["system"] == "Al2O3-SiO2"
     )
-    assert observation["type"] == "gibbs_table"
+    assert observation["type"] == "printed_table_context"
     assert observation["values"]["evidence_class"] == "thermodynamic_model_parameter"
     assert observation["values"]["activity_pin_eligible"] is False
     assert al_si["l210"] == 316.3
@@ -2742,7 +3027,7 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
         assert values.get("formula") == formula
         assert values.get("condensed_phase") == condensed_phase
         assert row["T_range_K"] == [temperature, temperature]
-        assert row["locator"]["page"] == 826
+        assert row["locator"]["page"] == 6
         assert row["locator"]["published_page"] == 826
         assert row["locator"]["pdf_page_index"] == 5
         assert row["locator"]["figure"] == "7"
@@ -2763,7 +3048,7 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
         assert row["T_range_K"] == [temperature, temperature]
         assert values["evidence_class"] == "figure_only"
         assert row["locator"] == {
-            "page": 826,
+            "page": 6,
             "published_page": 826,
             "pdf_page_index": 5,
             "figure": "7",
@@ -2789,26 +3074,27 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
         (figure["figure"], figure["locator"])
         for figure in geometry["polythermal_pressure_figures"]
     ] == [
-        ("8", {"page": 827, "pdf_page_index": 6}),
-        ("9", {"page": 827, "pdf_page_index": 6}),
-        ("10", {"page": 827, "pdf_page_index": 6}),
-        ("11", {"page": 827, "pdf_page_index": 6}),
-        ("12", {"page": 828, "pdf_page_index": 7}),
-        ("13", {"page": 828, "pdf_page_index": 7}),
+        ("8", {"page": 7, "published_page": 827, "pdf_page_index": 6}),
+        ("9", {"page": 7, "published_page": 827, "pdf_page_index": 6}),
+        ("10", {"page": 7, "published_page": 827, "pdf_page_index": 6}),
+        ("11", {"page": 7, "published_page": 827, "pdf_page_index": 6}),
+        ("12", {"page": 8, "published_page": 828, "pdf_page_index": 7}),
+        ("13", {"page": 8, "published_page": 828, "pdf_page_index": 7}),
     ]
 
     cross_sections = next(
         row for row in doc["species"]["CaO"]["observations"]
         if row["observation_id"] == "halwax_2024_table_iii_ionization_cross_sections"
     )
-    assert cross_sections["locator"]["page"] == 826
+    assert cross_sections["locator"]["page"] == 6
+    assert cross_sections["locator"]["published_page"] == 826
     assert cross_sections["locator"]["pdf_page_index"] == 5
     cross_sections = cross_sections["values"]
     assert cross_sections["pressure_equation_locator"] == {
-        "page": 824, "pdf_page_index": 3, "equation": "1"
+        "page": 4, "published_page": 824, "pdf_page_index": 3, "equation": "1"
     }
     assert cross_sections["oxygen_molecular_cross_section_equation_locator"] == {
-        "page": 826, "pdf_page_index": 5, "equation": "12"
+        "page": 6, "published_page": 826, "pdf_page_index": 5, "equation": "12"
     }
     for species in ("CaO", "MgO"):
         table_i = next(
@@ -2817,20 +3103,20 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
                 "table_i_" + species.lower() + "_sample_masses"
             )
         )
-        assert table_i["locator"]["page"] == 825
+        assert table_i["locator"]["page"] == 5
         assert table_i["locator"]["pdf_page_index"] == 4
         assert all(
-            item["locator"] == {"page": 825, "table": "I", "pdf_page_index": 4}
+            item["locator"] == {"page": 5, "published_page": 825, "table": "I", "pdf_page_index": 4}
             for item in table_i["values"]["series"]
         )
     ni = next(
         row for row in doc["species"]["Ni"]["observations"]
         if row["observation_id"] == "halwax_2024_table_ii_ni_sublimation_this_study"
     )
-    assert ni["locator"]["page"] == 826
+    assert ni["locator"]["page"] == 6
     assert ni["locator"]["pdf_page_index"] == 5
     assert ni["uncertainty"]["locator"] == {
-        "page": 826, "pdf_page_index": 5, "table": "II"
+        "page": 6, "published_page": 826, "pdf_page_index": 5, "table": "II"
     }
     assert ni["values"]["pressure_calibration_factor"] == 7.6414e-9
     factor_pin = next(
@@ -2838,7 +3124,7 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
         if sample.get("path", "").endswith("pressure_calibration_factor_as_printed")
     )
     assert factor_pin["value"] == "7.6414·10⁻⁹"
-    assert factor_pin["locator"]["page"] == 826
+    assert factor_pin["locator"]["page"] == 6
     assert factor_pin["locator"]["pdf_page_index"] == 5
 
 
@@ -3393,6 +3679,51 @@ def test_pilot_extract_count_exact_and_merge_smoke():
     assert report["kind"] == "cross_source_consistency"
     assert "conflicts" in report
 
+    # Golden pin the current merged output while allowing the live corpus to
+    # grow with post-policy extracts. Update this snapshot when the 347-source
+    # corpus changes intentionally.
+    if len(files) == 347:
+        merged_payload = json.dumps(
+            {"by_species": view, "coverage": cov, "consistency": report},
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+            default=lambda value: {
+                "type": type(value).__qualname__, "value": str(value)
+            },
+        ).encode("utf-8")
+        assert len(extracts) == 347
+        assert len(view["species"]) == 1842
+        assert sum(
+            len(species.get("observations") or [])
+            for species in view["species"].values()
+        ) == 8881
+        assert cov["source_count"] == 347
+        assert cov["cells_found"] == 2875
+        assert len(report["conflicts"]) == 10
+        assert hashlib.sha256(merged_payload).hexdigest() == (
+            "569b1af9d179b8009dc5626531be9ef7c87e29528779aa18c2cc2b64fcd6d76a"
+        )
+
+
+def test_extract_yaml_cache_copies_and_reloads_stat_changes(tmp_path: Path):
+    path = tmp_path / "extract.yaml"
+    path.write_text("value: 1\n", encoding="utf-8")
+
+    misses_before = vle._load_extract_yaml_cached.cache_info().misses
+    parsed = vle.load_extract_yaml(path)
+    parsed["value"] = 9
+    assert vle.load_extract_yaml(path) == {"value": 1}
+    assert vle._load_extract_yaml_cached.cache_info().misses == misses_before + 1
+
+    metadata = path.stat()
+    path.write_text("value: 2\n", encoding="utf-8")
+    os.utime(path, ns=(metadata.st_atime_ns, metadata.st_mtime_ns + 1_000_000))
+    assert path.stat().st_size == metadata.st_size
+    assert vle.load_extract_yaml(path) == {"value": 2}
+    assert vle._load_extract_yaml_cached.cache_info().misses == misses_before + 2
+
 
 # ---------------------------------------------------------------------------
 # Migrator fidelity pins (P1-F1 / F2 / F3 / Datz / CEA)
@@ -3449,9 +3780,7 @@ def test_cea_source_ref_and_relative_provenance():
     """Null-hypothesis (P2): Ag source_ref_code truncated; absolute Dropbox path."""
     c = load_cached_safe_yaml((EXTRACTS / "nasa-cea-thermo.yaml").read_text(encoding="utf-8"))
     assert c["species"]["Ag"]["observations"][0]["values"]["source_ref_code"] == "g10/97"
-    prov = c["extraction"]["provenance_path"]
-    assert not prov.startswith("/")
-    assert "docs-private" in prov
+    assert c["extraction"]["provenance_path"] == "raw/nasa-cea-thermo/nasa-cea-thermo.pdf"
 
 
 def test_lh84_top_level_payloads_not_empty():
@@ -3804,6 +4133,26 @@ def test_new_extract_metadata_only_path_sample_refused():
         check_fidelity_match=True,
     )
     assert any("observation evidence" in e or "metadata" in e for e in errs), errs
+
+
+def test_new_extract_context_value_path_sample_admitted():
+    doc = _minimal_extract()
+    doc["source_id"] = "context-source"
+    doc["species"]["Fe"]["context"] = [_context_row()]
+    doc["fidelity_samples"] = [
+        {
+            "path": "species.Fe.context[0].values.furnace",
+            "value": "muffle",
+            "locator": {"page": 3, "section": "experimental"},
+        }
+    ]
+    errs = vle.validate_extract_document(
+        doc,
+        expected_source_id="context-source",
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert errs == [], errs
 
 
 def test_new_extract_mixed_metadata_path_and_structured_sample_refused():
@@ -5331,3 +5680,210 @@ def test_offer10_extract_locators_use_physical_pdf_pages() -> None:
         "pdf_page_index": 11,
         "figure": "6",
     }
+
+
+def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None:
+    from simulator.battery.identity import quantity_token
+
+    files = {
+        "shornikov-1997-cao-alumina-vapor": {
+            "path": EXTRACTS / "shornikov-1997-cao-alumina-vapor.yaml",
+            "groups": {
+                "shornikov_1997_cao_fig1_series3_sulfide_1773k": 7,
+                "shornikov_1997_cao_fig1_series4_sulfide_1873k": 6,
+                "shornikov_1997_cao_fig1_series5_emf_1773k": 5,
+            },
+        },
+        "shornikov-2007-cao-aluminosilicate-melts": {
+            "path": EXTRACTS / "shornikov-2007-cao-aluminosilicate-melts.yaml",
+            "groups": {
+                "shornikov_2007_figure1_cao_activity_prior_markers": 11,
+                "shornikov_2007_figure1_al2o3_activity_prior_markers": 10,
+                "shornikov_2007_figure1_sio2_activity_prior_markers": 10,
+            },
+        },
+        "shornikov-2001-mgalumina-silica-vaporization": {
+            "path": EXTRACTS / "shornikov-2001-mgalumina-silica-vaporization.yaml",
+            "groups": {
+                "shornikov_2001_f2_mgo_ma_s_2050k": 6,
+                "shornikov_2001_f2_al2o3_ma_s_2050k": 5,
+                "shornikov_2001_f2_sio2_ma_s_2050k": 5,
+            },
+        },
+    }
+    documents = {
+        source_id: yaml.load(
+            source["path"].read_text(), Loader=_DuplicateRejectingLoader
+        )
+        for source_id, source in files.items()
+    }
+    audit = (EXTRACTS / "crown4-1018-figure-read-audit.md").read_text()
+
+    def assert_literal_pin(
+        source_id: str,
+        observation_id: str,
+        read_id: str,
+        t_k: str,
+        activity: float,
+        pixels: tuple[str, str],
+    ) -> None:
+        points = next(
+            observation["values"]["points"]
+            for species in documents[source_id]["species"].values()
+            for observation in species.get("observations", [])
+            if observation["observation_id"] == observation_id
+        )
+        point = next(row for row in points if row["audit_read_id"] == read_id)
+        note = point["point_conditions"]["composition"]["locator"]["note"]
+        assert point["T_K"] == t_k
+        assert point["activity"] == pytest.approx(activity)
+        assert "pixel reads" in note
+        for pixel in pixels:
+            assert pixel in note
+
+    # Literal T, activity and both pixel reads. These are not taken from the
+    # audit file, so editing the YAML and the audit together still fails.
+    assert_literal_pin(
+        "shornikov-1997-cao-alumina-vapor",
+        "shornikov_1997_cao_fig1_series5_emf_1773k",
+        "shornikov_1997_cao_fig1_series5_emf_1773k-01",
+        "1773",
+        0.0057,
+        ("(675.55,1619.08)", "(675.50,1620.00)"),
+    )
+    assert_literal_pin(
+        "shornikov-2007-cao-aluminosilicate-melts",
+        "shornikov_2007_figure1_al2o3_activity_prior_markers",
+        "shornikov_2007_figure1_al2o3_activity_prior_markers-04",
+        "2033",
+        0.23,
+        ("(1755.75,857.75)", "(1755.75,857.76)"),
+    )
+    assert_literal_pin(
+        "shornikov-2001-mgalumina-silica-vaporization",
+        "shornikov_2001_f2_mgo_ma_s_2050k",
+        "shornikov_2001_f2_mgo_ma_s_2050k-03",
+        "2050",
+        0.18,
+        ("(5747.25,1191.50)", "(5749.09,1192.49)"),
+    )
+
+    # The source text prints these six binary compositions; they are not
+    # inferred from the curve.
+    printed_x = [
+        point["SiO2_mole_percent_as_printed"]
+        for point in documents[
+            "shornikov-2001-mgalumina-silica-vaporization"
+        ]["species"]["MgO"]["observations"][0]["values"]["points"]
+    ]
+    assert printed_x == ["0.00", "18.18", "52.21", "55.56", "64.89", "74.69"]
+
+    total_digitized = 0
+    for source_id, source in files.items():
+        document = documents[source_id]
+        expected_count = sum(source["groups"].values())
+        marker_observations = {
+            row["observation_id"]: row
+            for species in document["species"].values()
+            for row in species.get("observations", [])
+            if row["observation_id"] in source["groups"]
+        }
+        assert set(marker_observations) == set(source["groups"])
+        assert {
+            observation_id: len(row["values"]["points"])
+            for observation_id, row in marker_observations.items()
+        } == source["groups"]
+        assert sum(source["groups"].values()) == expected_count
+        total_digitized += expected_count
+
+        migrator = battery_migrate.Migrator(root=REPO_ROOT, index={}, aliases={})
+        migrator._migrate_extract(source["path"])
+        migrator.finalize()
+        migrated = [
+            row for row in migrator.result.observations.values()
+            if row.source_id == source_id
+            and any(group_id in row.observation_id for group_id in source["groups"])
+        ]
+        assert len(migrated) == expected_count
+        assert not [
+            issue for issue in migrator.result.validation.hard_issues
+            if source_id in issue.path
+        ]
+        for observation in migrated:
+            assert observation.value.kind.value == "point"
+            assert quantity_token(observation.identity).value == "activity"
+            assert observation.identity.temperature_K.is_value
+            composition = observation.point_conditions["composition"]
+            assert composition.state.is_value
+            assert composition.state.value.amount_basis.value == "mole_fraction"
+            assert composition.locator.figure is not None
+
+    assert total_digitized == 65
+
+    stolyarova = yaml.load(
+        (EXTRACTS / "stolyarova-1995-cao-alumina-kems.yaml").read_text(),
+        Loader=_DuplicateRejectingLoader,
+    )
+    cross_reference = stolyarova["species"]["CaO"]["observations"][0][
+        "locator"
+    ]["note"]
+    assert "stored once in shornikov-1997-cao-alumina-vapor.yaml" in cross_reference
+
+    unmarked_curve = documents["shornikov-1997-cao-alumina-vapor"][
+        "species"
+    ]["CaO"]["observations"][0]
+    assert unmarked_curve["values"]["quantity"] == "activity"
+    assert unmarked_curve["values"]["activity"] is None
+    assert "unmarked curve" in unmarked_curve["values"]["reason"]
+
+    ternary = documents["shornikov-2007-cao-aluminosilicate-melts"]
+    for species, observation_id in (
+        ("CaO", "shornikov_2007_figure1_cao_activity_calculated_curve"),
+        ("Al2O3", "shornikov_2007_figure1_al2o3_activity_calculated_curve"),
+        ("SiO2", "shornikov_2007_figure1_sio2_activity_calculated_curve"),
+    ):
+        curve = next(
+            row for row in ternary["species"][species]["observations"]
+            if row["observation_id"] == observation_id
+        )
+        assert curve["values"]["quantity"] == "activity"
+        assert curve["values"]["activity"] is None
+        assert "points" not in curve["values"]
+
+    gibbs = next(
+        row
+        for row in documents[
+            "shornikov-2001-mgalumina-silica-vaporization"
+        ]["species"]["SiO2"]["observations"]
+        if row["observation_id"] == "shornikov_2001_f3_ma_s_2050k"
+    )
+    assert gibbs["values"]["quantity"] == "delta_fG"
+    assert gibbs["values"]["delta_fG_kJ_mol"] is None
+    assert "ΔfG/RT=-1.3, T=2050 K" in gibbs["locator"]["note"]
+    assert "no quantity token for dimensionless ΔfG/RT" in audit
+
+    mutated = copy.deepcopy(
+        documents["shornikov-1997-cao-alumina-vapor"]
+    )
+    series5 = next(
+        row for row in mutated["species"]["CaO"]["observations"]
+        if row["observation_id"] == "shornikov_1997_cao_fig1_series5_emf_1773k"
+    )
+    series5["values"]["points"][0]["activity"] = 0.99
+    series5["values"]["points"][0]["point_conditions"]["composition"]["locator"][
+        "note"
+    ] = series5["values"]["points"][0]["point_conditions"]["composition"]["locator"][
+        "note"
+    ].replace("(675.55,1619.08)", "(1.00,1.00)")
+    original = documents["shornikov-1997-cao-alumina-vapor"]
+    documents["shornikov-1997-cao-alumina-vapor"] = mutated
+    with pytest.raises(AssertionError):
+        assert_literal_pin(
+            "shornikov-1997-cao-alumina-vapor",
+            "shornikov_1997_cao_fig1_series5_emf_1773k",
+            "shornikov_1997_cao_fig1_series5_emf_1773k-01",
+            "1773",
+            0.0057,
+            ("(675.55,1619.08)", "(675.50,1620.00)"),
+        )
+    documents["shornikov-1997-cao-alumina-vapor"] = original

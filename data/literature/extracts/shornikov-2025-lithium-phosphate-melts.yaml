@@ -1,0 +1,213 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2025-lithium-phosphate-melts
+source:
+  citation: >-
+    Shornikov, S. I. (2025). Thermodynamic properties of the Li2O–P4O10 melts.
+    Experiment in Geosciences, 31(1), 61–64.
+  year: 2025
+  venue: Experiment in Geosciences
+  corpus_asset: raw/shornikov-2025-lithium-phosphate-melts/shornikov-2025-lithium-phosphate-melts.pdf
+  corpus_sha256: c1d134f7e73ea0fd22e06b1b63970c299c28a5d96c2b29a7fd5d84314c029b6b
+extraction:
+  method: >-
+    No numerical table is printed. MinerU content list has text, images, charts,
+    one equation and no table blocks, so mineru_table_draft emit was not run.
+    Figures 1–3 were read on 600 dpi renders of PDF pages 3 and 4. This-study
+    series on Figure 3 are continuous calculated strokes. Figure 2 has no
+    this-study series. Literature symbols stay in the audit sidecar. PDF page 2
+    also carries the end of the Li2O–SiO2 article; that article is extracted
+    only from shornikov-2025-lithium-silicate-melts.
+  date: '2026-10-20'
+  worker: t1372-w2-w7-t1
+review_status: draft
+fidelity_samples:
+  - species: Li2O
+    observable: activity_coefficient
+    observation_id: shornikov_2025_li2o_p4o10_fig3a_series3
+    field: admission_status
+    value: typed_refusal
+    locator:
+      page: 4
+      published_page: 63
+      pdf_page_index: 3
+      figure: '3'
+      panel: A
+      note: Series 3 is the calculated Li2O activity stroke at 1673 K. No marker centre.
+  - species: P4O10
+    observable: activity_coefficient
+    observation_id: shornikov_2025_li2o_p4o10_fig3a_series6
+    field: admission_status
+    value: typed_refusal
+    locator:
+      page: 4
+      published_page: 63
+      pdf_page_index: 3
+      figure: '3'
+      panel: A
+      note: Series 6 is the calculated P4O10 activity stroke at 1673 K. No marker centre.
+experiments:
+  - experiment_id: shornikov_2025_li2o_p4o10_model
+    method: engine_evaluation
+    locator:
+      page: 2
+      published_page: 61
+      pdf_page_index: 1
+      section: Abstract
+      note: Semi-empirical model calculations for 700–1800 K, stated as performed for the first time. No Knudsen cell is used in this paper.
+    conditions:
+      temperature_K:
+        state:
+          tag: unknown
+          reason: range_only_not_a_single_temperature
+        locator:
+          page: 2
+          published_page: 61
+          pdf_page_index: 1
+          section: Abstract
+          note: The model covers 700–1800 K.
+species:
+  Li2O:
+    observations:
+      - observation_id: shornikov_2025_li2o_p4o10_fig3a_series3
+        type: activity_coefficient
+        experiment: shornikov_2025_li2o_p4o10_model
+        locator:
+          page: 4
+          published_page: 63
+          pdf_page_index: 3
+          figure: '3'
+          panel: A
+          note: >-
+            Caption assigns this study the numbers 3, 6 and 9 at 1673 K. On the
+            600 dpi render, panel A holds strokes 1–6 and panel B holds 7–9.
+            The body says panel A shows both the alkali-oxide activities and the
+            P4O10 activities, with the alkali-oxide activity falling in the order
+            Li2O, Na2O, K2O. Series 3 is the uppermost stroke of that alkali group.
+            It is a continuous stroke, with no marker centre. Series 1 and 2 are
+            the K2O–P4O10 and Na2O–P4O10 calculations and are not stored.
+        phase: condensed
+        units: dimensionless activity as plotted, log10
+        T_range_K: [1673, 1673]
+        standard_state: >-
+          Published page 62 (PDF page 3): the initial values of the standard Gibbs
+          energies of formation of the simple oxides are taken in the crystalline
+          and liquid states (Glushko, 1978–1982; Barin, 1995). The paper does not
+          state which of those phases is the reference of the plotted Li2O activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 3
+          temperature_K: 1673
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+    context:
+      - observation_id: shornikov_2025_li2o_p4o10_model_scope
+        type: model_scope
+        locator:
+          page: 3
+          published_page: 62
+          pdf_page_index: 2
+          section: body
+        units: as reported
+        values:
+          quantity: model scope
+          method_class: model_derived
+          temperature_range_K: [700, 1800]
+          model: Semi-empirical model (Shornikov, 2019).
+          model_inputs: >-
+            Standard Gibbs energies of Li2O and P4O10 in the crystalline and liquid
+            state, and of Li3PO4, Li4P2O7, Li5P3O10, Li6P4O13 and LiPO3.
+          gas_species_considered:
+            [Li, Li2, LiO, Li2O, Li2O2, P, P2, P3, P4, PO, PO2, PO3, P2O3, P2O4, P2O5, P3O6, P4O6, P4O7, P4O8, P4O9, P4O10, O, O2, O3, O4, LiPO3]
+          condensed_compounds_as_printed:
+            - {formula: LiPO3, oxide_equivalent: 2Li2O · P4O10, congruent_melting_K: 938}
+            - {formula: Li4P2O7, oxide_equivalent: 4Li2O · P4O10, congruent_melting_K: 1158}
+            - {formula: Li3PO4, oxide_equivalent: 6Li2O · P4O10, congruent_melting_K: 1498}
+            - {formula: Li5P3O10, oxide_equivalent: 10Li2O · 3P4O10, dissociates_at_or_below_K: 400, source: 'Meadowcroft and Richardson, 1963'}
+            - {formula: Li6P4O13, oxide_equivalent: 3Li2O · P4O10, dissociates_at_or_below_K: 400, source: 'Meadowcroft and Richardson, 1963'}
+          stoichiometry_kept_as_printed: >-
+            Li6P4O13 is printed as 3Li2O · P4O10. That oxide equivalent is stored
+            as printed. It was not corrected.
+          cited_mixing_enthalpy_298_K: >-
+            Wagman et al. (1981) mixing enthalpies of LiPO3, Li4P2O7 and Li3PO4
+            at 298 K are printed as −272 to −255 kJ/mol. Those are cited estimates,
+            not this study.
+          mixing_energy_minimum_composition: >-
+            The minimum mixing energies of the alkali-phosphate melts lie from 22
+            to 27 mol % P4O10. That is a composition range across the comparison,
+            not a Gibbs-energy value for this study.
+          prose_figure_slip: >-
+            The body says "as follows from Fig. 1" for the LiPO3 partial-pressure
+            comparison. The plot with that caption is Fig. 2. The phase diagram is
+            Fig. 1. The extract follows the captions.
+      - observation_id: shornikov_2025_li2o_p4o10_fig1_phase_diagram
+        type: phase_diagram
+        locator:
+          page: 3
+          published_page: 62
+          pdf_page_index: 2
+          figure: '1'
+        units: figure-only
+        values:
+          quantity: Li2O–P4O10 phase diagram
+          method_class: figure_only
+          attribution: The caption does not name an author. The body cites Xie et al. (2020) for one high-temperature variant of the diagram.
+          reason: Region diagram. Boundaries were not digitized. Regions 1–15 are listed in the caption.
+  P4O10:
+    observations:
+      - observation_id: shornikov_2025_li2o_p4o10_fig3a_series6
+        type: activity_coefficient
+        experiment: shornikov_2025_li2o_p4o10_model
+        locator:
+          page: 4
+          published_page: 63
+          pdf_page_index: 3
+          figure: '3'
+          panel: A
+          note: >-
+            Caption series 6, this study at 1673 K. On the 600 dpi render it is
+            the P4O10-activity stroke that starts lowest at 15 mol % P4O10.
+            Continuous stroke, no marker centre. Series 4 and 5 are the other
+            phosphate systems and are not stored.
+        phase: condensed
+        units: dimensionless activity as plotted, log10
+        T_range_K: [1673, 1673]
+        standard_state: >-
+          Published page 62 (PDF page 3): the initial values of the standard Gibbs
+          energies of formation of the simple oxides are taken in the crystalline
+          and liquid states (Glushko, 1978–1982; Barin, 1995). The paper does not
+          state which of those phases is the reference of the plotted P4O10 activity.
+        uncertainty:
+          note: No read uncertainty, because no marker centre was admitted.
+        values:
+          quantity: activity
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 6
+          temperature_K: 1673
+          reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+  mixing:
+    observations: []
+    context:
+      - observation_id: shornikov_2025_li2o_p4o10_fig3b_series9
+        type: mixing_energy_curve
+        locator:
+          page: 4
+          published_page: 63
+          pdf_page_index: 3
+          figure: '3'
+          panel: B
+          note: >-
+            Caption series 9, this study, mixing energy at 1673 K. Continuous
+            stroke, no marker centre. Series 7 and 8 are Shornikov (2024) and
+            Shornikov (2024a) and are not stored.
+        units: kJ/mol as plotted, Delta G^m at 1673 K
+        values:
+          quantity: mixing energy
+          method_class: figure_only
+          admission_status: typed_refusal
+          series: 9
+          temperature_K: 1673
+          reason: Continuous calculated stroke. The 22–27 mol % sentence is a composition range, not a Gibbs-energy point.

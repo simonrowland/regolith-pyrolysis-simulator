@@ -1,0 +1,151 @@
+schema_version: literature_extract.v1
+source_id: li-kato-kobayashi-2021-cr-solubility
+source:
+  citation: 'Li, Z., Kato, C. & Kobayashi, Y. (2021), Determination of Solubility of Chromium Oxide in the CaO-SiO2-Cr2O3 Slag System at 1 873 K under Moderately Reducing Conditions, ISIJ International 61(9):2340-2344.'
+  doi: 10.2355/isijinternational.ISIJINT-2021-082
+  year: 2021
+extraction:
+  method: 'Born-digital pdftotext-layout; Tables 1 and 2 manually transcribed and every numeric cell checked against the 600 dpi PDF render of physical page 3. Figures deferred.'
+  date: '2026-10-20'
+  worker: fam34-1020
+review_status: draft
+species:
+  CrOx:
+    observations: []
+    context:
+      - observation_id: li_kato_2021_table1_initial_slag_composition
+        type: relation
+        locator: {page: 3, published_page: 2342, pdf_page_index: 2, table: '1'}
+        units: mass %
+        values:
+          method_class: measured_direct
+          quantity_as_printed: initial slag compositions used in equilibrium experiments
+          candidate_quantity_tokens: [composition]
+          disposition: context-only; the table reports initial charges, not the analyzed equilibrated slag composition, and no final composition rows are printed
+          rows:
+            - {CaO: '30.0', SiO2: '60.0', Cr2O3: '10.0', mass_percent_CaO_to_SiO2: '0.5'}
+            - {CaO: '37.1', SiO2: '52.9', Cr2O3: '10.0', mass_percent_CaO_to_SiO2: '0.7'}
+            - {CaO: '42.6', SiO2: '47.4', Cr2O3: '10.0', mass_percent_CaO_to_SiO2: '0.9'}
+            - {CaO: '47.1', SiO2: '42.9', Cr2O3: '10.0', mass_percent_CaO_to_SiO2: '1.1'}
+            - {CaO: '53.7', SiO2: '41.3', Cr2O3: '5.0', mass_percent_CaO_to_SiO2: '1.3'}
+            - {CaO: '58.2', SiO2: '38.8', Cr2O3: '3.0', mass_percent_CaO_to_SiO2: '1.5'}
+          note: Table heading states mass contents in percent; CaO/SiO2 column is explicitly mass%CaO/mass%SiO2.
+      - observation_id: li_kato_2021_table2_equilibrium_gas_mixtures
+        type: relation
+        locator: {page: 3, published_page: 2342, pdf_page_index: 2, table: '2'}
+        units: mL/min; dimensionless gas-flow ratio
+        values:
+          method_class: measured_direct
+          quantity_as_printed: gas mixture composition in equilibrium experiments
+          candidate_quantity_tokens: [partial_pressure]
+          disposition: context-only; these are flow settings and ratios, not measured partial pressures; pO2 is never calculated during extraction
+          rows:
+            - {CO_mL_min: '50', CO2_mL_min: '1', Ar_mL_min: '150', PCO_to_PCO2: '50/1'}
+            - {CO_mL_min: '50', CO2_mL_min: '0.1', Ar_mL_min: '150', PCO_to_PCO2: '500/1'}
+            - {CO_mL_min: '100', CO2_mL_min: '0.1', Ar_mL_min: '150', PCO_to_PCO2: '1 000/1'}
+            - {CO_mL_min: '200', CO2_mL_min: '0.1', Ar_mL_min: '150', PCO_to_PCO2: '2 000/1'}
+      - observation_id: li_kato_2021_figure1_sensor_diagram
+        type: figure_only
+        locator: {figure: '1', page: 2, published_page: 2341, pdf_page_index: 1}
+        units: not applicable
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: conceptual cross section and mechanism of zirconia oxygen sensor
+          species: O2
+          phase: gas and solid electrolyte
+          x_axis_as_printed: not applicable
+          y_axis_as_printed: not applicable
+          caption_as_printed: 'Conceptual cross section and mechanism of zirconia oxygen sensor.'
+          panel: single
+          series: [{name: 'sensor schematic', marker_count: 0}]
+          attribution: Li, Kato and Kobayashi (2021)
+          digitisation: deferred to a figure pass
+      - observation_id: li_kato_2021_figure2_apparatus
+        type: figure_only
+        locator: {figure: '2', page: 3, published_page: 2342, pdf_page_index: 2}
+        units: not applicable
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: experimental apparatus schematic
+          species: O2
+          phase: gas and condensed slag/solid pellet
+          x_axis_as_printed: not applicable
+          y_axis_as_printed: not applicable
+          caption_as_printed: 'Schematic representation of the experimental apparatus.'
+          panel: single
+          series: [{name: 'gas-flow, oxygen-sensor and main-furnace apparatus', marker_count: 0}]
+          attribution: Li, Kato and Kobayashi (2021)
+          digitisation: deferred to a figure pass
+      - observation_id: li_kato_2021_figure3_oxygen_pressure_comparison
+        type: figure_only
+        locator: {figure: '3', page: 3, published_page: 2342, pdf_page_index: 2}
+        units: -log10(pO2/atm)
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: comparison of measured and calculated oxygen partial pressures
+          species: O2
+          phase: gas
+          temperature_as_printed: 1173-1573 K
+          x_axis_as_printed: 1/T × 10^4 (K)
+          y_axis_as_printed: -log pO2 (atm)
+          caption_as_printed: 'Comparison of measured and calculated oxygen partial pressures at each ratio of PCO/PCO2 and temperature.'
+          panel: single
+          series:
+            - {name: '1/1 measured', marker_count: 3}
+            - {name: '1/1 calculation', marker_count: 0}
+            - {name: '500/1 measured', marker_count: 6}
+            - {name: '500/1 calculation', marker_count: 0}
+            - {name: '1000/1 measured', marker_count: 6}
+            - {name: '1000/1 calculation', marker_count: 0}
+          attribution: Li, Kato and Kobayashi (2021)
+          digitisation: deferred to a figure pass
+      - observation_id: li_kato_2021_figure4_oxygen_pressure_recalculation
+        type: figure_only
+        locator: {figure: '4', page: 4, published_page: 2343, pdf_page_index: 3}
+        units: -log10(pO2/atm)
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: measured oxygen partial pressure and recalculated values considering oxygen contamination
+          species: O2
+          phase: gas
+          temperature_as_printed: 1173-1573 K
+          x_axis_as_printed: 1/T × 10^4 (K)
+          y_axis_as_printed: -log pO2 (atm)
+          caption_as_printed: 'Comparison of measured oxygen partial pressures and recalculated values considering oxygen contamination at each ratio of PCO/PCO2 and temperature.'
+          panel: single
+          series: [{name: 'measured and recalculated series by PCO/PCO2 setting', marker_count: null}]
+          attribution: Li, Kato and Kobayashi (2021)
+          digitisation: deferred to a figure pass
+      - observation_id: li_kato_2021_figure5_cr_oxide_solubility
+        type: figure_only
+        locator: {figure: '5', page: 5, published_page: 2344, pdf_page_index: 4}
+        units: mass % CrOx
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: solubility lines of CrOx saturated with Cr2O3 in CaO-SiO2-Cr2O3 slag
+          species: CrOx
+          phase: liquid slag with Cr2O3(s) saturation
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: mass%CaO/mass%SiO2
+          y_axis_as_printed: CrOx solubility (mass %)
+          caption_as_printed: 'Solubility lines of CrOx with saturation of Cr2O3 in the CaO-SiO2-CrOx slag system under various oxygen partial pressures at 1873 K.'
+          panel: single
+          series: [{name: 'solubility series under various oxygen partial pressures', marker_count: null}]
+          attribution: Li, Kato and Kobayashi (2021)
+          digitisation: deferred to a figure pass
+      - observation_id: li_kato_2021_printed_summary_ranges
+        type: relation
+        locator: {page: 5, published_page: 2344, pdf_page_index: 4, section: Conclusions}
+        units: atm; dimensionless mass ratio
+        values:
+          method_class: measured_direct
+          quantity_as_printed: text summary ranges for pO2 and slag basicity represented in Figure 5
+          values_as_printed: 'pO2 6.8 × 10^-13 to 1.2 × 10^-10 atm; mass%CaO/mass%SiO2 0.5 to 1.5'
+          candidate_quantity_tokens: [partial_pressure, composition]
+          disposition: context-only; the ranges are plotted-series bounds without row-level paired observations or final liquid composition, so they cannot be typed as independent numeric points
+          note: The text says solubility decreases with increasing basicity and pO2; no numeric solubility values are printed in a table or sentence.

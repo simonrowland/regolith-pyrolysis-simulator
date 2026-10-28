@@ -104,6 +104,7 @@ experiments:
         - analytical column selected as printed measured sample assay for KMS measured records
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -174,7 +175,7 @@ experiments:
       locator:
         paragraph: Knudsen cell was made of 0.025 cm Pt sheet
         line_range: '163'
-        source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+        source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
     geometry:
       orifice_diameter_m:
         state:
@@ -210,6 +211,7 @@ experiments:
                 section: 2.2 Apparatus
                 note: Printed 0.5 cm effusion-orifice diameter; unit conversion only
           output_unit: m
+          references: []
       orifice_channel_length_m:
         state:
           tag: unknown
@@ -227,7 +229,7 @@ experiments:
           figure: '2'
           paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
           line_range: 145-163
-          source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+          source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
         inference:
           relation: cm_to_m
           inputs:
@@ -244,7 +246,7 @@ experiments:
                 figure: '2'
                 paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
                 line_range: 145-163
-                source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+                source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
           - - factor
             - state:
                 tag: value
@@ -253,8 +255,9 @@ experiments:
                 figure: '2'
                 paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
                 line_range: 145-163
-                source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+                source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
           output_unit: m
+          references: []
   bench_id: 10.6028/nbs.ir.83-2731::bench::kms
   thermal_schedule:
     total_duration_s:
@@ -365,6 +368,7 @@ experiments:
         - analytical column selected as printed measured sample assay; nominal is used for thermodynamic estimates
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -452,6 +456,7 @@ experiments:
               section: '3.5'
               note: N2 carrier gas at 0.3 atm; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: value

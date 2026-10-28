@@ -1,0 +1,232 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.34657/13959
+  citation: Kido L, Müller M, Rüssel C (2004). High temperature investigation of soda-lime-silicate glasses doped with manganese
+    and chromium. Glass Science and Technology 77C:397-401, Norbert Kreidl Memorial Conference.
+  source_ids:
+  - kido-2004-mn-cr-high-temperature-glass-spectra
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:kido-2004-mn-cr-high-temperature-glass-spectra
+      role: pdf
+      path: raw/kido-2004-mn-cr-high-temperature-glass-spectra/kido-2004-mn-cr-high-temperature-glass-spectra.pdf
+      sha256:
+        tag: value
+        value: 994bfa873e825fc7a2de8d54feb1d57aaff96571361ff79be1926089133a3c1e
+    - asset_id: pdftotext:kido-2004-mn-cr-high-temperature-glass-spectra
+      role: pdftotext
+      path: text/kido-2004-mn-cr-high-temperature-glass-spectra
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kido-2004-mn-cr-high-temperature-glass-spectra
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.34657/13959
+experiments: []
+context:
+- observation_id: kido_2004_figure1_absorption_spectra
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 399
+    pdf_page_index: 2
+    figure: '1'
+  panel: whole_figure
+  attribution: present work
+  units: absorbance in arbitrary units; wavenumber ×10^3 cm−1
+  values:
+    quantity_as_printed: absorption spectra
+    quantity_token: unavailable
+    schema_gap: No existing quantity enum represents absorbance spectra.
+    species:
+    - Mn
+    - Cr
+    phase: glass
+    temperature_as_printed: room temperature
+    axes_as_printed:
+      x: Wavenumber in ×10^3 cm−1
+      y: Absorption in arbitrary units
+    caption: Absorption spectra of glasses doped with 0.68 mol% MnO (solid) or 0.22 mol% CrO3 (dashed) at room temperature.
+    series:
+    - name: 0.68 mol% MnO
+      marker: solid line
+      marker_count: 0
+    - name: 0.22 mol% CrO3
+      marker: dashed line
+      marker_count: 0
+  digitisation: deferred to a figure pass
+  context_id: kido-2004-mn-cr-high-temperature-glass-spectra::context::kido_2004_figure1_absorption_spectra
+  work_id: 10.34657/13959
+  source_id: kido-2004-mn-cr-high-temperature-glass-spectra
+  species: Cr
+- observation_id: kido_2004_figure2_absorption_spectra
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 399
+    pdf_page_index: 2
+    figure: '2'
+  panel: whole_figure
+  attribution: present work
+  units: absorbance in arbitrary units; wavenumber ×10^3 cm−1
+  values:
+    quantity_as_printed: absorption spectra
+    quantity_token: unavailable
+    schema_gap: No existing quantity enum represents absorbance spectra.
+    species:
+    - Cr
+    - Mn
+    phase: glass
+    temperature_as_printed: room temperature
+    axes_as_printed:
+      x: Wavenumber in ×10^3 cm−1
+      y: Absorption in arbitrary units
+    caption: Absorption spectra of glasses solely doped with 0.22 mol% CrO3 and with 0.22 mol% CrO3 + 0.67 mol% MnO at room
+      temperature.
+    series:
+    - name: 0.22 mol% CrO3
+      marker: dashed line
+      marker_count: 0
+    - name: 0.22 mol% CrO3 + 0.67 mol% MnO
+      marker: dash-dot line
+      marker_count: 0
+  digitisation: deferred to a figure pass
+  context_id: kido-2004-mn-cr-high-temperature-glass-spectra::context::kido_2004_figure2_absorption_spectra
+  work_id: 10.34657/13959
+  source_id: kido-2004-mn-cr-high-temperature-glass-spectra
+  species: Cr
+- observation_id: kido_2004_figure3_high_temperature_spectra
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 400
+    pdf_page_index: 3
+    figure: '3'
+  panel: whole_figure
+  attribution: present work
+  units: absorbance in arbitrary units; wavenumber ×10^3 cm−1
+  values:
+    quantity_as_printed: absorption spectra
+    quantity_token: unavailable
+    schema_gap: No existing quantity enum represents absorbance spectra.
+    species:
+    - Cr
+    - Mn
+    phase: glass
+    temperature_as_printed: 25, 400, 600, 700, and 800 °C
+    axes_as_printed:
+      x: Wavenumber in ×10^3 cm−1
+      y: Absorption in arbitrary units
+    caption: Absorption spectra of a glass doped with 0.22 mol% CrO3 + 0.67 mol% MnO at different temperatures.
+    series:
+    - name: 25 °C
+      marker: solid line
+      marker_count: 0
+    - name: 400 °C
+      marker: dashed line
+      marker_count: 0
+    - name: 600 °C
+      marker: dashed line
+      marker_count: 0
+    - name: 700 °C
+      marker: dotted line
+      marker_count: 0
+    - name: 800 °C
+      marker: dash-dot line
+      marker_count: 0
+  digitisation: deferred to a figure pass
+  context_id: kido-2004-mn-cr-high-temperature-glass-spectra::context::kido_2004_figure3_high_temperature_spectra
+  work_id: 10.34657/13959
+  source_id: kido-2004-mn-cr-high-temperature-glass-spectra
+  species: Cr
+- observation_id: kido_2004_figure4_peak_intensities
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 400
+    pdf_page_index: 3
+    figure: '4'
+  panel: whole_figure
+  attribution: present work
+  units: absorbance in arbitrary units; temperature in °C; band positions in cm−1
+  values:
+    quantity_as_printed: maximum absorption-band intensity by oxidation state
+    quantity_token: unavailable
+    schema_gap: No existing quantity enum represents absorption-band peak intensity.
+    species:
+    - Cr
+    - Mn
+    phase: glass
+    temperature_as_printed: 25, 100, 400, 600, 700, and 800 °C
+    axes_as_printed:
+      x: Temperature in °C
+      y: Absorption in arbitrary units
+    caption: Maximum of the absorption bands of the individual oxidation states in a glass doped with 0.22 mol% CrO3 + 0.67
+      mol% MnO as a function of temperature.
+    series:
+    - name: Cr6+ at 27000 cm−1
+      marker: open square
+      marker_count: 6
+    - name: Mn3+ at 20000 cm−1
+      marker: filled circle
+      marker_count: 6
+    - name: Mn2+ at 15000 cm−1
+      marker: open circle
+      marker_count: 6
+    - name: Cr3+ at 22000 cm−1
+      marker: filled up-triangle
+      marker_count: 6
+    - name: Cr3+ at 15000 cm−1
+      marker: filled down-triangle
+      marker_count: 6
+  digitisation: deferred to a figure pass
+  context_id: kido-2004-mn-cr-high-temperature-glass-spectra::context::kido_2004_figure4_peak_intensities
+  work_id: 10.34657/13959
+  source_id: kido-2004-mn-cr-high-temperature-glass-spectra
+  species: Cr
+- observation_id: kido_2004_spectra_and_text_results
+  type: measured_spectra_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Results and discussion
+  units: mol% oxide; °C; nm; cm−1; absorbance in arbitrary units
+  reason: Measured absorption spectra and qualitative peak trends; no numeric Cr or Mn valence-ratio observations and no store
+    quantity token for absorbance spectra.
+  candidate_tokens:
+  - valence_ratio
+  values:
+    quantity_as_printed: high-temperature UV-vis-NIR absorption spectra and absorption-band peak intensities
+    quantity_token: unavailable
+    schema_gap: No existing quantity enum represents absorbance spectra or peak intensity.
+    species:
+    - Cr
+    - Mn
+    phase: soda-lime-silicate glass
+    composition_as_printed: 16Na2O-10CaO-74SiO2 (mol%); samples contain 0.68 mol% MnO, 0.22 mol% CrO3, or 0.22 mol% CrO3 +
+      0.67 mol% MnO
+    temperature_as_printed: spectra measured from 25 to 800 °C; Fig. 3 series at 25, 400, 600, 700, and 800 °C; Fig. 4 temperatures
+      at 25, 100, 400, 600, 700, and 800 °C
+    reported_results: The text reports Cr6+ charge-transfer absorption at 365 nm decreasing with temperature and vanishing
+      above 1000 °C; Cr3+ bands at 450 and 660 nm shift to longer wavelengths, with the 450 nm band intensity increasing and
+      the 660 nm band intensity decreasing. Mn2+ bands at 500 and 660 nm shift to longer wavelengths and broaden; above 700
+      °C they merge into one band. In the mixed glass, the Mn3+ band intensity remains nearly constant through 600 °C and
+      decreases at higher temperatures; the Cr6+ peak decreases through 600 °C and increases at higher temperatures. The authors
+      state the redox reaction is kinetically frozen below 600 °C. These are reported text trends, not numeric valence ratios.
+    figures:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+  context_id: kido-2004-mn-cr-high-temperature-glass-spectra::context::kido_2004_spectra_and_text_results
+  work_id: 10.34657/13959
+  source_id: kido-2004-mn-cr-high-temperature-glass-spectra
+  species: Cr

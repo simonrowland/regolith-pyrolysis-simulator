@@ -1,0 +1,58 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 2e0450f2fd81e929bdc4f6b195e8fe26744c9b5f6e9c0b91bb687b427caa8d0b
+  citation: Shornikov, S. I. (2013). Thermodynamics of Genesis of Ca–Al–Inclusions in Chondrites. 76th Annual Meeting of the
+    Meteoritical Society, abstract 5097.
+  source_ids:
+  - shornikov-2013-cai-genesis-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:shornikov-2013-cai-genesis-thermodynamics
+      role: pdf
+      path: raw/shornikov-2013-cai-genesis-thermodynamics/shornikov-2013-cai-genesis-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: 389ebd1e4afe1c3d67070346437d387a668cd909fd147cc4d536b5c895e4e487
+    - asset_id: pdftotext:shornikov-2013-cai-genesis-thermodynamics
+      role: pdftotext
+      path: text/shornikov-2013-cai-genesis-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2013-cai-genesis-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: shornikov_2013_5097_model_summary
+  type: model_summary
+  locator:
+    page: 1
+    pdf_page_index: 0
+    abstract: '5097'
+    section: Abstract
+  units: not applicable; no numeric target quantity is printed
+  values:
+    method_class: quoted_unattributed
+    system_as_printed: Ca–Al inclusions, discussed with CaO–MgO–Al2O3–SiO2
+    model_as_printed: semi-empirical model based on ideal associated solutions
+    temperature: not printed
+    measured_table: none
+    numeric_activities_pressures_or_coefficients: none printed
+    qualitative_result_as_printed: The abstract says evaporation of the studied CAI compositions changes the magnesium to
+      silicon oxide ratio while the calcium to aluminum oxide ratio stays constant. It criticizes Hertz–Knudsen coefficients,
+      partial-pressure balance equations, MELTS, and CMAS used by Grossman and coauthors, and says a comparison with Knudsen
+      effusion mass spectrometry is satisfactory. No number from that comparison is printed.
+    reason: No oxide activity, activity coefficient, partial pressure, vapour species, partial Gibbs energy, or evaporation
+      coefficient is printed with a temperature and a composition.
+  context_id: shornikov-2013-cai-genesis-thermodynamics::context::shornikov_2013_5097_model_summary
+  work_id: 2e0450f2fd81e929bdc4f6b195e8fe26744c9b5f6e9c0b91bb687b427caa8d0b
+  source_id: shornikov-2013-cai-genesis-thermodynamics
+  species: Al2O3

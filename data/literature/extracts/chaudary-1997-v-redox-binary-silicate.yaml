@@ -1,0 +1,154 @@
+schema_version: literature_extract.v1
+source_id: chaudary-1997-v-redox-binary-silicate
+source:
+  citation: >-
+    Chaudary, H., Miller, D. M., Brungs, M. P. and Belton, G. R. (1997).
+    Redox chemistry of vanadium in molten binary silicates and slags.
+    Molten Slags, Fluxes and Salts '97 Conference, 493–499.
+  year: 1997
+extraction:
+  method: >-
+    Scanned PDF; MinerU markdown used as the machine-readable source. The PDF
+    title, authors and proceedings citation were checked on the first page.
+    The MinerU <details> blocks beneath figures are chart-derived transcriptions
+    and are excluded. No numeric results are printed in tables. Figure-based
+    valence ratios and alumina contents are deferred without numeric points.
+  date: '2026-10-20'
+  worker: codex
+  provenance_path: text/chaudary-1997-v-redox-binary-silicate/mineru/p001-p007/
+review_status: draft
+experiments:
+  - experiment_id: chaudary1997_vanadium_soda_silicate
+    method: spectroscopy
+    method_as_printed: ESR combined with wet chemical analysis of quenched sodium silicate slags
+    locator: {page: 2, pdf_page_index: 1, section: '2.2 Analysis'}
+    conditions:
+      composition:
+        state: {tag: value, value: 'Na2O-SiO2 melt; figure-specific basicity and V2O5 content as captioned'}
+        locator: {page: 3, pdf_page_index: 2, section: 'Results and Discussion'}
+      temperature:
+        state: {tag: value, value: '1125, 1225, or 1325 °C in the figure-captioned series'}
+        locator: {page: 4, pdf_page_index: 3, figure: '4'}
+      oxygen_pressure:
+        state: {tag: value, value: 'pO2 varied from 10^-2 to 10^-14 atm across experiments'}
+        locator: {page: 3, pdf_page_index: 2, section: '2.1 Preparation of samples'}
+      quench:
+        state: {tag: value, value: 'quenched under the same gas environment; redox measured on solid slag'}
+        locator: {page: 3, pdf_page_index: 2, section: '2.1 Preparation of samples'}
+species:
+  V:
+    observations: []
+    context:
+      - observation_id: chaudary1997_figures_1_9
+        type: figure
+        locator: {page: 2, pdf_page_index: 1, figure: '1'}
+        units: figure_only; no values digitised
+        values:
+          quantity: valence_ratio
+          method_class: figure_only
+          figures:
+            - figure: '1'
+              page: 2
+              caption: Characteristic ESR spectrum for V4+ in sodium silicate melt scanned over 0.2 T (2000 Gauss).
+              panel: main
+              species: V
+              phase: melt
+              T: {state: {tag: unknown, reason: not_printed}}
+              axes_as_printed: {x: magnetic field (G), y: ESR intensity}
+              series: [V4+ ESR spectrum]
+              marker_counts: {V4+ ESR spectrum: not_counted}
+              attribution: this_work
+            - figure: '2'
+              page: 2
+              caption: Correlation between ESR signal intensity and V4+ ion determined by chemical analysis (R2 = 0.994).
+              panel: main
+              species: V
+              phase: quenched glass
+              T: {state: {tag: unknown, reason: not_printed}}
+              axes_as_printed: {x: V4+ wt%, y: signal intensity}
+              series: [calibration samples]
+              marker_counts: {calibration samples: not_counted}
+              attribution: this_work
+            - figure: '3'
+              page: 3
+              caption: Change in redox ratio of vanadium with oxygen partial pressure in Na2O-2SiO2 melt containing 5 mol% V2O5 at 1225°C.
+              panel: main
+              species: V
+              phase: quenched slag
+              T: {state: {tag: value, value: 1225, units: °C}}
+              axes_as_printed: {x: log pO2 (atm), y: log(Vred/Voxid)}
+              series: [V4+/V5+, V3+/V4+]
+              marker_counts: {V4+/V5+: not_counted, V3+/V4+: not_counted}
+              attribution: this_work
+            - figure: '4'
+              page: 4
+              caption: Variation in x function in Na2O-SiO2 melts as a function of oxygen pressure at different basicity ratios, temperatures and vanadium contents.
+              panel: [a, b, c]
+              species: V
+              phase: quenched slag
+              T: {state: {tag: value, value: '1125–1325', units: °C}}
+              axes_as_printed: {x: log pO2 (atm), y: x in VOx}
+              series: [basicity series, temperature series, V2O5 content series]
+              marker_counts: not_counted
+              attribution: this_work
+            - figure: '5'
+              page: 4
+              caption: Comparison of vanadium valency distribution for Na2O-2SiO2 melt at 1225°C with Mittelstadt and Schwerdtfeger and Johnston.
+              panel: main
+              species: V
+              phase: melt
+              T: {state: {tag: value, value: '1225; comparison series 1000 and 1085', units: °C}}
+              axes_as_printed: {x: log pO2 (atm), y: x in VOx}
+              series: [this_work, Mittelstadt and Schwerdtfeger, Johnston]
+              marker_counts: not_counted
+              attribution: mixed; this_work and cited measurements
+            - figure: '6'
+              page: 5
+              caption: Relationship between vanadium redox ratios and oxygen partial pressure at different basicity ratios for Na2O-SiO2 melts containing 5 mol% V2O5 at 1225°C.
+              panel: main
+              species: V
+              phase: quenched slag
+              T: {state: {tag: value, value: 1225, units: °C}}
+              axes_as_printed: {x: log pO2 (atm), y: log(Vred/Voxid)}
+              series: [Na2O/SiO2 = 0.5 V4+/V5+, Na2O/SiO2 = 0.5 V3+/V4+, Na2O/SiO2 = 1 V4+/V5+]
+              marker_counts: not_counted
+              attribution: this_work
+            - figure: '7'
+              page: 5
+              caption: Dependence of vanadium redox ratios on reciprocal temperature for Na2O-2SiO2 melt containing 1 mol% V2O5.
+              panel: main
+              species: V
+              phase: quenched slag
+              T: {state: {tag: unknown, reason: temperature_varies_on_axis}}
+              axes_as_printed: {x: 10^-4/T (K), y: log(V4+/V5+)}
+              series: [pO2 = 10^-4 atm, pO2 = 10^-10 atm]
+              marker_counts: {pO2 = 10^-4 atm: not_counted, pO2 = 10^-10 atm: not_counted}
+              attribution: this_work
+            - figure: '8'
+              page: 5
+              caption: Trends in aluminium dissolution from crucible material in Na2O-2SiO2-V2O5 melt at 1225°C at different basicities.
+              panel: main
+              species: Al2O3
+              phase: quenched slag
+              T: {state: {tag: value, value: 1225, units: °C}}
+              axes_as_printed: {x: log pO2 (atm), y: Al content (wt%)}
+              series: [Na2O/SiO2 = 1, Na2O/SiO2 = 0.5]
+              marker_counts: {Na2O/SiO2 = 1: not_counted, Na2O/SiO2 = 0.5: not_counted}
+              attribution: this_work
+            - figure: '9'
+              page: 6
+              caption: Trends in aluminium dissolution from crucible material in Na2O-2SiO2-V2O5 melt at different temperatures.
+              panel: main
+              species: Al2O3
+              phase: quenched slag
+              T: {state: {tag: value, value: '1125, 1225, 1325', units: °C}}
+              axes_as_printed: {x: log pO2 (atm), y: Al content (wt%)}
+              series: [1125°C, 1225°C, 1325°C]
+              marker_counts: {1125°C: not_counted, 1225°C: not_counted, 1325°C: not_counted}
+              attribution: this_work
+          digitisation: deferred to a figure pass
+          note: >-
+            Candidate tokens are valence_ratio for figures 3, 6 and 7 and
+            concentration for Al content in figures 8 and 9; all plotted values
+            are deferred under the wave figure rule. Figures 1, 2, 4 and 5 have
+            no numeric result table; figure 5 includes cited measurements.

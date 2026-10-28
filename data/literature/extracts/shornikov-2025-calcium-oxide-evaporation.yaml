@@ -290,6 +290,7 @@ experiments:
               kind: "bound"
               bound_operator: "<="
               bound_value: "1.0"
+            note: 'p. 221 Experimental: "CaO (chemically pure), the content of the basic substance is not less than 97.5 wt%, not more than 1.0 wt% CaCO3." Remaining composition unresolved.'
         locator:
           published_page: 221
           pdf_page_index: 7
@@ -415,7 +416,10 @@ species:
           method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
           method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
           composition_component: "CaO"
-          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -558,12 +562,29 @@ species:
         values:
           quantity: "partial_pressure"
           gas_species: "O(g)"
-          method_class: "measured_tabulated"
+          reaction:
+            tag: unknown
+            reason: no_reaction_stated_for_hertz_knudsen_reduction
+          method_class: "measured_reduced"
+          evidence_class: "measured_reduced"
           admission_status: "admitted"
           method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
-          method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
+          method_as_printed: "Hertz–Knudsen Eq. (11); Table 1 reports atm."
+          derivation:
+            relation: "Hertz–Knudsen pressure reduction from integrated ion currents using Eq. (11)"
+            output_unit: atm
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                published_page: 222
+                pdf_page_index: 8
+                equation: "11"
+                note: "Integrated ion-current inputs are not tabulated."
           composition_component: "CaO"
-          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -704,12 +725,25 @@ species:
         values:
           quantity: "partial_pressure"
           gas_species: "O(g)"
+          reaction:
+            tag: unknown
+            reason: no_reaction_stated_for_hertz_knudsen_reduction
           method_class: "measured_tabulated"
           admission_status: "admitted"
           method: "Hertz–Knudsen calculation from integrated ion current, Eq. (11)"
           method_as_printed: "Table 2 column (11)"
+          derivation:
+            relation: "Table 2 column (11) repeats the Table 1 pO value for the same temperature."
+            inputs:
+              - "shornikov_2025_table1_o_partial_pressure"
+            output_unit: atm
+          derived_from:
+            - "shornikov_2025_table1_o_partial_pressure"
           composition_component: "CaO"
-          composition_basis: "CaO sample described in the Experimental section"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -839,7 +873,7 @@ species:
           published_page: 225
           pdf_page_index: 11
           table: "2"
-          note: "atomic oxygen partial-pressure series calculated by equation (19)"
+          note: "Table 2 Eq. (19), p. 225; reaction from Eq. (2), p. 218: CaO(g) = Ca(g) + O(g)"
         T_range_K:
           - 1812
           - 2183
@@ -850,12 +884,16 @@ species:
         values:
           quantity: "partial_pressure"
           gas_species: "O(g)"
+          reaction: "CaO(g) = Ca(g) + O(g)"
           method_class: "model_derived"
           admission_status: "admitted"
           method: "pO = K2 pCaO / pCa (Eq. 19)"
           method_as_printed: "Table 2 column (19)"
           composition_component: "CaO"
-          composition_basis: "CaO sample described in the Experimental section"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -994,7 +1032,7 @@ species:
           published_page: 225
           pdf_page_index: 11
           table: "2"
-          note: "atomic oxygen partial-pressure series calculated by equation (20)"
+          note: "Table 2 Eq. (20), p. 225; reaction from Eq. (3), p. 218: 2 O(g) = O2(g)"
         T_range_K:
           - 1812
           - 2183
@@ -1005,12 +1043,16 @@ species:
         values:
           quantity: "partial_pressure"
           gas_species: "O(g)"
+          reaction: "2 O(g) = O2(g)"
           method_class: "model_derived"
           admission_status: "admitted"
           method: "pO = sqrt(pO2 / K3) (Eq. 20)"
           method_as_printed: "Table 2 column (20)"
           composition_component: "CaO"
-          composition_basis: "CaO sample described in the Experimental section"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -1147,7 +1189,7 @@ species:
           published_page: 225
           pdf_page_index: 11
           table: "2"
-          note: "atomic oxygen partial-pressure series calculated by equation (21)"
+          note: "Table 2 Eq. (21), p. 225; reaction from Eq. (15), p. 223: Mo(g) + O(g) = MoO(g)"
         T_range_K:
           - 1812
           - 2183
@@ -1158,12 +1200,16 @@ species:
         values:
           quantity: "partial_pressure"
           gas_species: "O(g)"
+          reaction: "Mo(g) + O(g) = MoO(g)"
           method_class: "model_derived"
           admission_status: "admitted"
           method: "pO = K15 pMoO / pMo (Eq. 21)"
           method_as_printed: "Table 2 column (21)"
           composition_component: "CaO"
-          composition_basis: "CaO sample described in the Experimental section"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -1302,7 +1348,7 @@ species:
           published_page: 225
           pdf_page_index: 11
           table: "2"
-          note: "atomic oxygen partial-pressure series calculated by equation (22)"
+          note: "Table 2 Eq. (22), p. 225; reaction from Eq. (16), p. 223: MoO(g) + O(g) = MoO2(g)"
         T_range_K:
           - 1812
           - 2183
@@ -1313,12 +1359,16 @@ species:
         values:
           quantity: "partial_pressure"
           gas_species: "O(g)"
+          reaction: "MoO(g) + O(g) = MoO2(g)"
           method_class: "model_derived"
           admission_status: "admitted"
           method: "pO = K16 pMoO2 / pMoO (Eq. 22)"
           method_as_printed: "Table 2 column (22)"
           composition_component: "CaO"
-          composition_basis: "CaO sample described in the Experimental section"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -1457,7 +1507,7 @@ species:
           published_page: 225
           pdf_page_index: 11
           table: "2"
-          note: "atomic oxygen partial-pressure series calculated by equation (23)"
+          note: "Table 2 Eq. (23), p. 225; reaction from Eq. (17), p. 223: MoO2(g) + O(g) = MoO3(g)"
         T_range_K:
           - 1812
           - 2183
@@ -1468,12 +1518,16 @@ species:
         values:
           quantity: "partial_pressure"
           gas_species: "O(g)"
+          reaction: "MoO2(g) + O(g) = MoO3(g)"
           method_class: "model_derived"
           admission_status: "admitted"
           method: "pO = K17 pMoO3 / pMoO2 (Eq. 23)"
           method_as_printed: "Table 2 column (23)"
           composition_component: "CaO"
-          composition_basis: "CaO sample described in the Experimental section"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -1625,12 +1679,29 @@ species:
         values:
           quantity: "partial_pressure"
           gas_species: "O2(g)"
-          method_class: "measured_tabulated"
+          reaction:
+            tag: unknown
+            reason: no_reaction_stated_for_hertz_knudsen_reduction
+          method_class: "measured_reduced"
+          evidence_class: "measured_reduced"
           admission_status: "admitted"
           method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
-          method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
+          method_as_printed: "Hertz–Knudsen Eq. (11); Table 1 reports atm."
+          derivation:
+            relation: "Hertz–Knudsen pressure reduction from integrated ion currents using Eq. (11)"
+            output_unit: atm
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                published_page: 222
+                pdf_page_index: 8
+                equation: "11"
+                note: "Integrated ion-current inputs are not tabulated."
           composition_component: "CaO"
-          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -1778,7 +1849,10 @@ species:
           method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
           method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
           composition_component: "CaO"
-          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -4059,7 +4133,10 @@ species:
           method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
           method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
           composition_component: "CaO"
-          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -4207,7 +4284,10 @@ species:
           method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
           method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
           composition_component: "CaO"
-          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -4355,7 +4435,10 @@ species:
           method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
           method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
           composition_component: "CaO"
-          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -
@@ -4503,7 +4586,10 @@ species:
           method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
           method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
           composition_component: "CaO"
-          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          composition_basis: "nominal CaO (CaO: 1.0); purity bounds are in the located experiment sample note on p. 221."
+          composition_mol_basis: pure_oxide_system
+          composition_mol:
+            CaO: "1.0"
           pressure_scale_as_printed: "atm"
           points:
             -

@@ -6,10 +6,10 @@ source:
   url: https://ntrs.nasa.gov/citations/20110001597
   year: 2010
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) of KEMS method monograph geometry
+  method: OCR-artifact transcription (MinerU vlm) of KEMS method monograph geometry; validated in an internal review, 2026-08-03, ocr-artifacts
   date: '2026-08-03'
   worker: ocr-phase2-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/
+  provenance_path: raw/kems-032-copland-jacobson-2010/kems-032-copland-jacobson-2010.pdf
 review_status: draft
 species:
   Fe:
@@ -17,7 +17,7 @@ species:
     - observation_id: copland_2010_kems_method_geometry_fe_package
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+        source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         paragraph: Whitman-Motzfeld design example; cavity 10×7.6 mm; orifice 1.5×4.0 mm
         line_range: 304-315
       phase: method_monograph
@@ -64,7 +64,7 @@ species:
           inference: area = π (d/2)^2 from stated typical orifice diameter 1.5 mm; channel length 4.0
             mm also stated (L/r = 5.333)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             paragraph: typical orifice diameter 1.5 mm and length 4.0 mm
             line_range: '315'
         sample_surface_area:
@@ -78,20 +78,20 @@ species:
             but not used for floor area). This is cell cavity bottom D in Whitman–Motzfeld, not an independent
             free-melt free-surface measurement.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             paragraph: cavity diameter 10 mm and height 7.6 mm
             line_range: '315'
         cell_material:
           value: system-dependent (Table II examples include W, Ta, graphite, Y2O3, Al2O3, Si3N4; SiO2
             studied in Ta with ZrO2 liners)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             table: II
             line_range: '319'
     - observation_id: copland_2010_clausing_table_I_fe_package
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+        source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         table: I
         line_range: 292-294
       phase: method_monograph
@@ -135,13 +135,13 @@ species:
               W: 0.191
             note: partial — use nearest tabulated L/r only with explicit review; do not invent W at L/r=5.333
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             table: I
             line_range: 292-294
     - observation_id: copland_2010_clausing_table_I_verbatim_full_b1
       type: gibbs_table
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+        source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         table: I
         line_range: 292-294
         paragraph: CLAUSING FACTORS FOR DIFFERENT ORIFICES FROM MONTE CARLO MODELING
@@ -188,7 +188,7 @@ species:
     - observation_id: copland_2010_clausing_bare_float_L_over_r_1_b1
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+        source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         table: I
         paragraph: L/r=1.0 row W=0.6720
       T_range_K:
@@ -210,7 +210,7 @@ species:
           units: dimensionless
           inferred: false
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             table: I
             paragraph: L/r=1.0 Clausing factor 0.6720
         orifice_area:
@@ -219,7 +219,7 @@ species:
           inferred: true
           inference: 'from typical orifice diameter 1.5 mm: A=pi*(0.00075)^2'
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             paragraph: typical orifice diameter 1.5 mm
             line_range: '315'
         sample_surface_area:
@@ -228,20 +228,20 @@ species:
           inferred: true
           inference: cavity floor from diameter 10 mm
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             paragraph: cavity diameter 10 mm
             line_range: '315'
         cell_material:
           value: method design example (material system-dependent)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             table: II
   SiO:
     observations:
     - observation_id: copland_2010_kems_method_geometry_sio_package
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+        source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         paragraph: Whitman-Motzfeld design example; Table II lists SiO2 cell materials
         line_range: 304-319
       phase: method_monograph
@@ -279,7 +279,7 @@ species:
           inference: area = π (d/2)^2 from stated typical orifice diameter 1.5 mm; channel length 4.0
             mm also stated
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             paragraph: typical orifice diameter 1.5 mm and length 4.0 mm
             line_range: '315'
         sample_surface_area:
@@ -290,14 +290,14 @@ species:
           inferred: true
           inference: cavity floor area = π (d/2)^2 from stated cavity diameter 10 mm
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             paragraph: cavity diameter 10 mm and height 7.6 mm
             line_range: '315'
         cell_material:
           value: Ta with ZrO2 liners (Table II entry for SiO2); general Table II also W, Ta, graphite,
             Y2O3, Al2O3
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             table: II
             line_range: '319'
         clausing_factor:
@@ -310,7 +310,7 @@ species:
             note: Nearest published Table I row is L/r=4.0 → W=0.3566; exact L/r=5.333 not tabulated —
               do not use nearest as if measured for the typical orifice without explicit review.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+            source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
             table: I
             line_range: 292-294
 fidelity_samples:
@@ -320,7 +320,7 @@ fidelity_samples:
   field: orifice_diameter_mm
   value: 1.5
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+    source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
     paragraph: typical orifice diameter 1.5 mm and length 4.0 mm
     line_range: '315'
 - species: Fe
@@ -329,7 +329,7 @@ fidelity_samples:
   field: design_Pe_over_Pm_at_alpha_v_1
   value: 1.005
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+    source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
     paragraph: Pe/Pm = 1.005 at alpha_v=1 with tabulated Clausing
     line_range: '315'
 - path: species.Fe.observations[copland_2010_clausing_table_I_fe_package].values.points
@@ -346,7 +346,7 @@ fidelity_samples:
     clausing_factor: 0.191
   note: Table I Monte Carlo Clausing factors (verbatim OCR table)
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+    source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
     table: I
     line_range: 292-294
 - species: SiO
@@ -355,7 +355,7 @@ fidelity_samples:
   field: orifice_diameter_mm
   value: 1.5
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+    source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
     paragraph: typical orifice diameter 1.5 mm
     line_range: '315'
 - species: Fe
@@ -389,7 +389,7 @@ fidelity_samples:
     avg_wall_collisions_escapes: 20.3455
     fraction_escapes_no_wall: 0.0098
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+    source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
     table: I
 - species: Fe
   observable: rate_series
@@ -397,5 +397,5 @@ fidelity_samples:
   field: clausing_factor
   value: 0.672
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+    source_path: text/kems-032-copland-jacobson-2010/mineru/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
     table: I

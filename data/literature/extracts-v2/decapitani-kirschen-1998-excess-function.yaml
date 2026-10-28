@@ -145,6 +145,7 @@ observations:
               table: '1'
               note: Table 1, run STC 10-4, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -176,12 +177,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 10-4, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_10_4_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_10_4
   identity:
@@ -325,6 +320,7 @@ observations:
               table: '1'
               note: Table 1, run STC 10-4, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -356,12 +352,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 10-4, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_10_4_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_10_4
   identity:
@@ -505,6 +495,7 @@ observations:
               table: '1'
               note: Table 1, run STC 10-4, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -536,12 +527,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 10-4, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_10_4_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_10_4
   identity:
@@ -685,6 +670,7 @@ observations:
               table: '1'
               note: Table 1, run STC 10-4, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -716,12 +702,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 10-4, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_10_4_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_10_4
   identity:
@@ -865,6 +845,7 @@ observations:
               table: '1'
               note: Table 1, run STC 10-4, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -896,12 +877,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 10-4, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_10_4_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_10_4
   identity:
@@ -1045,6 +1020,7 @@ observations:
               table: '1'
               note: Table 1, run STC 10-4, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1076,12 +1052,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 10-4, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_10_5_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_10_5
   identity:
@@ -1225,6 +1195,7 @@ observations:
               table: '1'
               note: Table 1, run STC 10-5, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1256,12 +1227,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 10-5, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_10_5_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_10_5
   identity:
@@ -1405,6 +1370,7 @@ observations:
               table: '1'
               note: Table 1, run STC 10-5, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1436,12 +1402,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 10-5, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_10_5_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_10_5
   identity:
@@ -1585,6 +1545,7 @@ observations:
               table: '1'
               note: Table 1, run STC 10-5, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1616,12 +1577,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 10-5, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_10_5_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_10_5
   identity:
@@ -1765,6 +1720,7 @@ observations:
               table: '1'
               note: Table 1, run STC 10-5, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1796,12 +1752,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 10-5, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_10_5_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_10_5
   identity:
@@ -1945,6 +1895,7 @@ observations:
               table: '1'
               note: Table 1, run STC 10-5, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1976,12 +1927,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 10-5, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_10_5_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_10_5
   identity:
@@ -2125,6 +2070,7 @@ observations:
               table: '1'
               note: Table 1, run STC 10-5, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2156,12 +2102,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 10-5, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_12_2_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_12_2
   identity:
@@ -2305,6 +2245,7 @@ observations:
               table: '1'
               note: Table 1, run STC 12-2, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2336,12 +2277,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 12-2, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_12_2_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_12_2
   identity:
@@ -2485,6 +2420,7 @@ observations:
               table: '1'
               note: Table 1, run STC 12-2, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2516,12 +2452,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 12-2, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_12_2_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_12_2
   identity:
@@ -2665,6 +2595,7 @@ observations:
               table: '1'
               note: Table 1, run STC 12-2, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2696,12 +2627,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 12-2, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_12_2_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_12_2
   identity:
@@ -2845,6 +2770,7 @@ observations:
               table: '1'
               note: Table 1, run STC 12-2, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2876,12 +2802,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 12-2, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_12_2_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_12_2
   identity:
@@ -3025,6 +2945,7 @@ observations:
               table: '1'
               note: Table 1, run STC 12-2, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -3056,12 +2977,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 12-2, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_12_2_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_12_2
   identity:
@@ -3205,6 +3120,7 @@ observations:
               table: '1'
               note: Table 1, run STC 12-2, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -3236,12 +3152,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 12-2, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_12_3_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_12_3
   identity:
@@ -3385,6 +3295,7 @@ observations:
               table: '1'
               note: Table 1, run STC 12-3, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -3416,12 +3327,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 12-3, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_12_3_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_12_3
   identity:
@@ -3565,6 +3470,7 @@ observations:
               table: '1'
               note: Table 1, run STC 12-3, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -3596,12 +3502,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 12-3, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_12_3_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_12_3
   identity:
@@ -3745,6 +3645,7 @@ observations:
               table: '1'
               note: Table 1, run STC 12-3, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -3776,12 +3677,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 12-3, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_12_3_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_12_3
   identity:
@@ -3925,6 +3820,7 @@ observations:
               table: '1'
               note: Table 1, run STC 12-3, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -3956,12 +3852,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 12-3, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_12_3_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_12_3
   identity:
@@ -4105,6 +3995,7 @@ observations:
               table: '1'
               note: Table 1, run STC 12-3, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -4136,12 +4027,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 12-3, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_12_3_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_12_3
   identity:
@@ -4285,6 +4170,7 @@ observations:
               table: '1'
               note: Table 1, run STC 12-3, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -4316,12 +4202,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 12-3, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_1_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_1
   identity:
@@ -4465,6 +4345,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-1, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -4496,12 +4377,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-1, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_1_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_1
   identity:
@@ -4645,6 +4520,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-1, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -4676,12 +4552,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-1, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_1_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_1
   identity:
@@ -4825,6 +4695,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-1, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -4856,12 +4727,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-1, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_1_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_1
   identity:
@@ -5005,6 +4870,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-1, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -5036,12 +4902,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-1, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_1_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_1
   identity:
@@ -5185,6 +5045,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-1, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -5216,12 +5077,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-1, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_1_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_1
   identity:
@@ -5365,6 +5220,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-1, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -5396,12 +5252,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-1, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_3_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_3
   identity:
@@ -5545,6 +5395,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-3, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -5576,12 +5427,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-3, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_3_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_3
   identity:
@@ -5725,6 +5570,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-3, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -5756,12 +5602,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-3, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_3_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_3
   identity:
@@ -5905,6 +5745,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-3, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -5936,12 +5777,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-3, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_3_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_3
   identity:
@@ -6085,6 +5920,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-3, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -6116,12 +5952,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-3, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_3_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_3
   identity:
@@ -6265,6 +6095,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-3, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -6296,12 +6127,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-3, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_3_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_3
   identity:
@@ -6445,6 +6270,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-3, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -6476,12 +6302,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-3, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_4_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_4
   identity:
@@ -6625,6 +6445,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-4, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -6656,12 +6477,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-4, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_4_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_4
   identity:
@@ -6805,6 +6620,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-4, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -6836,12 +6652,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-4, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_4_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_4
   identity:
@@ -6985,6 +6795,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-4, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -7016,12 +6827,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-4, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_4_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_4
   identity:
@@ -7165,6 +6970,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-4, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -7196,12 +7002,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-4, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_4_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_4
   identity:
@@ -7345,6 +7145,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-4, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -7376,12 +7177,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-4, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_13_4_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_13_4
   identity:
@@ -7525,6 +7320,7 @@ observations:
               table: '1'
               note: Table 1, run STC 13-4, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -7556,12 +7352,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 13-4, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_14_1_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_14_1
   identity:
@@ -7705,6 +7495,7 @@ observations:
               table: '1'
               note: Table 1, run STC 14-1, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -7736,12 +7527,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 14-1, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_14_1_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_14_1
   identity:
@@ -7885,6 +7670,7 @@ observations:
               table: '1'
               note: Table 1, run STC 14-1, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -7916,12 +7702,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 14-1, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_14_1_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_14_1
   identity:
@@ -8065,6 +7845,7 @@ observations:
               table: '1'
               note: Table 1, run STC 14-1, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -8096,12 +7877,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 14-1, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_14_1_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_14_1
   identity:
@@ -8245,6 +8020,7 @@ observations:
               table: '1'
               note: Table 1, run STC 14-1, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -8276,12 +8052,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 14-1, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_14_1_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_14_1
   identity:
@@ -8425,6 +8195,7 @@ observations:
               table: '1'
               note: Table 1, run STC 14-1, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -8456,12 +8227,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 14-1, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_14_1_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_14_1
   identity:
@@ -8605,6 +8370,7 @@ observations:
               table: '1'
               note: Table 1, run STC 14-1, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -8636,12 +8402,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 14-1, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_14_2_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_14_2
   identity:
@@ -8785,6 +8545,7 @@ observations:
               table: '1'
               note: Table 1, run STC 14-2, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -8816,12 +8577,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 14-2, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_14_2_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_14_2
   identity:
@@ -8965,6 +8720,7 @@ observations:
               table: '1'
               note: Table 1, run STC 14-2, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -8996,12 +8752,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 14-2, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_14_2_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_14_2
   identity:
@@ -9145,6 +8895,7 @@ observations:
               table: '1'
               note: Table 1, run STC 14-2, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -9176,12 +8927,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 14-2, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_14_2_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_14_2
   identity:
@@ -9325,6 +9070,7 @@ observations:
               table: '1'
               note: Table 1, run STC 14-2, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -9356,12 +9102,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 14-2, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_14_2_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_14_2
   identity:
@@ -9505,6 +9245,7 @@ observations:
               table: '1'
               note: Table 1, run STC 14-2, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -9536,12 +9277,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 14-2, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_14_2_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_14_2
   identity:
@@ -9685,6 +9420,7 @@ observations:
               table: '1'
               note: Table 1, run STC 14-2, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -9716,12 +9452,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 14-2, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_2_1_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_2_1a
   identity:
@@ -9865,6 +9595,7 @@ observations:
               table: '1'
               note: Table 1, run STC 2-1a, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -9896,12 +9627,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 2-1a, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_2_1_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_2_1a
   identity:
@@ -10045,6 +9770,7 @@ observations:
               table: '1'
               note: Table 1, run STC 2-1a, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -10076,12 +9802,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 2-1a, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_2_1_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_2_1a
   identity:
@@ -10225,6 +9945,7 @@ observations:
               table: '1'
               note: Table 1, run STC 2-1a, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -10256,12 +9977,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 2-1a, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_2_1_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_2_1a
   identity:
@@ -10405,6 +10120,7 @@ observations:
               table: '1'
               note: Table 1, run STC 2-1a, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -10436,12 +10152,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 2-1a, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_2_1_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_2_1a
   identity:
@@ -10585,6 +10295,7 @@ observations:
               table: '1'
               note: Table 1, run STC 2-1a, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -10616,12 +10327,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 2-1a, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_2_1_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_2_1a
   identity:
@@ -10765,6 +10470,7 @@ observations:
               table: '1'
               note: Table 1, run STC 2-1a, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -10796,12 +10502,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 2-1a, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_3_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_3
   identity:
@@ -10945,6 +10645,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-3, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -10976,12 +10677,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-3, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_3_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_3
   identity:
@@ -11125,6 +10820,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-3, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -11156,12 +10852,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-3, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_3_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_3
   identity:
@@ -11305,6 +10995,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-3, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -11336,12 +11027,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-3, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_3_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_3
   identity:
@@ -11485,6 +11170,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-3, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -11516,12 +11202,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-3, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_3_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_3
   identity:
@@ -11665,6 +11345,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-3, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -11696,12 +11377,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-3, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_3_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_3
   identity:
@@ -11845,6 +11520,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-3, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -11876,12 +11552,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-3, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_4_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_4
   identity:
@@ -12025,6 +11695,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-4, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -12056,12 +11727,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-4, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_4_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_4
   identity:
@@ -12205,6 +11870,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-4, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -12236,12 +11902,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-4, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_4_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_4
   identity:
@@ -12385,6 +12045,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-4, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -12416,12 +12077,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-4, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_4_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_4
   identity:
@@ -12565,6 +12220,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-4, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -12596,12 +12252,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-4, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_4_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_4
   identity:
@@ -12745,6 +12395,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-4, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -12776,12 +12427,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-4, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_4_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_4
   identity:
@@ -12925,6 +12570,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-4, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -12956,12 +12602,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-4, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_6_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_6
   identity:
@@ -13105,6 +12745,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-6, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -13136,12 +12777,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-6, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_6_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_6
   identity:
@@ -13285,6 +12920,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-6, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -13316,12 +12952,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-6, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_6_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_6
   identity:
@@ -13465,6 +13095,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-6, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -13496,12 +13127,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-6, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_6_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_6
   identity:
@@ -13645,6 +13270,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-6, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -13676,12 +13302,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-6, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_6_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_6
   identity:
@@ -13825,6 +13445,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-6, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -13856,12 +13477,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-6, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_3_6_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_3_6
   identity:
@@ -14005,6 +13620,7 @@ observations:
               table: '1'
               note: Table 1, run STC 3-6, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -14036,12 +13652,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 3-6, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_4_11_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_4_11
   identity:
@@ -14185,6 +13795,7 @@ observations:
               table: '1'
               note: Table 1, run STC 4-11, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -14216,12 +13827,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 4-11, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_4_11_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_4_11
   identity:
@@ -14365,6 +13970,7 @@ observations:
               table: '1'
               note: Table 1, run STC 4-11, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -14396,12 +14002,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 4-11, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_4_11_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_4_11
   identity:
@@ -14545,6 +14145,7 @@ observations:
               table: '1'
               note: Table 1, run STC 4-11, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -14576,12 +14177,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 4-11, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_4_11_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_4_11
   identity:
@@ -14725,6 +14320,7 @@ observations:
               table: '1'
               note: Table 1, run STC 4-11, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -14756,12 +14352,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 4-11, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_4_11_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_4_11
   identity:
@@ -14905,6 +14495,7 @@ observations:
               table: '1'
               note: Table 1, run STC 4-11, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -14936,12 +14527,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 4-11, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_4_11_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_4_11
   identity:
@@ -15085,6 +14670,7 @@ observations:
               table: '1'
               note: Table 1, run STC 4-11, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -15116,12 +14702,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 4-11, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_5_11_phase1_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_5_11b
   identity:
@@ -15265,6 +14845,7 @@ observations:
               table: '1'
               note: Table 1, run STC 5-11b, liquid 1, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -15296,12 +14877,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 5-11b, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_5_11_phase1_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_5_11b
   identity:
@@ -15445,6 +15020,7 @@ observations:
               table: '1'
               note: Table 1, run STC 5-11b, liquid 1, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -15476,12 +15052,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 5-11b, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_5_11_phase1_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_5_11b
   identity:
@@ -15625,6 +15195,7 @@ observations:
               table: '1'
               note: Table 1, run STC 5-11b, liquid 1, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -15656,12 +15227,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 5-11b, liquid 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_5_11_phase2_cao
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_5_11b
   identity:
@@ -15805,6 +15370,7 @@ observations:
               table: '1'
               note: Table 1, run STC 5-11b, liquid 2, CaO column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -15836,12 +15402,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 5-11b, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_5_11_phase2_sio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_5_11b
   identity:
@@ -15985,6 +15545,7 @@ observations:
               table: '1'
               note: Table 1, run STC 5-11b, liquid 2, SiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -16016,12 +15577,6 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 5-11b, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa
 - observation_id: decapitani-kirschen-1998-excess-function::decapitani_kirschen_1998_t1_stc_5_11_phase2_tio2
   experiment_id: 10.1016/s0016-7037(98)00319-6::experiment::decapitani_kirschen_1998_t1_stc_5_11b
   identity:
@@ -16165,6 +15720,7 @@ observations:
               table: '1'
               note: Table 1, run STC 5-11b, liquid 2, TiO2 column; checked against 600 dpi render.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -16196,9 +15752,3 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1 total for run STC 5-11b, liquid 2.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:decapitani-kirschen-1998-excess-function
-    parameters: []
-    output_unit: Pa

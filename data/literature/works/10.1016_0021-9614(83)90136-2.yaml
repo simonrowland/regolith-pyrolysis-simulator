@@ -1,0 +1,365 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/0021-9614(83)90136-2
+  citation: Kambayashi, S. and Kato, E. (1983), “A thermodynamic study of (magnesium oxide + silicon dioxide) by mass spectrometry”,
+    Journal of Chemical Thermodynamics 15, 701–707.
+  source_ids:
+  - kems-055-kambayashi-1983
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:kems-055-kambayashi-1983
+      role: pdf
+      path: raw/kems-055-kambayashi-1983/kems-055-kambayashi-1983.pdf
+      sha256:
+        tag: value
+        value: f17c015b4f7a87e6ad43f1386ad1636179fe01bea6b2a634366e79b6b4e1832b
+    - asset_id: pdftotext:kems-055-kambayashi-1983
+      role: pdftotext
+      path: text/kems-055-kambayashi-1983
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kems-055-kambayashi-1983
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/0021-9614(83)90136-2
+experiments:
+- experiment_id: 10.1016/0021-9614(83)90136-2::experiment::kambayashi_1983_kems_mgo_sio2
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: condition temperature_K is not a scalar numeric value
+      locator:
+        page: 2
+        published_page: 702
+        pdf_page_index: 1
+        note: Experimental Procedure
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 701
+        pdf_page_index: 0
+        note: The paper says high vacuum but reports no numerical total pressure.
+    apparatus:
+      state:
+        tag: unknown
+        reason: condition apparatus is not a scalar numeric value
+      locator:
+        page: 2
+        published_page: 702
+        pdf_page_index: 1
+        note: Experimental Procedure
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/0021-9614(83)90136-2
+  locator:
+    page: 1
+    published_page: 701
+    pdf_page_index: 0
+    note: Experimental Procedure
+context:
+- observation_id: kambayashi_1983_fig2_ionization_efficiency
+  type: figure_record
+  locator:
+    figure: '2'
+    page: 3
+    published_page: 703
+    pdf_page_index: 2
+  units: figure axes as printed
+  values:
+    quantity: ion_intensity_ratio
+    method_class: figure_only
+    admission_status: context_only
+    species_as_printed: (1−x)MgO+xSiO2
+    phase_as_printed: gas over oxide mixture
+    temperature_K_as_printed: '1873'
+    axes_as_printed:
+      x: E/V
+      y: I(SiO+)/Ie or I(Mg+)/Ie; I(SiO+)/I(Mg+)
+    caption_as_printed: Ionization efficiency curves of Mg+, SiO+, and ion-current ratios for (0.5MgO + 0.5SiO2) at 1873 K
+      using Mo cell.
+    series_as_printed: Mg+; SiO+; I(SiO+)/I(Mg+)
+    marker_count_per_series:
+      Mg+: 8
+      SiO+: 8
+      I(SiO+)/I(Mg+): 9
+    digitisation: deferred to a figure pass
+  admission_status: context_only
+  context_id: kems-055-kambayashi-1983::context::kambayashi_1983_fig2_ionization_efficiency
+  work_id: 10.1016/0021-9614(83)90136-2
+  source_id: kems-055-kambayashi-1983
+  species: SiO2
+- observation_id: kambayashi_1983_fig3_ratio_composition
+  type: figure_record
+  locator:
+    figure: '3'
+    page: 4
+    published_page: 704
+    pdf_page_index: 3
+  units: figure axes as printed
+  values:
+    quantity: ion_intensity_ratio
+    method_class: figure_only
+    admission_status: context_only
+    species_as_printed: (1−x)MgO+xSiO2
+    phase_as_printed: gas over oxide mixture
+    temperature_K_as_printed: '1873'
+    axes_as_printed:
+      x: x
+      y: I(SiO+)/I(Mg+)
+    caption_as_printed: Values of I(SiO+)/I(Mg+) as a function of x at 1873 K.
+    series_as_printed: 0.4 mm orifice; 0.5 mm orifice
+    marker_count_per_series:
+      0.4 mm orifice: 9
+      0.5 mm orifice: 1
+    digitisation: deferred to a figure pass
+  admission_status: context_only
+  context_id: kems-055-kambayashi-1983::context::kambayashi_1983_fig3_ratio_composition
+  work_id: 10.1016/0021-9614(83)90136-2
+  source_id: kems-055-kambayashi-1983
+  species: SiO2
+- observation_id: kambayashi_1983_fig4_activity_integration
+  type: figure_record
+  locator:
+    figure: '4'
+    page: 5
+    published_page: 705
+    pdf_page_index: 4
+  units: figure axes as printed
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: context_only
+    species_as_printed: (1−x)MgO+xSiO2
+    phase_as_printed: oxide mixture
+    temperature_K_as_printed: '1873'
+    axes_as_printed:
+      x: x
+      y: log10(I(Mg+)/I(SiO+))
+    caption_as_printed: The activity integration plot for {(1−x)MgO+xSiO2} at 1873 K.
+    series_as_printed: activity integration curve
+    marker_count_per_series:
+      activity integration curve: 10
+    digitisation: deferred to a figure pass
+  admission_status: context_only
+  context_id: kems-055-kambayashi-1983::context::kambayashi_1983_fig4_activity_integration
+  work_id: 10.1016/0021-9614(83)90136-2
+  source_id: kems-055-kambayashi-1983
+  species: SiO2
+- observation_id: kambayashi_1983_fig5_calculated_activities
+  type: figure_record
+  locator:
+    figure: '5'
+    page: 5
+    published_page: 705
+    pdf_page_index: 4
+  units: figure axes as printed
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: context_only
+    species_as_printed: (1−x)MgO+xSiO2
+    phase_as_printed: silicate oxide melt and coexisting solids
+    temperature_K_as_printed: '1873'
+    axes_as_printed:
+      x: x
+      y: a(SiO2); a(MgO)
+    caption_as_printed: Calculated activities for {(1−x)MgO+xSiO2} at 1873 K.
+    series_as_printed: present authors; Rein and Chipman; Elliot et al.
+    marker_count_per_series:
+      present_authors_SiO2: 0
+      present_authors_MgO: 0
+      Rein_and_Chipman_SiO2: 0
+      Rein_and_Chipman_MgO: 0
+      Elliot_et_al_SiO2: 0
+      Elliot_et_al_MgO: 0
+    digitisation: deferred to a figure pass
+  admission_status: context_only
+  context_id: kems-055-kambayashi-1983::context::kambayashi_1983_fig5_calculated_activities
+  work_id: 10.1016/0021-9614(83)90136-2
+  source_id: kems-055-kambayashi-1983
+  species: SiO2
+- observation_id: kambayashi_1983_fig6_proposed_liquidus
+  type: figure_record
+  locator:
+    figure: '6'
+    page: 7
+    published_page: 707
+    pdf_page_index: 6
+  units: figure axes as printed
+  values:
+    quantity: liquidus_composition
+    method_class: figure_only
+    admission_status: context_only
+    species_as_printed: (1−x)MgO+xSiO2
+    phase_as_printed: silicate oxide melt and coexisting solids
+    temperature_K_as_printed: liquidus diagram, 1800–1950 K; 1873 K marked
+    axes_as_printed:
+      x: x
+      y: T/K
+    caption_as_printed: Proposed liquidus lines in {(1−x)MgO+xSiO2} at 1873 K.
+    series_as_printed: Mg2SiO4 + liquid; liquid; MgSiO3 + Mg2SiO4; MgSiO3 + SiO2
+    marker_count_per_series:
+      This work boundary markers: 2
+      liquidus and phase-boundary lines: 0
+    digitisation: deferred to a figure pass
+  admission_status: context_only
+  context_id: kems-055-kambayashi-1983::context::kambayashi_1983_fig6_proposed_liquidus
+  work_id: 10.1016/0021-9614(83)90136-2
+  source_id: kems-055-kambayashi-1983
+  species: SiO2
+- observation_id: kambayashi_1983_liquid_phase_interval
+  type: phase_equilibrium
+  locator:
+    page: 1
+    published_page: 701
+    pdf_page_index: 0
+    note: Abstract; repeated in Results on physical page 4
+  units: mole fraction x(SiO2) at 1873 K
+  values:
+    quantity: liquid phase composition interval
+    method_class: measured_direct
+    schema_gap: The liquidus_composition token requires a component mole-fraction vector and cannot encode an interval without
+      inventing endpoint phase assignments.
+    x_interval_as_printed:
+    - '0.448'
+    - '0.565'
+    temperature_K: 1873
+    phase_as_printed: liquid phase observed between these x bounds
+    candidate_token: liquidus_composition
+  admission_status: context_only
+  context_id: kems-055-kambayashi-1983::context::kambayashi_1983_liquid_phase_interval
+  work_id: 10.1016/0021-9614(83)90136-2
+  source_id: kems-055-kambayashi-1983
+  species: SiO2
+- observation_id: kambayashi_1983_table2_sensitivity_constant
+  type: tabulation
+  locator:
+    page: 6
+    published_page: 706
+    pdf_page_index: 5
+    table: '2'
+  units: dimensionless
+  values:
+    quantity: instrument sensitivity factor C
+    method_class: measured_reduced
+    schema_gap: No quantity token for the instrument sensitivity factor.
+    table_rows:
+    - x_SiO2: '0.625'
+      C_as_printed: '2.34'
+    - x_SiO2: '0.569'
+      C_as_printed: '2.29'
+    - x_SiO2: '0.551'
+      C_as_printed: '2.48'
+    - x_SiO2: '0.530'
+      C_as_printed: '2.43'
+    - x_SiO2: '0.508'
+      C_as_printed: '2.33'
+    - x_SiO2: '0.485'
+      C_as_printed: '2.36'
+    - x_SiO2: '0.459'
+      C_as_printed: '2.37'
+    - x_SiO2: '0.400'
+      C_as_printed: '2.34'
+    - x_SiO2: '0.220'
+      C_as_printed: '2.34'
+    note: The C cells are not activities. The blank C cell at x=0.500 is not filled.
+  admission_status: context_only
+  context_id: kems-055-kambayashi-1983::context::kambayashi_1983_table2_sensitivity_constant
+  work_id: 10.1016/0021-9614(83)90136-2
+  source_id: kems-055-kambayashi-1983
+  species: SiO2
+- observation_id: kambayashi_1983_text_reaction1_gibbs_alternatives
+  type: thermochemistry
+  locator:
+    page: 5
+    published_page: 705
+    pdf_page_index: 4
+    note: Results, reaction (1) cross-section discussion
+  units: kJ mol−1 at 1873 K
+  values:
+    quantity: standard molar Gibbs free-energy change for reaction (1)
+    method_class: model_derived
+    schema_gap: No token for a reaction Gibbs-energy change; not formation from elements.
+    reaction_as_printed: SiO2(s,l in mixture) + Mg(g) = MgO(s,l in mixture) + SiO(g)
+    reported_results:
+    - value_as_printed: −(5.4 ± 1.3)
+      basis: Otvos and Stevenson relative ionization cross sections
+    - value_as_printed: +(2.2 ± 1.3)
+      basis: Mann relative ionization cross sections
+    temperature_K: 1873
+  admission_status: context_only
+  context_id: kems-055-kambayashi-1983::context::kambayashi_1983_text_reaction1_gibbs_alternatives
+  work_id: 10.1016/0021-9614(83)90136-2
+  source_id: kems-055-kambayashi-1983
+  species: SiO2
+- observation_id: kambayashi_1983_text_reaction8_gibbs
+  type: thermochemistry
+  locator:
+    page: 6
+    published_page: 706
+    pdf_page_index: 5
+    note: Results, reaction (8)
+  units: kJ mol−1 at 1873 K
+  values:
+    quantity: standard molar Gibbs free-energy change for reaction (8)
+    method_class: model_derived
+    schema_gap: No token for a reaction Gibbs-energy change; the reaction is formation from oxides, not delta_fG from elements.
+    reaction_as_printed: SiO2(s,l in mixture) + 2MgO(s,l in mixture) = Mg2SiO4(s)
+    value_as_printed: −(56.8 ± 0.6)
+    temperature_K: 1873
+  admission_status: context_only
+  context_id: kems-055-kambayashi-1983::context::kambayashi_1983_text_reaction8_gibbs
+  work_id: 10.1016/0021-9614(83)90136-2
+  source_id: kems-055-kambayashi-1983
+  species: SiO2
+- observation_id: kambayashi_1983_text_reaction9_gibbs
+  type: thermochemistry
+  locator:
+    page: 6
+    published_page: 706
+    pdf_page_index: 5
+    note: Results, reaction (9)
+  units: kJ mol−1 at 1873 K
+  values:
+    quantity: standard molar Gibbs free-energy change for reaction (9)
+    method_class: model_derived
+    schema_gap: No token for a reaction Gibbs-energy change; the reaction is formation from oxides, not delta_fG from elements.
+    reaction_as_printed: SiO2(s,l in mixture) + MgO(s,l in mixture) = MgSiO3(l)
+    value_as_printed: −(31.5 ± 0.6)
+    temperature_K: 1873
+  admission_status: context_only
+  context_id: kems-055-kambayashi-1983::context::kambayashi_1983_text_reaction9_gibbs
+  work_id: 10.1016/0021-9614(83)90136-2
+  source_id: kems-055-kambayashi-1983
+  species: SiO2

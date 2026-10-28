@@ -5,12 +5,12 @@ source:
     melts" — review; Table 1 vapour composition over ternary ionic silicate systems
   year: 2012
 extraction:
-  method: 'OCR MinerU. Review paper: Table 1 species map; figures are iso-activity contours (not digitizable
+  method: 'OCR MinerU. Review paper: Table 1 species map; figures are iso-activity contours (not digitizable; validated in an internal review, 2026-08-04, ocr-artifacts
     absolute series without inventing). No numeric partial-pressure tables in OCR. Extracted species map
     only.'
   date: '2026-08-04'
   worker: mine-multicarrier-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-018-stolyarova-2012/
+  provenance_path: raw/kems-018-stolyarova-2012/kems-018-stolyarova-2012.pdf
 review_status: draft
 species:
   SiO:
@@ -18,7 +18,7 @@ species:
     - observation_id: stolyarova_2012_ternary_ionic_silicate_vapour_map_table1
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-018-stolyarova-2012/spool/out/kems-018-stolyarova-2012/vlm/kems-018-stolyarova-2012.md
+        source_path: text/kems-018-stolyarova-2012/mineru/spool/out/kems-018-stolyarova-2012/vlm/kems-018-stolyarova-2012.md
         table: '1'
         paragraph: Composition of vapour over ternary ionic silicate systems studied
       T_range_K:
@@ -95,11 +95,11 @@ fidelity_samples:
   value: false
   note: confirmed no numeric P tables
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-018-stolyarova-2012/spool/out/kems-018-stolyarova-2012/vlm/kems-018-stolyarova-2012.md
+    source_path: text/kems-018-stolyarova-2012/mineru/spool/out/kems-018-stolyarova-2012/vlm/kems-018-stolyarova-2012.md
     table: '1'
 - path: species.SiO.observations[stolyarova_2012_ternary_ionic_silicate_vapour_map_table1].values.systems[0].system
   value: $Na_{2}O-B_{2}O_{3}-SiO_{2}$
   note: first Table 1 system
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-018-stolyarova-2012/spool/out/kems-018-stolyarova-2012/vlm/kems-018-stolyarova-2012.md
+    source_path: text/kems-018-stolyarova-2012/mineru/spool/out/kems-018-stolyarova-2012/vlm/kems-018-stolyarova-2012.md
     table: '1'

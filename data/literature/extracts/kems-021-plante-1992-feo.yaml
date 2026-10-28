@@ -12,16 +12,17 @@ extraction:
     400 dpi pdftoppm crops of Tables 1-2 + eqs. (5)-(6); visual certification;
     tesseract second reader; MinerU 2.5 HTML tables (studio-3 new-kems-021) third
     reader. pdftotext layer rejected (scanned HyperGEAR). No figure digitization.
+    validated in an internal review, 2026-08-27, ocr-repair
   date: '2026-08-27'
   worker: orphans-close
-  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/
+  provenance_path: raw/kems-021-plante-1992-feo/kems-021-plante-1992-feo.pdf
 review_status: draft
 benches:
 - id: tungsten-iridium-kems
   identity: {basis: described_in_this_work}
   apparatus_family:
     state: {tag: value, value: modulated-beam Knudsen effusion mass spectrometer}
-    locator: &plante_apparatus {page: 1277, pdf_page_index: 2, section: '3. Experimental Procedure'}
+    locator: &plante_apparatus {page: 2, published_page: 1277, pdf_page_index: 1, section: '3. Experimental Procedure'}
   cell_materials:
     - state:
         tag: value
@@ -37,14 +38,14 @@ benches:
   geometry:
     orifice_diameter_m:
       state: {tag: value, value: {kind: point, point: '0.0005'}}
-      locator: {page: 1277, pdf_page_index: 2, section: '3. Experimental Procedure', note: 'Printed 0.5 mm; unit conversion only'}
+      locator: {page: 2, published_page: 1277, pdf_page_index: 1, section: '3. Experimental Procedure', note: 'Printed 0.5 mm; unit conversion only'}
     cell_internal_dimensions:
       diameter_m:
         state: {tag: unknown, reason: not_published}
-        locator: {page: 1277, pdf_page_index: 2, section: '3. Experimental Procedure', note: 'No cell body dimensions are stated.'}
+        locator: {page: 2, published_page: 1277, pdf_page_index: 1, section: '3. Experimental Procedure', note: 'No cell body dimensions are stated.'}
       height_m:
         state: {tag: unknown, reason: not_published}
-        locator: {page: 1277, pdf_page_index: 2, section: '3. Experimental Procedure', note: 'No cell body dimensions are stated.'}
+        locator: {page: 2, published_page: 1277, pdf_page_index: 1, section: '3. Experimental Procedure', note: 'No cell body dimensions are stated.'}
   temperature_measurement:
     sensor:
       state: {tag: value, value: optical pyrometer sighted into the effusion orifice}
@@ -52,8 +53,9 @@ benches:
   detector:
     state: {tag: value, value: modulated-beam mass spectrometer with phase-sensitive detection}
     locator:
-      page: 1277
-      pdf_page_index: 2
+      page: 2
+      published_page: 1277
+      pdf_page_index: 1
       section: 3. Experimental Procedure
       note: 'The instrument is referenced as described earlier in ref. 8; no model number is printed in this paper.'
   ionization:
@@ -71,7 +73,7 @@ experiments:
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 280 to 350 mg; unit conversion only'}
     printed_composition:
       state: {tag: value, value: 'powdered FeO-MgO-SiO2; x(FeO)=0.15, x(MgO)=0.425 on x(MgO)/x(SiO2)=1'}
-      locator: {page: 1278, table: '1', pdf_page_index: 3, note: 'Label retained; numeric mole fractions in initial_composition'}
+      locator: {page: 3, published_page: 1278, table: '1', pdf_page_index: 2, note: 'Label retained; numeric mole fractions in initial_composition'}
     initial_composition:
       state:
         tag: value
@@ -83,9 +85,10 @@ experiments:
           - [MgO, '0.425']
           - [SiO2, '0.425']
       locator:
-        page: 1278
+        page: 3
+        published_page: 1278
         table: '1'
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: 'x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1; not renormalised'
     form:
       state: {tag: value, value: powdered}
@@ -94,7 +97,7 @@ experiments:
     setpoints_and_holds:
     - temperature_K:
         state: {tag: value, value: {kind: interval, interval_low: '1850', interval_high: '1980'}}
-        locator: {page: 1277, pdf_page_index: 2, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.'}
+        locator: {page: 2, published_page: 1277, pdf_page_index: 1, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.'}
     total_duration_s:
       state: {tag: value, value: {kind: interval, interval_low: '3600', interval_high: '7200'}}
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only'}
@@ -108,7 +111,7 @@ experiments:
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 280 to 350 mg; unit conversion only'}
     printed_composition:
       state: {tag: value, value: 'powdered FeO-MgO-SiO2; x(FeO)=0.30, x(MgO)=0.350 on x(MgO)/x(SiO2)=1'}
-      locator: {page: 1278, table: '1', pdf_page_index: 3, note: 'Label retained; numeric mole fractions in initial_composition'}
+      locator: {page: 3, published_page: 1278, table: '1', pdf_page_index: 2, note: 'Label retained; numeric mole fractions in initial_composition'}
     initial_composition:
       state:
         tag: value
@@ -120,9 +123,10 @@ experiments:
           - [MgO, '0.350']
           - [SiO2, '0.350']
       locator:
-        page: 1278
+        page: 3
+        published_page: 1278
         table: '1'
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: 'x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1; not renormalised'
     form:
       state: {tag: value, value: powdered}
@@ -131,7 +135,7 @@ experiments:
     setpoints_and_holds:
     - temperature_K:
         state: {tag: value, value: {kind: interval, interval_low: '1850', interval_high: '1980'}}
-        locator: {page: 1277, pdf_page_index: 2, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.'}
+        locator: {page: 2, published_page: 1277, pdf_page_index: 1, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.'}
     total_duration_s:
       state: {tag: value, value: {kind: interval, interval_low: '3600', interval_high: '7200'}}
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only'}
@@ -145,7 +149,7 @@ experiments:
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 280 to 350 mg; unit conversion only'}
     printed_composition:
       state: {tag: value, value: 'powdered FeO-MgO-SiO2; x(FeO)=0.40, x(MgO)=0.300 on x(MgO)/x(SiO2)=1'}
-      locator: {page: 1278, table: '1', pdf_page_index: 3, note: 'Label retained; numeric mole fractions in initial_composition'}
+      locator: {page: 3, published_page: 1278, table: '1', pdf_page_index: 2, note: 'Label retained; numeric mole fractions in initial_composition'}
     initial_composition:
       state:
         tag: value
@@ -157,9 +161,10 @@ experiments:
           - [MgO, '0.300']
           - [SiO2, '0.300']
       locator:
-        page: 1278
+        page: 3
+        published_page: 1278
         table: '1'
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: 'x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1; not renormalised'
     form:
       state: {tag: value, value: powdered}
@@ -168,7 +173,7 @@ experiments:
     setpoints_and_holds:
     - temperature_K:
         state: {tag: value, value: {kind: interval, interval_low: '1850', interval_high: '1980'}}
-        locator: {page: 1277, pdf_page_index: 2, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.'}
+        locator: {page: 2, published_page: 1277, pdf_page_index: 1, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.'}
     total_duration_s:
       state: {tag: value, value: {kind: interval, interval_low: '3600', interval_high: '7200'}}
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only'}
@@ -182,7 +187,7 @@ experiments:
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 280 to 350 mg; unit conversion only'}
     printed_composition:
       state: {tag: value, value: 'powdered FeO-MgO-SiO2; x(FeO)=0.54, x(MgO)=0.230 on x(MgO)/x(SiO2)=1'}
-      locator: {page: 1278, table: '1', pdf_page_index: 3, note: 'Label retained; numeric mole fractions in initial_composition'}
+      locator: {page: 3, published_page: 1278, table: '1', pdf_page_index: 2, note: 'Label retained; numeric mole fractions in initial_composition'}
     initial_composition:
       state:
         tag: value
@@ -194,9 +199,10 @@ experiments:
           - [MgO, '0.230']
           - [SiO2, '0.230']
       locator:
-        page: 1278
+        page: 3
+        published_page: 1278
         table: '1'
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: 'x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1; not renormalised'
     form:
       state: {tag: value, value: powdered}
@@ -205,7 +211,7 @@ experiments:
     setpoints_and_holds:
     - temperature_K:
         state: {tag: value, value: {kind: interval, interval_low: '1850', interval_high: '1980'}}
-        locator: {page: 1277, pdf_page_index: 2, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.'}
+        locator: {page: 2, published_page: 1277, pdf_page_index: 1, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.'}
     total_duration_s:
       state: {tag: value, value: {kind: interval, interval_low: '3600', interval_high: '7200'}}
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only'}
@@ -219,7 +225,7 @@ experiments:
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 280 to 350 mg; unit conversion only'}
     printed_composition:
       state: {tag: value, value: 'powdered FeO-MgO-SiO2; x(FeO)=0.70, x(MgO)=0.150 on x(MgO)/x(SiO2)=1'}
-      locator: {page: 1278, table: '1', pdf_page_index: 3, note: 'Label retained; numeric mole fractions in initial_composition'}
+      locator: {page: 3, published_page: 1278, table: '1', pdf_page_index: 2, note: 'Label retained; numeric mole fractions in initial_composition'}
     initial_composition:
       state:
         tag: value
@@ -231,9 +237,10 @@ experiments:
           - [MgO, '0.150']
           - [SiO2, '0.150']
       locator:
-        page: 1278
+        page: 3
+        published_page: 1278
         table: '1'
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: 'x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1; not renormalised'
     form:
       state: {tag: value, value: powdered}
@@ -242,7 +249,7 @@ experiments:
     setpoints_and_holds:
     - temperature_K:
         state: {tag: value, value: {kind: interval, interval_low: '1850', interval_high: '1980'}}
-        locator: {page: 1277, pdf_page_index: 2, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.'}
+        locator: {page: 2, published_page: 1277, pdf_page_index: 1, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.'}
     total_duration_s:
       state: {tag: value, value: {kind: interval, interval_low: '3600', interval_high: '7200'}}
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only'}
@@ -256,7 +263,7 @@ experiments:
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 280 to 350 mg; unit conversion only'}
     printed_composition:
       state: {tag: value, value: 'powdered FeO-MgO-SiO2; x(FeO)=0.80, x(MgO)=0.100 on x(MgO)/x(SiO2)=1'}
-      locator: {page: 1278, table: '1', pdf_page_index: 3, note: 'Label retained; numeric mole fractions in initial_composition'}
+      locator: {page: 3, published_page: 1278, table: '1', pdf_page_index: 2, note: 'Label retained; numeric mole fractions in initial_composition'}
     initial_composition:
       state:
         tag: value
@@ -268,9 +275,10 @@ experiments:
           - [MgO, '0.100']
           - [SiO2, '0.100']
       locator:
-        page: 1278
+        page: 3
+        published_page: 1278
         table: '1'
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: 'x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1; not renormalised'
     form:
       state: {tag: value, value: powdered}
@@ -279,7 +287,7 @@ experiments:
     setpoints_and_holds:
     - temperature_K:
         state: {tag: value, value: {kind: interval, interval_low: '1850', interval_high: '1980'}}
-        locator: {page: 1277, pdf_page_index: 2, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.'}
+        locator: {page: 2, published_page: 1277, pdf_page_index: 1, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.'}
     total_duration_s:
       state: {tag: value, value: {kind: interval, interval_low: '3600', interval_high: '7200'}}
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only'}
@@ -293,7 +301,7 @@ experiments:
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 280 to 350 mg; unit conversion only'}
     printed_composition:
       state: {tag: value, value: 'powdered FeO-MgO-SiO2; x(FeO)=0.90, x(MgO)=0.050 on x(MgO)/x(SiO2)=1'}
-      locator: {page: 1278, table: '1', pdf_page_index: 3, note: 'Label retained; numeric mole fractions in initial_composition'}
+      locator: {page: 3, published_page: 1278, table: '1', pdf_page_index: 2, note: 'Label retained; numeric mole fractions in initial_composition'}
     initial_composition:
       state:
         tag: value
@@ -305,9 +313,10 @@ experiments:
           - [MgO, '0.050']
           - [SiO2, '0.050']
       locator:
-        page: 1278
+        page: 3
+        published_page: 1278
         table: '1'
-        pdf_page_index: 3
+        pdf_page_index: 2
         note: 'x(FeO) and x(MgO) as Table 1 columns (printed spelling); x(SiO2)=x(MgO) from caption join x(MgO)/x(SiO2)=1; not renormalised'
     form:
       state: {tag: value, value: powdered}
@@ -316,7 +325,7 @@ experiments:
     setpoints_and_holds:
     - temperature_K:
         state: {tag: value, value: {kind: interval, interval_low: '1790', interval_high: '1910'}}
-        locator: {page: 1277, pdf_page_index: 2, section: '3. Experimental Procedure', note: 'Printed 1790 to 1910 K for the highest-FeO composition x(FeO)=0.90.'}
+        locator: {page: 2, published_page: 1277, pdf_page_index: 1, section: '3. Experimental Procedure', note: 'Printed 1790 to 1910 K for the highest-FeO composition x(FeO)=0.90.'}
     total_duration_s:
       state: {tag: value, value: {kind: interval, interval_low: '3600', interval_high: '7200'}}
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only'}
@@ -329,23 +338,26 @@ experiments:
       ion_current_pressure_standards:
         state: {tag: value, value: 'not printed'}
         locator:
-          page: 1277
-          pdf_page_index: 2
+          page: 2
+          published_page: 1277
+          pdf_page_index: 1
           section: 3. Experimental Procedure
           note: 'The paper reports intensity ratios but names no absolute-pressure calibrant.'
   pressure_environment:
     total_pressure_Pa:
       state: {tag: unknown, reason: not_published}
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
         note: 'No chamber or residual-gas background pressure near the cell is reported.'
     sweep_gas:
       state: {tag: unknown, reason: not_published}
       locator:
-        page: 1277
-        pdf_page_index: 2
+        page: 2
+        published_page: 1277
+        pdf_page_index: 1
         section: 3. Experimental Procedure
         note: 'No sweep gas is reported.'
     regime:
@@ -364,7 +376,7 @@ experiments:
     setpoints_and_holds:
     - temperature_K:
         state: {tag: value, value: {kind: interval, interval_low: '1850', interval_high: '1980'}}
-        locator: {page: 1277, pdf_page_index: 2, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; the highest-FeO charge was 1790 to 1910 K. Per-charge compositions are on feo-mgo-sio2-xfeo-* experiments.'}
+        locator: {page: 2, published_page: 1277, pdf_page_index: 1, section: '3. Experimental Procedure', note: 'Printed 1850 to 1980 K; the highest-FeO charge was 1790 to 1910 K. Per-charge compositions are on feo-mgo-sio2-xfeo-* experiments.'}
     total_duration_s:
       state: {tag: value, value: {kind: interval, interval_low: '3600', interval_high: '7200'}}
       locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only'}
@@ -375,43 +387,49 @@ fidelity_samples:
     field: f_at_x_0_1
     value: 4.04
     locator:
-      page: 1278
-      pdf_page_index: 3
+      page: 3
+      published_page: 1278
+      pdf_page_index: 2
       table: '2'
       note: Table 2 f(FeO) at x(FeO)=0.1 as printed
   - path: species.Fe.observations[plante_1992_table1_xfeo_0p15].values.rows[0].ion_intensity_ratio
     value: 7.04
     locator:
-      page: 1278
-      pdf_page_index: 3
+      page: 3
+      published_page: 1278
+      pdf_page_index: 2
       table: '1'
       note: Table 1 I(Fe+)/I(Mg+) at x(FeO)=0.15
   - path: species.FeO.observations[plante_1992_table2_feo_activity_coefficient_1973k].values.rows[1].f
     value: 3.02
     locator:
-      page: 1278
-      pdf_page_index: 3
+      page: 3
+      published_page: 1278
+      pdf_page_index: 2
       table: '2'
       note: Table 2 f(FeO) at x(FeO)=0.2 as printed
   - path: species.FeO.observations[plante_1992_table2_feo_activity_coefficient_1973k].values.rows[8].f
     value: 1.02
     locator:
-      page: 1278
-      pdf_page_index: 3
+      page: 3
+      published_page: 1278
+      pdf_page_index: 2
       table: '2'
       note: Table 2 f(FeO) at x(FeO)=0.9 as printed
   - path: species.Fe.observations[plante_1992_table1_xfeo_0p40].values.rows[0].ion_intensity_ratio
     value: 48.41
     locator:
-      page: 1278
-      pdf_page_index: 3
+      page: 3
+      published_page: 1278
+      pdf_page_index: 2
       table: '1'
       note: Table 1 I(Fe+)/I(Mg+) at x(FeO)=0.40 as printed
   - path: species.Fe.observations[plante_1992_table1_xfeo_0p80].values.rows[1].ion_intensity_ratio
     value: 29.05
     locator:
-      page: 1278
-      pdf_page_index: 3
+      page: 3
+      published_page: 1278
+      pdf_page_index: 2
       table: '1'
       note: Table 1 I(Fe+)/I(SiO+) at x(FeO)=0.80 as printed
 species:
@@ -422,8 +440,9 @@ species:
       type: activity_coefficient
       locator:
         table: '2'
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
       T_range_K:
       - 1973.0
       - 1973.0
@@ -443,6 +462,41 @@ species:
         state".
       regime: kems_effusion
       units: dimensionless activity
+      derived_from:
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p15::rows:h=3a2b47c99153
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p15::rows:h=530b489d64f6
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p30::rows:h=8ab48e8a15ab
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p30::rows:h=c0fd2c2a2315
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p40::rows:h=c923adf0ad27
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p40::rows:h=27620d32b777
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p54::rows:h=cad40b2f02a7
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p54::rows:h=fa110e67ab1d
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p70::rows:h=3471283ba8b1
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p70::rows:h=31cbd0349b51
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p80::rows:h=74b0251157b4
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p80::rows:h=ac160c987d81
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p90::rows:h=facdb3555ee2
+      - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p90::rows:h=85cdfbdee3ac
+      derivation:
+        relation: >-
+          The Table 2 activity coefficients were calculated by analytical integration
+          of Eq. (4), using least-squares fits to the measured ratios in Table 1
+          and Figures 2–3.
+        inputs:
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p15::rows:h=3a2b47c99153
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p15::rows:h=530b489d64f6
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p30::rows:h=8ab48e8a15ab
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p30::rows:h=c0fd2c2a2315
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p40::rows:h=c923adf0ad27
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p40::rows:h=27620d32b777
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p54::rows:h=cad40b2f02a7
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p54::rows:h=fa110e67ab1d
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p70::rows:h=3471283ba8b1
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p70::rows:h=31cbd0349b51
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p80::rows:h=74b0251157b4
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p80::rows:h=ac160c987d81
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p90::rows:h=facdb3555ee2
+        - kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p90::rows:h=85cdfbdee3ac
       admission_status: admitted
       values:
         quantity: activity
@@ -479,8 +533,9 @@ species:
           arithmetic: a=f*x; 4.04*0.1=0.404
           in_table1: false
           locator:
-            page: 1278
-            pdf_page_index: 3
+            page: 3
+            published_page: 1278
+            pdf_page_index: 2
             table: '2'
             note: >-
               Printed x(FeO)=0.1 and f(FeO)=4.04; x(MgO)=x(SiO2)=0.45 is
@@ -497,8 +552,9 @@ species:
           arithmetic: a=f*x; 3.02*0.2=0.604
           in_table1: false
           locator:
-            page: 1278
-            pdf_page_index: 3
+            page: 3
+            published_page: 1278
+            pdf_page_index: 2
             table: '2'
             note: >-
               Printed x(FeO)=0.2 and f(FeO)=3.02; x(MgO)=x(SiO2)=0.4 is
@@ -515,8 +571,9 @@ species:
           arithmetic: a=f*x; 2.33*0.3=0.699
           in_table1: false
           locator:
-            page: 1278
-            pdf_page_index: 3
+            page: 3
+            published_page: 1278
+            pdf_page_index: 2
             table: '2'
             note: >-
               Printed x(FeO)=0.3 and f(FeO)=2.33; x(MgO)=x(SiO2)=0.35 is
@@ -533,8 +590,9 @@ species:
           arithmetic: a=f*x; 1.85*0.4=0.74
           in_table1: true
           locator:
-            page: 1278
-            pdf_page_index: 3
+            page: 3
+            published_page: 1278
+            pdf_page_index: 2
             table: '2'
             note: >-
               Table 2 prints x(FeO)=0.4 and f(FeO)=1.85; Table 1 prints
@@ -551,8 +609,9 @@ species:
           arithmetic: a=f*x; 1.54*0.5=0.77
           in_table1: false
           locator:
-            page: 1278
-            pdf_page_index: 3
+            page: 3
+            published_page: 1278
+            pdf_page_index: 2
             table: '2'
             note: >-
               Printed x(FeO)=0.5 and f(FeO)=1.54; x(MgO)=x(SiO2)=0.25 is
@@ -569,8 +628,9 @@ species:
           arithmetic: a=f*x; 1.32*0.6=0.792
           in_table1: false
           locator:
-            page: 1278
-            pdf_page_index: 3
+            page: 3
+            published_page: 1278
+            pdf_page_index: 2
             table: '2'
             note: >-
               Printed x(FeO)=0.6 and f(FeO)=1.32; x(MgO)=x(SiO2)=0.2 is
@@ -587,8 +647,9 @@ species:
           arithmetic: a=f*x; 1.17*0.7=0.819
           in_table1: true
           locator:
-            page: 1278
-            pdf_page_index: 3
+            page: 3
+            published_page: 1278
+            pdf_page_index: 2
             table: '2'
             note: >-
               Table 2 prints x(FeO)=0.7 and f(FeO)=1.17; Table 1 prints
@@ -605,8 +666,9 @@ species:
           arithmetic: a=f*x; 1.07*0.8=0.856
           in_table1: true
           locator:
-            page: 1278
-            pdf_page_index: 3
+            page: 3
+            published_page: 1278
+            pdf_page_index: 2
             table: '2'
             note: >-
               Table 2 prints x(FeO)=0.8 and f(FeO)=1.07; Table 1 prints
@@ -623,8 +685,9 @@ species:
           arithmetic: a=f*x; 1.02*0.9=0.918
           in_table1: true
           locator:
-            page: 1278
-            pdf_page_index: 3
+            page: 3
+            published_page: 1278
+            pdf_page_index: 2
             table: '2'
             note: >-
               Table 2 prints x(FeO)=0.9 and f(FeO)=1.02; Table 1 prints
@@ -683,7 +746,7 @@ species:
     - observation_id: plante_1992_fig4_activity_figure_only_blocked
       type: activity_coefficient
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+        source_path: text/kems-021-plante-1992-feo/ocr-repair/kems-021-plante-1992-feo.md
         figure: '4'
         page: 1278
       T_range_K:
@@ -710,15 +773,16 @@ species:
       experiment: feo-mgo-sio2-xfeo-0p15
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+        source_path: text/kems-021-plante-1992-feo/ocr-repair/kems-021-plante-1992-feo.md
         table: '1'
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         note: 'Table 1 row x(FeO)=0.15'
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -766,15 +830,16 @@ species:
       experiment: feo-mgo-sio2-xfeo-0p30
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+        source_path: text/kems-021-plante-1992-feo/ocr-repair/kems-021-plante-1992-feo.md
         table: '1'
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         note: 'Table 1 row x(FeO)=0.30'
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -822,15 +887,16 @@ species:
       experiment: feo-mgo-sio2-xfeo-0p40
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+        source_path: text/kems-021-plante-1992-feo/ocr-repair/kems-021-plante-1992-feo.md
         table: '1'
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         note: 'Table 1 row x(FeO)=0.40'
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -878,15 +944,16 @@ species:
       experiment: feo-mgo-sio2-xfeo-0p54
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+        source_path: text/kems-021-plante-1992-feo/ocr-repair/kems-021-plante-1992-feo.md
         table: '1'
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         note: 'Table 1 row x(FeO)=0.54'
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -934,15 +1001,16 @@ species:
       experiment: feo-mgo-sio2-xfeo-0p70
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+        source_path: text/kems-021-plante-1992-feo/ocr-repair/kems-021-plante-1992-feo.md
         table: '1'
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         note: 'Table 1 row x(FeO)=0.70'
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -990,15 +1058,16 @@ species:
       experiment: feo-mgo-sio2-xfeo-0p80
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+        source_path: text/kems-021-plante-1992-feo/ocr-repair/kems-021-plante-1992-feo.md
         table: '1'
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         note: 'Table 1 row x(FeO)=0.80'
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false
@@ -1046,15 +1115,16 @@ species:
       experiment: feo-mgo-sio2-xfeo-0p90
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+        source_path: text/kems-021-plante-1992-feo/ocr-repair/kems-021-plante-1992-feo.md
         table: '1'
-        page: 1278
-        pdf_page_index: 3
+        page: 3
+        published_page: 1278
+        pdf_page_index: 2
         note: 'Table 1 row x(FeO)=0.90'
       T_range_K:
       - 1973.0
       - 1973.0
-      phase: FeO-MgO-SiO2_ternary_silicate_melt
+      phase: l
       condensed_form:
         state: liquid_melt
         metastable: false

@@ -218,6 +218,7 @@ class RunExecutor:
         except (
             CampaignPressureSetpointRefusal,
             CampaignSetpointMissingRefusal,
+            EvaporationFluxRefusal,
         ) as exc:
             return self.execute_session(
                 session,
@@ -238,6 +239,7 @@ class RunExecutor:
         initial_refusal: (
             CampaignPressureSetpointRefusal
             | CampaignSetpointMissingRefusal
+            | EvaporationFluxRefusal
             | None
         ) = None,
     ) -> RunExecution:

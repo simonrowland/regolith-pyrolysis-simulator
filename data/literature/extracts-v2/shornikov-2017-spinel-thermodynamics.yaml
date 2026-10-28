@@ -1,0 +1,4468 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml
+observations:
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_1863k
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1863'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-21.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.30'
+      unit: kJ/mol
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.30 kJ/mol and ±10 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_1863k
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 3
+    published_page: 289
+    pdf_page_index: 2
+    figure: '2'
+    equation: '18'
+    note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1477.4, 958.6), page pixel (2818, 1394). Unrounded
+      read 1862.89 K and −21.154 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol. The fit line passes below the centre. The
+      centre is in the open interior.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: value
+        value: '1863'
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1477.4, 958.6), page pixel (2818, 1394).
+          Unrounded read 1862.89 K and −21.154 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol. The fit line passes below
+          the centre. The centre is in the open interior.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
+          435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
+          949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
+          ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol
+          at y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint
+          of the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol.
+          This point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_1950k
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1950'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-22.07'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.30'
+      unit: kJ/mol
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.30 kJ/mol and ±10 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_1950k
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 3
+    published_page: 289
+    pdf_page_index: 2
+    figure: '2'
+    equation: '18'
+    note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1576.4, 1002.1), page pixel (2917, 1437). Unrounded
+      read 1949.65 K and −22.071 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol. The centre is in the open interior.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: value
+        value: '1950'
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1576.4, 1002.1), page pixel (2917, 1437).
+          Unrounded read 1949.65 K and −22.071 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol. The centre is in the open
+          interior.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
+          435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
+          949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
+          ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol
+          at y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint
+          of the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol.
+          This point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2004k
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '2004'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-22.32'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.30'
+      unit: kJ/mol
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.30 kJ/mol and ±10 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2004k
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 3
+    published_page: 289
+    pdf_page_index: 2
+    figure: '2'
+    equation: '18'
+    note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1638.4, 1013.8). Unrounded read 2003.94 K and
+      −22.318 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol. Neighbouring outlines touch the corners. The centre is in the
+      open interior.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: value
+        value: '2004'
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1638.4, 1013.8). Unrounded read 2003.94 K
+          and −22.318 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol. Neighbouring outlines touch the corners. The centre
+          is in the open interior.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
+          435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
+          949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
+          ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol
+          at y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint
+          of the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol.
+          This point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2050k
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-22.41'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.30'
+      unit: kJ/mol
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.30 kJ/mol and ±10 K. The paper draws error bars and does not print their values.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Figure 2 series 16. The least-squares constants of this series are the Table 1 this-work cells. This point
+      is not that fit.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2050k
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 3
+    published_page: 289
+    pdf_page_index: 2
+    figure: '2'
+    equation: '18'
+    note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
+      435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
+      949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
+      ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol at
+      y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint of
+      the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol. This
+      point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
+          435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
+          949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
+          ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol
+          at y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint
+          of the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol.
+          This point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
+          435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
+          949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
+          ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol
+          at y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint
+          of the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol.
+          This point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2102k
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '2102'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-22.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.30'
+      unit: kJ/mol
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.30 kJ/mol and ±10 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2102k
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 3
+    published_page: 289
+    pdf_page_index: 2
+    figure: '2'
+    equation: '18'
+    note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1749.8, 1032.1). Unrounded read 2101.58 K and
+      −22.703 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: value
+        value: '2102'
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1749.8, 1032.1). Unrounded read 2101.58 K
+          and −22.703 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
+          435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
+          949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
+          ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol
+          at y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint
+          of the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol.
+          This point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2160k
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '2160'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-22.92'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.30'
+      unit: kJ/mol
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.30 kJ/mol and ±10 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2160k
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 3
+    published_page: 289
+    pdf_page_index: 2
+    figure: '2'
+    equation: '18'
+    note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1816.3, 1042.2). Unrounded read 2159.85 K and
+      −22.915 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1816.3, 1042.2). Unrounded read 2159.85 K
+          and −22.915 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
+          435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
+          949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
+          ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol
+          at y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint
+          of the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol.
+          This point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2210k
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '2210'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-23.47'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.30'
+      unit: kJ/mol
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.30 kJ/mol and ±10 K. Both the 600 dpi and 1200 dpi crops were read.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2210k
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 3
+    published_page: 289
+    pdf_page_index: 2
+    figure: '2'
+    equation: '18'
+    note: Series 16. Same tick calibration as the 2050 K point. 600 dpi crop centre (1873.1, 1068.5), page pixel (3214, 1504).
+      Unrounded read 2209.62 K and −23.469 kJ/mol. The 1200 dpi render of PDF page 3 puts the white centroid at page pixel
+      (6428, 3007), which is crop (1873.0, 1068.2) in the 600 dpi frame, 2209.49 K and −23.464 kJ/mol. The two reads agree
+      inside the ±10 K and ±0.30 kJ/mol uncertainty. The next outline meets the tip. The centre stays in the open interior.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: value
+        value: '2210'
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: Series 16. Same tick calibration as the 2050 K point. 600 dpi crop centre (1873.1, 1068.5), page pixel (3214,
+          1504). Unrounded read 2209.62 K and −23.469 kJ/mol. The 1200 dpi render of PDF page 3 puts the white centroid at
+          page pixel (6428, 3007), which is crop (1873.0, 1068.2) in the 600 dpi frame, 2209.49 K and −23.464 kJ/mol. The
+          two reads agree inside the ±10 K and ±0.30 kJ/mol uncertainty. The next outline meets the tip. The centre stays
+          in the open interior.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
+          435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
+          949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
+          ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol
+          at y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint
+          of the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol.
+          This point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2252k
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '2252'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-23.39'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.30'
+      unit: kJ/mol
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.30 kJ/mol and ±10 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2252k
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 3
+    published_page: 289
+    pdf_page_index: 2
+    figure: '2'
+    equation: '18'
+    note: Series 16. Same tick calibration as the 2050 K point. 600 dpi crop centre (1921.5, 1064.6), page pixel (3263, 1500).
+      Unrounded read 2252.04 K and −23.387 kJ/mol. The 1200 dpi white centroid is page pixel (6521, 2999), crop (1919.6, 1064.5)
+      in the 600 dpi frame, 2250.32 K and −23.385 kJ/mol. The next outline meets the tip. The centre is in the open interior.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: value
+        value: '2252'
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: Series 16. Same tick calibration as the 2050 K point. 600 dpi crop centre (1921.5, 1064.6), page pixel (3263,
+          1500). Unrounded read 2252.04 K and −23.387 kJ/mol. The 1200 dpi white centroid is page pixel (6521, 2999), crop
+          (1919.6, 1064.5) in the 600 dpi frame, 2250.32 K and −23.385 kJ/mol. The next outline meets the tip. The centre
+          is in the open interior.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
+          435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
+          949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
+          ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol
+          at y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint
+          of the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol.
+          This point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2302k
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '2302'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-23.61'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.30'
+      unit: kJ/mol
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.30 kJ/mol and ±10 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig2_series16_2302k
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 3
+    published_page: 289
+    pdf_page_index: 2
+    figure: '2'
+    equation: '18'
+    note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1978.6, 1075.1). Unrounded read 2302.09 K and
+      −23.608 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: value
+        value: '2302'
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: Series 16. Same tick calibration as the 2050 K point. Crop centre (1978.6, 1075.1). Unrounded read 2302.09 K
+          and −23.608 kJ/mol. Read uncertainty ±10 K and ±0.30 kJ/mol.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 289
+        pdf_page_index: 2
+        figure: '2'
+        equation: '18'
+        note: 'Series 16, open right-pointing triangle. 600 dpi render of PDF page 3. Figure-crop origin is page pixel (1341,
+          435), top-left, y downward. Temperature ticks are linear: 800 K at crop x 264.5, then every 200 K at x 492.5, 720.5,
+          949.0, 1177.5, 1405.5, 1633.5, and 2200 K at x 1862.5. Slope 0.8762 K per px. Tick-fit residual under 0.4 K. Ordinate
+          ticks are linear: −5 kJ/mol at crop y 191.5, then every −5 kJ/mol at y 428.5, 666.5, 903.5, 1141.5, and −30 kJ/mol
+          at y 1378.5. Slope −0.02106 kJ/mol per px. Tick-fit residual under 0.01 kJ/mol. The stored coordinate is the midpoint
+          of the white-interior centroid and the local-stroke bounding-box centre. Read uncertainty is ±10 K and ±0.30 kJ/mol.
+          This point is crop (1690.5, 1018.2). Unrounded read 2049.63 K and −22.410 kJ/mol.'
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8::T=1917:h=2a3bfcdf2825
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1917'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291: a(MgO) = p(MgO)/p°(MgO)
+        = p(Mg)p(O)/(p°(Mg)p°(O)). The paper prints that p_i and p_i° are the partial pressures of the components of the gas
+        phase over spinel and simple oxide (pure component), respectively. The phase of that pure-component simple oxide is
+        not stated, and the temperature of the reference-pressure measurement is not stated. The pure-oxide-at-experiment-T
+        ruling was not applied. Crystal in "crystal state" names the spinel, not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.276'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.010'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (a) series 8. Crop centre (1192.0, 1112.0). The tip meets the next outline. The centre is in the open interior.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (a), series 8, open right-pointing triangles with no bar. 600 dpi render of PDF page 5. The figure crop
+          origin is page pixel (2560, 435), top-left, y downward. Temperature ticks are linear: 1400 K at crop x 239.5, 1600
+          K at 609.5, 1800 K at 977.5, 2000 K at 1345.5, 2200 K at 1714.0. Slope 0.5427 K per px. Tick-fit residual under
+          0.5 K. Activity ticks are linear: 0 at crop y 1393.5, 0.2 at 1189.5, 0.4 at 985.5, 0.6 at 782.0, 0.8 at 578.5, 1.0
+          at 374.5, 1.2 at 174.5. Slope -0.000983 per px. Tick-fit residual under 0.002. The stored coordinate is the bounding-box
+          centre. Read uncertainty is ±10 px, which is ±5.4 K and ±0.010 in activity. The points from 2161 K upward lie in
+          the crystal-state range 2048–2298 K that the paper takes from reference [54] by equations (16) and (17). The 1917
+          K and 2008 K points are below that range. The 2051 K point lies inside it. The reference sentence is equations (12)
+          and (13) for every point. The pure-oxide-at-experiment-T ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '1917'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (a) series 8. Crop centre (1192.0, 1112.0). The tip meets the next outline. The centre is in the open
+          interior.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8::T=2008:h=3c4a5d0cfaad
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2008'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291: a(MgO) = p(MgO)/p°(MgO)
+        = p(Mg)p(O)/(p°(Mg)p°(O)). The paper prints that p_i and p_i° are the partial pressures of the components of the gas
+        phase over spinel and simple oxide (pure component), respectively. The phase of that pure-component simple oxide is
+        not stated, and the temperature of the reference-pressure measurement is not stated. The pure-oxide-at-experiment-T
+        ruling was not applied. Crystal in "crystal state" names the spinel, not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.328'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.010'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (a) series 8. Crop centre (1360.5, 1059.0), page pixel (3920, 1494). Neighbouring outlines meet the left side.
+      The centre is in the open interior.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (a), series 8, open right-pointing triangles with no bar. 600 dpi render of PDF page 5. The figure crop
+          origin is page pixel (2560, 435), top-left, y downward. Temperature ticks are linear: 1400 K at crop x 239.5, 1600
+          K at 609.5, 1800 K at 977.5, 2000 K at 1345.5, 2200 K at 1714.0. Slope 0.5427 K per px. Tick-fit residual under
+          0.5 K. Activity ticks are linear: 0 at crop y 1393.5, 0.2 at 1189.5, 0.4 at 985.5, 0.6 at 782.0, 0.8 at 578.5, 1.0
+          at 374.5, 1.2 at 174.5. Slope -0.000983 per px. Tick-fit residual under 0.002. The stored coordinate is the bounding-box
+          centre. Read uncertainty is ±10 px, which is ±5.4 K and ±0.010 in activity. The points from 2161 K upward lie in
+          the crystal-state range 2048–2298 K that the paper takes from reference [54] by equations (16) and (17). The 1917
+          K and 2008 K points are below that range. The 2051 K point lies inside it. The reference sentence is equations (12)
+          and (13) for every point. The pure-oxide-at-experiment-T ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '2008'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (a) series 8. Crop centre (1360.5, 1059.0), page pixel (3920, 1494). Neighbouring outlines meet the left
+          side. The centre is in the open interior.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8::T=2051:h=38bd764eb2a6
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2051'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291: a(MgO) = p(MgO)/p°(MgO)
+        = p(Mg)p(O)/(p°(Mg)p°(O)). The paper prints that p_i and p_i° are the partial pressures of the components of the gas
+        phase over spinel and simple oxide (pure component), respectively. The phase of that pure-component simple oxide is
+        not stated, and the temperature of the reference-pressure measurement is not stated. The pure-oxide-at-experiment-T
+        ruling was not applied. Crystal in "crystal state" names the spinel, not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.326'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.010'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (a) series 8. Crop centre (1440.0, 1061.5), page pixel (4000, 1496). A second outline runs along the lower
+      edge. The centre is in the open interior.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (a), series 8, open right-pointing triangles with no bar. 600 dpi render of PDF page 5. The figure crop
+          origin is page pixel (2560, 435), top-left, y downward. Temperature ticks are linear: 1400 K at crop x 239.5, 1600
+          K at 609.5, 1800 K at 977.5, 2000 K at 1345.5, 2200 K at 1714.0. Slope 0.5427 K per px. Tick-fit residual under
+          0.5 K. Activity ticks are linear: 0 at crop y 1393.5, 0.2 at 1189.5, 0.4 at 985.5, 0.6 at 782.0, 0.8 at 578.5, 1.0
+          at 374.5, 1.2 at 174.5. Slope -0.000983 per px. Tick-fit residual under 0.002. The stored coordinate is the bounding-box
+          centre. Read uncertainty is ±10 px, which is ±5.4 K and ±0.010 in activity. The points from 2161 K upward lie in
+          the crystal-state range 2048–2298 K that the paper takes from reference [54] by equations (16) and (17). The 1917
+          K and 2008 K points are below that range. The 2051 K point lies inside it. The reference sentence is equations (12)
+          and (13) for every point. The pure-oxide-at-experiment-T ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '2051'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (a) series 8. Crop centre (1440.0, 1061.5), page pixel (4000, 1496). A second outline runs along the lower
+          edge. The centre is in the open interior.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8::T=2161:h=a7250fa89fb2
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2161'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291: a(MgO) = p(MgO)/p°(MgO)
+        = p(Mg)p(O)/(p°(Mg)p°(O)). The paper prints that p_i and p_i° are the partial pressures of the components of the gas
+        phase over spinel and simple oxide (pure component), respectively. The phase of that pure-component simple oxide is
+        not stated, and the temperature of the reference-pressure measurement is not stated. The pure-oxide-at-experiment-T
+        ruling was not applied. Crystal in "crystal state" names the spinel, not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.368'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.010'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (a) series 8. Crop centre (1641.5, 1018.5).
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (a), series 8, open right-pointing triangles with no bar. 600 dpi render of PDF page 5. The figure crop
+          origin is page pixel (2560, 435), top-left, y downward. Temperature ticks are linear: 1400 K at crop x 239.5, 1600
+          K at 609.5, 1800 K at 977.5, 2000 K at 1345.5, 2200 K at 1714.0. Slope 0.5427 K per px. Tick-fit residual under
+          0.5 K. Activity ticks are linear: 0 at crop y 1393.5, 0.2 at 1189.5, 0.4 at 985.5, 0.6 at 782.0, 0.8 at 578.5, 1.0
+          at 374.5, 1.2 at 174.5. Slope -0.000983 per px. Tick-fit residual under 0.002. The stored coordinate is the bounding-box
+          centre. Read uncertainty is ±10 px, which is ±5.4 K and ±0.010 in activity. The points from 2161 K upward lie in
+          the crystal-state range 2048–2298 K that the paper takes from reference [54] by equations (16) and (17). The 1917
+          K and 2008 K points are below that range. The 2051 K point lies inside it. The reference sentence is equations (12)
+          and (13) for every point. The pure-oxide-at-experiment-T ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '2161'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (a) series 8. Crop centre (1641.5, 1018.5).
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8::T=2218:h=aad71fdbd6a0
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2218'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291: a(MgO) = p(MgO)/p°(MgO)
+        = p(Mg)p(O)/(p°(Mg)p°(O)). The paper prints that p_i and p_i° are the partial pressures of the components of the gas
+        phase over spinel and simple oxide (pure component), respectively. The phase of that pure-component simple oxide is
+        not stated, and the temperature of the reference-pressure measurement is not stated. The pure-oxide-at-experiment-T
+        ruling was not applied. Crystal in "crystal state" names the spinel, not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.388'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.010'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (a) series 8. Crop centre (1747.5, 998.5).
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (a), series 8, open right-pointing triangles with no bar. 600 dpi render of PDF page 5. The figure crop
+          origin is page pixel (2560, 435), top-left, y downward. Temperature ticks are linear: 1400 K at crop x 239.5, 1600
+          K at 609.5, 1800 K at 977.5, 2000 K at 1345.5, 2200 K at 1714.0. Slope 0.5427 K per px. Tick-fit residual under
+          0.5 K. Activity ticks are linear: 0 at crop y 1393.5, 0.2 at 1189.5, 0.4 at 985.5, 0.6 at 782.0, 0.8 at 578.5, 1.0
+          at 374.5, 1.2 at 174.5. Slope -0.000983 per px. Tick-fit residual under 0.002. The stored coordinate is the bounding-box
+          centre. Read uncertainty is ±10 px, which is ±5.4 K and ±0.010 in activity. The points from 2161 K upward lie in
+          the crystal-state range 2048–2298 K that the paper takes from reference [54] by equations (16) and (17). The 1917
+          K and 2008 K points are below that range. The 2051 K point lies inside it. The reference sentence is equations (12)
+          and (13) for every point. The pure-oxide-at-experiment-T ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '2218'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (a) series 8. Crop centre (1747.5, 998.5).
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8::T=2257:h=00ca9098f119
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2257'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291: a(MgO) = p(MgO)/p°(MgO)
+        = p(Mg)p(O)/(p°(Mg)p°(O)). The paper prints that p_i and p_i° are the partial pressures of the components of the gas
+        phase over spinel and simple oxide (pure component), respectively. The phase of that pure-component simple oxide is
+        not stated, and the temperature of the reference-pressure measurement is not stated. The pure-oxide-at-experiment-T
+        ruling was not applied. Crystal in "crystal state" names the spinel, not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.406'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.010'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (a) series 8. Crop centre (1819.5, 979.5).
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (a), series 8, open right-pointing triangles with no bar. 600 dpi render of PDF page 5. The figure crop
+          origin is page pixel (2560, 435), top-left, y downward. Temperature ticks are linear: 1400 K at crop x 239.5, 1600
+          K at 609.5, 1800 K at 977.5, 2000 K at 1345.5, 2200 K at 1714.0. Slope 0.5427 K per px. Tick-fit residual under
+          0.5 K. Activity ticks are linear: 0 at crop y 1393.5, 0.2 at 1189.5, 0.4 at 985.5, 0.6 at 782.0, 0.8 at 578.5, 1.0
+          at 374.5, 1.2 at 174.5. Slope -0.000983 per px. Tick-fit residual under 0.002. The stored coordinate is the bounding-box
+          centre. Read uncertainty is ±10 px, which is ±5.4 K and ±0.010 in activity. The points from 2161 K upward lie in
+          the crystal-state range 2048–2298 K that the paper takes from reference [54] by equations (16) and (17). The 1917
+          K and 2008 K points are below that range. The 2051 K point lies inside it. The reference sentence is equations (12)
+          and (13) for every point. The pure-oxide-at-experiment-T ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '2257'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (a) series 8. Crop centre (1819.5, 979.5).
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4a_mgo_series8::T=2304:h=fc70b3cfa489
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2304'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291: a(MgO) = p(MgO)/p°(MgO)
+        = p(Mg)p(O)/(p°(Mg)p°(O)). The paper prints that p_i and p_i° are the partial pressures of the components of the gas
+        phase over spinel and simple oxide (pure component), respectively. The phase of that pure-component simple oxide is
+        not stated, and the temperature of the reference-pressure measurement is not stated. The pure-oxide-at-experiment-T
+        ruling was not applied. Crystal in "crystal state" names the spinel, not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.425'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.010'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (a) series 8. Crop centre (1905.5, 961.0).
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (a), series 8, open right-pointing triangles with no bar. 600 dpi render of PDF page 5. The figure crop
+          origin is page pixel (2560, 435), top-left, y downward. Temperature ticks are linear: 1400 K at crop x 239.5, 1600
+          K at 609.5, 1800 K at 977.5, 2000 K at 1345.5, 2200 K at 1714.0. Slope 0.5427 K per px. Tick-fit residual under
+          0.5 K. Activity ticks are linear: 0 at crop y 1393.5, 0.2 at 1189.5, 0.4 at 985.5, 0.6 at 782.0, 0.8 at 578.5, 1.0
+          at 374.5, 1.2 at 174.5. Slope -0.000983 per px. Tick-fit residual under 0.002. The stored coordinate is the bounding-box
+          centre. Read uncertainty is ±10 px, which is ±5.4 K and ±0.010 in activity. The points from 2161 K upward lie in
+          the crystal-state range 2048–2298 K that the paper takes from reference [54] by equations (16) and (17). The 1917
+          K and 2008 K points are below that range. The 2051 K point lies inside it. The reference sentence is equations (12)
+          and (13) for every point. The pure-oxide-at-experiment-T ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '2304'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (a) series 8. Crop centre (1905.5, 961.0).
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4b_al2o3_series8::T=1917:h=4afe1d324729
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1917'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291, give a(Al2O3)
+        as the partial-pressure ratio over spinel and over the simple oxide (pure component). The paper prints that p_i and
+        p_i° are the partial pressures of the components of the gas phase over spinel and simple oxide (pure component), respectively.
+        The phase of that pure-component simple oxide is not stated, and the temperature of the reference-pressure measurement
+        is not stated. The pure-oxide-at-experiment-T ruling was not applied. Crystal in "crystal state" names the spinel,
+        not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.236'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.005'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (b) series 8. Crop centre (1193.5, 2290.0). The tip meets the next outline. The centre is in the open interior.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (b), series 8, open right-pointing triangles with no bar. Same 600 dpi crop and the same temperature
+          ticks as panel (a): 1400 K at crop x 239.5 and 2200 K at crop x 1714.0, slope 0.5427 K per px, tick-fit residual
+          under 0.5 K. Activity ticks are linear: 0 at crop y 2771.5, 0.1 at 2567.5, 0.2 at 2363.5, 0.3 at 2159.5, 0.4 at
+          1955.5, 0.5 at 1751.5, 0.6 at 1551.5. Slope -0.000491 per px. Tick-fit residual under 0.0011. Crop origin is page
+          pixel (2560, 435). The stored coordinate is the bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
+          and ±0.0049 in activity. The points from 2162 K upward are the high-temperature tail, in the crystal-state range
+          2048–2298 K from reference [54] by equations (16) and (17). The 1917 K, 1954 K, and 2009 K points are below that
+          range. 2009 K is not inside it. The reference sentence is equations (12) and (13) for every point. The pure-oxide-at-experiment-T
+          ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '1917'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (b) series 8. Crop centre (1193.5, 2290.0). The tip meets the next outline. The centre is in the open
+          interior.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4b_al2o3_series8::T=1954:h=507def2e6cc5
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1954'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291, give a(Al2O3)
+        as the partial-pressure ratio over spinel and over the simple oxide (pure component). The paper prints that p_i and
+        p_i° are the partial pressures of the components of the gas phase over spinel and simple oxide (pure component), respectively.
+        The phase of that pure-component simple oxide is not stated, and the temperature of the reference-pressure measurement
+        is not stated. The pure-oxide-at-experiment-T ruling was not applied. Crystal in "crystal state" names the spinel,
+        not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.232'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.005'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (b) series 8. Crop centre (1260.5, 2297.5), page pixel (3820, 2732). A neighbouring outline meets the upper
+      and lower corners. The centre is in the open interior. The left-hand stroke is 16 px from this triangle's base and is
+      not a bar of this symbol.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (b), series 8, open right-pointing triangles with no bar. Same 600 dpi crop and the same temperature
+          ticks as panel (a): 1400 K at crop x 239.5 and 2200 K at crop x 1714.0, slope 0.5427 K per px, tick-fit residual
+          under 0.5 K. Activity ticks are linear: 0 at crop y 2771.5, 0.1 at 2567.5, 0.2 at 2363.5, 0.3 at 2159.5, 0.4 at
+          1955.5, 0.5 at 1751.5, 0.6 at 1551.5. Slope -0.000491 per px. Tick-fit residual under 0.0011. Crop origin is page
+          pixel (2560, 435). The stored coordinate is the bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
+          and ±0.0049 in activity. The points from 2162 K upward are the high-temperature tail, in the crystal-state range
+          2048–2298 K from reference [54] by equations (16) and (17). The 1917 K, 1954 K, and 2009 K points are below that
+          range. 2009 K is not inside it. The reference sentence is equations (12) and (13) for every point. The pure-oxide-at-experiment-T
+          ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '1954'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (b) series 8. Crop centre (1260.5, 2297.5), page pixel (3820, 2732). A neighbouring outline meets the
+          upper and lower corners. The centre is in the open interior. The left-hand stroke is 16 px from this triangle's
+          base and is not a bar of this symbol.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4b_al2o3_series8::T=2009:h=6fd4c7783bdb
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2009'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291, give a(Al2O3)
+        as the partial-pressure ratio over spinel and over the simple oxide (pure component). The paper prints that p_i and
+        p_i° are the partial pressures of the components of the gas phase over spinel and simple oxide (pure component), respectively.
+        The phase of that pure-component simple oxide is not stated, and the temperature of the reference-pressure measurement
+        is not stated. The pure-oxide-at-experiment-T ruling was not applied. Crystal in "crystal state" names the spinel,
+        not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.223'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.005'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (b) series 8. Crop centre (1362.5, 2317.0), page pixel (3922, 2752). The previous outline stays to the left
+      of the base. The next symbol is filled. The centre is in the open interior.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (b), series 8, open right-pointing triangles with no bar. Same 600 dpi crop and the same temperature
+          ticks as panel (a): 1400 K at crop x 239.5 and 2200 K at crop x 1714.0, slope 0.5427 K per px, tick-fit residual
+          under 0.5 K. Activity ticks are linear: 0 at crop y 2771.5, 0.1 at 2567.5, 0.2 at 2363.5, 0.3 at 2159.5, 0.4 at
+          1955.5, 0.5 at 1751.5, 0.6 at 1551.5. Slope -0.000491 per px. Tick-fit residual under 0.0011. Crop origin is page
+          pixel (2560, 435). The stored coordinate is the bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
+          and ±0.0049 in activity. The points from 2162 K upward are the high-temperature tail, in the crystal-state range
+          2048–2298 K from reference [54] by equations (16) and (17). The 1917 K, 1954 K, and 2009 K points are below that
+          range. 2009 K is not inside it. The reference sentence is equations (12) and (13) for every point. The pure-oxide-at-experiment-T
+          ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '2009'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (b) series 8. Crop centre (1362.5, 2317.0), page pixel (3922, 2752). The previous outline stays to the
+          left of the base. The next symbol is filled. The centre is in the open interior.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4b_al2o3_series8::T=2162:h=b5c74d87bc66
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2162'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291, give a(Al2O3)
+        as the partial-pressure ratio over spinel and over the simple oxide (pure component). The paper prints that p_i and
+        p_i° are the partial pressures of the components of the gas phase over spinel and simple oxide (pure component), respectively.
+        The phase of that pure-component simple oxide is not stated, and the temperature of the reference-pressure measurement
+        is not stated. The pure-oxide-at-experiment-T ruling was not applied. Crystal in "crystal state" names the spinel,
+        not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.211'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.005'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (b) series 8. Crop centre (1644.5, 2341.5).
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (b), series 8, open right-pointing triangles with no bar. Same 600 dpi crop and the same temperature
+          ticks as panel (a): 1400 K at crop x 239.5 and 2200 K at crop x 1714.0, slope 0.5427 K per px, tick-fit residual
+          under 0.5 K. Activity ticks are linear: 0 at crop y 2771.5, 0.1 at 2567.5, 0.2 at 2363.5, 0.3 at 2159.5, 0.4 at
+          1955.5, 0.5 at 1751.5, 0.6 at 1551.5. Slope -0.000491 per px. Tick-fit residual under 0.0011. Crop origin is page
+          pixel (2560, 435). The stored coordinate is the bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
+          and ±0.0049 in activity. The points from 2162 K upward are the high-temperature tail, in the crystal-state range
+          2048–2298 K from reference [54] by equations (16) and (17). The 1917 K, 1954 K, and 2009 K points are below that
+          range. 2009 K is not inside it. The reference sentence is equations (12) and (13) for every point. The pure-oxide-at-experiment-T
+          ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '2162'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (b) series 8. Crop centre (1644.5, 2341.5).
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4b_al2o3_series8::T=2220:h=dbea6e192f58
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2220'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291, give a(Al2O3)
+        as the partial-pressure ratio over spinel and over the simple oxide (pure component). The paper prints that p_i and
+        p_i° are the partial pressures of the components of the gas phase over spinel and simple oxide (pure component), respectively.
+        The phase of that pure-component simple oxide is not stated, and the temperature of the reference-pressure measurement
+        is not stated. The pure-oxide-at-experiment-T ruling was not applied. Crystal in "crystal state" names the spinel,
+        not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.202'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.005'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (b) series 8. Crop centre (1750.5, 2360.0).
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (b), series 8, open right-pointing triangles with no bar. Same 600 dpi crop and the same temperature
+          ticks as panel (a): 1400 K at crop x 239.5 and 2200 K at crop x 1714.0, slope 0.5427 K per px, tick-fit residual
+          under 0.5 K. Activity ticks are linear: 0 at crop y 2771.5, 0.1 at 2567.5, 0.2 at 2363.5, 0.3 at 2159.5, 0.4 at
+          1955.5, 0.5 at 1751.5, 0.6 at 1551.5. Slope -0.000491 per px. Tick-fit residual under 0.0011. Crop origin is page
+          pixel (2560, 435). The stored coordinate is the bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
+          and ±0.0049 in activity. The points from 2162 K upward are the high-temperature tail, in the crystal-state range
+          2048–2298 K from reference [54] by equations (16) and (17). The 1917 K, 1954 K, and 2009 K points are below that
+          range. 2009 K is not inside it. The reference sentence is equations (12) and (13) for every point. The pure-oxide-at-experiment-T
+          ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '2220'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (b) series 8. Crop centre (1750.5, 2360.0).
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4b_al2o3_series8::T=2259:h=e91960182e3d
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2259'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291, give a(Al2O3)
+        as the partial-pressure ratio over spinel and over the simple oxide (pure component). The paper prints that p_i and
+        p_i° are the partial pressures of the components of the gas phase over spinel and simple oxide (pure component), respectively.
+        The phase of that pure-component simple oxide is not stated, and the temperature of the reference-pressure measurement
+        is not stated. The pure-oxide-at-experiment-T ruling was not applied. Crystal in "crystal state" names the spinel,
+        not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.203'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.005'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (b) series 8. Crop centre (1823.0, 2358.0).
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (b), series 8, open right-pointing triangles with no bar. Same 600 dpi crop and the same temperature
+          ticks as panel (a): 1400 K at crop x 239.5 and 2200 K at crop x 1714.0, slope 0.5427 K per px, tick-fit residual
+          under 0.5 K. Activity ticks are linear: 0 at crop y 2771.5, 0.1 at 2567.5, 0.2 at 2363.5, 0.3 at 2159.5, 0.4 at
+          1955.5, 0.5 at 1751.5, 0.6 at 1551.5. Slope -0.000491 per px. Tick-fit residual under 0.0011. Crop origin is page
+          pixel (2560, 435). The stored coordinate is the bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
+          and ±0.0049 in activity. The points from 2162 K upward are the high-temperature tail, in the crystal-state range
+          2048–2298 K from reference [54] by equations (16) and (17). The 1917 K, 1954 K, and 2009 K points are below that
+          range. 2009 K is not inside it. The reference sentence is equations (12) and (13) for every point. The pure-oxide-at-experiment-T
+          ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '2259'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (b) series 8. Crop centre (1823.0, 2358.0).
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_fig4b_al2o3_series8::T=2306:h=9ad3aed8ece8
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2306'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equations (12) and (13), PDF page 5, published page 291, give a(Al2O3)
+        as the partial-pressure ratio over spinel and over the simple oxide (pure component). The paper prints that p_i and
+        p_i° are the partial pressures of the components of the gas phase over spinel and simple oxide (pure component), respectively.
+        The phase of that pure-component simple oxide is not stated, and the temperature of the reference-pressure measurement
+        is not stated. The pure-oxide-at-experiment-T ruling was not applied. Crystal in "crystal state" names the spinel,
+        not the reference oxide.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.005'
+      unit: dimensionless
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±10 px on the activity axis. Temperature read uncertainty is ±5.4 K.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    note: Panel (b) series 8. Crop centre (1910.0, 2363.5).
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        equation: 12-13
+        note: 'Panel (b), series 8, open right-pointing triangles with no bar. Same 600 dpi crop and the same temperature
+          ticks as panel (a): 1400 K at crop x 239.5 and 2200 K at crop x 1714.0, slope 0.5427 K per px, tick-fit residual
+          under 0.5 K. Activity ticks are linear: 0 at crop y 2771.5, 0.1 at 2567.5, 0.2 at 2363.5, 0.3 at 2159.5, 0.4 at
+          1955.5, 0.5 at 1751.5, 0.6 at 1551.5. Slope -0.000491 per px. Tick-fit residual under 0.0011. Crop origin is page
+          pixel (2560, 435). The stored coordinate is the bounding-box centre. Read uncertainty is ±10 px, which is ±5.4 K
+          and ±0.0049 in activity. The points from 2162 K upward are the high-temperature tail, in the crystal-state range
+          2048–2298 K from reference [54] by equations (16) and (17). The 1917 K, 1954 K, and 2009 K points are below that
+          range. 2009 K is not inside it. The reference sentence is equations (12) and (13) for every point. The pure-oxide-at-experiment-T
+          ruling was not applied.'
+    temperature_K:
+      state:
+        tag: value
+        value: '2306'
+      locator:
+        page: 5
+        published_page: 291
+        pdf_page_index: 4
+        figure: '4'
+        note: Panel (b) series 8. Crop centre (1910.0, 2363.5).
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2017-spinel-thermodynamics
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fH
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '43.79'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '4.84'
+      unit: kJ/mol
+      basis: as printed
+      confidence_level: not_stated
+      note: The paper prints ± and does not state the confidence level.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Published page 292. Gibbs energies of spinel formation in the liquid state, from the MgAl2O4–SiO2 melt activities
+      of equations (16) and (17), reduced by equation (19). The sentence does not print a temperature or a range for this
+      constant.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fH
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 6
+    published_page: 292
+    pdf_page_index: 5
+    paragraph: liquid-state formation
+    equation: '19'
+    note: 'Prose, not a table cell. 600 dpi render of PDF page 6: ΔH_T(MgAl2O4) = 43.79 ± 4.84 kJ/mol and ΔS_T(MgAl2O4) =
+      28.09 ± 1.64 J/(mol K), liquid state, equation (19).'
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The liquid-state sentence does not print a temperature or a range. The Table 1 range is not copied onto it.
+      locator:
+        page: 6
+        published_page: 292
+        pdf_page_index: 5
+        paragraph: liquid-state formation
+        equation: '19'
+        note: 'Prose, not a table cell. 600 dpi render of PDF page 6: ΔH_T(MgAl2O4) = 43.79 ± 4.84 kJ/mol and ΔS_T(MgAl2O4)
+          = 28.09 ± 1.64 J/(mol K), liquid state, equation (19).'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 292
+        pdf_page_index: 5
+        paragraph: liquid-state formation
+        equation: '19'
+        note: 'Prose, not a table cell. 600 dpi render of PDF page 6: ΔH_T(MgAl2O4) = 43.79 ± 4.84 kJ/mol and ΔS_T(MgAl2O4)
+          = 28.09 ± 1.64 J/(mol K), liquid state, equation (19).'
+  derivation:
+    relation: Published page 292. Gibbs energies of spinel formation in the liquid state, from the MgAl2O4–SiO2 melt activities
+      of equations (16) and (17), reduced by equation (19). The activity grid is not printed as a numeric table.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mol
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 292
+        pdf_page_index: 5
+        equation: '19'
+        note: Equations (16) and (17) supply the melt activities. Those activities are not printed as a numeric table. Equation
+          (19) is the reduction to the formation constants on published page 292.
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fS
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'delta_fS'
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    per:
+      tag: value
+      value: mol_species
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fS'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '1.64'
+      unit: J/(mol K)
+      basis: as printed
+      confidence_level: not_stated
+      note: The paper prints ± and does not state the confidence level.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Published page 292, liquid-state formation entropy from equation (19). Retained and refused because the schema
+      has no delta_fS token.
+  admission:
+    status: rejected
+    reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+    decided_by:
+      worker: t1372-w1-w3-t1
+      date: '2026-10-20'
+      evidence:
+        page: 6
+        published_page: 292
+        pdf_page_index: 5
+        paragraph: liquid-state formation
+        equation: '19'
+        note: Same prose sentence as the liquid formation enthalpy. 600 dpi render of PDF page 6. The schema has no formation-entropy
+          token.
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 6
+    published_page: 292
+    pdf_page_index: 5
+    paragraph: liquid-state formation
+    equation: '19'
+    note: Same prose sentence as the liquid formation enthalpy. 600 dpi render of PDF page 6. The schema has no formation-entropy
+      token.
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The liquid-state sentence does not print a temperature or a range. The Table 1 range is not copied onto it.
+      locator:
+        page: 6
+        published_page: 292
+        pdf_page_index: 5
+        paragraph: liquid-state formation
+        equation: '19'
+        note: Same prose sentence as the liquid formation enthalpy. 600 dpi render of PDF page 6. The schema has no formation-entropy
+          token.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 292
+        pdf_page_index: 5
+        paragraph: liquid-state formation
+        equation: '19'
+        note: Same prose sentence as the liquid formation enthalpy. 600 dpi render of PDF page 6. The schema has no formation-entropy
+          token.
+  derivation:
+    relation: Published page 292, liquid-state formation entropy from equation (19). The activity grid of equations (16) and
+      (17) is not printed as a numeric table.
+    inputs: []
+    parameters: []
+    output_unit: J/(mol K)
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 292
+        pdf_page_index: 5
+        equation: '19'
+        note: Same prose sentence as the liquid formation enthalpy. Equations (16) and (17) supply the melt activities. Those
+          activities are not printed as a numeric table.
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1851, 2298]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-12.02'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '1.14'
+      unit: kJ/mol
+      basis: as printed
+      confidence_level: not_stated
+      note: The paper prints ± and does not state the confidence level.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Table 1 this-work row. Least squares of this paper's ΔG_T for crystalline spinel, equation (19), assumed
+      constant over the printed range. Per 1 mol of compound.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 2
+    published_page: 288
+    pdf_page_index: 1
+    table: '1'
+    note: MinerU CSV row 29. 600 dpi render of PDF page 2 shows Knudsen mass spectrometry, 1851–2298, −12.02 ± 1.14, 5.03
+      ± 0.56, This work. pdftotext uses U+2013 before 12.02. MinerU stored an ASCII hyphen. The emitted column header was
+      the LaTeX fragment; the caption header is written here.; row=29; column=3; row_label=This work; column_header=ΔH_T,
+      kJ/mol
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 prints 1851–2298 K for this least-squares constant, not a point. No midpoint is stored.
+      locator:
+        page: 2
+        published_page: 288
+        pdf_page_index: 1
+        table: '1'
+        note: MinerU CSV row 29. 600 dpi render of PDF page 2 shows Knudsen mass spectrometry, 1851–2298, −12.02 ± 1.14, 5.03
+          ± 0.56, This work. pdftotext uses U+2013 before 12.02. MinerU stored an ASCII hyphen. The emitted column header
+          was the LaTeX fragment; the caption header is written here.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 288
+        pdf_page_index: 1
+        table: '1'
+        note: MinerU CSV row 29. 600 dpi render of PDF page 2 shows Knudsen mass spectrometry, 1851–2298, −12.02 ± 1.14, 5.03
+          ± 0.56, This work. pdftotext uses U+2013 before 12.02. MinerU stored an ASCII hyphen. The emitted column header
+          was the LaTeX fragment; the caption header is written here.
+  derivation:
+    relation: Table 1 this-work row. Least squares of this paper's ΔG_T for crystalline spinel, equation (19), assumed constant
+      over the printed range. Per 1 mol of compound. The ΔG_T grid is not printed as a numeric table.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mol
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 292
+        pdf_page_index: 5
+        equation: '19'
+        note: Table 1 on published page 288 prints this enthalpy. Equation (19), ΔG_T = ΔH_T − TΔS_T, is the reduction and
+          is printed on published page 292. The least-squares inputs are this paper's ΔG_T values. They are not printed as
+          a numeric table. Figure 2 series 16 is a partial marker read, not that input list.
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p002_t01_r29_c04
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'delta_fS'
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1851, 2298]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_fS'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.56'
+      unit: J/(mol K)
+      basis: as printed
+      confidence_level: not_stated
+      note: The paper prints ± and does not state the confidence level.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Table 1 this-work formation entropy. Least squares of ΔG_T, equation (19). Retained and refused because the
+      schema has no delta_fS token.
+  admission:
+    status: rejected
+    reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+    decided_by:
+      worker: t1372-w1-w3-t1
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 288
+        pdf_page_index: 1
+        table: '1'
+        note: Same Table 1 this-work row as the enthalpy. 600 dpi render of PDF page 2. The schema has no formation-entropy
+          token.; row=29; column=4; row_label=This work; column_header=ΔS_T, J/(mol K)
+  notices: []
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 2
+    published_page: 288
+    pdf_page_index: 1
+    table: '1'
+    note: Same Table 1 this-work row as the enthalpy. 600 dpi render of PDF page 2. The schema has no formation-entropy token.;
+      row=29; column=4; row_label=This work; column_header=ΔS_T, J/(mol K)
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 prints 1851–2298 K for this least-squares constant, not a point. No midpoint is stored.
+      locator:
+        page: 2
+        published_page: 288
+        pdf_page_index: 1
+        table: '1'
+        note: Same Table 1 this-work row as the enthalpy. 600 dpi render of PDF page 2. The schema has no formation-entropy
+          token.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 288
+        pdf_page_index: 1
+        table: '1'
+        note: Same Table 1 this-work row as the enthalpy. 600 dpi render of PDF page 2. The schema has no formation-entropy
+          token.
+  derivation:
+    relation: Table 1 this-work formation entropy. Least squares of ΔG_T, equation (19). The ΔG_T grid is not printed as a
+      numeric table.
+    inputs: []
+    parameters: []
+    output_unit: J/(mol K)
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 292
+        pdf_page_index: 5
+        equation: '19'
+        note: Table 1 on published page 288 prints this entropy. Equation (19), ΔG_T = ΔH_T − TΔS_T, is the reduction and
+          is printed on published page 292. The least-squares inputs are this paper's ΔG_T values. They are not printed as
+          a numeric table.
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p004_t02_r14_c02
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: Table 2 does not print a total pressure for this melting temperature.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2420'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '25'
+      unit: K
+      basis: as printed
+      confidence_level: not_stated
+      note: The ± is printed on the melting temperature. Confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: 'Table 2 on published page 290 prints this melting temperature. Equation (22) is on published page 292: ΔH_melt
+      / ΔS_melt. The paper calculates it from the liquid and crystalline formation constants; it is not a separate pyrometry
+      run.'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p004_t02_r14_c02
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 4
+    published_page: 290
+    pdf_page_index: 3
+    table: '2'
+    note: Same Table 2 this-work row. Emit stored 2420 ± 25 on values.value. transition_temperature is read from T_K, so the
+      number was moved here after the 600 dpi render check. PDF page 4.; row=14; column=2; row_label=This work; column_header=T_melt,
+      K
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: value
+        value: '2420'
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        table: '2'
+        note: Same Table 2 this-work row. Emit stored 2420 ± 25 on values.value. transition_temperature is read from T_K,
+          so the number was moved here after the 600 dpi render check. PDF page 4.; row=14; column=2; row_label=This work;
+          column_header=T_melt, K
+  derived_from:
+  - shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p004_t02_r14_c03
+  - shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p004_t02_r14_c04
+  derivation:
+    relation: 'Table 2 on published page 290 prints this melting temperature. Equation (22) is on published page 292: ΔH_melt
+      / ΔS_melt. The paper calculates it from the liquid and crystalline formation constants; it is not a separate pyrometry
+      run.'
+    inputs:
+    - shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p004_t02_r14_c03
+    - shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p004_t02_r14_c04
+    parameters: []
+    output_unit: K
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p004_t02_r14_c03
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2420'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '55.81'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '4.62'
+      unit: kJ/mol
+      basis: as printed
+      confidence_level: not_stated
+      note: The paper prints ± and does not state the confidence level.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: 'Table 2 on published page 290 prints this melting enthalpy. Equation (20) is on published page 292: liquid-state
+      formation enthalpy minus crystalline formation enthalpy. The same row prints T_melt 2420 ± 25 K; that ± is on the transition_point
+      row, not on this enthalpy.'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p004_t02_r14_c03
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 4
+    published_page: 290
+    pdf_page_index: 3
+    table: '2'
+    note: MinerU CSV row 14, the last row of the MgAl2O4 block. 600 dpi render of PDF page 4 shows 2420 ± 25, 55.81 ± 4.62,
+      23.06 ± 1.73, This work, above the Al2O3 block. Emit's column header included the MgO literature cells because MinerU
+      had marked those body rows as header. The header written here is the printed column header.; row=14; column=3; row_label=This
+      work; column_header=ΔH_melt, kJ/mol
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: value
+        value: '2420'
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        table: '2'
+        note: MinerU CSV row 14, the last row of the MgAl2O4 block. 600 dpi render of PDF page 4 shows 2420 ± 25, 55.81 ±
+          4.62, 23.06 ± 1.73, This work, above the Al2O3 block. Emit's column header included the MgO literature cells because
+          MinerU had marked those body rows as header. The header written here is the printed column header.; row=14; column=3;
+          row_label=This work; column_header=ΔH_melt, kJ/mol
+  derived_from:
+  - shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fH
+  - shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03
+  derivation:
+    relation: 'Table 2 on published page 290 prints this melting enthalpy. Equation (20) is on published page 292: liquid-state
+      formation enthalpy minus crystalline formation enthalpy.'
+    inputs:
+    - shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fH
+    - shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p002_t01_r29_c03
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p004_t02_r14_c04
+  experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2420'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '23.06'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '1.73'
+      unit: J/(mol K)
+      basis: as printed
+      confidence_level: not_stated
+      note: The paper prints ± and does not state the confidence level.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: 'Table 2 on published page 290 prints this melting entropy. Equation (21) is on published page 292: liquid-state
+      formation entropy minus crystalline formation entropy.'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p004_t02_r14_c04
+  source_id: shornikov-2017-spinel-thermodynamics
+  locator:
+    page: 4
+    published_page: 290
+    pdf_page_index: 3
+    table: '2'
+    note: Same Table 2 this-work row. The caption prints J/(mol K). The stored unit is J/mol K, the same unit, so migration
+      can read it. 600 dpi render of PDF page 4.; row=14; column=4; row_label=This work; column_header=ΔS_melt, J/(mol K)
+  read_from: pdf:shornikov-2017-spinel-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_MgAl2O4_oxide_mole_fractions
+          components:
+          - - MgO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        section: INTRODUCTION
+        note: Final introductory paragraph. The paper studies stoichiometric spinel MgAl2O4 at 1850–2300 K.
+    temperature_K:
+      state:
+        tag: value
+        value: '2420'
+      locator:
+        page: 4
+        published_page: 290
+        pdf_page_index: 3
+        table: '2'
+        note: Same Table 2 this-work row. The caption prints J/(mol K). The stored unit is J/mol K, the same unit, so migration
+          can read it. 600 dpi render of PDF page 4.; row=14; column=4; row_label=This work; column_header=ΔS_melt, J/(mol
+          K)
+  derived_from:
+  - shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fS
+  - shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p002_t01_r29_c04
+  derivation:
+    relation: 'Table 2 on published page 290 prints this melting entropy. Equation (21) is on published page 292: liquid-state
+      formation entropy minus crystalline formation entropy.'
+    inputs:
+    - shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_liquid_delta_fS
+    - shornikov-2017-spinel-thermodynamics::shornikov_2017_spinel_thermodynamics_p002_t01_r29_c04
+    parameters: []
+    output_unit: J/mol K
+    references: []

@@ -25,7 +25,7 @@ species:
       type: method_description
       locator:
         page: 1
-        pdf_page_index: 1
+        pdf_page_index: 0
         section: Volatiles Preservation
       phase: instrument_design
       standard_state: ProSPA sample handling and sealed-oven design as printed
@@ -54,18 +54,18 @@ species:
             unit: as printed
             value:
               state: {tag: value, value: {kind: categorical, categorical: series of single-use sample ovens on a rotary carousel with sample imager}}
-              locator: {page: 1, pdf_page_index: 1, section: Volatiles Preservation}
+              locator: {page: 1, pdf_page_index: 0, section: Volatiles Preservation}
           - name: thermal_isolation
             unit: as printed
             value:
               state: {tag: value, value: {kind: categorical, categorical: SIS thermally isolated from the warm enclosure}}
-              locator: {page: 1, pdf_page_index: 1, section: Volatiles Preservation}
-          locator: {page: 1, pdf_page_index: 1, section: Volatiles Preservation}
+              locator: {page: 1, pdf_page_index: 0, section: Volatiles Preservation}
+          locator: {page: 1, pdf_page_index: 0, section: Volatiles Preservation}
     - observation_id: barber_2017_prospa_extraction_programmes
       type: method_description
       locator:
         page: 2
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
       phase: instrument_design
       standard_state: ProSPA proposed extraction modes as printed
@@ -94,13 +94,13 @@ species:
             unit: as printed
             value:
               state: {tag: value, value: {kind: categorical, categorical: sealed sample oven for thermal extraction}}
-              locator: {page: 2, pdf_page_index: 2, section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion}
-          locator: {page: 2, pdf_page_index: 2, section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion}
+              locator: {page: 2, pdf_page_index: 1, section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion}
+          locator: {page: 2, pdf_page_index: 1, section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion}
     - observation_id: barber_2017_prospa_analysis_capability_and_status
       type: method_description
       locator:
         page: 2
-        pdf_page_index: 2
+        pdf_page_index: 1
         section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions
       phase: instrument_design
       standard_state: ProSPA analytical capability and project status as printed
@@ -138,18 +138,18 @@ species:
             unit: as printed
             value:
               state: {tag: value, value: {kind: categorical, categorical: ion trap device and magnetic sector instrument}}
-              locator: {page: 2, pdf_page_index: 2, section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions}
+              locator: {page: 2, pdf_page_index: 1, section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions}
           - name: heritage_device_mass_as_printed
             unit: as printed
             value:
               state: {tag: value, value: {kind: categorical, categorical: "<500 gram all-in device"}}
-              locator: {page: 2, pdf_page_index: 2, section: Instrument Heritage}
+              locator: {page: 2, pdf_page_index: 1, section: Instrument Heritage}
           - name: gas_handling
             unit: as printed
             value:
               state: {tag: value, value: {kind: categorical, categorical: 'open/closed valves, metering valves, micro-reactors, pressure sensors, and reference materials'}}
-              locator: {page: 2, pdf_page_index: 2, section: Volatiles Analysis}
-          locator: {page: 2, pdf_page_index: 2, section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions}
+              locator: {page: 2, pdf_page_index: 1, section: Volatiles Analysis}
+          locator: {page: 2, pdf_page_index: 1, section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions}
 vocabulary_gaps:
 - ion_trap_target_mz_range_amu
 - magnetic_sector_isotope_precision

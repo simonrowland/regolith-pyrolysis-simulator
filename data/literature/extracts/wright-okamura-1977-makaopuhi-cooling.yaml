@@ -1,0 +1,3652 @@
+schema_version: literature_extract.v1
+source_id: wright-okamura-1977-makaopuhi-cooling
+source:
+  citation: Wright, T. L. & Okamura, R. T. (1977), “Cooling and Crystallization of Tholeiitic Basalt, 1965 Makaopuhi
+    Lava Lake, Hawaii”, U.S. Geological Survey Professional Paper 1004.
+  corpus_asset: raw/wright-okamura-1977-makaopuhi-cooling/wright-okamura-1977-makaopuhi-cooling.pdf
+  year: 1977
+extraction:
+  method: Born-digital pdftotext-layout was used as the primary text. Table 10A whole-sample oxide values were preserved in context and checked against the 600 dpi render of physical page 32. Table 11 sample 69-1-22
+    was hand-transcribed and each cell checked against the 600 dpi render of physical page 33 because MinerU omitted
+    its final sample column. Table 17 residual-glass microprobe cells in columns 1–3 were emitted from the table
+    mapping and checked against the 600 dpi render of physical page 42. Figures 1–28 are deferred with no numeric
+    points.
+  date: '2026-10-20'
+  worker: codex-resume-45736-1792513930
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables:
+  - page: 42
+    table_index: 32
+    count: 0
+species:
+  SiO2:
+    observations:
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r03_c02
+      type: equilibrium_phase_composition
+      locator: &id030
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $SiO_{2}$
+        column_header: Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '75.0'
+        component_as_published: SiO2
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-7
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r03_c03
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $SiO_{2}$
+        column_header: Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '75.1'
+        component_as_published: SiO2
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-14
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r03_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $SiO_{2}$
+        column_header: Alae lava lake A12-9(probe) $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '75.9'
+        component_as_published: SiO2
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: A12-9
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_table11_69_1_22_sio2
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: SiO2
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '50.90'
+        component_as_published: SiO2
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+    context:
+    - observation_id: wright_okamura_table_01_context
+      type: measured_table_context
+      locator: &id001
+        page: 14
+        pdf_page_index: 13
+        published_page: 9
+        table: '1'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: percent as printed
+      values:
+        quantity_as_printed: 'Contamination effects of thermocouple elements: semiquantitative elemental percentages;
+          midpoint categories'
+        method_class: measured_direct
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition_reason: 'Context: the caption defines values as midpoints of geometric interval classes with
+          about 30% interval coverage, so they are not point compositions.'
+        page_locators:
+        - *id001
+    - observation_id: wright_okamura_table_02_context
+      type: measured_table_context
+      locator: &id002
+        page: 17
+        pdf_page_index: 16
+        published_page: 12
+        table: '2'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: ft; °C
+      values:
+        quantity_as_printed: 'Depth to isothermal surfaces in the upper crust: depth to isotherms by date and drill
+          hole'
+        method_class: measured_direct
+        candidate_tokens:
+        - transition_temperature
+        disposition_reason: 'Context: depth and temperature profile coordinates are conditions, not transition-temperature
+          results; no depth quantity token exists.'
+        page_locators:
+        - *id002
+        - page: 18
+          pdf_page_index: 17
+          published_page: 13
+          table: '2'
+        - page: 19
+          pdf_page_index: 18
+          published_page: 14
+          table: '2'
+    - observation_id: wright_okamura_table_03_context
+      type: measured_table_context
+      locator: &id003
+        page: 20
+        pdf_page_index: 19
+        published_page: 15
+        table: '3'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: °C; ft
+      values:
+        quantity_as_printed: 'Temperature profiles used to construct isotherms in the melt: measured temperature
+          by time and depth'
+        method_class: measured_direct
+        candidate_tokens:
+        - transition_temperature
+        disposition_reason: 'Context: profile temperatures are conditions along depth and time, not transition points;
+          no temperature-profile quantity token exists.'
+        page_locators:
+        - *id003
+        - page: 21
+          pdf_page_index: 20
+          published_page: 16
+          table: '3'
+    - observation_id: wright_okamura_table_04_context
+      type: measured_table_context
+      locator: &id004
+        page: 22
+        pdf_page_index: 21
+        published_page: 17
+        table: '4'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: ft; °C
+      values:
+        quantity_as_printed: 'Depth to crust-melt interface and temperatures following drilling: interface depth
+          and post-drilling temperatures'
+        method_class: measured_direct
+        candidate_tokens:
+        - transition_temperature
+        disposition_reason: 'Context: the values describe interface position and temperature-profile conditions,
+          not a measured transition point.'
+        page_locators:
+        - *id004
+    - observation_id: wright_okamura_table_05_context
+      type: measured_table_context
+      locator: &id005
+        page: 22
+        pdf_page_index: 21
+        published_page: 17
+        table: '5'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: ft; standards have printed reference melting temperatures in °C
+      values:
+        quantity_as_printed: 'Melting-point observations for Ag, Au, and GeO2 standards in drill holes: depths of
+          melt/no-melt observations for calibration standards'
+        method_class: measured_direct
+        candidate_tokens:
+        - transition_temperature
+        disposition_reason: 'Context: the table reports where standards melted or did not melt, not a new sample
+          transition-temperature measurement; lower/upper bracketing observations remain as printed.'
+        page_locators:
+        - *id005
+    - observation_id: wright_okamura_table_06_context
+      type: measured_table_context
+      locator: &id006
+        page: 22
+        pdf_page_index: 21
+        published_page: 17
+        table: '6'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: in.
+      values:
+        quantity_as_printed: 'Rainfall record at Makaopuhi crater: rainfall by month and cumulative rainfall'
+        method_class: measured_direct
+        candidate_tokens: []
+        disposition_reason: 'Context: no rainfall or precipitation quantity token exists.'
+        page_locators:
+        - *id006
+    - observation_id: wright_okamura_table_07_context
+      type: measured_table_context
+      locator: &id007
+        page: 26
+        pdf_page_index: 25
+        published_page: 21
+        table: '7'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: °C; log fO2 as printed in linked profiles
+      values:
+        quantity_as_printed: 'Summary of observations on oxygen-fugacity profiles: high-fO2 event summary by drill
+          hole and temperature interval'
+        method_class: measured_reduced
+        candidate_tokens:
+        - fugacity
+        disposition_reason: 'Context: this summary reports redox conditions and time intervals only; fO2 is a condition
+          and no independent result is tabulated.'
+        page_locators:
+        - *id007
+    - observation_id: wright_okamura_table_08_context
+      type: measured_table_context
+      locator: &id008
+        page: 30
+        pdf_page_index: 29
+        published_page: 25
+        table: '8'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: ft^3
+      values:
+        quantity_as_printed: 'Volume of subsidence/uplift from surface altitude changes: volume change by time interval'
+        method_class: measured_reduced
+        candidate_tokens: []
+        disposition_reason: 'Context: the reported integrated volume-change quantity has no store token.'
+        page_locators:
+        - *id008
+    - observation_id: wright_okamura_table_09_context
+      type: method_context
+      locator: &id009
+        page: 31
+        pdf_page_index: 30
+        published_page: 26
+        table: '9'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: °C; ft; identifiers as printed
+      values:
+        quantity_as_printed: 'Sample data for chemical analyses in Tables 10 and 11: sample descriptions, collection
+          date/depth/temperature, lab identifiers, chemistry comments'
+        method_class: method_only
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition_reason: 'Context: metadata provide sample identity and temperature windows, not standalone measured
+          composition observations.'
+        page_locators:
+        - *id009
+    - observation_id: wright_okamura_table_10_context
+      type: measured_table_context
+      locator: &id010
+        page: 32
+        pdf_page_index: 31
+        published_page: 27
+        table: '10'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: wt% as printed; ratio dimensionless
+      values:
+        quantity_as_printed: 'Major-element chemical analyses of 1965–66 Makaopuhi samples: oxide composition by
+          sample, including a printed 0.9Fe2O3/(0.9Fe2O3+FeO) ratio'
+        method_class: measured_direct
+        candidate_tokens:
+        - equilibrium_phase_composition
+        - valence_ratio
+        disposition_reason: Table 10A records whole-sample major-element analyses. Table 13A modes show that M1-1G,
+          M-3, M-8, M-12, M-18, and M-22 contain mineral grains with interstitial glass and quench; these oxide
+          analyses and their printed Fe2O3/FeO ratios are whole-sample bulk of a multiphase rock; not a single-phase
+          composition. Their printed values are preserved below.
+        page_locators:
+        - *id010
+        - page: 33
+          pdf_page_index: 32
+          published_page: 28
+          table: '10'
+        other_printed_sample_groups:
+        - 'A: pumice (M-1, M-1A, M-20, M-26);'
+        - 'B: 1965–66 melt samples collected through drill holes, including metal-contact, flow-differentiated,
+          and pyroxene-rich samples;'
+        - 'C: 1965–66 drill-core bulk analyses;'
+        - 'D: segregation veins and differentiated core material.'
+        sample_analyses_as_printed:
+        - sample_id_as_published: M1-1G
+          sample_type_as_printed: Glassy skin on lava lake surface
+          components_as_printed:
+            SiO2: '50.06'
+            Al2O3: '13.31'
+            FeO: '9.81'
+            MgO: '8.52'
+            CaO: '10.72'
+            Na2O: '2.23'
+            K2O: '0.49'
+            TiO2: '2.60'
+            Fe2O3: '1.49'
+            H2O: '0.42'
+            P2O5: '0.27'
+            MnO: '0.17'
+            CO2: '0.01'
+            Cl: '0.0'
+            F: '0.0'
+          temperature_as_printed: not printed; Table 16 gives an inferred minimum of 1,140 °C, not a measured collection
+            temperature
+          quench_provenance_as_printed: Quench history not stated; Table 16 describes a glassy skin on the lava-lake
+            surface.
+          valence_ratio_as_printed: '.120'
+          valence_ratio_basis_as_printed: .9 Fe2O3/(.9 Fe2O3 + FeO)
+        - sample_id_as_published: M-3
+          sample_type_as_printed: Melt dipped from rising lava lake
+          components_as_printed:
+            SiO2: '50.27'
+            Al2O3: '13.50'
+            FeO: '9.90'
+            MgO: '8.14'
+            CaO: '10.84'
+            Na2O: '2.36'
+            K2O: '0.55'
+            TiO2: '2.65'
+            Fe2O3: '1.41'
+            H2O: '0.05'
+            P2O5: '0.27'
+            MnO: '0.17'
+            CO2: '0.01'
+            Cl: '0.01'
+            F: '0.04'
+          temperature_as_printed: Approx. 1,160–1,180 °C (Table 9)
+          quench_provenance_as_printed: Quenched in air (Table 16); preservation of the redox ratio is not stated.
+          valence_ratio_as_printed: '.114'
+          valence_ratio_basis_as_printed: .9 Fe2O3/(.9 Fe2O3 + FeO)
+        - sample_id_as_published: M-8
+          sample_type_as_printed: Melt dipped from rising lava lake
+          components_as_printed:
+            SiO2: '50.29'
+            Al2O3: '13.57'
+            FeO: '9.91'
+            MgO: '7.95'
+            CaO: '10.90'
+            Na2O: '2.29'
+            K2O: '0.54'
+            TiO2: '2.70'
+            Fe2O3: '1.34'
+            H2O: '0.07'
+            P2O5: '0.27'
+            MnO: '0.17'
+            CO2: '0.01'
+            Cl: '0.02'
+            F: '0.04'
+          temperature_as_printed: Approx. 1,160–1,180 °C (Table 9)
+          quench_provenance_as_printed: Quenched in air (Table 16); preservation of the redox ratio is not stated.
+          valence_ratio_as_printed: '.109'
+          valence_ratio_basis_as_printed: .9 Fe2O3/(.9 Fe2O3 + FeO)
+        - sample_id_as_published: M-12
+          sample_type_as_printed: Melt dipped from rising lava lake
+          components_as_printed:
+            SiO2: '50.45'
+            Al2O3: '13.63'
+            FeO: '9.97'
+            MgO: '7.59'
+            CaO: '11.04'
+            Na2O: '2.38'
+            K2O: '0.52'
+            TiO2: '2.74'
+            Fe2O3: '1.24'
+            H2O: '0.04'
+            P2O5: '0.28'
+            MnO: '0.17'
+            CO2: '0.01'
+            Cl: '0.0'
+            F: '0.0'
+          temperature_as_printed: Approx. 1,160–1,180 °C (Table 9)
+          quench_provenance_as_printed: Quenched in air (Table 16); preservation of the redox ratio is not stated.
+          valence_ratio_as_printed: '.101'
+          valence_ratio_basis_as_printed: .9 Fe2O3/(.9 Fe2O3 + FeO)
+        - sample_id_as_published: M-18
+          sample_type_as_printed: Melt dipped from rising lava lake
+          components_as_printed:
+            SiO2: '50.33'
+            Al2O3: '13.59'
+            FeO: '10.01'
+            MgO: '7.97'
+            CaO: '10.95'
+            Na2O: '2.34'
+            K2O: '0.55'
+            TiO2: '2.68'
+            Fe2O3: '1.23'
+            H2O: '0.06'
+            P2O5: '0.26'
+            MnO: '0.17'
+            CO2: '0.01'
+            Cl: '0.01'
+            F: '0.04'
+          temperature_as_printed: ¹≥1,160 °C (thermocouple reading during collection; Table 16)
+          quench_provenance_as_printed: Quenched in water (Table 16); preservation of the redox ratio is not stated.
+          valence_ratio_as_printed: '.100'
+          valence_ratio_basis_as_printed: .9 Fe2O3/(.9 Fe2O3 + FeO)
+        - sample_id_as_published: M-22
+          sample_type_as_printed: Melt dipped from rising lava lake
+          components_as_printed:
+            SiO2: '50.09'
+            Al2O3: '13.34'
+            FeO: '9.98'
+            MgO: '8.56'
+            CaO: '10.75'
+            Na2O: '2.29'
+            K2O: '0.53'
+            TiO2: '2.65'
+            Fe2O3: '1.32'
+            H2O: '0.05'
+            P2O5: '0.27'
+            MnO: '0.17'
+            CO2: '0.02'
+            Cl: '0.0'
+            F: '0.0'
+          temperature_as_printed: Approx. 1,160–1,180 °C (Table 9)
+          quench_provenance_as_printed: Quenched in air (Table 16); preservation of the redox ratio is not stated.
+          valence_ratio_as_printed: '.107'
+          valence_ratio_basis_as_printed: .9 Fe2O3/(.9 Fe2O3 + FeO)
+    - observation_id: wright_okamura_table_11_context
+      type: measured_table_context
+      locator: &id011
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: wt% as printed; ratio dimensionless
+      values:
+        quantity_as_printed: 'Major-element chemical analyses of 1968–69 Makaopuhi samples: oxide composition by
+          sample, including a printed 0.9Fe2O3/(0.9Fe2O3+FeO) ratio'
+        method_class: measured_direct
+        candidate_tokens:
+        - equilibrium_phase_composition
+        - valence_ratio
+        disposition_reason: Typed only 69-1-22, which the source explicitly identifies as crystal- and vesicle-free
+          glass (quenched melt). The drill-core analyses are whole-sample bulk of a multiphase rock; not a single-phase
+          composition. Samples 68-1-21 and 68-2-59 are described as melt in the bit, but the source does not establish
+          that the analyzed material is single-phase glass; those melt-in-bit compositions remain context.
+        page_locators:
+        - *id011
+        typed_glass_samples:
+        - 69-1-22
+        other_printed_sample_groups:
+        - 1968–69 drill-core bulk samples;
+        - melt in bit (68-1-21 and 68-2-59; single-phase glass status not stated);
+        - black sand (68-1-57);
+        - melt in core barrel (69-1-22; typed as glass from the explicit Figure 26D/text description).
+    - observation_id: wright_okamura_table_12_context
+      type: measured_table_context
+      locator: &id012
+        page: 36
+        pdf_page_index: 35
+        published_page: 31
+        table: '12'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: wt% as printed
+      values:
+        quantity_as_printed: 'Average composition of pumice (MPUMAV): printed average and dry-weight composition'
+        method_class: measured_reduced
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition_reason: MPUMAV is an average whole-sample pumice composition, not a single-phase composition;
+          retained in context with candidate token equilibrium_phase_composition. Its printed average/dry-weight
+          values are preserved below.
+        page_locators:
+        - *id012
+        printed_columns_as_published:
+        - Original
+        - Dry weight
+        printed_rows_as_published:
+          SiO2:
+          - '50.18'
+          - '50.28'
+          Al2O3:
+          - '13.26'
+          - '13.28'
+          Fe2O3:
+          - '1.48'
+          - ''
+          FeO (footnote 2):
+          - '9.86'
+          - 11.21²
+          MgO:
+          - '8.27'
+          - '8.29'
+          CaO:
+          - '10.82'
+          - '10.84'
+          Na2O:
+          - '2.32'
+          - '2.32'
+          K2O:
+          - '.54'
+          - '.54'
+          H2O+:
+          - '.12'
+          - —
+          H2O-:
+          - '.01'
+          - —
+          TiO2:
+          - '2.64'
+          - '2.65'
+          P2O5:
+          - '.27'
+          - '.27'
+          MnO:
+          - '.17'
+          - '.17'
+          CO2:
+          - '.01'
+          - —
+          Cl:
+          - '.02'
+          - —
+          F:
+          - '.04'
+          - —
+          Subtotal:
+          - '100.01'
+          - ''
+          less O:
+          - '.02'
+          - ''
+          Total:
+          - '99.99'
+          - 99.85²
+        footnotes_as_printed:
+        - Composition used in mixing and differentiation calculations.
+        - “FeO” = FeO + 0.9 Fe2O3 after normalization to 100 percent; the total differs from 100 percent by the
+          amount of Fe2O3 converted to FeO.
+    - observation_id: wright_okamura_table_13_context
+      type: measured_table_context
+      locator: &id013
+        page: 37
+        pdf_page_index: 36
+        published_page: 32
+        table: '13'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: volume percent
+      values:
+        quantity_as_printed: 'Modal data, Makaopuhi lava lake: glass, quench, mineral, and oxide modal proportions
+          by sample'
+        method_class: measured_direct
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition_reason: 'Context: modal phase fractions are not oxide-component compositions; no phase-fraction
+          quantity token exists. Sample temperatures are printed as ranges or estimates and are not promoted to
+          points.'
+        page_locators:
+        - *id013
+        - page: 38
+          pdf_page_index: 37
+          published_page: 33
+          table: '13'
+        - page: 39
+          pdf_page_index: 38
+          published_page: 34
+          table: '13'
+    - observation_id: wright_okamura_table_14_context
+      type: model_context
+      locator: &id014
+        page: 39
+        pdf_page_index: 38
+        published_page: 34
+        table: '14'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: weight percent
+      values:
+        quantity_as_printed: 'Chemical mode for MPUMAV: calculated mineral proportions in the bulk chemistry'
+        method_class: model_derived
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition_reason: 'Context: the chemical mode is author-calculated from bulk chemistry and modal assumptions;
+          no mineral-mode or phase-fraction quantity token exists.'
+        page_locators:
+        - *id014
+    - observation_id: wright_okamura_table_15_context
+      type: measured_table_context
+      locator: &id015
+        page: 40
+        pdf_page_index: 39
+        published_page: 35
+        table: '15'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: as printed
+      values:
+        quantity_as_printed: 'Mineral paragenesis, Makaopuhi lava lake: qualitative phase sequence'
+        method_class: measured_reduced
+        candidate_tokens: []
+        disposition_reason: 'Context: qualitative phase-order statements have no numeric quantity token.'
+        page_locators:
+        - *id015
+    - observation_id: wright_okamura_table_16_context
+      type: model_context
+      locator: &id016
+        page: 41
+        pdf_page_index: 40
+        published_page: 36
+        table: '16'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: °C
+      values:
+        quantity_as_printed: 'Temperatures of melt samples estimated in two different ways: estimated sample temperatures
+          from figures and modal data'
+        method_class: model_derived
+        candidate_tokens:
+        - transition_temperature
+        disposition_reason: 'Context: the temperatures are estimates from figures and assumptions, not direct point
+          measurements; temperature is not a result quantity here.'
+        page_locators:
+        - *id016
+    - observation_id: wright_okamura_table_17_context
+      type: measured_table_context
+      locator: &id017
+        page: 42
+        pdf_page_index: 41
+        published_page: 37
+        table: '17'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: wt% as printed
+      values:
+        quantity_as_printed: 'Composition of residual glass from Makaopuhi and Alae lava lakes: oxide compositions
+          of residual glass'
+        method_class: measured_reduced
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition_reason: 'Typed: first three electron-microprobe glass columns are direct measurements. The recalculated
+          wet-chemical column and printed totals are retained in context because its four separate inputs are not
+          printed here; P2O5 and MnO are dashes, not zero.'
+        page_locators:
+        - *id017
+        untyped_printed_column:
+          sample_id_as_published: A12-1011
+          phase_as_published: Alae residual glass (wet chemical)
+          basis_as_printed: Recalculated from four impure separates after correction for feldspar and apatite; analysts
+            R. Meyerowitz and J. Marinenko.
+          components_wt_pct_as_printed:
+            SiO2: '75.8'
+            Al2O3: '12.2'
+            FeO: '1.6'
+            MgO: '.2'
+            CaO: '.6'
+            Na2O: '3.4'
+            K2O: '5.5'
+            TiO2: '.7'
+          derivation_note: derivation pending a corpus table asset (controller)
+          totals_as_printed:
+            68-1-7: '98.2'
+            68-1-14: '99.2'
+            A12-9: '99.2'
+            A12-1011: '100.0'
+          unreported_oxides:
+            P2O5: —
+            MnO: —
+    - observation_id: wright_okamura_table_18_context
+      type: measured_table_context
+      locator: &id018
+        page: 43
+        pdf_page_index: 42
+        published_page: 38
+        table: '18'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: mm
+      values:
+        quantity_as_printed: 'Summary of grain-size measurements for drill-core samples: grain sizes by sample and
+          phase'
+        method_class: measured_direct
+        candidate_tokens: []
+        disposition_reason: 'Context: no grain-size quantity token exists.'
+        page_locators:
+        - *id018
+    - observation_id: wright_okamura_table_19_context
+      type: measured_table_context
+      locator: &id019
+        page: 43
+        pdf_page_index: 42
+        published_page: 38
+        table: '19'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: mm^3 as printed
+      values:
+        quantity_as_printed: 'Volumes of crystals and vesicles: crystal and vesicle volumes by sample'
+        method_class: measured_reduced
+        candidate_tokens: []
+        disposition_reason: 'Context: no crystal-volume or vesicle-volume quantity token exists.'
+        page_locators:
+        - *id019
+    - observation_id: wright_okamura_table_20_context
+      type: measured_table_context
+      locator: &id020
+        page: 44
+        pdf_page_index: 43
+        published_page: 39
+        table: '20'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: g/cm^3
+      values:
+        quantity_as_printed: 'Density of drill core: bulk density by sample and depth'
+        method_class: measured_direct
+        candidate_tokens:
+        - density
+        disposition_reason: 'Context: density is a candidate token, but these are bulk-rock samples without a species
+          formula/container; no rock-species container can be added in this extraction.'
+        page_locators:
+        - *id020
+    - observation_id: wright_okamura_table_21_context
+      type: model_context
+      locator: &id021
+        page: 48
+        pdf_page_index: 47
+        published_page: 43
+        table: '21'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: weight/volume percent as printed
+      values:
+        quantity_as_printed: 'Adjusted modal data for differentiated melt samples: author-adjusted modal proportions'
+        method_class: model_derived
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition_reason: 'Context: adjusted modal data are model-derived phase fractions; no phase-fraction token
+          exists.'
+        page_locators:
+        - *id021
+    - observation_id: wright_okamura_table_22_context
+      type: model_context
+      locator: &id022
+        page: 48
+        pdf_page_index: 47
+        published_page: 43
+        table: '22'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: wt% and coefficients as printed
+      values:
+        quantity_as_printed: 'Results of mixing calculations for segregation veins: calculated compositions and
+          mixing coefficients'
+        method_class: model_derived
+        candidate_tokens:
+        - equilibrium_phase_composition
+        disposition_reason: 'Context: equation-derived mixing results are model outputs and their input associations
+          do not map to a single measured composition token.'
+        page_locators:
+        - *id022
+    - observation_id: wright_okamura_table_23_context
+      type: measured_table_context
+      locator: &id023
+        page: 49
+        pdf_page_index: 48
+        published_page: 44
+        table: '23'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: degrees
+      values:
+        quantity_as_printed: 'Attitudes of segregation veins: strike/dip and orientation data'
+        method_class: measured_direct
+        candidate_tokens: []
+        disposition_reason: 'Context: no vein-orientation quantity token exists.'
+        page_locators:
+        - *id023
+    - observation_id: wright_okamura_table_24_context
+      type: method_context
+      locator: &id024
+        page: 65
+        pdf_page_index: 64
+        published_page: 60
+        table: '24'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: ft; descriptions as printed
+      values:
+        quantity_as_printed: 'Core logs for drill holes 1–24, 1965–66: drill-core lithology, depth, and recovery
+          descriptions'
+        method_class: method_only
+        candidate_tokens: []
+        disposition_reason: 'Context: descriptive core logs have no relevant numeric quantity token.'
+        page_locators:
+        - *id024
+        - page: 66
+          pdf_page_index: 65
+          published_page: 61
+          table: '24'
+        - page: 67
+          pdf_page_index: 66
+          published_page: 62
+          table: '24'
+        - page: 68
+          pdf_page_index: 67
+          published_page: 63
+          table: '24'
+        - page: 69
+          pdf_page_index: 68
+          published_page: 64
+          table: '24'
+        - page: 70
+          pdf_page_index: 69
+          published_page: 65
+          table: '24'
+    - observation_id: wright_okamura_table_25_context
+      type: method_context
+      locator: &id025
+        page: 70
+        pdf_page_index: 69
+        published_page: 65
+        table: '25'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: ft; descriptions as printed
+      values:
+        quantity_as_printed: 'Core logs for drill holes 68-1, 68-2, and 69-1, 1968–69: drill-core lithology, depth,
+          and recovery descriptions'
+        method_class: method_only
+        candidate_tokens: []
+        disposition_reason: 'Context: descriptive core logs have no relevant numeric quantity token.'
+        page_locators:
+        - *id025
+        - page: 71
+          pdf_page_index: 70
+          published_page: 66
+          table: '25'
+    - observation_id: wright_okamura_table_26_context
+      type: measured_table_context
+      locator: &id026
+        page: 71
+        pdf_page_index: 70
+        published_page: 66
+        table: '26'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: °C; ft
+      values:
+        quantity_as_printed: 'Temperature profiles measured in drill holes: temperature by depth and date'
+        method_class: measured_direct
+        candidate_tokens:
+        - transition_temperature
+        disposition_reason: 'Context: temperatures are profile conditions, not transition points; no temperature-profile
+          result quantity token exists.'
+        page_locators:
+        - *id026
+        - page: 72
+          pdf_page_index: 71
+          published_page: 67
+          table: '26'
+        - page: 73
+          pdf_page_index: 72
+          published_page: 68
+          table: '26'
+        - page: 74
+          pdf_page_index: 73
+          published_page: 69
+          table: '26'
+        - page: 75
+          pdf_page_index: 74
+          published_page: 70
+          table: '26'
+        - page: 76
+          pdf_page_index: 75
+          published_page: 71
+          table: '26'
+        - page: 77
+          pdf_page_index: 76
+          published_page: 72
+          table: '26'
+    - observation_id: wright_okamura_table_27_context
+      type: measured_table_context
+      locator: &id027
+        page: 78
+        pdf_page_index: 77
+        published_page: 73
+        table: '27'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: log fO2 (atm); V; °C; ft
+      values:
+        quantity_as_printed: 'Oxygen-fugacity profiles, Makaopuhi lava lake: printed log fO2 and emf by temperature
+          and depth'
+        method_class: measured_reduced
+        candidate_tokens:
+        - fugacity
+        disposition_reason: 'Context: fO2 is recorded as printed and never computed, but these profiles contain
+          conditions without an independent measured result quantity.'
+        page_locators:
+        - *id027
+        - page: 79
+          pdf_page_index: 78
+          published_page: 74
+          table: '27'
+    - observation_id: wright_okamura_table_28_context
+      type: measured_table_context
+      locator: &id028
+        page: 79
+        pdf_page_index: 78
+        published_page: 74
+        table: '28'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: ft
+      values:
+        quantity_as_printed: 'Altitudes obtained by leveling the surface of Makaopuhi: station elevations by survey
+          date'
+        method_class: measured_direct
+        candidate_tokens: []
+        disposition_reason: 'Context: no altitude/elevation quantity token exists.'
+        page_locators:
+        - *id028
+        - page: 80
+          pdf_page_index: 79
+          published_page: 75
+          table: '28'
+        - page: 81
+          pdf_page_index: 80
+          published_page: 76
+          table: '28'
+    - observation_id: wright_okamura_table_29_context
+      type: measured_table_context
+      locator: &id029
+        page: 82
+        pdf_page_index: 81
+        published_page: 77
+        table: '29'
+      phase: Makaopuhi lava-lake samples or observations, as specified by the table
+      units: ft
+      values:
+        quantity_as_printed: 'Altitudes and differences corrected for ground tilt: adjusted station elevations and
+          differences'
+        method_class: measured_reduced
+        candidate_tokens: []
+        disposition_reason: 'Context: adjusted elevation differences have no store quantity token.'
+        page_locators:
+        - *id029
+        - page: 83
+          pdf_page_index: 82
+          published_page: 78
+          table: '29'
+    - observation_id: wright_okamura_figure_01_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        figure: '1'
+        note: Physical PDF page; numeric figure values deferred.
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Geographic map labels and map scale as printed; no numeric graph axes.
+        caption: Index map of Kilauea lava lakes (modified from Peck and others, 1966). Craters, lava lakes, and
+          roads are shown as they existed prior to 1968. Eruptions beginning in February, 1969 crossed the Chain
+          of Craters Road in several places. The long Mauna Ulu eruption, centered between Aloi and Alae craters,
+          erupted lava that by the summer of 1974 had completely filled Aloi crater, Alae crater, and the west pit
+          of Makaopuhi crater. HM=Halemaumau crater. Black rectangle in inset indicates area covered by index map.
+        panel: whole figure; panels as stated in caption
+        series:
+        - Kilauea lava lakes and crater locations
+        marker_count_per_series:
+        - 0
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_02_deferred
+      type: figure_record
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: '2'
+        note: Physical PDF page; numeric figure values deferred.
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Photograph; no graph axes.
+        caption: Posteruption surface, Makaopuhi lava lake. Vertical photograph. The vent is to the left and the
+          diameter of the lake surface is about 365 m. Drainback rim surrounds the lake. The east wall of the craters
+          is in shadow. Part of the shallower east pit is shown at the far right. Surface features are labeled in
+          figure 3. The relatively smooth surface, marked by polygonal cracks and flow lines, formed following the
+          last crustal foundering episode on March 19, 1965. The elongate area in the right center and some smaller
+          areas near the vent are lower in altitude than the overturn crust surface and were the locus of the latest
+          ooze-outs on March 20. Darker areas are islands of crust; those associated with the low area to the right
+          are remnants of a pressure ridge that was formed during the first eruptive phase on March 5. Those at
+          the left are pieces of the vent rafted out on the lake surface.
+        panel: whole figure; panels as stated in caption
+        series:
+        - Makaopuhi post-eruption surface
+        marker_count_per_series:
+        - 0
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_03_deferred
+      type: figure_record
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: '3'
+        note: Physical PDF page; numeric figure values deferred.
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Map locations and level-station/drill-hole labels; no numeric graph axes.
+        caption: Index map showing surface features of Makaopuhi lava lake drawn from figure 2. Level stations are
+          numbered and shown as small solid dots (●). Drill holes, labeled in larger type, are shown as open circles
+          (○). Cross section shown in figure 4 is drawn approximately along the line connecting level stations 1
+          and 52.
+        panel: whole figure; panels as stated in caption
+        series:
+        - surface features, level stations, drill holes
+        marker_count_per_series:
+        - 0
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_04_deferred
+      type: figure_record
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: '4'
+        note: Physical PDF page; numeric figure values deferred.
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Schematic cross-section; horizontal and vertical scales are equal.
+        caption: Schematic cross section through the west pit, Makaopuhi crater. Horizontal = vertical scale. Line
+          of section goes through the vent and level station 1 (fig. 3.). The island near station 4 is projected
+          onto the section; its base is conjectured.
+        panel: whole figure; panels as stated in caption
+        series:
+        - crater/lake cross-section
+        marker_count_per_series:
+        - 0
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_05_deferred
+      type: figure_record
+      locator:
+        page: 10
+        pdf_page_index: 9
+        figure: '5'
+        note: Physical PDF page; numeric figure values deferred.
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Photographic panels A–B; no graph axes.
+        caption: Photographs of the tramway used to transport equipment from the rim to the crater floor in 1965–67.
+          A, Scale is given by the wooden box which is about 1 m long. A $\frac{3}{8}$ in. steel cable is fastened
+          at the upper end to an A-frame set in concrete and at the lower end to a chain wrapped around the island.
+          Equipment is lowered in a wooden box attached to a pulley running on the steel cable. A rope attached
+          to the box is reeled on a winch (left of A-frame) which in turn is connected by rope to a pulley attached
+          to the axle of a jeep, jacked up and blocked in position (not shown). B, The foreground shows the relatively
+          smooth surface of the lake near level station 5. The surface of the east pit of Makaopuhi crater (top
+          of photo) is underlain by four lava flows which in turn overlie the prehistoric Makaopuhi lava lake, distinguished
+          by prominent columnar jointing.
+        panel: whole figure; panels as stated in caption
+        series:
+        - tramway and lake surface photographs
+        marker_count_per_series:
+        - 0
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_06_deferred
+      type: figure_record
+      locator:
+        page: 11
+        pdf_page_index: 10
+        figure: '6'
+        note: Physical PDF page; numeric figure values deferred.
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Photographic panels A–B; no graph axes.
+        caption: Photographs of the tramway used to transport equipment from the rim to the floor in 1968–69. A,
+          The arrangement is similar to that shown in figure 5 but a higher A-frame and heavier cable were used.
+          B, Foreground shows equipment trailer, litter used to take equipment from tram to drill site, core box
+          (lower left) and sheathed thermocouple (center). Trail to get in and out of crater goes up the left side
+          of the talus in the background, thence up the ridge between the east and west pits, to the top.
+        panel: whole figure; panels as stated in caption
+        series:
+        - 1968–69 tramway equipment photographs
+        marker_count_per_series:
+        - 0
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_07_deferred
+      type: figure_record
+      locator:
+        page: 12
+        pdf_page_index: 11
+        figure: '7'
+        note: Physical PDF page; numeric figure values deferred.
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Photograph; no graph axes.
+        caption: Photograph of portable drilling rig used in 1965–66. Drill (left) is powered by a connected chain
+          saw motor (left hand) and drill is lowered and raised by a hydraulic feed (right hand). Coolant water
+          is pumped (right center) from two 50-gallon drums. Steam rises from the March 1965 vent area; main vent
+          is out of picture toward right background. Highest level of lava lake before drainback is recorded by
+          the "bathtub ring" in background.
+        panel: whole figure; panels as stated in caption
+        series:
+        - 1965–66 drilling rig photograph
+        marker_count_per_series:
+        - 0
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_08_deferred
+      type: figure_record
+      locator:
+        page: 12
+        pdf_page_index: 11
+        figure: '8'
+        note: Physical PDF page; numeric figure values deferred.
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Photographic panels A–B; no graph axes.
+        caption: Photographs of trailer-mounted drill rig used during 1968–69. A, A distant view showing the A-frame.
+          Water is brought from the rim by hose and stored in a child's swimming pool (foreground) from which it
+          is pumped to cool the drill string. B, A closer view of the drilling head. The water pump is shown in
+          the right background. Drilling was done using an NX core barrel and bits attached to an AX drill string.
+        panel: whole figure; panels as stated in caption
+        series:
+        - 1968–69 trailer-mounted drill-rig photographs
+        marker_count_per_series:
+        - 0
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_09_deferred
+      type: figure_record
+      locator:
+        page: 15
+        pdf_page_index: 14
+        figure: '9'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 10
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Photographic panels A–B; no graph axes.
+        caption: Photographs of field studies. A, Leveling on the surface of Alae lava lake. Zeiss level is shown
+          at left, 12 foot Invar rod at right. This equipment was also used throughout the study of Makaopuhi lava
+          lake. B, Measurement of oxygen fugacity. The oxygen probe sheathed in ceramic is attached to a hollow
+          stainless steel rod through which platinum leads are threaded. The leads are connected to an electrometer
+          (lower right) from which the emf is read.
+        panel: whole figure; panels as stated in caption
+        series:
+        - leveling equipment photograph
+        - oxygen-fugacity probe photograph
+        marker_count_per_series:
+        - 0
+        - 0
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_10_deferred
+      type: figure_record
+      locator:
+        page: 16
+        pdf_page_index: 15
+        figure: '10'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 11
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Square root of time (days) and depth below lake surface (ft); isotherms in °C, with cumulative
+          rainfall in a lower panel.
+        caption: Isotherms plotted as a function of square root of time $\sqrt{t}$ (days) and depth below lava-lake
+          surface. Isotherms are dashed where interpolated. Data used to construct the figure are given in tables
+          2–5. Plotted below, at the same square root of time scale, is the cumulative rainfall that fell on the
+          lake surface. The inset (lower left) shows all measurements made at least 2 weeks after drilling for three
+          different isotherms. Single temperature profiles are reproducible within 5°C; most of the scatter represents
+          real temperature differences between drill holes.
+        panel: whole figure; panels as stated in caption
+        series:
+        - isotherm contours
+        - cumulative rainfall
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_11_deferred
+      type: figure_record
+      locator:
+        page: 23
+        pdf_page_index: 22
+        figure: '11'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 18
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: oxygen fugacity profile
+        method_class: figure_only
+        species: Fe
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: log fO2 versus 10^4/T (K^-1); temperature scale in °C.
+        caption: Log fO2 plotted against reciprocal absolute temperature for profiles obtained in 11 drill holes.
+          Panels A–H identify drill-hole profiles; measurements used an oxygen probe, with profile dates and symbols
+          as printed. The caption states that profiles are compared with QFM, Ni–NiO, and H–M buffers.
+        panel: panels/series as stated in caption
+        series:
+        - oxygen-probe profiles for drill holes 6, 8, 9, 10, 11, 14, 16, 17, 20, 21, and 24
+        - QFM buffer
+        - Ni–NiO buffer
+        - hematite–magnetite buffer
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_12_deferred
+      type: figure_record
+      locator:
+        page: 26
+        pdf_page_index: 25
+        figure: '12'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 21
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Map contours of elevation change over time intervals; geographic map coordinates and contour
+          legend as printed.
+        caption: Contoured elevation changes on the surface of Makaopuhi lava lake. A, 7/26 to 9/8/65. B, 9/8 to
+          10/20/65. C, 10/20 to 12/22/65. D, 12/22/65 to 3/7/66. E, 3/7 to 5/18/66. F, 5/18 to 8/9/66. G, 8/9 to
+          10/31/66. H, 10/31/66 to 1/31/67. I, 1/31 to 5/31/67. J, 5/31 to 10/2/67. K, 10/2/67 to 1/29/68. L, 1/29
+          to 7/10/68. M, 7/10 to 12/11/68. Base map is taken from figure 3 and shows only the outlines of physical
+          features on the lake. Surface contouring was done after converting the altitude differences for each station
+          (table 28 and 29) to a rate by dividing each difference by the difference in square root of time (days)
+          for each leveling period. This is done to reduce the effect of the changing crustal growth rate and instead
+          emphasize changes between level maps that result from density contrast between melt and the crust forming
+          from it.
+        panel: panels/series as stated in caption
+        series:
+        - elevation-change contour panels A–M
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_13_deferred
+      type: figure_record
+      locator:
+        page: 29
+        pdf_page_index: 28
+        figure: '13'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 24
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Map/station altitude changes in ft; tilt-vector orientation and magnitude in microradians.
+        caption: Tilting of the Makaopuhi lava lake surface. A, 12/25/65 to 3/7/66. B, 7/10/68 to 12/11/68. Altitude
+          changes (ft) are plotted for edge stations that should have showed no change over the period. Orientation
+          and magnitude (in microradians ( $\mu$ r)) of the tilt vector are determined at right angles to the approximate
+          azimuth of "O" change. Map base is the same as figure 12. Larger dots represent station locations whose
+          numbers are adjacent.
+        panel: panels/series as stated in caption
+        series:
+        - edge-station elevation changes
+        - tilt vectors
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_14_deferred
+      type: figure_record
+      locator:
+        page: 30
+        pdf_page_index: 29
+        figure: '14'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 25
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Volume rate of subsidence or uplift versus square root of time (days).
+        caption: Volume rate of subsidence or uplift of the lava surface plotted against square root of time. Volumes
+          are calculated by computer for the area enclosed by a dashed line in figure 12. Differences in the values,
+          for different time periods, are caused by variable crustal growth rate (fig. 10), changes in vesicularity
+          (fig. 21) as a reflection of changes in crust/melt density ratios, and possible irregular behavior of
+          different parts of the lava lake. Further discussion and interpretation are given in the text.
+        panel: whole figure; panels as stated in caption
+        series:
+        - volume rate by interval
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_15_deferred
+      type: figure_record
+      locator:
+        page: 36
+        pdf_page_index: 35
+        figure: '15'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 31
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Oxide weight-percent variation diagrams against MgO weight percent; panel labels name the
+          oxide and sample series.
+        caption: MgO variation diagrams, Makaopuhi lava lake plotted in weight percent. Symbols are explained in
+          the MgO-TiO₂ Box. O1=olivine; aug=augite; plag=plagioclase; ilm=ilmenite. The dashed line is the liquid
+          line of descent for Alae lava lake (Wright and Fiske, 1971, fig. 4). Plotted samples include all core
+          and melt samples from drill holes 68-1 and 68-2 (table 11), pumice and melt samples collected during the
+          eruption (table 10A), and all segregation veins (table 10D). Most of the 1965-66 drill core (tables 10C)
+          would plot at MgO contents greater than 7.5 percent with values of other oxides that fall within the scatter
+          shown for the later drill core and eruption samples. These are not shown to avoid overcrowding of data
+          points. Many melt samples (table 9, 10B) are contaminated from being collected in drilling steel or stainless
+          steel. They would plot with slightly higher values of "FeO"/MgO than the samples shown. These are also
+          not plotted.
+        panel: panels/series as stated in caption
+        series:
+        - oxide-composition samples by MgO
+        - Alae liquid line of descent
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_16_deferred
+      type: figure_record
+      locator:
+        page: 39
+        pdf_page_index: 38
+        figure: '16'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 34
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Weight percent minerals versus percent glass; interpolated temperature is shown on the
+          vertical axis.
+        caption: Modal data (transmitted light—Table 13) plotted as percent minerals versus percent glass. Temperatures
+          from Figure 17 are interpolated on the vertical axis. Data are converted to weight percent and compared
+          with theoretical curves that pass through the mode calculated from bulk chemistry (Table 14).
+        panel: panels/series as stated in caption
+        series:
+        - modal mineral points
+        - glass percentage
+        - theoretical curves
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_17_deferred
+      type: figure_record
+      locator:
+        page: 40
+        pdf_page_index: 39
+        figure: '17'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 35
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Percent glass versus collection temperature (°C).
+        caption: Percent glass plotted against collection temperature. This is an updated version of figure 12 of
+          Wright, Kinoshita, and Peck (1968). Length of bars show uncertainties in both temperature and modal composition.
+          All samples used to define curve were collected above 8.5 m depth and were neither contaminated nor flow-differentiated.
+          Liquidus is estimated from the MgO/FeO ratio (Tilley, and others, 1964; see also Wright and others, 1968,
+          table 5), and solidus is drawn where residual glass content becomes approximately constant. The interface
+          between crust and melt is defined from the drilling to be at a temperature of 1,070°C (fig. 10). Crystallization
+          rate (percent crystallization per unit drop in temperature) is higher near the interface than at temperatures
+          closer to either solidus or liquidus.
+        panel: panels/series as stated in caption
+        series:
+        - glass percentage samples
+        - estimated liquidus and solidus/interface reference lines
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_18_deferred
+      type: figure_record
+      locator:
+        page: 40
+        pdf_page_index: 39
+        figure: '18'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 35
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Weight percent minerals versus temperature (°C).
+        caption: Weight-percent minerals plotted against temperature. These are the solid lines of figure 16 plotted
+          with temperature instead of glass content as the ordinate. This figure emphasizes, as does figure 17,
+          the increased rates of crystallization across the crust-melt interface.
+        panel: panels/series as stated in caption
+        series:
+        - weight-percent mineral series
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_19_deferred
+      type: figure_record
+      locator:
+        page: 42
+        pdf_page_index: 41
+        figure: '19'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 37
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Depth in drill holes (ft or m as marked) and distribution/abundance of olivine crystals
+          >1 mm; MgO comparison as annotated.
+        caption: Schematic distribution of large (>1 mm diam) olivine crystals in drill holes 68–1 and 68–2. Note
+          the different distribution in the two drill holes and the correlation between MgO content and the incidence
+          of large olivine. Samples below 8.5 m depth are flow differentiated (fig. 22).
+        panel: whole figure; panels as stated in caption
+        series:
+        - large olivine crystal distributions in drill holes 68–1 and 68–2
+        - MgO comparison
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_20_deferred
+      type: figure_record
+      locator:
+        page: 44
+        pdf_page_index: 43
+        figure: '20'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 39
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Median volumes of augite, plagioclase, ilmenite, and vesicles versus depth; vesicles use
+          a different scale.
+        caption: Median volumes of augite, plagioclase, ilmenite, and vesicles plotted against depth (note different
+          scale for vesicles). Data are given in table 19, calculated from grain size data given in table 18. Grain
+          size is nearly constant between 1.8 m and 6.1 m. Between 1.8 m and the surface, the core shows increasing
+          amounts of devitrified glass and fine-grained quench intergrowths of the mineral phases. Below 6.1 m,
+          grain size increases and reaches a maximum in partially molten core collected at 13.4–14.0 m. Grain size
+          decreases below 14.0 m correlated with decreasing crystallinity of the partially molten samples.
+        panel: whole figure; panels as stated in caption
+        series:
+        - median augite volume
+        - median plagioclase volume
+        - median ilmenite volume
+        - median vesicle volume
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_21_deferred
+      type: figure_record
+      locator:
+        page: 45
+        pdf_page_index: 44
+        figure: '21'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 40
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Bulk density versus depth for 1-cm and 6-cm drill core.
+        caption: Bulk density of drill core plotted against depth. The left-hand plot compares the density of 1-cm
+          drill core collected in 1965–66 with that of 6-cm drill core collected from drill hole 68–1 in 1968. The
+          incidence of large vesicles and vesicular zones recovered in the larger core explains the somewhat lower
+          bulk density of this core at similar depths compared with the 1-cm core where only the denser pieces were
+          recovered.
+        panel: whole figure; panels as stated in caption
+        series:
+        - 1-cm drill core density
+        - 6-cm drill core density
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_22_deferred
+      type: figure_record
+      locator:
+        page: 46
+        pdf_page_index: 45
+        figure: '22'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 41
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Differentiation calculation panels; axes and oxide labels are printed on the plots.
+        caption: Results of differentiation calculations, Makaopuhi lava lake. The following mixing equation was
+          solved by the method of Wright and Doherty, 1970) for each sample collected in 1968. (Chemical analyses
+          are given in table 11 and plotted in figure 15.)
+        panel: panels/series as stated in caption
+        series:
+        - differentiation calculation series
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_23_deferred
+      type: figure_record
+      locator:
+        page: 47
+        pdf_page_index: 46
+        figure: '23'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 42
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Mineral composition and weight-percent mineral-loss calculations versus amount of differentiation;
+          axes are printed on each panel.
+        caption: Results of differentiation calculations, Makaopuhi lava lake. A, Composition of minerals removed
+          as a function of amount of differentiation (see mixing equation in caption for fig. 22). The squares represent
+          the results of calculations that assume regular increase in Fe/Mg ratio of olivine with increased amount
+          of differentiation; Fe/Mg ratios of augite are determined by calculation and scatter widely. The dots
+          represent the results of calculations that assume a regular increase of Fe/Mg ratio of augite with increased
+          amount of differentiation; Fe/Mg ratios of olivine are determined by calculation and scatter widely. Plagioclase
+          compositions are obtained by calculation and show slight differences related to assumptions regarding
+          composition of mafic phases. Triangles represent selected points on the curves of weight percent mineral
+          plotted against weight percent glass calculated from modal data of undifferentiated samples (fig. 16).
+          B, Weight percent of olivine, augite, and plagioclase lost as a function of the amount of differentiation
+          (refer to mixing equation in caption for fig. 22). Coefficients b (olivine), c (augite), and d (plagioclase)
+          are plotted against a (amount of differentiate). Symbols as in A. The calculated amounts of crystallizing
+          phases are little affected by assumptions regarding composition of augite and olivine (see above). There
+          is a break at about 87 percent glass where both the absolute amount of the rate of crystallization of
+          augite and plagioclase increase at the expense of olivine.
+        panel: panels/series as stated in caption
+        series:
+        - calculated olivine
+        - calculated augite
+        - calculated plagioclase
+        - mineral loss coefficients
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_24_deferred
+      type: figure_record
+      locator:
+        page: 55
+        pdf_page_index: 54
+        figure: '24'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 50
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Photographic panels A–D; depth intervals are labeled in feet; no graph axes.
+        caption: Photographs of drill core for 68–1. A, 0–14.4 ft. B, 14.4–28.8 ft. C, 28.8–54.0 ft. D, Bags containing
+          shattered glass (quenched melt) that came out around the drill hole collar while drilling between about
+          44 ft and 57 ft.
+        panel: whole figure; panels as stated in caption
+        series:
+        - drill-core photographs, panels A–D
+        marker_count_per_series:
+        - 0
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_25_deferred
+      type: figure_record
+      locator:
+        page: 56
+        pdf_page_index: 55
+        figure: '25'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 51
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Photographic panels A–C; depth intervals are labeled in feet; no graph axes.
+        caption: Photographs of drill core for 68-2. A, 0-17.0 ft. B, 17.0-33.0 ft. C, 33.0-52.0 ft.
+        panel: whole figure; panels as stated in caption
+        series:
+        - drill-core photographs, panels A–C
+        marker_count_per_series:
+        - 0
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_26_deferred
+      type: figure_record
+      locator:
+        page: 57
+        pdf_page_index: 56
+        figure: '26'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 52
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: figure-only plotted, mapped, or photographic data
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Photographic panels A–D; depth intervals are labeled in feet; no graph axes.
+        caption: Photographs of drill core for 69–1. A, 0–23.0 ft. B, 23.0–41.0 ft. C, 41.0–56.0 ft. D, Core barrel
+          filled with glass (quenched melt) collected at approximately 61–66 ft.
+        panel: whole figure; panels as stated in caption
+        series:
+        - drill-core photographs, panels A–D
+        marker_count_per_series:
+        - 0
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_27_deferred
+      type: figure_record
+      locator:
+        page: 58
+        pdf_page_index: 57
+        figure: '27'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 53
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: temperature profile
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Temperature (°C) versus depth (ft) for panels A–S.
+        caption: Uncorrected temperature profiles. A, DH 3. B, DH 4. C, DH 5. D, DH 6. E, DH 8. F, DH 9. G, DH 10.
+          H, DH 11. I, DH 12. J, DH 13, 14, and 16. K, DH 17. L, DH 20. M, DH 21. N, DH 22. O, DH 23. P, DH 23 uncorrected.
+          Q, DH 24. R, DH 24 uncorrected. S, DH 68–1. Temperature in °C, depth in feet. Each profile is represented
+          by a simple set of symbols.
+        panel: panels/series as stated in caption
+        series:
+        - temperature profiles by drill-hole panel A–S
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+    - observation_id: wright_okamura_figure_28_deferred
+      type: figure_record
+      locator:
+        page: 62
+        pdf_page_index: 61
+        figure: '28'
+        note: Physical PDF page; numeric figure values deferred.
+        published_page: 57
+      phase: Makaopuhi lava-lake samples or field observations, as stated in the caption
+      units: as printed in the figure axes
+      values:
+        quantity_as_printed: temperature profile
+        method_class: figure_only
+        species: SiO2
+        phase_as_printed: field measurements, lake surface, samples, or equipment as named in the caption
+        temperature_as_printed: axes or panels as stated in the caption; no single point temperature
+        axes_as_printed: Temperature (°C) versus depth (ft) for panels A–K.
+        caption: Temperature profiles for DH 23 with correction for thermocouple contamination. A, 2/14/66. B, 2/18/66.
+          C, 2/23/66. D, 3/1/66. E, 3/3/66. F, 3/8/66. G, 3/22/66. H, 3/28/66. I, 4/4/66. J, 4/25/66. K, 5/6/66.
+          Temperature in °C, depth in feet.
+        panel: panels/series as stated in caption
+        series:
+        - corrected temperature profiles by date, panels A–K
+        marker_count_per_series:
+        - 'not enumerated: the figure caption does not give a marker count'
+        attribution_as_printed: Wright and Okamura (1977), USGS Professional Paper 1004; method cited in caption
+          retained where stated.
+        digitisation: deferred to a figure pass
+  Al2O3:
+    observations:
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r04_c02
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $Al_{2}O_{3}$
+        column_header: Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '12.6'
+        component_as_published: Al2O3
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-7
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r04_c03
+      type: equilibrium_phase_composition
+      locator: &id031
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $Al_{2}O_{3}$
+        column_header: Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '12.6'
+        component_as_published: Al2O3
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-14
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r04_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $Al_{2}O_{3}$
+        column_header: Alae lava lake A12-9(probe) $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '11.9'
+        component_as_published: Al2O3
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: A12-9
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_table11_69_1_22_al2o3
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: Al2O3
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '12.97'
+        component_as_published: Al2O3
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  FeO:
+    observations:
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r05_c02
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: FeO
+        column_header: Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '.76'
+        component_as_published: FeO
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-7
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r05_c03
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: FeO
+        column_header: Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '1.64'
+        component_as_published: FeO
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-14
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r05_c04
+      type: equilibrium_phase_composition
+      locator: &id032
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: FeO
+        column_header: Alae lava lake A12-9(probe) $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '1.1'
+        component_as_published: FeO
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: A12-9
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_table11_69_1_22_feo
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: FeO
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '11.70'
+        component_as_published: FeO
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  MgO:
+    observations:
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r06_c02
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: MgO
+        column_header: Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '.03'
+        component_as_published: MgO
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-7
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r06_c03
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: MgO
+        column_header: Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '.05'
+        component_as_published: MgO
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-14
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r06_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: MgO
+        column_header: Alae lava lake A12-9(probe) $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '.05'
+        component_as_published: MgO
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: A12-9
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_table11_69_1_22_mgo
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: MgO
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '5.18'
+        component_as_published: MgO
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  CaO:
+    observations:
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r07_c02
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: CaO
+        column_header: Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '.40'
+        component_as_published: CaO
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-7
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r07_c03
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: CaO
+        column_header: Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '.43'
+        component_as_published: CaO
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-14
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r07_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: CaO
+        column_header: Alae lava lake A12-9(probe) $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '.54'
+        component_as_published: CaO
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: A12-9
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_table11_69_1_22_cao
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: CaO
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '9.38'
+        component_as_published: CaO
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  Na2O:
+    observations:
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r08_c02
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $Na_{2}O$
+        column_header: Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '3.25'
+        component_as_published: Na2O
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-7
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r08_c03
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $Na_{2}O$
+        column_header: Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '3.44'
+        component_as_published: Na2O
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-14
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r08_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $Na_{2}O$
+        column_header: Alae lava lake A12-9(probe) $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '3.37'
+        component_as_published: Na2O
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: A12-9
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_table11_69_1_22_na2o
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: Na2O
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '2.73'
+        component_as_published: Na2O
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  K2O:
+    observations:
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r09_c02
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $K_{2}O$
+        column_header: Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '5.82'
+        component_as_published: K2O
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-7
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r09_c03
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $K_{2}O$
+        column_header: Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '5.64'
+        component_as_published: K2O
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-14
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r09_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $K_{2}O$
+        column_header: Alae lava lake A12-9(probe) $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '5.99'
+        component_as_published: K2O
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: A12-9
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_table11_69_1_22_k2o
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: K2O
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '0.80'
+        component_as_published: K2O
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  TiO2:
+    observations:
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r10_c02
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $TiO_{2}$
+        column_header: Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '.45'
+        component_as_published: TiO2
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-7
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r10_c03
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $TiO_{2}$
+        column_header: Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '.33'
+        component_as_published: TiO2
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: 68-1-14
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_1977_makaopuhi_cooling_p042_t32_r10_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 42
+        pdf_page_index: 41
+        table: '17'
+        row_label: $TiO_{2}$
+        column_header: Alae lava lake A12-9(probe) $^{1}$
+        published_page: 37
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '.24'
+        component_as_published: TiO2
+        basis_as_published: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+        sample_id_as_published: A12-9
+        phase_as_published: glass
+      phase: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: No temperature of the glass analyses is printed.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 42
+            pdf_page_index: 41
+            published_page: 37
+            table: '17'
+            note: The table does not state the quench history of the analyzed glass.
+      phase_as_published: glass
+    - observation_id: wright_okamura_table11_69_1_22_tio2
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: TiO2
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '3.89'
+        component_as_published: TiO2
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  Fe2O3:
+    observations:
+    - observation_id: wright_okamura_table11_69_1_22_fe2o3
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: Fe2O3
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '1.65'
+        component_as_published: Fe2O3
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  H2O:
+    observations:
+    - observation_id: wright_okamura_table11_69_1_22_h2o
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: H2O
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '0.12'
+        component_as_published: H2O
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  P2O5:
+    observations:
+    - observation_id: wright_okamura_table11_69_1_22_p2o5
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: P2O5
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '0.41'
+        component_as_published: P2O5
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  MnO:
+    observations:
+    - observation_id: wright_okamura_table11_69_1_22_mno
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: MnO
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '0.20'
+        component_as_published: MnO
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  CO2:
+    observations:
+    - observation_id: wright_okamura_table11_69_1_22_co2
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: CO2
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '0.0'
+        component_as_published: CO2
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  Cl:
+    observations:
+    - observation_id: wright_okamura_table11_69_1_22_cl
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: Cl
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '0.03'
+        component_as_published: Cl
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  F:
+    observations:
+    - observation_id: wright_okamura_table11_69_1_22_f
+      type: equilibrium_phase_composition
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: F
+        column_header: 69-1-22
+      units: wt% as printed
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        value: '0.06'
+        component_as_published: F
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+        basis_as_published: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the
+          core barrel; wt% as printed.
+        temperature_as_printed: 1,080–1,100? °C (Table 9); retained as a range, not a point.
+      phase: glass
+      phase_as_published: glass
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+  Fe:
+    observations:
+    - observation_id: wright_okamura_table11_69_1_22_fe_valence_ratio
+      type: concentration_series
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 28
+        table: '11'
+        row_label: .9 Fe2O3
+        column_header: 69-1-22
+        note: The denominator is printed on the following row as .9 Fe2O3 + FeO.
+      phase: glass
+      phase_as_published: glass
+      units: fraction as printed
+      quench_note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+        stated.
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        value: '.122'
+        value_as_published: '.122'
+        basis_as_printed: .9 Fe2O3/(.9 Fe2O3 + FeO)
+        sample_id_as_published: 69-1-22
+        phase_as_published: glass
+        sample_type_as_printed: Melt in core barrel
+        glass_status_as_printed: glass (quenched melt)
+      point_conditions:
+        T_C:
+          state:
+            tag: unknown
+            reason: range_not_point
+          locator:
+            page: 31
+            pdf_page_index: 30
+            published_page: 26
+            table: '9'
+            row: 69-1-22
+            column: temperature of collection
+            note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 57
+            pdf_page_index: 56
+            published_page: 52
+            figure: '26'
+            panel: D
+            row: 69-1-22
+            note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not
+              stated.
+      derived_from:
+      - wright_okamura_table11_69_1_22_fe2o3
+      - wright_okamura_table11_69_1_22_feo
+      derivation:
+        relation: Printed .9 Fe2O3/(.9 Fe2O3 + FeO) oxidation ratio; retained as printed without recalculation.
+        inputs:
+        - wright_okamura_table11_69_1_22_fe2o3
+        - wright_okamura_table11_69_1_22_feo
+        output_unit: fraction
+notes:
+- 'Duplicate check: the corpus PDF title page identifies Wright and Okamura (1977), USGS Professional Paper 1004;
+  no DOI is printed. No extract with this title, author-year, or source stem was found in the candidate extracts
+  or review branches.'
+- Table 17 first three columns are footnoted electron-microprobe analyses by R. T. Helz and explicitly report residual
+  glass. The fourth column, A12-1011 (wet chemical), is recalculated from four impure separates after feldspar and
+  apatite correction; its derived values are recorded in context pending their source inputs.
+- 'Tables 10–12 follow the controller ruling: type only explicitly single-phase glass compositions; pumice, core, segregation-vein, and ambiguous melt-in-bit bulk analyses stay in context. Table 10A samples M1-1G/M-3/M-8/M-12/M-18/M-22 are multiphase whole-sample bulk and remain in context; Table 11 sample 69-1-22 and Table 17 residual-glass columns are typed.'
+- Table 9 reports sample-specific collection temperatures, frequently as approximate values or ranges. They are
+  not promoted to a point temperature on Table 17 observations, whose temperature is not printed.
+- Table 27 prints oxygen-fugacity profiles. fO2 is a condition; no value has been computed. The condition-only profile
+  table is retained in context because no separate measured result anchors it.
+fidelity_samples:
+- path: species.SiO2.observations[wright_okamura_1977_makaopuhi_cooling_p042_t32_r03_c02].values.value
+  value: '75.0'
+  locator: *id030
+- path: species.Al2O3.observations[wright_okamura_1977_makaopuhi_cooling_p042_t32_r04_c03].values.value
+  value: '12.6'
+  locator: *id031
+- path: species.FeO.observations[wright_okamura_1977_makaopuhi_cooling_p042_t32_r05_c04].values.value
+  value: '1.1'
+  locator: *id032

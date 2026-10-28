@@ -46,9 +46,14 @@ from web.events import _completion_payload
 def _sim(feedstocks, setpoints=None):
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    resolved_setpoints = {
+        "campaigns": {},
+        "chemistry_kernel": {"liquid_fraction_provider": "analytical"},
+    }
+    resolved_setpoints.update(setpoints or {})
     return PyrolysisSimulator(
         backend,
-        setpoints if setpoints is not None else {"campaigns": {}},
+        resolved_setpoints,
         feedstocks,
         {"metals": {}, "oxide_vapors": {}},
     )
@@ -356,13 +361,14 @@ def test_c5_branch_one_rump_expectation_honors_c5_targets():
         {
             "oxide": {
                 "label": "Oxide",
-                "composition_wt_pct": {"CaO": 100.0},
+                "composition_wt_pct": {"CaO": 50.0, "SiO2": 50.0},
             }
         },
         setpoints=_campaign_pressure_setpoints("C5"),
     )
     sim.setpoints["campaigns"]["C5"]["c5_targets"] = ["Ca"]
-    sim.load_batch("oxide", mass_kg=10.0)
+    # Keep the original 10 kg CaO target and a silicate rump for the declared gate.
+    sim.load_batch("oxide", mass_kg=20.0)
     _enable_c5_mre(sim, target_species="CaO", max_voltage_V=2.5)
     sim.record.branch = "one"
     sim.start_campaign(CampaignPhase.C5)
@@ -398,6 +404,7 @@ def test_c5_branch_one_rump_expectation_honors_c5_targets():
     diagnostic = sim._rump_expectation_diagnostic(CampaignPhase.C5)
 
     assert "Ca" not in diagnostic["actual_rump_elements_kg"]
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt")["SiO2"] == pytest.approx(10.0)
     assert diagnostic["targeted_rump_elements"] == ["Ca"]
     assert diagnostic["missing_expected_rump_elements"] == []
 

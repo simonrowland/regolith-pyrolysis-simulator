@@ -1,0 +1,240 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0036024417020303
+  citation: 'Shornikov, S. I. (2017). Thermodynamic Properties of Spinel MgAl2O4: A Mass Spectrometric Study. Russian Journal
+    of Physical Chemistry A, 91(2), 287–294.'
+  source_ids:
+  - shornikov-2017-spinel-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:shornikov-2017-spinel-thermodynamics
+      role: pdf
+      path: raw/shornikov-2017-spinel-thermodynamics/shornikov-2017-spinel-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: 91452e537c56932b76579f39a97c596f33cf1bf20aedf0cea3945828b3f927f3
+    - asset_id: pdftotext:shornikov-2017-spinel-thermodynamics
+      role: pdftotext
+      path: text/shornikov-2017-spinel-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shornikov-2017-spinel-thermodynamics
+      role: table_csv
+      path: tables/shornikov-2017-spinel-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:shornikov-2017-spinel-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s0036024417020303
+experiments:
+- experiment_id: 10.1134/s0036024417020303::experiment::shornikov_2017_spinel_thermodynamics_kems
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0036024417020303
+  locator:
+    page: 4
+    published_page: 290
+    pdf_page_index: 3
+    section: INTRODUCTION
+    note: Final introductory paragraph. Stoichiometric spinel was studied by Knudsen effusion mass spectrometry at 1850–2300
+      K. Experimental details of the apparatuses are described in reference [52]. This paper does not restate the cell metal.
+context:
+- observation_id: shornikov_2017_spinel_thermodynamics_fig1_heat_capacity
+  type: figure_context_not_digitised
+  locator:
+    page: 1
+    published_page: 287
+    pdf_page_index: 0
+    figure: '1'
+    note: Literature heat capacity of spinel. Not this paper's measurements.
+  units: as printed
+  values:
+    status: context_only
+    reason: Figure 1 compares published heat-capacity curves. No point was read.
+  context_id: shornikov-2017-spinel-thermodynamics::context::shornikov_2017_spinel_thermodynamics_fig1_heat_capacity
+  work_id: 10.1134/s0036024417020303
+  source_id: shornikov-2017-spinel-thermodynamics
+  species: MgAl2O4
+- observation_id: shornikov_2017_spinel_thermodynamics_fig2_delta_g
+  type: figure_context_not_digitised
+  locator:
+    page: 3
+    published_page: 289
+    pdf_page_index: 2
+    figure: '2'
+    note: ΔG_T of spinel formation from simple oxides. Series 16 is this study. Series 13 and 15 lie on the same trend.
+  units: kJ/mol
+  values:
+    status: context_only
+    reason: 'Series 16 is the open right-pointing triangle. Nine centres are stored. The 1863 K centre is crop (1477.4, 958.6):
+      the fit line passes below it and the centre stays in the open interior. The 1950 K centre is crop (1576.4, 1002.1),
+      in the open interior. The 2210 K and 2252 K markers were re-read on the 1200 dpi render. A crossing outline is not by
+      itself a reason to refuse. Refused, each by the symbol the render shows. About 1310–1439 K, crop x 847–994 and y 974–1044:
+      open and filled squares, not series 16. About 1620–1840 K, crop x 1200–1450: up-triangles, open and half-filled, not
+      series 16. The marker at crop (1368, 858), about 1767 K, is a right-pointing triangle with the lower half filled, not
+      an up-triangle and not series 16. The open right triangle at the right edge of that band is the stored 1863 K point.
+      Above that chain the symbol is a filled right triangle, series 13, not series 16. Legend symbols near crop x 2078 are
+      not data. Error-bar ends were not read. The least-squares constants of this series are Table 1. MinerU''s chart table
+      was ignored.'
+  context_id: shornikov-2017-spinel-thermodynamics::context::shornikov_2017_spinel_thermodynamics_fig2_delta_g
+  work_id: 10.1134/s0036024417020303
+  source_id: shornikov-2017-spinel-thermodynamics
+  species: MgAl2O4
+- observation_id: shornikov_2017_spinel_thermodynamics_fig3_pressures
+  type: figure_context_not_digitised
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '3'
+    note: 'Caption: partial pressures of the gas over spinel, reference [1].'
+  units: atm
+  values:
+    status: context_only
+    reason: PDF page 7, published page 293, prints reference [1] as "S. I. Shornikov, Zh. Fiz. Khim. 90 (2016, in press)."
+      The body on PDF page 5 says the Figure 3 pressures are Knudsen effusion mass spectrometry over spinel at 1851–2089 K
+      [1]. That span matches the evaporation paper's Table 2, so the identity with shornikov-2017-spinel-evaporation is an
+      inference, not the citation this paper prints. Figure 3 is not re-extracted.
+  context_id: shornikov-2017-spinel-thermodynamics::context::shornikov_2017_spinel_thermodynamics_fig3_pressures
+  work_id: 10.1134/s0036024417020303
+  source_id: shornikov-2017-spinel-thermodynamics
+  species: MgAl2O4
+- observation_id: shornikov_2017_spinel_thermodynamics_fig4_activities
+  type: figure_context_not_digitised
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '4'
+    equation: 12-13
+    note: Activities of MgO (panel a) and Al2O3 (panel b). Series 8 is this work. Series 5, 6, and 7 are earlier KEMS studies.
+  units: dimensionless
+  values:
+    status: context_only
+    standard_state_as_printed: where p_i and p_i° are the partial pressures of the components of the gas phase over spinel
+      and simple oxide (pure component), respectively.
+    reference_phase: The paper does not state whether that pure-component simple oxide is solid or liquid, and it does not
+      state the temperature of the reference-pressure measurement. The pure-oxide-at-experiment-T ruling was not applied.
+      No melting point was used.
+    reason: 'Series 8 is the open right-pointing triangle with one left stroke. A series 5 or 6 bar is the vertical stroke
+      that extends past the triangle. Two left strokes that join at the corners are not that open triangle. Seven centres
+      on panel (a) and seven on panel (b) are the activity observations. Refused on panel (a), one marker at a time. About
+      1425 K, crop (286, 741): up-triangle, series 1-4. About 1522 K, crop (465, 692): up-triangle, series 1-4. About 1576
+      K, crop (565, 631): up-triangle, series 1-4. About 1672 K, crop (741, 751): up-triangle, series 1-4. About 1861 K, crop
+      (1090.5, 1132.5): two left strokes. At 1200 dpi the white gap is 20 px (10 px at 600 dpi) and the strokes join for 8
+      rows at the top and 8 rows at the bottom. That is not the single left stroke of an open series-8 triangle. About 1643
+      K, crop (688, 1318): up-triangle, series 1-4. About 1692 K, crop (779, 1272): up-triangle, series 1-4. About 1742 K,
+      crop (870, 1304): up-triangle, series 1-4. About 1789 K, crop (958, 1288): up-triangle, series 1-4. About 1843 K, crop
+      (1057, 1263): two up-triangles, series 1-4. About 1873 K, crop (1111, 1250): up-triangles and a right-pointing outline
+      are one mass, so no open centre is assigned. About 1933 K, crop (1222, 1098), and about 1944 K, crop (1242, 1103): the
+      white gaps are 10 to 15 px wide and run into a filled triangle, so they are not a series-8 interior. About 1954 K, crop
+      (1261, 1090): filled right triangle, series 7. About 1980 K, crop (1310, 1013): the bar extends past the triangle, series
+      5 or 6. About 1988 K, crop (1323, 1082): the white region is about 20 px wide and sits on the filled triangle''s tip,
+      so no series-8 centre is there. About 2042 K, crop (1424, 880): the bar extends past the triangle and a horizontal stroke
+      crosses it, series 5 or 6. About 2080 K, crop (1460, 980): the bar extends past the triangle, series 5 or 6. About 2101
+      K, crop (1532.0, 1044.5): two left strokes on this glyph. At 1200 dpi the white gap is 20 px and the strokes join for
+      4 rows at the top and 4 rows at the bottom, the same pattern as 1861 K and 2103 K. The marker above is a separate glyph.
+      About 2174 K, crop (1666, 944): the bar extends past the triangle, series 5 or 6. About 2274 K, crop (1852, 906): the
+      bar extends past the triangle, series 5 or 6. The open triangle at crop (1633, 799) is the legend key. Refused on panel
+      (b). About 1423 K, crop (283, 2527): up-triangle, series 1-4. About 1471 K, crop (370, 2642): up-triangle, series 1-4.
+      About 1520 K, crop (462, 2669): up-triangle, series 1-4. About 1521 K, crop (464, 2615): up-triangle, series 1-4. About
+      1571 K, crop (555, 2658): up-triangle, series 1-4. About 1576 K, crop (564, 2607): up-triangle, series 1-4. About 1619
+      K, crop (643, 2642): up-triangle, series 1-4. About 1627 K, crop (658, 2675): up-triangle, series 1-4. About 1671 K,
+      crops (740, 2587), (740, 2628) and (740, 2669): three up-triangles, series 1-4. About 1772 K, crop (926, 2371): up-triangle
+      with the upper half filled, not series 8. About 1843 K, crop (1057, 2168): up-triangle, series 1-4. About 1850 K, crop
+      (1080, 2280): an up-triangle and a right triangle are one mass, so no open centre is assigned. About 1955 K, crop (1263,
+      2157): the right triangle is filled on its left half, so the centre is not an open series-8 interior. About 2053 K,
+      crop (1443, 2321): filled right triangle, series 7. About 2103 K, crop (1535.5, 2329.5): two left strokes, the same
+      pattern as the 1861 K panel-(a) glyph. At 1200 dpi the white gap is 20 px (10 px at 600 dpi) and the strokes join for
+      4 rows at the top and 4 rows at the bottom. The 2162 K series-8 triangle on this panel has one left stroke. The 2174
+      K panel-(a) glyph is the bar that extends past the triangle. The 2103 K glyph matches the 1861 K glyph, not those two.
+      The open triangle at crop (1650, 2114) is the legend key. MinerU''s scatter table was ignored.'
+  context_id: shornikov-2017-spinel-thermodynamics::context::shornikov_2017_spinel_thermodynamics_fig4_activities
+  work_id: 10.1134/s0036024417020303
+  source_id: shornikov-2017-spinel-thermodynamics
+  species: MgAl2O4
+- observation_id: shornikov_2017_spinel_thermodynamics_fig5_phase_diagram
+  type: figure_context_not_digitised
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    figure: '5'
+    note: Phase diagram of MgAl2O4–SiO2 cited to reference [55].
+  units: as printed
+  values:
+    status: context_only
+    reason: Figure 5 is a cited phase diagram, not a measurement of this paper. MinerU's invented contour table was ignored.
+  context_id: shornikov-2017-spinel-thermodynamics::context::shornikov_2017_spinel_thermodynamics_fig5_phase_diagram
+  work_id: 10.1134/s0036024417020303
+  source_id: shornikov-2017-spinel-thermodynamics
+  species: MgAl2O4
+- observation_id: shornikov_2017_spinel_thermodynamics_table1_literature
+  type: literature_compilation_not_extracted
+  locator:
+    page: 2
+    published_page: 288
+    pdf_page_index: 1
+    table: '1'
+    note: Thirty literature rows. The this-work row is the observation above.
+  units: as printed
+  values:
+    literature_row_count: 30
+    reason: Table 1 has 31 body rows. One is this work. The other 30 are cited calorimetry, EMF, thermochemical calculations,
+      and earlier KEMS. They are not measurements of this paper and are not stored.
+  context_id: shornikov-2017-spinel-thermodynamics::context::shornikov_2017_spinel_thermodynamics_table1_literature
+  work_id: 10.1134/s0036024417020303
+  source_id: shornikov-2017-spinel-thermodynamics
+  species: MgAl2O4
+- observation_id: shornikov_2017_spinel_thermodynamics_table2_literature
+  type: literature_compilation_not_extracted
+  locator:
+    page: 4
+    published_page: 290
+    pdf_page_index: 3
+    table: '2'
+    note: MgO, the other MgAl2O4 rows, and Al2O3. MinerU had marked the four MgO rows as header because of a rowspan. The
+      render shows they are body rows.
+  units: as printed
+  values:
+    literature_row_count: 15
+    reason: Table 2 has four MgO rows, eight other MgAl2O4 rows, and three Al2O3 rows. They are cited melting data, not this
+      paper's result. They are not stored.
+  context_id: shornikov-2017-spinel-thermodynamics::context::shornikov_2017_spinel_thermodynamics_table2_literature
+  work_id: 10.1134/s0036024417020303
+  source_id: shornikov-2017-spinel-thermodynamics
+  species: MgAl2O4

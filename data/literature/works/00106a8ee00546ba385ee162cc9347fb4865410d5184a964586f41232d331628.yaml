@@ -1,0 +1,180 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628
+  citation: Shornikov, S. I., Archakov, I. Yu., Shultz, M. M., and Borisova, N. V. (2002). Mass Spectrometric Study of Evaporation
+    and the Thermodynamic Properties of Solid Phases in the Al2O3–SiO2 System. Doklady Chemistry, 383(1–3), 82–85. Translated
+    from Doklady Akademii Nauk, 383(3), 358–361.
+  source_ids:
+  - shornikov-2002-aluminosilicate-solid-phases
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:shornikov-2002-aluminosilicate-solid-phases
+      role: pdf
+      path: raw/shornikov-2002-aluminosilicate-solid-phases/shornikov-2002-aluminosilicate-solid-phases.pdf
+      sha256:
+        tag: value
+        value: eb36c88205ba7bf9138bfdbc016ee6b53ed4fb5512a60992087cb3adbb1e9286
+    - asset_id: pdftotext:shornikov-2002-aluminosilicate-solid-phases
+      role: pdftotext
+      path: text/shornikov-2002-aluminosilicate-solid-phases
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2002-aluminosilicate-solid-phases
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628::experiment::shornikov-2002-doklady-solid-kems
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Knudsen effusion mass spectrometry, molybdenum cells, eight compositions, 1676–2327 K. The paper says
+      the conditions match the melt study cited as [3].' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628
+  locator:
+    page: 1
+    published_page: 82
+    pdf_page_index: 0
+context:
+- observation_id: shornikov_2002_evaporation_coefficients_not_measured
+  type: quoted_assumption
+  locator:
+    page: 2
+    published_page: 83
+    pdf_page_index: 1
+  units: dimensionless
+  values:
+    reason: Direct experimental data on the partial evaporation coefficients for the aluminosilicate system are unavailable.
+      They were assumed equal to silica [11] and alumina [12]. Not stored as alpha.
+  context_id: shornikov-2002-aluminosilicate-solid-phases::context::shornikov_2002_evaporation_coefficients_not_measured
+  work_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628
+  source_id: shornikov-2002-aluminosilicate-solid-phases
+  species: Al6Si2O13
+- observation_id: shornikov_2002_fig2_pressures_not_digitized
+  type: figure_partial_pressure_overlap
+  locator:
+    page: 2
+    published_page: 83
+    pdf_page_index: 1
+    figure: '2'
+    note: log p(SiO), log p(Al), and log p(O) versus T. Eight compositions, open symbols in silica–mullite and filled symbols
+      in mullite–alumina, plus changed-composition replicas. Symbols overlap. Lines are silica [10], the S–M and M–A summaries,
+      and alumina from Drowart [13] and Shornikov [14].
+  units: atm
+  values:
+    method_class: figure_only
+    reason: '1200 dpi PDF page 2. Panel frames, page pixels: (a) y-axis x=5430, y=1155-3541, x-axis y=3541, x=5430-8913, T
+      ticks 1700/1800/1900/2000/2100 at x=5692/6502/7232/7886/8478, log10(p) ticks -3/-4/-5/-6 at y=1659.5/2277.5/2885.5/3508.5;
+      (b) y-axis x=5522, y=3971-6238, x-axis y=6238; (c) y-axis x=5430, y=6719-9130, x-axis y=9130. The low-T crop of panel
+      (a), x=5460-7000 and y=2300-3520, is the region of the claimed isolated VIII near 1740 K. The diamond at the top of
+      that crop is the legend entry, not a datum. A 2 px opening leaves 24x24 dash cores of the dotted lines (area about 417)
+      and a few larger cores still crossed by dashes. Three filled diamonds at (5898.5, 2903.8), (6042.5, 2897.7) and (5892.5,
+      2993.5) match legend VIII. The two on the fit, (5898.5, 2903.8) and (6042.5, 2897.7), are stored on shornikov_2002_fig2a_sio_viii
+      at the printed 84.14 mol% Al2O3. The diamond at (5892.5, 2993.5) is 0.144 dex below the first of those at nearly the
+      same T. It is stored on shornikov_2002_fig2a_sio_replica. The caption says replica filled symbols refer to samples with
+      changed composition, and that mole percent is not printed, so the composition is unknown. Every other core has its own
+      audit row. The same overlap holds on panels (b) and (c).'
+    sample_mol_percent_Al2O3: 1.19, 3.31, 12.84, 28.20, 60.00, 67.63, 70.21, 84.14
+    temperature_span_as_printed_K: 1676–2327
+  context_id: shornikov-2002-aluminosilicate-solid-phases::context::shornikov_2002_fig2_pressures_not_digitized
+  work_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628
+  source_id: shornikov-2002-aluminosilicate-solid-phases
+  species: Al6Si2O13
+- observation_id: shornikov_2002_fig3_schematic
+  type: figure_partial_pressure_schematic
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    figure: '3'
+    note: log p_1850(i). The y axis is broken between −4.0 and −8.5. The x axis is labelled S, M, A only.
+  units: atm
+  values:
+    method_class: figure_only
+    reason: Schematic. The broken y axis leaves the SiO line uncalibrated, and S/M/A is not a numeric composition.
+  context_id: shornikov-2002-aluminosilicate-solid-phases::context::shornikov_2002_fig3_schematic
+  work_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628
+  source_id: shornikov-2002-aluminosilicate-solid-phases
+  species: Al6Si2O13
+- observation_id: shornikov_2002_mullite_composition
+  type: quoted_derived_composition
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    equation: 4–5
+    note: x solved from the equality of the two Gibbs-energy expressions.
+  units: mol% Al2O3
+  values:
+    x_Al2O3_mol_percent: 60 ± 5
+    formula_as_printed: 3Al2O3·2SiO2
+    temperature_spans_as_printed: 1676–1879 K and 1676–2160 K
+  context_id: shornikov-2002-aluminosilicate-solid-phases::context::shornikov_2002_mullite_composition
+  work_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628
+  source_id: shornikov-2002-aluminosilicate-solid-phases
+  species: Al6Si2O13
+- observation_id: shornikov_2002_mullite_delta_fS_schema_gap
+  type: quoted_prose_schema_gap
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    equation: '6'
+    note: Printed with the enthalpy. The extract schema has no token for formation entropy delta_fS, so this is not a scored
+      observation. The later mullite table stores the same digits as a typed_refusal cell.
+  units: J/(mol K)
+  values:
+    value_as_printed: 11.6 ± 0.4
+    temperature_span_as_printed: 1676–2180
+    reason: The extract schema has no token for formation entropy delta_fS.
+  context_id: shornikov-2002-aluminosilicate-solid-phases::context::shornikov_2002_mullite_delta_fS_schema_gap
+  work_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628
+  source_id: shornikov-2002-aluminosilicate-solid-phases
+  species: Al6Si2O13
+- observation_id: shornikov_2002_transition_enthalpies
+  type: quoted_phase_transition_estimate
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    note: Author estimates. The sentences are on published page 84, which is PDF page 3. Partial pressures below 10^−9 atm.
+      Not fusion enthalpies of a pure endmember.
+  units: kJ/mol
+  values:
+    M_plus_S_to_M_plus_liquid_and_S_plus_liquid_maximum_kJ_mol: '5'
+    bound: do not exceed
+    M_plus_A_to_A_plus_liquid_kJ_mol: 13 ± 10
+    note_as_printed: The 13 ± 10 kJ/mol estimate exceeds published values, which are typically no higher than 3 kJ/mol.
+  context_id: shornikov-2002-aluminosilicate-solid-phases::context::shornikov_2002_transition_enthalpies
+  work_id: 00106a8ee00546ba385ee162cc9347fb4865410d5184a964586f41232d331628
+  source_id: shornikov-2002-aluminosilicate-solid-phases
+  species: Al6Si2O13

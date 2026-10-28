@@ -11,12 +11,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'pseudowollastonite_to_CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: value
+        value: cyclowollastonite
       charge:
         tag: value
         value: 0
@@ -91,8 +90,9 @@ observations:
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_heat_of_fusion_at_1817K
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 197
-    pdf_page_index: 5
+    page: 5
+    published_page: 197
+    pdf_page_index: 4
     figure: '1'
     equation: '8'
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
@@ -102,8 +102,9 @@ observations:
         tag: value
         value: '1817'
       locator:
-        page: 197
-        pdf_page_index: 5
+        page: 5
+        published_page: 197
+        pdf_page_index: 4
         figure: '1'
         equation: '8'
   derived_from:
@@ -116,6 +117,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_relative_enthalpy_fit_eq7
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_heat_capacity_stated
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -202,8 +204,9 @@ observations:
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_heat_capacity_stated
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 198
-    pdf_page_index: 6
+    page: 6
+    published_page: 198
+    pdf_page_index: 5
     section: Discussion
     equation: '7'
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
@@ -216,6 +219,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_relative_enthalpy_fit_eq7
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_relative_enthalpy_fit_eq7
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -258,8 +262,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 197
-    pdf_page_index: 5
+    page: 5
+    published_page: 197
+    pdf_page_index: 4
     table: III
     equation: '7'
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
@@ -279,6 +284,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1961:h=32621aaaf097
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_27_6_quote
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -362,8 +368,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 199
-    pdf_page_index: 7
+    page: 7
+    published_page: 199
+    pdf_page_index: 6
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_50_1_quote
@@ -450,8 +457,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 199
-    pdf_page_index: 7
+    page: 7
+    published_page: 199
+    pdf_page_index: 6
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_56_1_quote
@@ -538,8 +546,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 199
-    pdf_page_index: 7
+    page: 7
+    published_page: 199
+    pdf_page_index: 6
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_59_0_quote
@@ -626,8 +635,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 199
-    pdf_page_index: 7
+    page: 7
+    published_page: 199
+    pdf_page_index: 6
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_68_2_quote
@@ -713,8 +723,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 199
-    pdf_page_index: 7
+    page: 7
+    published_page: 199
+    pdf_page_index: 6
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_82_9_quote
@@ -800,8 +811,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 199
-    pdf_page_index: 7
+    page: 7
+    published_page: 199
+    pdf_page_index: 6
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote
@@ -892,8 +904,9 @@ observations:
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 198
-    pdf_page_index: 6
+    page: 6
+    published_page: 198
+    pdf_page_index: 5
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_15073_quote
@@ -984,8 +997,9 @@ observations:
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_15073_quote
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 198
-    pdf_page_index: 6
+    page: 6
+    published_page: 198
+    pdf_page_index: 5
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_cooling_fit_eq3
@@ -1029,8 +1043,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
     equation: '3'
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
@@ -1052,6 +1067,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_heat_capacity_eq4
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -1091,8 +1107,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     equation: '4'
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   derived_from:
@@ -1103,6 +1120,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_cooling_fit_eq3
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_relative_enthalpy_fit_eq6
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -1144,8 +1162,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: I
     equation: '6'
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
@@ -1170,6 +1189,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
   identity:
@@ -1252,8 +1272,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -1262,8 +1283,9 @@ observations:
         tag: value
         value: '1506'
       locator:
-        page: 195
-        pdf_page_index: 3
+        page: 3
+        published_page: 195
+        pdf_page_index: 2
         table: I
   derivation:
     relation: negative_cooling_enthalpy_to_H_minus_H298
@@ -1275,18 +1297,21 @@ observations:
           tag: value
           value: '139.6'
         locator:
-          page: 195
-          pdf_page_index: 3
+          page: 3
+          published_page: 195
+          pdf_page_index: 2
           table: I
     - - factor
       - state:
           tag: value
           value: '1'
         locator:
-          page: 195
-          pdf_page_index: 3
+          page: 3
+          published_page: 195
+          pdf_page_index: 2
           table: I
     output_unit: kJ/mol
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
   identity:
@@ -1369,8 +1394,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -1379,8 +1405,9 @@ observations:
         tag: value
         value: '1576'
       locator:
-        page: 195
-        pdf_page_index: 3
+        page: 3
+        published_page: 195
+        pdf_page_index: 2
         table: I
   derivation:
     relation: negative_cooling_enthalpy_to_H_minus_H298
@@ -1392,18 +1419,21 @@ observations:
           tag: value
           value: '150.6'
         locator:
-          page: 195
-          pdf_page_index: 3
+          page: 3
+          published_page: 195
+          pdf_page_index: 2
           table: I
     - - factor
       - state:
           tag: value
           value: '1'
         locator:
-          page: 195
-          pdf_page_index: 3
+          page: 3
+          published_page: 195
+          pdf_page_index: 2
           table: I
     output_unit: kJ/mol
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
   identity:
@@ -1486,8 +1516,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -1496,8 +1527,9 @@ observations:
         tag: value
         value: '1630'
       locator:
-        page: 195
-        pdf_page_index: 3
+        page: 3
+        published_page: 195
+        pdf_page_index: 2
         table: I
   derivation:
     relation: negative_cooling_enthalpy_to_H_minus_H298
@@ -1509,18 +1541,21 @@ observations:
           tag: value
           value: '157.1'
         locator:
-          page: 195
-          pdf_page_index: 3
+          page: 3
+          published_page: 195
+          pdf_page_index: 2
           table: I
     - - factor
       - state:
           tag: value
           value: '1'
         locator:
-          page: 195
-          pdf_page_index: 3
+          page: 3
+          published_page: 195
+          pdf_page_index: 2
           table: I
     output_unit: kJ/mol
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
   identity:
@@ -1603,8 +1638,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -1613,8 +1649,9 @@ observations:
         tag: value
         value: '1678'
       locator:
-        page: 195
-        pdf_page_index: 3
+        page: 3
+        published_page: 195
+        pdf_page_index: 2
         table: I
   derivation:
     relation: negative_cooling_enthalpy_to_H_minus_H298
@@ -1626,18 +1663,21 @@ observations:
           tag: value
           value: '165'
         locator:
-          page: 195
-          pdf_page_index: 3
+          page: 3
+          published_page: 195
+          pdf_page_index: 2
           table: I
     - - factor
       - state:
           tag: value
           value: '1'
         locator:
-          page: 195
-          pdf_page_index: 3
+          page: 3
+          published_page: 195
+          pdf_page_index: 2
           table: I
     output_unit: kJ/mol
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
   identity:
@@ -1720,8 +1760,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -1730,8 +1771,9 @@ observations:
         tag: value
         value: '1730'
       locator:
-        page: 195
-        pdf_page_index: 3
+        page: 3
+        published_page: 195
+        pdf_page_index: 2
         table: I
   derivation:
     relation: negative_cooling_enthalpy_to_H_minus_H298
@@ -1743,18 +1785,21 @@ observations:
           tag: value
           value: '173.9'
         locator:
-          page: 195
-          pdf_page_index: 3
+          page: 3
+          published_page: 195
+          pdf_page_index: 2
           table: I
     - - factor
       - state:
           tag: value
           value: '1'
         locator:
-          page: 195
-          pdf_page_index: 3
+          page: 3
+          published_page: 195
+          pdf_page_index: 2
           table: I
     output_unit: kJ/mol
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
   identity:
@@ -1837,8 +1882,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -1847,8 +1893,9 @@ observations:
         tag: value
         value: '1780'
       locator:
-        page: 195
-        pdf_page_index: 3
+        page: 3
+        published_page: 195
+        pdf_page_index: 2
         table: I
   derivation:
     relation: negative_cooling_enthalpy_to_H_minus_H298
@@ -1860,18 +1907,21 @@ observations:
           tag: value
           value: '183.3'
         locator:
-          page: 195
-          pdf_page_index: 3
+          page: 3
+          published_page: 195
+          pdf_page_index: 2
           table: I
     - - factor
       - state:
           tag: value
           value: '1'
         locator:
-          page: 195
-          pdf_page_index: 3
+          page: 3
+          published_page: 195
+          pdf_page_index: 2
           table: I
     output_unit: kJ/mol
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1506:h=13c0520666a4
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -1912,8 +1962,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -1922,8 +1973,9 @@ observations:
         tag: value
         value: '1506'
       locator:
-        page: 195
-        pdf_page_index: 3
+        page: 3
+        published_page: 195
+        pdf_page_index: 2
         table: I
   derived_from:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
@@ -1956,6 +2008,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1576:h=70272ed69634
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -1996,8 +2049,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2006,8 +2060,9 @@ observations:
         tag: value
         value: '1576'
       locator:
-        page: 195
-        pdf_page_index: 3
+        page: 3
+        published_page: 195
+        pdf_page_index: 2
         table: I
   derived_from:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
@@ -2040,6 +2095,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1630:h=1cdd7210e586
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -2080,8 +2136,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2090,8 +2147,9 @@ observations:
         tag: value
         value: '1630'
       locator:
-        page: 195
-        pdf_page_index: 3
+        page: 3
+        published_page: 195
+        pdf_page_index: 2
         table: I
   derived_from:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
@@ -2124,6 +2182,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1678:h=7f5dd9b90129
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -2164,8 +2223,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2174,8 +2234,9 @@ observations:
         tag: value
         value: '1678'
       locator:
-        page: 195
-        pdf_page_index: 3
+        page: 3
+        published_page: 195
+        pdf_page_index: 2
         table: I
   derived_from:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
@@ -2208,6 +2269,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1730:h=de2a9db8efd6
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -2248,8 +2310,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2258,8 +2321,9 @@ observations:
         tag: value
         value: '1730'
       locator:
-        page: 195
-        pdf_page_index: 3
+        page: 3
+        published_page: 195
+        pdf_page_index: 2
         table: I
   derived_from:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
@@ -2292,6 +2356,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1780:h=0f90032e6c86
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -2332,8 +2397,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 195
-    pdf_page_index: 3
+    page: 3
+    published_page: 195
+    pdf_page_index: 2
     table: I
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2342,8 +2408,9 @@ observations:
         tag: value
         value: '1780'
       locator:
-        page: 195
-        pdf_page_index: 3
+        page: 3
+        published_page: 195
+        pdf_page_index: 2
         table: I
   derived_from:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
@@ -2376,6 +2443,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
   identity:
@@ -2418,8 +2486,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: II
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2428,8 +2497,9 @@ observations:
         tag: value
         value: '298'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: II
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
@@ -2473,8 +2543,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: II
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2483,8 +2554,9 @@ observations:
         tag: value
         value: '298'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: II
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
@@ -2528,8 +2600,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: II
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2538,8 +2611,9 @@ observations:
         tag: value
         value: '298'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: II
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
@@ -2583,8 +2657,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: II
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2593,8 +2668,9 @@ observations:
         tag: value
         value: '298'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: II
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
@@ -2638,8 +2714,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: II
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2648,8 +2725,9 @@ observations:
         tag: value
         value: '298'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: II
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
@@ -2693,8 +2771,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: II
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2703,8 +2782,9 @@ observations:
         tag: value
         value: '298'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: II
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
@@ -2747,8 +2827,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2757,8 +2838,9 @@ observations:
         tag: value
         value: '1829'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
@@ -2801,8 +2883,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2811,8 +2894,9 @@ observations:
         tag: value
         value: '1848'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
@@ -2855,8 +2939,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2865,8 +2950,9 @@ observations:
         tag: value
         value: '1859'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
@@ -2909,8 +2995,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2919,8 +3006,9 @@ observations:
         tag: value
         value: '1915'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
@@ -2963,8 +3051,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -2973,8 +3062,9 @@ observations:
         tag: value
         value: '1961'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1829:h=cf370c06c383
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
@@ -3017,8 +3107,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -3027,8 +3118,9 @@ observations:
         tag: value
         value: '1829'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
   derived_from:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
@@ -3056,6 +3148,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1848:h=0841596d01f9
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -3097,8 +3190,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -3107,8 +3201,9 @@ observations:
         tag: value
         value: '1848'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
   derived_from:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
@@ -3136,6 +3231,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1859:h=ec5d85f803d1
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -3177,8 +3273,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -3187,8 +3284,9 @@ observations:
         tag: value
         value: '1859'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
   derived_from:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
@@ -3216,6 +3314,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1915:h=3d0ce135d3d3
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -3257,8 +3356,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -3267,8 +3367,9 @@ observations:
         tag: value
         value: '1915'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
   derived_from:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
@@ -3296,6 +3397,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1961:h=32621aaaf097
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -3337,8 +3439,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -3347,8 +3450,9 @@ observations:
         tag: value
         value: '1961'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
   derived_from:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
@@ -3376,6 +3480,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
     parameters: []
     output_unit: as_published
+    references: []
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
   identity:
@@ -3417,8 +3522,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -3427,8 +3533,9 @@ observations:
         tag: value
         value: '1829'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
@@ -3471,8 +3578,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -3481,8 +3589,9 @@ observations:
         tag: value
         value: '1848'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
@@ -3525,8 +3634,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -3535,8 +3645,9 @@ observations:
         tag: value
         value: '1859'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
@@ -3579,8 +3690,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -3589,8 +3701,9 @@ observations:
         tag: value
         value: '1915'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
@@ -3633,8 +3746,9 @@ observations:
   notices: []
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
-    page: 196
-    pdf_page_index: 4
+    page: 4
+    published_page: 196
+    pdf_page_index: 3
     table: III
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   point_conditions:
@@ -3643,6 +3757,7 @@ observations:
         tag: value
         value: '1961'
       locator:
-        page: 196
-        pdf_page_index: 4
+        page: 4
+        published_page: 196
+        pdf_page_index: 3
         table: III
