@@ -10529,6 +10529,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'{carbon_kg_remaining:.6g} kg remains'
             )
 
+        claimed_kg = self._stage0_bakeout_reserved_carbon_kg + math.fsum(
+            amounts.get('C', 0.0)
+            for spec in specs
+            for account, amounts, _origin in spec['debits']
+            if account == 'process.reagent_inventory'
+        )
+        if claimed_kg > min(required_kg, available_kg) + 1e-12:
+            raise AccountingError('Stage 0 carbon claims exceed the admitted C budget')
         self._stage0_carbon_cleanup_specs = specs
 
     @staticmethod
@@ -10640,12 +10648,85 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         if species not in BAKEOUT_SULFATE_HOSTS:
             return False, carbon_mol_remaining
-        carbon_mol = float(extent_mol) * float(c_per_mol)
+        carbon_mol = min(
+            max(0.0, carbon_mol_remaining),
+            max(0.0, float(extent_mol) * float(c_per_mol)),
+        )
         self._stage0_bakeout_reserved_carbon_kg = (
             float(getattr(self, '_stage0_bakeout_reserved_carbon_kg', 0.0))
             + carbon_mol * float(molar_c_kg)
         )
         return True, carbon_mol_remaining - carbon_mol
+
+    def _stage0_sulfate_carbon_order(
+        self, hosts: Mapping[str, float], *, to_sulfide: bool,
+    ) -> list[str]:
+        from engines.builtin.foulant_disposition import _parse_dg_points
+        from simulator.chemistry.organics_pyrolysis import carbon_delta_g_co_kj_per_mol_o2
+
+        temperature_K = float(self.inventory.stage0_temp_range_C[1]) + 273.15
+        registry = self._load_foulant_registry_cached()
+        scores: dict[str, float] = {}
+        rows: dict[str, str] = {}
+        flags = ['sulfate_carbon_standard_state_gas_activities']
+        for host in sorted(hosts):
+            entry = registry.carriers.get(host)
+            pointer = entry.thermo.get('dG_row') if entry else None
+            row = registry.foulant_dG.get(str(pointer).split('.')[-1])
+            if to_sulfide or not row:
+                flags.append('sulfate_carbon_missing_dG_canonical_order')
+                continue
+            try:
+                points = sorted(_parse_dg_points(row))
+            except (KeyError, ValueError, TypeError):
+                flags.append('sulfate_carbon_missing_dG_canonical_order')
+                continue
+            rows[host] = str(pointer)
+            if not points[0][0] <= temperature_K <= points[-1][0]:
+                flags.append('sulfate_carbon_dG_extrapolated')
+            lower, upper = points[0], points[1]
+            for lower, upper in zip(points, points[1:]):
+                if temperature_K <= upper[0]:
+                    break
+            thermal_dg = lower[1] + (
+                (temperature_K - lower[0]) * (upper[1] - lower[1])
+                / (upper[0] - lower[0])
+            )
+            # Hess composition, using foulant_dG.{CaSO4,FeSO4,MgSO4}_thermal_decomp:
+            # Ca: CaSO4 -> CaO + SO2 + 1/2 O2; Fe: 2 FeSO4 -> Fe2O3
+            # + 2 SO2 + 1/2 O2. Add C + 1/2 O2 -> CO to either row.
+            # The carbon resolver is per mol O2 (2 C), hence divide by 2;
+            # divide the composed reaction by nu_C=1, NOT by host moles (Fe=2).
+            # Mg's row produces SO3: first add SO3 -> SO2 + 1/2 O2.
+            # REF-012 NIST WebBook gas Hf/S (Chase 1998, CAS 7446-11-9,
+            # 7446-09-5, 7782-44-7): dH=-296.84-(-395.77)=98.93 kJ/mol;
+            # dS=(248.21+205.15/2-256.77)/1000=0.094015 kJ/(mol K).
+            # This uses the registry's tier-2 dH-T*dS approximation (no Cp).
+            # Units: kJ/mol reaction / (mol C/mol reaction) = kJ/mol C.
+            # At 1323.15 K: Fe=-35-228.796763=-263.796763 kJ/mol C;
+            # Ca=85.75-228.796763=-143.046763. A zero carbon budget gives
+            # zero extent regardless of rank. No Stage-0 gas partial pressures
+            # are declared here: use unit gas activities and flag that premise.
+            if host == 'MgSO4':
+                thermal_dg += 98.93 - temperature_K * 0.094015
+            scores[host] = (
+                thermal_dg + carbon_delta_g_co_kj_per_mol_o2(temperature_K) / 2.0
+            ) / STAGE0_CATION_SULFATE_OXIDE_STOICH[host]['C']
+        if len(scores) != len(hosts):
+            order = sorted(hosts)
+        else:
+            order = sorted(hosts, key=lambda host: (scores[host], host))
+            if len(set(scores.values())) != len(scores):
+                flags.append('sulfate_carbon_tied_dG_canonical_order')
+        self._stage0_foulant_diagnostics.append({
+            'reaction_family': 'sulfate_carbon_allocation',
+            'temperature_K': temperature_K,
+            'dG_kJ_per_mol_C': scores,
+            'dG_rows': rows,
+            'host_order': order,
+            'notice_flags': sorted(set(flags)),
+        })
+        return order
 
     def _apply_stage0_cation_sulfate_carbon_reactions(
         self,
@@ -10662,7 +10743,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             cleanup.get('cation_sulfate_product', 'oxide')
         ).lower()
         to_sulfide = product_mode == 'sulfide'
-        cation_feed = dict(self.inventory.cation_sulfate_feed_kg)
+        cation_feed = {
+            species: kg for species, kg in self.inventory.cation_sulfate_feed_kg.items()
+            if kg > 1e-12
+        }
         if not cation_feed:
             return carbon_mol_remaining
 
@@ -10675,7 +10759,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ).molar_mass_kg_per_mol()
             for species in molar_species
         }
-        for species, feed_kg in list(cation_feed.items()):
+        host_order = (
+            self._stage0_sulfate_carbon_order(cation_feed, to_sulfide=to_sulfide)
+            if len(cation_feed) > 1 else sorted(cation_feed)
+        )
+        for species in host_order:
+            feed_kg = cation_feed[species]
             if feed_kg <= 1e-12:
                 continue
             feed_formula = resolve_species_formula(

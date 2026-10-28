@@ -16,7 +16,7 @@ import sys
 import pytest
 
 from engines.builtin.foulant_disposition import chi_decomp, load_foulant_registry
-from simulator.accounting import resolve_species_formula
+from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 
@@ -101,6 +101,78 @@ def test_sulfate_carbon_claims_share_one_budget(carbon_mol):
     result = _limiting_carbon_probe(carbon_mol)
     assert result["reserved"] + result["consumed"] <= carbon_mol + 1e-12
     assert result["reserved"] + result["consumed"] == pytest.approx(carbon_mol)
+
+
+def test_sulfate_carbon_ranks_composed_rows_at_stage_temperature():
+    sim = _sim({})
+    hosts = {"CaSO4": 1.0, "FeSO4": 1.0, "MgSO4": 1.0}
+    sim.inventory.stage0_temp_range_C = (20.0, 1050.0)
+    assert sim._stage0_sulfate_carbon_order(hosts, to_sulfide=False) == [
+        "FeSO4", "MgSO4", "CaSO4",
+    ]
+    diagnostic = sim._stage0_foulant_diagnostics[-1]
+    # Hess-composed REF-012/REF-021 rows and Chase 1998 carbon/SOx
+    # formation data, at 1323.15 K; independently tabulated in b1056.md.
+    assert diagnostic["dG_kJ_per_mol_C"] == pytest.approx({
+        "FeSO4": -263.79676275, "CaSO4": -143.04676275,
+        "MgSO4": -236.9293766667,
+    })
+    assert "sulfate_carbon_dG_extrapolated" in diagnostic["notice_flags"]
+    sim.inventory.stage0_temp_range_C = (20.0, 1500.0)
+    assert sim._stage0_sulfate_carbon_order(hosts, to_sulfide=False)[0] == "MgSO4"
+
+
+@pytest.mark.parametrize("fallback", ["missing", "tie", "sulfide"])
+def test_sulfate_carbon_fallback_is_sorted_and_flagged(monkeypatch, fallback):
+    from dataclasses import replace
+
+    sim = _sim({})
+    sim.inventory.stage0_temp_range_C = (20.0, 1050.0)
+    registry = load_foulant_registry(FOULANT_THERMO)
+    rows = dict(registry.foulant_dG)
+    if fallback == "missing":
+        del rows["CaSO4_thermal_decomp"]
+    elif fallback == "tie":
+        rows["CaSO4_thermal_decomp"] = rows["FeSO4_thermal_decomp"]
+    monkeypatch.setattr(sim, "_load_foulant_registry_cached", lambda: replace(
+        registry, foulant_dG=rows,
+    ))
+    for hosts in ({"FeSO4": 1.0, "CaSO4": 1.0}, {"CaSO4": 1.0, "FeSO4": 1.0}):
+        assert sim._stage0_sulfate_carbon_order(
+            hosts, to_sulfide=fallback == "sulfide",
+        ) == ["CaSO4", "FeSO4"]
+        flags = sim._stage0_foulant_diagnostics[-1]["notice_flags"]
+        assert (
+            "sulfate_carbon_tied_dG_canonical_order" if fallback == "tie"
+            else "sulfate_carbon_missing_dG_canonical_order"
+        ) in flags
+
+
+def test_bakeout_reservation_cannot_overclaim_remaining_carbon():
+    from tests.test_subsolidus_bakeout import _molar
+
+    sim = _sim({})
+    reserved, remaining = sim._reserve_stage0_bakeout_sulfate_carbon(
+        "CaSO4", 2.0, 1.0, _molar("C"), 1.0,
+    )
+    assert reserved
+    assert remaining == 0.0
+    assert sim._stage0_bakeout_reserved_carbon_kg == _molar("C")
+
+
+def test_carbon_admission_guard_rejects_summed_overclaims(monkeypatch):
+    original = PyrolysisSimulator._apply_stage0_cation_sulfate_carbon_reactions
+
+    def overclaim(sim, feedstock, carbon_mol, specs):
+        remaining = original(sim, feedstock, carbon_mol, specs)
+        specs.append({"debits": (("process.reagent_inventory", {"C": 1.0}, "reagent"),)})
+        return remaining
+
+    monkeypatch.setattr(
+        PyrolysisSimulator, "_apply_stage0_cation_sulfate_carbon_reactions", overclaim,
+    )
+    with pytest.raises(AccountingError, match="claims exceed the admitted C budget"):
+        _limiting_carbon_probe()
 
 
 def _carbonate_decomposition_extent(
