@@ -2134,7 +2134,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2144,6 +2144,7 @@ species:
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.042898315936', FeO: '0.869985701925', Fe2O3: '0.047281831626', CaO: '0.039834150513'}
         sample_1_two_phase_note: Table 2 No. 1 (CaO addition) is suspected two-phase; authors did not
           use it for the interaction-parameter fit
+        activity: 2.5000000000000003e-17
         row:
           sample_no: 1
           P2O5_mol_percent: 3.92
@@ -2155,7 +2156,6 @@ species:
           L_P: 570
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 2.5000000000000003e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2181,7 +2181,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2189,6 +2189,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.07679892813', FeO: '0.83293722032', Fe2O3: '0.038561908348', CaO: '0.051701943202'}
+        activity: 4.8000000000000003e-17
         row:
           sample_no: 2
           P2O5_mol_percent: 7.13
@@ -2200,7 +2201,6 @@ species:
           L_P: 666
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 4.8000000000000003e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2226,7 +2226,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2234,6 +2234,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.098323201937', FeO: '0.81539912956', Fe2O3: '0.038462223092', CaO: '0.047815445411'}
+        activity: 8.400000000000001e-17
         row:
           sample_no: 3
           P2O5_mol_percent: 9.13
@@ -2245,7 +2246,6 @@ species:
           L_P: 589
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 8.400000000000001e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2271,7 +2271,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2279,6 +2279,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.103484718249', FeO: '0.810337400281', Fe2O3: '0.043566526897', CaO: '0.042611354573'}
+        activity: 6.3e-17
         row:
           sample_no: 4
           P2O5_mol_percent: 9.52
@@ -2290,7 +2291,6 @@ species:
           L_P: 690
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 6.3e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2316,7 +2316,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2324,6 +2324,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.04573135069', FeO: '0.867977597788', Fe2O3: '0.040559700831', MgO: '0.045731350691'}
+        activity: 4.6e-17
         row:
           sample_no: 5
           P2O5_mol_percent: 4.23
@@ -2335,7 +2336,6 @@ species:
           L_P: 452
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 4.6e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2361,7 +2361,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2369,6 +2369,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.06912172071', FeO: '0.835663462061', Fe2O3: '0.048585085004', MgO: '0.046629732225'}
+        activity: 4.8000000000000003e-17
         row:
           sample_no: 6
           P2O5_mol_percent: 6.3
@@ -2380,7 +2381,6 @@ species:
           L_P: 615
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 4.8000000000000003e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2406,7 +2406,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2414,6 +2414,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.078974471567', FeO: '0.825344803497', Fe2O3: '0.043901319335', MgO: '0.051779405601'}
+        activity: 5.900000000000001e-17
         row:
           sample_no: 7
           P2O5_mol_percent: 7.26
@@ -2425,7 +2426,6 @@ species:
           L_P: 615
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 5.900000000000001e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2451,7 +2451,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2459,6 +2459,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.088094154114', FeO: '0.823562745193', Fe2O3: '0.042451687897', MgO: '0.045891412796'}
+        activity: 7.8e-17
         row:
           sample_no: 8
           P2O5_mol_percent: 8.12
@@ -2470,7 +2471,6 @@ species:
           L_P: 578
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 7.8e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2496,7 +2496,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2504,6 +2504,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.019634005006', FeO: '0.880547142064', Fe2O3: '0.045389027941', MnO: '0.054429824989'}
+        activity: 2.0e-17
         row:
           sample_no: 9
           P2O5_mol_percent: 1.8
@@ -2515,7 +2516,6 @@ species:
           L_P: 310
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 2.0e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2541,7 +2541,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2549,6 +2549,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.048933519405', FeO: '0.857408495179', Fe2O3: '0.042445965108', MnO: '0.051212020308'}
+        activity: 5.8e-17
         row:
           sample_no: 10
           P2O5_mol_percent: 4.51
@@ -2560,7 +2561,6 @@ species:
           L_P: 416
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 5.8e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2586,7 +2586,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2594,6 +2594,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.064145513658', FeO: '0.836247707127', Fe2O3: '0.049191041596', MnO: '0.050415737619'}
+        activity: 6.800000000000001e-17
         row:
           sample_no: 11
           P2O5_mol_percent: 5.84
@@ -2605,7 +2606,6 @@ species:
           L_P: 477
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 6.800000000000001e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2631,7 +2631,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2639,6 +2639,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.066126170226', FeO: '0.838956535928', Fe2O3: '0.045595463909', MnO: '0.049321829937'}
+        activity: 8.2e-17
         row:
           sample_no: 12
           P2O5_mol_percent: 6.06
@@ -2650,7 +2651,6 @@ species:
           L_P: 447
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 8.2e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2676,7 +2676,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2684,6 +2684,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.090348121492', FeO: '0.819677560554', Fe2O3: '0.042251420647', MnO: '0.047722897307'}
+        activity: 9.7e-17
         row:
           sample_no: 13
           P2O5_mol_percent: 8.33
@@ -2695,7 +2696,6 @@ species:
           L_P: 520
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 9.7e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2721,7 +2721,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2729,6 +2729,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.020651354189', FeO: '0.875461307229', Fe2O3: '0.049183219507', SiO2: '0.054704119075'}
+        activity: 3.3e-17
         row:
           sample_no: 14
           P2O5_mol_percent: 1.88
@@ -2740,7 +2741,6 @@ species:
           L_P: 253
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 3.3e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2766,7 +2766,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2774,6 +2774,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.047524519808', FeO: '0.842905231305', Fe2O3: '0.046313474248', SiO2: '0.063256774639'}
+        activity: 8.2e-17
         row:
           sample_no: 15
           P2O5_mol_percent: 4.35
@@ -2785,7 +2786,6 @@ species:
           L_P: 343
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 8.2e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2811,7 +2811,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2819,6 +2819,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.05189878588', FeO: '0.851975370414', Fe2O3: '0.046303009262', SiO2: '0.049822834444'}
+        activity: 7.8e-17
         row:
           sample_no: 16
           P2O5_mol_percent: 4.75
@@ -2830,7 +2831,6 @@ species:
           L_P: 379
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 7.8e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2856,7 +2856,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2864,6 +2864,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.069562882612', FeO: '0.830662657072', Fe2O3: '0.047739233165', SiO2: '0.052035227151'}
+        activity: 1.1000000000000001e-16
         row:
           sample_no: 17
           P2O5_mol_percent: 6.35
@@ -2875,7 +2876,6 @@ species:
           L_P: 406
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 1.1000000000000001e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2901,7 +2901,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2909,6 +2909,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.072801791597', FeO: '0.786885543575', Fe2O3: '0.036095667136', CaO: '0.047605295242', SiO2: '0.05661170245'}
+        activity: 3.3e-17
         row:
           sample_no: 18
           P2O5_mol_percent: 6.79
@@ -2921,7 +2922,6 @@ species:
           L_P: 784
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 3.3e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -2947,7 +2947,7 @@ species:
       regime: kems_effusion
       units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
       values:
-        quantity: raoultian_activity_and_composition
+        quantity: raoultian_activity
         method_class: model_derived
         model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
           atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
@@ -2955,6 +2955,7 @@ species:
         composition_basis: mol_percent as printed
         T_K: 1643.0
         composition_mol: {basis: printed_mole_fraction, P2O5: '0.090324058615', FeO: '0.779428917553', Fe2O3: '0.031943808096', CaO: '0.047130221397', SiO2: '0.051172994339'}
+        activity: 6.1e-17
         row:
           sample_no: 19
           P2O5_mol_percent: 8.49
@@ -2967,7 +2968,6 @@ species:
           L_P: 665
           T_C: 1370
           T_K: 1643.0
-          a_P2O5: 6.1e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
@@ -3163,7 +3163,7 @@ species:
           P_P2_x1e8_atm_as_printed: 2.47
           P_P2_atm: 2.4700000000000003e-08
           P_PO_x1e7_atm_as_printed: 4.78
-          P_PO_atm: 4.78e-07
+          p_atm: 4.78e-07
           P_PO2_x1e8_atm_as_printed: 7.58
           P_PO2_atm: 7.58e-08
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3180,7 +3180,7 @@ species:
           P_P2_x1e8_atm_as_printed: 5.51
           P_P2_atm: 5.51e-08
           P_PO_x1e7_atm_as_printed: 7.23
-          P_PO_atm: 7.23e-07
+          p_atm: 7.23e-07
           P_PO2_x1e8_atm_as_printed: 10.84
           P_PO2_atm: 1.084e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3197,7 +3197,7 @@ species:
           P_P2_x1e8_atm_as_printed: 7.54
           P_P2_atm: 7.54e-08
           P_PO_x1e7_atm_as_printed: 8.95
-          P_PO_atm: 8.949999999999999e-07
+          p_atm: 8.95e-07
           P_PO2_x1e8_atm_as_printed: 14.06
           P_PO2_atm: 1.406e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3214,7 +3214,7 @@ species:
           P_P2_x1e8_atm_as_printed: 5.2
           P_P2_atm: 5.2e-08
           P_PO_x1e7_atm_as_printed: 10.05
-          P_PO_atm: 1.0050000000000001e-06
+          p_atm: 1.005e-06
           P_PO2_x1e8_atm_as_printed: 13.3
           P_PO2_atm: 1.33e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3231,7 +3231,7 @@ species:
           P_P2_x1e8_atm_as_printed: 1.63
           P_P2_atm: 1.63e-08
           P_PO_x1e7_atm_as_printed: 7.39
-          P_PO_atm: 7.389999999999999e-07
+          p_atm: 7.39e-07
           P_PO2_x1e8_atm_as_printed: 10.88
           P_PO2_atm: 1.0880000000000001e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3248,7 +3248,7 @@ species:
           P_P2_x1e8_atm_as_printed: 4.27
           P_P2_atm: 4.27e-08
           P_PO_x1e7_atm_as_printed: 6.99
-          P_PO_atm: 6.99e-07
+          p_atm: 6.99e-07
           P_PO2_x1e8_atm_as_printed: 10.6
           P_PO2_atm: 1.06e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3265,7 +3265,7 @@ species:
           P_P2_x1e8_atm_as_printed: 3.47
           P_P2_atm: 3.47e-08
           P_PO_x1e7_atm_as_printed: 7.88
-          P_PO_atm: 7.879999999999999e-07
+          p_atm: 7.88e-07
           P_PO2_x1e8_atm_as_printed: 11.16
           P_PO2_atm: 1.1160000000000001e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3282,7 +3282,7 @@ species:
           P_P2_x1e8_atm_as_printed: 5.61
           P_P2_atm: 5.6100000000000006e-08
           P_PO_x1e7_atm_as_printed: 8.28
-          P_PO_atm: 8.28e-07
+          p_atm: 8.28e-07
           P_PO2_x1e8_atm_as_printed: 12.17
           P_PO2_atm: 1.217e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3299,7 +3299,7 @@ species:
           P_P2_x1e8_atm_as_printed: 5.92
           P_P2_atm: 5.92e-08
           P_PO_x1e7_atm_as_printed: 9.95
-          P_PO_atm: 9.949999999999998e-07
+          p_atm: 9.95e-07
           P_PO2_x1e8_atm_as_printed: 14.19
           P_PO2_atm: 1.419e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3316,7 +3316,7 @@ species:
           P_P2_x1e8_atm_as_printed: 2.51
           P_P2_atm: 2.51e-08
           P_PO_x1e7_atm_as_printed: 4.66
-          P_PO_atm: 4.66e-07
+          p_atm: 4.66e-07
           P_PO2_x1e8_atm_as_printed: 6.97
           P_PO2_atm: 6.97e-08
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3333,7 +3333,7 @@ species:
           P_P2_x1e8_atm_as_printed: 2.28
           P_P2_atm: 2.28e-08
           P_PO_x1e7_atm_as_printed: 8.69
-          P_PO_atm: 8.69e-07
+          p_atm: 8.69e-07
           P_PO2_x1e8_atm_as_printed: 12.29
           P_PO2_atm: 1.229e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3350,7 +3350,7 @@ species:
           P_P2_x1e8_atm_as_printed: 3.66
           P_P2_atm: 3.6600000000000003e-08
           P_PO_x1e7_atm_as_printed: 9.74
-          P_PO_atm: 9.74e-07
+          p_atm: 9.74e-07
           P_PO2_x1e8_atm_as_printed: 13.46
           P_PO2_atm: 1.346e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3367,7 +3367,7 @@ species:
           P_P2_x1e8_atm_as_printed: 4.99
           P_P2_atm: 4.9900000000000003e-08
           P_PO_x1e7_atm_as_printed: 9.78
-          P_PO_atm: 9.78e-07
+          p_atm: 9.78e-07
           P_PO2_x1e8_atm_as_printed: 14.39
           P_PO2_atm: 1.439e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3384,7 +3384,7 @@ species:
           P_P2_x1e8_atm_as_printed: 8.46
           P_P2_atm: 8.460000000000002e-08
           P_PO_x1e7_atm_as_printed: 11.93
-          P_PO_atm: 1.1929999999999998e-06
+          p_atm: 1.193e-06
           P_PO2_x1e8_atm_as_printed: 16.24
           P_PO2_atm: 1.624e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3401,7 +3401,7 @@ species:
           P_P2_x1e8_atm_as_printed: 0.85
           P_P2_atm: 8.5e-09
           P_PO_x1e7_atm_as_printed: 5.65
-          P_PO_atm: 5.65e-07
+          p_atm: 5.65e-07
           P_PO2_x1e8_atm_as_printed: 8.83
           P_PO2_atm: 8.83e-08
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3418,7 +3418,7 @@ species:
           P_P2_x1e8_atm_as_printed: 4.66
           P_P2_atm: 4.66e-08
           P_PO_x1e7_atm_as_printed: 9.97
-          P_PO_atm: 9.97e-07
+          p_atm: 9.97e-07
           P_PO2_x1e8_atm_as_printed: 14.47
           P_PO2_atm: 1.4470000000000002e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3435,7 +3435,7 @@ species:
           P_P2_x1e8_atm_as_printed: 5.72
           P_P2_atm: 5.7199999999999996e-08
           P_PO_x1e7_atm_as_printed: 11.04
-          P_PO_atm: 1.104e-06
+          p_atm: 1.104e-06
           P_PO2_x1e8_atm_as_printed: 14.71
           P_PO2_atm: 1.4710000000000001e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3452,7 +3452,7 @@ species:
           P_P2_x1e8_atm_as_printed: 7.04
           P_P2_atm: 7.040000000000001e-08
           P_PO_x1e7_atm_as_printed: 13.51
-          P_PO_atm: 1.3509999999999999e-06
+          p_atm: 1.351e-06
           P_PO2_x1e8_atm_as_printed: 17.65
           P_PO2_atm: 1.765e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3470,7 +3470,7 @@ species:
           P_P2_x1e8_atm_as_printed: 3.04
           P_P2_atm: 3.04e-08
           P_PO_x1e7_atm_as_printed: 6.97
-          P_PO_atm: 6.97e-07
+          p_atm: 6.97e-07
           P_PO2_x1e8_atm_as_printed: 9.43
           P_PO2_atm: 9.43e-08
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -3488,7 +3488,7 @@ species:
           P_P2_x1e8_atm_as_printed: 6.03
           P_P2_atm: 6.03e-08
           P_PO_x1e7_atm_as_printed: 9.6
-          P_PO_atm: 9.6e-07
+          p_atm: 9.6e-07
           P_PO2_x1e8_atm_as_printed: 12.98
           P_PO2_atm: 1.298e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
