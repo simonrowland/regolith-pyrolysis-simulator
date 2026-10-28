@@ -345,9 +345,16 @@ class _MAGEMinModeVectorMassDeficit(RuntimeError):
 class _MAGEMinEngineCallError(RuntimeError):
     """An exception raised by a MAGEMin engine call, with its source type."""
 
-    def __init__(self, exception_type: str, message: str) -> None:
+    def __init__(
+        self,
+        exception_type: str,
+        message: str,
+        *,
+        failure_disposition: Optional[str] = None,
+    ) -> None:
         self.exception_type = exception_type
         self.engine_message = message
+        self.failure_disposition = failure_disposition
         super().__init__(f'{exception_type}: {message}')
 
 
@@ -1717,6 +1724,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_failure_exception': exc.exception_type,
                 'backend_failure_message': exc.engine_message,
             })
+            if exc.failure_disposition is not None:
+                failure_diagnostics['backend_failure_disposition'] = (
+                    exc.failure_disposition
+                )
             if isinstance(exc, _MAGEMinDeclaredInputError):
                 failure_diagnostics['reason'] = 'invalid_input'
             return EquilibriumResult(
@@ -2083,6 +2094,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 ),
             )
             diagnostics['projected_liquidus_status'] = projected.status
+            diagnostics['projected_liquidus_diagnostics'] = dict(
+                projected.diagnostics or {}
+            )
             diagnostics['composition_projected_notice'] = notice
             if (
                 projected.status == 'ok'
@@ -2110,6 +2124,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
             warnings_out = [
                 *warnings_out,
+                *projected.warnings,
                 (
                     'composition_projected bulk has no projected liquidus; '
                     f'status={projected.status}'
@@ -2891,6 +2906,16 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             diagnostic_detail,
                         )
                         raise timeout from exc
+                    except (
+                        OSError,
+                        subprocess.SubprocessError,
+                        MemoryError,
+                    ) as exc:
+                        raise _MAGEMinEngineCallError(
+                            type(exc).__name__,
+                            f'MAGEMin warm worker could not be started: {exc}',
+                            failure_disposition='environment',
+                        ) from exc
                 except EngineWorkerTimeout:
                     raise
                 except (
@@ -2918,7 +2943,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             == _MAGEMinEngineLifecycleError.__name__
                             else _MAGEMinEngineCallError
                         )
-                        raise error_type(exception_type, engine_message) from exc
+                        raise error_type(
+                            exception_type,
+                            engine_message,
+                            failure_disposition=exc.failure_disposition,
+                        ) from exc
 
                     remote_exception = getattr(builtins, exc.exc_name, None)
                     remote_message = (
@@ -3000,6 +3029,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 subprocess_exc.exception_type,
                 f'{message}; subprocess retry failed: '
                 f'{subprocess_exc.engine_message}',
+                failure_disposition=subprocess_exc.failure_disposition,
             ) from subprocess_exc
         warnings_out = tuple(raw.get('buffer_warnings') or ())
         return {**raw, 'buffer_warnings': (message, *warnings_out)}
@@ -3151,23 +3181,31 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         timeout=remaining_timeout_s,
                         check=False,
                     )
-                    if capture_native_activities:
-                        matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
-                        matlab_text = (
-                            matlab_path.read_text()
-                            if matlab_path.exists()
-                            else ''
-                        )
                 except subprocess.TimeoutExpired as exc:
                     raise _MAGEMinEngineCallError(
                         type(exc).__name__, f'MAGEMin binary timed out after '
-                        f'{timeout_s:g}s'
+                        f'{timeout_s:g}s',
+                        failure_disposition='environment',
+                    ) from exc
+                except (subprocess.SubprocessError, MemoryError) as exc:
+                    raise _MAGEMinEngineCallError(
+                        type(exc).__name__,
+                        f'MAGEMin binary launch failed: {exc}',
+                        failure_disposition='environment',
                     ) from exc
                 except OSError as exc:
                     raise _MAGEMinEngineCallError(
                         type(exc).__name__,
                         f'MAGEMin binary could not be executed: {exc}',
+                        failure_disposition='environment',
                     ) from exc
+                if capture_native_activities:
+                    matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
+                    matlab_text = (
+                        matlab_path.read_text()
+                        if matlab_path.exists()
+                        else ''
+                    )
 
         if completed.returncode != 0:
             stderr = (completed.stderr or '').strip()

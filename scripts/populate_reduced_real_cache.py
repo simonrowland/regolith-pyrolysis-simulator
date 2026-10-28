@@ -76,13 +76,6 @@ FIRST_FLIP_CAMPAIGNS = ("C2A_continuous", "C2B", "C4")
 CAL_FEEDSTOCKS = ("lunar_mare_low_ti", "mars_perchlorate_rich", "ci_carbonaceous_chondrite")
 KREEP_FEEDSTOCK = "lunar_pkt_kreep_average"
 MAGEMIN_PROVIDER_ID = "magemin-shadow"
-# Prefix remains for a missing liquidus that is not a composition projection
-# (still RuntimeError). Pinned by tests/test_populate_reduced_real_cache_driver.py
-# against the upstream literal in simulator/evaporation.py. The empty-melt
-# projection refusal is EvaporationFluxRefusal, classified separately.
-GATE_LIQUIDUS_UNAVAILABLE_PREFIX = (
-    "freeze_gate.enabled requires a liquid_fraction(T) source"
-)
 
 
 class WallCapExceeded(BaseException):
@@ -469,11 +462,6 @@ def _known_chemistry_case_gap(
             }
         return None
     if isinstance(exc, RuntimeError):
-        if detail.startswith(GATE_LIQUIDUS_UNAVAILABLE_PREFIX):
-            return {
-                "reason": "gate_liquidus_unavailable",
-                "detail": detail,
-            }
         if detail.startswith("real_backend_out_of_domain:"):
             reason = detail.split(":", 2)[1].strip()
             return {

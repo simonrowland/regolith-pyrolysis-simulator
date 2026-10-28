@@ -4312,9 +4312,7 @@ def test_reduced_terminal_payload_preserves_run_notices_after_projection_failure
         )
         assert artifact == {"execution_status": "failed"}
         metadata = captured["payload"]["run_metadata"]
-        assert metadata["diagnostic_gate_authority_notice"]["provider_id"] == (
-            "alphamelts-diagnostic"
-        )
+        assert "diagnostic_gate_authority_notice" not in metadata
         assert metadata["engine_commissioning_notice"] == sibling_notice
         assert metadata["high_t_melt_activity_fallback_notice"] == fallback_notice
     finally:

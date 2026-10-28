@@ -3512,6 +3512,28 @@ def _nasa9_fit_comparisons(
     invoke_pure_phase: bool,
     fit_records: Sequence[Mapping[str, object]] | None = None,
 ) -> list[_Nasa9FitComparison]:
+    """Score NASA-9 cells with one lineage index for this store snapshot."""
+
+    from simulator.battery.validate import bound_work_inputs
+
+    with bound_work_inputs(
+        context.works, context.observations, context.experiments
+    ):
+        return _nasa9_fit_comparisons_with_bound_lineage(
+            context,
+            engines=engines,
+            invoke_pure_phase=invoke_pure_phase,
+            fit_records=fit_records,
+        )
+
+
+def _nasa9_fit_comparisons_with_bound_lineage(
+    context,
+    *,
+    engines: Sequence[Engine],
+    invoke_pure_phase: bool,
+    fit_records: Sequence[Mapping[str, object]] | None = None,
+) -> list[_Nasa9FitComparison]:
     """Score precision-qualified NASA-9 grid points with the shared residual owner."""
 
     from simulator.battery.generators.compilation_thermo_fits import (

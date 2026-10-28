@@ -213,7 +213,7 @@ class RunExecutor:
                 config,
                 backend=_backend_from_worker_runtime(config, worker_runtime),
             )
-        except CampaignPressureSetpointRefusal as exc:
+        except (CampaignPressureSetpointRefusal, EvaporationFluxRefusal) as exc:
             return self.execute_session(
                 session,
                 hours=hours,
@@ -230,7 +230,9 @@ class RunExecutor:
         *,
         hours: int,
         stop_at_stage0_exit: bool | None = None,
-        initial_refusal: CampaignPressureSetpointRefusal | None = None,
+        initial_refusal: (
+            CampaignPressureSetpointRefusal | EvaporationFluxRefusal | None
+        ) = None,
     ) -> RunExecution:
         sim = session.simulator
         condensation_model = getattr(sim, "_condensation_model", None)

@@ -12,6 +12,8 @@ from simulator.chemistry.kernel.capabilities import (
     ChemistryIntent,
 )
 from simulator.chemistry.kernel.config import (
+    CHEMISTRY_KERNEL_RUN_INPUT_KEYS,
+    DEFAULT_LIQUID_FRACTION_PROVIDER,
     DEFAULT_OXYGEN_SINK_CHANNEL_MODE,
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
@@ -50,6 +52,8 @@ from simulator.chemistry.kernel.registry import ProviderRegistry
 # package surface stops accidental dependence in non-kernel code.
 
 __all__ = (
+    "CHEMISTRY_KERNEL_RUN_INPUT_KEYS",
+    "DEFAULT_LIQUID_FRACTION_PROVIDER",
     # DTOs
     "IntentRequest",
     "BACKEND_STATUS_PRECEDENCE",
