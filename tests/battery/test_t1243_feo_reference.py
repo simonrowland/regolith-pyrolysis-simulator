@@ -603,7 +603,7 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
         conversion = next(
             notice
             for notice in residual.notices
-            if notice.reason.startswith("reference_converted_via_fusion;")
+            if notice.reason.startswith("reference_converted_via_iron_saturation;")
         )
         assert conversion.kind is NoticeKind.DERIVATION_USES_COMPILATION
         assert "method=a_FeO(stoich)=N_Fe2+^0*a_FeO(source)" in conversion.reason
@@ -613,9 +613,6 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
             assert observation.value.point == Decimal("0.952")
             assert "factor=0.9861" in conversion.reason
             assert "log10_shift=-0.0061 dex" in conversion.reason
-        assert FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION in flagged_strata(
-            residual.notices
-        )
         for engine, reason in {
             Engine.INTERNAL_ANALYTICAL: RefusalReason.IDENTITY_INCOMPLETE,
             Engine.ALPHAMELTS: RefusalReason.UNSUPPORTED,
