@@ -180,14 +180,22 @@ def test_c0b_coevaporation_uses_hot_train_flux_and_debits_ledger(
     assert cleanup_flux.species_kg_hr["PO"] > 0.0
     assert cleanup_flux.species_kg_hr["PO2"] > 0.0
 
+    hot_depleted = sim._apply_analytic_evaporation_depletion(hot_flux)
+    cleanup_flux = sim._apply_analytic_evaporation_depletion(cleanup_flux)
+    assert hot_depleted.species_kg_hr["Na"] > 0.0
+    assert hot_depleted.species_kg_hr["K"] > 0.0
+    if temperature_C == 1320.0:
+        assert hot_depleted.species_kg_hr["SiO"] > 0.0
     before = sim.atom_ledger.mol_by_account("process.cleaned_melt")
     sim._route_to_condensation(cleanup_flux)
     committed = sim._ledger_committed_evap_flux_this_tick.species_kg_hr
     after = sim.atom_ledger.mol_by_account("process.cleaned_melt")
     for species, parent in (("Na", "Na2O"), ("K", "K2O"), ("SiO", "SiO2")):
-        assert committed[species] > 0.0
-        assert after[parent] < before[parent]
-        assert sim.condensation_model.last_condensation_authority_by_species[species]["status"] != "refused"
+        expected = hot_depleted.species_kg_hr.get(species, 0.0)
+        assert committed.get(species, 0.0) == pytest.approx(expected, rel=1e-12, abs=0.0)
+        if expected > 0.0:
+            assert after[parent] < before[parent]
+            assert sim.condensation_model.last_condensation_authority_by_species[species]["status"] != "refused"
     sim.atom_ledger.assert_balanced()
 
 
