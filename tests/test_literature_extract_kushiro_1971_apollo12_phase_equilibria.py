@@ -104,7 +104,7 @@ def test_isolated_migration_maps_compositions_temperatures_and_unknown_condition
     )
     assert mixture_b_row.identity.composition is not None
     assert mixture_b_row.identity.composition.is_value
-    assert mixture_b_row.identity.composition.value.as_map() == expected_moles
+    assert mixture_b_row.identity.composition.value.as_map() == expected_moles.as_map()
     composition_condition = mixture_b_row.point_conditions["composition"]
     assert composition_condition.state.is_value
     assert composition_condition.locator is not None
