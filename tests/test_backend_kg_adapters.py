@@ -520,11 +520,11 @@ def test_backend_composition_mol_preserves_noncanonical_ledger_species():
     )
 
 
-def test_backend_composition_mol_includes_spent_reductant_residue():
+def test_backend_composition_mol_excludes_spent_reductant_residue():
     backend = RecordingInternalAnalyticalBackend()
     sim = _sim(backend)
     sim.load_batch("oxide", mass_kg=1000.0)
-    before = sim._backend_composition_mol().get("Na2O", 0.0)
+    before = sim._backend_composition_mol()
     sim.atom_ledger.load_external(
         SPENT_REDUCTANT_RESIDUE_ACCOUNT,
         {"Na2O": 1.0},
@@ -534,9 +534,9 @@ def test_backend_composition_mol_includes_spent_reductant_residue():
 
     composition = sim._backend_composition_mol()
 
-    assert composition["Na2O"] == pytest.approx(
-        before + sim.atom_ledger.mol_by_account(SPENT_REDUCTANT_RESIDUE_ACCOUNT)["Na2O"]
-    )
+    assert composition == before
+    assert sim.atom_ledger.project_account_kg(
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT)["Na2O"] == pytest.approx(1.0)
 
 
 def test_equilibrium_mixin_backend_path_is_disabled():

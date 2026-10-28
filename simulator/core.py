@@ -9162,7 +9162,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
 
     def _melt_resident_composition_kg_from_atom_ledger(self) -> Dict[str, float]:
-        """Project both melt-resident accounts without changing cached outputs."""
+        """Project the shared physical-melt account basis."""
         return _merge_species_amounts_from_accounts(
             {account: self.atom_ledger.project_account_kg(account)
              for account in MELT_RESIDENT_ACCOUNTS},
@@ -9277,9 +9277,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Project the *full* cleaned_melt account, not just OXIDE_SPECIES: a
         # FactSAGE LIQUID/SOLID phase can legitimately carry non-oxide species
         # (dissolved metallic Fe/Si, a solid mineral). Truncating to oxides
-        # would drop that mass.  Na spent-reductant residue is also
-        # melt-resident, but kept in its own ledger account so vapor/yield
-        # completeness cannot mistake it for feedstock Na.
+        # would drop that mass. Dissolved shuttle oxides share cleaned_melt;
+        # their material origin is tracked independently in the ledger.
         self.melt.composition_kg = projected_melt
         # melt_oxide_kg keeps its oxide-only contract (Stage 0 reload path,
         # feedstock inventory snapshots); the non-oxide remainder stays in

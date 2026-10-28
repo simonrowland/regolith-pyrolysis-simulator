@@ -197,9 +197,8 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
 
         from simulator.accounting.account_views import merge_species_amounts_from_accounts
 
-        # Provenance-isolated spent oxide is physically in the same melt.
-        # Only this thermodynamic basis is combined; Fe/O2 funding and
-        # transition accounts continue to use the original account view.
+        # Thermodynamic composition shares the debitable physical-melt basis;
+        # Fe/O2 funding still uses the original account view.
         basis_view = ProviderAccountView(
             accounts={CLEANED_MELT_ACCOUNT: merge_species_amounts_from_accounts(
                 accounts, MELT_RESIDENT_ACCOUNTS)},

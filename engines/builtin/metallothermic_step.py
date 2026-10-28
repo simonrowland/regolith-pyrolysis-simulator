@@ -108,8 +108,7 @@ atom-balance validation at dispatch time AND again at commit time.
 
 Account declaration: ``process.cleaned_melt`` (debit oxides being
 reduced + credit K2O / Na2O / MgO / regenerated Al2O3 coproducts),
-``process.spent_reductant_residue`` (read existing melt-resident residue
-for composition), ``process.metal_phase`` (credit Fe/Cr/Ti/Al/Si metals
+``process.metal_phase`` (credit Fe/Cr/Ti/Al/Si metals
 + debit Al on back-reduction), ``process.reagent_inventory`` (debit
 K/Na/Mg consumed), and ``terminal.drain_tap_material`` (credit net C6
 Al product).
@@ -164,7 +163,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
-from simulator.account_ids import MELT_RESIDENT_ACCOUNTS, SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.account_ids import MELT_RESIDENT_ACCOUNTS
 from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
@@ -232,13 +231,12 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
     name = "builtin-metallothermic-step"
 
     # Accounts the legacy _shuttle_inject_K / _shuttle_inject_Na /
-    # _step_thermite collectively touch, including existing residue read
-    # for melt composition. New dissolved coproducts share cleaned_melt.
+    # _step_thermite collectively touch. Dissolved coproducts share the
+    # physical melt account used by evaporation.
     DECLARED_ACCOUNTS = frozenset({
-        "process.cleaned_melt",
+        *MELT_RESIDENT_ACCOUNTS,
         "process.metal_phase",
         "process.reagent_inventory",
-        SPENT_REDUCTANT_RESIDUE_ACCOUNT,
         C6_AL_PRODUCT_ACCOUNT,
     })
 
@@ -312,26 +310,12 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             or {}
         )
 
-        # Project the melt's kg view from the mol accounts (the legacy
-        # path reads self.melt.composition_kg, which is the simulator's
-        # projection of process.cleaned_melt plus melt-resident
-        # spent-reductant residue).  The kg dict + total_kg pair is the
-        # shape the C3 solubility-limit math reads.
+        # Use the same debitable melt for composition and the C3
+        # solubility denominator; legacy residue is separate inventory.
         composition_kg, total_kg = composition_kg_from_account_view(
             request.account_view,
-            "process.cleaned_melt",
+            MELT_RESIDENT_ACCOUNTS[0],
         )
-        spent_residue_kg, spent_residue_total_kg = (
-            composition_kg_from_account_view(
-                request.account_view,
-                SPENT_REDUCTANT_RESIDUE_ACCOUNT,
-            )
-        )
-        composition_kg = merge_species_amounts_from_accounts(
-            {MELT_RESIDENT_ACCOUNTS[0]: composition_kg,
-             SPENT_REDUCTANT_RESIDUE_ACCOUNT: spent_residue_kg},
-            MELT_RESIDENT_ACCOUNTS)
-        total_kg += spent_residue_total_kg
         composition_mol = merge_species_amounts_from_accounts(
             request.account_view.accounts, MELT_RESIDENT_ACCOUNTS)
         composition_wt_pct = self._wt_pct_from_kg(composition_kg, total_kg)

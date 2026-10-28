@@ -217,7 +217,6 @@ def test_provider_declares_metallothermic_accounts():
         "process.cleaned_melt",
         "process.metal_phase",
         "process.reagent_inventory",
-        SPENT_REDUCTANT_RESIDUE_ACCOUNT,
         "terminal.drain_tap_material",
     })
     assert "process.overhead_gas" not in profile.declared_accounts
@@ -525,7 +524,6 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         "process.cleaned_melt",
         "process.metal_phase",
         "process.reagent_inventory",
-        SPENT_REDUCTANT_RESIDUE_ACCOUNT,
         # b3de842: fresh C6 thermite Al routes to the terminal product tap.
         C6_AL_PRODUCT_ACCOUNT,
     })
@@ -3117,7 +3115,6 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
         "process.cleaned_melt",
         "process.metal_phase",
         "process.reagent_inventory",
-        SPENT_REDUCTANT_RESIDUE_ACCOUNT,
         "terminal.drain_tap_material",
     }
     cumulative_imbalance_kg = 0.0

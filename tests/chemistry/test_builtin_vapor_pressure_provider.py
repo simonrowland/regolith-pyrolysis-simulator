@@ -253,16 +253,11 @@ def test_provider_declares_exactly_melt_resident_accounts(vapor_pressure_data):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     profile = provider.capability_profile()
     assert profile.declared_accounts == frozenset({
-        "process.cleaned_melt", "process.spent_reductant_residue"})
+        "process.cleaned_melt"})
 
 
 def test_provider_declares_only_cleaned_melt_account(vapor_pressure_data):
-    """Old intent: the provider declared only process.cleaned_melt.
-
-    That claim cannot hold. The provider now uses the complete physical
-    melt basis, cleaned melt plus spent reductant residue. This name
-    asserts that basis.
-    """
+    """Pressure and evaporation debit the same dissolved inventory."""
     test_provider_declares_exactly_melt_resident_accounts(vapor_pressure_data)
 
 
@@ -3597,7 +3592,7 @@ def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(
     assert oxidized_activity < reduced_activity
 
 
-def test_spent_oxide_provenance_does_not_change_physical_vapour_activity(
+def test_legacy_spent_oxide_does_not_change_debitable_melt_activity(
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     from dataclasses import replace
@@ -3610,10 +3605,10 @@ def test_spent_oxide_provenance_does_not_change_physical_vapour_activity(
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     request = _fe_redox_request(species_formula_registry=registry,
                                intrinsic_fO2_log=-10.0)
-    cleaned = {'SiO2': 200.0, 'FeO': 100.0, 'Fe2O3': 1.0}
+    cleaned = {'SiO2': 200.0, 'FeO': 100.0, 'Fe2O3': 1.0, 'Na2O': 50.0}
     results = []
     for accounts in (
-        {'process.cleaned_melt': {**cleaned, 'Na2O': 50.0}},
+        {'process.cleaned_melt': cleaned},
         {'process.cleaned_melt': cleaned,
          'process.spent_reductant_residue': {'Na2O': 50.0}},
     ):
@@ -3629,8 +3624,7 @@ def test_spent_oxide_provenance_does_not_change_physical_vapour_activity(
         assert ledger.mol_by_account() == before_mol
         results.append(result.diagnostic)
 
-    # Account provenance cannot change the chemical potential of the same
-    # physical melt. Fe/O2 inventory availability remains a separate input.
+    # Historical residue is separate from the same debitable physical melt.
     assert results[1]['source_reaction_composition_wt_pct'] == pytest.approx(
         results[0]['source_reaction_composition_wt_pct'])
     assert results[1]['activities'] == pytest.approx(results[0]['activities'])
@@ -3752,7 +3746,7 @@ def test_imposed_vapor_request_retains_exact_serialized_result(vapor_pressure_da
 def test_kernel_filters_provider_to_melt_resident_accounts_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """The kernel exposes both physical melt accounts and excludes other phases."""
+    """The kernel exposes debitable melt and excludes legacy residue/other phases."""
 
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -3791,7 +3785,7 @@ def test_kernel_filters_provider_to_melt_resident_accounts_only(
     assert seen_accounts, "provider was never dispatched"
     for accounts in seen_accounts:
         assert accounts == frozenset({
-            "process.cleaned_melt", "process.spent_reductant_residue"}), (
+            "process.cleaned_melt"}), (
             "kernel filter leaked an undeclared account into the provider"
         )
 
@@ -3799,12 +3793,7 @@ def test_kernel_filters_provider_to_melt_resident_accounts_only(
 def test_kernel_filters_provider_to_cleaned_melt_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """Old intent: the kernel showed the provider only process.cleaned_melt.
-
-    That claim cannot hold. The provider's declared basis is both physical
-    melt accounts, and the kernel still drops every other phase. This name
-    asserts that complete-basis filter.
-    """
+    """The kernel's physical melt basis is the cleaned-melt debit account."""
     test_kernel_filters_provider_to_melt_resident_accounts_only(
         vapor_pressure_data, feedstocks_data, setpoints_data,
     )

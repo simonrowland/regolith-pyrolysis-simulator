@@ -19,7 +19,6 @@ from tests.chemistry.conftest import _atom_check, _build_sim
 
 DECLARED_ACCOUNTS = frozenset({
     "process.cleaned_melt",
-    "process.spent_reductant_residue",
     "process.overhead_gas",
     "reservoir.fo2_buffer",
     "process.metal_phase",
@@ -112,7 +111,7 @@ def test_fe_redox_respeciation_intent_authority_is_registered(
     ] == "builtin-fe-redox-respeciation"
 
 
-def test_respeciation_at_intrinsic_potential_keeps_spent_oxide_equilibrium(
+def test_respeciation_at_intrinsic_potential_excludes_legacy_spent_oxide(
     formula_registry,
 ):
     from simulator.accounting.ledger import AtomLedger
@@ -130,6 +129,7 @@ def test_respeciation_at_intrinsic_potential_keeps_spent_oxide_equilibrium(
         sim.atom_ledger.load_external_mol(
             account, species_mol, source='fixture', material_origin='feedstock')
     composition = sim._melt_oxide_wt_pct()
+    assert 'Na2O' not in composition
     intrinsic = kress91_intrinsic_state(
         feo_mol=100.0, fe2o3_mol=1.0,
         mol_fractions=melt_mol_fractions_for_kress91(composition),

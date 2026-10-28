@@ -50,10 +50,9 @@ OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT = (
 # (operator-supplied reductant).
 SOLID_CHAR_CARBON_ACCOUNT = "process.solid_char_carbon"
 SPENT_REDUCTANT_RESIDUE_ACCOUNT = "process.spent_reductant_residue"
-MELT_RESIDENT_ACCOUNTS = (
-    "process.cleaned_melt",
-    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
-)
+# Dissolved shuttle coproducts return to cleaned_melt, which evaporation can
+# debit. The legacy spent-residue bucket remains separate inventory, not melt.
+MELT_RESIDENT_ACCOUNTS = ("process.cleaned_melt",)
 C7_AL_CREDIT_ACCOUNT = "process.c7_al_credit"
 OXYGEN_STORED_ACCOUNTS = (
     OXYGEN_STAGE0_ACCOUNT,

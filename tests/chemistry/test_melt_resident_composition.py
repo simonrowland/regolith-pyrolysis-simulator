@@ -1,4 +1,4 @@
-"""Pin melt-resident account aggregation before consolidating its readers."""
+"""Physical melt projection shares the account evaporation can debit."""
 
 from types import SimpleNamespace
 
@@ -9,7 +9,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.state import MeltState
 
 
-def test_melt_resident_projection_includes_spent_oxide_and_retains_nonoxide(
+def test_melt_projection_excludes_spent_residue_and_retains_nonoxide(
     vapor_pressure_data,
 ):
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
@@ -26,12 +26,14 @@ def test_melt_resident_projection_includes_spent_oxide_and_retains_nonoxide(
     sim._project_cleaned_melt_from_atom_ledger()
 
     assert sim.melt.composition_kg == pytest.approx(
-        {'FeO': 3.0, 'Fe': 0.2, 'Na2O': 1.0}, abs=1e-15)
-    assert sim.melt.total_mass_kg == pytest.approx(4.2, abs=1e-15)
+        {'FeO': 3.0, 'Fe': 0.2}, abs=1e-15)
+    assert sim.melt.total_mass_kg == pytest.approx(3.2, abs=1e-15)
     assert sim._melt_oxide_wt_pct() == pytest.approx(
-        {'FeO': 75.0, 'Na2O': 25.0}, abs=1e-14)
+        {'FeO': 100.0}, abs=1e-14)
+    assert sim.atom_ledger.project_account_kg(
+        'process.spent_reductant_residue') == pytest.approx({'Na2O': 1.0})
 
     sim.vapor_pressures = vapor_pressure_data
     sim.species_formula_registry = {}
     _, _, available_kg = sim._build_evaporation_aux_maps({'Na': 1.0, 'Fe': 1.0})
-    assert available_kg == pytest.approx({'Na': 1.0, 'Fe': 3.0}, abs=1e-15)
+    assert available_kg == pytest.approx({'Na': 0.0, 'Fe': 3.0}, abs=1e-15)
