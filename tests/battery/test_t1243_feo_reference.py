@@ -517,6 +517,13 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
 
 
 def test_distin_activity_refuses_without_source_oxygen_potential(migration) -> None:
+    """d-305: keep all 24 Distin rows refused until t-1571 can score them.
+
+    Table I prints FeO, Fe2O3, SiO2 and an oxygen-in-metal activity ratio,
+    but no fO2. Fixing fO2 or dropping Fe2O3 would be an unruled derivation;
+    scoring needs an engine that imposes Fe-metal saturation and solves fO2
+    and a_FeO jointly from the full bulk composition.
+    """
     observation = next(
         row
         for row in _feo_rows(migration)
