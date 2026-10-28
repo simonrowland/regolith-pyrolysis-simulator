@@ -1045,9 +1045,9 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
         ),
         pytest.param(
             {'missing_alpha': {'CrO2': {}, 'CrO': {}}},
-            'missing evaporation_alpha for sampled species: CrO, CrO2; set '
-            'chemistry_kernel.allow_unmeasured_alpha_fallback '
-            'for alpha=1.0 prototype fallback',
+            # Artificial unavailable provider output gets the generic refusal;
+            # absent measured alpha alone now predicts proxy/upper-bound flux.
+            'evaporation_flux_unavailable',
             id='missing-alpha-alone',
         ),
         pytest.param(
