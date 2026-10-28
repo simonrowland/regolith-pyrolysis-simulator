@@ -100,12 +100,18 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
         for family in extract["species"].values()
         for row in family["observations"]
     }
-    assert "simulator/battery/enums.py:65-66" in rows[
+    assert "simulator/battery/enums.py::Quantity.P_SAT" in rows[
         "powell_1971_t01_r05_apparent_knudsen_pressure"
     ]["values"]["schema_gap_note"]
-    assert "simulator/battery/migrate.py:5385-5387" in rows[
+    assert "simulator/battery/migrate.py::_pressure_species_phase_provenance" in rows[
         "powell_1971_t01_r05_apparent_knudsen_pressure"
     ]["values"]["schema_gap_note"]
+    positive_k_note = rows["powell_1971_p101_r04_dissociation_and_kp"]["values"][
+        "schema_gap_note"
+    ]
+    assert "simulator/battery/enums.py::Quantity.LOG10_K_REACTION" in positive_k_note
+    assert "tools/validate_literature_extracts.py::OBSERVATION_TYPES" in positive_k_note
+    assert "simulator/battery/migrate.py::TYPE_QUANTITY" in positive_k_note
     assert (
         rows["powell_1971_t01_r02_mass_loss_rate"]["values"]["mass_loss_rate_as_printed"]
         == "3.33 x 10-3"
