@@ -11031,8 +11031,9 @@ def test_stolyarova_table3_137_content_ids_and_reference_states_are_stable(
         ).encode()
     ).hexdigest()
     # t-1353 stores the physical PDF page on locator.page, so the content-stable
-    # point ids move. The reference states in this payload are unchanged.
-    assert digest == "979291d9c0a3171046d7bc98ee762e85687eb2b937c1d1fa4405b9493f15bf97"
+    # point ids move. The Table 2-3 run conditions move the same :h= suffix.
+    # The reference states in this payload are unchanged.
+    assert digest == "294d6b5b3fba35da66634a64205243f9a774bf7db707dab8ef9d7b37bbfa3754"
 
 
 def test_schaefer_photochemical_lifetimes_retain_table4_rate_ancestry(
@@ -11148,8 +11149,24 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         and obs.identity.composition is not None
         and obs.identity.composition.is_value
     ]
-    assert len(composition_rows) == 300
-    for obs in composition_rows:
+    table_composition_rows = [
+        obs
+        for obs in composition_rows
+        if "stolyarova_1996_table2_" in obs.observation_id
+        or "stolyarova_1996_table3_" in obs.observation_id
+    ]
+    figure_composition_rows = [
+        obs
+        for obs in composition_rows
+        if "stolyarova_1996_fig2_" in obs.observation_id
+        and "_digitized" in obs.observation_id
+    ]
+    assert len(table_composition_rows) == 300
+    assert len(figure_composition_rows) == 281
+    assert len(composition_rows) == (
+        len(table_composition_rows) + len(figure_composition_rows)
+    )
+    for obs in table_composition_rows:
         assert obs.identity.temperature_K.is_value
         assert obs.identity.temperature_K.value == Decimal("1933")
         condition = obs.point_conditions["composition"]
@@ -11222,21 +11239,35 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         for obs in candidates
         if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
     ]
-    candidate_rails = Counter(
-        str(
-            rail_for_quantity(
-                obs.identity.quantity.value if obs.identity.quantity.is_value else None,
-                species_formula=obs.identity.species.formula,
+    def _rail_counter(observations):
+        return Counter(
+            str(
+                rail_for_quantity(
+                    obs.identity.quantity.value if obs.identity.quantity.is_value else None,
+                    species_formula=obs.identity.species.formula,
+                )
             )
+            for obs in observations
         )
+
+    table_candidates = [
+        obs
         for obs in candidates
-    )
-    assert candidate_rails == {
+        if "stolyarova_1996_fig2_" not in obs.observation_id
+    ]
+    figure_candidates = [
+        obs
+        for obs in candidates
+        if "stolyarova_1996_fig2_" in obs.observation_id
+        and "_digitized" in obs.observation_id
+    ]
+    assert _rail_counter(table_candidates) == {
         "None": 6,
         "SiO_evolution": 45,
         "melt_activity": 137,
         "vapour": 118,
     }
+    assert _rail_counter(figure_candidates) == {"melt_activity": 281}
 
 
 def test_comparison_provenance_is_not_inherited_by_unknown_quantity_points(
