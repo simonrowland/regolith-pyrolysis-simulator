@@ -1324,7 +1324,9 @@ def test_hot_non_c0_campaign_uses_same_hour_resolved_backpressure(monkeypatch):
     sim.start_campaign(CampaignPhase.C4)
     sim.melt.temperature_C = 1600.0
     provider_partials = []
+    solver_inputs = []
     calculate_evaporation = sim._calculate_evaporation
+    solve_overloaded = sim.overhead_model._solve_overloaded_evaporation_flux
 
     def observe_evaporation(equilibrium, **kwargs):
         partials = kwargs.get("overhead_partials_override_Pa")
@@ -1332,11 +1334,20 @@ def test_hot_non_c0_campaign_uses_same_hour_resolved_backpressure(monkeypatch):
             provider_partials.append(dict(partials))
         return calculate_evaporation(equilibrium, **kwargs)
 
+    def observe_solver(melt, **kwargs):
+        solver_inputs.append(dict(kwargs))
+        return solve_overloaded(melt, **kwargs)
+
     monkeypatch.setattr(sim, "_calculate_evaporation", observe_evaporation)
+    monkeypatch.setattr(
+        sim.overhead_model,
+        "_solve_overloaded_evaporation_flux",
+        observe_solver,
+    )
 
     snapshot = sim.step()
 
-    assert snapshot.evap_flux.total_kg_hr == pytest.approx(0.0)
+    assert snapshot.evap_flux.species_kg_hr["Na"] > 0.0
     assert sim.melt.campaign == CampaignPhase.C4
     assert snapshot.overhead.transport_saturation_pct == pytest.approx(100.0)
     notice = snapshot.overhead.transport_overload_notice
@@ -1350,10 +1361,45 @@ def test_hot_non_c0_campaign_uses_same_hour_resolved_backpressure(monkeypatch):
     )
     assert notice["predicted_pressure_bar"] > sim.melt.p_total_mbar / 1000.0
     assert provider_partials
-    assert sum(provider_partials[-1].values()) == pytest.approx(
-        notice["resolved_pressure_bar"] * 1.0e5,
+    fixed_inlet_species_kg_hr = solver_inputs[-1][
+        "fixed_inlet_species_kg_hr"
+    ]
+    assert fixed_inlet_species_kg_hr["O2"] > 0.0
+    total_gas_species_kg_hr = dict(fixed_inlet_species_kg_hr)
+    for species, rate in snapshot.evap_flux.species_kg_hr.items():
+        total_gas_species_kg_hr[species] = (
+            total_gas_species_kg_hr.get(species, 0.0) + rate
+        )
+    total_gas_flux = EvaporationFlux(
+        species_kg_hr=total_gas_species_kg_hr
+    )
+    total_gas_flux.update_totals()
+    solved_pressure_Pa = notice["resolved_pressure_bar"] * 1.0e5
+    expected_partials_mbar = sim.overhead_model.species_partial_pressures(
+        total_gas_flux,
+        solved_pressure_Pa / 100.0,
+        sim.overhead_model.species_formula_registry,
+    )
+    expected_partials_Pa = {
+        species: pressure_mbar * 100.0
+        for species, pressure_mbar in expected_partials_mbar.items()
+    }
+    assert expected_partials_Pa["O2"] > 0.0
+    assert sum(expected_partials_Pa.values()) == pytest.approx(
+        solved_pressure_Pa,
         rel=1.0e-9,
         abs=1.0e-6,
+    )
+    assert provider_partials[-1]["Na"] == pytest.approx(
+        expected_partials_Pa["Na"], rel=1.0e-9, abs=1.0e-9
+    )
+    transport = sim._effective_transport_capacity_this_tick
+    assert transport.demand_flux_kg_hr == pytest.approx(
+        snapshot.evap_flux.total_kg_hr
+        + sum(fixed_inlet_species_kg_hr.values())
+    )
+    assert transport.demand_flux_kg_hr == pytest.approx(
+        transport.pipe_capacity_kg_hr, rel=1.0e-9
     )
     assert snapshot.overhead.pressure_mbar >= (
         notice["resolved_pressure_bar"] * 1000.0
