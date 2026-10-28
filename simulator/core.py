@@ -152,30 +152,27 @@ class _RefusalSnapshotHistoryPrefix:
 
 
 class _RefusalSnapshotInsertedMapping:
-    """O(1) rollback view of the per-hour yield rows.
+    """Rollback view of the committed yield rows.
 
-    ``_yield_disposition_ledger_snapshots`` is written only by
-    ``capture_ledger_snapshot`` after a successful step.  It appends one
-    uniquely keyed hour row and never edits a committed row in place.  Keep
-    the source and its prefix length so the successful step avoids copying
-    the cumulative gross-event history.  On terminal refusal, deepcopy the
-    saved prefix into an ordinary detached dict before restoring it.
+    Capture key/value references at the start of the hour so rollback can
+    discard inserted keys and restore overwritten values. Terminal refusal
+    deep-copies those references into an owned dict; successful steps keep
+    the committed values shared.
     """
 
-    __slots__ = ('_source', '_length', '_memo')
+    __slots__ = ('_source', '_items', '_memo')
 
     def __init__(self, source: dict[Any, Any], memo: Dict[int, Any]) -> None:
         self._source = source
-        self._length = len(source)
+        self._items = tuple(source.items())
         self._memo = memo
         memo[id(source)] = self
 
     def materialize(self) -> dict[Any, Any]:
         materialized: dict[Any, Any] = {}
         self._memo[id(self._source)] = materialized
-        for index, (key, item) in enumerate(self._source.items()):
-            if index >= self._length:
-                break
+        for key, item in self._items:
+            # Match dict deepcopy's value-before-key order.
             copied_item = _deepcopy_refusal_value(item, self._memo)
             copied_key = _deepcopy_refusal_value(key, self._memo)
             materialized[copied_key] = copied_item
@@ -15232,9 +15229,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self, '_yield_disposition_ledger_snapshots', None,
         )
         if defer_committed_history and type(yield_rows) is dict:
-            # Each committed row retains all condensation gross events to
-            # date. Keep only the O(1) mapping frontier on the step hot path;
-            # terminal refusal materializes the old rows with owned values.
+            # Terminal refusal copies the captured rows; non-dict values use
+            # the ordinary deepcopy path.
             _RefusalSnapshotInsertedMapping(yield_rows, memo)
         state_source = {
             name: value

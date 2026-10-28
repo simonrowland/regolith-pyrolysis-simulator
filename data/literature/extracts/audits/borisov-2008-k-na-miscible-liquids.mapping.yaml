@@ -1,0 +1,111 @@
+schema_version: literature_extract_mapping_audit.v1
+source_id: borisov-2008-k-na-miscible-liquids
+source_text: text/borisov-2008-k-na-miscible-liquids/pdftotext-layout.txt
+table_tool_status: No MinerU markdown/table draft exists for this born-digital source; the pdftotext-layout.txt
+  text layer is exact, and every row/column assignment was confirmed against the 600 dpi render.
+tables:
+- table: '1'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 553
+    table: '1'
+  printed_data_rows: 11
+  columns_as_printed:
+  - Composition
+  - SiO2
+  - Al2O3
+  - MgO
+  - CaO
+  mapped_fields:
+  - values.formula
+  - values.value
+  - values.composition_wt_pct
+  - derived_from Table 3 sample rows
+  disposition: typed as measured_reduced because authors report average experimental-glass microprobe analyses recalculated
+    to alkali-free compositions; CSA MgO cells are explicit dashes and are not imputed.
+- table: '2'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 554
+    table: '2'
+  printed_data_rows: 11
+  columns_as_printed:
+  - Series no.
+  - Sample label
+  - −log fO2
+  - Duration h
+  - Source label
+  - Initial SiO2
+  - Initial Na2O
+  - Initial K2O
+  - Initial total
+  - Final SiO2
+  - Final Na2O
+  - Final K2O
+  - Final total
+  mapped_fields:
+  - conditions fO2_log, duration_h, temperature_K; source composition formula/value; source label and initial/final
+    stage
+  disposition: typed measured initial and final source compositions by printed source label; explicit dashes remain
+    missing. Series 23 initial source composition is model-derived context because the footnote says it was calculated.
+- table: '3'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 555
+    table: '3'
+  printed_data_rows: 45
+  columns_as_printed:
+  - Sample
+  - SiO2
+  - Al2O3
+  - MgO
+  - CaO
+  - Na2O
+  - s.d.
+  - K2O
+  - s.d.
+  - Total
+  mapped_fields:
+  - equilibrium_phase_composition for every printed oxide component, sample_id, T_C, fO2_log, duration, pressure,
+    quench provenance, incomplete composition unknown
+  disposition: typed all 213 printed oxide-component measurements across 45 rows. The 8 mixed-alkali rows have two
+    alkali species. Dashes are retained as missing-cell declarations; DAS25Na-1 is preserved as printed.
+- table: '4'
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 559
+    table: '4'
+  printed_data_rows: 31
+  columns_as_printed:
+  - Sample
+  - X SiO2
+  - X Na2O
+  - X K2O
+  - γ Na2O
+  - γ K2O
+  mapped_fields:
+  - activity_coefficient by measured species; printed mole fractions; inherited experiment conditions; derived_from
+    Table 3 rows; standard_state_as_published
+  disposition: typed 33 measured_reduced gamma values. The eight X SiO2=0.45 standard rows are extrapolated virtual
+    reference compositions and are context/model-derived. The author-defined virtual reference melt has no matching
+    closed standard-state token; retain the printed basis in standard_state_as_published.
+render_check:
+  dpi: 600
+  physical_pdf_pages:
+  - 2
+  - 3
+  - 4
+  - 8
+  rendered_cells_checked: 834
+  numeric_cells_emitted: 577
+  explicit_dash_cells_checked: 137
+  hand_corrections: 0
+  table_rows:
+    '1': 11
+    '2': 11
+    '3': 45
+    '4': 31

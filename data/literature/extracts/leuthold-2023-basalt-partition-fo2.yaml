@@ -1,0 +1,560 @@
+schema_version: literature_extract.v1
+source_id: leuthold-2023-basalt-partition-fo2
+source:
+  citation: 'Leuthold, J., Blundy, J. & Ulmer, P. (2023). Trace element partitioning in basaltic systems as a function of oxygen fugacity. Contributions to Mineralogy and Petrology 178, 95.'
+  doi: 10.1007/s00410-023-02069-x
+  year: 2023
+  corpus_asset: raw/leuthold-2023-basalt-partition-fo2/leuthold-2023-basalt-partition-fo2.pdf
+  sha256: 2ffbfc964d244752d6dcb3490bcf5b1ab5f13c9bba72d353e389dbdd22c41114
+extraction:
+  method: >-
+    Born-digital pdftotext-layout review with 600 dpi render checks of Table 1, Table 2 and figure pages. The corpus has no MinerU table blocks and the table emitter does not accept pdftotext-only sources. The complete run analyses are in Online Resource 3, which is absent from the corpus. Two glass V concentrations quoted in the main text have printed temperature and NNO-relative conditions and are retained as observations; their final melt compositions remain unknown. The remaining plotted values are figure records with digitisation deferred.
+  date: '2026-10-20'
+  worker: fam19-1019
+review_status: draft
+fidelity_samples:
+  - path: species.V.observations[leuthold_2023_b62_2_glass_v_1190c_nno_minus4].values.points[0].value
+    value: '400'
+    note: Printed glass V concentration at 1190 °C under NNO-4; individual final glass composition is unavailable.
+    locator: {page: 7, pdf_page_index: 6, section: Trace element chemistry}
+experiments:
+  - experiment_id: leuthold_2023_b62_2_picrite_gas_mixing_experiments
+    series: B62/2 picrite experiments under variable oxygen fugacity
+    method: quench_equilibration
+    method_as_printed: One-atmosphere CO2-H2 gas-mixing furnace experiments followed by drop-quench into water.
+    locator: {page: 3, pdf_page_index: 2, section: Experiments}
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: leuthold_2023_table_1_starting_material_compositions
+        type: printed_table_context
+        locator: {page: 2, pdf_page_index: 1, table: '1'}
+        attribution: 'B62/2 picrite from Upton et al. (2002); 11JL33 basalt from Leuthold et al. (2014). Analyses are reported in this paper.'
+        units: wt% except Mg#
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - liquidus_composition
+          - residue_component_composition
+        reason_unscored: No existing token represents the major-oxide composition of fused starting powders before the experiments. These are not equilibrated phases or the final melt compositions.
+        values:
+          quantity_as_printed: Starting-material composition
+          composition_basis_as_printed: wt%
+          rows:
+            - {component: SiO2, B62/2_picrite: '45.76', 11JL33_basalt: '47.09'}
+            - {component: TiO2, B62/2_picrite: '1.56', 11JL33_basalt: '2.14'}
+            - {component: Al2O3, B62/2_picrite: '13.58', 11JL33_basalt: '14.12'}
+            - {component: Cr2O3, B62/2_picrite: '0.11', 11JL33_basalt: '0.03'}
+            - {component: Fe2O3, B62/2_picrite: '12.38', 11JL33_basalt: '13.21'}
+            - {component: MnO, B62/2_picrite: '0.19', 11JL33_basalt: '0.2'}
+            - {component: MgO, B62/2_picrite: '12.42', 11JL33_basalt: '6.47'}
+            - {component: CaO, B62/2_picrite: '11.25', 11JL33_basalt: '10.43'}
+            - {component: NiO, B62/2_picrite: '0.04', 11JL33_basalt: '0.01'}
+            - {component: Na2O, B62/2_picrite: '2.23', 11JL33_basalt: '2.97'}
+            - {component: K2O, B62/2_picrite: '0.16', 11JL33_basalt: '0.57'}
+            - {component: P2O5, B62/2_picrite: '0.13', 11JL33_basalt: '0.20'}
+            - {component: LOI, B62/2_picrite: '0.51', 11JL33_basalt: '2.58'}
+            - {component: Total, B62/2_picrite: '100.32', 11JL33_basalt: '100.04'}
+            - {component: Mg#, B62/2_picrite: '0.67', 11JL33_basalt: '0.49', basis: molar}
+      - observation_id: leuthold_2023_equilibrium_run_compositions_not_available
+        type: data_availability_context
+        locator: {page: 3, pdf_page_index: 2, section: Analyses}
+        units: PDF and online-resource availability
+        values:
+          quantity_as_printed: Experimental run conditions and phase compositions
+          source_as_printed: Online Resources 1 to 3
+          availability: Online Resource 3 contains the analytical results; Online Resources 1 and 2 contain run conditions and products for B62/2 and 11JL33 respectively.
+          corpus_status: The supplied corpus contains the article PDF but not the online resource files.
+          reason_unscored: Individual sample analyses and complete melt compositions are not available here. The starting-material table does not substitute for final glass compositions.
+      - observation_id: leuthold_2023_table_2_fit_parameters
+        type: model_parameter_table_context
+        locator: {page: 18, pdf_page_index: 17, table: '2'}
+        attribution: 'Sources printed in the table: (1) Mallmann and O’Neill (2009); (2) this study; (3) Dohmen and Blundy (2014).'
+        units: values and SD as printed
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - valence_ratio
+          - interaction_parameter
+        reason_unscored: Table 2 reports fitted redox potentials and mineral-melt partition coefficients. No existing quantity token represents a partition coefficient or the fitted redox-potential parameter. All rows are model-derived fit parameters, not measured compositions or valence-ratio observations.
+        values:
+          quantity_as_printed: Fit parameters for D(V), D(V)/D(Sc) and D(Eu)/D(Sr)
+          method_class: model_derived
+          rows:
+            - {mineral: olivine and clinopyroxene, parameter: 'E*(V2+–V5+)', value: '−3.587', SD: '0.059', source: '1'}
+            - {mineral: olivine and clinopyroxene, parameter: 'E*(V3+–V5+)', value: '−1.174', SD: '0.037', source: '1'}
+            - {mineral: olivine and clinopyroxene, parameter: 'E*(V4+–V5+)', value: '−0.838', SD: '0.123', source: '1'}
+            - {mineral: clinopyroxene, parameter: 'D(V2+)/D(Sc)', value: '0.228', SD: '0.024', source: '2'}
+            - {mineral: clinopyroxene, parameter: 'D(V3+)/D(Sc)', value: '2.66', SD: '0.05', source: '2'}
+            - {mineral: clinopyroxene, parameter: 'D(V4+)/D(Sc)', value: '0.286', SD: '0.033', source: '2'}
+            - {mineral: clinopyroxene, parameter: 'D(V5+)/D(Sc)', value: '0.0134', SD: '0.0006', source: '2'}
+            - {mineral: clinopyroxene, parameter: 'D(V2+)', value: '0.764', SD: '0.059', source: '2'}
+            - {mineral: clinopyroxene, parameter: 'D(V3+)', value: '4.642', SD: '0.058', source: '2'}
+            - {mineral: clinopyroxene, parameter: 'D(V4+)', value: '0.607', SD: '0.046', source: '2'}
+            - {mineral: clinopyroxene, parameter: 'D(V5+)', value: '0.0169', SD: '0.0006', source: '2'}
+            - {mineral: olivine, parameter: 'D(V2+)', value: '6.84', SD: '0.05', source: '2'}
+            - {mineral: olivine, parameter: 'D(V3+)', value: '0.107', SD: '0.002', source: '2'}
+            - {mineral: olivine, parameter: 'D(V4+)', value: '0.0809', SD: '0.0016', source: '2'}
+            - {mineral: olivine, parameter: 'D(V5+)', value: '0.00270', SD: '0.00004', source: '2'}
+            - {mineral: plagioclase, parameter: 'E*(Eu2+–Eu3+)', value: '−1.463', SD: '0.004', source: '2'}
+            - {mineral: plagioclase, parameter: 'D(Eu2+)/D(Sr)', value: '1.047', SD_as_printed: '–', source: '3'}
+            - {mineral: plagioclase, parameter: 'D(Eu3+)/D(Sr)', value: '0.0080', SD: '0.0023', source: '2'}
+      - observation_id: leuthold_2023_text_fe_redox_estimates
+        type: model_result_context
+        locator: {page: 7, pdf_page_index: 6, section: Major element chemistry}
+        units: dimensionless fractions and Fe3+/Fe2+ ratio as printed
+        candidate_tokens_considered:
+          - valence_ratio
+          - fe3_fe2_ratio
+        reason_unscored: The prose says glass Fe3+/Fetot was estimated with the Kress and Carmichael (1991) algorithm. These are model estimates rather than measured valence-ratio points, and the cited prose does not bind the estimates to individual sample rows.
+        values:
+          quantity_as_printed: Glass Fe3+/Fetot and Fe3+/Fe2+
+          method_class: model_derived
+          calculation_as_printed: Kress and Carmichael (1991) algorithm at experimental temperature and fO2
+          estimates_as_printed:
+            maximum_temperature: 'ca. 1180 °C'
+            reduced: 'Fe3+/Fetot ca. 0.02 and Fe3+/Fe2+ 0.04 at NNO-4'
+            oxidized: 'Fe3+/Fetot 0.17 at NNO+1 and 0.35 in air; Fe3+/Fe2+ 1.04 in air'
+          note: The estimates are post-run calculations; no absolute fO2 values were computed or added.
+      - observation_id: leuthold_2023_text_glass_composition_summaries_without_complete_rows
+        type: measured_summary_context
+        locator: {page: 7, pdf_page_index: 6, section: Major and trace element chemistry}
+        units: printed units retained per quantity
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - liquidus_composition
+        reason_unscored: The prose gives trend summaries and ranges without a complete per-sample composition row. The final glass analyses and run identifiers are in absent Online Resource 3, so these summaries cannot be bound as full melt-composition observations.
+        values:
+          evidence_class: measured_direct unless specifically marked calculated below
+          summaries:
+            - {quantity: 'glass NBO/T', values_as_printed: '0.83 to 0.55 from liquidus to plagioclase saturation; 0.74 at 1110 °C and NNO-0.8; ca. 0.68 at NNO-4; ca. 0.66 at NNO-0.8; ca. 0.34–0.48 in air', units: dimensionless, approximate_terms_as_printed: ['ca. 0.68', 'ca. 0.66', 'ca. 0.34–0.48']}
+            - {quantity: 'glass Cr and Cr2O3', values_as_printed: 'Cr2O3 0.11 wt% on the liquidus to 0.01 wt% after Cr-spinel saturation; at 1175–1160 °C glass Cr is ca. 470 µg/g (0.07 wt% Cr2O3) from NNO-4 to NNO-2; decreases to 20 µg/g in air', units: wt% and µg/g, approximate_terms_as_printed: ['ca. 470 µg/g']}
+            - {quantity: 'glass V', values_as_printed: '400 µg/g at 1190 °C to 150 µg/g at 1125 °C under NNO-4; under oxidizing conditions 400 µg/g at 1200 °C to ca. 1100 µg/g at 1165–1125 °C', units: µg/g, approximate_terms_as_printed: ['ca. 1100 µg/g']}
+            - {quantity: 'glass TiO2', values_as_printed: 'ca. 1.8 wt% at 1200 °C to ca. 6.8 wt% at 1110 °C below NNO; ca. 4.2 wt% at or below 1140 °C above NNO', units: wt%, approximate_terms_as_printed: ['ca. 1.8 wt%', 'ca. 6.8 wt%', 'ca. 4.2 wt%']}
+            - {quantity: 'glass Ni', values_as_printed: 'ca. 112 µg/g above NNO versus ca. 88 µg/g under reduced conditions', units: µg/g, approximate_terms_as_printed: ['ca. 112 µg/g', 'ca. 88 µg/g']}
+      - observation_id: leuthold_2023_text_partition_coefficient_summaries
+        type: measured_and_model_partition_context
+        locator: {page: 8, pdf_page_index: 7, section: Olivine and trace element chemistry}
+        units: dimensionless partition coefficients as printed
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - valence_ratio
+          - interaction_parameter
+        reason_unscored: The store has no quantity token for mineral-melt partition coefficients D or D normalized to another element. Printed D summaries are retained here without treating them as component compositions or valence ratios.
+        values:
+          quantity_as_printed: Mineral-melt trace-element partition coefficients
+          method_class: measured_direct and model_derived where noted
+          summaries:
+            - {mineral: olivine, parameter: 'D(Fe2+)/D(Mg)', value_as_printed: '0.292 ± 0.029', condition_as_printed: 'independent of temperature and fO2'}
+            - {mineral: olivine, parameter: 'DCr', value_as_printed: 'ca. 1.1'}
+            - {mineral: olivine, parameter: 'DNi', value_as_printed: '12–28'}
+            - {mineral: olivine, parameter: 'DSc', value_as_printed: '0.15–0.47'}
+            - {mineral: plagioclase, parameter: 'DEu', value_as_printed: 'ca. 0.5 at NNO-4 to ca. 0.05 at NNO+1'}
+            - {mineral: plagioclase, parameter: 'DEu in air', value_as_printed: '0.015', evidence_class: model_derived, method_as_printed: Lattice-strain estimate}
+      - observation_id: leuthold_2023_figure_1_bse_products
+        type: figure_record
+        locator: {page: 4, pdf_page_index: 3, figure: '1'}
+        panel: a–f
+        attribution: This study; starting-material descriptions refer to Leuthold et al. (2015).
+        units: no axes
+        values:
+          quantity: unavailable
+          species: [olivine, plagioclase, clinopyroxene, spinel, pigeonite, glass]
+          phase: Experimental multiphase products
+          temperature_as_printed: Close to clinopyroxene saturation for a,b and close to solidus for c,d; exact temperatures are not stated in the caption. Panels e,f use 11JL33 basalt.
+          axes_as_printed: no plotted axes
+          caption: Back-scattered electron images of B62/2 products near clinopyroxene saturation and solidus in strongly reducing and oxidizing conditions; panels e,f show 11JL33 basalt products. Sector zoning is visible in panel f.
+          series:
+            - {name: panel a B62/2 image, marker: BSE image, marker_count: 0}
+            - {name: panel b B62/2 image, marker: BSE image, marker_count: 0}
+            - {name: panel c B62/2 image, marker: BSE image, marker_count: 0}
+            - {name: panel d B62/2 image, marker: BSE image, marker_count: 0}
+            - {name: panel e 11JL33 image, marker: BSE image, marker_count: 0}
+            - {name: panel f 11JL33 image, marker: BSE image, marker_count: 0}
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_2_nbo_t
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, figure: '2'}
+        panel: whole_figure
+        attribution: This study; open starting-glass symbols identify B62/2 and 11JL33.
+        units: NBO/T dimensionless; ΔNNO log units relative to NNO
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity token represents the plotted melt NBO/T structural ratio.
+          species: [silicate melt]
+          phase: glass
+          temperature_as_printed: Liquidus through 1110–1125 °C; discrete temperature bands appear in the legend.
+          axes_as_printed: {x: 'Δ NNO', y: 'Glass NBO/T'}
+          caption: NBO/T of experimental glasses as a function of fO2 relative to NNO. The melt polymerizes from liquidus to plagioclase saturation and depolymerizes thereafter; it is more polymerized under oxidizing conditions. Open symbols denote starting-material glasses.
+          series:
+            - {name: B62/2 picrite 1180–1200 °C, marker: black filled diamond, marker_count: 7, evidence_class: measured_direct}
+            - {name: B62/2 picrite 1170–1175 °C, marker: purple filled diamond, marker_count: 6, evidence_class: measured_direct}
+            - {name: B62/2 picrite 1160–1165 °C, marker: blue filled diamond, marker_count: 8, evidence_class: measured_direct}
+            - {name: B62/2 picrite 1140–1150 °C, marker: cyan filled diamond, marker_count: 5, evidence_class: measured_direct}
+            - {name: B62/2 picrite 1110–1125 °C, marker: pale-blue filled diamond, marker_count: 6, evidence_class: measured_direct}
+            - {name: B62/2 starting glass, marker: open diamond, marker_count: 1, evidence_class: measured_direct}
+            - {name: 11JL33 starting glass, marker: open diamond, marker_count: 1, evidence_class: measured_direct}
+          marker_count_note: Counts are visual counts from the 600 dpi render; coincident markers may overlap.
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_3_trace_compositions
+        type: figure_record
+        locator: {page: 7, pdf_page_index: 6, figure: '3'}
+        panel: a–f
+        attribution: This study; shaded fields show 11JL33 basalt experiments and the plotted individual symbols show B62/2 picrite experiments.
+        units: Cr2O3 wt% and element concentrations µg/g; ΔNNO relative to NNO
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - liquidus_composition
+        values:
+          quantity: equilibrium_phase_composition
+          species: [Cr, V, Sm]
+          phase: glass in panels a–c; clinopyroxene in panels d–f
+          temperature_as_printed: Temperature bands are distinguished by symbol color; individual run temperatures are in Online Resources.
+          axes_as_printed: {x: 'ΔNNO', y: 'Glass or Cpx element concentration as labelled in each panel'}
+          caption: Trace-element variations for Cr2O3 in panels a,d; V in panels b,e; and Sm in panels c,f. Glass is shown in a–c and clinopyroxene in d–f. Cr2O3 varies with fO2, temperature and sector zoning; clinopyroxene V varies strongly with fO2; glass and clinopyroxene Sm increase with cooling and differentiation.
+          series:
+            - {name: panel a B62/2 glass Cr2O3 temperature-coded data, marker: diamond, marker_count: 37, evidence_class: measured_direct}
+            - {name: panel b B62/2 glass V temperature-coded data, marker: diamond, marker_count: 38, evidence_class: measured_direct}
+            - {name: panel c B62/2 glass Sm temperature-coded data, marker: diamond, marker_count: 40, evidence_class: measured_direct}
+            - {name: panel d B62/2 clinopyroxene Cr2O3 bright and dark sectors, marker: filled and open diamond, marker_count: 46, evidence_class: measured_direct}
+            - {name: panel e B62/2 clinopyroxene V temperature-coded data, marker: filled and open diamond, marker_count: 39, evidence_class: measured_direct}
+            - {name: panel f B62/2 clinopyroxene Sm bright and dark sectors, marker: filled and open diamond, marker_count: 36, evidence_class: measured_direct}
+            - {name: basalt experimental ranges, marker: shaded field, marker_count: 0, evidence_class: measured_direct}
+          marker_count_note: Counts are visual counts from the 600 dpi render; coincident sector markers may overlap.
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_4_plagioclase_feo
+        type: figure_record
+        locator: {page: 9, pdf_page_index: 8, figure: '4'}
+        panel: whole_figure
+        attribution: This study; shaded field shows 11JL33 basalt experiments.
+        units: FeOtot wt%; ΔNNO relative to NNO
+        values:
+          quantity: equilibrium_phase_composition
+          species: Fe
+          phase: plagioclase
+          temperature_as_printed: 1125–1200 °C in B62/2 experiments; discrete temperature bands appear in the legend.
+          axes_as_printed: {x: 'Δ NNO', y: 'Plg FeOtot [wt%]'}
+          caption: Plagioclase FeOtot as a function of fO2 relative to NNO. FeOtot rises strongly at high fO2 due to preferential Fe3+ incorporation. Individual B62/2 data and a shaded 11JL33 data range are shown.
+          series:
+            - {name: B62/2 plagioclase temperature-coded data, marker: filled colored diamond, marker_count: 35, evidence_class: measured_direct}
+            - {name: 11JL33 basalt range, marker: shaded field, marker_count: 0, evidence_class: measured_direct}
+          marker_count_note: Visible B62/2 marker count from the 600 dpi render; coincident markers may overlap.
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_5_cpx_aliv
+        type: figure_record
+        locator: {page: 10, pdf_page_index: 9, figure: '5'}
+        panel: whole_figure
+        attribution: This study; shaded fields show 11JL33 basalt experiments.
+        units: AlIV atoms per formula unit; temperature °C
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity token represents clinopyroxene tetrahedral AlIV site occupancy.
+          species: Al
+          phase: clinopyroxene
+          temperature_as_printed: Run temperature 1100–1200 °C
+          axes_as_printed: {x: 'Temperature [°C]', y: 'Cpx AlIV [apfu]'}
+          caption: Clinopyroxene tetrahedral aluminium decreases on cooling under relatively reducing conditions and is higher in slowly grown bright sectors. Filled symbols are bright sectors and open symbols are dark sectors.
+          series:
+            - {name: B62/2 bright sectors, marker: filled colored squares, marker_count: 32, evidence_class: measured_direct}
+            - {name: B62/2 dark sectors, marker: open colored squares, marker_count: 29, evidence_class: measured_direct}
+            - {name: 11JL33 basalt ranges for bright and dark sectors, marker: shaded fields, marker_count: 0, evidence_class: measured_direct}
+            - {name: model/reference lines, marker: line, marker_count: 0, evidence_class: model_derived}
+          marker_count_note: Counts are visual counts from the 600 dpi render; coincident markers may overlap.
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_6_sm_partitioning
+        type: figure_record
+        locator: {page: 13, pdf_page_index: 12, figure: '6'}
+        panel: a–b
+        attribution: This study; basalt field is from differentiation data.
+        units: dimensionless DSm; temperature °C and AlIV apfu
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - valence_ratio
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity token represents mineral-melt partition coefficient DSm.
+          species: Sm
+          phase: clinopyroxene and glass
+          temperature_as_printed: Panel a gives run temperature; panel b has AlIV on its x-axis.
+          axes_as_printed: {panel_a_x: 'Temperature [°C] and reciprocal temperature [K−1]', panel_a_y: 'D Sm Cpx-glass', panel_b_x: 'AlIV [apfu]', panel_b_y: 'D Sm Cpx-glass'}
+          caption: Samarium partitioning in clinopyroxene. DSm decreases on cooling and increases with differentiation from picrite to basalt; clinopyroxene-glass DSm is positively correlated with calculated clinopyroxene AlIV.
+          series:
+            - {name: panel a B62/2 equilibrium experiments, marker: colored squares, marker_count: 30, evidence_class: measured_direct}
+            - {name: panel b clinopyroxene-glass data, marker: filled and open colored squares, marker_count: 41, evidence_class: measured_direct}
+            - {name: basalt differentiation field, marker: shaded field, marker_count: 0, evidence_class: measured_direct}
+            - {name: panel b regression, marker: line, marker_count: 0, evidence_class: model_derived}
+          marker_count_note: Counts are visual counts from the 600 dpi render; coincident markers may overlap.
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_7_cpx_ree_onuma
+        type: figure_record
+        locator: {page: 14, pdf_page_index: 13, figure: '7'}
+        panel: whole_figure
+        attribution: Present study data for run250 at 1170 °C and NNO; lattice-strain fits after Blundy and Wood (1994).
+        units: dimensionless partition coefficient; cation radius Å; temperature °C; Mg# dimensionless
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - interaction_parameter
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity token represents clinopyroxene-melt partition coefficients DREE.
+          species: [REE, Y]
+          phase: clinopyroxene and melt
+          temperature_as_printed: Run250 at 1170 °C and NNO; panels b and c span 1050–1200 °C.
+          axes_as_printed: {panel_a_x: 'cation radius (Å)', panel_a_y: 'Partition coefficient', panel_b_x: 'Temperature (°C)', panel_b_y: 'D0 (REE)', panel_c_x: 'Temperature (°C)', panel_c_y: 'Mg#'}
+          caption: Onuma diagram for clinopyroxene-melt partition coefficients in a sector-zoned run250 crystal. Bright and dark sector least-squares lattice-strain fits are shown; DEu is omitted because both Eu valence states are present.
+          series:
+            - {name: bright sector REE and Y data, marker: blue circle, marker_count: 14, evidence_class: measured_direct}
+            - {name: dark sector REE and Y data, marker: red square, marker_count: 14, evidence_class: measured_direct}
+            - {name: bright-sector lattice-strain fit, marker: line, marker_count: 0, evidence_class: model_derived}
+            - {name: dark-sector lattice-strain fit, marker: line, marker_count: 0, evidence_class: model_derived}
+          marker_count_note: Visible symbol counts from the 600 dpi render; the apparent series includes Y and excludes Eu.
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_8_calculated_vs_experimental_ree
+        type: figure_record
+        locator: {page: 15, pdf_page_index: 14, figure: '8'}
+        panel: whole_figure
+        attribution: Experimental values are from this study; calculated values use Wood and Blundy (1997).
+        units: dimensionless DREE
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - interaction_parameter
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity token represents mineral-melt partition coefficient DREE.
+          species: REE
+          phase: clinopyroxene and melt
+          temperature_as_printed: Experimental temperatures; individual values are not enumerated in the figure caption.
+          axes_as_printed: {x: 'DREE (this study)', y: 'DREE (WB97)'}
+          caption: Comparison of calculated and experimental clinopyroxene DREE using experimental crystal and melt compositions and temperature, assuming all Fe is Fe2+. The figure reports 525 individual DREE determinations; DEu is not plotted.
+          series:
+            - {name: experimental versus calculated DREE determinations, marker: black circles, marker_count: 525, evidence_class: measured_direct}
+            - {name: 1:1 comparison, marker: line, marker_count: 0, evidence_class: model_derived}
+            - {name: 1.5:1 comparison, marker: line, marker_count: 0, evidence_class: model_derived}
+            - {name: 1:1.5 comparison, marker: line, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_9_cpx_ree_partitioning
+        type: figure_record
+        locator: {page: 16, pdf_page_index: 15, figure: '9'}
+        panel: a–c
+        attribution: Present study experimental data; panel c model after Wood and Blundy (2001).
+        units: dimensionless D0; Mg#; AlIV apfu; temperature °C
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - interaction_parameter
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity token represents D0 partition coefficients or Mg# against temperature and AlIV.
+          species: [REE, Mg, Al]
+          phase: clinopyroxene and melt
+          temperature_as_printed: 1050–1200 °C in panels a,b; panel c uses a 1150 °C model.
+          axes_as_printed: {panel_a_x: 'Temperature (°C)', panel_a_y: 'D0 (REE)', panel_b_x: 'Temperature (°C)', panel_b_y: 'Mg#', panel_c_x: 'AlIV (apfu)', panel_c_y: 'D0 (REE)'}
+          caption: Clinopyroxene-melt partitioning of REE. Filled symbols are experiments below NNO and open symbols are at or above NNO. Panel a plots D0 versus temperature; panel b compares M1-site Mg occupancy and melt Mg#; panel c plots D0 versus AlIV and includes sector tie-lines and an electrostatic model.
+          series:
+            - {name: panel a experimental D0 below NNO, marker: filled red square, marker_count: 22, evidence_class: measured_direct}
+            - {name: panel a experimental D0 at or above NNO, marker: open red square, marker_count: 13, evidence_class: measured_direct}
+            - {name: panel b clinopyroxene M1 Mg occupancy below and at/above NNO, marker: filled and open red square, marker_count: 32, evidence_class: measured_direct}
+            - {name: panel b melt Mg# below and at/above NNO, marker: filled and open black circle, marker_count: 30, evidence_class: measured_direct}
+            - {name: panel c experimental D0 and sector tie-lines, marker: filled/open square and line, marker_count: 29, evidence_class: measured_direct}
+            - {name: panel c electrostatic model, marker: purple dashed line, marker_count: 0, evidence_class: model_derived}
+          marker_count_note: Counts are visual counts from the 600 dpi render; coincident markers may overlap.
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_10_olivine_v_partitioning
+        type: figure_record
+        locator: {page: 18, pdf_page_index: 17, figure: '10'}
+        panel: whole_figure
+        attribution: Present study and cited literature datasets listed in the caption.
+        units: dimensionless DV; ΔNNO log units relative to NNO
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - valence_ratio
+          - interaction_parameter
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity token represents olivine-melt partition coefficient DV.
+          species: V
+          phase: olivine and melt
+          temperature_as_printed: Dataset spans multiple temperatures; individual conditions are in the cited sources.
+          axes_as_printed: {x: 'ΔNNO', y: 'DV'}
+          caption: Vanadium partitioning into olivine as a function of fO2 relative to NNO. A fitted curve uses redox potentials from Mallmann and O’Neill (2009); the combined calibration dataset is n=348.
+          series:
+            - {name: olivine DV calibration dataset, marker: source-coded symbols, marker_count: 348, evidence_class: measured_direct}
+            - {name: fitted relation, marker: solid line, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_11_cpx_v_partitioning
+        type: figure_record
+        locator: {page: 19, pdf_page_index: 18, figure: '11'}
+        panel: a–b
+        attribution: Present study and cited literature datasets listed in the caption.
+        units: dimensionless DV and DV/DSc; ΔNNO relative to NNO
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - valence_ratio
+          - interaction_parameter
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity token represents clinopyroxene-melt DV or DV normalized to DSc.
+          species: V
+          phase: clinopyroxene and melt
+          temperature_as_printed: Cited datasets span 1080–1470 °C; pressure and temperature vary among sources.
+          axes_as_printed: {panel_a_x: 'ΔNNO', panel_a_y: 'DV', panel_b_x: 'ΔNNO', panel_b_y: 'DV/DSc'}
+          caption: Vanadium partitioning into clinopyroxene as a function of ΔNNO. Panel a shows DV and panel b DV/DSc. The captions report n=185 for DV and n=116 for DV/DSc; curves are fits.
+          series:
+            - {name: panel a clinopyroxene DV datasets, marker: source-coded symbols, marker_count: 185, evidence_class: measured_direct}
+            - {name: panel b clinopyroxene DV/DSc datasets, marker: source-coded symbols, marker_count: 116, evidence_class: measured_direct}
+            - {name: panel a and b fitted relations, marker: solid lines, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_12_plagioclase_eu_partitioning
+        type: figure_record
+        locator: {page: 20, pdf_page_index: 19, figure: '12'}
+        panel: whole_figure
+        attribution: Present study and cited literature datasets listed in the caption.
+        units: dimensionless DEu/DSr; ΔNNO relative to NNO
+        candidate_tokens_considered:
+          - equilibrium_phase_composition
+          - valence_ratio
+          - interaction_parameter
+        values:
+          quantity: unavailable
+          schema_gap: No existing quantity token represents plagioclase-melt DEu/DSr.
+          species: Eu
+          phase: plagioclase and melt
+          temperature_as_printed: Cited experimental values span 1100–1220 °C.
+          axes_as_printed: {x: 'ΔNNO', y: 'DEu/DSr'}
+          caption: Europium partitioning into plagioclase expressed as DEu/DSr versus ΔNNO. The plot includes 150 data points and fitted curves.
+          series:
+            - {name: plagioclase DEu/DSr data, marker: source-coded symbols, marker_count: 150, evidence_class: measured_direct}
+            - {name: present-study and Sun et al. (1974) fit, marker: solid black line, marker_count: 0, evidence_class: model_derived}
+            - {name: Laubier et al. (2014) fit, marker: dashed black line, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_13_model_v_speciation
+        type: figure_record
+        locator: {page: 21, pdf_page_index: 20, figure: '13'}
+        panel: a–c
+        attribution: Panel a uses Borisov (2013); panel b uses Mallmann and O’Neill (2009); panel c uses extreme-fit values from this study.
+        units: fraction of total V; ΔNNO relative to NNO
+        candidate_tokens_considered:
+          - valence_ratio
+          - fe3_fe2_ratio
+        reason_unscored: Calculated vanadium-speciation curves are model-derived; figure points are deferred and no individual computed points are stored.
+        values:
+          quantity: valence_ratio
+          method_class: model_derived
+          species: V
+          phase: silicate melt
+          temperature_as_printed: Panel a at 1300 °C; panels b,c use values stated in Table 2 and in the text.
+          axes_as_printed: {x: 'ΔNNO', y: 'X (fraction of total V)'}
+          caption: Calculated vanadium redox speciation in silicate melts using three sets of redox potentials.
+          series:
+            - {name: panel a V2+ fraction, marker: red curve, marker_count: 0, evidence_class: model_derived}
+            - {name: panel a V3+ fraction, marker: black curve, marker_count: 0, evidence_class: model_derived}
+            - {name: panel a V4+ fraction, marker: purple curve, marker_count: 0, evidence_class: model_derived}
+            - {name: panel a V5+ fraction, marker: green curve, marker_count: 0, evidence_class: model_derived}
+            - {name: panel b four calculated valence fractions, marker: colored curves, marker_count: 0, evidence_class: model_derived}
+            - {name: panel c four revised calculated valence fractions, marker: colored curves, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: leuthold_2023_figure_14_v_average_valence_xanes
+        type: figure_record
+        locator: {page: 21, pdf_page_index: 20, figure: '14'}
+        panel: whole_figure
+        attribution: XANES data from Sutton et al. (2005) and Righter et al. (2006, 2011); model curves are from Borisov (2013), Mallmann and O’Neill (2009) and this study.
+        units: average V valence; ΔNNO relative to NNO
+        candidate_tokens_considered:
+          - valence_ratio
+        reason_unscored: Figure points are deferred. The caption identifies quenched XANES glass measurements and calculated comparison curves; no individual numeric points are transcribed.
+        values:
+          quantity: valence_ratio
+          species: V
+          phase: quenched silicate glass
+          post_quench: true
+          temperature_as_printed: Not stated for the compiled quenched-glass measurements.
+          axes_as_printed: {x: 'ΔNNO', y: 'Average valence'}
+          caption: Vanadium average valence plotted against ΔNNO. Open and filled circles denote XANES analyses of quenched Fe-bearing and Fe-free glasses; three calculated curves and an arrow for quench modification are also shown.
+          compiled_glass_count_as_printed: 98
+          marker_count_source_locator: {page: 22, pdf_page_index: 21, section: Vanadium redox speciation}
+          series:
+            - {name: Fe-bearing open and Fe-free filled quenched-glass XANES points, marker: open and filled circles, marker_count: 98, evidence_class: quoted_attributed}
+            - {name: Borisov (2013) calculated V*, marker: dashed black line, marker_count: 0, evidence_class: model_derived}
+            - {name: Mallmann and O’Neill (2009) calculated V*, marker: red line, marker_count: 0, evidence_class: model_derived}
+            - {name: extreme-fit calculated V*, marker: blue line, marker_count: 0, evidence_class: model_derived}
+            - {name: quench-modification direction and magnitude, marker: arrow, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+  V:
+    observations:
+      - observation_id: leuthold_2023_b62_2_glass_v_1190c_nno_minus4
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        experiment: leuthold_2023_b62_2_picrite_gas_mixing_experiments
+        phase: glass
+        locator: {page: 7, pdf_page_index: 6, section: Trace element chemistry}
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: Vanadium concentration in quenched experimental glass; µg/g
+          method_as_printed: LA-ICP-MS
+          formula: V
+          points:
+            - sample_id_as_published: B62/2
+              sample_material_as_published: B62/2 picrite-derived experimental glass; the per-run glass composition is unavailable.
+              value: '400'
+              value_as_printed: '400'
+              value_as_published: '400 µg/g at 1190 °C under NNO-4'
+              T_C: '1190'
+              point_conditions:
+                T_C:
+                  state: {tag: value, value: '1190'}
+                  locator: {page: 7, pdf_page_index: 6, section: Trace element chemistry}
+                delta_NNO:
+                  state: {tag: value, value: '-4'}
+                  locator: {page: 7, pdf_page_index: 6, section: Trace element chemistry, note: Printed buffer condition NNO-4; no absolute fO2 calculated.}
+                total_pressure_Pa:
+                  state: {tag: value, value: '101325'}
+                  locator: {page: 3, pdf_page_index: 2, section: Experiments, note: Experiments were conducted in one-atmosphere gas-mixing furnaces.}
+                composition:
+                  state: {tag: unknown, reason: The final glass analysis and individual run composition are in absent Online Resource 3; Table 1 is only the starting powder composition.}
+                  locator: {page: 3, pdf_page_index: 2, section: Analyses}
+              quench_statement:
+                text: Following equilibration the experimental sample was drop-quenched into water.
+                preservation: not_stated
+                quench_direction: not_stated
+                locator: {page: 3, pdf_page_index: 2, section: Experiments}
+      - observation_id: leuthold_2023_b62_2_glass_v_1125c_nno_minus4
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        experiment: leuthold_2023_b62_2_picrite_gas_mixing_experiments
+        phase: glass
+        locator: {page: 7, pdf_page_index: 6, section: Trace element chemistry}
+        units: µg/g
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: measured_direct
+          admission_status: admitted
+          basis_as_published: Vanadium concentration in quenched experimental glass; µg/g
+          method_as_printed: LA-ICP-MS
+          formula: V
+          points:
+            - sample_id_as_published: B62/2
+              sample_material_as_published: B62/2 picrite-derived experimental glass; the per-run glass composition is unavailable.
+              value: '150'
+              value_as_printed: '150'
+              value_as_published: '150 µg/g at 1125 °C under NNO-4'
+              T_C: '1125'
+              point_conditions:
+                T_C:
+                  state: {tag: value, value: '1125'}
+                  locator: {page: 7, pdf_page_index: 6, section: Trace element chemistry}
+                delta_NNO:
+                  state: {tag: value, value: '-4'}
+                  locator: {page: 7, pdf_page_index: 6, section: Trace element chemistry, note: Printed buffer condition NNO-4; no absolute fO2 calculated.}
+                total_pressure_Pa:
+                  state: {tag: value, value: '101325'}
+                  locator: {page: 3, pdf_page_index: 2, section: Experiments, note: Experiments were conducted in one-atmosphere gas-mixing furnaces.}
+                composition:
+                  state: {tag: unknown, reason: The final glass analysis and individual run composition are in absent Online Resource 3; Table 1 is only the starting powder composition.}
+                  locator: {page: 3, pdf_page_index: 2, section: Analyses}
+              quench_statement:
+                text: Following equilibration the experimental sample was drop-quenched into water.
+                preservation: not_stated
+                quench_direction: not_stated
+                locator: {page: 3, pdf_page_index: 2, section: Experiments}
+    context: []

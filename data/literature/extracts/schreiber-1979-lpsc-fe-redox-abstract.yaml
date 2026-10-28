@@ -1,0 +1,201 @@
+schema_version: literature_extract.v1
+source_id: schreiber-1979-lpsc-fe-redox-abstract
+figure_policy: Figures 1-6 are recorded without numeric plot points; measured plot series remain deferred to a figure pass.
+source:
+  citation: >-
+    Schreiber, H. D., Thanyasiri, T., and Lauer, H. V., Jr. (1979). Redox
+    Equilibria of Iron in Synthetic Basaltic Melts. Lunar and Planetary Science
+    X, 1070-1072 (abstract 1376).
+  year: 1979
+  doi: null
+extraction:
+  method: >-
+    Three-page scanned LPSC abstract transcribed from pdftotext-layout and
+    MinerU. The abstract gives redox results as Figures 1-6; their data points
+    are deferred. Printed conditions and fit descriptions are retained as
+    context without creating scored observations.
+  date: '2026-10-20'
+  worker: fam27-1020
+review_status: draft
+experiments:
+  - experiment_id: schreiber_1979_iron_redox_abstract
+    series: >-
+      Preliminary Fe(III)-Fe(II) equilibrium in synthetic FAS and FAD silicate
+      melts as a function of bulk composition, temperature, oxygen fugacity and
+      total Fe concentration. The abstract prints 1500/1550 °C, -log fO2 = 0-3,
+      and total Fe = 0.2-2.5 wt%; numerical redox results are in deferred figures.
+    locator: {page: 1, pdf_page_index: 0, section: Abstract}
+species:
+  Fe:
+    observations: []
+    context:
+      - observation_id: schreiber_1979_no_numeric_redox_points_outside_figures
+        type: assessment
+        locator: {page: 1, pdf_page_index: 0, section: Abstract}
+        units: qualitative
+        values:
+          quantity: Fe(III)-Fe(II) redox equilibrium in synthetic melts
+          admission_status: typed_unavailable
+          reason: >-
+            The abstract reports experimental conditions and summarizes results
+            only in Figures 1-6. No numerical measured redox ratio is printed in
+            the prose; figure points are deferred by the family rules.
+      - observation_id: schreiber_1979_figure1_iron_redox_equilibrium
+        type: figure_record
+        locator: {page: 2, pdf_page_index: 1, published_page: 1071, figure: '1'}
+        phase: glass
+        units: ratio and oxygen fugacity
+        values:
+          quantity: fe3_fe2_ratio
+          method_class: figure_only
+          species: Fe
+          temperature_as_published: 1500 and 1550 °C
+          axes_as_published: x log([Fe2+]/[Fe3+]) with top axis [Fe2+]/[ΣFe]; y -log fO2
+          caption_as_published: >-
+            Summary of Fe(III)-Fe(II) equilibrium results in synthetic silicate
+            melts with total Fe below 1.5 wt%. Straight-line slopes agree within
+            experimental error with the theoretical value 4; the caption gives
+            a calculated reduction-reaction enthalpy of 28±17 kcal/mole.
+          panel: upper 1550 °C and lower 1500 °C
+          series:
+            - {label: FAS, marker: circle, marker_count: 6}
+            - {label: FAD, marker: triangle, marker_count: 6}
+            - {label: fitted equilibrium lines, marker_count: 0}
+          attribution: This work
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: schreiber_1979_figure2_absorption_and_equilibrium_time
+        type: figure_record
+        locator: {page: 2, pdf_page_index: 1, published_page: 1071, figure: '2'}
+        phase: glass
+        units: Fe uptake and redox ratio versus equilibration time (hours)
+        values:
+          quantity: valence_ratio
+          method_class: figure_only
+          species: Fe
+          T_C: 1500
+          axes_as_published: x equilibration time (hours); y Fe absorption and Fe redox equilibrium measures
+          caption_as_published: >-
+            Time dependence of Fe absorption by the Pt container and establishment
+            of Fe redox equilibrium for FAS and FAD with Fe/(Fe+Mg)=0.1 at 1500 °C
+            and fO2=10^-2.8 atm. A Pt capsule was used to hold enough material for
+            wet-chemical analysis.
+          panel: A Pt-container Fe absorption; B Fe redox equilibrium
+          series:
+            - {label: FAS, marker: circle, marker_count: 10}
+            - {label: FAD, marker: triangle, marker_count: 10}
+          attribution: This work
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: schreiber_1979_figure3_epr_spectrum
+        type: figure_record
+        locator: {page: 2, pdf_page_index: 1, published_page: 1071, figure: '3'}
+        phase: glass
+        units: normalized EPR absorption derivative versus magnetic field
+        values:
+          quantity: unavailable
+          schema_gap: No EPR spectrum quantity token exists in the store.
+          method_class: figure_only
+          species: Fe
+          temperature_as_published: ambient EPR measurement
+          axes_as_published: x magnetic field; y absorption derivative
+          caption_as_published: >-
+            Typical X-band EPR spectrum for a silicate glass containing trace
+            amounts of Fe. The absorption peak is characteristic of Fe(III) in
+            the glass structure.
+          panel: single spectrum
+          series:
+            - {label: representative Fe-doped glass EPR trace, marker_count: 0}
+          attribution: This work
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: schreiber_1979_figure4_feiii_epr_calibration
+        type: figure_record
+        locator: {page: 2, pdf_page_index: 1, published_page: 1071, figure: '4'}
+        phase: glass
+        units: Fe(III) wt% and relative EPR signal intensity
+        values:
+          quantity: unavailable
+          schema_gap: >-
+            No store quantity represents the calibration of EPR intensity to
+            Fe(III) concentration in weight percent.
+          method_class: figure_only
+          species: Fe
+          temperature_as_published: not stated in the figure caption
+          axes_as_published: x [Fe3+] wt%; y peak intensity and integrated intensity (relative units)
+          caption_as_published: >-
+            Preliminary calibration of Fe(III) EPR signal to Fe(III) concentration
+            in silicate glasses. Fe(III) is total Fe by electron microprobe minus
+            Fe(II) by chemical titration. The caption says EPR is reliable only
+            below 0.5 wt% Fe(III); circles denote FAS and triangles FAD.
+          panel: upper integrated intensity; lower peak intensity
+          series:
+            - {label: FAS, marker: circle, marker_count: 22}
+            - {label: FAD, marker: triangle, marker_count: 24}
+          attribution: This work
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: schreiber_1979_figure5_redox_couple_comparison
+        type: figure_record
+        locator: {page: 3, pdf_page_index: 2, published_page: 1072, figure: '5'}
+        phase: glass
+        units: log redox ratio and -log fO2
+        values:
+          quantity: valence_ratio
+          method_class: figure_only
+          species: [Ti, Eu, Cr, Fe, Ce]
+          temperature_as_published: 1500 °C
+          composition_as_published: FAS
+          axes_as_published: x log R; y -log fO2; upper axis X (reduced-ion fraction)
+          caption_as_published: >-
+            Comparison of redox equilibria of multivalent elements in synthetic
+            silicate melts at a common temperature and bulk composition for
+            multivalent-element concentrations of about 1 wt%. R is the ratio of
+            reduced to oxidized ion concentrations and X the fraction in the
+            reduced state.
+          panel: single plot
+          series:
+            - {label: Ti(III)-Ti(IV), marker_count: 0}
+            - {label: Eu(II)-Eu(III), marker_count: 0}
+            - {label: Cr(II)-Cr(III), marker_count: 0}
+            - {label: Fe(II)-Fe(III), marker_count: 0}
+            - {label: Ce(III)-Ce(IV), marker_count: 0}
+          attribution: This work; other redox couples are comparative series
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: schreiber_1979_figure6_iron_redox_vs_total_fe
+        type: figure_record
+        locator: {page: 3, pdf_page_index: 2, published_page: 1072, figure: '6'}
+        phase: glass
+        units: Fe redox ratio and total Fe wt%
+        values:
+          quantity: fe3_fe2_ratio
+          method_class: figure_only
+          species: Fe
+          T_C: 1500
+          fO2_as_published: 10^-0.7 atm
+          axes_as_published: x total Fe wt%; y log([Fe2+]/[Fe3+]); upper axis Fe/(Fe+Mg) molar ratio
+          caption_as_published: >-
+            Dependence of Fe(III)-Fe(II) equilibrium on total Fe concentration in
+            synthetic silicate melts at 1500 °C and fO2=10^-0.7 atm. Fe replaces
+            Mg in FAS and FAD to obtain different Fe/(Fe+Mg) ratios.
+          panel: single plot
+          series:
+            - {label: FAS, marker: circle, marker_count: 7}
+            - {label: FAD, marker: triangle, marker_count: 7}
+          attribution: This work
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: schreiber_1979_table1_reduction_reaction_enthalpy
+        type: assessment
+        locator: {page: 2, pdf_page_index: 1, published_page: 1071, figure: '1'}
+        units: kcal/mole as printed
+        values:
+          quantity: standard enthalpy change for Fe(III) to Fe(II) reduction reaction
+          method_class: model_derived
+          admission_status: typed_unavailable
+          value_as_published: 28±17 kcal/mole
+          candidate_tokens: [delta_fH]
+          reason: >-
+            The value is calculated from the equilibrium plot and is an enthalpy
+            change for a reduction reaction, not a standard formation enthalpy.

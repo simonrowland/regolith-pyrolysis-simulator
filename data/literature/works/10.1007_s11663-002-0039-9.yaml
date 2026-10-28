@@ -1,0 +1,2616 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s11663-002-0039-9
+  citation: Xiao, Y., Holappa, L. & Reuter, M.A. (2002). Oxidation State and Activities of Chromium Oxides in CaO-SiO2-CrOx
+    Slag System. Metallurgical and Materials Transactions B, 33, 595-603.
+  source_ids:
+  - xiao-2002-chromium-oxide-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:xiao-2002-chromium-oxide-activities
+      role: pdf
+      path: raw/xiao-2002-chromium-oxide-activities/xiao-2002-chromium-oxide-activities.pdf
+      sha256:
+        tag: value
+        value: 7ac2d28cd448df32101ed8e7718905d4d6f2188b716086b1ffbffe2d830604e2
+    - asset_id: pdftotext:xiao-2002-chromium-oxide-activities
+      role: pdftotext
+      path: text/xiao-2002-chromium-oxide-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:xiao-2002-chromium-oxide-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+    - asset_id: tables:xiao-2002-chromium-oxide-activities
+      role: table_csv
+      path: tables/xiao-2002-chromium-oxide-activities/t1.csv
+      sha256:
+        tag: value
+        value: 94496a3bc606991e1c4c18cbb78cc05fbc8d3f26c67e924c230fa30655e24f65
+  doi: 10.1007/s11663-002-0039-9
+experiments:
+- experiment_id: 10.1007/s11663-002-0039-9::xiao-2002-chromium-oxide-activities
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11663-002-0039-9
+  locator:
+    page: 4
+    published_page: 598
+    pdf_page_index: 3
+    table: I
+    note: Table I, sample CSC1; the printed values are bound by sample id.; row=CSC1; column=Cr2+/T_Cr
+context:
+- observation_id: xiao_2002_fig10_pe_effect
+  type: figure_record
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 601
+    figure: '10'
+  phase: l
+  units: as printed
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: CrO1.5
+    temperature_as_printed: 1873 K (from the section discussion; not restated in the caption)
+    axes_as_printed: ordinate activity of CrO1.5; abscissa mol% CrOx.
+    attribution: Xiao, Holappa and Reuter (2002), present study.
+    caption: Effect of Pe on the activity of CrO1.5, standard state - pure solid CrO1.5.
+    panel: whole figure
+    series:
+    - label: without Pe effect
+      marker: open circle
+      marker_count: 14
+    - label: with Pe effect
+      marker: filled circle
+      marker_count: 14
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: Model curves are not digitized.
+    standard_state_as_printed: pure solid CrO1.5
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig10_pe_effect
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: CrO1.5
+- observation_id: xiao_2002_fig11_activities_comparison
+  type: figure_record
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 602
+    figure: '11'
+  phase: l
+  units: as printed
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: CrO and CrO1.5
+    temperature_as_printed: 1873 K
+    axes_as_printed: ordinate calculated activities; abscissa measured activities; both dimensionless.
+    attribution: Xiao, Holappa and Reuter (2002), present study.
+    caption: Measured and calculated activities.
+    panel: whole figure
+    series:
+    - label: CrO activity data
+      marker: triangle
+      marker_count: 48
+    - label: CrO1.5 activity data
+      marker: circle
+      marker_count: 48
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: Model calculations and measurements are shown together; no points are digitized.
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig11_activities_comparison
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_fig12_activity_cro_comparison
+  type: figure_record
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 602
+    figure: '12'
+  phase: l
+  units: as printed
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: CrO
+    temperature_as_printed: 1873 K
+    axes_as_printed: ternary mol% CaO-SiO2-CrOx composition; contours of CrO activity.
+    attribution: Xiao, Holappa and Reuter (2002), present study.
+    caption: Comparison between calculated and measured activities of CrO in CaO-SiO2-CrO-CrO1.5 slag system in equilibrium
+      with Cr at 1873 K, standard state - pure liquid CrO.
+    panel: whole figure
+    series:
+    - label: a(CrO) marker bin 0-0.15
+      marker: legend symbol as printed
+      marker_count: 2
+    - label: a(CrO) marker bin 0.15-0.25
+      marker: legend symbol as printed
+      marker_count: 7
+    - label: a(CrO) marker bin 0.25-0.35
+      marker: legend symbol as printed
+      marker_count: 4
+    - label: a(CrO) marker bin 0.35-0.45
+      marker: legend symbol as printed
+      marker_count: 2
+    - label: a(CrO) marker bin 0.45-0.55
+      marker: legend symbol as printed
+      marker_count: 6
+    - label: a(CrO) marker bin 0.55-0.65
+      marker: legend symbol as printed
+      marker_count: 3
+    - label: a(CrO) marker bin 0.65-0.75
+      marker: legend symbol as printed
+      marker_count: 5
+    - label: a(CrO) marker bin 0.75-0.85
+      marker: legend symbol as printed
+      marker_count: 8
+    - label: a(CrO) marker bin 0.85-0.95
+      marker: legend symbol as printed
+      marker_count: 11
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: Counted measured sample markers per activity-bin legend from Table I; calculated contours are unmarked model lines.
+      No values digitized.
+    standard_state_as_printed: pure liquid CrO
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig12_activity_cro_comparison
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: CrO
+- observation_id: xiao_2002_fig13_activity_cro15_comparison
+  type: figure_record
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 602
+    figure: '13'
+  phase: l
+  units: as printed
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: CrO1.5
+    temperature_as_printed: 1873 K
+    axes_as_printed: ternary mol% CaO-SiO2-CrOx composition; contours of CrO1.5 activity.
+    attribution: Xiao, Holappa and Reuter (2002), present study.
+    caption: Comparison between calculated and measured activities of CrO1.5 in CaO-SiO2-CrO-CrO1.5 slag system in equilibrium
+      with Cr at 1873 K, standard state - pure solid CrO1.5.
+    panel: whole figure
+    series:
+    - label: a(CrO1.5) marker bin 0-0.08
+      marker: legend symbol as printed
+      marker_count: 4
+    - label: a(CrO1.5) marker bin 0.08-0.15
+      marker: legend symbol as printed
+      marker_count: 5
+    - label: a(CrO1.5) marker bin 0.15-0.25
+      marker: legend symbol as printed
+      marker_count: 4
+    - label: a(CrO1.5) marker bin 0.25-0.35
+      marker: legend symbol as printed
+      marker_count: 2
+    - label: a(CrO1.5) marker bin 0.35-0.45
+      marker: legend symbol as printed
+      marker_count: 6
+    - label: a(CrO1.5) marker bin 0.45-0.55
+      marker: legend symbol as printed
+      marker_count: 3
+    - label: a(CrO1.5) marker bin 0.55-0.65
+      marker: legend symbol as printed
+      marker_count: 2
+    - label: a(CrO1.5) marker bin 0.65-0.75
+      marker: legend symbol as printed
+      marker_count: 7
+    - label: a(CrO1.5) marker bin 0.75-0.85
+      marker: legend symbol as printed
+      marker_count: 3
+    - label: a(CrO1.5) marker bin 0.85-0.95
+      marker: legend symbol as printed
+      marker_count: 7
+    - label: a(CrO1.5) marker bin 0.95-1.00
+      marker: legend symbol as printed
+      marker_count: 5
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: Counted measured sample markers per activity-bin legend from Table I; calculated contours are unmarked model lines.
+      No values digitized.
+    standard_state_as_printed: pure solid CrO1.5
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig13_activity_cro15_comparison
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: CrO1.5
+- observation_id: xiao_2002_fig1_apparatus
+  type: figure_record
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 595
+    figure: '1'
+  phase: l
+  units: as printed
+  values:
+    quantity: electrochemical_apparatus_schematic
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: CrO-CrO1.5 slag system
+    temperature_as_printed: 1873 K experiment
+    axes_as_printed: not applicable; schematic diagram
+    attribution: Xiao, Holappa and Reuter (2002), present study; the associated procedure cites [11].
+    caption: Schematic diagram of the experimental apparatus.
+    panel: whole figure
+    series: []
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: No quantitative plotted series; equipment schematic.
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig1_apparatus
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_fig2_isothermal_section
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 596
+    figure: '2'
+  phase: l in equilibrium with metallic Cr
+  units: as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: CaO-SiO2-CrOx slag system
+    temperature_as_printed: 1873 K
+    axes_as_printed: Ternary mol% CaO-SiO2-CrOx composition; isothermal phase fields and liquidus contours.
+    attribution: De Villiers and Muan [13], as stated in the text.
+    caption: Isothermal section through CaO-SiO2-CrOx quasiternary system at 1873 K in equilibrium with metallic chromium.
+    panel: whole figure
+    series:
+    - label: phase boundaries and liquidus contours
+      marker: none
+      marker_count: 0
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: Figure diagram is not digitized.
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig2_isothermal_section
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: SiO2
+- observation_id: xiao_2002_fig3_chromium_oxidation_state
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    figure: '3'
+  phase: l
+  units: as printed
+  values:
+    quantity: valence_ratio
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: Cr
+    temperature_as_printed: 1873 K and 1863 K
+    axes_as_printed: ordinate Cr2+/T_Cr; abscissa mol% CrOx; series grouped by temperature and basicity B.
+    attribution: Xiao, Holappa and Reuter (2002), present study.
+    caption: Oxidation state of chromium in CaO-SiO2-CrOx slag.
+    panel: whole figure
+    series:
+    - label: 1873 K, B=1.34-1.47
+      marker: filled triangle
+      marker_count: 6
+    - label: 1873 K, B=0.91-1.10
+      marker: filled diamond
+      marker_count: 12
+    - label: 1873 K, B=0.15-0.34
+      marker: filled circle
+      marker_count: 5
+    - label: 1863 K, B=1.35-1.37
+      marker: open triangle
+      marker_count: 2
+    - label: 1863 K, B=0.97-1.07
+      marker: open diamond
+      marker_count: 10
+    - label: 1863 K, B=0-0.01
+      marker: open circle
+      marker_count: 3
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: Table I and Table II provide the printed redox fractions; plotted points are not digitized.
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig3_chromium_oxidation_state
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_fig4_microstructure_A1
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    figure: '4'
+  phase: quenched solidified slag
+  units: as printed
+  values:
+    quantity: microstructure
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: Cr-bearing CaO-SiO2-CrOx slag
+    temperature_as_printed: 1863 K quench temperature
+    axes_as_printed: not applicable; micrograph
+    attribution: Xiao, Holappa and Reuter (2002), present study.
+    caption: Microstructure of sample A1 quenched from 1863 K with compositions of 0.3 mol pct CaO - 39.7 mol pct SiO2 - 45.7
+      mol pct CrO - 14.4 mol pct CrO1.5.
+    panel: whole figure
+    series: []
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: No plotted series; micrograph only.
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig4_microstructure_A1
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_fig5_microstructure_B1
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    figure: '5'
+  phase: quenched solidified slag
+  units: as printed
+  values:
+    quantity: microstructure
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: Cr-bearing CaO-SiO2-CrOx slag
+    temperature_as_printed: 1863 K quench temperature
+    axes_as_printed: not applicable; micrograph
+    attribution: Xiao, Holappa and Reuter (2002), present study.
+    caption: Microstructure of sample B1 quenched from 1863 K with compositions of 46.1 mol pct CaO - 43.6 mol pct SiO2 -
+      8.7 mol pct CrO - 1.6 mol pct CrO1.5.
+    panel: whole figure
+    series: []
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: No plotted series; micrograph only.
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig5_microstructure_B1
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_fig6_microstructure_B6_quenched
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 600
+    figure: '6'
+  phase: quenched solidified slag
+  units: as printed
+  values:
+    quantity: microstructure
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: Cr-bearing CaO-SiO2-CrOx slag
+    temperature_as_printed: 1863 K quench temperature
+    axes_as_printed: not applicable; micrograph
+    attribution: Xiao, Holappa and Reuter (2002), present study.
+    caption: Microstructure of sample B6 quenched from 1863 K with compositions of 34.65 mol pct CaO - 34.09 mol pct SiO2
+      - 21.90 mol pct CrO - 9.36 mol pct CrO1.5.
+    panel: whole figure
+    series: []
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: No plotted series; micrograph only.
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig6_microstructure_B6_quenched
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_fig7_microstructure_B6_natural
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 600
+    figure: '7'
+  phase: naturally cooled slag
+  units: as printed
+  values:
+    quantity: microstructure
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: Cr-bearing CaO-SiO2-CrOx slag
+    temperature_as_printed: 1863 K
+    axes_as_printed: not applicable; micrograph
+    attribution: Xiao, Holappa and Reuter (2002), present study.
+    caption: Microstructure of sample B6 naturally cooled in the furnace from 1863 K.
+    panel: whole figure
+    series: []
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: No plotted series; micrograph only.
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig7_microstructure_B6_natural
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_fig8_gamma_cro
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 600
+    figure: '8'
+  phase: l
+  units: as printed
+  values:
+    quantity: activity_coefficient
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: CrO
+    temperature_as_printed: 1873 K
+    axes_as_printed: ordinate gamma(CrO); abscissa mol% CrOx; marker series grouped by basicity B.
+    attribution: Xiao, Holappa and Reuter (2002), present study.
+    caption: Activity coefficients of CrO at 1873 K, standard state - pure liquid CrO.
+    panel: whole figure
+    series:
+    - label: B=1.34-1.47
+      marker: open diamond
+      marker_count: 6
+    - label: B=0.85-1.11
+      marker: filled diamond
+      marker_count: 16
+    - label: B=0.76-0.80
+      marker: open triangle
+      marker_count: 4
+    - label: B=0.34-0.52
+      marker: open circle
+      marker_count: 14
+    - label: B=0.00-0.19
+      marker: filled triangle
+      marker_count: 8
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: Curves are not digitized.
+    standard_state_as_printed: pure liquid CrO
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig8_gamma_cro
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: CrO
+- observation_id: xiao_2002_fig9_gamma_cro15
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 600
+    figure: '9'
+  phase: l
+  units: as printed
+  values:
+    quantity: activity_coefficient
+    method_class: figure_only
+    admission_status: figure_only
+    species_as_printed: CrO1.5
+    temperature_as_printed: 1873 K
+    axes_as_printed: ordinate gamma(CrO1.5); abscissa mol% CrOx; marker series grouped by basicity B.
+    attribution: Xiao, Holappa and Reuter (2002), present study.
+    caption: Activity coefficients of CrO1.5 at 1873 K, standard state - pure solid CrO1.5.
+    panel: whole figure
+    series:
+    - label: B=1.34-1.47
+      marker: open diamond
+      marker_count: 6
+    - label: B=0.85-1.11
+      marker: filled diamond
+      marker_count: 16
+    - label: B=0.76-0.80
+      marker: open triangle
+      marker_count: 4
+    - label: B=0.34-0.52
+      marker: open circle
+      marker_count: 14
+    - label: B=0.00-0.19
+      marker: filled triangle
+      marker_count: 8
+    digitisation: deferred to a figure pass
+    numeric_points: []
+    note: Curves are not digitized.
+    standard_state_as_printed: pure solid CrO1.5
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_fig9_gamma_cro15
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: CrO1.5
+- observation_id: xiao_2002_table_i_auxiliary_csc1
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC1
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC1
+    x_as_published: '1.15'
+    B_as_published: '1.47'
+    EMF_as_published: 51.2 ± 0.2 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc1
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc10
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC10
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC10
+    x_as_published: '1.07'
+    B_as_published: '0.94'
+    EMF_as_published: 65.7 ± 0.4 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc10
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc11
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC11
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC11
+    x_as_published: '1.16'
+    B_as_published: '0.95'
+    EMF_as_published: 34.7 ± 0.2 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc11
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc12
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC12
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC12
+    x_as_published: '1.20'
+    B_as_published: '0.93'
+    EMF_as_published: 30.1 ± 0.2 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc12
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc13
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC13
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC13
+    x_as_published: '1.25'
+    B_as_published: '0.95'
+    EMF_as_published: 16.4 ± 0.7 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc13
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc14
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC14
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC14
+    x_as_published: '1.25'
+    B_as_published: '0.94'
+    EMF_as_published: 0.0 ± 2.4 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc14
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc15
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC15
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC15
+    x_as_published: '1.01'
+    B_as_published: '1.11'
+    EMF_as_published: 99.8 ± 0.7 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc15
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc16
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC16
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC16
+    x_as_published: '1.04'
+    B_as_published: '1.10'
+    EMF_as_published: 85.4 ± 0.7 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc16
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc17
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC17
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC17
+    x_as_published: '1.04'
+    B_as_published: '1.08'
+    EMF_as_published: 96.7 ± 0.5 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc17
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc18
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC18
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC18
+    x_as_published: '1.08'
+    B_as_published: '1.08'
+    EMF_as_published: 77.7 ± 0.8 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc18
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc19
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC19
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC19
+    x_as_published: '1.07'
+    B_as_published: '1.06'
+    EMF_as_published: 59.0 ± 0.5 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc19
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc2
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC2
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC2
+    x_as_published: '1.16'
+    B_as_published: '1.43'
+    EMF_as_published: 35.1 ± 0.7 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc2
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc20
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC20
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC20
+    x_as_published: '1.12'
+    B_as_published: '1.03'
+    EMF_as_published: 41.2 ± 0.7 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc20
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc21
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC21
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC21
+    x_as_published: '1.13'
+    B_as_published: '0.91'
+    EMF_as_published: 16.5 ± 0.3 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc21
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc22
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC22
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC22
+    x_as_published: '1.21'
+    B_as_published: '1.06'
+    EMF_as_published: 40.6 ± 0.4 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc22
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc23
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC23
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC23
+    x_as_published: '1.22'
+    B_as_published: '0.80'
+    EMF_as_published: 25.6 ± 0.5 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc23
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc24
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC24
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC24
+    x_as_published: '1.25'
+    B_as_published: '0.78'
+    EMF_as_published: 22.7 ± 0.4 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc24
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc25
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC25
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC25
+    x_as_published: '1.26'
+    B_as_published: '0.76'
+    EMF_as_published: 12.6 ± 0.1 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc25
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc26
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC26
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC26
+    x_as_published: '1.25'
+    B_as_published: '0.76'
+    EMF_as_published: 9.5 ± 0.3 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc26
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc27
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC27
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC27
+    x_as_published: '1.01'
+    B_as_published: '0.52'
+    EMF_as_published: 104.2 ± 2.5 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc27
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc28
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC28
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC28
+    x_as_published: '1.02'
+    B_as_published: '0.51'
+    EMF_as_published: 85.2 ± 0.7 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc28
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc29
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC29
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC29
+    x_as_published: '1.12'
+    B_as_published: '0.51'
+    EMF_as_published: 64.3 ± 1.2 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc29
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc3
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC3
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC3
+    x_as_published: '1.23'
+    B_as_published: '1.43'
+    EMF_as_published: 14.8 ± 0.5 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc3
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc30
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC30
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC30
+    x_as_published: '1.08'
+    B_as_published: '0.51'
+    EMF_as_published: 44.5 ± 0.2 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc30
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc31
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC31
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC31
+    x_as_published: '1.08'
+    B_as_published: '0.50'
+    EMF_as_published: 36.6 ± 0.1 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc31
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc32
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC32
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC32
+    x_as_published: '1.22'
+    B_as_published: '0.50'
+    EMF_as_published: 30.7 ± 0.5 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc32
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc33
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC33
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC33
+    x_as_published: '1.23'
+    B_as_published: '0.49'
+    EMF_as_published: 21.7 ± 0.5 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc33
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc34
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC34
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC34
+    x_as_published: '1.31'
+    B_as_published: '0.48'
+    EMF_as_published: 14.5 ± 0.3 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc34
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc35
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC35
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC35
+    x_as_published: '1.30'
+    B_as_published: '0.47'
+    EMF_as_published: 3.8 ± 0.5 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc35
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc36
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC36
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC36
+    x_as_published: '1.32'
+    B_as_published: '0.47'
+    EMF_as_published: 0.0 ± 1.2 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc36
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc37
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC37
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC37
+    x_as_published: '1.04'
+    B_as_published: '0.41'
+    EMF_as_published: 40.1 ± 0.4 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc37
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc38
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC38
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC38
+    x_as_published: '1.08'
+    B_as_published: '0.51'
+    EMF_as_published: 60.3 ± 0.7 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc38
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc39
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC39
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC39
+    x_as_published: '1.31'
+    B_as_published: '0.15'
+    EMF_as_published: 11.6 ± 0.3 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc39
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc4
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC4
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC4
+    x_as_published: '1.27'
+    B_as_published: '1.42'
+    EMF_as_published: 0.0 ± 0.8 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc4
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc40
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC40
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC40
+    x_as_published: '1.31'
+    B_as_published: '0.02'
+    EMF_as_published: 6.9 ± 0.8 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc40
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc41
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC41
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC41
+    x_as_published: '1.29'
+    B_as_published: '0.00'
+    EMF_as_published: 9.1 ± 0.4 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc41
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc42
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC42
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC42
+    x_as_published: '1.30'
+    B_as_published: '0.19'
+    EMF_as_published: 6.5 ± 0.3 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc42
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc43
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC43
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC43
+    x_as_published: '1.28'
+    B_as_published: '0.17'
+    EMF_as_published: 3.6 ± 0.2 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc43
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc44
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC44
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC44
+    x_as_published: '1.32'
+    B_as_published: '0.34'
+    EMF_as_published: 9.7 ± 0.4 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc44
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc45
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC45
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC45
+    x_as_published: '1.31'
+    B_as_published: '0.42'
+    EMF_as_published: 3.7 ± 0.2 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc45
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc46
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC46
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC46
+    x_as_published: '1.27'
+    B_as_published: '0.18'
+    EMF_as_published: 4.2 ± 0.7 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc46
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc47
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC47
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC47
+    x_as_published: '1.33'
+    B_as_published: '0.06'
+    EMF_as_published: 12.5 ± 0.5 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc47
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc48
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC48
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC48
+    x_as_published: '1.36'
+    B_as_published: '0.05'
+    EMF_as_published: 13.7 ± 0.4 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc48
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc5
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC5
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC5
+    x_as_published: '1.29'
+    B_as_published: '1.39'
+    EMF_as_published: 0.0 ± 1.5 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc5
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc6
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC6
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC6
+    x_as_published: '1.28'
+    B_as_published: '1.34'
+    EMF_as_published: 0.0 ± 2.0 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc6
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc7
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC7
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC7
+    x_as_published: '1.06'
+    B_as_published: '0.85'
+    EMF_as_published: 114 ± 1.0 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc7
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc8
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC8
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC8
+    x_as_published: '1.04'
+    B_as_published: '0.85'
+    EMF_as_published: 87.7 ± 0.8 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc8
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_i_auxiliary_csc9
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 598
+    table: I
+    row: CSC9
+  units: EMF in mV; x and B dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: EMF, x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents EMF in mV, the composition index x, or basicity B as printed. The table reports
+      activities, coefficients and Cr2+/T_Cr separately under their matching tokens.
+    method_class: measured_direct
+    sample_as_published: CSC9
+    x_as_published: '1.04'
+    B_as_published: '0.86'
+    EMF_as_published: 84.7 ± 1.0 mV
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_i_auxiliary_csc9
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_a1
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: A1
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: A1
+    x_as_published: '1.12'
+    B_as_published: '0.01'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_a1
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_a2
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: A2
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: A2
+    x_as_published: '1.27'
+    B_as_published: '0.00'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_a2
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_a3
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: A3
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: A3
+    x_as_published: '1.14'
+    B_as_published: '0.00'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_a3
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_a4
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: A4
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: A4
+    x_as_published: '1.25'
+    B_as_published: '0.04'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_a4
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_a5
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: A5
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: A5
+    x_as_published: '1.29'
+    B_as_published: '0.04'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_a5
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_a6
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: A6
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: A6
+    x_as_published: '1.27'
+    B_as_published: '0.04'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_a6
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_a7
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: A7
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: A7
+    x_as_published: '1.27'
+    B_as_published: '0.04'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_a7
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_a8
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: A8
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: A8
+    x_as_published: '1.25'
+    B_as_published: '0.02'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_a8
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_a9
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: A9
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: A9
+    x_as_published: '1.22'
+    B_as_published: '0.03'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_a9
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_b1
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: B1
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: B1
+    x_as_published: '1.08'
+    B_as_published: '1.06'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_b1
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_b10
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: B10
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: B10
+    x_as_published: '1.07'
+    B_as_published: '0.97'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_b10
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_b2
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: B2
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: B2
+    x_as_published: '1.06'
+    B_as_published: '1.06'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_b2
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_b3
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: B3
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: B3
+    x_as_published: '1.04'
+    B_as_published: '1.07'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_b3
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_b4
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: B4
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: B4
+    x_as_published: '1.06'
+    B_as_published: '1.07'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_b4
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_b5
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: B5
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: B5
+    x_as_published: '1.17'
+    B_as_published: '1.02'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_b5
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_b6
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: B6
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: B6
+    x_as_published: '1.15'
+    B_as_published: '1.02'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_b6
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_b7
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: B7
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: B7
+    x_as_published: '1.08'
+    B_as_published: '1.07'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_b7
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_b8
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: B8
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: B8
+    x_as_published: '1.07'
+    B_as_published: '1.01'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_b8
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_b9
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: B9
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: B9
+    x_as_published: '1.12'
+    B_as_published: '1.00'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_b9
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_c1
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: C1
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: C1
+    x_as_published: '1.24'
+    B_as_published: '1.35'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_c1
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_ii_auxiliary_c2
+  type: thermodynamic_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 599
+    table: II
+    row: C2
+  units: dimensionless as printed
+  values:
+    quantity_as_printed: 'Table row auxiliary values: x and basicity B'
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - valence_ratio
+    - partial_pressure
+    - electrical_conductivity
+    schema_gap: No quantity token represents the composition index x or basicity B as printed; the Table II Cr2+/T_Cr values
+      are typed separately.
+    method_class: measured_direct
+    sample_as_published: C2
+    x_as_published: '1.21'
+    B_as_published: '1.37'
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_ii_auxiliary_c2
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_iii_optimized_interaction_energy_parameters
+  type: thermodynamic_context
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 602
+    table: III
+  units: J
+  values:
+    quantity_as_printed: Optimized interaction energy parameters alpha_ij between cations in CaO-SiO2-CrO-CrO1.5 slags
+    quantity_token: unavailable_for_model_fit_context
+    candidate_tokens_considered:
+    - interaction_parameter
+    method_class: model_derived
+    evidence_class: model_derived
+    schema_gap: The table contains optimized regular-solution model parameters; the family ruling requires fitted parameters
+      in context.
+    matrix_as_published:
+    - cation: Ca2+
+      Ca2+: —
+      Si4+: −139,100
+      Cr2+: −6,140
+      Cr3+: 44,235
+    - cation: Si4+
+      Ca2+: −139,100
+      Si4+: —
+      Cr2+: −60,540
+      Cr3+: −48,975
+    - cation: Cr2+
+      Ca2+: −6,140
+      Si4+: −60,540
+      Cr2+: —
+      Cr3+: 32,710
+    - cation: Cr3+
+      Ca2+: 44,235
+      Si4+: −48,975
+      Cr2+: 32,710
+      Cr3+: —
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_iii_optimized_interaction_energy_parameters
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr
+- observation_id: xiao_2002_table_iv_standard_state_conversion_gibbs_energy_relations
+  type: thermodynamic_context
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 602
+    table: IV
+  units: J; T in K
+  values:
+    quantity_as_printed: Conversion Gibbs-energy relations from hypothetical pure liquid regular-solution standards to traditional
+      solid or liquid standards
+    quantity_token: unavailable
+    candidate_tokens_considered:
+    - delta_fG
+    - interaction_parameter
+    method_class: model_derived
+    evidence_class: model_derived
+    schema_gap: These are standard-state conversion relations, not formation Gibbs energies from the elements; the family
+      ruling keeps model outputs in context.
+    relations_as_published:
+    - reaction: CrO(liq) = CrO(RS)
+      delta_G_as_published: 77,150 - 33.5T (J)
+    - reaction: CrO1.5(s) = CrO1.5(RS)
+      delta_G_as_published: 74,967 - 37.5T (J)
+    - reaction: CrO1.5(liq) = CrO1.5(RS)
+      delta_G_as_published: 10,152 - 12.6T (J)
+    - reaction: CrO1.5(s) = CrO1.5(liq)
+      delta_G_as_published: 64,815 - 24.9T (J)
+    - reaction: SiO2(s) = SiO2(RS)
+      delta_G_as_published: 51,346 - 13.88T (J)
+  context_id: xiao-2002-chromium-oxide-activities::context::xiao_2002_table_iv_standard_state_conversion_gibbs_energy_relations
+  work_id: 10.1007/s11663-002-0039-9
+  source_id: xiao-2002-chromium-oxide-activities
+  species: Cr

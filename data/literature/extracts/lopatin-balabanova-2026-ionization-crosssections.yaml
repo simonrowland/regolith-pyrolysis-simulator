@@ -1,0 +1,95 @@
+schema_version: literature_extract.v1
+source_id: lopatin-balabanova-2026-ionization-crosssections
+source:
+  citation: 'Lopatin, S. I. & Balabanova, E. A. (2026). Electron Ionization Cross-Sections of Polyatomic Oxide Molecules Determined by High-Temperature Mass Spectrometry. Russian Journal of Physical Chemistry A, 100(3), 411–414 (pagination printed in the publisher PDF; repository metadata gives 353–356).'
+  doi: 10.1134/S0036024425703601
+  year: 2026
+  corpus_asset: raw/lopatin-balabanova-2026-ionization-crosssections/lopatin-balabanova-2026-ionization-crosssections.pdf
+extraction:
+  method: >-
+    Born-digital publisher PDF text was checked against 600 dpi page 3 rendering for every Table 1 cell. Pages 1–4 were read from the layout-preserving text; the scientific methods/results on page 2 were visually inspected. Ionization cross-sections have no store quantity token, so measured values, comparison estimates, calibration intensities, and method conditions are retained as context without scoring.
+  date: '2026-10-21'
+  worker: fam33b-1020
+review_status: draft
+species:
+  B2O3:
+    observations: []
+    context:
+      - observation_id: lopatin_balabanova_2026_b2o3_cross_section_method_data
+        type: method_data_context
+        locator: {page: 3, pdf_page_index: 2, published_page: 413, table: '1', row: B2O3}
+        units: 'ionization cross-section: ×10−16 cm2; ion current: arbitrary units; temperature: K; appearance energy: eV'
+        values:
+          quantity_as_printed: ionization cross-section
+          candidate_tokens: [ion_intensity, p_partial]
+          schema_gap: 'The store has no quantity token for electron ionization cross-section; do not treat these calibration parameters as thermochemical quantities.'
+          table_1_columns: 'I: experimental, present work; II: additivity estimate with correction factors; III: estimate from measured binary-oxide cross-sections following [17].'
+          compound: B2O3
+          table_1: {I_experimental: '1.72 ± 0.22', II_additivity_estimate: '6.31', III_binary_oxide_estimate: '— (not reported)'}
+          provenance_note: 'Table 1, column I is this work; II is an additivity calculation, III is an estimate based on [17].'
+      - observation_id: lopatin_balabanova_2026_literature_ratios_context
+        type: quoted_method_comparison
+        locator: {page: 2, pdf_page_index: 1, published_page: 412, section: Results}
+        units: dimensionless ratios
+        values:
+          quantity_as_printed: ratios of ionization cross-sections
+          candidate_tokens: [equilibrium_phase_composition]
+          schema_gap: 'Ratios of electron ionization cross-sections are not equilibrium composition.'
+          values_as_quoted_from_reference_8: 'σ(M2)/σ(M)=1.25; σ(MO)/σ(M)=0.65; σ(MO2)/σ(MO)=0.5.'
+          attribution: 'Summary of Drowart et al. [8], as cited in this paper.'
+      - observation_id: lopatin_balabanova_2026_methods_and_calibration_measurements
+        type: method_data_context
+        locator: {page: 2, pdf_page_index: 1, published_page: 412, section: Experimental and results}
+        units: 'ion current: arbitrary units; temperature: K; appearance energy: eV; reference cross-section: cm2'
+        values:
+          quantity_as_printed: ionization cross-section calibration and supporting ion-current measurements
+          scope_species: [B2O3, NaBO2, NaPO3, KPO3, Ag]
+          candidate_tokens: [ion_intensity, p_partial]
+          schema_gap: 'Ionization cross-section itself has no store token; printed supporting calibration values are retained here.'
+          apparatus_and_method: 'MS-1301; molybdenum effusion chamber; 30 eV ionizing electrons; silver standard σ(Ag)=5.05 × 10−16 cm2; chamber temperature accuracy ±10 K; ion appearance energy accuracy ±0.3 eV; starting reagent purity at least 99.9%.'
+          B2O3: 'Ag+ current 430 arb. units at 1389 K; B2O3+ current 290 arb. units at 1557 K. Ag+ appeared from approximately 1270 K; B2O3+ appeared at 1350 K with appearance energy 14.0 eV; Ag+ appearance energy 7.6 eV. The text repeats measured σ(B2O3)=1.72 × 10−16 cm2 and additive estimate 6.31 × 10−16 cm2; these are also in Table 1 above.'
+          NaBO2: 'At approximately 1300 K, vapor spectrum contained Na+, NaBO2+, Na2BO2+, and Ag+. At 1374 K the currents were 72, 72, 45, and 9 arb. units, respectively. Appearance energies were 9.8, 9.9, 11.7, and 7.6 eV. The paper identifies NaBO2+ and Ag+ as molecular ions, Na+ and Na2BO2+ as dissociative-ionization products, and accounts for NaBO2 dimerization in sample mass.'
+          NaPO3: 'At approximately 1300 K, Na+, NaPO3+, and Ag+ peaks were recorded. Appearance energies: Na+ 10.2 eV, Ag+ 7.6 eV; NaPO3+ was not measured because of low ion-current intensity. At 1344 K, Na+ and Ag+ currents were 44 and 6.6 arb. units. The paper identifies NaPO3+ and Ag+ as molecular ions and Na+ as a dissociative-ionization product.'
+          KPO3: 'At approximately 1320 K, K+ and Ag+ peaks were recorded. Appearance energies: K+ 9.8 eV, Ag+ 7.6 eV. At 1491 K, their currents were 66 and 3.0 arb. units. The paper identifies Ag+ as a molecular ion and K+ as a dissociative-ionization product.'
+  NaBO2:
+    observations: []
+    context:
+      - observation_id: lopatin_balabanova_2026_nabo2_cross_section_method_data
+        type: method_data_context
+        locator: {page: 3, pdf_page_index: 2, published_page: 413, table: '1', row: NaBO2}
+        units: 'ionization cross-section: ×10−16 cm2; ion current: arbitrary units; temperature: K; appearance energy: eV'
+        values:
+          quantity_as_printed: ionization cross-section
+          candidate_tokens: [ion_intensity, p_partial]
+          schema_gap: 'The store has no quantity token for electron ionization cross-section.'
+          table_1_columns: 'I: experimental, present work; II: additivity estimate with correction factors; III: estimate from measured binary-oxide cross-sections following [17].'
+          compound: NaBO2
+          table_1: {I_experimental: '2.73 ± 0.25', II_additivity_estimate: '6.41', III_binary_oxide_estimate: '3.01'}
+  NaPO3:
+    observations: []
+    context:
+      - observation_id: lopatin_balabanova_2026_napo3_cross_section_method_data
+        type: method_data_context
+        locator: {page: 3, pdf_page_index: 2, published_page: 413, table: '1', row: NaPO3}
+        units: 'ionization cross-section: ×10−16 cm2; ion current: arbitrary units; temperature: K; appearance energy: eV'
+        values:
+          quantity_as_printed: ionization cross-section
+          candidate_tokens: [ion_intensity, p_partial]
+          schema_gap: 'The store has no quantity token for electron ionization cross-section.'
+          table_1_columns: 'I: experimental, present work; II: additivity estimate with correction factors; III: estimate from measured binary-oxide cross-sections following [17].'
+          compound: NaPO3
+          table_1: {I_experimental: '3.51 ± 0.18', II_additivity_estimate: '7.60', III_binary_oxide_estimate: '2.83'}
+  KPO3:
+    observations: []
+    context:
+      - observation_id: lopatin_balabanova_2026_kpo3_cross_section_method_data
+        type: method_data_context
+        locator: {page: 3, pdf_page_index: 2, published_page: 413, table: '1', row: KPO3}
+        units: 'ionization cross-section: ×10−16 cm2; ion current: arbitrary units; temperature: K; appearance energy: eV'
+        values:
+          quantity_as_printed: ionization cross-section
+          candidate_tokens: [ion_intensity, p_partial]
+          schema_gap: 'The store has no quantity token for electron ionization cross-section.'
+          table_1_columns: 'I: experimental, present work; II: additivity estimate with correction factors; III: estimate from measured binary-oxide cross-sections following [17].'
+          compound: KPO3
+          table_1: {I_experimental: '4.43 ± 0.31', II_additivity_estimate: '8.23', III_binary_oxide_estimate: '4.29'}

@@ -1,0 +1,309 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: f5025888204d11ed77fd6b24ee058ee19f427376503e5c235eb6cdde18e01a70
+  citation: Schreiber, H. D., Thanyasiri, T., and Lauer, H. V., Jr. (1979). Redox Equilibria of Iron in Synthetic Basaltic
+    Melts. Lunar and Planetary Science X, 1070-1072 (abstract 1376).
+  source_ids:
+  - schreiber-1979-lpsc-fe-redox-abstract
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:schreiber-1979-lpsc-fe-redox-abstract
+      role: pdf
+      path: raw/schreiber-1979-lpsc-fe-redox-abstract/schreiber-1979-lpsc-fe-redox-abstract.pdf
+      sha256:
+        tag: value
+        value: 7b2f9b30bb5ba48f4604902da8c4ea8e6c9798cdd9233bbafbfedf96ad2f7319
+    - asset_id: pdftotext:schreiber-1979-lpsc-fe-redox-abstract
+      role: pdftotext
+      path: text/schreiber-1979-lpsc-fe-redox-abstract
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:schreiber-1979-lpsc-fe-redox-abstract
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: f5025888204d11ed77fd6b24ee058ee19f427376503e5c235eb6cdde18e01a70::experiment::schreiber_1979_iron_redox_abstract
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f5025888204d11ed77fd6b24ee058ee19f427376503e5c235eb6cdde18e01a70
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Abstract
+context:
+- observation_id: schreiber_1979_figure1_iron_redox_equilibrium
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1071
+    figure: '1'
+  phase: glass
+  units: ratio and oxygen fugacity
+  values:
+    quantity: fe3_fe2_ratio
+    method_class: figure_only
+    species: Fe
+    temperature_as_published: 1500 and 1550 °C
+    axes_as_published: x log([Fe2+]/[Fe3+]) with top axis [Fe2+]/[ΣFe]; y -log fO2
+    caption_as_published: Summary of Fe(III)-Fe(II) equilibrium results in synthetic silicate melts with total Fe below 1.5
+      wt%. Straight-line slopes agree within experimental error with the theoretical value 4; the caption gives a calculated
+      reduction-reaction enthalpy of 28±17 kcal/mole.
+    panel: upper 1550 °C and lower 1500 °C
+    series:
+    - label: FAS
+      marker: circle
+      marker_count: 6
+    - label: FAD
+      marker: triangle
+      marker_count: 6
+    - label: fitted equilibrium lines
+      marker_count: 0
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1979-lpsc-fe-redox-abstract::context::schreiber_1979_figure1_iron_redox_equilibrium
+  work_id: f5025888204d11ed77fd6b24ee058ee19f427376503e5c235eb6cdde18e01a70
+  source_id: schreiber-1979-lpsc-fe-redox-abstract
+  species: Fe
+- observation_id: schreiber_1979_figure2_absorption_and_equilibrium_time
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1071
+    figure: '2'
+  phase: glass
+  units: Fe uptake and redox ratio versus equilibration time (hours)
+  values:
+    quantity: valence_ratio
+    method_class: figure_only
+    species: Fe
+    T_C: 1500
+    axes_as_published: x equilibration time (hours); y Fe absorption and Fe redox equilibrium measures
+    caption_as_published: Time dependence of Fe absorption by the Pt container and establishment of Fe redox equilibrium for
+      FAS and FAD with Fe/(Fe+Mg)=0.1 at 1500 °C and fO2=10^-2.8 atm. A Pt capsule was used to hold enough material for wet-chemical
+      analysis.
+    panel: A Pt-container Fe absorption; B Fe redox equilibrium
+    series:
+    - label: FAS
+      marker: circle
+      marker_count: 10
+    - label: FAD
+      marker: triangle
+      marker_count: 10
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1979-lpsc-fe-redox-abstract::context::schreiber_1979_figure2_absorption_and_equilibrium_time
+  work_id: f5025888204d11ed77fd6b24ee058ee19f427376503e5c235eb6cdde18e01a70
+  source_id: schreiber-1979-lpsc-fe-redox-abstract
+  species: Fe
+- observation_id: schreiber_1979_figure3_epr_spectrum
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1071
+    figure: '3'
+  phase: glass
+  units: normalized EPR absorption derivative versus magnetic field
+  values:
+    quantity: unavailable
+    schema_gap: No EPR spectrum quantity token exists in the store.
+    method_class: figure_only
+    species: Fe
+    temperature_as_published: ambient EPR measurement
+    axes_as_published: x magnetic field; y absorption derivative
+    caption_as_published: Typical X-band EPR spectrum for a silicate glass containing trace amounts of Fe. The absorption
+      peak is characteristic of Fe(III) in the glass structure.
+    panel: single spectrum
+    series:
+    - label: representative Fe-doped glass EPR trace
+      marker_count: 0
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1979-lpsc-fe-redox-abstract::context::schreiber_1979_figure3_epr_spectrum
+  work_id: f5025888204d11ed77fd6b24ee058ee19f427376503e5c235eb6cdde18e01a70
+  source_id: schreiber-1979-lpsc-fe-redox-abstract
+  species: Fe
+- observation_id: schreiber_1979_figure4_feiii_epr_calibration
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1071
+    figure: '4'
+  phase: glass
+  units: Fe(III) wt% and relative EPR signal intensity
+  values:
+    quantity: unavailable
+    schema_gap: No store quantity represents the calibration of EPR intensity to Fe(III) concentration in weight percent.
+    method_class: figure_only
+    species: Fe
+    temperature_as_published: not stated in the figure caption
+    axes_as_published: x [Fe3+] wt%; y peak intensity and integrated intensity (relative units)
+    caption_as_published: Preliminary calibration of Fe(III) EPR signal to Fe(III) concentration in silicate glasses. Fe(III)
+      is total Fe by electron microprobe minus Fe(II) by chemical titration. The caption says EPR is reliable only below 0.5
+      wt% Fe(III); circles denote FAS and triangles FAD.
+    panel: upper integrated intensity; lower peak intensity
+    series:
+    - label: FAS
+      marker: circle
+      marker_count: 22
+    - label: FAD
+      marker: triangle
+      marker_count: 24
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1979-lpsc-fe-redox-abstract::context::schreiber_1979_figure4_feiii_epr_calibration
+  work_id: f5025888204d11ed77fd6b24ee058ee19f427376503e5c235eb6cdde18e01a70
+  source_id: schreiber-1979-lpsc-fe-redox-abstract
+  species: Fe
+- observation_id: schreiber_1979_figure5_redox_couple_comparison
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1072
+    figure: '5'
+  phase: glass
+  units: log redox ratio and -log fO2
+  values:
+    quantity: valence_ratio
+    method_class: figure_only
+    species:
+    - Ti
+    - Eu
+    - Cr
+    - Fe
+    - Ce
+    temperature_as_published: 1500 °C
+    composition_as_published: FAS
+    axes_as_published: x log R; y -log fO2; upper axis X (reduced-ion fraction)
+    caption_as_published: Comparison of redox equilibria of multivalent elements in synthetic silicate melts at a common temperature
+      and bulk composition for multivalent-element concentrations of about 1 wt%. R is the ratio of reduced to oxidized ion
+      concentrations and X the fraction in the reduced state.
+    panel: single plot
+    series:
+    - label: Ti(III)-Ti(IV)
+      marker_count: 0
+    - label: Eu(II)-Eu(III)
+      marker_count: 0
+    - label: Cr(II)-Cr(III)
+      marker_count: 0
+    - label: Fe(II)-Fe(III)
+      marker_count: 0
+    - label: Ce(III)-Ce(IV)
+      marker_count: 0
+    attribution: This work; other redox couples are comparative series
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1979-lpsc-fe-redox-abstract::context::schreiber_1979_figure5_redox_couple_comparison
+  work_id: f5025888204d11ed77fd6b24ee058ee19f427376503e5c235eb6cdde18e01a70
+  source_id: schreiber-1979-lpsc-fe-redox-abstract
+  species: Fe
+- observation_id: schreiber_1979_figure6_iron_redox_vs_total_fe
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1072
+    figure: '6'
+  phase: glass
+  units: Fe redox ratio and total Fe wt%
+  values:
+    quantity: fe3_fe2_ratio
+    method_class: figure_only
+    species: Fe
+    T_C: 1500
+    fO2_as_published: 10^-0.7 atm
+    axes_as_published: x total Fe wt%; y log([Fe2+]/[Fe3+]); upper axis Fe/(Fe+Mg) molar ratio
+    caption_as_published: Dependence of Fe(III)-Fe(II) equilibrium on total Fe concentration in synthetic silicate melts at
+      1500 °C and fO2=10^-0.7 atm. Fe replaces Mg in FAS and FAD to obtain different Fe/(Fe+Mg) ratios.
+    panel: single plot
+    series:
+    - label: FAS
+      marker: circle
+      marker_count: 7
+    - label: FAD
+      marker: triangle
+      marker_count: 7
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1979-lpsc-fe-redox-abstract::context::schreiber_1979_figure6_iron_redox_vs_total_fe
+  work_id: f5025888204d11ed77fd6b24ee058ee19f427376503e5c235eb6cdde18e01a70
+  source_id: schreiber-1979-lpsc-fe-redox-abstract
+  species: Fe
+- observation_id: schreiber_1979_no_numeric_redox_points_outside_figures
+  type: assessment
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Abstract
+  units: qualitative
+  values:
+    quantity: Fe(III)-Fe(II) redox equilibrium in synthetic melts
+    admission_status: typed_unavailable
+    reason: The abstract reports experimental conditions and summarizes results only in Figures 1-6. No numerical measured
+      redox ratio is printed in the prose; figure points are deferred by the family rules.
+  context_id: schreiber-1979-lpsc-fe-redox-abstract::context::schreiber_1979_no_numeric_redox_points_outside_figures
+  work_id: f5025888204d11ed77fd6b24ee058ee19f427376503e5c235eb6cdde18e01a70
+  source_id: schreiber-1979-lpsc-fe-redox-abstract
+  species: Fe
+- observation_id: schreiber_1979_table1_reduction_reaction_enthalpy
+  type: assessment
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1071
+    figure: '1'
+  units: kcal/mole as printed
+  values:
+    quantity: standard enthalpy change for Fe(III) to Fe(II) reduction reaction
+    method_class: model_derived
+    admission_status: typed_unavailable
+    value_as_published: 28±17 kcal/mole
+    candidate_tokens:
+    - delta_fH
+    reason: The value is calculated from the equilibrium plot and is an enthalpy change for a reduction reaction, not a standard
+      formation enthalpy.
+  context_id: schreiber-1979-lpsc-fe-redox-abstract::context::schreiber_1979_table1_reduction_reaction_enthalpy
+  work_id: f5025888204d11ed77fd6b24ee058ee19f427376503e5c235eb6cdde18e01a70
+  source_id: schreiber-1979-lpsc-fe-redox-abstract
+  species: Fe

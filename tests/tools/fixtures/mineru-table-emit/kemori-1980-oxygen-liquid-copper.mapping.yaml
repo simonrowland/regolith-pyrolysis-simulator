@@ -1,0 +1,28 @@
+source_id: kemori-1980-oxygen-liquid-copper
+source:
+  citation: >-
+    Kemori N, Katayama I, Kozuka Z (1980). Thermodynamic Study of Oxygen in
+    Liquid Copper. Transactions of the Japan Institute of Metals 21(5):275–284.
+  doi: 10.2320/matertrans1960.21.275
+  year: 1980
+extraction:
+  method: MinerU table draft emit; remaining table rows transcribed by hand.
+  date: '2026-10-20'
+  worker: fam26-1020
+review_status: draft
+tables:
+  - page: 5
+    table_index: 2
+    type: activity_coefficient
+    quantity: activity_coefficient
+    unit: dimensionless
+    evidence_class: measured_direct
+    phase: l
+    published_page: 279
+    rows: [2]
+    temperature: {column: 2, unit: K}
+    values:
+      - {column: 4, species: O}
+# Table 1 is a bulk charge impurity assay; Table 3 contains interaction
+# coefficients requiring explicit forms; Table 4 is typed by phase component.
+# Tables 5 and 6 are calculated solution-model outputs and remain context.

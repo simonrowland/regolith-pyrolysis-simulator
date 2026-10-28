@@ -1,0 +1,1141 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0869591108060027
+  citation: Borisov, A.A. (2008). Experimental Investigation of K and Na Partitioning between Miscible Liquids. Petrology
+    16(6), 552–564.
+  source_ids:
+  - borisov-2008-k-na-miscible-liquids
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:borisov-2008-k-na-miscible-liquids
+      role: pdf
+      path: raw/borisov-2008-k-na-miscible-liquids/borisov-2008-k-na-miscible-liquids.pdf
+      sha256:
+        tag: value
+        value: fcfaeb7a9eafc780fb37ce1437a32368ba0dd9bd0dc0c32a1bf2a02ba04180d8
+    - asset_id: pdftotext:borisov-2008-k-na-miscible-liquids
+      role: pdftotext
+      path: text/borisov-2008-k-na-miscible-liquids
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:borisov-2008-k-na-miscible-liquids
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s0869591108060027
+experiments:
+- experiment_id: 10.1134/s0869591108060027::borisov-2008-k-na-miscible-liquids
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591108060027
+  locator:
+    page: 2
+    published_page: 553
+    pdf_page_index: 1
+    table: '1'
+    note: row=CSA6; column=SiO2
+- experiment_id: 10.1134/s0869591108060027::experiment::borisov2008_series_13
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'crucible-supported loop; alkali vapor saturation' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591108060027
+  locator:
+    page: 3
+    published_page: 554
+    pdf_page_index: 2
+    table: '2'
+    note: row=13
+- experiment_id: 10.1134/s0869591108060027::experiment::borisov2008_series_23
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'crucible-supported loop; alkali vapor saturation' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591108060027
+  locator:
+    page: 3
+    published_page: 554
+    pdf_page_index: 2
+    table: '2'
+    note: row=23
+- experiment_id: 10.1134/s0869591108060027::experiment::borisov2008_series_24
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'crucible-supported loop; alkali vapor saturation' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591108060027
+  locator:
+    page: 3
+    published_page: 554
+    pdf_page_index: 2
+    table: '2'
+    note: row=24
+- experiment_id: 10.1134/s0869591108060027::experiment::borisov2008_series_25
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'crucible-supported loop; alkali vapor saturation' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591108060027
+  locator:
+    page: 3
+    published_page: 554
+    pdf_page_index: 2
+    table: '2'
+    note: row=25
+- experiment_id: 10.1134/s0869591108060027::experiment::borisov2008_series_26
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'crucible-supported loop; alkali vapor saturation' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591108060027
+  locator:
+    page: 3
+    published_page: 554
+    pdf_page_index: 2
+    table: '2'
+    note: row=26
+- experiment_id: 10.1134/s0869591108060027::experiment::borisov2008_series_27
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'crucible-supported loop; alkali vapor saturation' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591108060027
+  locator:
+    page: 3
+    published_page: 554
+    pdf_page_index: 2
+    table: '2'
+    note: row=27
+- experiment_id: 10.1134/s0869591108060027::experiment::borisov2008_series_3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'crucible-supported loop; alkali vapor saturation' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591108060027
+  locator:
+    page: 3
+    published_page: 554
+    pdf_page_index: 2
+    table: '2'
+    note: row=3
+- experiment_id: 10.1134/s0869591108060027::experiment::borisov2008_series_4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'crucible-supported loop; alkali vapor saturation' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591108060027
+  locator:
+    page: 3
+    published_page: 554
+    pdf_page_index: 2
+    table: '2'
+    note: row=4
+- experiment_id: 10.1134/s0869591108060027::experiment::borisov2008_series_5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'crucible-supported loop; alkali vapor saturation' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591108060027
+  locator:
+    page: 3
+    published_page: 554
+    pdf_page_index: 2
+    table: '2'
+    note: row=5
+- experiment_id: 10.1134/s0869591108060027::experiment::borisov2008_series_6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'crucible-supported loop; alkali vapor saturation' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591108060027
+  locator:
+    page: 3
+    published_page: 554
+    pdf_page_index: 2
+    table: '2'
+    note: row=6
+- experiment_id: 10.1134/s0869591108060027::experiment::borisov2008_series_8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'crucible-supported loop; alkali vapor saturation' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0869591108060027
+  locator:
+    page: 3
+    published_page: 554
+    pdf_page_index: 2
+    table: '2'
+    note: row=8
+context:
+- observation_id: borisov2008_figure10_caption
+  type: figure_record
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 562
+    note: Figure 10 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: Na2O equilibrium-phase composition
+    species:
+    - Na2O
+    phase: l except T16
+    temperature_as_printed: 1250 °C and 1265 °C
+    axes_as_published: 'x: SiO2 (wt %); y: Na2O (wt %)'
+    caption: Example of the influence of SiO2 content in natural basic and ultrabasic melts on their saturation with sodium.
+      BR is the standard basalt (MgO content in the bulk rock is 13.3 wt %, and that in melts at 1250 and 1265 °C, 10.3 and
+      12.0 wt %, respectively); MFR-1 is the standard gabbro (MgO content in the bulk rock is 13.6 wt %, and that in melts
+      at 1250 and 1265 °C, 10.1 and 12.1 wt %, respectively); L81 is the ultrabasic composition provided by A.A. Gurenko (MgO
+      contents in the bulk rock and glass are 20.2 and 10.1 wt %, respectively); and T16 is the basalts of the Great Fissure
+      Tolbachik Eruption, Kamchatka (10.9 wt % MgO). All of the melts, except for T16, contained olivine as a liquidus phase
+      at experimental temperature.
+    panel: whole_figure
+    series:
+    - name: 1250 °C natural-melt series
+      marker_count: 3
+    - name: 1265 °C natural-melt series
+      marker_count: 3
+    numeric_points: none
+    attribution: Present-work data
+    digitisation: deferred to a figure pass
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_figure10_caption
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_figure1_caption
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 554
+    note: Figure 1 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: Loop apparatus arrangement
+    species:
+    - SiO2
+    - Na2O
+    - K2O
+    phase: melt source and experimental melts
+    temperature_as_printed: not specified
+    axes_as_published: none
+    caption: Cartoon illustrating the arrangement of samples in the crucible supported loop technique. See text for further
+      explanation.
+    panel: whole_figure
+    series:
+    - name: apparatus schematic
+      marker_count: 0
+    numeric_points: none
+    attribution: Present-work data
+    digitisation: deferred to a figure pass
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_figure1_caption
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_figure2_caption
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 556
+    note: Figure 2 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: Na2O equilibrium-phase composition
+    species:
+    - Na2O
+    phase: l
+    temperature_as_printed: 1470 °C
+    axes_as_published: 'x: oxygen fugacity; y: Na2O (wt %)'
+    caption: Saturation of melts of CSA compositions (Ca2Si3O8–Al2O3 system) with sodium as a function of oxygen fugacity.
+    panel: whole_figure
+    series:
+    - name: CSA6
+      marker_count: 4
+    - name: CSA12
+      marker_count: 4
+    - name: CSA18
+      marker_count: 4
+    - name: CSA25
+      marker_count: 4
+    numeric_points: none
+    attribution: Present-work data
+    digitisation: deferred to a figure pass
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_figure2_caption
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_figure3_caption
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 557
+    note: Figure 3 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: Na2O equilibrium-phase composition
+    species:
+    - Na2O
+    phase: l
+    temperature_as_printed: 1470 °C
+    axes_as_published: 'x: Al2O3 (wt %); y: Na2O (wt %)'
+    caption: Influence of Al2O3 content in CSA melts (Ca2Si3O8–Al2O3 system) on the saturation of these melts with sodium.
+      The dashed lines are average Na2O contents for the given series (log fO2 values are given). The series in air (up-pointing
+      triangles) and pure CO2 (down-pointing triangles) are combined together. For the most reduced series, which showed the
+      widest range of atomic Na/Al ratios, the values of this ratio in experimental melts are shown.
+    panel: whole_figure
+    series:
+    - name: −log fO2 = 8.91
+      marker_count: 4
+    - name: −log fO2 = 6.89
+      marker_count: 4
+    - name: air, −log fO2 = 0.68
+      marker_count: 4
+    - name: pure CO2, −log fO2 = 2.84
+      marker_count: 4
+    numeric_points: none
+    attribution: Present-work data
+    digitisation: deferred to a figure pass
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_figure3_caption
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_figure4_caption
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 557
+    note: Figure 4 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: Na2O and K2O equilibrium-phase compositions
+    species:
+    - Na2O
+    - K2O
+    phase: l
+    temperature_as_printed: 1470 °C
+    axes_as_published: 'x: SiO2 (wt %); y: Na2O or K2O (wt %)'
+    caption: Influence of SiO2 content in DAS melts (DiAn–SiO2 system) on the saturation of these melts with sodium and potassium.
+    panel: whole_figure
+    series:
+    - name: Na, series 8, fO2 = 10^-10.7 atm
+      marker_count: 4
+    - name: Na, series 13, fO2 = 10^-8.9 atm
+      marker_count: 5
+    - name: K, series 23
+      marker_count: 4
+    - name: K, series 24
+      marker_count: 4
+    numeric_points: none
+    attribution: Present-work data
+    digitisation: deferred to a figure pass
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_figure4_caption
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_figure5_caption
+  type: figure_record
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 558
+    note: Figure 5 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: Na2O and K2O equilibrium-phase compositions
+    species:
+    - Na2O
+    - K2O
+    phase: l
+    temperature_as_printed: 1470 °C and 1300 °C
+    axes_as_published: 'x: SiO2 (wt %); y: Me2O (wt %)'
+    caption: Influence of SiO2 content in DAS melts (DiAn–SiO2 system) on the simultaneous saturation of these melts with
+      sodium and potassium from a combined K–Na source.
+    panel: whole_figure
+    series:
+    - name: Na2O, 1470 °C
+      marker_count: 4
+    - name: K2O, 1470 °C
+      marker_count: 4
+    - name: Na2O, 1300 °C
+      marker_count: 4
+    - name: K2O, 1300 °C
+      marker_count: 4
+    numeric_points: none
+    attribution: Present-work data
+    digitisation: deferred to a figure pass
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_figure5_caption
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_figure6_caption
+  type: figure_record
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 560
+    note: Figure 6 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: Na2O and K2O activity coefficients
+    species:
+    - Na2O
+    - K2O
+    phase: l
+    temperature_as_printed: 1470 °C and 1300 °C
+    axes_as_published: 'x: X SiO2; y: γ Na2O and γ K2O'
+    caption: Influence of X SiO2 on the activity coefficients of Na2O and K2O in DAS melts (DiAn–SiO2 system). γ Na2O and
+      γ K2O in melts with X SiO2 = 0.45 are taken to be 1 (compositions are shown by asterisks). See text for calculation
+      details.
+    panel: panels (a) and (b)
+    series:
+    - name: 'Na2O panel a: Na-only, 1470 °C'
+      marker_count: 11
+      panel: a
+    - name: 'Na2O panel a: Na and K, 1470 °C'
+      marker_count: 5
+      panel: a
+    - name: 'Na2O panel a: Na and K, 1300 °C'
+      marker_count: 5
+      panel: a
+    - name: 'K2O panel b: K-only, 1470 °C'
+      marker_count: 10
+      panel: b
+    - name: 'K2O panel b: Na and K, 1470 °C'
+      marker_count: 5
+      panel: b
+    - name: 'K2O panel b: Na and K, 1300 °C'
+      marker_count: 5
+      panel: b
+    numeric_points: none
+    attribution: Present-work data
+    digitisation: deferred to a figure pass
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_figure6_caption
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_figure7_caption
+  type: figure_record
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 560
+    note: Figure 7 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: Relative alkali enrichment D
+    species:
+    - Na2O
+    - K2O
+    phase: l
+    temperature_as_printed: not specified
+    axes_as_published: 'x: SiO2 (wt %); y: D (silicic melt/reference melt)'
+    caption: Relative enrichment of alkalis in melts more silicic than the reference melt with 45 wt % SiO2. Also shown are
+      the compositions of the basic and silicic melts selected for further calculations.
+    panel: whole_figure
+    series:
+    - name: Na model curve
+      marker_count: 0
+    - name: K model curve
+      marker_count: 0
+    numeric_points: none
+    attribution: Author-calculated model; no figure values digitized.
+    digitisation: deferred to a figure pass
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_figure7_caption
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_figure8_caption
+  type: figure_record
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 561
+    note: Figure 8 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: Model melt compositions during mixing and contamination
+    species:
+    - Na2O
+    - K2O
+    phase: l
+    temperature_as_printed: not specified
+    axes_as_published: 'x: SiO2 (wt %); y: Na2O and K2O (wt %)'
+    caption: Behavior of (a) Na and (b) K during the mixing/contamination of basic and silicic melts. See text for calculation
+      details.
+    panel: panels (a) and (b)
+    series:
+    - name: panel a, simple mixing circles
+      marker_count: 24
+      panel: a
+    - name: panel a, excess silicic melt downward triangles
+      marker_count: 24
+      panel: a
+    - name: panel a, excess basic melt upward triangles
+      marker_count: 24
+      panel: a
+    - name: panel b, simple mixing circles
+      marker_count: 24
+      panel: b
+    - name: panel b, excess silicic melt downward triangles
+      marker_count: 24
+      panel: b
+    - name: panel b, excess basic melt upward triangles
+      marker_count: 24
+      panel: b
+    numeric_points: none
+    attribution: Author-calculated model; no figure values digitized.
+    digitisation: deferred to a figure pass
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_figure8_caption
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_figure9_caption
+  type: figure_record
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 561
+    note: Figure 9 caption and plotted panel.
+  units: as printed
+  values:
+    quantity: Model Na/K composition ratio
+    species:
+    - Na2O
+    - K2O
+    phase: l
+    temperature_as_printed: not specified
+    axes_as_published: 'x: SiO2 (wt %); y: Na/K (wt ratio)'
+    caption: Dependence of the Na/K ratio on SiO2 content during the mixing/contamination of basic and silicic melts. See
+      text for calculation details.
+    panel: whole_figure
+    series:
+    - name: simple mixing open circles
+      marker_count: 23
+    - name: basic melt with excess silicic melt
+      marker_count: 23
+    - name: silicic melt with excess basic melt
+      marker_count: 23
+    numeric_points: none
+    attribution: Author-calculated model; no figure values digitized.
+    digitisation: deferred to a figure pass
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_figure9_caption
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_t2_series23_initial_source_model
+  type: thermodynamic_example
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 554
+    table: '2'
+    row: '23'
+    column: initial composition
+  units: wt%
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: model_derived
+    candidate_tokens:
+    - equilibrium_phase_composition
+    source_label_as_published: K2S-23
+    stage_as_published: initial
+    composition_wt_pct_as_published:
+      SiO2: '48.9'
+      Na2O: –
+      K2O: '51.1'
+      total: '100.0'
+    row_cells_as_published:
+    - '23'
+    - DAK-23, DASiK-23*
+    - '8.92'
+    - '16.0'
+    - K2S-23
+    - '48.9'
+    - –
+    - '51.1'
+    - '100.0'
+    - '88.9'
+    - –
+    - '10.1'
+    - '98.9'
+    context_reason: The Table 2 footnote explicitly says this initial source-melt composition was calculated after the high-K2O
+      melt fused the crucible bottom.
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_t2_series23_initial_source_model
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_t4_sandard_13_na2o_reference
+  type: activity_coefficient_reference
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 559
+    table: '4'
+    row: Sandard 13
+    column: γ Na2O
+  units: dimensionless
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    formula: Na2O
+    gamma_as_published: '1.000'
+    X_SiO2_as_published: '0.450'
+    X_Na2O_as_published: '0.047'
+    X_K2O_as_published: '0.000'
+    source_row_as_published: Sandard 13
+    row_cells_as_published:
+    - Sandard 13
+    - '0.450'
+    - '0.047'
+    - '0.000'
+    - '1.000'
+    - –
+    standard_state_as_published: Virtual reference melt with X SiO2 = 0.45; authors define γref = 1 after extrapolating alkali
+      content to that composition.
+    candidate_tokens:
+    - activity_coefficient
+    context_reason: The standard row is a virtual reference composition extrapolated to X SiO2 = 0.45, not a measured sample
+      point.
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_t4_sandard_13_na2o_reference
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_t4_standard_23_k2o_reference
+  type: activity_coefficient_reference
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 559
+    table: '4'
+    row: Standard 23
+    column: γ K2O
+  units: dimensionless
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    formula: K2O
+    gamma_as_published: '1.000'
+    X_SiO2_as_published: '0.450'
+    X_Na2O_as_published: '0.000'
+    X_K2O_as_published: '0.027'
+    source_row_as_published: Standard 23
+    row_cells_as_published:
+    - Standard 23
+    - '0.450'
+    - '0.000'
+    - '0.027'
+    - –
+    - '1.000'
+    standard_state_as_published: Virtual reference melt with X SiO2 = 0.45; authors define γref = 1 after extrapolating alkali
+      content to that composition.
+    candidate_tokens:
+    - activity_coefficient
+    context_reason: The standard row is a virtual reference composition extrapolated to X SiO2 = 0.45, not a measured sample
+      point.
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_t4_standard_23_k2o_reference
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_t4_standard_24_k2o_reference
+  type: activity_coefficient_reference
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 559
+    table: '4'
+    row: Standard 24
+    column: γ K2O
+  units: dimensionless
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    formula: K2O
+    gamma_as_published: '1.000'
+    X_SiO2_as_published: '0.450'
+    X_Na2O_as_published: '0.000'
+    X_K2O_as_published: '0.029'
+    source_row_as_published: Standard 24
+    row_cells_as_published:
+    - Standard 24
+    - '0.450'
+    - '0.000'
+    - '0.029'
+    - –
+    - '1.000'
+    standard_state_as_published: Virtual reference melt with X SiO2 = 0.45; authors define γref = 1 after extrapolating alkali
+      content to that composition.
+    candidate_tokens:
+    - activity_coefficient
+    context_reason: The standard row is a virtual reference composition extrapolated to X SiO2 = 0.45, not a measured sample
+      point.
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_t4_standard_24_k2o_reference
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_t4_standard_26_k2o_reference
+  type: activity_coefficient_reference
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 559
+    table: '4'
+    row: Standard 26
+    column: γ K2O
+  units: dimensionless
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    formula: K2O
+    gamma_as_published: '1.000'
+    X_SiO2_as_published: '0.450'
+    X_Na2O_as_published: '0.024'
+    X_K2O_as_published: '0.013'
+    source_row_as_published: Standard 26
+    row_cells_as_published:
+    - Standard 26
+    - '0.450'
+    - '0.024'
+    - '0.013'
+    - '1.000'
+    - '1.000'
+    standard_state_as_published: Virtual reference melt with X SiO2 = 0.45; authors define γref = 1 after extrapolating alkali
+      content to that composition.
+    candidate_tokens:
+    - activity_coefficient
+    context_reason: The standard row is a virtual reference composition extrapolated to X SiO2 = 0.45, not a measured sample
+      point.
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_t4_standard_26_k2o_reference
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_t4_standard_26_na2o_reference
+  type: activity_coefficient_reference
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 559
+    table: '4'
+    row: Standard 26
+    column: γ Na2O
+  units: dimensionless
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    formula: Na2O
+    gamma_as_published: '1.000'
+    X_SiO2_as_published: '0.450'
+    X_Na2O_as_published: '0.024'
+    X_K2O_as_published: '0.013'
+    source_row_as_published: Standard 26
+    row_cells_as_published:
+    - Standard 26
+    - '0.450'
+    - '0.024'
+    - '0.013'
+    - '1.000'
+    - '1.000'
+    standard_state_as_published: Virtual reference melt with X SiO2 = 0.45; authors define γref = 1 after extrapolating alkali
+      content to that composition.
+    candidate_tokens:
+    - activity_coefficient
+    context_reason: The standard row is a virtual reference composition extrapolated to X SiO2 = 0.45, not a measured sample
+      point.
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_t4_standard_26_na2o_reference
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_t4_standard_27_k2o_reference
+  type: activity_coefficient_reference
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 559
+    table: '4'
+    row: Standard 27
+    column: γ K2O
+  units: dimensionless
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    formula: K2O
+    gamma_as_published: '1.000'
+    X_SiO2_as_published: '0.450'
+    X_Na2O_as_published: '0.032'
+    X_K2O_as_published: '0.016'
+    source_row_as_published: Standard 27
+    row_cells_as_published:
+    - Standard 27
+    - '0.450'
+    - '0.032'
+    - '0.016'
+    - '1.000'
+    - '1.000'
+    standard_state_as_published: Virtual reference melt with X SiO2 = 0.45; authors define γref = 1 after extrapolating alkali
+      content to that composition.
+    candidate_tokens:
+    - activity_coefficient
+    context_reason: The standard row is a virtual reference composition extrapolated to X SiO2 = 0.45, not a measured sample
+      point.
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_t4_standard_27_k2o_reference
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_t4_standard_27_na2o_reference
+  type: activity_coefficient_reference
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 559
+    table: '4'
+    row: Standard 27
+    column: γ Na2O
+  units: dimensionless
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    formula: Na2O
+    gamma_as_published: '1.000'
+    X_SiO2_as_published: '0.450'
+    X_Na2O_as_published: '0.032'
+    X_K2O_as_published: '0.016'
+    source_row_as_published: Standard 27
+    row_cells_as_published:
+    - Standard 27
+    - '0.450'
+    - '0.032'
+    - '0.016'
+    - '1.000'
+    - '1.000'
+    standard_state_as_published: Virtual reference melt with X SiO2 = 0.45; authors define γref = 1 after extrapolating alkali
+      content to that composition.
+    candidate_tokens:
+    - activity_coefficient
+    context_reason: The standard row is a virtual reference composition extrapolated to X SiO2 = 0.45, not a measured sample
+      point.
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_t4_standard_27_na2o_reference
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2
+- observation_id: borisov2008_t4_standard_8_na2o_reference
+  type: activity_coefficient_reference
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 559
+    table: '4'
+    row: Standard 8
+    column: γ Na2O
+  units: dimensionless
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    formula: Na2O
+    gamma_as_published: '1.000'
+    X_SiO2_as_published: '0.450'
+    X_Na2O_as_published: '0.055'
+    X_K2O_as_published: '0.000'
+    source_row_as_published: Standard 8
+    row_cells_as_published:
+    - Standard 8
+    - '0.450'
+    - '0.055'
+    - '0.000'
+    - '1.000'
+    - –
+    standard_state_as_published: Virtual reference melt with X SiO2 = 0.45; authors define γref = 1 after extrapolating alkali
+      content to that composition.
+    candidate_tokens:
+    - activity_coefficient
+    context_reason: The standard row is a virtual reference composition extrapolated to X SiO2 = 0.45, not a measured sample
+      point.
+  context_id: borisov-2008-k-na-miscible-liquids::context::borisov2008_t4_standard_8_na2o_reference
+  work_id: 10.1134/s0869591108060027
+  source_id: borisov-2008-k-na-miscible-liquids
+  species: SiO2

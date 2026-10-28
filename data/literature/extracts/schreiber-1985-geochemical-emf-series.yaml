@@ -1,0 +1,150 @@
+schema_version: literature_extract.v1
+source_id: schreiber-1985-geochemical-emf-series
+figure_policy: Figures 1-2 are recorded without numeric plot points; their plotted comparisons remain deferred to a figure pass.
+source:
+  citation: >-
+    Schreiber, H. D. (1985). A geochemical electromotive force series. Lunar
+    and Planetary Science XVI, 738-739 (abstract 1376).
+  year: 1985
+  doi: null
+extraction:
+  method: >-
+    Two-page scanned abstract transcribed from MinerU and pdftotext-layout.
+    Table 1 was checked cell by cell against the 600 dpi page 2 render. Its
+    reference reduction potentials have no matching quantity token and are
+    retained in context; figure points remain deferred.
+  date: '2026-10-20'
+  worker: fam27-1020
+review_status: draft
+experiments:
+  - experiment_id: schreiber_1985_reference_reduction_potentials
+    series: >-
+      Reference reduction potentials for multivalent redox couples in three
+      silicate melts. Table 1 compiles potentials computed from experimental
+      redox information; figures compare the couples across aqueous and melt
+      reference scales.
+    locator: {page: 2, pdf_page_index: 1, published_page: 739, table: '1'}
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: schreiber_1985_table1_reference_reduction_potentials
+        type: assessment
+        locator: {page: 2, pdf_page_index: 1, published_page: 739, table: '1'}
+        units: relative units as printed
+        values:
+          printed_quantity: experimentally determined reference reduction potential E_M'
+          method_class: measured_reduced
+          admission_status: typed_unavailable
+          schema_gap: >-
+            No quantity token represents a reference reduction potential in
+            relative units. valence_ratio is a ratio and interaction_parameter
+            is not an electrode potential; EMF_CELL is a method token, not a
+            quantity token.
+          candidate_tokens: [valence_ratio, interaction_parameter]
+          printed_conditions:
+            SRL-131: 1150 °C; fO2 reference unity in the definition of E_M'
+            FAS: 1500 °C; fO2 reference unity in the definition of E_M'
+            Na2Si2O5: 1085 °C; fO2 reference unity in the definition of E_M'
+          composition_as_published:
+            SRL-131: >-
+              Savannah River Laboratory glass frit, wt%: SiO2 57.9, TiO2 1.0,
+              ZrO2 0.5, B2O3 14.7, La2O3 0.5, MgO 2.0, Na2O 17.7, Li2O 5.7.
+            FAS: >-
+              Forsterite-Anorthite-Silica ternary, wt%: SiO2 54.1, Al2O3 10.8,
+              CaO 5.7, MgO 29.4.
+            Na2Si2O5: sodium disilicate; no further composition is printed.
+          table_row_count: 26
+          table_rows:
+            - {index: b, element: Ni, couple: '3-2', SRL-131_1150_C: '1.7', FAS_1500_C: null, Na2Si2O5_1085_C: '1.5'}
+            - {index: a, element: Co, couple: '3-2', SRL-131_1150_C: '1.4', FAS_1500_C: null, Na2Si2O5_1085_C: '1.1'}
+            - {index: e, element: Au, couple: '3-0', SRL-131_1150_C: '> .8', FAS_1500_C: null, Na2Si2O5_1085_C: null}
+            - {index: c, element: Mn, couple: '3-2', SRL-131_1150_C: '.8', FAS_1500_C: null, Na2Si2O5_1085_C: '.7'}
+            - {index: i, element: Ag, couple: '1-0', SRL-131_1150_C: '.5', FAS_1500_C: null, Na2Si2O5_1085_C: null}
+            - {index: f, element: O, couple: 'O2-2-', SRL-131_1150_C: '0', FAS_1500_C: null, Na2Si2O5_1085_C: null}
+            - {index: d, element: Ce, couple: '4-3', SRL-131_1150_C: '-.1', FAS_1500_C: '.8', Na2Si2O5_1085_C: '-.5'}
+            - {index: g, element: Cr, couple: '6-3', SRL-131_1150_C: '-.3', FAS_1500_C: '1.1', Na2Si2O5_1085_C: null}
+            - {index: k, element: Sb, couple: '5-3', SRL-131_1150_C: '-.3', FAS_1500_C: null, Na2Si2O5_1085_C: '-.9'}
+            - {index: q, element: Cu, couple: '2-1', SRL-131_1150_C: '-.8', FAS_1500_C: null, Na2Si2O5_1085_C: null}
+            - {index: s, element: U, couple: '6-5', SRL-131_1150_C: '-1.5', FAS_1500_C: '.2', Na2Si2O5_1085_C: null}
+            - {index: j, element: Fe, couple: '3-2', SRL-131_1150_C: '-1.7', FAS_1500_C: '-.4', Na2Si2O5_1085_C: '-2.1'}
+            - {index: m, element: As, couple: '5-3', SRL-131_1150_C: '-1.7', FAS_1500_C: null, Na2Si2O5_1085_C: null}
+            - {index: h, element: V, couple: '5-4', SRL-131_1150_C: '-1.9', FAS_1500_C: '-.8', Na2Si2O5_1085_C: '-2.7'}
+            - {index: l, element: U, couple: '5-4', SRL-131_1150_C: '-2.2', FAS_1500_C: '-1.3', Na2Si2O5_1085_C: null}
+            - {index: n, element: Cu, couple: '1-0', SRL-131_1150_C: '-3.3', FAS_1500_C: null, Na2Si2O5_1085_C: null}
+            - {index: x, element: Cr, couple: '3-2', SRL-131_1150_C: '-3.4', FAS_1500_C: '-1.6', Na2Si2O5_1085_C: null}
+            - {index: o, element: Mo, couple: '6-5', SRL-131_1150_C: '-3.8', FAS_1500_C: null, Na2Si2O5_1085_C: null}
+            - {index: p, element: V, couple: '4-3', SRL-131_1150_C: '-4.0', FAS_1500_C: null, Na2Si2O5_1085_C: '-3.8'}
+            - {index: w, element: Eu, couple: '3-2', SRL-131_1150_C: '-4.3', FAS_1500_C: '-1.8', Na2Si2O5_1085_C: null}
+            - {index: t, element: Ti, couple: '4-3', SRL-131_1150_C: '-5.0', FAS_1500_C: '-3.7', Na2Si2O5_1085_C: '-5.7'}
+            - {index: u, element: Ni, couple: '2-0', SRL-131_1150_C: '-5.3', FAS_1500_C: null, Na2Si2O5_1085_C: null}
+            - {index: r, element: Sn, couple: '4-2', SRL-131_1150_C: '-5.5', FAS_1500_C: null, Na2Si2O5_1085_C: '-4.4'}
+            - {index: v, element: Co, couple: '2-0', SRL-131_1150_C: '-6.0', FAS_1500_C: null, Na2Si2O5_1085_C: null}
+            - {index: y, element: Fe, couple: '2-0', SRL-131_1150_C: '-6.3', FAS_1500_C: null, Na2Si2O5_1085_C: null}
+            - {index: '-', element: Mo, couple: '5-0', SRL-131_1150_C: '-15.8', FAS_1500_C: null, Na2Si2O5_1085_C: null}
+          table_disposition: >-
+            Context-no-token. Table 1 is the only printed measured-value table;
+            its 26 redox-couple rows report reference reduction potentials,
+            not redox ratios or interaction parameters. The printed lower bound
+            > .8 remains a bound, and blank cells remain unreported.
+          attribution: This work; potentials computed from experimental information cited in references 2-4.
+      - observation_id: schreiber_1985_figure1_reference_potentials_vs_aqueous
+        type: figure_record
+        locator: {page: 2, pdf_page_index: 1, published_page: 739, figure: '1'}
+        phase: melt
+        units: relative melt reference potential and aqueous potential in volts
+        values:
+          quantity: reference reduction potential E_M'
+          schema_gap: No store quantity token represents reference reduction potential.
+          method_class: figure_only
+          species: [Ni, Co, Au, Mn, Ag, O, Ce, Cr, Sb, Cu, U, Fe, As, V, Mo, Eu, Ti, Sn]
+          temperature_as_published: SRL-131 melt at 1150 °C; aqueous potentials at 25 °C
+          composition_as_published: SRL-131 glass frit; full printed composition is retained with Table 1.
+          axes_as_published: x E_M' relative units in SRL-131 at 1150 °C; y E° standard reduction potential in aqueous solution, volts at 25 °C
+          caption_as_published: >-
+            Correlation of the reference reduction potentials (E') of various
+            redox couples in SRL-131 melt to their standard reduction
+            potentials (E°) in aqueous solution. Redox couples are identified
+            in Table 1 by index letter.
+          panel: single plot
+          series:
+            - {label: individual redox couples indexed in Table 1, marker: filled circle, marker_count: 26}
+            - {label: correlation guide, marker_count: 0}
+          attribution: This work; aqueous reference potentials are the comparison series.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: schreiber_1985_figure2_melt_potential_correlations
+        type: figure_record
+        locator: {page: 2, pdf_page_index: 1, published_page: 739, figure: '2'}
+        phase: melt
+        units: relative reference reduction potentials E_M'
+        values:
+          quantity: reference reduction potential E_M'
+          schema_gap: No store quantity token represents reference reduction potential.
+          method_class: figure_only
+          species: [Ni, Co, Mn, Ce, Cr, Sb, U, Fe, V, Eu, Ti, Sn]
+          temperature_as_published: SRL-131 1150 °C; FAS 1500 °C; sodium disilicate 1085 °C
+          composition_as_published: SRL-131, FAS, and sodium disilicate; SRL-131 and FAS compositions are retained with Table 1.
+          axes_as_published: x E_M' relative units in SRL-131 at 1150 °C; y E_M' relative units in FAS at 1500 °C or sodium disilicate at 1085 °C
+          caption_as_published: >-
+            Correlation of the reference reduction potentials (E') for various
+            redox couples in SRL-131 at 1150 °C to those in FAS melt at 1500 °C
+            (solid points) and sodium disilicate melt at 1085 °C (open points).
+          panel: single plot
+          series:
+            - {label: FAS, marker: filled circle, marker_count: 9}
+            - {label: sodium disilicate, marker: open circle, marker_count: 10}
+            - {label: correlation guides, marker_count: 0}
+          attribution: This work; plotted potentials are identified in Table 1.
+          digitisation: deferred to a figure pass
+          numeric_points: none
+      - observation_id: schreiber_1985_general_emf_ordering
+        type: assessment
+        locator: {page: 2, pdf_page_index: 1, published_page: 739, paragraph: results}
+        units: qualitative
+        values:
+          quantity: relative order of redox-couple reduction potentials across melts
+          method_class: model_derived
+          admission_status: typed_unavailable
+          claim_as_printed: The general order is expected to differ only in detail among silicate melts; its magnitude is sensitive to thermal and compositional parameters.
+          reason: This is an interpretation of the comparison, not a separate measured quantity.

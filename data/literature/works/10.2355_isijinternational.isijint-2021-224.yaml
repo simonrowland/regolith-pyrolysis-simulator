@@ -76,3 +76,49 @@ experiments:
     section: Abstract
     note: The abstract describes slag-metal equilibrium at 1 873 K using Sn as metal solvent and CaF2–MgO slag as reference
       slag.
+context:
+- observation_id: guo_2021_table6_mg_activity_coefficients_1873k
+  type: model_output
+  locator:
+    published_page: 2730
+    pdf_page_index: 6
+    table: '6'
+    note: Authors calculate Mg activity coefficients from Table 5 results using Eqs. (18)-(22); retained as model output,
+      not scored data.
+  units: dimensionless activity coefficient
+  values:
+    method_class: model_derived
+    temperature_K: '1873'
+    equation_as_printed: a[Mg] = K° × a(MgO); gamma[Mg] calculated from Eq. (19)
+    points:
+    - x_Mg: '0.001355'
+      a_Mg_R: '0.004297'
+      gamma: '3.1713'
+    - x_Mg: '0.001550'
+      a_Mg_R: '0.004914'
+      gamma: '3.1704'
+    - x_Mg: '0.001628'
+      a_Mg_R: '0.005162'
+      gamma: '3.1706'
+    - x_Mg: '0.001929'
+      a_Mg_R: '0.006118'
+      gamma: '3.1718'
+    - x_Mg: '0.001282'
+      a_Mg_R: '0.004065'
+      gamma: '3.1707'
+    - x_Mg: '0.001438'
+      a_Mg_R: '0.004559'
+      gamma: '3.1704'
+    - x_Mg: '0.001730'
+      a_Mg_R: '0.005485'
+      gamma: '3.1706'
+    - x_Mg: '0.001959'
+      a_Mg_R: '0.006211'
+      gamma: '3.1703'
+    gamma_first_column_as_printed: '3.1713'
+    gamma_fourth_column_as_printed: '3.1718'
+    gamma_eighth_column_as_printed: '3.1703'
+  context_id: guo-2021-mgo-activity-cmas-slag::context::guo_2021_table6_mg_activity_coefficients_1873k
+  work_id: 10.2355/isijinternational.isijint-2021-224
+  source_id: guo-2021-mgo-activity-cmas-slag
+  species: Mg

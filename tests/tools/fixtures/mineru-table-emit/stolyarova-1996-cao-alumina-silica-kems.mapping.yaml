@@ -1,0 +1,141 @@
+# Table 3 has no OCR header rows. The 600 dpi page shows composition in columns
+# 1-2, then activities for CaO (3), Al2O3 (4-6), and SiO2 (7). Row-specific
+# composition is not expressible as a point condition in the mapping language.
+# Table 2 stores its printed partial pressures after applying each explicit
+# header factor. Table 3's row-specific composition is not expressible here.
+source_id: stolyarova-1996-cao-alumina-silica-kems
+source:
+  citation: >-
+    Stolyarova, Shornikov and Shultz (1996), High-Temperature Mass
+    Spectrometric Study of the Thermodynamic Properties of the CaO-Al2O3-SiO2 System.
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: emitbt-1018
+review_status: draft
+tables:
+  - page: 5
+    table_index: 1
+    type: rate_series
+    quantity: ion_intensity
+    evidence_class: measured_direct
+    unit: relative mass-spectrum units as printed
+    phase: gas
+    published_page: 19
+    rows: [10]
+    temperature:
+      as_printed: '1933'
+      unit: K
+    values:
+      - column: 2
+        species: MoO2
+      - column: 3
+        species: MoO2
+      - column: 4
+        species: MoO2
+  - page: 5
+    table_index: 1
+    type: rate_series
+    quantity: ion_intensity
+    evidence_class: measured_direct
+    unit: relative mass-spectrum units as printed
+    phase: gas
+    published_page: 19
+    rows: [11]
+    temperature:
+      as_printed: '1933'
+      unit: K
+    values:
+      - column: 2
+        species: MoO3
+      - column: 3
+        species: MoO3
+      - column: 4
+        species: MoO3
+  - page: 6
+    table_index: 2
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: measured_direct
+    unit: atm
+    phase: gas
+    published_page: 20
+    rows: all
+    temperature:
+      as_printed: '1933'
+      unit: K
+    values:
+      - column: 3
+        species: Ca
+        scale_factor:
+          header: ' $p_{Ca}, \cdot 10^{7}$ '
+          exponent: 7
+          direction: quantity_times_factor_equals_cell
+      - column: 4
+        species: Al
+        scale_factor:
+          header: ' $p_{Al}, \cdot 10^{8}$ '
+          exponent: 8
+          direction: quantity_times_factor_equals_cell
+      - column: 5
+        species: AlO
+        scale_factor:
+          header: ' $p_{AlO}, \cdot 10^{8}$ '
+          exponent: 8
+          direction: quantity_times_factor_equals_cell
+      - column: 6
+        species: SiO
+        scale_factor:
+          header: ' $p_{SiO}, \cdot 10^{5}$ '
+          exponent: 5
+          direction: quantity_times_factor_equals_cell
+      - column: 7
+        species: SiO2
+        scale_factor:
+          header: ' $p_{SiO2}, \cdot 10^{8}$ '
+          exponent: 8
+          direction: quantity_times_factor_equals_cell
+      - column: 8
+        species: O
+        evidence_class: quoted_attributed
+        scale_factor:
+          header: ' $p_{O}, \cdot 10^{8}$ '
+          exponent: 8
+          direction: quantity_times_factor_equals_cell
+      - column: 9
+        species: O
+        evidence_class: quoted_attributed
+        scale_factor:
+          header: ' $p''_{O}, \cdot 10^{8}$ '
+          exponent: 8
+          direction: quantity_times_factor_equals_cell
+      - column: 10
+        species: O
+        evidence_class: quoted_attributed
+        scale_factor:
+          header: ' $p''''_{O}, \cdot 10^{8}$ '
+          exponent: 8
+          direction: quantity_times_factor_equals_cell
+  - page: 9
+    table_index: 3
+    type: activity_coefficient
+    quantity: activity
+    evidence_class: measured_reduced
+    unit: dimensionless activity as printed
+    phase: CaO-Al2O3-SiO2 liquid oxide melt
+    published_page: 23
+    rows: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]
+    temperature:
+      as_printed: '1933'
+      unit: K
+    values:
+      - column: 3
+        species: CaO
+      - column: 4
+        species: Al2O3
+      - column: 5
+        species: Al2O3
+      - column: 6
+        species: Al2O3
+      - column: 7
+        species: SiO2

@@ -1,0 +1,399 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2320/matertrans1960.21.275
+  citation: Kemori N, Katayama I, Kozuka Z (1980). Thermodynamic Study of Oxygen in Liquid Copper. Transactions of the Japan
+    Institute of Metals 21(5):275–284.
+  source_ids:
+  - kemori-1980-oxygen-liquid-copper
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:kemori-1980-oxygen-liquid-copper
+      role: pdf
+      path: raw/kemori-1980-oxygen-liquid-copper/kemori-1980-oxygen-liquid-copper.pdf
+      sha256:
+        tag: value
+        value: b04c4322cf43699a1f4637c8210c3afbb9bd5912fd6b5f98387d9a867ae2b49a
+    - asset_id: pdftotext:kemori-1980-oxygen-liquid-copper
+      role: pdftotext
+      path: text/kemori-1980-oxygen-liquid-copper
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kemori-1980-oxygen-liquid-copper
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2320/matertrans1960.21.275
+experiments:
+- experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans1960.21.275
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=This work
+context:
+- observation_id: kemori_1980_table1_copper_impurities
+  type: context_record
+  units: mass ppm
+  locator:
+    page: 3
+    published_page: 277
+    pdf_page_index: 2
+    table: '1'
+  candidate_quantities:
+  - equilibrium_phase_composition
+  - impurity_concentration
+  reason: The table reports bulk impurity mass ppm in the copper charge, not a species activity or a liquid-phase composition.
+    Candidate store quantities do not fit this multi-element bulk assay.
+  values:
+    table_as_printed: Table 1 copper impurities, mass ppm
+    impurities_mass_ppm:
+      S: '8'
+      Pb: '7'
+      Ag: '6'
+      Fe: '4'
+      Ni: '2'
+      Zn: '2'
+      As: '1'
+      Bi: '1'
+      Sn: '1'
+      Te: '1'
+      P: '0'
+      Al: '0'
+      Au: '0'
+      Cd: '0'
+      Sb: '0'
+      Se: '0'
+      Si: '0'
+      Mn: '0'
+  context_id: kemori-1980-oxygen-liquid-copper::context::kemori_1980_table1_copper_impurities
+  work_id: 10.2320/matertrans1960.21.275
+  source_id: kemori-1980-oxygen-liquid-copper
+  species: O
+- observation_id: kemori_1980_table3_interaction_coefficients
+  type: context_record
+  units: dimensionless ε°ₒ; concentrations as printed
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+  candidate_quantities:
+  - interaction_parameter
+  reason: Table 3 reports oxygen self-interaction coefficients fitted from electrochemical data. The ε° coefficients and concentration
+    intervals are typed as interaction_parameter observations; this context record retains the table locator and the separate
+    solubility fits reported in the same table.
+  values:
+    table_as_printed: ε°ₒ values and concentration intervals, Table 3
+    solubility_fits:
+    - equation_as_printed: ln N*_O = -20590/(T/K) + 11.259
+      temperature_range_K:
+      - 1358
+      - 1483
+      equation_number: '14'
+    - equation_as_printed: ln N*_O = -12950/(T/K) + 6.273
+      temperature_range_K:
+      - 1508
+      - 1583
+      equation_number: '15'
+  context_id: kemori-1980-oxygen-liquid-copper::context::kemori_1980_table3_interaction_coefficients
+  work_id: 10.2320/matertrans1960.21.275
+  source_id: kemori-1980-oxygen-liquid-copper
+  species: O
+- observation_id: kemori_1980_tables5_6_activity_model
+  type: model_derived
+  units: dimensionless activity and J mol-1 coefficients
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '5'
+  candidate_quantities:
+  - activity
+  reason: Tables 5 and 6 report activities and coefficients calculated from polynomial solution models, not measured activity
+    data.
+  values:
+    table_as_printed: Activities for N=2 through 7 and β coefficients for N=4
+    table5_rows_as_printed_in_order:
+    - T_K
+    - a_Cu_star
+    - a_Cu_N_a
+    - a_Cu_N_b
+    - a_Cu2O_N_a
+    - a_Cu2O_N_b
+    table5_activity_rows:
+    - N: 2
+      rows:
+      - - '1508'
+        - '0.933'
+        - '0.909'
+        - '0.898'
+        - '0.815'
+        - '0.872'
+      - - '1523'
+        - '0.931'
+        - '0.904'
+        - '0.905'
+        - '0.827'
+        - '0.865'
+      - - '1543'
+        - '0.928'
+        - '0.894'
+        - '0.897'
+        - '0.857'
+        - '0.861'
+      - - '1558'
+        - '0.925'
+        - '0.886'
+        - '0.900'
+        - '0.882'
+        - '0.855'
+      - - '1573'
+        - '0.924'
+        - '0.881'
+        - '0.892'
+        - '0.887'
+        - '0.853'
+      - - '1583'
+        - '0.923'
+        - '0.874'
+        - '0.884'
+        - '0.905'
+        - '0.853'
+    - N: 3
+      rows:
+      - - '1508'
+        - '0.933'
+        - '0.926'
+        - '0.919'
+        - '0.864'
+        - '0.870'
+      - - '1523'
+        - '0.931'
+        - '0.923'
+        - '0.926'
+        - '0.862'
+        - '0.863'
+      - - '1543'
+        - '0.928'
+        - '0.918'
+        - '0.919'
+        - '0.863'
+        - '0.859'
+      - - '1558'
+        - '0.925'
+        - '0.915'
+        - '0.922'
+        - '0.860'
+        - '0.852'
+      - - '1573'
+        - '0.924'
+        - '0.913'
+        - '0.913'
+        - '0.851'
+        - '0.850'
+      - - '1583'
+        - '0.923'
+        - '0.912'
+        - '0.904'
+        - '0.844'
+        - '0.851'
+    - N: 4
+      rows:
+      - - '1508'
+        - '0.933'
+        - '0.935'
+        - '0.935'
+        - '0.896'
+        - '0.896'
+      - - '1523'
+        - '0.931'
+        - '0.933'
+        - '0.935'
+        - '0.889'
+        - '0.890'
+      - - '1543'
+        - '0.928'
+        - '0.929'
+        - '0.925'
+        - '0.885'
+        - '0.887'
+      - - '1558'
+        - '0.925'
+        - '0.925'
+        - '0.928'
+        - '0.882'
+        - '0.879'
+      - - '1573'
+        - '0.924'
+        - '0.923'
+        - '0.921'
+        - '0.873'
+        - '0.875'
+      - - '1583'
+        - '0.923'
+        - '0.921'
+        - '0.920'
+        - '0.872'
+        - '0.872'
+    - N: 5
+      rows:
+      - - '1508'
+        - '0.933'
+        - '0.934'
+        - '0.933'
+        - '0.884'
+        - '0.885'
+      - - '1523'
+        - '0.931'
+        - '0.932'
+        - '0.934'
+        - '0.878'
+        - '0.879'
+      - - '1543'
+        - '0.928'
+        - '0.928'
+        - '0.924'
+        - '0.874'
+        - '0.876'
+      - - '1558'
+        - '0.925'
+        - '0.924'
+        - '0.926'
+        - '0.871'
+        - '0.869'
+      - - '1573'
+        - '0.924'
+        - '0.922'
+        - '0.919'
+        - '0.863'
+        - '0.865'
+      - - '1583'
+        - '0.923'
+        - '0.920'
+        - '0.920'
+        - '0.861'
+        - '0.860'
+    - N: 6
+      rows:
+      - - '1508'
+        - '0.933'
+        - '0.909'
+        - '0.910'
+        - '0.890'
+        - '0.896'
+      - - '1523'
+        - '0.931'
+        - '0.907'
+        - '0.909'
+        - '0.892'
+        - '0.891'
+      - - '1543'
+        - '0.928'
+        - '0.903'
+        - '0.900'
+        - '0.891'
+        - '0.887'
+      - - '1558'
+        - '0.925'
+        - '0.901'
+        - '0.903'
+        - '0.885'
+        - '0.879'
+      - - '1573'
+        - '0.924'
+        - '0.899'
+        - '0.898'
+        - '0.870'
+        - '0.876'
+      - - '1583'
+        - '0.923'
+        - '0.896'
+        - '0.896'
+        - '0.871'
+        - '0.873'
+    - N: 7
+      rows:
+      - - '1508'
+        - '0.933'
+        - '0.923'
+        - '0.921'
+        - '0.906'
+        - '0.904'
+      - - '1523'
+        - '0.931'
+        - '0.917'
+        - '0.916'
+        - '0.895'
+        - '0.900'
+      - - '1543'
+        - '0.928'
+        - '0.903'
+        - '0.902'
+        - '0.894'
+        - '0.897'
+      - - '1558'
+        - '0.925'
+        - '0.888'
+        - '0.889'
+        - '0.895'
+        - '0.898'
+      - - '1573'
+        - '0.924'
+        - '0.879'
+        - '0.875'
+        - '0.896'
+        - '0.896'
+      - - '1583'
+        - '0.923'
+        - '0.861'
+        - '0.862'
+        - '0.901'
+        - '0.900'
+    table6_beta_J_mol:
+      Cu_liquid:
+        beta_02: '488840'
+        beta_03: '-722960'
+        beta_04: '367350'
+      Cu2O_liquid:
+        beta_02: '322190'
+        beta_03: '-405180'
+        beta_04: '193660'
+  context_id: kemori-1980-oxygen-liquid-copper::context::kemori_1980_tables5_6_activity_model
+  work_id: 10.2320/matertrans1960.21.275
+  source_id: kemori-1980-oxygen-liquid-copper
+  species: O

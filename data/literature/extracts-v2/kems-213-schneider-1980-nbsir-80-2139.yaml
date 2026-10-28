@@ -1,0 +1,2034 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-213-schneider-1980-nbsir-80-2139.yaml
+observations:
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_kcas_vp_1_liquid_phase_first_forms::T=1583.15:h=02d35deb9617
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: temperature at which a liquid phase first forms
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: The KCAS-VP-1 run-state composition at liquid-phase appearance is not reported.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1583.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: Vaporization Studies
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1583.15'
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1310'
+            locator:
+              page: 6
+              published_page: 2
+              pdf_page_index: 5
+              section: Vaporization Studies
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 2
+              pdf_page_index: 5
+              section: Vaporization Studies
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: unknown
+        reason: The KCAS-VP-1 run-state composition at liquid-phase appearance is not reported.
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - pdf:kems-213-schneider-1980-nbsir-80-2139
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1310'
+        locator:
+          page: 6
+          published_page: 2
+          pdf_page_index: 5
+          section: Vaporization Studies
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          page: 6
+          published_page: 2
+          pdf_page_index: 5
+          section: Vaporization Studies
+    output_unit: K
+    references: []
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair1_component1
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: KAlSiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '35'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair1_component1
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSiO4/CaSiO3
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSiO4
+            - '0.35'
+          - - CaSiO3
+            - '0.65'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair1
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSiO4/CaSiO3 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair1_component2
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaSiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '65'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair1_component2
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSiO4/CaSiO3
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSiO4
+            - '0.35'
+          - - CaSiO3
+            - '0.65'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair1
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSiO4/CaSiO3 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair2_component1
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: KAlSiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '19'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair2_component1
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSiO4/CaAl2Si2O8
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSiO4
+            - '0.19'
+          - - CaAl2Si2O8
+            - '0.81'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSiO4/CaAl2Si2O8 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair2_component2
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaAl2Si2O8
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '81'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair2_component2
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSiO4/CaAl2Si2O8
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSiO4
+            - '0.19'
+          - - CaAl2Si2O8
+            - '0.81'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair2
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSiO4/CaAl2Si2O8 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair3_component1
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: KAlSiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '37'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair3_component1
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSiO4/Ca2Al2SiO7
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSiO4
+            - '0.37'
+          - - Ca2Al2SiO7
+            - '0.63'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair3
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSiO4/Ca2Al2SiO7 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair3_component2
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Ca2Al2SiO7
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '63'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair3_component2
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSiO4/Ca2Al2SiO7
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSiO4
+            - '0.37'
+          - - Ca2Al2SiO7
+            - '0.63'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair3
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSiO4/Ca2Al2SiO7 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair4_component1
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: KAlSiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '17'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair4_component1
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSiO4/Ca2SiO4
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSiO4
+            - '0.17'
+          - - Ca2SiO4
+            - '0.83'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair4
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSiO4/Ca2SiO4 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair4_component2
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '83'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair4_component2
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSiO4/Ca2SiO4
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSiO4
+            - '0.17'
+          - - Ca2SiO4
+            - '0.83'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair4
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSiO4/Ca2SiO4 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair5_component1
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '39'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair5_component1
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSi2O6/CaSiO3
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSi2O6
+            - '0.39'
+          - - CaSiO3
+            - '0.61'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair5
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSi2O6/CaSiO3 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair5_component2
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaSiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '61'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair5_component2
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSi2O6/CaSiO3
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSi2O6
+            - '0.39'
+          - - CaSiO3
+            - '0.61'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair5
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSi2O6/CaSiO3 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair6_component1
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '43'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair6_component1
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSi2O6/Ca2Al2SiO7
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSi2O6
+            - '0.43'
+          - - Ca2Al2SiO7
+            - '0.57'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair6
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSi2O6/Ca2Al2SiO7 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair6_component2
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Ca2Al2SiO7
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '57'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair6_component2
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSi2O6/Ca2Al2SiO7
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSi2O6
+            - '0.43'
+          - - Ca2Al2SiO7
+            - '0.57'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair6
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSi2O6/Ca2Al2SiO7 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair7_component1
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '30'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair7_component1
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSi2O6/CaAl2Si2O8
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSi2O6
+            - '0.3'
+          - - CaAl2Si2O8
+            - '0.7'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair7
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSi2O6/CaAl2Si2O8 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+- observation_id: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair7_component2
+  experiment_id: 389fb8d1bb79ddfc2725256cece2cc2c2be9f0b2b564233ab7fdc41a6c464491::kems-213-schneider-1980-nbsir-80-2139
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaAl2Si2O8
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole percent of binary invariant melt components
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '70'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-213-schneider-1980-nbsir-80-2139::schneider_1980_table3_pair7_component2
+  source_id: kems-213-schneider-1980-nbsir-80-2139
+  locator:
+    page: 10
+    published_page: 6
+    pdf_page_index: 9
+    table: '3'
+    note: row=KAlSi2O6/CaAl2Si2O8
+  read_from: pdf:kems-213-schneider-1980-nbsir-80-2139
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 gives no numerical temperature for this low-temperature binary invariant melt.
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - KAlSi2O6
+            - '0.3'
+          - - CaAl2Si2O8
+            - '0.7'
+          amount_basis: mole_fraction
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    assemblage_id:
+      state:
+        tag: value
+        value: schneider80_table3_pair7
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'
+    full_assemblage:
+      state:
+        tag: value
+        value: Binary invariant melt; components KAlSi2O6/CaAl2Si2O8 as printed
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        table: '3'

@@ -103,6 +103,7 @@ experiments:
               pdf_page_index: 3
               figure: '2'
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -144,6 +145,7 @@ experiments:
               section: Vacuum heating experiment
               note: Total pressure 10^-8 atm as printed; converted using 101325 Pa per atm.
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -270,6 +272,7 @@ experiments:
               pdf_page_index: 3
               figure: '2'
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -311,6 +314,7 @@ experiments:
               section: Vacuum heating experiment
               note: Total pressure 10^-8 atm as printed; converted using 101325 Pa per atm.
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -437,6 +441,7 @@ experiments:
               pdf_page_index: 3
               figure: '2'
         output_unit: K
+        references: []
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -478,6 +483,7 @@ experiments:
               section: Vacuum heating experiment
               note: Total pressure 10^-8 atm as printed; converted using 101325 Pa per atm.
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -549,6 +555,7 @@ experiments:
               section: Results
               note: Printed duration 1.5 h; converted to seconds (5400) by h_to_s.
         output_unit: s
+        references: []
 benches:
 - id: 10.1038/s41598-026-70347-2::bench::vacuum-heating-furnace
   work_id: 10.1038/s41598-026-70347-2

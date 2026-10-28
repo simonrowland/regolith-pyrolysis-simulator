@@ -1,0 +1,3083 @@
+schema_version: literature_extract.v1
+source_id: de-abreu-2024-li2o-sio2-thermochemistry
+source:
+  citation: de Abreu, D. A. and Fabrichnaya, O. (2024). Critical Experiments and Thermodynamic Modeling of the Li2O-SiO2 System.
+    Solids, 5, 303–320.
+  doi: 10.3390/solids5020020
+  year: 2024
+  corpus_asset: raw/de-abreu-2024-li2o-sio2-thermochemistry/de-abreu-2024-li2o-sio2-thermochemistry.pdf
+  corpus_sha256: 95686a945aad57328768c585859e4d461f63d92013abe0a4ec695c9935b57dd9
+extraction:
+  method: Born-digital pdftotext-layout transcription; the MinerU table tool had no content-list JSON input for this source.
+    Table cells and layout were checked against 600 dpi renders of physical pages 3, 5–6, 11–15. Table 5's standard-state
+    label is interpreted in prose as the conventional 1 bar reference; the paper prints no pressure, so no pressure value
+    is stored. Figures are records only with deferred digitisation and no numeric points.
+  date: '2026-10-20'
+  worker: fam24-1020
+review_status: draft
+fidelity_samples:
+- path: species.Li2O.observations[deabreu2024_table5_li4sio4_delta_fH_1].values.delta_f_H
+  value: -2328.9
+  locator:
+    page: 13
+    published_page: 315
+    pdf_page_index: 12
+    table: '5'
+    row: Li4SiO4
+    column: ΔH°298K
+- path: species.Li2O.observations[deabreu2024_table5_li2sio3_S_7].values.entropy
+  value: 79.8
+  locator:
+    page: 13
+    published_page: 315
+    pdf_page_index: 12
+    table: '5'
+    row: Li2SiO3
+    column: S°298K
+- path: species.SiO2.observations[deabreu2024_table6_g8_r2].values.T_K
+  value: '1215'
+  locator:
+    page: 15
+    published_page: 317
+    pdf_page_index: 14
+    table: '6'
+    row: h-Li2Si2O5 ⇌ l-Li2Si2O5; SC [41]
+    column: Temp. (K)
+- path: species.Li2O.observations[deabreu2024_figure3_li4sio4_second_order_transition].values.T_K
+  value: '873.4'
+  locator:
+    page: 9
+    published_page: 311
+    pdf_page_index: 8
+    figure: '3'
+    panel: a
+scope_assessment:
+  tables:
+  - table: '1'
+    disposition: context-no-token
+    reason: Quoted crystallographic descriptors have no matching store quantity token.
+  - table: '2'
+    disposition: context-no-token
+    reason: Measured XRD phase identification, Rietveld volume fractions, and lattice constants do not fit existing quantity
+      tokens; the paper states phase compositions were not experimentally determined.
+  - table: '3'
+    disposition: context-model
+    reason: Thermodynamic model definitions and ionic-liquid parameters are model content, not measured property points.
+  - table: '4'
+    disposition: context-model
+    reason: CALPHAD functions and coefficients are fitted model content.
+  - table: '5'
+    disposition: typed and context-model
+    reason: Six measured quoted formation enthalpies and two measured quoted standard entropies are typed; all 16 optimized
+      entries are model_derived context.
+  - table: '6'
+    disposition: typed and context-model
+    reason: 17 single-subject measured/quoted transition temperatures are typed; seven multi-phase reaction rows are preserved in context because the schema cannot bind their assemblages to one species. All 18 optimized entries are model_derived context.
+  figure_only_candidates: Figures 1–7 are retained as figure records without numeric points. Figure 4 includes measured DSC
+    Cp points for Li8SiO6; all plotted digitisation is deferred.
+species:
+  Li2O:
+    observations:
+    - observation_id: deabreu2024_table5_li4sio4_delta_fH_1
+      type: gibbs_table
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        row: Li4SiO4
+        column: ΔH°298K
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      published_unit_and_molar_basis: kJ mol−1, per mole of formula unit
+      values:
+        quantity: delta_fH
+        formula: Li4SiO4
+        method_class: quoted_attributed
+        T_K: '298'
+        delta_f_H: -2328.9
+        delta_f_H_as_printed: '-2328.9'
+        technique_as_printed: KEM
+        attribution: KEM [49]
+        note: Table 5 labels this standard enthalpy/entropy of formation; no converted value is stored.
+    - observation_id: deabreu2024_table5_li2sio3_delta_fH_2
+      type: gibbs_table
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        row: Li2SiO3
+        column: ΔH°298K
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      published_unit_and_molar_basis: kJ mol−1, per mole of formula unit
+      values:
+        quantity: delta_fH
+        formula: Li2SiO3
+        method_class: quoted_attributed
+        T_K: '298'
+        delta_f_H: -1646.1
+        delta_f_H_as_printed: '-1646.1'
+        technique_as_printed: Solution calorimetry
+        attribution: Solution calorimetry [41]
+        note: Table 5 labels this standard enthalpy/entropy of formation; no converted value is stored.
+    - observation_id: deabreu2024_table5_li2sio3_delta_fH_3
+      type: gibbs_table
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        row: Li2SiO3
+        column: ΔH°298K
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      published_unit_and_molar_basis: kJ mol−1, per mole of formula unit
+      values:
+        quantity: delta_fH
+        formula: Li2SiO3
+        method_class: quoted_attributed
+        T_K: '298'
+        delta_f_H: -1655.0
+        delta_f_H_as_printed: '-1655.0'
+        technique_as_printed: KEM
+        attribution: KEM [50]
+        note: Table 5 labels this standard enthalpy/entropy of formation; no converted value is stored.
+    - observation_id: deabreu2024_table5_li2sio3_delta_fH_4
+      type: gibbs_table
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        row: Li2SiO3
+        column: ΔH°298K
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      published_unit_and_molar_basis: kJ mol−1, per mole of formula unit
+      values:
+        quantity: delta_fH
+        formula: Li2SiO3
+        method_class: quoted_attributed
+        T_K: '298'
+        delta_f_H: -1629.0
+        delta_f_H_as_printed: '-1629.0'
+        technique_as_printed: KEM
+        attribution: KEM [51]
+        note: Table 5 labels this standard enthalpy/entropy of formation; no converted value is stored.
+    - observation_id: deabreu2024_table5_li2sio3_delta_fH_5
+      type: gibbs_table
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        row: Li2SiO3
+        column: ΔH°298K
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      published_unit_and_molar_basis: kJ mol−1, per mole of formula unit
+      values:
+        quantity: delta_fH
+        formula: Li2SiO3
+        method_class: quoted_attributed
+        T_K: '298'
+        delta_f_H: -1674.5
+        delta_f_H_as_printed: '-1674.5'
+        technique_as_printed: KEM
+        attribution: KEM [52]
+        note: Table 5 labels this standard enthalpy/entropy of formation; no converted value is stored.
+    - observation_id: deabreu2024_table5_li2sio3_S_7
+      type: gibbs_table
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        row: Li2SiO3
+        column: S°298K
+      phase: cr
+      per: mol_species
+      units: J/mol/K
+      published_unit_and_molar_basis: J mol−1 K−1, per mole of formula unit
+      values:
+        quantity: S
+        formula: Li2SiO3
+        method_class: quoted_attributed
+        T_K: '298'
+        entropy: 79.8
+        entropy_as_printed: '79.8'
+        technique_as_printed: AC
+        attribution: AC [42]
+        note: Table 5 labels this standard enthalpy/entropy of formation; no converted value is stored.
+    - observation_id: deabreu2024_table6_g6_r1
+      type: transition_point
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li4SiO4; Thermal analysis [54]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id001
+            page: 14
+            published_page: 316
+            pdf_page_index: 13
+            table: '6'
+            row: Liq. ⇌ Li4SiO4; Thermal analysis [54]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id001
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + Li4SiO4
+          locator: *id001
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g6
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id001
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li4SiO4
+        method_class: quoted_attributed
+        T_K: '1490'
+        value_as_printed: '1490'
+        phase_reaction_as_printed: Liq. ⇌ Li4SiO4
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: Thermal analysis
+        attribution: Thermal analysis—[54]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g6_r2
+      type: transition_point
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li4SiO4; quenching method [10]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id002
+            page: 14
+            published_page: 316
+            pdf_page_index: 13
+            table: '6'
+            row: Liq. ⇌ Li4SiO4; quenching method [10]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id002
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + Li4SiO4
+          locator: *id002
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g6
+          locator: *id002
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id002
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li4SiO4
+        method_class: quoted_attributed
+        T_K: '1528'
+        value_as_printed: '1528'
+        phase_reaction_as_printed: Liq. ⇌ Li4SiO4
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: quenching method
+        attribution: quenching method—[10]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g6_r3
+      type: transition_point
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li4SiO4; DTA [12]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id003
+            page: 14
+            published_page: 316
+            pdf_page_index: 13
+            table: '6'
+            row: Liq. ⇌ Li4SiO4; DTA [12]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id003
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + Li4SiO4
+          locator: *id003
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g6
+          locator: *id003
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id003
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li4SiO4
+        method_class: quoted_attributed
+        T_K: '1531'
+        value_as_printed: '1531'
+        phase_reaction_as_printed: Liq. ⇌ Li4SiO4
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: DTA
+        attribution: DTA—[12]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g6_r4
+      type: transition_point
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li4SiO4; DC [35]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id004
+            page: 14
+            published_page: 316
+            pdf_page_index: 13
+            table: '6'
+            row: Liq. ⇌ Li4SiO4; DC [35]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id004
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + Li4SiO4
+          locator: *id004
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g6
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id004
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li4SiO4
+        method_class: quoted_attributed
+        T_K: '1531'
+        value_as_printed: '1531'
+        phase_reaction_as_printed: Liq. ⇌ Li4SiO4
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: DC
+        attribution: DC—[35]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g7_r1
+      type: transition_point
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li2SiO3; Thermal analysis [54]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id005
+            page: 14
+            published_page: 316
+            pdf_page_index: 13
+            table: '6'
+            row: Liq. ⇌ Li2SiO3; Thermal analysis [54]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id005
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + Li2SiO3
+          locator: *id005
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g7
+          locator: *id005
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id005
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li2SiO3
+        method_class: quoted_attributed
+        T_K: '1453'
+        value_as_printed: '1453'
+        phase_reaction_as_printed: Liq. ⇌ Li2SiO3
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: Thermal analysis
+        attribution: Thermal analysis—[54]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g7_r2
+      type: transition_point
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li2SiO3; Thermal analysis [10]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id006
+            page: 14
+            published_page: 316
+            pdf_page_index: 13
+            table: '6'
+            row: Liq. ⇌ Li2SiO3; Thermal analysis [10]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id006
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + Li2SiO3
+          locator: *id006
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g7
+          locator: *id006
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id006
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li2SiO3
+        method_class: quoted_attributed
+        T_K: '1474'
+        value_as_printed: '1474'
+        phase_reaction_as_printed: Liq. ⇌ Li2SiO3
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: Thermal analysis
+        attribution: Thermal analysis—[10]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g7_r3
+      type: transition_point
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li2SiO3; quenching method [10]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id007
+            page: 14
+            published_page: 316
+            pdf_page_index: 13
+            table: '6'
+            row: Liq. ⇌ Li2SiO3; quenching method [10]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id007
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + Li2SiO3
+          locator: *id007
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g7
+          locator: *id007
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id007
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li2SiO3
+        method_class: quoted_attributed
+        T_K: '1475'
+        value_as_printed: '1475'
+        phase_reaction_as_printed: Liq. ⇌ Li2SiO3
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: quenching method
+        attribution: quenching method—[10]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g7_r4
+      type: transition_point
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li2SiO3; DTA [12]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id008
+            page: 14
+            published_page: 316
+            pdf_page_index: 13
+            table: '6'
+            row: Liq. ⇌ Li2SiO3; DTA [12]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id008
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + Li2SiO3
+          locator: *id008
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g7
+          locator: *id008
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id008
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li2SiO3
+        method_class: quoted_attributed
+        T_K: '1482'
+        value_as_printed: '1482'
+        phase_reaction_as_printed: Liq. ⇌ Li2SiO3
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: DTA
+        attribution: DTA—[12]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g7_r5
+      type: transition_point
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li2SiO3; KEMS [51]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id009
+            page: 14
+            published_page: 316
+            pdf_page_index: 13
+            table: '6'
+            row: Liq. ⇌ Li2SiO3; KEMS [51]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id009
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + Li2SiO3
+          locator: *id009
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g7
+          locator: *id009
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id009
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li2SiO3
+        method_class: quoted_attributed
+        T_K: '1474'
+        value_as_printed: '1474'
+        phase_reaction_as_printed: Liq. ⇌ Li2SiO3
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: KEMS
+        attribution: KEMS—[51]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g7_r6
+      type: transition_point
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li2SiO3; DTA [28]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id010
+            page: 14
+            published_page: 316
+            pdf_page_index: 13
+            table: '6'
+            row: Liq. ⇌ Li2SiO3; DTA [28]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id010
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + Li2SiO3
+          locator: *id010
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g7
+          locator: *id010
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id010
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li2SiO3
+        method_class: quoted_attributed
+        T_K: '1484'
+        value_as_printed: '1484'
+        phase_reaction_as_printed: Liq. ⇌ Li2SiO3
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: DTA
+        attribution: DTA—[28]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_figure3_li4sio4_second_order_transition
+      type: transition_point
+      locator:
+        page: 9
+        published_page: 311
+        pdf_page_index: 8
+        figure: '3'
+        panel: a
+        note: Figure 3 caption; caption identifies the second-order transition.
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No composition is printed for the Li4SiO4 second-order transition.
+          locator: &id011
+            page: 9
+            published_page: 311
+            pdf_page_index: 8
+            table: Figure 3
+            row: 873.4 K effect
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id011
+      values:
+        quantity: transition_temperature
+        property_kind: second_order_transition
+        formula: Li4SiO4
+        method_class: measured_direct
+        T_K: '873.4'
+        value_as_printed: '873.4'
+        phase_reaction_as_printed: second-order transformation in the Li4SiO4 phase
+        attribution: This work; DTA, Figure 3 caption
+    context:
+    - observation_id: deabreu2024_figure4_panel_a_cp_li8sio6
+      type: figure_record
+      locator:
+        page: 10
+        published_page: 312
+        pdf_page_index: 9
+        figure: '4'
+      units: as plotted; no numeric points
+      values:
+        quantity: cp
+        method_class: mixed_measured_quoted_model
+        admission_status: figure_only
+        identity:
+          species: Li8SiO6
+          phase: cr
+          temperature_as_printed: 200–800 K
+        axes_as_printed:
+          x: Temperature / K
+          y: Cp / J mol−1 K−1
+        caption_as_printed: Figure 4. Heat capacities curves of the (a) Li8SiO6, (b) Li4SiO4 [35–39], (c) Li2SiO3 [36,39–42]
+          and (d) Li2Si2O5 [41] phases.
+        panel: a
+        series:
+        - series: Experimental DSC data (open circles)
+          marker: open circles
+          marker_count: not_countable_from_render
+          method_class: measured_direct
+        - series: Neumann–Kopp
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Fit
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        digitisation: deferred to a figure pass
+        attribution: This work and the per-series attributions printed in the legend.
+        note: DSC sample is identified in text as LA_3; phase amount is XRD-based.
+    - observation_id: deabreu2024_figure4_panel_b_cp_li4sio4
+      type: figure_record
+      locator:
+        page: 10
+        published_page: 312
+        pdf_page_index: 9
+        figure: '4'
+      units: as plotted; no numeric points
+      values:
+        quantity: cp
+        method_class: mixed_measured_quoted_model
+        admission_status: figure_only
+        identity:
+          species: Li4SiO4
+          phase: cr
+          temperature_as_printed: 300–1200 K
+        axes_as_printed:
+          x: Temperature / K
+          y: Cp / J mol−1 K−1
+        caption_as_printed: Figure 4. Heat capacities curves of the (a) Li8SiO6, (b) Li4SiO4 [35–39], (c) Li2SiO3 [36,39–42]
+          and (d) Li2Si2O5 [41] phases.
+        panel: b
+        series:
+        - series: Asou et al. 1992
+          marker: open circles
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Barin 1989
+          marker: open squares
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Hollenberg 1986
+          marker: triangles
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Brandt and Schulz 1988
+          marker: x
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Kleykamp 1996
+          marker: filled circles
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: This work
+          marker: red line
+          marker_count: 0
+          method_class: model_derived
+        digitisation: deferred to a figure pass
+        attribution: This work and the per-series attributions printed in the legend.
+        note: Fitted curve uses selected previous experimental values; no figure points digitized.
+    - observation_id: deabreu2024_figure4_panel_c_cp_li2sio3
+      type: figure_record
+      locator:
+        page: 10
+        published_page: 312
+        pdf_page_index: 9
+        figure: '4'
+      units: as plotted; no numeric points
+      values:
+        quantity: cp
+        method_class: mixed_measured_quoted_model
+        admission_status: figure_only
+        identity:
+          species: Li2SiO3
+          phase: cr
+          temperature_as_printed: 0–1400 K
+        axes_as_printed:
+          x: Temperature / K
+          y: Cp / J mol−1 K−1
+        caption_as_printed: Figure 4. Heat capacities curves of the (a) Li8SiO6, (b) Li4SiO4 [35–39], (c) Li2SiO3 [36,39–42]
+          and (d) Li2Si2O5 [41] phases.
+        panel: c
+        series:
+        - series: Stull et al. 1970
+          marker: open diamonds
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Barin 1989
+          marker: open squares
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Bennington 1976
+          marker: triangles
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Brandt and Schulz 1988
+          marker: x
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Kleykamp 1994
+          marker: open circles
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: This work
+          marker: red line
+          marker_count: 0
+          method_class: model_derived
+        digitisation: deferred to a figure pass
+        attribution: This work and the per-series attributions printed in the legend.
+        note: Literature values and fitted curve shown; no figure points digitized.
+  SiO2:
+    observations:
+    - observation_id: deabreu2024_table5_li2si2o5_delta_fH_6
+      type: gibbs_table
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        row: Li2Si2O5
+        column: ΔH°298K
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      published_unit_and_molar_basis: kJ mol−1, per mole of formula unit
+      values:
+        quantity: delta_fH
+        formula: Li2Si2O5
+        method_class: quoted_attributed
+        T_K: '298'
+        delta_f_H: -2557.3
+        delta_f_H_as_printed: '-2557.3'
+        technique_as_printed: Solution calorimetry
+        attribution: Solution calorimetry [41]
+        note: Table 5 labels this standard enthalpy/entropy of formation; no converted value is stored.
+    - observation_id: deabreu2024_table5_li2si2o5_S_8
+      type: gibbs_table
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+        row: Li2Si2O5
+        column: S°298K
+      phase: cr
+      per: mol_species
+      units: J/mol/K
+      published_unit_and_molar_basis: J mol−1 K−1, per mole of formula unit
+      values:
+        quantity: S
+        formula: Li2Si2O5
+        method_class: quoted_attributed
+        T_K: '298'
+        entropy: 122.2
+        entropy_as_printed: '122.2'
+        technique_as_printed: AC
+        attribution: AC [41]
+        note: Table 5 labels this standard enthalpy/entropy of formation; no converted value is stored.
+    - observation_id: deabreu2024_table6_g8_r1
+      type: transition_point
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        row: h-Li2Si2O5 ⇌ l-Li2Si2O5; DTA [56]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id019
+            page: 15
+            published_page: 317
+            pdf_page_index: 14
+            table: '6'
+            row: h-Li2Si2O5 ⇌ l-Li2Si2O5; DTA [56]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id019
+        full_assemblage:
+          state:
+            tag: value
+            value: h-Li2Si2O5 + l-Li2Si2O5
+          locator: *id019
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g8
+          locator: *id019
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id019
+      values:
+        quantity: transition_temperature
+        property_kind: polymorphic_transition
+        formula: Li2Si2O5
+        method_class: quoted_attributed
+        T_K: '1203'
+        value_as_printed: '1203'
+        phase_reaction_as_printed: h-Li2Si2O5 ⇌ l-Li2Si2O5
+        table_type_as_printed: Congruent
+        classification_note: >-
+          The discussion calls this reaction polymorphic while Table 6 prints Congruent in the Type cell.
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: DTA
+        attribution: DTA—[56]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g8_r2
+      type: transition_point
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        row: h-Li2Si2O5 ⇌ l-Li2Si2O5; SC [41]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id020
+            page: 15
+            published_page: 317
+            pdf_page_index: 14
+            table: '6'
+            row: h-Li2Si2O5 ⇌ l-Li2Si2O5; SC [41]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id020
+        full_assemblage:
+          state:
+            tag: value
+            value: h-Li2Si2O5 + l-Li2Si2O5
+          locator: *id020
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g8
+          locator: *id020
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id020
+      values:
+        quantity: transition_temperature
+        property_kind: polymorphic_transition
+        formula: Li2Si2O5
+        method_class: quoted_attributed
+        T_K: '1215'
+        value_as_printed: '1215'
+        phase_reaction_as_printed: h-Li2Si2O5 ⇌ l-Li2Si2O5
+        table_type_as_printed: Congruent
+        classification_note: >-
+          The discussion calls this reaction polymorphic while Table 6 prints Congruent in the Type cell.
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: SC
+        attribution: SC—[41]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g8_r3
+      type: transition_point
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        row: h-Li2Si2O5 ⇌ l-Li2Si2O5; DSC [57]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id021
+            page: 15
+            published_page: 317
+            pdf_page_index: 14
+            table: '6'
+            row: h-Li2Si2O5 ⇌ l-Li2Si2O5; DSC [57]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id021
+        full_assemblage:
+          state:
+            tag: value
+            value: h-Li2Si2O5 + l-Li2Si2O5
+          locator: *id021
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g8
+          locator: *id021
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id021
+      values:
+        quantity: transition_temperature
+        property_kind: polymorphic_transition
+        formula: Li2Si2O5
+        method_class: quoted_attributed
+        T_K: '1223'
+        value_as_printed: '1223'
+        phase_reaction_as_printed: h-Li2Si2O5 ⇌ l-Li2Si2O5
+        table_type_as_printed: Congruent
+        classification_note: >-
+          The discussion calls this reaction polymorphic while Table 6 prints Congruent in the Type cell.
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: DSC
+        attribution: DSC—[57]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g9_r1
+      type: transition_point
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        row: Liq. ⇌ h-Li2Si2O5; Thermal analysis [54]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id022
+            page: 15
+            published_page: 317
+            pdf_page_index: 14
+            table: '6'
+            row: Liq. ⇌ h-Li2Si2O5; Thermal analysis [54]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id022
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + h-Li2Si2O5
+          locator: *id022
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g9
+          locator: *id022
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id022
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li2Si2O5
+        method_class: quoted_attributed
+        T_K: '1228'
+        value_as_printed: '1228'
+        phase_reaction_as_printed: Liq. ⇌ h-Li2Si2O5
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: Thermal analysis
+        attribution: Thermal analysis—[54]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g9_r2
+      type: transition_point
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        row: Liq. ⇌ h-Li2Si2O5; Thermal analysis [55]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id023
+            page: 15
+            published_page: 317
+            pdf_page_index: 14
+            table: '6'
+            row: Liq. ⇌ h-Li2Si2O5; Thermal analysis [55]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id023
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + h-Li2Si2O5
+          locator: *id023
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g9
+          locator: *id023
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id023
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li2Si2O5
+        method_class: quoted_attributed
+        T_K: '1305'
+        value_as_printed: '1305'
+        phase_reaction_as_printed: Liq. ⇌ h-Li2Si2O5
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: Thermal analysis
+        attribution: Thermal analysis—[55]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g9_r3
+      type: transition_point
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        row: Liq. ⇌ h-Li2Si2O5; Quenching method [10]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id024
+            page: 15
+            published_page: 317
+            pdf_page_index: 14
+            table: '6'
+            row: Liq. ⇌ h-Li2Si2O5; Quenching method [10]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id024
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + h-Li2Si2O5
+          locator: *id024
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g9
+          locator: *id024
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id024
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li2Si2O5
+        method_class: quoted_attributed
+        T_K: '1300'
+        value_as_printed: '1300'
+        phase_reaction_as_printed: Liq. ⇌ h-Li2Si2O5
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: Quenching method
+        attribution: Quenching method—[10]
+        system_as_printed: Li2O-SiO2
+    - observation_id: deabreu2024_table6_g9_r4
+      type: transition_point
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        table: '6'
+        row: Liq. ⇌ h-Li2Si2O5; DSC [57]
+        column: Temp. (K)
+      phase: cr
+      units: K
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: No liquid composition is printed for this reaction row.
+          locator: &id025
+            page: 15
+            published_page: 317
+            pdf_page_index: 14
+            table: '6'
+            row: Liq. ⇌ h-Li2Si2O5; DSC [57]
+        liquid_x_SiO2_as_printed:
+          state:
+            tag: unknown
+            reason: Table 6 prints a dash for liquid x(SiO2).
+          locator: *id025
+        full_assemblage:
+          state:
+            tag: value
+            value: Liquid + h-Li2Si2O5
+          locator: *id025
+        assemblage_id:
+          state:
+            tag: value
+            value: deabreu2024_table6_g9
+          locator: *id025
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not report the total pressure for this transition measurement.
+          locator: *id025
+      values:
+        quantity: transition_temperature
+        property_kind: congruent
+        formula: Li2Si2O5
+        method_class: quoted_attributed
+        T_K: '1311'
+        value_as_printed: '1311'
+        phase_reaction_as_printed: Liq. ⇌ h-Li2Si2O5
+        table_type_as_printed: congruent
+        liquid_x_SiO2_as_printed: '-'
+        technique_as_printed: DSC
+        attribution: DSC—[57]
+        system_as_printed: Li2O-SiO2
+    context:
+    - observation_id: deabreu2024_table6_g1_r1
+      type: table_record
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li2O + Li4SiO4; DTA [11]
+        column: Temp. (K)
+      units: K
+      values:
+        quantity_as_printed: transition temperature
+        quantity_token: unavailable
+        candidate_tokens_considered:
+        - transition_temperature
+        method_class: quoted_attributed
+        admission_status: context_only
+        schema_gap: The printed reaction is a multi-phase assemblage. The existing single-species identity
+          cannot bind that assemblage; assigning the filing container SiO2 would misidentify the transition
+          subject.
+        phase_reaction_as_printed: Liq. ⇌ Li2O + Li4SiO4
+        temperature_as_printed: '1263'
+        technique_as_printed: DTA
+        assemblage_id: deabreu2024_table6_g1
+        assemblage_as_printed: Liquid + Li2O + Li4SiO4
+        table_type_as_printed: eutectic
+        system_as_printed: Li2O-SiO2
+        liquid_x_SiO2_as_printed: '0.20'
+        attribution: DTA—[11]
+    - observation_id: deabreu2024_table6_g2_r1
+      type: table_record
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li4SiO4 + Li2SiO3; DTA [10]
+        column: Temp. (K)
+      units: K
+      values:
+        quantity_as_printed: transition temperature
+        quantity_token: unavailable
+        candidate_tokens_considered:
+        - transition_temperature
+        method_class: quoted_attributed
+        admission_status: context_only
+        schema_gap: The printed reaction is a multi-phase assemblage. The existing single-species identity
+          cannot bind that assemblage; assigning the filing container SiO2 would misidentify the transition
+          subject.
+        phase_reaction_as_printed: Liq. ⇌ Li4SiO4 + Li2SiO3
+        temperature_as_printed: '1297'
+        technique_as_printed: DTA
+        assemblage_id: deabreu2024_table6_g2
+        assemblage_as_printed: Liquid + Li4SiO4 + Li2SiO3
+        table_type_as_printed: eutectic
+        system_as_printed: Li2O-SiO2
+        liquid_x_SiO2_as_printed: '0.40'
+        attribution: DTA—[10]
+    - observation_id: deabreu2024_table6_g2_r2
+      type: table_record
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li4SiO4 + Li2SiO3; DTA [28]
+        column: Temp. (K)
+      units: K
+      values:
+        quantity_as_printed: transition temperature
+        quantity_token: unavailable
+        candidate_tokens_considered:
+        - transition_temperature
+        method_class: quoted_attributed
+        admission_status: context_only
+        schema_gap: The printed reaction is a multi-phase assemblage. The existing single-species identity
+          cannot bind that assemblage; assigning the filing container SiO2 would misidentify the transition
+          subject.
+        phase_reaction_as_printed: Liq. ⇌ Li4SiO4 + Li2SiO3
+        temperature_as_printed: '1297'
+        technique_as_printed: DTA
+        assemblage_id: deabreu2024_table6_g2
+        assemblage_as_printed: Liquid + Li4SiO4 + Li2SiO3
+        table_type_as_printed: eutectic
+        system_as_printed: Li2O-SiO2
+        liquid_x_SiO2_as_printed: '0.39'
+        attribution: DTA—[28]
+    - observation_id: deabreu2024_table6_g2_r4
+      type: table_record
+      locator:
+        page: 9
+        published_page: 311
+        pdf_page_index: 8
+        figure: '3'
+        panel: a
+        note: Figure 3 caption gives 1289.4 K; Table 6 gives the same DTA result as 1289 K.
+      units: K
+      values:
+        quantity_as_printed: transition temperature
+        quantity_token: unavailable
+        candidate_tokens_considered:
+        - transition_temperature
+        method_class: measured_direct
+        admission_status: context_only
+        schema_gap: The printed reaction is a multi-phase assemblage. The existing single-species identity
+          cannot bind that assemblage; assigning the filing container SiO2 would misidentify the transition
+          subject.
+        phase_reaction_as_printed: Liq. ⇌ Li4SiO4 + Li2SiO3
+        temperature_as_printed: '1289.4'
+        technique_as_printed: DTA
+        assemblage_id: deabreu2024_table6_g2
+        assemblage_as_printed: Liquid + Li4SiO4 + Li2SiO3
+        table_type_as_printed: eutectic
+        system_as_printed: Li2O-SiO2
+        liquid_x_SiO2_as_printed: '-'
+        attribution: DTA—This work
+        same_measurement_also_reported_as:
+          value_as_printed: 1289 K
+          locator:
+            page: 14
+            published_page: 316
+            pdf_page_index: 13
+            table: '6'
+            row: Liq. ⇌ Li4SiO4 + Li2SiO3; DTA This work
+            column: Temp. (K)
+          note: Table 6 reports the same DTA transition rounded to the nearest kelvin.
+    - observation_id: deabreu2024_table6_g3_r1
+      type: table_record
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ Li2SiO3 + h-Li2Si2O5; DTA [28]
+        column: Temp. (K)
+      units: K
+      values:
+        quantity_as_printed: transition temperature
+        quantity_token: unavailable
+        candidate_tokens_considered:
+        - transition_temperature
+        method_class: quoted_attributed
+        admission_status: context_only
+        schema_gap: The printed reaction is a multi-phase assemblage. The existing single-species identity
+          cannot bind that assemblage; assigning the filing container SiO2 would misidentify the transition
+          subject.
+        phase_reaction_as_printed: Liq. ⇌ Li2SiO3 + h-Li2Si2O5
+        temperature_as_printed: '1307'
+        technique_as_printed: DTA
+        assemblage_id: deabreu2024_table6_g3
+        assemblage_as_printed: Liquid + Li2SiO3 + h-Li2Si2O5
+        table_type_as_printed: eutectic
+        system_as_printed: Li2O-SiO2
+        liquid_x_SiO2_as_printed: '-'
+        attribution: DTA—[28]
+    - observation_id: deabreu2024_table6_g4_r1
+      type: table_record
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Liq. ⇌ h-Li2Si2O5 + Trd-SiO2; quenching method [12]
+        column: Temp. (K)
+      units: K
+      values:
+        quantity_as_printed: transition temperature
+        quantity_token: unavailable
+        candidate_tokens_considered:
+        - transition_temperature
+        method_class: quoted_attributed
+        admission_status: context_only
+        schema_gap: The printed reaction is a multi-phase assemblage. The existing single-species identity
+          cannot bind that assemblage; assigning the filing container SiO2 would misidentify the transition
+          subject.
+        phase_reaction_as_printed: Liq. ⇌ h-Li2Si2O5 + Trd-SiO2
+        temperature_as_printed: '1301'
+        technique_as_printed: quenching method
+        assemblage_id: deabreu2024_table6_g4
+        assemblage_as_printed: Liquid + h-Li2Si2O5 + tridymite-SiO2
+        table_type_as_printed: eutectic
+        system_as_printed: Li2O-SiO2
+        liquid_x_SiO2_as_printed: '0.70'
+        attribution: quenching method—[12]
+    - observation_id: deabreu2024_table6_g5_r1
+      type: table_record
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+        row: Li2O + Li4SiO4 ⇌ Li8SiO6; DTA [11]
+        column: Temp. (K)
+      units: K
+      values:
+        quantity_as_printed: transition temperature
+        quantity_token: unavailable
+        candidate_tokens_considered:
+        - transition_temperature
+        method_class: quoted_attributed
+        admission_status: context_only
+        schema_gap: The printed reaction is a multi-phase assemblage. The existing single-species identity
+          cannot bind that assemblage; assigning the filing container SiO2 would misidentify the transition
+          subject.
+        phase_reaction_as_printed: Li2O + Li4SiO4 ⇌ Li8SiO6
+        temperature_as_printed: '1103'
+        technique_as_printed: DTA
+        assemblage_id: deabreu2024_table6_g5
+        assemblage_as_printed: Li2O + Li4SiO4 + Li8SiO6
+        table_type_as_printed: peritectoid
+        system_as_printed: Li2O-SiO2
+        liquid_x_SiO2_as_printed: '-'
+        attribution: DTA—[11]
+    - observation_id: deabreu2024_table1_crystallographic_data
+      type: data_table_context
+      locator:
+        page: 3
+        published_page: 305
+        pdf_page_index: 2
+        table: '1'
+      units: as printed
+      values:
+        quantity_as_printed: crystallographic phase labels, Pearson symbols, space groups, prototypes, references
+        quantity_token: unavailable
+        method_class: quoted_attributed
+        admission_status: context_only
+        candidate_tokens_considered:
+        - equilibrium_phase_composition
+        - transition_temperature
+        - cp
+        - S
+        - delta_fH
+        schema_gap: No existing token types crystal-system, Pearson symbol, space group, or prototype; these structural descriptors
+          are cited from [17–27].
+        row_fields_as_printed:
+        - Phase
+        - Polymorph
+        - Pearson Symbol
+        - Space Group
+        - Prototype
+        - Reference
+        row_count: 11
+        rows:
+        - - Li2O
+          - '-'
+          - cF12
+          - Fm3m
+          - CaF2
+          - '[17]'
+        - - Li8SiO6
+          - '-'
+          - hP30
+          - P421m
+          - Li8CoO6
+          - '[18]'
+        - - Li6Si2O7
+          - '-'
+          - tP30
+          - P63cm
+          - Li6Si2O7
+          - '[19]'
+        - - Li4SiO4
+          - '-'
+          - mP126
+          - P21/m
+          - Li15(SiO4)3PO4
+          - '[20]'
+        - - Li2SiO3
+          - '-'
+          - oS24
+          - Cmc21
+          - Na2SiO3
+          - '[21]'
+        - - Li2Si2O5
+          - l
+          - oS36
+          - Ccc2
+          - l-Li2Si2O5
+          - '[22]'
+        - - Li2Si2O5
+          - h
+          - oP36
+          - Pbcn
+          - h-Li2Si2O5
+          - '[23]'
+        - - SiO2
+          - l-quartz
+          - hP9
+          - P3121
+          - quartz (l)
+          - '[24]'
+        - - SiO2
+          - h-quartz
+          - hP9
+          - P6222
+          - quartz (h)
+          - '[25]'
+        - - SiO2
+          - cristobalite
+          - cF24
+          - Fd3m
+          - cristobalite
+          - '[26]'
+        - - SiO2
+          - tridymite
+          - hP12
+          - P63/mmc
+          - tridymite
+          - '[27]'
+    - observation_id: deabreu2024_table2_xrd_rietveld_sample_grid
+      type: data_table_context
+      locator:
+        page: 5
+        published_page: 307
+        pdf_page_index: 4
+        table: '2'
+      units: nominal mole fractions; annealing K/h; vol. fraction %; lattice parameters Å; β degrees
+      values:
+        quantity_as_printed: nominal sample compositions, phases identified by XRD/SEM-BSE, Rietveld phase volume fractions
+          and lattice parameters
+        quantity_token: unavailable
+        method_class: measured_direct
+        admission_status: context_only
+        candidate_tokens_considered:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        - transition_temperature
+        - cp
+        schema_gap: The paper says phase compositions were not experimentally determined. Existing composition tokens cannot
+          represent phase identification, nominal batch mole fractions, phase volume fractions, or lattice constants; the
+          annealing temperatures are conditions, not transition temperatures.
+        sample_count: 6
+        condition_count: 11
+        phase_row_count: 20
+        samples:
+        - sample_id: LSO_1
+          nominal_composition_mole_fraction:
+            SiO2: '0.20'
+            Li2O: '0.80'
+          conditions:
+          - annealing_as_printed: 1073 K/8 h
+            phase_rows:
+            - phase_as_printed: Li8SiO6
+              volume_fraction_percent_as_printed: '62.2'
+              lattice_parameters_A_as_printed:
+                a: '5.4179'
+                b: ''
+                c: '10.6507'
+              beta_degrees_as_printed: ''
+            - phase_as_printed: Li4SiO4
+              volume_fraction_percent_as_printed: '37.8'
+              lattice_parameters_A_as_printed:
+                a: '11.4244'
+                b: '6.1667'
+                c: '16.6477'
+              beta_degrees_as_printed: '98.5'
+          - annealing_as_printed: 1173 K/4 h
+            phase_rows:
+            - phase_as_printed: Li4SiO4
+              volume_fraction_percent_as_printed: '100.0'
+              lattice_parameters_A_as_printed:
+                a: '11.4301'
+                b: '6.1535'
+                c: '16.7126'
+              beta_degrees_as_printed: '98.5'
+        - sample_id: LSO_2
+          nominal_composition_mole_fraction:
+            SiO2: '0.17'
+            Li2O: '0.83'
+          conditions:
+          - annealing_as_printed: 1073 K/8 h
+            phase_rows:
+            - phase_as_printed: Li8SiO6
+              volume_fraction_percent_as_printed: '63.4'
+              lattice_parameters_A_as_printed:
+                a: '5.4211'
+                b: ''
+                c: '10.6454'
+              beta_degrees_as_printed: ''
+            - phase_as_printed: Li4SiO4
+              volume_fraction_percent_as_printed: '36.6'
+              lattice_parameters_A_as_printed:
+                a: '11.4291'
+                b: '6.1676'
+                c: '16.6618'
+              beta_degrees_as_printed: '98.5'
+          - annealing_as_printed: 1173 K/4 h
+            phase_rows:
+            - phase_as_printed: Li4SiO4
+              volume_fraction_percent_as_printed: '100.0'
+              lattice_parameters_A_as_printed:
+                a: '11.4208'
+                b: '6.1642'
+                c: '16.7116'
+              beta_degrees_as_printed: '98.5'
+        - sample_id: LSO_3
+          nominal_composition_mole_fraction:
+            SiO2: '0.13'
+            Li2O: '0.87'
+          conditions:
+          - annealing_as_printed: 1073 K/8 h
+            phase_rows:
+            - phase_as_printed: Li8SiO6
+              volume_fraction_percent_as_printed: '65.9'
+              lattice_parameters_A_as_printed:
+                a: '5.4216'
+                b: ''
+                c: '10.6472'
+              beta_degrees_as_printed: ''
+            - phase_as_printed: Li4SiO4
+              volume_fraction_percent_as_printed: '34.1'
+              lattice_parameters_A_as_printed:
+                a: '11.4252'
+                b: '6.1664'
+                c: '16.6618'
+              beta_degrees_as_printed: '98.5'
+        - sample_id: LSO_4
+          nominal_composition_mole_fraction:
+            SiO2: '0.40'
+            Li2O: '0.60'
+          conditions:
+          - annealing_as_printed: 1273 K/2 h
+            phase_rows:
+            - phase_as_printed: Li2SiO3
+              volume_fraction_percent_as_printed: '43.2'
+              lattice_parameters_A_as_printed:
+                a: '9.4042'
+                b: '5.4010'
+                c: '4.6629'
+              beta_degrees_as_printed: ''
+            - phase_as_printed: Li4SiO4
+              volume_fraction_percent_as_printed: '56.8'
+              lattice_parameters_A_as_printed:
+                a: '11.4586'
+                b: '6.1436'
+                c: '16.6299'
+              beta_degrees_as_printed: '98.6'
+        - sample_id: LSO_5
+          nominal_composition_mole_fraction:
+            SiO2: '0.45'
+            Li2O: '0.55'
+          conditions:
+          - annealing_as_printed: 1273 K/2 h
+            phase_rows:
+            - phase_as_printed: Li2SiO3
+              volume_fraction_percent_as_printed: '47.5'
+              lattice_parameters_A_as_printed:
+                a: '9.3937'
+                b: '5.3940'
+                c: '4.6614'
+              beta_degrees_as_printed: ''
+            - phase_as_printed: Li4SiO4
+              volume_fraction_percent_as_printed: '51.1'
+              lattice_parameters_A_as_printed:
+                a: '11.4293'
+                b: '6.1348'
+                c: '16.7132'
+              beta_degrees_as_printed: '98.2'
+          - annealing_as_printed: 1288 K/2 h
+            phase_rows:
+            - phase_as_printed: Li2SiO3
+              volume_fraction_percent_as_printed: '43.57'
+              lattice_parameters_A_as_printed:
+                a: '9.3914'
+                b: '5.3962'
+                c: '4.6624'
+              beta_degrees_as_printed: ''
+            - phase_as_printed: Li4SiO4
+              volume_fraction_percent_as_printed: '56.43'
+              lattice_parameters_A_as_printed:
+                a: '11.4261'
+                b: '6.1504'
+                c: '16.6805'
+              beta_degrees_as_printed: '98.4'
+          - annealing_as_printed: melted - DTA
+            phase_rows:
+            - phase_as_printed: Li2SiO3
+              volume_fraction_percent_as_printed: '-'
+              lattice_parameters_A_as_printed:
+                a: '-'
+                b: '-'
+                c: '-'
+              beta_degrees_as_printed: ''
+            - phase_as_printed: Li4SiO4
+              volume_fraction_percent_as_printed: '-'
+              lattice_parameters_A_as_printed:
+                a: '-'
+                b: '-'
+                c: '-'
+              beta_degrees_as_printed: ''
+        - sample_id: LSO_7
+          nominal_composition_mole_fraction:
+            SiO2: '0.35'
+            Li2O: '0.65'
+          conditions:
+          - annealing_as_printed: 1273 K/2 h
+            phase_rows:
+            - phase_as_printed: Li2SiO3
+              volume_fraction_percent_as_printed: '32.0'
+              lattice_parameters_A_as_printed:
+                a: '9.3976'
+                b: '5.3991'
+                c: '4.6655'
+              beta_degrees_as_printed: ''
+            - phase_as_printed: Li4SiO4
+              volume_fraction_percent_as_printed: '68.0'
+              lattice_parameters_A_as_printed:
+                a: '11.4266'
+                b: '6.1680'
+                c: '16.6824'
+              beta_degrees_as_printed: '98.4'
+          - annealing_as_printed: 1288 K/2 h
+            phase_rows:
+            - phase_as_printed: Li2SiO3
+              volume_fraction_percent_as_printed: '31.9'
+              lattice_parameters_A_as_printed:
+                a: '9.3976'
+                b: '5.3991'
+                c: '4.6655'
+              beta_degrees_as_printed: ''
+            - phase_as_printed: Li4SiO4
+              volume_fraction_percent_as_printed: '68.1'
+              lattice_parameters_A_as_printed:
+                a: '11.4266'
+                b: '6.1680'
+                c: '16.6824'
+              beta_degrees_as_printed: '98.4'
+        continued_on:
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          table: '2'
+        notes:
+        - Blank cells are retained as empty strings; printed dashes remain dashes.
+        - The reported LSO_5 1273 K phase volume fractions sum to 98.6%; values are retained as printed.
+    - observation_id: deabreu2024_table3_thermodynamic_models
+      type: data_table_context
+      locator:
+        page: 11
+        published_page: 313
+        pdf_page_index: 10
+        table: '3'
+      units: as printed; Gibbs energy model parameters
+      values:
+        quantity_as_printed: thermodynamic description and ionic-liquid model parameters
+        quantity_token: unavailable
+        method_class: model_derived
+        admission_status: context_only
+        candidate_tokens_considered:
+        - delta_fG
+        - delta_fH
+        - S
+        - cp
+        schema_gap: These are model parameter definitions and standard-state relations, not measured thermodynamic property
+          points.
+        continued_on:
+          page: 12
+          published_page: 314
+          pdf_page_index: 11
+          table: '3'
+        as_printed: "Table 3. Thermodynamic description for the Li2 O-SiO2 system.\n\n                  Phase          Sublattice\
+          \ Model                                Thermodynamic Parameter\n                  Liquid         (Si+4 , Li+1 )P\
+          \ : (O−2 , Va, SiO4−4 , SiO2 )Q   0 G Ionic\n                                                                  \
+          \                  Si+4 :O−2\n                                                                                 \
+          \                = 2·GSIO2LIQ + 2,000,000\n                                                                    \
+          \             0 G Ionic\n                                                                                      \
+          \ + 4      −4 = 8·GSIO2LIQ + 2,000,000\n                                                                       \
+          \             Si :SiO4\n                                                                                 0 G Ionic\
+          \       = GLI2O + 58,585 − 34.24·T\n                                                                           \
+          \          Li+1 :O−2\n                                                                                 0 G Ionic\
+          \ = GLIQSI\n                                                                                    Si+4 :Va\n     \
+          \                                                                            0 G Ionic      = GLIQLI\n         \
+          \                                                                            Li+1 :Va\n                        \
+          \                                                         0 G Ionic = GSIO2LIQ\n                               \
+          \                                                     SiO2\n                                                   \
+          \                              0 G Ionic         = GLI4SIO4 + 28,000 − 16·T\n                                  \
+          \                                                   Li+1 :SiO4−4\n                                             \
+          \                                    0 G Ionic           = −1,482,600 + 14.4·T\n                               \
+          \                                                     Si+4 :O−2 ,Va\n                                          \
+          \                                       0 G Ionic           = 920 + 12.21·T\n                                  \
+          \                                                   Li+1 :O−2 ,Va\n                                            \
+          \                                     0 G Ionic            = 120,000 + 55·T\n                                  \
+          \                                                     + 4\n                                                    \
+          \                                Si :Va,SiO2\n                                                                 \
+          \                0 G Ionic              = L12\n                                                                \
+          \                     Li+1 :SiO4−4 ,O−2\n                                                                      \
+          \           0 G Ionic             = L0\n                                                                       \
+          \              Li+1 :O−2 ,SiO2\n                                                                               \
+          \  1 G Ionic             = L1\n                                                                                \
+          \     Li+1 :O−2 ,SiO2\n                                                                                 2 G Ionic\
+          \             = L2\n                                                                                     Li+1 :O−2\
+          \ ,SiO2\n                                                                                 3 G Ionic            \
+          \ = L3\n                                                                                     Li+1 :O−2 ,SiO2\n \
+          \                                                                                0 G Ionic               = 2·L0\n\
+          \                                                                                       + 1      −4\n          \
+          \                                                                           Li :SiO4 ,SiO2\n                   \
+          \                                                              1 G Ionic               = 2·L1\n                \
+          \                                                                     Li+1 :SiO4−4 ,SiO2\n                     \
+          \                                                            2 G Ionic               = 2·L2\n                  \
+          \                                                                   Li+1 :SiO4−4 ,SiO2\n                       \
+          \                                                          3 G Ionic               = 2·L3\n                    \
+          \                                                                 Li+1 :SiO4−4 ,SiO2\n                  Li2 O  \
+          \        (Li+1 )2 : (O−2 )1                              0 G Li2 O       = GLI2O\n                             \
+          \                                                        Li+1 :O−2\n                  Quartz         (Si+4 )1 :\
+          \ (O−2 )2                              0 G quartz      =  GSIO2SOL\n                                           \
+          \                                         Si+4 :O−2\n                  Cristobalite   (Si+4 )1 : (O−2 )2       \
+          \                       0 G crist.\n                                                                           \
+          \         Si+4 :O−2\n                                                                                          \
+          \       = GCRISTOB\n                  Tridymite      (Si+4 )1 : (O−2 )2                              0 G tridym.\
+          \ = GTRIDYM\n                                                                                       +\n        \
+          \                                                                            Si :O4   − 2\n\n                  Li2\
+          \ O          (Li+1 )2 : (O−2 )1                              0 G Li2 O       = GLI2O\n                         \
+          \                                                            Li+1 :O−2\n                  Li8 SiO6       (Li+1 )8\
+          \ : (Si+4 )1 : (O−2 )6                   0 G Li8 SiO6          = GLI8O6SI1\n                                   \
+          \                                                  Li+1 :Si+4 :O−2\n                  Li4 SiO4       (Li+1 )4 :\
+          \ (Si+4 )1 : (O−2 )4                   0 G Li4 SiO4          = GLI4O4SI1\n                                     \
+          \                                                  + 1   +\n                                                   \
+          \                                  Li :Si :O 4   − 2\n\n                  Li2 SiO3       (Li+1 )2 : (Si+4 )1 : (O−2\
+          \ )3                   0 G Li2 SiO3          = GLI2O3SI1\n                                                     \
+          \                                Li+1 :Si+4 :O−2\n\fSolids 2024, 5                                             \
+          \                                                                                     314\n\n\n\n              \
+          \                     Table 3. Cont.\n\n                                    Phase           Sublattice Model   \
+          \                           Thermodynamic Parameter\n                                    l-Li2 Si2 O5    (Li+1 )\
+          \       : (Si+4 )       : (O−2 )        0 G l − Li2 Si2 O5  = GLI2O5SI2\n                                      \
+          \                        2               2              5        Li+1 :Si+4 :O−2\n                             \
+          \       h-Li2 Si2 O5    (Li+1 )2 : (Si+4 )2 : (O−2 )5                 0 G h− Li2 Si2 O5 = GLI2O5SI2 + 941.4 − 1·T\n\
+          \                                                                                                      Li+1 :Si+4\
+          \ :O−2"
+    - observation_id: deabreu2024_table4_thermodynamic_functions
+      type: data_table_context
+      locator:
+        page: 12
+        published_page: 314
+        pdf_page_index: 11
+        table: '4'
+      units: as printed; model Gibbs-energy functions and temperature ranges
+      values:
+        quantity_as_printed: CALPHAD thermodynamic function coefficients
+        quantity_token: unavailable
+        method_class: model_derived
+        admission_status: context_only
+        candidate_tokens_considered:
+        - delta_fG
+        - delta_fH
+        - S
+        - cp
+        schema_gap: Printed functions are fitted CALPHAD model coefficients, not measured property points; family rule keeps
+          fits in model context.
+        as_printed: "Table 4. Thermodynamic description for the Li2 O-SiO2 system.\n\n Name            Temp. Range (K)   Function\n\
+          \ GHSERLI   (200–453.6)             −10,583.817 + 217.637482·T − 38.940488·T ·ln(T) + 0.035466931·T2 − 1.9869816·10−5\
+          \ ·T3 + 159,994·T −1\n           (453.6–500)             −559,579.123 + 10,547.8799·T − 1702.88865·T ·ln(T) + 2.25832944·T2\
+          \ − 5.71066077·10−4 ·T3 + 33,885,874·T −1\n           (500–3000)              −9062.994 + 179.278285·T − 31.2283718·T\
+          \ ·ln(T) + 0.002633221·T2 − 4.38058·10−7 ·T3 − 102,387·T −1\n GLIQLI    (200–250)               2700.205 − 5.795621·T\
+          \ + GHSERLI\n           (250–453.6)             12,015.027 − 362.187078·T + 61.6104424·T ·ln(T) − 0.182426463·T2\
+          \ + 6.3955671·10−5 ·T3 − 559,968 ·T −1\n           (453.6–500)             −6057.31 + 172.652183·T − 31.2283718·T\
+          \ ·ln(T) + 0.002633221·T2 − 4.38058·10−7 ·T3 − 102,387·T −1\n           (500–3000)              3005.684 −6.626102·T\
+          \ + GHSERLI\n GHSERSI   (298.15–1687)           −8162.609 + 137.236859·T − 22.8317533·T ·ln(T) − 0.001912904·T2\
+          \ − 3.552·10−9 ·T3 + 176,667·T −1\n           (1687–3600)             −9457.642 + 167.281367·T − 27.196·T ·ln(T)\
+          \ − 4.20369·1030 ·T −9\n GLIQSI    (298.15–1687)           50,696.36 − 30.099439·T + GHSERSI 2.09307·10−21 ·T7\n\
+          \           (1687–3600)             40,370.523 + 137.722298·T − 27.196·T ·ln(T)\n GSIO2SOL (298.15–540)        \
+          \     −900,936.64 − 360.892175·T + 61.1323·T ·ln(T) − 0.189203605 ·T2 + 4.9509742·10−5 ·T3 − 854,401·T −1\n    \
+          \       (540–770)               −1,091,466.54 + 2882.67275·T − 452.1367·T ·ln(T) + 0.428883845·T2 − 9.0917706·10−5\
+          \ ·T3 + 12,476,689·T −1\n           (770–848)               −1,563,481.44 + 9178.58655·T − 1404.5352·T ·ln(T) +\
+          \ 1.28404426·T2 − 2.35047657· 10−4 ·T3 +56,402,304·T −1\n           (848–1800)              −928,732.923 + 356.218325·T\
+          \ − 58.4292·T ·ln(T) − 0.00515995·T2 −2.47·10−10 ·T3 − 95,113·T −1\n           (1800–2960)             −924,076.574\
+          \ + 281.229013·T − 47.451·T ·ln(T) − 0.01200315·T2 − 6.7812·10−7 ·T3 + 665,385·T −1\n           (2960–4000)    \
+          \         −95,7997.4 + 544.992084·T − 82.709·T ·ln(T)\n GSIO2LIQ (298.15–2980)            −923,689.98 + 316.24766·T\
+          \ − 52.17·T ·ln(T) − 0.012002·T2 +6.78·10−7 ·T3 + 665,550·T −1\n           (2980–4000)             − 957,614.21\
+          \ + 580.01419·T − 87.428·T ·ln(T)\n GTRIDYM (298.15–388)              −918,008.73 + 140.55925·T − 25.1574·T ·ln(T)\
+          \ − 0.0148714·T2 − 2.2791833·10−5 ·T3 + 66,331·T −1\n           (388–433)               −921,013.31 + 224.53808·T\
+          \ − 37.8701·T ·ln(T) − 0.02368535·T2 − 1.6835·10−7 ·T3\n           (433–900)               −919,633.42 + 210.51651·T\
+          \ − 35.605·T ·ln(T) − 0.03049985·T2 + 4.6255·10−6 ·T3 − 162,026·T −1\n           (900–1668)              −979,377.7\
+          \ + 848.3098·T − 128.434·T ·ln(T) + 0.03387055·T2 − 3.786883·10−6 ·T3 − 7,070,800·T −1\n           (1668–3300) \
+          \            −943,685.26 + 493.58035·T − 77.5875·T ·ln(T) + 0.003040245·T2 − 4.63118·10−7 ·T3 − 2,227,125·T −1\n\
+          \           (3300–4000)             −974,449.74 + 587.37585·T −87.373·T ·ln(T)\n GCRISTOB (298.15–373)         \
+          \    −601,467.73 − 8140.2255·T + 1399.8908·T ·ln(T) − 2.8579085·T2 + 0.0010408145·T3 − 13,144,016·T −1\n       \
+          \    (373–453)               −1,498,711.3 + 13075.913·T − 2178.3561·T ·ln(T) + 3.493609·T2 − 0.0010762132·T3 + 29,100,273·T\
+          \ −1\n           (453–543)               −3,224,538.7 + 47,854.938·T − 7860.2125·T ·ln(T) + 11.817149·T2 − 0.0033651832·T3\
+          \ + 127,502,720·T −1\n           (543–3300)              −943,127.51 + 493.26056·T − 77.5875·T ·ln(T) + 0.003040245·T2\
+          \ − 4.63118·10−7 ·T3 − 2,227,125·T −1\n           (3300–4000)             −973,891.99 + 587.05606·T − 87.373·T ·ln(T)\n\
+          \ GLI2O     (298.15–3000)           −624800 + 446.6·T − 69.79·T ·ln(T) − 0.00883·T2 + 925,000·T −1\n GLI4O4SI1 (298.15–2200)\
+          \           −2,332,887.25 + 566.24079·T − 95.6958·T ·ln(T) − 0.094645·T2 −455,836.475·T −1\n GLI2O3SI1 (298.15–2500)\
+          \           −1,720,636.91 + 791.818565·T − 125.80476·T ·ln(T) − 0.01716·T2 + 1,804,226.17·T −1\n GLI2O5SI2 (298.15–1307)\
+          \           −2,669,484.12 + 1279.33792·T − 202.0705·T ·ln(T) − 0.01936355·T2 + 3,371,258·T −1\n           (1307–2200)\
+          \             −2,695,250.72 + 1627.09772·T − 251.04·T ·ln(T)\n GLI8O6SI1 (298.15–2200)           −3,623,067.542\
+          \ + 1424.997383·T − 221.5594·T ·ln(T) − 0.13585·T2 + 2,673,426.835·T −1\n L0        (298.15–6000)           26,902.7455\
+          \ − 86.1824918·T\n L1        (298.15–6000)           54,362.0415 − 34.9867572·T\n L2        (298.15–6000)      \
+          \     128,176.217 − 69.9409477·T\n L3        (298.15–6000)           −757.7632\n L12       (298.15–6000)       \
+          \    −67,793.1799 + 40·T\n\n\n\n                                        The phase diagram was effectively reproduced\
+          \ within uncertainty limits, as shown in\n                                   Figure 5. Discrepancies observed between\
+          \ the calculated liquidus lines and experimental\n                                   data can be attributed to higher\
+          \ uncertainties of determination of liquidus temperatures\n                                   compared to invariant\
+          \ reactions using DTA. Especially uncertainty of liquidus determi-\n                                   nation is\
+          \ increased in case of Li2 O evaporation during melting and therefore shift the\n                              \
+          \     composition of sample towards the SiO2 side.\n                                        The metastable liquid\
+          \ miscibility gap of the Li2 O-SiO2 system was calculated to be\n                                   in agreement\
+          \ with the experimental data from Moriya et al. [14], Haller et al. [16] and\n                                 \
+          \  calculations of Kim et al. [13]. The metastable miscibility gap is shown also in Figure 5 close\n           \
+          \                        to the SiO2 -side. The formation of metastable miscibility gaps between SiO2 and oxides\n\
+          \                                   formed by alkali metals (e.g., Na2 O and K2 O) were already reported by Wu et\
+          \ al. [48].\n\fSolids 2024, 5                                                                                  \
+          \                 315\n\n\n\n                      The calculated values of thermodynamic properties like enthalpy\
+          \ of formation and\n                 standard entropy at room temperatures are listed in the Table 5. No significant\
+          \ deviations\n                 were observed in comparison with experimental data [41,42,49–52]. Our calculated\
+          \ values\n                 are also compared with the values obtained by Konar et al. [15], and except for the Li8\
+          \ SiO6\n                 phase, the thermodynamic properties are in good agreement. For the Li8 SiO6 and Li4 SiO4\n\
+          \                 phases, the Gibbs energies were calculated and comparison with estimated data from\n         \
+          \        Migge [53] was done in temperature range between 700 to 1100 K, as shown in Figure 6.\n               \
+          \  For both phases, the Gibbs energies are in good agreement with data of [53].\n\n                 Table 5. Standard\
+          \ enthalpy and entropy of formation of the Li2 O-SiO2 compounds at 298 K.\n\n                  Phase           \
+          \    ∆H298K\n                                        ◦    (kJ mol−1 )                Technique                 \
+          \       Ref.\n                  Li8 SiO6            −3515.1                           optimized                \
+          \        [15]\n                                      −3527.0                           optimized               \
+          \         This work\n                  Li4 SiO4            −2328.9                           KEM               \
+          \               [49]\n                                      −2314.4                           optimized        \
+          \                [15]\n                                      −2299.0                           optimized       \
+          \                 This work\n                  Li2 SiO3            −1646.1                           Solution calorimetry\
+          \             [41]\n                                      −1655.0                           KEM                \
+          \              [50]\n                                      −1629.0                           KEM               \
+          \               [51]\n                                      −1674.5                           KEM              \
+          \                [52]\n                                      −1647.8                           optimized       \
+          \                 [15]\n                                      −1669.5                           optimized      \
+          \                  This work\n                  Li2 Si2 O5          −2557.3                           Solution calorimetry\
+          \             [41]\n                                      −2560.0                           optimized          \
+          \              [15]\n                                      −2584.9                           optimized         \
+          \               This work\n                  Phase                ◦\n                                      S298K\
+          \ (J mol−1 K−1 )              Technique                        Ref.\n                  Li8 SiO6            192.0\
+          \                             optimized                        [15]\n                                      170.0\
+          \                             optimized                        This work\n                  Li4 SiO4           \
+          \ 117.0                             optimized                        [15]\n                                    \
+          \  126.0                             optimized                        This work\n                  Li2 SiO3    \
+          \        79.8                              AC                               [42]\n                             \
+          \         79.8                              optimized                        [15]\n                            \
+          \          81.3                              optimized                        This work\n                  Li2 Si2\
+          \ O5          122.2                             AC                               [41]\n                        \
+          \              122.6                             optimized                        [15]\n                       \
+          \               123.5                             optimized                        This work\n\n\n             \
+          \          Experimentally heat capacity data for the intermediate phases were used to develop\n                \
+          \ the thermodynamic database. Effects of the second order transition for the heat capacity\n                 of\
+          \ the Li4 SiO4 phase was not considered in the present work for the reasons previously\n                 discussed\
+          \ in Section 5.1, although an increase of entropy is resulted from this transformation.\n                 However,\
+          \ it does not affect significantly the modeling on this region of the phase diagram.\n                       The\
+          \ data for invariant reactions calculated with the thermodynamic parameters op-\n                 timized in the\
+          \ present work are compared with temperatures experimentally determined\n                 by different methods like\
+          \ quenching method from [10,54], DTA from [11,12,54–56], drop\n                 calorimetry from [35], KEMS from\
+          \ [51], DSC from [41,57] and assessment from [15] in\n                 Table 6. Results of calculations for the\
+          \ eutectic reaction (Liq ↔ Li4 SiO4 + Li2 SiO3 ) are almost\n                 30 K higher than our experimental\
+          \ value of 1289K obtained by DTA. It seems to be difficult\n                 to fit substantial temperature difference\
+          \ between the congruent melting of the Li4 SiO4 and\n                 Li2 SiO3 phases and eutectic reaction without\
+          \ distortion of other parts of diagram using\n                 models accepted in the present work. The calculated\
+          \ phase diagram using thermodynamic\n                 parameters optimized in the present work reproduces well the\
+          \ polymorphic transforma-\n                 tion of Li2 Si2 O5 phase, the congruent melting for the intermediate\
+          \ compounds like Li4 SiO4 ,\n                 Li2 SiO3 and Li2 Si2 O5 , as well as most of the invariant reactions\
+          \ from literature data (Table 6).\n\fSolids 2024, 5                                                            \
+          \                                                           316"
+    - observation_id: deabreu2024_table5_optimized_thermochemistry
+      type: data_table_context
+      locator:
+        page: 13
+        published_page: 315
+        pdf_page_index: 12
+        table: '5'
+      units: kJ mol−1 and J mol−1 K−1; per mole of formula unit
+      values:
+        quantity_as_printed: optimized standard enthalpies and entropies of formation at 298 K
+        quantity_token: delta_fH and S
+        method_class: model_derived
+        admission_status: context_only
+        candidate_tokens_considered:
+        - delta_fH
+        - S
+        schema_gap: The values are CALPHAD-optimized values [15] or This work; measured rows are separately typed as quoted_attributed
+          observations.
+        row_fields_as_printed:
+        - Phase
+        - ΔH°298K (kJ mol−1)
+        - S°298K (J mol−1 K−1)
+        - Technique
+        - Ref.
+        model_row_count: 16
+        optimized_rows:
+        - - Li8SiO6
+          - delta_fH
+          - '-3515.1'
+          - optimized
+          - '[15]'
+        - - Li8SiO6
+          - delta_fH
+          - '-3527.0'
+          - optimized
+          - This work
+        - - Li4SiO4
+          - delta_fH
+          - '-2314.4'
+          - optimized
+          - '[15]'
+        - - Li4SiO4
+          - delta_fH
+          - '-2299.0'
+          - optimized
+          - This work
+        - - Li2SiO3
+          - delta_fH
+          - '-1647.8'
+          - optimized
+          - '[15]'
+        - - Li2SiO3
+          - delta_fH
+          - '-1669.5'
+          - optimized
+          - This work
+        - - Li2Si2O5
+          - delta_fH
+          - '-2560.0'
+          - optimized
+          - '[15]'
+        - - Li2Si2O5
+          - delta_fH
+          - '-2584.9'
+          - optimized
+          - This work
+        - - Li8SiO6
+          - S
+          - '192.0'
+          - optimized
+          - '[15]'
+        - - Li8SiO6
+          - S
+          - '170.0'
+          - optimized
+          - This work
+        - - Li4SiO4
+          - S
+          - '117.0'
+          - optimized
+          - '[15]'
+        - - Li4SiO4
+          - S
+          - '126.0'
+          - optimized
+          - This work
+        - - Li2SiO3
+          - S
+          - '79.8'
+          - optimized
+          - '[15]'
+        - - Li2SiO3
+          - S
+          - '81.3'
+          - optimized
+          - This work
+        - - Li2Si2O5
+          - S
+          - '122.6'
+          - optimized
+          - '[15]'
+        - - Li2Si2O5
+          - S
+          - '123.5'
+          - optimized
+          - This work
+        typed_observation_ids:
+        - deabreu2024_table5_li4sio4_delta_fH_1
+        - deabreu2024_table5_li2sio3_delta_fH_2
+        - deabreu2024_table5_li2sio3_delta_fH_3
+        - deabreu2024_table5_li2sio3_delta_fH_4
+        - deabreu2024_table5_li2sio3_delta_fH_5
+        - deabreu2024_table5_li2sio3_S_7
+        - deabreu2024_table5_li2si2o5_delta_fH_6
+        - deabreu2024_table5_li2si2o5_S_8
+    - observation_id: deabreu2024_table6_calphad_optimized_transition_rows
+      type: data_table_context
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        table: '6'
+      units: K; optimized temperatures and liquid x(SiO2) as printed
+      values:
+        quantity_as_printed: optimized invariant and congruent reaction temperatures
+        quantity_token: transition_temperature
+        method_class: model_derived
+        admission_status: context_only
+        candidate_tokens_considered:
+        - transition_temperature
+        schema_gap: All rows marked optimized are CALPHAD model results and are retained in context, not typed as measurements.
+        continued_on:
+          page: 15
+          published_page: 317
+          pdf_page_index: 14
+          table: '6'
+        optimized_row_count: 18
+        optimized_rows:
+        - phase_reaction_as_printed: Liq. ⇌ Li2O + Li4SiO4
+          type_as_printed: eutectic
+          full_assemblage: Liquid + Li2O + Li4SiO4
+          temperature_K_as_printed: '1262'
+          liquid_x_SiO2_as_printed: '0.25'
+          technique_and_attribution_as_printed: optimized—[15]
+        - phase_reaction_as_printed: Liq. ⇌ Li2O + Li4SiO4
+          type_as_printed: eutectic
+          full_assemblage: Liquid + Li2O + Li4SiO4
+          temperature_K_as_printed: '1257'
+          liquid_x_SiO2_as_printed: '0.26'
+          technique_and_attribution_as_printed: optimized—This work
+        - phase_reaction_as_printed: Liq. ⇌ Li4SiO4 + Li2SiO3
+          type_as_printed: eutectic
+          full_assemblage: Liquid + Li4SiO4 + Li2SiO3
+          temperature_K_as_printed: '1293'
+          liquid_x_SiO2_as_printed: '0.39'
+          technique_and_attribution_as_printed: optimized—[15]
+        - phase_reaction_as_printed: Liq. ⇌ Li4SiO4 + Li2SiO3
+          type_as_printed: eutectic
+          full_assemblage: Liquid + Li4SiO4 + Li2SiO3
+          temperature_K_as_printed: '1321'
+          liquid_x_SiO2_as_printed: '0.41'
+          technique_and_attribution_as_printed: optimized—This work
+        - phase_reaction_as_printed: Liq. ⇌ Li2SiO3 + h-Li2Si2O5
+          type_as_printed: eutectic
+          full_assemblage: Liquid + Li2SiO3 + h-Li2Si2O5
+          temperature_K_as_printed: '1295'
+          liquid_x_SiO2_as_printed: '0.65'
+          technique_and_attribution_as_printed: optimized—[15]
+        - phase_reaction_as_printed: Liq. ⇌ Li2SiO3 + h-Li2Si2O5
+          type_as_printed: eutectic
+          full_assemblage: Liquid + Li2SiO3 + h-Li2Si2O5
+          temperature_K_as_printed: '1307'
+          liquid_x_SiO2_as_printed: '0.64'
+          technique_and_attribution_as_printed: optimized—This work
+        - phase_reaction_as_printed: Liq. ⇌ h-Li2Si2O5 + Trd-SiO2
+          type_as_printed: eutectic
+          full_assemblage: Liquid + h-Li2Si2O5 + tridymite-SiO2
+          temperature_K_as_printed: '1291'
+          liquid_x_SiO2_as_printed: '0.70'
+          technique_and_attribution_as_printed: optimized—[15]
+        - phase_reaction_as_printed: Liq. ⇌ h-Li2Si2O5 + Trd-SiO2
+          type_as_printed: eutectic
+          full_assemblage: Liquid + h-Li2Si2O5 + tridymite-SiO2
+          temperature_K_as_printed: '1293'
+          liquid_x_SiO2_as_printed: '0.75'
+          technique_and_attribution_as_printed: optimized—This work
+        - phase_reaction_as_printed: Li2O + Li4SiO4 ⇌ Li8SiO6
+          type_as_printed: peritectoid
+          full_assemblage: Li2O + Li4SiO4 + Li8SiO6
+          temperature_K_as_printed: '1094'
+          liquid_x_SiO2_as_printed: '-'
+          technique_and_attribution_as_printed: optimized—[15]
+        - phase_reaction_as_printed: Li2O + Li4SiO4 ⇌ Li8SiO6
+          type_as_printed: peritectoid
+          full_assemblage: Li2O + Li4SiO4 + Li8SiO6
+          temperature_K_as_printed: '1104'
+          liquid_x_SiO2_as_printed: '-'
+          technique_and_attribution_as_printed: optimized—This work
+        - phase_reaction_as_printed: Liq. ⇌ Li4SiO4
+          type_as_printed: congruent
+          full_assemblage: Liquid + Li4SiO4
+          temperature_K_as_printed: '1542'
+          liquid_x_SiO2_as_printed: '-'
+          technique_and_attribution_as_printed: optimized—[15]
+        - phase_reaction_as_printed: Liq. ⇌ Li4SiO4
+          type_as_printed: congruent
+          full_assemblage: Liquid + Li4SiO4
+          temperature_K_as_printed: '1513'
+          liquid_x_SiO2_as_printed: '-'
+          technique_and_attribution_as_printed: optimized—This work
+        - phase_reaction_as_printed: Liq. ⇌ Li2SiO3
+          type_as_printed: congruent
+          full_assemblage: Liquid + Li2SiO3
+          temperature_K_as_printed: '1486'
+          liquid_x_SiO2_as_printed: '-'
+          technique_and_attribution_as_printed: optimized—[15]
+        - phase_reaction_as_printed: Liq. ⇌ Li2SiO3
+          type_as_printed: congruent
+          full_assemblage: Liquid + Li2SiO3
+          temperature_K_as_printed: '1454'
+          liquid_x_SiO2_as_printed: '-'
+          technique_and_attribution_as_printed: optimized—This work
+        - phase_reaction_as_printed: h-Li2Si2O5 ⇌ l-Li2Si2O5
+          type_as_printed: polymorphic_transition
+          full_assemblage: h-Li2Si2O5 + l-Li2Si2O5
+          temperature_K_as_printed: '1215'
+          liquid_x_SiO2_as_printed: '-'
+          technique_and_attribution_as_printed: optimized—[15]
+        - phase_reaction_as_printed: h-Li2Si2O5 ⇌ l-Li2Si2O5
+          type_as_printed: polymorphic_transition
+          full_assemblage: h-Li2Si2O5 + l-Li2Si2O5
+          temperature_K_as_printed: '1215'
+          liquid_x_SiO2_as_printed: '-'
+          technique_and_attribution_as_printed: optimized—This work
+        - phase_reaction_as_printed: Liq. ⇌ h-Li2Si2O5
+          type_as_printed: congruent
+          full_assemblage: Liquid + h-Li2Si2O5
+          temperature_K_as_printed: '1296'
+          liquid_x_SiO2_as_printed: '-'
+          technique_and_attribution_as_printed: optimized—[15]
+        - phase_reaction_as_printed: Liq. ⇌ h-Li2Si2O5
+          type_as_printed: congruent
+          full_assemblage: Liquid + h-Li2Si2O5
+          temperature_K_as_printed: '1312'
+          liquid_x_SiO2_as_printed: '-'
+          technique_and_attribution_as_printed: optimized—This work
+        typed_observation_ids:
+        - deabreu2024_table6_g6_r1
+        - deabreu2024_table6_g6_r2
+        - deabreu2024_table6_g6_r3
+        - deabreu2024_table6_g6_r4
+        - deabreu2024_table6_g7_r1
+        - deabreu2024_table6_g7_r2
+        - deabreu2024_table6_g7_r3
+        - deabreu2024_table6_g7_r4
+        - deabreu2024_table6_g7_r5
+        - deabreu2024_table6_g7_r6
+        - deabreu2024_table6_g8_r1
+        - deabreu2024_table6_g8_r2
+        - deabreu2024_table6_g8_r3
+        - deabreu2024_table6_g9_r1
+        - deabreu2024_table6_g9_r2
+        - deabreu2024_table6_g9_r3
+        - deabreu2024_table6_g9_r4
+    - observation_id: deabreu2024_figure1_panel_a_xrd
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        figure: '1'
+      units: as plotted; no numeric points
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li2O-SiO2 phases as labeled
+          phase: crystalline
+          temperature_as_printed: 1273 K
+        axes_as_printed:
+          x: 2θ / °
+          y: Intensity / Counts^1/2
+        caption_as_printed: 'Figure 1. Diffractograms from XRD after heat treatments: (a) sample LSO_5 at 1273 K; (b) sample
+          LSO_5 at 1288 K; (c) sample LSO_7 at 1273 K; (d) sample LSO_7 at 1288 K; (e) sample LSO_3 at 1073 K; (f) sample
+          LSO_1 at 1073 K.'
+        panel: a
+        series:
+        - series: Counts
+          marker: small open circles
+          marker_count: not_countable_dense
+          method_class: measured_direct
+        - series: Rietveld fit Li4SiO4
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Rietveld fit Li2SiO3
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Difference
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Sample LSO_5; phase-fit series are as shown in the panel legend. No store token for diffraction counts or fitted
+          profile.
+    - observation_id: deabreu2024_figure1_panel_b_xrd
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        figure: '1'
+      units: as plotted; no numeric points
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li2O-SiO2 phases as labeled
+          phase: crystalline
+          temperature_as_printed: 1288 K
+        axes_as_printed:
+          x: 2θ / °
+          y: Intensity / Counts^1/2
+        caption_as_printed: 'Figure 1. Diffractograms from XRD after heat treatments: (a) sample LSO_5 at 1273 K; (b) sample
+          LSO_5 at 1288 K; (c) sample LSO_7 at 1273 K; (d) sample LSO_7 at 1288 K; (e) sample LSO_3 at 1073 K; (f) sample
+          LSO_1 at 1073 K.'
+        panel: b
+        series:
+        - series: Counts
+          marker: small open circles
+          marker_count: not_countable_dense
+          method_class: measured_direct
+        - series: Rietveld fit Li4SiO4
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Rietveld fit Li2SiO3
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Difference
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Sample LSO_5; phase-fit series are as shown in the panel legend. No store token for diffraction counts or fitted
+          profile.
+    - observation_id: deabreu2024_figure1_panel_c_xrd
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        figure: '1'
+      units: as plotted; no numeric points
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li2O-SiO2 phases as labeled
+          phase: crystalline
+          temperature_as_printed: 1273 K
+        axes_as_printed:
+          x: 2θ / °
+          y: Intensity / Counts^1/2
+        caption_as_printed: 'Figure 1. Diffractograms from XRD after heat treatments: (a) sample LSO_5 at 1273 K; (b) sample
+          LSO_5 at 1288 K; (c) sample LSO_7 at 1273 K; (d) sample LSO_7 at 1288 K; (e) sample LSO_3 at 1073 K; (f) sample
+          LSO_1 at 1073 K.'
+        panel: c
+        series:
+        - series: Counts
+          marker: small open circles
+          marker_count: not_countable_dense
+          method_class: measured_direct
+        - series: Rietveld fit Li4SiO4
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Rietveld fit Li2SiO3
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Difference
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Sample LSO_7; phase-fit series are as shown in the panel legend. No store token for diffraction counts or fitted
+          profile.
+    - observation_id: deabreu2024_figure1_panel_d_xrd
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        figure: '1'
+      units: as plotted; no numeric points
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li2O-SiO2 phases as labeled
+          phase: crystalline
+          temperature_as_printed: 1288 K
+        axes_as_printed:
+          x: 2θ / °
+          y: Intensity / Counts^1/2
+        caption_as_printed: 'Figure 1. Diffractograms from XRD after heat treatments: (a) sample LSO_5 at 1273 K; (b) sample
+          LSO_5 at 1288 K; (c) sample LSO_7 at 1273 K; (d) sample LSO_7 at 1288 K; (e) sample LSO_3 at 1073 K; (f) sample
+          LSO_1 at 1073 K.'
+        panel: d
+        series:
+        - series: Counts
+          marker: small open circles
+          marker_count: not_countable_dense
+          method_class: measured_direct
+        - series: Rietveld fit Li4SiO4
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Rietveld fit Li2SiO3
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Difference
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Sample LSO_7; phase-fit series are as shown in the panel legend. No store token for diffraction counts or fitted
+          profile.
+    - observation_id: deabreu2024_figure1_panel_e_xrd
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        figure: '1'
+      units: as plotted; no numeric points
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li2O-SiO2 phases as labeled
+          phase: crystalline
+          temperature_as_printed: 1073 K
+        axes_as_printed:
+          x: 2θ / °
+          y: Intensity / Counts^1/2
+        caption_as_printed: 'Figure 1. Diffractograms from XRD after heat treatments: (a) sample LSO_5 at 1273 K; (b) sample
+          LSO_5 at 1288 K; (c) sample LSO_7 at 1273 K; (d) sample LSO_7 at 1288 K; (e) sample LSO_3 at 1073 K; (f) sample
+          LSO_1 at 1073 K.'
+        panel: e
+        series:
+        - series: Counts
+          marker: small open circles
+          marker_count: not_countable_dense
+          method_class: measured_direct
+        - series: Rietveld fit Li8SiO6
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Rietveld fit Li4SiO4
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Difference
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Sample LSO_3; phase-fit series are as shown in the panel legend. No store token for diffraction counts or fitted
+          profile.
+    - observation_id: deabreu2024_figure1_panel_f_xrd
+      type: figure_record
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        figure: '1'
+      units: as plotted; no numeric points
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li2O-SiO2 phases as labeled
+          phase: crystalline
+          temperature_as_printed: 1073 K
+        axes_as_printed:
+          x: 2θ / °
+          y: Intensity / Counts^1/2
+        caption_as_printed: 'Figure 1. Diffractograms from XRD after heat treatments: (a) sample LSO_5 at 1273 K; (b) sample
+          LSO_5 at 1288 K; (c) sample LSO_7 at 1273 K; (d) sample LSO_7 at 1288 K; (e) sample LSO_3 at 1073 K; (f) sample
+          LSO_1 at 1073 K.'
+        panel: f
+        series:
+        - series: Counts
+          marker: small open circles
+          marker_count: not_countable_dense
+          method_class: measured_direct
+        - series: Rietveld fit Li8SiO6
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Rietveld fit Li4SiO4
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Difference
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Sample LSO_1; phase-fit series are as shown in the panel legend. No store token for diffraction counts or fitted
+          profile.
+    - observation_id: deabreu2024_figure2_panel_a_sem_bse
+      type: figure_record
+      locator:
+        page: 8
+        published_page: 310
+        pdf_page_index: 7
+        figure: '2'
+      units: as plotted; no numeric points
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li2SiO3 + Li4SiO4
+          phase: crystalline
+          temperature_as_printed: 1273 K
+        axes_as_printed:
+          x: image scale bar as printed
+          y: micrograph; no numerical axis
+        caption_as_printed: 'Figure 2. SEM-BSE images after heat treatments: (a) sample LSO_5 at 1273 K for 2 h; (b) sample
+          LSO_5 at 1288 K for 2 h; (c) sample LSO_7 at 1273 K for 2 h; (d) sample LSO_7 at 1288 K for 2 h; (e) sample LSO_4
+          at 1273 K for 2 h; (f) sample LSO_3 at 1073 K for 8 h.'
+        panel: a
+        series:
+        - series: SEM/BSE image
+          marker: none
+          marker_count: 0
+          method_class: measured_direct
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Sample LSO_5; labels identify phases as Li2SiO3 + Li4SiO4. No quantitative image-analysis token is applicable.
+    - observation_id: deabreu2024_figure2_panel_b_sem_bse
+      type: figure_record
+      locator:
+        page: 8
+        published_page: 310
+        pdf_page_index: 7
+        figure: '2'
+      units: as plotted; no numeric points
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li2SiO3 + Li4SiO4
+          phase: crystalline
+          temperature_as_printed: 1288 K
+        axes_as_printed:
+          x: image scale bar as printed
+          y: micrograph; no numerical axis
+        caption_as_printed: 'Figure 2. SEM-BSE images after heat treatments: (a) sample LSO_5 at 1273 K for 2 h; (b) sample
+          LSO_5 at 1288 K for 2 h; (c) sample LSO_7 at 1273 K for 2 h; (d) sample LSO_7 at 1288 K for 2 h; (e) sample LSO_4
+          at 1273 K for 2 h; (f) sample LSO_3 at 1073 K for 8 h.'
+        panel: b
+        series:
+        - series: SEM/BSE image
+          marker: none
+          marker_count: 0
+          method_class: measured_direct
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Sample LSO_5; labels identify phases as Li2SiO3 + Li4SiO4. No quantitative image-analysis token is applicable.
+    - observation_id: deabreu2024_figure2_panel_c_sem_bse
+      type: figure_record
+      locator:
+        page: 8
+        published_page: 310
+        pdf_page_index: 7
+        figure: '2'
+      units: as plotted; no numeric points
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li2SiO3 + Li4SiO4
+          phase: crystalline
+          temperature_as_printed: 1273 K
+        axes_as_printed:
+          x: image scale bar as printed
+          y: micrograph; no numerical axis
+        caption_as_printed: 'Figure 2. SEM-BSE images after heat treatments: (a) sample LSO_5 at 1273 K for 2 h; (b) sample
+          LSO_5 at 1288 K for 2 h; (c) sample LSO_7 at 1273 K for 2 h; (d) sample LSO_7 at 1288 K for 2 h; (e) sample LSO_4
+          at 1273 K for 2 h; (f) sample LSO_3 at 1073 K for 8 h.'
+        panel: c
+        series:
+        - series: SEM/BSE image
+          marker: none
+          marker_count: 0
+          method_class: measured_direct
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Sample LSO_7; labels identify phases as Li2SiO3 + Li4SiO4. No quantitative image-analysis token is applicable.
+    - observation_id: deabreu2024_figure2_panel_d_sem_bse
+      type: figure_record
+      locator:
+        page: 8
+        published_page: 310
+        pdf_page_index: 7
+        figure: '2'
+      units: as plotted; no numeric points
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li2SiO3 + Li4SiO4
+          phase: crystalline
+          temperature_as_printed: 1288 K
+        axes_as_printed:
+          x: image scale bar as printed
+          y: micrograph; no numerical axis
+        caption_as_printed: 'Figure 2. SEM-BSE images after heat treatments: (a) sample LSO_5 at 1273 K for 2 h; (b) sample
+          LSO_5 at 1288 K for 2 h; (c) sample LSO_7 at 1273 K for 2 h; (d) sample LSO_7 at 1288 K for 2 h; (e) sample LSO_4
+          at 1273 K for 2 h; (f) sample LSO_3 at 1073 K for 8 h.'
+        panel: d
+        series:
+        - series: SEM/BSE image
+          marker: none
+          marker_count: 0
+          method_class: measured_direct
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Sample LSO_7; labels identify phases as Li2SiO3 + Li4SiO4. No quantitative image-analysis token is applicable.
+    - observation_id: deabreu2024_figure2_panel_e_sem_bse
+      type: figure_record
+      locator:
+        page: 8
+        published_page: 310
+        pdf_page_index: 7
+        figure: '2'
+      units: as plotted; no numeric points
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li2SiO3 + Li4SiO4
+          phase: crystalline
+          temperature_as_printed: 1273 K
+        axes_as_printed:
+          x: image scale bar as printed
+          y: micrograph; no numerical axis
+        caption_as_printed: 'Figure 2. SEM-BSE images after heat treatments: (a) sample LSO_5 at 1273 K for 2 h; (b) sample
+          LSO_5 at 1288 K for 2 h; (c) sample LSO_7 at 1273 K for 2 h; (d) sample LSO_7 at 1288 K for 2 h; (e) sample LSO_4
+          at 1273 K for 2 h; (f) sample LSO_3 at 1073 K for 8 h.'
+        panel: e
+        series:
+        - series: SEM/BSE image
+          marker: none
+          marker_count: 0
+          method_class: measured_direct
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Sample LSO_4; labels identify phases as Li2SiO3 + Li4SiO4. No quantitative image-analysis token is applicable.
+    - observation_id: deabreu2024_figure2_panel_f_sem_bse
+      type: figure_record
+      locator:
+        page: 8
+        published_page: 310
+        pdf_page_index: 7
+        figure: '2'
+      units: as plotted; no numeric points
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li8SiO6 + Li4SiO4
+          phase: crystalline
+          temperature_as_printed: 1073 K
+        axes_as_printed:
+          x: image scale bar as printed
+          y: micrograph; no numerical axis
+        caption_as_printed: 'Figure 2. SEM-BSE images after heat treatments: (a) sample LSO_5 at 1273 K for 2 h; (b) sample
+          LSO_5 at 1288 K for 2 h; (c) sample LSO_7 at 1273 K for 2 h; (d) sample LSO_7 at 1288 K for 2 h; (e) sample LSO_4
+          at 1273 K for 2 h; (f) sample LSO_3 at 1073 K for 8 h.'
+        panel: f
+        series:
+        - series: SEM/BSE image
+          marker: none
+          marker_count: 0
+          method_class: measured_direct
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Sample LSO_3; labels identify phases as Li8SiO6 + Li4SiO4. No quantitative image-analysis token is applicable.
+    - observation_id: deabreu2024_figure3_dta_and_micrograph
+      type: figure_record
+      locator:
+        page: 9
+        published_page: 311
+        pdf_page_index: 8
+        figure: '3'
+      units: as plotted; no numeric points
+      values:
+        quantity: transition_temperature
+        method_class: figure_only
+        admission_status: figure_only
+        identity:
+          species: Li2O-SiO2; Li4SiO4 and Li2SiO3
+          phase: DTA effect and eutectic assemblage
+          temperature_as_printed: 873.4 K; 1289.4 K
+        axes_as_printed:
+          x: Temperature / K
+          y: HeatFlow / µV
+        caption_as_printed: 'Figure 3. Experimental results obtained for LSO_5: (a) DTA results with effects at 873.4 K and
+          1289.4 K associated respectively to the second-order transition for Li4SiO4 phase and the eutectic reaction Liq.
+          ⇌ Li4SiO4 + Li2SiO3 and (b) SEM/BSE micrograph after melting.'
+        panel: all panels
+        series:
+        - series: DTA heating trace
+          panel: a
+          marker: continuous trace
+          marker_count: 0
+          method_class: measured_direct
+        - series: DTA cooling trace
+          panel: a
+          marker: continuous trace
+          marker_count: 0
+          method_class: measured_direct
+        - series: SEM/BSE image after melting
+          panel: b
+          marker: none
+          marker_count: 0
+          method_class: measured_direct
+        digitisation: deferred to a figure pass
+        attribution: This work
+        note: Caption values are represented by typed transition observations; figure record has no numeric points.
+    - observation_id: deabreu2024_figure4_panel_d_cp_li2si2o5
+      type: figure_record
+      locator:
+        page: 10
+        published_page: 312
+        pdf_page_index: 9
+        figure: '4'
+      units: as plotted; no numeric points
+      values:
+        quantity: cp
+        method_class: mixed_measured_quoted_model
+        admission_status: figure_only
+        identity:
+          species: Li2Si2O5
+          phase: cr
+          temperature_as_printed: 0–1200 K
+        axes_as_printed:
+          x: Temperature / K
+          y: Cp / J mol−1 K−1
+        caption_as_printed: Figure 4. Heat capacities curves of the (a) Li8SiO6, (b) Li4SiO4 [35–39], (c) Li2SiO3 [36,39–42]
+          and (d) Li2Si2O5 [41] phases.
+        panel: d
+        series:
+        - series: Bennington et al. 1976
+          marker: open circles
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: This work
+          marker: red line
+          marker_count: 0
+          method_class: model_derived
+        digitisation: deferred to a figure pass
+        attribution: This work and the per-series attributions printed in the legend.
+        note: Literature values and fitted curve shown; no figure points digitized.
+    - observation_id: deabreu2024_figure5_calculated_phase_diagram
+      type: figure_record
+      locator:
+        page: 14
+        published_page: 316
+        pdf_page_index: 13
+        figure: '5'
+      units: as plotted; no numeric points
+      values:
+        quantity: transition_temperature
+        method_class: model_derived
+        admission_status: figure_only
+        identity:
+          species: Li2O-SiO2 system
+          phase: liquid and solid phase fields as labeled
+          temperature_as_printed: 800–2200 K axis range
+        axes_as_printed:
+          x: Mole fraction SiO2
+          y: Temperature / K
+        caption_as_printed: Figure 5. Phase diagram of the Li2O-SiO2 system calculated with thermodynamic parameters obtained
+          in this work [10–12,28,35,41,54–57].
+        panel: all panels
+        series:
+        - series: Ballo and Dittler (1912)
+          marker: open circle
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Jaeger and Klooster (1914)
+          marker: star
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Kracek (1930)
+          marker: filled circle
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Murthy and Hummel (1955)
+          marker: star
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Bennington et al. (1974)
+          marker: filled point
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Skokan et al. (1986)
+          marker: diamond
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Pengzhong et al. (1988)
+          marker: open triangle
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Boivin et al. (1993)
+          marker: open diamond
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Kleykamp (1996)
+          marker: triangle
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Claus et al. (1996)
+          marker: open down-triangle
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Meshalkin and Kaplun (2004)
+          marker: filled triangle
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: This work calculated phase boundaries
+          marker: continuous line
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        digitisation: deferred to a figure pass
+        attribution: Literature datasets as named in the legend; model parameters from this work.
+    - observation_id: deabreu2024_figure6_calculated_gibbs_energies
+      type: figure_record
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        figure: '6'
+      units: as plotted; no numeric points
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        admission_status: figure_only
+        identity:
+          species: Li8SiO6; Li4SiO4
+          phase: cr
+          temperature_as_printed: 700–1100 K axis range
+        axes_as_printed:
+          x: Temperature / K
+          y: G° / kJ mol−1
+        caption_as_printed: Figure 6. Calculated Gibbs energies for the Li8SiO6 and Li4SiO4 phases in comparison to estimated
+          data from Migge [53].
+        panel: all panels
+        series:
+        - series: Calculated Li8SiO6
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Calculated Li4SiO4
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Migge [53] estimated Li8SiO6 values
+          marker: open circles
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        - series: Migge [53] estimated Li4SiO4 values
+          marker: open squares
+          marker_count: not_countable_from_render
+          method_class: quoted_attributed
+        digitisation: deferred to a figure pass
+        attribution: Calculated by this work; estimated points attributed to Migge [53].
+    - observation_id: deabreu2024_figure7_li2o_activity
+      type: figure_record
+      locator:
+        page: 15
+        published_page: 317
+        pdf_page_index: 14
+        figure: '7'
+      units: as plotted; no numeric points
+      values:
+        quantity: activity
+        method_class: mixed_model_and_quoted
+        admission_status: figure_only
+        identity:
+          species: Li2O
+          phase: l
+          temperature_as_printed: 1473 K and 1673 K
+        axes_as_printed:
+          x: Mole fraction SiO2
+          y: ln a(Li2O)
+        caption_as_printed: Figure 7. Calculated activity of Li2O for liquid in comparison to data obtained by Charles [58].
+        panel: all panels
+        series:
+        - series: Calculated liquid ln a(Li2O), 1473 K
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Calculated liquid ln a(Li2O), 1673 K
+          marker: line
+          marker_count: 0
+          method_class: model_derived
+        - series: Charles [58] at 1473 K
+          marker: open triangles
+          marker_count: 5
+          method_class: quoted_attributed
+        - series: Charles [58] at 1673 K
+          marker: open circles
+          marker_count: 5
+          method_class: quoted_attributed
+        digitisation: deferred to a figure pass
+        attribution: Calculated by this work; comparison points attributed to Charles [58].
+        note: The activity reference state is not stated in the paper; no numeric activity points are extracted.

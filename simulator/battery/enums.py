@@ -39,6 +39,11 @@ class Engine(StrEnum):
     OPENIMCC = "openimcc"
 
 
+class Fo2Mode(StrEnum):
+    ENGINE_INTRINSIC = "engine_intrinsic"
+    SHARED_LADDER = "shared_ladder"
+
+
 class PolymorphRejectionKind(StrEnum):
     OMITTED = "omitted"
     UNRECOGNISED = "unrecognised"
@@ -125,6 +130,12 @@ class ValenceValueForm(StrEnum):
 
 class ValencePrintedForm(StrEnum):
     MASS_FRACTION_PAIR = "mass_fraction_pair"
+
+
+class ScalarPrintedForm(StrEnum):
+    LOG10 = "log10"
+    NEG_LOG10 = "neg_log10"
+    LN = "ln"
 
 
 class EvidenceClass(StrEnum):
@@ -258,6 +269,7 @@ class NoticeKind(StrEnum):
     ADMISSION_DEFAULTED = "admission_defaulted"
     VALIDATION_HARD_ISSUE_LABEL = "validation_hard_issue_label"
     FIGURE_ONLY = "figure_only"
+    APPROXIMATE_VALUE = "approximate_value"
     REACTIVE_CELL_NOT_MODELLED = "reactive_cell_not_modelled"
     # t-1123a: printed point sits between printed liquidus positions; scored as
     # liquid, flagged (all-numeric line only). Reason carries the stated liquidus.
@@ -660,7 +672,13 @@ PHASE_ROW_QUANTITIES = PHASE_COMPOSITION_QUANTITIES | PRINTED_CAPACITY_QUANTITIE
 # ratios (Darken–Gurry r, pCO2/pCO) reuse EQUILIBRIUM_PHASE_COMPOSITION
 # with a free-text basis and are not in this set. ppm_mass is the printed
 # mass-ppm scale; it is not a weight percent and is not stored converted.
-PHASE_BASIS_TOKENS = frozenset({"wt_percent", "mole_fraction", "ppm_mass"})
+# element_ppm_by_mass is the residue ppm subtype, a different quantity.
+PHASE_BASIS_TOKENS = frozenset({
+    "wt_percent",
+    "mole_fraction",
+    "element_ppm_by_mass",
+    "ppm_mass",
+})
 
 # 1 wt% = 1 mass part per 100. 1 ppm by mass = 1 mass part per 1_000_000.
 # 1e6 / 1e2 = 1e4, so 1 wt% = 10_000 ppm and wt% = ppm / 1e4.
@@ -673,13 +691,12 @@ _PPM_MASS_PER_WT_PERCENT = Decimal("10000")
 def ppm_mass_to_wt_percent(ppm: Decimal) -> Decimal:
     """Scale a mass-ppm amount onto weight percent.
 
-    This is the only conversion. A stored phase-composition point stays the
-    printed ppm with subtype ppm_mass. A scorer that holds an engine wt% map
-    refuses the row; it does not call this on the stored point.
+    This is the only conversion for subtype ppm_mass. A stored
+    phase-composition point stays the printed ppm. A scorer that holds an
+    engine wt% map refuses the row; it does not call this on the stored point.
     """
 
     return ppm / _PPM_MASS_PER_WT_PERCENT
-
 
 KINETIC_YIELD_QUANTITIES = frozenset(
     {

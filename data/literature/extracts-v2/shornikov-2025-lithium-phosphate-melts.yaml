@@ -1,0 +1,243 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2025-lithium-phosphate-melts.yaml
+observations:
+- observation_id: shornikov-2025-lithium-phosphate-melts::shornikov_2025_li2o_p4o10_fig3a_series3
+  experiment_id: c3887570c193a2917376b01afa177c410d748bbbb2a3b8dcd24a3b5e22cc2fe1::experiment::shornikov_2025_li2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Li2O
+      phase:
+        tag: unknown
+        reason: phase string 'condensed' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Published page 62 (PDF page 3): the initial values of the standard Gibbs
+        energies of formation of the simple oxides are taken in the crystalline and liquid states (Glushko, 1978–1982; Barin,
+        1995). The paper does not state which of those phases is the reference of the plotted Li2O activity.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, series,
+      temperature_K, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 63
+        pdf_page_index: 3
+        figure: '3'
+        note: Caption assigns this study the numbers 3, 6 and 9 at 1673 K. On the 600 dpi render, panel A holds strokes 1–6
+          and panel B holds 7–9. The body says panel A shows both the alkali-oxide activities and the P4O10 activities, with
+          the alkali-oxide activity falling in the order Li2O, Na2O, K2O. Series 3 is the uppermost stroke of that alkali
+          group. It is a continuous stroke, with no marker centre. Series 1 and 2 are the K2O–P4O10 and Na2O–P4O10 calculations
+          and are not stored.; panel=A
+  notices: []
+  source_id: shornikov-2025-lithium-phosphate-melts
+  locator:
+    page: 4
+    published_page: 63
+    pdf_page_index: 3
+    figure: '3'
+    note: Caption assigns this study the numbers 3, 6 and 9 at 1673 K. On the 600 dpi render, panel A holds strokes 1–6 and
+      panel B holds 7–9. The body says panel A shows both the alkali-oxide activities and the P4O10 activities, with the alkali-oxide
+      activity falling in the order Li2O, Na2O, K2O. Series 3 is the uppermost stroke of that alkali group. It is a continuous
+      stroke, with no marker centre. Series 1 and 2 are the K2O–P4O10 and Na2O–P4O10 calculations and are not stored.; panel=A
+  read_from: pdf:shornikov-2025-lithium-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 4
+        published_page: 63
+        pdf_page_index: 3
+        figure: '3'
+        note: Caption assigns this study the numbers 3, 6 and 9 at 1673 K. On the 600 dpi render, panel A holds strokes 1–6
+          and panel B holds 7–9. The body says panel A shows both the alkali-oxide activities and the P4O10 activities, with
+          the alkali-oxide activity falling in the order Li2O, Na2O, K2O. Series 3 is the uppermost stroke of that alkali
+          group. It is a continuous stroke, with no marker centre. Series 1 and 2 are the K2O–P4O10 and Na2O–P4O10 calculations
+          and are not stored.; panel=A
+- observation_id: shornikov-2025-lithium-phosphate-melts::shornikov_2025_li2o_p4o10_fig3a_series6
+  experiment_id: c3887570c193a2917376b01afa177c410d748bbbb2a3b8dcd24a3b5e22cc2fe1::experiment::shornikov_2025_li2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P4O10
+      phase:
+        tag: unknown
+        reason: phase string 'condensed' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Published page 62 (PDF page 3): the initial values of the standard Gibbs
+        energies of formation of the simple oxides are taken in the crystalline and liquid states (Glushko, 1978–1982; Barin,
+        1995). The paper does not state which of those phases is the reference of the plotted P4O10 activity.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, series,
+      temperature_K, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 63
+        pdf_page_index: 3
+        figure: '3'
+        note: Caption series 6, this study at 1673 K. On the 600 dpi render it is the P4O10-activity stroke that starts lowest
+          at 15 mol % P4O10. Continuous stroke, no marker centre. Series 4 and 5 are the other phosphate systems and are not
+          stored.; panel=A
+  notices: []
+  source_id: shornikov-2025-lithium-phosphate-melts
+  locator:
+    page: 4
+    published_page: 63
+    pdf_page_index: 3
+    figure: '3'
+    note: Caption series 6, this study at 1673 K. On the 600 dpi render it is the P4O10-activity stroke that starts lowest
+      at 15 mol % P4O10. Continuous stroke, no marker centre. Series 4 and 5 are the other phosphate systems and are not stored.;
+      panel=A
+  read_from: pdf:shornikov-2025-lithium-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 4
+        published_page: 63
+        pdf_page_index: 3
+        figure: '3'
+        note: Caption series 6, this study at 1673 K. On the 600 dpi render it is the P4O10-activity stroke that starts lowest
+          at 15 mol % P4O10. Continuous stroke, no marker centre. Series 4 and 5 are the other phosphate systems and are not
+          stored.; panel=A

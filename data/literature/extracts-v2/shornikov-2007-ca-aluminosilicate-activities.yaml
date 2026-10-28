@@ -1,0 +1,722 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2007-ca-aluminosilicate-activities.yaml
+observations:
+- observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_al_ratio
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, gas_species, oxide_as_printed,
+      ratio_as_printed, comparison_as_printed, absolute_pressure, source_comparison'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: The sentence says approximately. No numerical uncertainty is printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2007-ca-aluminosilicate-activities
+  locator:
+    page: 1
+    published_page: 37
+    pdf_page_index: 0
+    figure: 1b
+    note: Same 600 dpi crop as the SiO factor. The word 10 is at pt x 382.3, y 711.6. The sentence does not print one temperature.
+  read_from: pdf:shornikov-2007-ca-aluminosilicate-activities
+- observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_ca_ratio
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, gas_species, oxide_as_printed,
+      ratio_as_printed, comparison_as_printed, absolute_pressure, source_comparison'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed on this factor.
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2007-ca-aluminosilicate-activities
+  locator:
+    page: 1
+    published_page: 37
+    pdf_page_index: 0
+    note: Same 600 dpi crop as the SiO factor. The word 14 is at pt x 454.3, y 723.1. The sentence does not name a figure
+      panel or one temperature.
+  read_from: pdf:shornikov-2007-ca-aluminosilicate-activities
+- observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_fe_ratio
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, gas_species, oxide_as_printed,
+      ratio_as_printed, comparison_as_printed, absolute_pressure, source_comparison'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: The sentence says more than 100 times. No single number and no uncertainty are printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2007-ca-aluminosilicate-activities
+  locator:
+    page: 1
+    published_page: 37
+    pdf_page_index: 0
+    note: Same 600 dpi crop as the SiO factor. The word 100 is at pt x 321.8, y 757.6. The sentence says more than 100 times
+      and does not print one temperature.
+  read_from: pdf:shornikov-2007-ca-aluminosilicate-activities
+- observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_forsterite_alpha
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed on this coefficient.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: 'Hashimoto [14, 15]. Printed citations: Hashimoto A. // Geochem. J. 1983. V. 17. No. 3. P. 111-145. Hashimoto
+      A. // Nature. 1990. V. 347. No. 6288. P. 53-55. The coefficient sentence does not assign 0.2 to one of the two papers.'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_forsterite_alpha
+  source_id: shornikov-2007-ca-aluminosilicate-activities
+  locator:
+    page: 2
+    published_page: 38
+    pdf_page_index: 1
+    note: Same 600 dpi crop as the silica coefficient. The word 0.2. is at pt x 388.05-403.06, y 561.43-572.52 (px x 3234-3359,
+      y 4679-4771).
+  read_from: pdf:shornikov-2007-ca-aluminosilicate-activities
+- observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_mg_ratio
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, gas_species, oxide_as_printed,
+      ratio_as_printed, comparison_as_printed, absolute_pressure, source_comparison'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed on this factor.
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2007-ca-aluminosilicate-activities
+  locator:
+    page: 1
+    published_page: 37
+    pdf_page_index: 0
+    note: Same 600 dpi crop as the SiO factor. The word 5 is at pt x 515.7, y 734.6. The sentence does not print one temperature.
+  read_from: pdf:shornikov-2007-ca-aluminosilicate-activities
+- observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_sio2_alpha
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.04'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed on this coefficient.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: 'Hashimoto [14, 15]. Printed citations: Hashimoto A. // Geochem. J. 1983. V. 17. No. 3. P. 111-145. Hashimoto
+      A. // Nature. 1990. V. 347. No. 6288. P. 53-55. The coefficient sentence does not assign 0.04 to one of the two papers.'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_sio2_alpha
+  source_id: shornikov-2007-ca-aluminosilicate-activities
+  locator:
+    page: 2
+    published_page: 38
+    pdf_page_index: 1
+    note: 600 dpi PDF page 2, crop x 3000-4666, y 4458-4833. The word 0.04 is at pt x 438.63-456.17, y 549.91-561.00 (px x
+      3655-3801, y 4583-4675).
+  read_from: pdf:shornikov-2007-ca-aluminosilicate-activities
+- observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_sio2_ptot_discrepancy
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, oxide_as_printed, quantity_as_printed,
+      ratio_as_printed, comparison_as_printed, absolute_pressure, source_comparison'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: The sentence prints a range. No single value and no uncertainty are printed.
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2007-ca-aluminosilicate-activities
+  locator:
+    page: 3
+    published_page: 39
+    pdf_page_index: 2
+    note: The sentence begins at the bottom of published p. 38, "Estimated discrepancies", and the number is the first line
+      of the left column on published p. 39. 600 dpi PDF page 3. The words 10, superscript 4, hyphen, 10, superscript 5 are
+      at pt x 221.70-251.58, y 41.45-53.88 (px x 1848-2130, y 345-449). The 4 and the 5 sit above the baseline.
+  read_from: pdf:shornikov-2007-ca-aluminosilicate-activities
+- observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_sio_ratio
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, gas_species, oxide_as_printed,
+      container_as_printed, ratio_as_printed, comparison_as_printed, absolute_pressure, source_disagreement'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: The sentence says approximately. No numerical uncertainty is printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2007-ca-aluminosilicate-activities
+  locator:
+    page: 1
+    published_page: 37
+    pdf_page_index: 0
+    figure: 1a
+    note: 600 dpi PDF page 1, crop x 2500-4666, y 5583-6500. The word 60 is at pt x 419.97-430.00, y 688.57-699.66 (px x 3500-3583,
+      y 5738-5831). The sentence does not print one temperature.
+  read_from: pdf:shornikov-2007-ca-aluminosilicate-activities

@@ -1,0 +1,3604 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2008-zinc-phosphate-melts.yaml
+observations:
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_p4o10_curve_5
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-fig-calculated
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Figure caption, published page 150: activities of ZnO and P4O10. The article
+        does not state the reference phase. Reference phase is not stated. The introduction says P4O10 in the liquid state
+        is thermodynamically unstable; that sentence is not an activity-standard declaration.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Curve spans composition; no mole-percent composition basis exists in the schema.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, activity_basis_as_published, curve_number, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: the present study
+  admission:
+    status: rejected
+    reason: Smooth calculated curve has no discrete data markers; no numeric points are sampled.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 150
+        pdf_page_index: 1
+        figure: '1'
+        note: Panel a, line 5. Continuous calculated lg a(P4O10) at 1300 K.
+  notices: []
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 2
+    published_page: 150
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel a, line 5. Continuous calculated lg a(P4O10) at 1300 K.
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 2
+        published_page: 150
+        pdf_page_index: 1
+        figure: '1'
+        note: Panel a, line 5. Continuous calculated lg a(P4O10) at 1300 K.
+    composition:
+      state:
+        tag: unknown
+        reason: Curve spans composition; no mole-percent composition basis exists in the schema.
+      locator:
+        page: 2
+        published_page: 150
+        pdf_page_index: 1
+        figure: '1'
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_p4o10_series_2
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-1996-2001-fig-dots
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Figure caption, published page 150: the dots are experimental activities
+        of P4O10. The article does not state the reference phase. Reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Markers span composition; no mole-percent composition basis exists in the schema.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, marker_census, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Shornikov, Shilov and Shultz (1996) and Shornikov (2001), references [6] and [7]
+  admission:
+    status: rejected
+    reason: Caption assigns symbol 2 to experimental a(P4O10) from the cited KEMS work at 1300 K, not a measurement of this
+      article. Coordinates were not read.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 150
+        pdf_page_index: 1
+        figure: '1'
+        note: Panel a, open squares, legend symbol 2. Thirteen data squares on the 600 dpi crop; the legend glyph is not a
+          point.
+  notices: []
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 2
+    published_page: 150
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel a, open squares, legend symbol 2. Thirteen data squares on the 600 dpi crop; the legend glyph is not a point.
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 2
+        published_page: 150
+        pdf_page_index: 1
+        figure: '1'
+        note: Panel a, open squares, legend symbol 2. Thirteen data squares on the 600 dpi crop; the legend glyph is not a
+          point.
+    composition:
+      state:
+        tag: unknown
+        reason: Markers span composition; no mole-percent composition basis exists in the schema.
+      locator:
+        page: 2
+        published_page: 150
+        pdf_page_index: 1
+        figure: '1'
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_zno_curve_4
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-fig-calculated
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: ZnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Figure caption, published page 150: activities of ZnO and P4O10 in the
+        ZnO–P4O10 melts at 1300 K. The article does not state the reference phase. Reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Curve spans composition; no mole-percent composition basis exists in the schema.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, activity_basis_as_published, curve_number, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: the present study
+  admission:
+    status: rejected
+    reason: Smooth calculated curve has no discrete data markers; no numeric points are sampled.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 150
+        pdf_page_index: 1
+        figure: '1'
+        note: Panel a, line 4. Continuous calculated lg a(ZnO) at 1300 K.
+  notices: []
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 2
+    published_page: 150
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel a, line 4. Continuous calculated lg a(ZnO) at 1300 K.
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 2
+        published_page: 150
+        pdf_page_index: 1
+        figure: '1'
+        note: Panel a, line 4. Continuous calculated lg a(ZnO) at 1300 K.
+    composition:
+      state:
+        tag: unknown
+        reason: Curve spans composition; no mole-percent composition basis exists in the schema.
+      locator:
+        page: 2
+        published_page: 150
+        pdf_page_index: 1
+        figure: '1'
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_fig_a_zno_series_1
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-1996-2001-fig-dots
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: ZnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Figure caption, published page 150: the dots are experimental activities
+        of ZnO. The article does not state the reference phase. Reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Markers span composition; no mole-percent composition basis exists in the schema.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, marker_census, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Shornikov, Shilov and Shultz (1996) and Shornikov (2001), references [6] and [7]
+  admission:
+    status: rejected
+    reason: Caption assigns symbol 1 to experimental a(ZnO) from the cited KEMS work at 1300 K, not a measurement of this
+      article. Coordinates were not read.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 2
+        published_page: 150
+        pdf_page_index: 1
+        figure: '1'
+        note: Panel a, filled triangles, legend symbol 1. Ten data triangles on the 600 dpi crop; the legend glyph is not
+          a point.
+  notices: []
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 2
+    published_page: 150
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel a, filled triangles, legend symbol 1. Ten data triangles on the 600 dpi crop; the legend glyph is not a point.
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 2
+        published_page: 150
+        pdf_page_index: 1
+        figure: '1'
+        note: Panel a, filled triangles, legend symbol 1. Ten data triangles on the 600 dpi crop; the legend glyph is not
+          a point.
+    composition:
+      state:
+        tag: unknown
+        reason: Markers span composition; no mole-percent composition basis exists in the schema.
+      locator:
+        page: 2
+        published_page: 150
+        pdf_page_index: 1
+        figure: '1'
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c02
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: ZnO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-215.458'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c02
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=ZnO; column_header=Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=ZnO; column_header=Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c04
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: ZnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-187.675'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c04
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=ZnO; column_header=Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=ZnO; column_header=Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-11.654'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=Zn; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=Zn; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c02
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Zn2P4O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2548.589'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c02
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$Zn_{2}P_{4}O_{12}$; column_header=Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$Zn_{2}P_{4}O_{12}$; column_header=Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c04
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Zn2P4O12
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2563.101'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c04
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$Zn_{2}P_{4}O_{12}$; column_header=Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$Zn_{2}P_{4}O_{12}$; column_header=Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: ZnO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '110.942'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=ZnO; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=ZnO; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c02
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Zn4P4O14
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-3156.786'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c02
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$Zn_{4}P_{4}O_{14}$; column_header=Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$Zn_{4}P_{4}O_{14}$; column_header=Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c04
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Zn4P4O14
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-3157.417'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c04
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$Zn_{4}P_{4}O_{14}$; column_header=Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$Zn_{4}P_{4}O_{14}$; column_header=Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '168.116'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=O; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=O; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c02
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Zn6P4O16
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-3711.91'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c02
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$Zn_{6}P_{4}O_{16}$; column_header=Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$Zn_{6}P_{4}O_{16}$; column_header=Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c04
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Zn6P4O16
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-3706.14'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c04
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$Zn_{6}P_{4}O_{16}$; column_header=Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$Zn_{6}P_{4}O_{16}$; column_header=Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$O_{2}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$O_{2}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c02
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1791.401'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c02
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{4}O_{10}$; column_header=Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{4}O_{10}$; column_header=Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c04
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1850.113'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c04
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{4}O_{10}$; column_header=Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{4}O_{10}$; column_header=Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: O3
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '230.138'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$O_{3}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$O_{3}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r08_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '163.188'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r08_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=P; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=P; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r09_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-15.613'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r09_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{2}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{2}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r10_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P3
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '48.956'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r10_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{3}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{3}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r11_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-62.412'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r11_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{4}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{4}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r12_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-122.406'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r12_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=PO; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=PO; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r13_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-280.302'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r13_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$PO_{2}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$PO_{2}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r14_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P2O3
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-572.015'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r14_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{2}O_{3}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{2}O_{3}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r15_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P2O4
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-689.417'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r15_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{2}O_{4}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{2}O_{4}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r16_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P2O5
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-822.492'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r16_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{2}O_{5}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{2}O_{5}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r17_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P3O6
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1207.738'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r17_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{3}O_{6}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{3}O_{6}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r18_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O6
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1044.55'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r18_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{4}O_{6}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{4}O_{6}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r19_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O7
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1320.239'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r19_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{4}O_{7}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{4}O_{7}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r20_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O8
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1524.268'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r20_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{4}O_{8}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{4}O_{8}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r21_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O9
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1709.567'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r21_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{4}O_{9}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{4}O_{9}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+- observation_id: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r22_c06
+  experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1868.78'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents
+      are not published as per-row inputs, so derived_from and derivation are absent.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2008-zinc-phosphate-melts::shornikov_2008_zinc_phosphate_melts_p001_t01_r22_c06
+  source_id: shornikov-2008-zinc-phosphate-melts
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+    note: row_label=$P_{4}O_{10}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$
+  read_from: pdf:shornikov-2008-zinc-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 1
+        published_page: 149
+        pdf_page_index: 0
+        table: '1'
+        note: row_label=$P_{4}O_{10}$; column_header=Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$

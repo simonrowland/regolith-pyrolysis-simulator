@@ -135,10 +135,10 @@ species:
         method_class: model_derived
         admission_status: model_output_not_measurement
         model_generator: ideal_gas_law_equation_1_author_calculation
-        derived_from: [boulliung_2025_hg_retention_1300c, boulliung_2025_ssas_apparatus_and_run_conditions]
+        derived_from: [boulliung_2025_hg_retention_1300c, boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions]
         derivation:
           relation: ideal_gas_law_equation_1
-          inputs: [boulliung_2025_hg_retention_1300c, boulliung_2025_ssas_apparatus_and_run_conditions]
+          inputs: [boulliung_2025_hg_retention_1300c, boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions]
           output_unit: Pa
         T_K: 1573.15
         T_K_conversion: 1300 C + 273.15 = 1573.15 K
@@ -164,10 +164,10 @@ species:
         method_class: model_derived
         admission_status: model_output_not_measurement
         model_generator: ideal_gas_law_equation_1_author_calculation
-        derived_from: [boulliung_2025_starting_material_hg_and_trace_doping, boulliung_2025_ssas_apparatus_and_run_conditions]
+        derived_from: [boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_starting_material_hg_and_trace_doping, boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions]
         derivation:
           relation: ideal_gas_law_equation_1
-          inputs: [boulliung_2025_starting_material_hg_and_trace_doping, boulliung_2025_ssas_apparatus_and_run_conditions]
+          inputs: [boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_starting_material_hg_and_trace_doping, boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions]
           output_unit: Pa
         T_K: 1673.15
         T_K_conversion: 1400 C + 273.15 = 1673.15 K
@@ -211,10 +211,10 @@ species:
         method_class: model_derived
         admission_status: model_output_not_measurement
         model_generator: ideal_gas_law_equation_1_author_calculation
-        derived_from: [boulliung_2025_volatile_metal_measured_retention, boulliung_2025_ssas_apparatus_and_run_conditions]
+        derived_from: [boulliung_2025_volatile_metal_measured_retention, boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions]
         derivation:
           relation: ideal_gas_law_equation_1
-          inputs: [boulliung_2025_volatile_metal_measured_retention, boulliung_2025_ssas_apparatus_and_run_conditions]
+          inputs: [boulliung_2025_volatile_metal_measured_retention, boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions]
           output_unit: Pa
         cadmium:
           melt_concentration_ppm: 71
@@ -252,10 +252,10 @@ species:
         method_class: model_derived
         admission_status: model_output_not_measurement
         model_generator: HSC_Chemistry_GEM_free_energy_minimization
-        derived_from: [boulliung_2025_starting_material_hg_and_trace_doping, boulliung_2025_ssas_apparatus_and_run_conditions]
+        derived_from: [boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_starting_material_hg_and_trace_doping, boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions]
         derivation:
           relation: HSC_Chemistry_GEM_free_energy_minimization
-          inputs: [boulliung_2025_starting_material_hg_and_trace_doping, boulliung_2025_ssas_apparatus_and_run_conditions]
+          inputs: [boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_starting_material_hg_and_trace_doping, boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions]
           output_unit: qualitative_species_assignments
         calculation_basis: specified composition, temperature, pressure and oxygen fugacity
         alkali_species: LiF0, CsCl0, CsF0, NaCl0, NaF0, RbF0

@@ -244,6 +244,33 @@ def test_each_mechanical_flag_fires_only_on_the_suspect_cell() -> None:
     assert not grid[3][2].flags
 
 
+def test_letter_for_digit_flags_casefold_confusables_without_a_scale_token() -> None:
+    for text in (
+        "L.23 x 10^2",
+        "l.23 x 10^2",
+        "O.23 x 10^2",
+        "o.23 x 10^2",
+        "S.23 x 10^2",
+        "s.23 x 10^2",
+        "O.23 x",
+    ):
+        assert "letter_for_digit" in draft._render_traps(
+            {"text": text, "value_text": text}, None
+        )
+    assert "letter_for_digit" not in draft._render_traps(
+        {"text": "0.23 x", "value_text": "0.23 x"}, None
+    )
+    for text in ("SiO2", "SiO2 x 10", "solid", "Olivine"):
+        assert "letter_for_digit" not in draft._render_traps(
+            {"text": text, "value_text": text}, None
+        )
+
+
+def test_stacked_values_bare_integer_cutoff_stays_at_seven_digits() -> None:
+    assert not draft._stacked_values("123456")
+    assert draft._stacked_values("1234567")
+
+
 def test_comma_formats_distinguish_decimal_from_ambiguous_grouping() -> None:
     grid = draft.parse_table_html(
         "<table><tr><th>Value</th></tr><tr><td>123.456</td></tr>"
@@ -342,6 +369,75 @@ def test_latex_numeric_cells_convert_and_compare(tmp_path: Path) -> None:
     }]}}}
     compared = draft.compare_extract_to_draft(extract, index_path)
     assert [row["status"] for row in compared] == ["presence-only"] * 3
+
+
+def test_compare_typed_transition_temperature_in_cr_unqualified_table(
+    tmp_path: Path,
+) -> None:
+    csv_path = tmp_path / "p002-t01.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        writer.writerow({
+            "row": 1, "column": 1, "row_type": "header", "text": "Mineral",
+            "value_text": "Mineral", "mark": "", "numeric_column": 0,
+            "origin_row": 1, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 1, "column": 2, "row_type": "header", "text": "T_melt, K",
+            "value_text": "T_melt, K", "mark": "", "numeric_column": 1,
+            "origin_row": 1, "origin_column": 2, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 2, "column": 1, "row_type": "body", "text": "CA",
+            "value_text": "CA", "mark": "", "numeric_column": 0,
+            "origin_row": 2, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 2, "column": 2, "row_type": "body", "text": "1877",
+            "value_text": "1877", "mark": "", "numeric_column": 1,
+            "origin_row": 2, "origin_column": 2, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({
+        "tables": [{
+            "table_key": "p002-t01",
+            "pdf_page": 2,
+            "csv": csv_path.name,
+            "columns": [{"column": 2, "header": "T_melt, K"}],
+        }],
+    }))
+    extract = {
+        "species": {
+            "CaAl2O4": {
+                "observations": [{
+                    "observation_id": "transition_p002_t01_r02_c02",
+                    "type": "transition_point",
+                    "phase": "cr",
+                    "locator": {
+                        "pdf_page_index": 1,
+                        "table": "1",
+                    },
+                    "units": "K",
+                    "values": {
+                        "quantity": "transition_temperature",
+                        "T_m_K": "1877",
+                    },
+                }],
+            },
+        },
+    }
+
+    compared = draft.compare_extract_to_draft(extract, index_path)
+
+    assert [row["status"] for row in compared] == ["matched", "unverifiable"]
+    assert compared[0]["matched_cell"]["row"] == 2
+    assert compared[0]["matched_cell"]["column"] == 2
+    assert "no printed-caption evidence" in compared[1]["locator_issue"]
 
 
 def test_nazarov_table_2_rowspan_temperature_header_is_not_a_body_row(
@@ -597,6 +693,104 @@ def test_compare_reads_partial_pressure_atm_strings(tmp_path: Path) -> None:
     assert result[0]["matched_cell"]["text"] == "$1.25 \\times 10^{-6}$"
 
 
+def test_compare_applies_mapped_scale_and_requires_mapping_for_scale_headers(
+    tmp_path: Path,
+) -> None:
+    csv_path = tmp_path / "p001-t01.csv"
+    header = r"p_O, \\cdot 10^{3}"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        writer.writerow({
+            "row": 1, "column": 1, "row_type": "header", "text": "T, K",
+            "value_text": "T, K", "mark": "", "numeric_column": 0,
+            "origin_row": 1, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 1, "column": 2, "row_type": "header", "text": header,
+            "value_text": header, "mark": "", "numeric_column": 1,
+            "origin_row": 1, "origin_column": 2, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 2, "column": 1, "row_type": "body", "text": "1416",
+            "value_text": "1416", "mark": "", "numeric_column": 0,
+            "origin_row": 2, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 2, "column": 2, "row_type": "body", "text": "100",
+            "value_text": "100", "mark": "", "numeric_column": 1,
+            "origin_row": 2, "origin_column": 2, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{
+        "table_key": "p001-t01", "pdf_page": 1, "csv": csv_path.name,
+        "header_rows": [["T, K", header]],
+        "columns": [{"column": 2, "header": header}],
+    }]}), encoding="utf-8")
+    mapping = {"tables": [{
+        "page": 1, "table_index": 1, "quantity": "partial_pressure",
+        "values": [{
+            "column": 2, "species": "O",
+            "scale_factor": {
+                "header": header, "exponent": 3,
+                "direction": "quantity_times_factor_equals_cell",
+            },
+        }],
+    }]}
+
+    def extract(value: str) -> dict:
+        return {"species": {"O": {"observations": [{
+            "observation_id": "scaled-point",
+            "locator": {"pdf_page": 1, "table": "1"},
+            "values": {"points": [{
+                "value": value, "table_row_number": 2, "table_column_number": 2,
+            }]},
+        }]}}}
+
+    correct = draft.compare_extract_to_draft(extract("0.1"), index_path, mapping)[0]
+    unscaled = draft.compare_extract_to_draft(extract("100"), index_path, mapping)[0]
+    unmapped_correct = draft.compare_extract_to_draft(extract("0.1"), index_path)[0]
+    unmapped_raw = draft.compare_extract_to_draft(extract("100"), index_path)[0]
+
+    assert correct["status"] == "matched"
+    assert correct["matched_cell"]["value"] == 100.0
+    assert unscaled["status"] == "mismatch"
+    assert unscaled["matched_cell"] is None
+    assert unmapped_correct["status"] == "needs_mapping"
+    assert unmapped_correct["matched_cell"] is None
+    assert unmapped_raw["status"] == "needs_mapping"
+    assert unmapped_raw["matched_cell"] is None
+
+    temperature_only = {
+        "species": {"O": {"observations": [{
+            "observation_id": "unmapped-temperature",
+            "locator": {"pdf_page": 1, "table": "1"},
+            "values": {"points": [{"value": "1416", "table_row_number": 2}]},
+        }]}}
+    }
+    temperature_match = draft.compare_extract_to_draft(
+        temperature_only, index_path
+    )[0]
+    assert temperature_match["status"] == "matched"
+    assert temperature_match["matched_cell"]["column"] == 1
+
+    for emitted_value in ("100", "0.1"):
+        emitted_shape = {
+            "species": {"O": {"observations": [{
+                "observation_id": "source_p001_t01_r02_c02",
+                "locator": {"pdf_page": 1, "table": "1"},
+                "values": {"value": emitted_value},
+            }]}}
+        }
+        unmapped_emitted = draft.compare_extract_to_draft(
+            emitted_shape, index_path
+        )[0]
+        assert unmapped_emitted["status"] == "needs_mapping", emitted_value
+        assert unmapped_emitted["matched_cell"] is None
 def test_compare_flags_fake_printed_table_label(tmp_path: Path) -> None:
     source_root = tmp_path / "raw" / "caption-check" / "ocr-mineru" / "p001-p008"
     source_root.mkdir(parents=True)
@@ -825,6 +1019,290 @@ def test_compare_rejects_draft_id_when_printed_label_disagrees(
     assert results[0]["matched_cell"] is None
     assert "selects printed table '3'" in results[0]["locator_issue"]
     assert "locator declares '4'" in results[0]["locator_issue"]
+
+
+def test_printed_label_does_not_share_a_key_with_the_draft_ordinal(
+    tmp_path: Path,
+) -> None:
+    source_root = tmp_path / "raw" / "label-ordinal" / "ocr-mineru" / "p001-p008"
+    source_root.mkdir(parents=True)
+    (source_root / "content_list.json").write_text(
+        json.dumps(
+            [
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_caption": ["Table 3. First table."],
+                    "table_body": "<table><tr><td>1.5</td></tr></table>",
+                },
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_caption": ["Table 1. Second table."],
+                    "table_body": "<table><tr><td>9.5</td></tr></table>",
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+    index_path = draft.convert_source(
+        "label-ordinal", tmp_path / "draft", corpus_root=tmp_path / "raw"
+    )
+
+    def located(value: str, table: str, observation_id: str) -> dict:
+        extract = {
+            "species": {
+                "Fe": {
+                    "observations": [
+                        {
+                            "observation_id": observation_id,
+                            "locator": {"page": 1, "table": table},
+                            "values": {"points": [{"value": value}]},
+                        }
+                    ]
+                }
+            }
+        }
+        rows = [
+            row
+            for row in draft.compare_extract_to_draft(extract, index_path)
+            if row["observation_id"]
+        ]
+        assert len(rows) == 1
+        return rows[0]
+
+    collided = located("1.5", "1", "value-at-printed-table-1")
+    assert collided["status"] == "mismatch"
+    assert collided["matched_cell"] is None
+
+    printed = located("9.5", "1", "printed-table-1")
+    assert printed["status"] == "matched"
+    assert printed["matched_cell"]["table_key"] == "p001-t02"
+    assert printed["matched_cell"]["printed_table_label"] == "1"
+
+    disagreement = located("1.5", "1", "sample_p001_t01_r01_c01")
+    assert disagreement["status"] == "locator-error"
+    assert disagreement["matched_cell"] is None
+    assert "selects printed table '3'" in disagreement["locator_issue"]
+    assert "locator declares '1'" in disagreement["locator_issue"]
+
+
+def test_empty_printed_label_does_not_fall_through_to_the_draft_ordinal(
+    tmp_path: Path,
+) -> None:
+    source_root = tmp_path / "raw" / "empty-label" / "ocr-mineru" / "p001-p008"
+    source_root.mkdir(parents=True)
+    (source_root / "content_list.json").write_text(
+        json.dumps(
+            [
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_body": "<table><tr><td>1.5</td></tr></table>",
+                },
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_caption": ["Table 1. No numeric cell."],
+                    "table_body": "<table><tr><td>note</td></tr></table>",
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+    index_path = draft.convert_source(
+        "empty-label", tmp_path / "draft", corpus_root=tmp_path / "raw"
+    )
+    extract = {
+        "species": {
+            "Fe": {
+                "observations": [
+                    {
+                        "observation_id": "ordinal-value",
+                        "locator": {"page": 1, "table": "1"},
+                        "values": {"points": [{"value": 1.5}]},
+                    }
+                ]
+            }
+        }
+    }
+
+    row = next(
+        item
+        for item in draft.compare_extract_to_draft(extract, index_path)
+        if item["observation_id"]
+    )
+
+    assert row["status"] == "no-match"
+    assert row["draft_candidate_count"] == 0
+    assert row["matched_cell"] is None
+
+
+def test_compare_includes_only_render_verified_numeric_header_cells(
+    tmp_path: Path,
+) -> None:
+    csv_path = tmp_path / "p001-t01.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        for row, column, row_type, text in (
+            (2, 1, "header", "999"),
+            (2, 2, "header", "112"),
+            (2, 3, "header", "125"),
+            (3, 2, "body", "40"),
+        ):
+            writer.writerow({
+                "row": row,
+                "column": column,
+                "row_type": row_type,
+                "text": text,
+                "value_text": text,
+                "mark": "",
+                "numeric_column": 1,
+                "origin_row": row,
+                "origin_column": column,
+                "rowspan": 1,
+                "colspan": 1,
+                "flags": "[]",
+            })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{
+        "table_key": "p001-t01",
+        "pdf_page": 1,
+        "csv": csv_path.name,
+        "columns": [
+            {"column": 1, "header": "unchecked"},
+            {"column": 2, "header": "extractive"},
+            {"column": 3, "header": "gravimetric"},
+        ],
+    }]}), encoding="utf-8")
+    mapping = {"tables": [{
+        "page": 1,
+        "table_index": 1,
+        "quantity": "mass_loss",
+        "values": [
+            {"column": 2, "species": "Na"},
+            {"column": 3, "species": "Na"},
+        ],
+        "render_verified": [
+            {"row": 2, "column": 2, "text": "112"},
+            {"row": 2, "column": 3, "text": "125"},
+        ],
+    }]}
+
+    def observation(column: int, value: int) -> dict:
+        return {
+            "observation_id": f"header_p001_t01_r02_c{column:02d}",
+            "locator": {"pdf_page": 1, "table": "1"},
+            "values": {"value": value},
+        }
+
+    compared = draft.compare_extract_to_draft(
+        {"species": {"Na": {"observations": [
+            observation(1, 999),
+            observation(2, 112),
+            observation(3, 125),
+        ]}}},
+        index_path,
+        mapping,
+    )
+    by_column = {
+        int(row["observation_id"][-2:]): row
+        for row in compared
+        if row["observation_id"]
+    }
+    assert by_column[1]["status"] == "mismatch"
+    assert by_column[1]["matched_cell"] is None
+    assert by_column[2]["status"] == "matched"
+    assert by_column[2]["matched_cell"]["row"] == 2
+    assert by_column[3]["status"] == "matched"
+    assert by_column[3]["matched_cell"]["row"] == 2
+
+    without_mapping = draft.compare_extract_to_draft(
+        {"species": {"Na": {"observations": [observation(2, 112)]}}},
+        index_path,
+    )
+    assert without_mapping[0]["status"] == "mismatch"
+    assert without_mapping[0]["matched_cell"] is None
+
+
+def test_emitted_locator_carries_printed_label_and_id_keeps_ordinal(
+    tmp_path: Path,
+) -> None:
+    source_root = tmp_path / "raw" / "printed-emit" / "ocr-mineru" / "p001-p001"
+    source_root.mkdir(parents=True)
+    (source_root / "content_list.json").write_text(
+        json.dumps(
+            [
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_caption": ["Table 3. Printed caption."],
+                    "table_body": (
+                        "<table><tr><th>T, K</th><th>p</th></tr>"
+                        "<tr><td>1851</td><td>1.25</td></tr></table>"
+                    ),
+                },
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_body": (
+                        "<table><tr><th>T, K</th><th>p</th></tr>"
+                        "<tr><td>1852</td><td>2.50</td></tr></table>"
+                    ),
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+    index_path = draft.convert_source(
+        "printed-emit", tmp_path / "draft", corpus_root=tmp_path / "raw"
+    )
+    mapping = {
+        "source_id": "printed-emit",
+        "source": {"citation": "A. Author, Example measurements, 2020."},
+        "extraction": {
+            "method": "mineru_table_draft emit",
+            "date": "2026-10-26",
+            "worker": "test",
+        },
+        "tables": [
+            {
+                "page": 1,
+                "table_index": table_index,
+                "type": "partial_pressure",
+                "quantity": "partial_pressure",
+                "evidence_class": "measured_direct",
+                "unit": "atm",
+                "temperature": {"column": 1, "unit": "K"},
+                "values": [{"column": 2, "species": species}],
+            }
+            for table_index, species in ((1, "O"), (2, "Mg"))
+        ],
+    }
+    mapping_path = tmp_path / "mapping.yaml"
+    mapping_path.write_text(
+        yaml.safe_dump(mapping, sort_keys=False), encoding="utf-8"
+    )
+    document = draft.emit_extract(
+        index_path.parent, mapping_path, tmp_path / "fragment.yaml"
+    )
+    oxygen = document["species"]["O"]["observations"][0]
+    magnesium = document["species"]["Mg"]["observations"][0]
+    assert oxygen["locator"]["table"] == "3"
+    assert oxygen["point_conditions"]["temperature_K"]["locator"]["table"] == "3"
+    assert "_t01_" in oxygen["observation_id"]
+    assert magnesium["locator"]["table"] == "unknown"
+    assert "_t02_" in magnesium["observation_id"]
+
+    compared = {
+        row["matched_cell"]["table_key"]: row
+        for row in draft.compare_extract_to_draft(document, index_path)
+        if row["observation_id"]
+    }
+    assert compared["p001-t01"]["status"] == "matched"
+    assert compared["p001-t01"]["matched_cell"]["printed_table_label"] == "3"
+    assert compared["p001-t02"]["status"] == "matched"
 
 
 def test_caption_between_tables_does_not_label_both(tmp_path: Path) -> None:
@@ -1104,6 +1582,42 @@ def test_compare_phase_is_bound_to_the_candidate_column(tmp_path: Path) -> None:
     assert result["matched_cell"] is None
 
 
+def test_compare_accepts_a_neutral_equation_column_for_a_typed_phase(
+    tmp_path: Path,
+) -> None:
+    csv_path = tmp_path / "p006-t03.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        writer.writerow({
+            "row": 5, "column": 3, "row_type": "body", "text": "1.29e-9",
+            "value_text": "1.29e-9", "mark": "", "numeric_column": 3,
+            "origin_row": 5, "origin_column": 3, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{
+        "table_key": "p006-t03", "pdf_page": 6, "csv": csv_path.name,
+        "columns": [{"column": 3, "header": "(24)"}],
+    }]}), encoding="utf-8")
+    extract = {"species": {"O": {"observations": [{
+        "observation_id": "equation-24-oxygen-pressure",
+        "locator": {"pdf_page": 6, "table": "3"},
+        "phase": "gas",
+        "values": {"points": [{
+            "pressure_atm": 1.29e-9,
+            "table_row_number": 5,
+            "table_column_number": 3,
+        }]},
+    }]}}}
+
+    result = draft.compare_extract_to_draft(extract, index_path)[0]
+
+    assert result["status"] == "matched"
+    assert result["matched_cell"]["row"] == 5
+    assert result["matched_cell"]["column"] == 3
+
+
 def test_phase_tokens_do_not_match_words_in_other_column_headers(tmp_path: Path) -> None:
     csv_path = tmp_path / "p005-t01.csv"
     with csv_path.open("w", encoding="utf-8", newline="") as stream:
@@ -1160,4 +1674,16 @@ def test_compare_summary_prints_presence_only_count(tmp_path: Path, capsys) -> N
 
     summary = capsys.readouterr().err
     assert "presence-only=1" in summary
+    assert "needs_mapping=0" in summary
     assert "unverifiable=0" in summary
+
+
+def test_compare_help_documents_scale_mapping(capsys) -> None:
+    with pytest.raises(SystemExit) as exc:
+        draft.main(["compare", "--help"])
+
+    assert exc.value.code == 0
+    help_text = capsys.readouterr().out
+    assert "--mapping MAPPING" in help_text
+    assert "power-of-ten headers" in help_text
+    assert "needs_mapping" in help_text

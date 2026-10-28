@@ -1,0 +1,135 @@
+schema_version: literature_extract.v1
+source_id: richter-2008-cai-like-liquids-lpsc-abstract
+source:
+  citation: 'Richter, F. M., Teng, F.-Z., Mendybaev, R. A., Davis, A. M. and Georg, R. B. (2008). Elemental and isotope fractionation of CAI-like liquids by evaporation in low pressure H2. Lunar and Planetary Science XXXIX, abstract 1385.'
+  year: 2008
+  corpus_asset: raw/richter-2008-cai-like-liquids-lpsc-abstract/richter-2008-cai-like-liquids-lpsc-abstract.pdf
+extraction:
+  method: >-
+    Manual review of the authoritative born-digital pdftotext-layout file and both PDF pages rendered at 600 dpi. The abstract has no tables. Its three plotted figures are context-only records with no digitised points. The printed Mg isotope fractionation fits, hydrogen-pressure relation, and approximate evaporation-rate comparison are retained in context because the store has no quantity token for these values.
+  date: '2026-10-18'
+  worker: fam3-1018
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: richter_2008_figure1_evaporation_kinetics
+        type: figure_record
+        locator: {page: 1, published_page: '1385.pdf', pdf_page_index: 0, figure: '1'}
+        panel: whole_figure
+        attribution: 'Data from [2] and [3], as printed in the caption.'
+        units: moles cm−2 s−1; dimensionless 10000/T(K)
+        values:
+          quantity: unavailable
+          schema_gap: The store has no quantity token for species-specific evaporation rate plotted against temperature.
+          species: [Mg, SiO]
+          phase: CAI-like silicate liquid evaporating in vacuum or hydrogen
+          temperature_as_printed: hydrogen comparison at 1500 °C; x-axis spans temperature
+          pressure_as_printed: 2×10−4 bars hydrogen for the hydrogen series
+          axes_as_printed: {x: '10000/T(K)', top_x: 'T (°C)', y: 'log evaporation rate (moles cm−2 s−1)'}
+          caption: >-
+            Evaporation kinetics as a function of temperature for a CAI-like liquid in vacuum and in 2×10−4 bars hydrogen. The evaporation rate in hydrogen (T=1500°C) is about two orders of magnitude larger that the vacuum rate extrapolated to 1500°C. Data from [2] and [3].
+          series:
+            - {name: Mg in hydrogen, marker: filled red circle, marker_count: 1, evidence_class: quoted_attributed}
+            - {name: SiO in hydrogen, marker: filled blue square, marker_count: 1, evidence_class: quoted_attributed}
+            - {name: Mg in vacuum, marker: open red circle, marker_count: 4, evidence_class: quoted_attributed}
+            - {name: SiO in vacuum, marker: open blue square, marker_count: 4, evidence_class: quoted_attributed}
+          digitisation: deferred to a figure pass
+      - observation_id: richter_2008_figure2_magnesium_isotope_residues
+        type: figure_record
+        locator: {page: 2, published_page: '1385.pdf', pdf_page_index: 1, figure: '2'}
+        panel: whole_figure
+        attribution: Figure 2 shows present-work and earlier experimental symbols; its red relation is not assigned to one source subset, and its blue line is the ideal inverse-square-root mass comparison.
+        units: dimensionless axes as printed
+        values:
+          quantity: unavailable
+          schema_gap: The store has no quantity token for plotted kinetic magnesium isotope fractionation against the logarithmic remaining fraction.
+          species: [Mg]
+          isotope_species_as_printed: magnesium isotopes; x-axis labels 24Mg
+          phase: evaporation residues
+          temperature_as_printed: not stated for Figure 2
+          pressure_as_printed: residues evaporated in 1.87×10−4 bars H2
+          axes_as_printed: {x: '−ln(f^24Mg)', y: '1000 ln(R/R0)'}
+          caption: >-
+            Magnesium isotopic composition of residues evaporated in 1.87×10−4 bars H2. Open symbols are earlier measurements by [2] and the small solid symbols are new high-precision data.
+          series:
+            - {name: present-work high-precision data, marker: small solid symbol, marker_count: 6, evidence_class: measured_direct}
+            - {name: 'earlier measurements [2]', marker: open symbol, marker_count: 5, evidence_class: quoted_attributed}
+            - {name: 'ideal inverse-square-root mass comparison (blue line; annotated 0.97980)', marker_count: 0, evidence_class: model_derived}
+            - {name: 'experimental-symbol relation (red line; annotated 0.98797 ± 0.00022; source subset not distinguished)', marker_count: 0, evidence_class: quoted_attributed}
+          digitisation: deferred to a figure pass
+      - observation_id: richter_2008_figure3_magnesium_fractionation_factor
+        type: figure_record
+        locator: {page: 2, published_page: '1385.pdf', pdf_page_index: 1, figure: '3'}
+        panel: whole_figure
+        attribution: Present-work hydrogen experiment; vacuum comparison data from [3]; ideal inverse-square-root isotope-mass relation shown for comparison.
+        units: dimensionless
+        values:
+          quantity: unavailable
+          schema_gap: The store has no quantity token for the kinetic isotope fractionation factor plotted against temperature.
+          species: [Mg]
+          phase: evaporation residues
+          temperature_as_printed: hydrogen experiment at 1500 °C; vacuum data shown as a function of temperature
+          pressure_as_printed: hydrogen experiment at 1.87×10−4 bars hydrogen; vacuum series
+          axes_as_printed: {x: '10000/T(K)', top_x: 'T (°C)', y: '10000(1−α)'}
+          caption: >-
+            Experimentally determined kinetic isotope fractionation factor for residues evaporated at 1500°C into 1.87×10−4 bars hydrogen (blue symbol) compared to the isotope fractionation factor as a function of temperature for vacuum evaporation (red symbols) and the often-assumed value for kinetic fractionations corresponding to inverse square root of the masses of the magnesium isotopes (thick black line at the top of the figure).
+          series:
+            - {name: present-work hydrogen experiment, marker: blue symbol, marker_count: 1, evidence_class: measured_direct}
+            - {name: 'vacuum evaporation [3]', marker: red symbol, marker_count: 4, evidence_class: quoted_attributed}
+            - {name: fitted vacuum relation, marker: line, marker_count: 0, evidence_class: model_derived}
+            - {name: CAI crystallization range, marker: shaded range, marker_count: 0, evidence_class: model_derived}
+            - {name: inverse-square-root isotope-mass relation, marker: thick black line, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: richter_2008_figure2_printed_alpha_fits
+        type: figure_fit_record
+        locator: {page: 2, published_page: '1385.pdf', pdf_page_index: 1, figure: '2'}
+        units: dimensionless
+        attribution: Figure 2 shows an ideal inverse-square-root mass comparison (blue line, annotated 0.97980) and a red relation (annotated 0.98797 ± 0.00022) that follows the experimental symbols; the red relation is not assigned to one source subset.
+        values:
+          quantity_as_printed: kinetic magnesium isotope fractionation factor α from Rayleigh fits
+          quantity_token: unavailable
+          schema_gap: No existing quantity enum represents the kinetic isotope fractionation factor α.
+          definition_as_printed: Ratio of the isotopic composition of the evaporation flux divided by the isotopic composition of the condensed phase.
+          fits:
+            - name: ideal inverse-square-root mass relation (inferred from Figure 3 and discussion)
+              value_as_printed: '0.97980'
+              evidence_class: model_derived
+            - name: experimental-data fit; source subset not distinguished
+              value_as_printed: '0.98797'
+              uncertainty_as_printed: '± 0.00022'
+              confidence_level: not stated
+              evidence_class: quoted_attributed
+              attribution: Figure 2 experimental data include present-work and earlier measurements [2]; the fit is not assigned to one subset.
+      - observation_id: richter_2008_text_hydrogen_pressure_dependence
+        type: textual_fact
+        locator: {page: 1, published_page: '1385.pdf', pdf_page_index: 0, section: 'Elemental Fractionations'}
+        units: bars H2; evaporation-rate relation
+        attribution: 'Richter et al. cite [2] for the hydrogen-pressure dependence.'
+        values:
+          quantity_as_printed: evaporation-rate response to hydrogen pressure
+          quantity_token: unavailable
+          schema_gap: The store has no quantity token for the printed qualitative rate-versus-pressure relation.
+          evidence_class: quoted_attributed
+          relations:
+            - pressure_condition_as_printed: less than about 10−7 bars H2
+              threshold: {value: {kind: point, point: '10−7', approximate: true}, units: bars H2, comparator: less_than}
+              rate_as_printed: evaporation kinetics effectively that in vacuum
+            - pressure_condition_as_printed: greater than 10−7 bars H2
+              threshold: {value: {kind: point, point: '10−7', approximate: false}, units: bars H2, comparator: greater_than}
+              rate_as_printed: increases in proportion to the square root of hydrogen pressure
+      - observation_id: richter_2008_figure1_approximate_rate_comparison
+        type: textual_fact
+        locator: {page: 1, published_page: '1385.pdf', pdf_page_index: 0, figure: '1'}
+        units: orders of magnitude
+        attribution: 'Figure 1 caption cites data from [2] and [3].'
+        values:
+          quantity_as_printed: relative evaporation rate in hydrogen versus extrapolated vacuum rate
+          quantity_token: unavailable
+          schema_gap: No existing quantity token represents this species-unspecified relative rate comparison.
+          evidence_class: quoted_attributed
+          temperature_as_printed: hydrogen rate at 1500 °C; vacuum rate extrapolated to 1500 °C
+          hydrogen_pressure_as_printed: 2×10−4 bars
+          comparison_as_printed: about two orders of magnitude larger
+          rate_ratio: {value: {kind: point, point: 'two orders of magnitude', approximate: true}, direction: larger_than_vacuum}
