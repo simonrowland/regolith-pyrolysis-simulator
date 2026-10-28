@@ -1,14 +1,14 @@
 # Battery v2.1 migration report
 
-rows in: 72839
-records out (observations): 152238
+rows in: 73069
+records out (observations): 152468
 works: 444
 experiments: 5612
-queue size: 110370
+queue size: 109856
 identical-payload dedupe aliases: 342
 metadata files: 48
 index sources: 443
-hard issues: 1887
+hard issues: 1796
 
 ## Unavailable input work census
 
@@ -228,7 +228,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | citations | 147 | 442 (mismatch) |
 | doi_works | 56 | 241 (mismatch) |
 | no_doi_works | 91 | 203 (mismatch) |
-| admission_statuses | 374 | 23814 (mismatch) |
+| admission_statuses | 374 | 24044 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
 | series | 60 | 824 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1637 (mismatch) |
@@ -239,7 +239,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | absent_admissions | 3511 | 7410 (mismatch) |
 | absent_classes | 2174 | 2120 (mismatch) |
 | range_only_T | 3125 | 2637 (mismatch) |
-| system_like_phases | 1065 | 2805 (mismatch) |
+| system_like_phases | 1065 | 2801 (mismatch) |
 | missing_phases | 237 | 1208 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -18185,7 +18185,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/abdul-2023-cao-sio2-calphad.yaml` | 2 | 13 | 2 |
 | `data/literature/extracts/abdul-2023-clinker-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/abdullah-2013-redox-acid-base-soda-lime-silicate-thesis.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml` | 20 | 47 | 118 |
+| `data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml` | 20 | 47 | 119 |
 | `data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml` | 28 | 28 | 64 |
 | `data/literature/extracts/albertsson-2013-cr-slag-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/ames-walsh-white-1967.yaml` | 2 | 2 | 8 |
@@ -18425,7 +18425,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/lpsc-2024-bennu-pyrolysis-vandam.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/lunarsurface-2020-5029.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/mamiya-2000-sio-disproportionation.yaml` | 2 | 2 | 0 |
-| `data/literature/extracts/mathieu-2009-sodium-solubility-thesis.yaml` | 421 | 421 | 633 |
+| `data/literature/extracts/mathieu-2009-sodium-solubility-thesis.yaml` | 421 | 421 | 209 |
 | `data/literature/extracts/matzen-2017-ni-olivine-composition.yaml` | 180 | 180 | 180 |
 | `data/literature/extracts/matzen-2022-martian-basalt-redox.yaml` | 24 | 24 | 26 |
 | `data/literature/extracts/mccready-1948-sodium-silicate.yaml` | 17 | 17 | 53 |
@@ -18464,7 +18464,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml` | 11 | 20 | 46 |
 | `data/literature/extracts/ohta-suito-1995-mno-activity-slags.yaml` | 19 | 19 | 19 |
 | `data/literature/extracts/okazaki-2022-ryugu-gas-treasure-box.yaml` | 13 | 13 | 53 |
-| `data/literature/extracts/oneill-2002-feo-activity-coefficients-cmas.yaml` | 5 | 91 | 91 |
+| `data/literature/extracts/oneill-2002-feo-activity-coefficients-cmas.yaml` | 235 | 321 | 0 |
 | `data/literature/extracts/oneill-2005-alkali-oxide-activities.yaml` | 3 | 3 | 3 |
 | `data/literature/extracts/ostrovski-2000-cao-tio2-sio2.yaml` | 40 | 40 | 66 |
 | `data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml` | 8 | 51 | 16 |
@@ -18632,13 +18632,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 1887
+hard issues: 1796
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 1508 |
+| `conditional_field:derived_from` | 1417 |
 | `conditional_field:inputs` | 237 |
 | `conditional_field:derivation` | 138 |
 | `invalid_source:initial_composition` | 4 |
@@ -18698,8 +18698,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 280301
+advisory issues: 274078
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 280301 |
+| `identity_incomplete` | 274078 |

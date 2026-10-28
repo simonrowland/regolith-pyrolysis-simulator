@@ -1087,6 +1087,89 @@ def test_crash_serializer_uses_loaded_backend_model_id() -> None:
     assert cell.model_id == backend.model_id
 
 
+@pytest.mark.parametrize(
+    ("returncode", "stderr", "expected_reason"),
+    [
+        (-6, "AlphaMELTS aborted", "SIGABRT (returncode -6): AlphaMELTS aborted"),
+        (-6, "", "SIGABRT (returncode -6)"),
+        (1, "synthetic crash", "isolated worker exit_code=1: synthetic crash"),
+    ],
+)
+def test_crash_cell_preserves_existing_reason_and_signal_stderr(
+    returncode: int, stderr: str, expected_reason: str
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        ARM_HEADLINE,
+        _crash_cell_from_returncode,
+    )
+
+    handle = EngineHandle(
+        name="alphamelts", backend=None, available=False,
+        unavailable_reason="test", takes_fo2=True, supports_intrinsic_fo2=False,
+    )
+    cell = _crash_cell_from_returncode(
+        handle=handle,
+        pot=BinaryPot(
+            pot_id="stderr-crash",
+            kato_1993_table4_system=None,
+            why="stderr retention test",
+            composition_wt_pct={"SiO2": 100.0},
+        ),
+        temperature_K=1700.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        wall0=time.perf_counter(),
+        cpu0=time.process_time(),
+        hostname="test",
+        returncode=returncode,
+        timed_out=False,
+        stderr=stderr,
+        arm=ARM_HEADLINE,
+        notices=(),
+        authority=None,
+        certified_band=None,
+    )
+
+    assert cell.refusal_reason == REFUSAL_ENGINE_CRASH
+    assert cell.engine_reason == expected_reason
+
+
+def test_signal_crash_stderr_is_bounded_to_4000_characters() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        ARM_HEADLINE,
+        _crash_cell_from_returncode,
+    )
+
+    stderr = "prefix" + "x" * 5000 + "tail"
+    handle = EngineHandle(
+        name="alphamelts", backend=None, available=False,
+        unavailable_reason="test", takes_fo2=True, supports_intrinsic_fo2=False,
+    )
+    cell = _crash_cell_from_returncode(
+        handle=handle,
+        pot=BinaryPot(
+            pot_id="bounded-stderr-crash",
+            kato_1993_table4_system=None,
+            why="stderr bound test",
+            composition_wt_pct={"SiO2": 100.0},
+        ),
+        temperature_K=1700.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        wall0=time.perf_counter(),
+        cpu0=time.process_time(),
+        hostname="test",
+        returncode=-6,
+        timed_out=False,
+        stderr=stderr,
+        arm=ARM_HEADLINE,
+        notices=(),
+        authority=None,
+        certified_band=None,
+    )
+
+    assert cell.engine_reason.endswith("x" * 3996 + "tail")
+    assert len(cell.engine_reason.rsplit(": ", 1)[1]) == 4000
+
+
 def test_handle_without_backend_has_no_model_id() -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import _handle_model_id
 

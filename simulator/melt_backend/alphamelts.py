@@ -71,13 +71,18 @@ from simulator.config import (
 )
 from simulator.melt_backend.base import (
     EquilibriumResult,
+    FO2_GAS_ONLY_NOTICE,
     LiquidFractionInvalidError,
+    MELTS_CARRIED_COMPONENT_MIN_WT_PCT,
     MeltBackend,
     MeltBackendError,
     REDOX_MODE_NOT_AN_INPUT,
     RealBackendAuthority,
     RealBackendFamily,
+    fo2_gas_only_diagnostic,
+    imposed_absolute_fo2_without_iron_couple,
     liquid_fraction_from_phase_masses,
+    other_redox_without_iron_couple_refusal,
 )
 from simulator.engine_pool import (
     EngineWorkerRemoteError,
@@ -260,9 +265,10 @@ ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C = 0.01
 # decimal-to-binary boundary while remaining below one emitted 1e-3 quantum.
 ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10 = 5.001e-4
 ALPHAMELTS_PHASE_MASS_DISPLAY_RESOLUTION_G = 0.001
-# alphaMELTS input serialization emits an oxide only above this wt% value.
-# Values at/below it are native zero-component cells, regardless of Python sign.
-ALPHAMELTS_MIN_EMITTED_COMPONENT_WT_PCT = 0.001
+# Same object as MELTS_CARRIED_COMPONENT_MIN_WT_PCT. The .melts serializer
+# and the Fe-free couple test share this floor: iron the file drops cannot
+# be the buffer an imposed fO2 would require.
+ALPHAMELTS_MIN_EMITTED_COMPONENT_WT_PCT = MELTS_CARRIED_COMPONENT_MIN_WT_PCT
 
 
 def _format_melts_file_fO2_offset(fO2_offset: float) -> str:
@@ -1678,6 +1684,27 @@ class _MELTSBackendSupport(MeltBackend):
         warnings = list(self._last_normalization_warnings)
         warnings.extend(commissioning_warnings)
 
+        fo2_decision = imposed_absolute_fo2_without_iron_couple(
+            comp_wt,
+            oxide_aliases=MELTS_OXIDE_ALIASES,
+            fO2_log=fO2_log,
+            redox_mode=redox_mode,
+            redox_buffer=self._redox_buffer,
+            fo2_offset=self._fo2_offset,
+        )
+        if fo2_decision is not None and fo2_decision[0] == 'other_redox':
+            return other_redox_without_iron_couple_refusal(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                components=fo2_decision[1],
+            )
+        gas_only_fo2_log = (
+            None
+            if fo2_decision is None
+            else float(fO2_log)
+        )
+
         prepared_kwargs: dict[str, Any] = {
             'temperature_C': temperature_C,
             'comp_wt': comp_wt,
@@ -1688,6 +1715,7 @@ class _MELTSBackendSupport(MeltBackend):
             'crash_diagnostics': crash_diagnostics,
             'subprocess_run_mode': subprocess_run_mode,
             'redox_mode': redox_mode,
+            'gas_only_fo2_log': gas_only_fo2_log,
         }
         if call_timeout_s is not None and self.backend_name == 'thermoengine':
             prepared_kwargs['call_timeout_s'] = float(call_timeout_s)
@@ -1705,6 +1733,7 @@ class _MELTSBackendSupport(MeltBackend):
         crash_diagnostics: Mapping[str, object],
         redox_mode: Optional[str],
         subprocess_run_mode: AlphaMELTSSubprocessRunMode | str | None,
+        gas_only_fo2_log: Optional[float] = None,
     ) -> EquilibriumResult:
         if self._mode == 'python_api':
             return self._equilibrate_python(
@@ -1716,9 +1745,11 @@ class _MELTSBackendSupport(MeltBackend):
                 total_input_kg=total_input_kg,
                 require_solved_fo2=(
                     redox_mode != REDOX_MODE_NOT_AN_INPUT
+                    and gas_only_fo2_log is None
                 ),
                 crash_diagnostics=crash_diagnostics,
                 redox_mode=redox_mode,
+                gas_only_fo2_log=gas_only_fo2_log,
             )
         if self._mode == 'subprocess':
             subprocess_kwargs = {
@@ -1728,6 +1759,8 @@ class _MELTSBackendSupport(MeltBackend):
                     subprocess_run_mode
                 ),
             }
+            if gas_only_fo2_log is not None:
+                subprocess_kwargs['gas_only_fo2_log'] = gas_only_fo2_log
             if redox_mode is not None:
                 subprocess_kwargs['redox_mode'] = redox_mode
             return self._equilibrate_subprocess(
@@ -2876,6 +2909,7 @@ class _MELTSBackendSupport(MeltBackend):
         require_solved_fo2: bool = False,
         crash_diagnostics: Optional[Mapping[str, object]] = None,
         redox_mode: Optional[str] = None,
+        gas_only_fo2_log: Optional[float] = None,
     ):
         """
         Use PetThermoTools for equilibrium calculation.
@@ -2899,7 +2933,13 @@ class _MELTSBackendSupport(MeltBackend):
                 )
             )
             self._melts_model_code()
-            no_fO2_constraint = redox_mode == REDOX_MODE_NOT_AN_INPUT
+            gas_only = (
+                gas_only_fo2_log is not None
+                and math.isfinite(float(gas_only_fo2_log))
+            )
+            no_fO2_constraint = (
+                redox_mode == REDOX_MODE_NOT_AN_INPUT or gas_only
+            )
             results = self._run_petthermotools_isolated(
                 'equilibrate_MELTS',
                 kwargs={
@@ -2919,7 +2959,7 @@ class _MELTSBackendSupport(MeltBackend):
                 results,
                 temperature_C=temperature_C,
                 pressure_bar=solved_pressure_bar,
-                fO2_log=fO2_log,
+                fO2_log=None if gas_only else fO2_log,
                 comp_wt=comp_wt,
                 total_input_kg=total_input_kg,
                 require_solved_fo2=require_solved_fo2,
@@ -2941,6 +2981,19 @@ class _MELTSBackendSupport(MeltBackend):
                 return self._mark_vapor_unavailable_without_fO2(eq)
             if eq.status != 'ok':
                 return eq
+            vapor_fO2_log = fO2_log
+            if gas_only:
+                if eq.fO2_log is not None:
+                    eq.diagnostics['intrinsic_fO2_log'] = eq.fO2_log
+                eq.fO2_log = None
+                eq.printed_fO2_echo_log = None
+                eq.requested_fO2_log = float(gas_only_fo2_log)
+                eq.diagnostics.update(
+                    fo2_gas_only_diagnostic(float(gas_only_fo2_log))
+                )
+                if FO2_GAS_ONLY_NOTICE not in eq.warnings:
+                    eq.warnings.append(FO2_GAS_ONLY_NOTICE)
+                vapor_fO2_log = float(gas_only_fo2_log)
 
             # Vapor pressures via the real VapoRock helper if available,
             # fed the SOLVED equilibrium liquid composition (not the
@@ -2952,7 +3005,7 @@ class _MELTSBackendSupport(MeltBackend):
                         T_C=temperature_C,
                         solved_melt_wt_pct=eq.liquid_composition_wt_pct,
                         liquid_fraction=eq.liquid_fraction,
-                        fO2_log=fO2_log,
+                        fO2_log=vapor_fO2_log,
                         pressure_bar=solved_pressure_bar,
                         activities=eq.activity_coefficients,
                     )
@@ -2967,11 +3020,15 @@ class _MELTSBackendSupport(MeltBackend):
                 # fit_target=pure_component_psat is a fit target, not a
                 # first-principles evidence class; pseudo rows are backsolved
                 # VapoRock curve-fit fallbacks.
+                antoine_kwargs: dict[str, float] = {}
+                if gas_only:
+                    antoine_kwargs['pO2_bar'] = 10.0 ** float(gas_only_fo2_log)
                 projection = self._activities_times_antoine_or_fail(
                     temperature_C,
                     eq.activity_coefficients,
                     comp_wt,
                     context='PetThermoTools VapoRock fallback unavailable',
+                    **antoine_kwargs,
                 )
                 eq.vapor_pressures_Pa, source = self._finalize_antoine_projection(
                     projection,
@@ -3394,6 +3451,7 @@ class _MELTSBackendSupport(MeltBackend):
         diagnostics: Optional[Mapping[str, object]] = None,
         redox_mode: Optional[str] = None,
         run_mode: AlphaMELTSSubprocessRunMode,
+        gas_only_fo2_log: Optional[float] = None,
     ):
         """
         Run alphaMELTS binary via subprocess.
@@ -3442,8 +3500,15 @@ class _MELTSBackendSupport(MeltBackend):
             frozenset({'SiO2', 'Na2O'}),
             frozenset({'SiO2', 'K2O'}),
         )
+        gas_only = (
+            gas_only_fo2_log is not None
+            and math.isfinite(float(gas_only_fo2_log))
+        )
         if (
-            redox_mode == REDOX_MODE_NOT_AN_INPUT
+            (
+                redox_mode == REDOX_MODE_NOT_AN_INPUT
+                or gas_only
+            )
             and active_components in alkali_silica_binaries
         ):
             assessment_diagnostics = dict(diagnostics or {})
@@ -3475,7 +3540,8 @@ class _MELTSBackendSupport(MeltBackend):
                     reason=OutOfDomainReason.SILICATE_WINDOW,
                 )
         if (
-            redox_mode != REDOX_MODE_NOT_AN_INPUT
+            not gas_only
+            and redox_mode != REDOX_MODE_NOT_AN_INPUT
             and fO2_log is not None
             and active_components in alkali_silica_binaries
         ):
@@ -3509,6 +3575,12 @@ class _MELTSBackendSupport(MeltBackend):
                 },
                 diagnostics=diagnostics,
             )
+        if gas_only:
+            # The melt has no redox couple. Omit the fO2 path so the binary
+            # equilibrates the stated bulk, and keep the printed absolute for
+            # the gas projection after the parse. Named buffers are not
+            # rewritten here: they still hit the crash guards above.
+            fO2_path, fO2_offset = None, None
         if (
             fO2_path is not None
             and active_components in (
@@ -3728,6 +3800,9 @@ class _MELTSBackendSupport(MeltBackend):
                 },
                 redox_mode=redox_mode,
                 table_outputs=table_outputs,
+                gas_only_fo2_log=(
+                    float(gas_only_fo2_log) if gas_only else None
+                ),
             )
             if redox_mode == REDOX_MODE_NOT_AN_INPUT:
                 return self._mark_vapor_unavailable_without_fO2(eq)
@@ -4367,6 +4442,7 @@ class _MELTSBackendSupport(MeltBackend):
                                    table_outputs: Optional[
                                        Mapping[str, str]
                                    ] = None,
+                                   gas_only_fo2_log: Optional[float] = None,
                                    ) -> EquilibriumResult:
         physical_input_kg = float(total_input_kg)
         if not math.isfinite(physical_input_kg) or physical_input_kg <= 0.0:
@@ -4624,7 +4700,15 @@ class _MELTSBackendSupport(MeltBackend):
             fO2_header.lower().startswith('fo2(absolute)')
             and system_values.get('fO2_value') is not None
         )
-        if not has_fO2_echo and redox_mode != REDOX_MODE_NOT_AN_INPUT:
+        gas_only = (
+            gas_only_fo2_log is not None
+            and math.isfinite(float(gas_only_fo2_log))
+        )
+        if (
+            not has_fO2_echo
+            and redox_mode != REDOX_MODE_NOT_AN_INPUT
+            and not gas_only
+        ):
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING,
                 'System_main_tbl.txt lacks absolute engine fO2 echo',
@@ -4651,9 +4735,19 @@ class _MELTSBackendSupport(MeltBackend):
         if (
             executed_fO2_log is not None
             and redox_mode != REDOX_MODE_NOT_AN_INPUT
+            and not gas_only
         ):
             result_diagnostics['intrinsic_fO2_log'] = executed_fO2_log
-        if redox_mode == REDOX_MODE_NOT_AN_INPUT:
+        if gas_only:
+            requested_fO2_log = float(gas_only_fo2_log)
+            if executed_fO2_log is not None:
+                result_diagnostics['intrinsic_fO2_log'] = executed_fO2_log
+            result_diagnostics.update(
+                fo2_gas_only_diagnostic(requested_fO2_log)
+            )
+            if FO2_GAS_ONLY_NOTICE not in result_warnings:
+                result_warnings.append(FO2_GAS_ONLY_NOTICE)
+        elif redox_mode == REDOX_MODE_NOT_AN_INPUT:
             result_diagnostics['fO2_output_status'] = 'not_reported'
             result_diagnostics['fO2_output_status_reason'] = (
                 'not_an_input_default_column'
@@ -4668,7 +4762,8 @@ class _MELTSBackendSupport(MeltBackend):
                 result_diagnostics['requested_fO2_log'] = requested_fO2_log
             result_diagnostics['engine_reported_fO2_header'] = fO2_header
         if (
-            executed_fO2_log is not None
+            not gas_only
+            and executed_fO2_log is not None
             and echo_comparison_fO2_log is not None
             and not math.isclose(
                 executed_fO2_log,
@@ -4789,16 +4884,17 @@ class _MELTSBackendSupport(MeltBackend):
         )
         reported_fO2_log = (
             None
-            if redox_mode == REDOX_MODE_NOT_AN_INPUT
+            if redox_mode == REDOX_MODE_NOT_AN_INPUT or gas_only
             else executed_fO2_log
         )
+        printed_echo_log = None if gas_only else reported_fO2_log
         eq = self._emit_equilibrium_result(
             temperature_C=executed_temperature_C,
             requested_temperature_C=requested_temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=reported_fO2_log,
             requested_fO2_log=requested_fO2_log,
-            printed_fO2_echo_log=reported_fO2_log,
+            printed_fO2_echo_log=printed_echo_log,
             phases_present=phases_present,
             phase_masses_kg=phase_masses_kg,
             phase_species_mol=phase_species_mol,

@@ -973,6 +973,90 @@ def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeyp
     assert output["run_mode"] == "isothermal"
 
 
+def test_run_point_forwards_gas_only_fo2_and_still_captures_timeout(monkeypatch):
+    """gas_only_fo2_log is forwarded only when the adapter set it.
+
+    The timeout test above uses the non-gas-only signature. This one is
+    the other arm: the keyword reaches the callee and the subprocess
+    budget is still captured.
+    """
+    result = SimpleNamespace(**dict(_output()["generic"]))
+    received: dict[str, object] = {}
+
+    class FakeBackend:
+        _mode = "subprocess"
+        _model = "MELTSv1.0.2"
+        _timeout_s = 5.0
+
+        def _equilibrate_subprocess(
+            self,
+            temperature_C,
+            composition_wt_pct,
+            fO2_log,
+            pressure_bar,
+            warnings=None,
+            *,
+            total_input_kg=None,
+            diagnostics=None,
+            run_mode,
+            gas_only_fo2_log=None,
+        ):
+            del (
+                temperature_C,
+                composition_wt_pct,
+                fO2_log,
+                pressure_bar,
+                warnings,
+                total_input_kg,
+                diagnostics,
+                run_mode,
+            )
+            received["gas_only_fo2_log"] = gas_only_fo2_log
+            module._run_alphamelts_subprocess(
+                ["fake-alphamelts"],
+                input="fixture",
+                timeout=self._timeout_s,
+            )
+            return result
+
+        def equilibrate(self, **kwargs):
+            return self._equilibrate_subprocess(
+                kwargs["temperature_C"],
+                kwargs["composition_mol"],
+                kwargs["fO2_log"],
+                kwargs["pressure_bar"],
+                total_input_kg=100.0,
+                diagnostics={},
+                run_mode=kwargs["subprocess_run_mode"],
+                gas_only_fo2_log=-9.0,
+            )
+
+    module = SimpleNamespace(
+        _run_alphamelts_subprocess=lambda *args, **kwargs: SimpleNamespace(
+            returncode=0,
+            stdout="",
+            stderr="",
+        )
+    )
+    backend = FakeBackend()
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND", backend)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_MODULE", module)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_ENGINE_VERSION", "fixture-engine")
+
+    _grid_key_id, output = grid_pregrind._run_point(
+        grid_pregrind.WorkerJob(
+            grid_key_id=7,
+            shuffle_rank=0,
+            inputs={**_inputs(1200.0), "intended_fO2_log": -9.0},
+        )
+    )
+
+    capture = json.loads(output["raw_payload"])["captures"][0]
+    assert received["gas_only_fo2_log"] == pytest.approx(-9.0)
+    assert capture["timeout"] == pytest.approx(20.0)
+    assert output["native_input"]["fO2_constraint"] == {"path": None, "offset": None}
+
+
 def test_run_point_real_alphamelts_adapter_omits_default_redox_mode(
     monkeypatch,
 ):

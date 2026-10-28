@@ -102,6 +102,17 @@ def test_series_row_extra_distinguishes_same_T_rows() -> None:
     assert all("::point:" not in i for i in ids)
 
 
+def test_series_row_extra_ignores_derived_from() -> None:
+    from simulator.battery.stable_ids import series_row_extra
+
+    row = {"run": "AD eutectic", "T_C": "1400", "gamma": "1.367"}
+    linked = {**row, "derived_from": ["oneill_2002_table4_xfeo_ad_eutectic"]}
+    assert series_row_extra(linked) == series_row_extra(row)
+    assert series_row_extra(linked, include_locator=False) == series_row_extra(
+        row, include_locator=False
+    )
+
+
 def test_series_row_extra_uses_sample_and_content_fingerprint() -> None:
     from simulator.battery.stable_ids import series_point_id, series_row_extra
 
