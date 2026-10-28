@@ -138,7 +138,14 @@ function lineChart(id, title, series, options = {}) {
       }
     });
     if (points.length) segments.push(points);
-    return segments.map((segment) => `<polyline class="series" style="stroke:${item.color || COLORS[seriesIndex]}" points="${segment.join(" ")}"/>`).join("");
+    const color = item.color || COLORS[seriesIndex];
+    return segments.map((segment) => {
+      if (segment.length === 1) {
+        const [cx, cy] = segment[0].split(",");
+        return `<circle class="series-point" cx="${cx}" cy="${cy}" r="3" style="fill:${color}"/>`;
+      }
+      return `<polyline class="series" style="stroke:${color}" points="${segment.join(" ")}"/>`;
+    }).join("");
   }).join("");
   const bands = (options.spans || []).map((span, index) => {
     const start = x(span.startIndex);
