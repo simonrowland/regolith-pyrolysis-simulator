@@ -3737,10 +3737,11 @@ def test_imposed_vapor_request_retains_exact_serialized_result(vapor_pressure_da
     serialized = json.dumps({
         'diagnostic': result.diagnostic, 'warnings': result.warnings,
     }, sort_keys=True, default=str).encode()
-    # Behavior-preserving pin recorded at 76581ad1d before the closed-ledger
-    # discriminator. Absent discriminator retains imposed-condition semantics.
+    # Matched 85a23b321 hash56047a4d differs only in four stoichiometric-FeO
+    # tie-point floats and iw_basis_note; pressures, activities and warnings
+    # match for this imposed request. Historical72f00005 predates85.
     assert hashlib.sha256(serialized).hexdigest() == (
-        '72f00005265099b2d7946f94f40b5e5bc61044b5dcc93081ac20771ce21ffd0a')
+        'ab5bcce3e04c66c5dae3a71db22ad47978deb108a3d1b2922304a3cd76e25473')
 
 
 # ---------------------------------------------------------------------------
