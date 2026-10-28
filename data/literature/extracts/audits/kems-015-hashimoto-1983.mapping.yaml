@@ -1,0 +1,46 @@
+source_id: kems-015-hashimoto-1983
+citation: Hashimoto (1983), Geochemical Journal 17:111-145
+tables:
+- table: '2'
+  page: 4
+  published_page: 114
+  draft_csv: p004-t02.csv
+  role: run sequence and T_C/duration coordinates for every run notation
+  columns:
+    T_C: Table 2 T (°C)
+    time_min: Table 2 time (min)
+    run_id: run notation
+  row_count_printed: 19
+  verification: MinerU and pdftotext numeric agreement; row/column layout checked
+    against PDF p4 render
+- table: '3'
+  page: 6
+  published_page: 116
+  draft_csv: p006-t03.csv
+  role: residue samples cross-linked to Table 2 run IDs; existing stored residue values
+    retained
+  columns:
+    sample: sample label
+    VF_wt_pct: VF, wt%
+    SiO2_wt_pct: SiO2
+    Al2O3_wt_pct: Al2O3
+    FeO_wt_pct: FeO
+    MgO_wt_pct: MgO
+    CaO_wt_pct: CaO
+    n_analyses: n.a.
+  row_count_printed: 31
+  verification: MinerU and pdftotext numeric agreement; row/column layout checked
+    against PDF p6 render
+condition_prose:
+- quantity: total_pressure_Pa
+  page: 8
+  published_page: 118
+  section: RESULTS AND DISCUSSION
+  printed: chamber vacuum about 10^-4 Torr during experiments
+  kind: approximate total chamber vacuum
+- quantity: fO2_Pa
+  page: 17
+  published_page: 127
+  section: Disproportionation reactions in a liquid state
+  printed: unbuffered with respect to P_O2 (e.g., vacuum condition)
+  state: unknown; no run fO2 or numerical pO2 printed
