@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import importlib.util as _importlib_util
 from pathlib import Path as _Path
-import resource
 import sys as _sys
 import time
 
@@ -343,18 +342,13 @@ def _cpu_budget_failure_message(state: _CpuBudgetState) -> str:
     )
 
 
-def _child_process_cpu_seconds() -> float:
-    """Return CPU used by children that have exited and been reaped."""
-    usage = resource.getrusage(resource.RUSAGE_CHILDREN)
-    return usage.ru_utime + usage.ru_stime
-
-
 def _start_cpu_budget(item: pytest.Item) -> None:
     """Start per-test accounting; the verdict is applied after the call phase.
 
     The call runs to completion before its CPU verdict, so runaway work is
-    bounded by pytest-timeout's wall-clock hang guard. Persistent pool children
-    are not counted until reaped.
+    bounded by pytest-timeout's wall-clock hang guard. Only the pytest worker's
+    CPU is budgeted; child and engine-pool CPU is outside the budget and bounded
+    only by the wall-clock hang guard.
     """
     budget_seconds = cpu_budget_seconds(item)
     state = _CpuBudgetState(
@@ -598,16 +592,10 @@ def pytest_runtest_protocol(
 def pytest_runtest_call(item: pytest.Item) -> Iterator[object]:
     state = item.stash[_CPU_BUDGET_STATE]
     started_cpu_seconds = time.process_time()
-    started_child_cpu_seconds = _child_process_cpu_seconds()
     started_wall_seconds = time.monotonic()
     yield
     ended_cpu_seconds = time.process_time()
-    ended_child_cpu_seconds = _child_process_cpu_seconds()
     state.call_cpu_seconds = max(0.0, ended_cpu_seconds - started_cpu_seconds)
-    state.call_cpu_seconds += max(
-        0.0,
-        ended_child_cpu_seconds - started_child_cpu_seconds,
-    )
     state.call_wall_seconds = max(0.0, time.monotonic() - started_wall_seconds)
 
 

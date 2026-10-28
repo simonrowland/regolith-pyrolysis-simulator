@@ -141,7 +141,9 @@ def test_sleep_over_wall_guard_fails_with_hang_message(tmp_path: Path) -> None:
     assert "wall-clock hang guard" in _output(result)
 
 
-def test_reaped_child_cpu_counts_toward_the_budget(tmp_path: Path) -> None:
+def test_reaping_earlier_cpu_child_does_not_charge_its_cpu_to_this_test(
+    tmp_path: Path,
+) -> None:
     result = _run_probe(
         tmp_path,
         """
@@ -149,24 +151,31 @@ def test_reaped_child_cpu_counts_toward_the_budget(tmp_path: Path) -> None:
         import pytest
         import sys
 
+        burn_cpu = "\\n".join((
+            "import time",
+            "started = time.process_time()",
+            "while time.process_time() - started < 0.35:",
+            "    pass",
+        ))
+        child = None
+
+        @pytest.mark.cpu_budget(0.5)
+        @pytest.mark.timeout(5)
+        def test_00_start_cpu_child():
+            global child
+            child = subprocess.Popen([sys.executable, "-c", burn_cpu])
+
         @pytest.mark.cpu_budget(0.1)
         @pytest.mark.timeout(5)
-        def test_child_cpu_exceeds_budget():
-            burn_cpu = "\\n".join((
-                "import time",
-                "started = time.process_time()",
-                "while time.process_time() - started < 0.35:",
-                "    pass",
-            ))
-            subprocess.run([sys.executable, "-c", burn_cpu], check=True)
+        def test_01_reap_earlier_child():
+            assert child is not None
+            assert child.wait(timeout=5) == 0
         """,
-        expected_test_count=1,
+        expected_test_count=2,
     )
 
     output = _output(result)
-    assert result.returncode == pytest.ExitCode.TESTS_FAILED, output
-    assert "CPU budget exceeded:" in output
-    assert " s of 0.1 s (wall " in output
+    assert result.returncode == pytest.ExitCode.OK, output
 
 
 def test_long_lived_child_is_not_limited_by_the_next_test(tmp_path: Path) -> None:
