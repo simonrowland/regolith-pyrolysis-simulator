@@ -1541,6 +1541,7 @@ def kress91_oxygen_demand_mol(
     # 2 FeO + 1/2 O2 = Fe2O3: n_Fe stays constant, n_Fe2O3=x*n_Fe/2,
     # so demand = (target n_Fe2O3 - current n_Fe2O3)/2 mol O2.
     # At equal splits demand=0; from all-ferrous to all-ferric it is n_Fe/4.
+    # Sanity: oxidizing 100 mol of all-ferrous Fe therefore consumes 25 mol O2.
     return (0.5 * target * (feo_mol + 2.0 * fe2o3_mol) - fe2o3_mol) / 2.0
 
 

@@ -5735,7 +5735,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Source transitions already changed the ledger. Labels are accounting
         # telemetry; integrating their oxygen equivalents would count them twice.
         applied_delta_ln = 0.0
-        refusal_context: Dict[str, Any] = {}
         skip_reason = ''
         if (
             C_m <= OXYGEN_RESERVOIR_NOOP_MOL
@@ -5756,8 +5755,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     terms,
                     skip_reason,
                 )
-                if refusal_context:
-                    self._redox_source_refusal_context_this_hr = refusal_context
             else:
                 self._accumulate_redox_source_terms_for_hour(
                     '_redox_source_applied_terms_this_hr',
