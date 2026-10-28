@@ -397,6 +397,119 @@ class WarmEngineWorker:
             if self._pool_call_abort_event is abort_event:
                 self._pool_call_abort_event = None
 
+    def _receive_frame_with_deadline(
+        self,
+        connection: Any,
+        process: Any,
+        *,
+        deadline: float,
+        timeout_s: float,
+        phase: str,
+        abort_event: threading.Event | None = None,
+        debug_timeout_s: float | None = None,
+    ) -> Any:
+        """Receive one complete frame without letting ``recv`` overrun its wall."""
+        reply_lock = threading.Lock()
+        reply: tuple[float, Any, BaseException | None] | None = None
+        reply_ready = threading.Event()
+
+        def receive_frame() -> None:
+            nonlocal reply
+            try:
+                message = connection.recv()
+            except BaseException as exc:
+                outcome = (time.monotonic(), None, exc)
+            else:
+                outcome = (time.monotonic(), message, None)
+            with reply_lock:
+                reply = outcome
+            reply_ready.set()
+
+        receiver = threading.Thread(
+            target=receive_frame,
+            name=f'{self.name} {phase} reader',
+            daemon=True,
+        )
+        receiver.start()
+        try:
+            while True:
+                with reply_lock:
+                    outcome = reply
+                if outcome is not None:
+                    receiver.join()
+                    completed_at, message, receive_error = outcome
+                    # A complete receipt at the deadline is on time.
+                    if completed_at <= deadline:
+                        if receive_error is not None:
+                            raise receive_error
+                        return message
+                    break
+                with self._state_lock:
+                    aborted = (
+                        abort_event is not None and abort_event.is_set()
+                    )
+                    current = (
+                        not self.disabled
+                        and self.process is process
+                        and self.connection is connection
+                    )
+                if aborted:
+                    raise EngineWorkerTimeout(
+                        self.name,
+                        self.call_timeout_s,
+                        phase='job',
+                    )
+                if phase == 'job' and not current:
+                    raise EngineWorkerDied(
+                        'call',
+                        f'{self.name} worker exited without a result',
+                        returncode=getattr(process, 'exitcode', None),
+                    )
+                remaining = deadline - time.monotonic()
+                if remaining <= 0.0:
+                    # Recheck after reading the clock so an outcome
+                    # published while the caller resumed is not lost.
+                    with reply_lock:
+                        outcome = reply
+                    if outcome is not None:
+                        continue
+                    break
+                reply_ready.wait(min(
+                    ENGINE_WORKER_CANCEL_POLL_S,
+                    remaining,
+                ))
+            if debug_timeout_s is not None:
+                _pool_debug(
+                    f'{self.name}: reply receive timeout after '
+                    f'{debug_timeout_s:.2f}s (wall {timeout_s:.2f}s) — '
+                    'discarding worker'
+                )
+            self._discard_current(
+                diagnostic=debug_timeout_s is not None,
+                expected_process=process,
+                expected_connection=connection,
+            )
+            raise EngineWorkerTimeout(
+                self.name,
+                timeout_s,
+                phase=phase,
+            )
+        finally:
+            if receiver.is_alive():
+                self._discard_current(
+                    diagnostic=False,
+                    expected_process=process,
+                    expected_connection=connection,
+                )
+                # Closing the endpoint and killing the worker group should
+                # end recv(), but an in-flight pipe read can outlive close if
+                # another writer still holds the descriptor. Keep this
+                # daemon reader bounded by the deadline plus one poll quantum.
+                receiver.join(
+                    timeout=max(0.0, deadline - time.monotonic())
+                    + ENGINE_WORKER_CANCEL_POLL_S
+                )
+
     def start(self, *, timeout_s: Optional[float] = None) -> Any:
         """Start a fresh worker and wait for its bootstrap acknowledgement."""
         self.close()
@@ -541,7 +654,14 @@ class WarmEngineWorker:
                     )
                 if parent.poll(min(ENGINE_WORKER_CANCEL_POLL_S, remaining)):
                     break
-            message = parent.recv()
+            message = self._receive_frame_with_deadline(
+                parent,
+                process,
+                deadline=deadline,
+                timeout_s=startup_timeout,
+                phase='initialization',
+                abort_event=abort_event,
+            )
         except (EOFError, OSError, TimeoutError) as exc:
             self._discard_current(
                 diagnostic=False,
@@ -748,103 +868,15 @@ class WarmEngineWorker:
                     min(ENGINE_WORKER_CANCEL_POLL_S, poll_remaining)
                 ):
                     break
-            # Connection.recv() can block after poll() has consumed only the
-            # start of a frame. Keep its existing framing and unpickling, but
-            # run that blocking read where the caller can enforce this same
-            # deadline and retain its cancellation checks.
-            reply_lock = threading.Lock()
-            reply: tuple[float, Any, BaseException | None] | None = None
-            reply_ready = threading.Event()
-
-            def receive_reply() -> None:
-                nonlocal reply
-                try:
-                    message = connection.recv()
-                except BaseException as exc:
-                    outcome = (time.monotonic(), None, exc)
-                else:
-                    outcome = (time.monotonic(), message, None)
-                with reply_lock:
-                    reply = outcome
-                reply_ready.set()
-
-            receiver = threading.Thread(
-                target=receive_reply,
-                name=f'{self.name} reply reader',
-                daemon=True,
+            message = self._receive_frame_with_deadline(
+                connection,
+                process,
+                deadline=deadline,
+                timeout_s=timeout,
+                phase='job',
+                abort_event=abort_event,
+                debug_timeout_s=remaining,
             )
-            receiver.start()
-            try:
-                while True:
-                    with reply_lock:
-                        outcome = reply
-                    if outcome is not None:
-                        receiver.join()
-                        completed_at, message, receive_error = outcome
-                        # A complete receipt at the deadline is on time.
-                        timed_out = completed_at > deadline
-                        if not timed_out and receive_error is not None:
-                            raise receive_error
-                        break
-                    with self._state_lock:
-                        aborted = (
-                            abort_event is not None and abort_event.is_set()
-                        )
-                        current = (
-                            not self.disabled
-                            and self.process is process
-                            and self.connection is connection
-                        )
-                    if aborted:
-                        raise EngineWorkerTimeout(
-                            self.name,
-                            timeout,
-                            phase='job',
-                        )
-                    if not current:
-                        raise EngineWorkerDied(
-                            'call',
-                            f'{self.name} worker exited without a result',
-                            returncode=getattr(process, 'exitcode', None),
-                        )
-                    reply_remaining = deadline - time.monotonic()
-                    if reply_remaining <= 0.0:
-                        # Recheck after reading the clock so an outcome
-                        # published while the caller resumed is not lost.
-                        with reply_lock:
-                            outcome = reply
-                        if outcome is not None:
-                            continue
-                        timed_out = True
-                        break
-                    reply_ready.wait(min(
-                        ENGINE_WORKER_CANCEL_POLL_S,
-                        reply_remaining,
-                    ))
-                if timed_out:
-                    _pool_debug(
-                        f'{self.name}: reply receive timeout after '
-                        f'{remaining:.2f}s (wall {timeout:.2f}s) — '
-                        'discarding worker'
-                    )
-                    self._discard_current(
-                        diagnostic=True,
-                        expected_process=process,
-                        expected_connection=connection,
-                    )
-                    raise EngineWorkerTimeout(
-                        self.name,
-                        timeout,
-                        phase='job',
-                    )
-            finally:
-                if receiver.is_alive():
-                    self._discard_current(
-                        diagnostic=False,
-                        expected_process=process,
-                        expected_connection=connection,
-                    )
-                    receiver.join()
         except TimeoutError:
             raise
         except (BrokenPipeError, EOFError, OSError) as exc:
