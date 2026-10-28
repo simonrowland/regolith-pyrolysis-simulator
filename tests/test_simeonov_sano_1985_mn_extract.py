@@ -14,6 +14,9 @@ EXTRACT = (
 
 
 def _assert_table1_pins(doc: dict) -> None:
+    from simulator.battery.enums import Quantity, Rail
+    from simulator.battery.score import rail_for_quantity
+
     rows = doc["species"]["MnO"]["observations"]
     expected = {
         "simeonov_sano_1985_t1_r2_lmn": "0.80",
@@ -30,6 +33,18 @@ def _assert_table1_pins(doc: dict) -> None:
         assert row["locator"]["page"] == 5
         assert row["locator"]["published_page"] == 1120
         assert row["locator"]["table"] == "1"
+        assert row["phase"] == "l"
+        assert row["values"]["formula"] == "Mn"
+        assert row["values"]["phase_label"] == "slag"
+        assert row["values"]["counter_phase_label"] == "metal"
+        assert row["values"]["method_class"] == "measured_reduced"
+        assert row["derivation"]["relation"] == "(MnO)/[Mn]"
+        assert row["derivation"]["raw_inputs"]["state"]["value"] == (
+            "not_printed"
+        )
+        assert rail_for_quantity(
+            Quantity.DISTRIBUTION_RATIO, species_formula=row["values"]["formula"]
+        ) is Rail.REDOX
 
 
 def test_table1_mn_distribution_rows_match_render_and_migrate(tmp_path: Path) -> None:
@@ -67,7 +82,7 @@ def test_table1_mn_distribution_rows_match_render_and_migrate(tmp_path: Path) ->
         for row in result.observations.values()
         if row.source_id == "simeonov-sano-1985-na-bearing-mno-activities"
     }
-    assert len(migrated) == 4, (
+    assert len(migrated) == 5, (
         f"observations={len(result.observations)} contexts={sum(map(len, result.context_by_work.values()))} "
         f"queue={[entry.why for entry in result.queue]} issues={result.validation.issues}"
     )
@@ -80,7 +95,15 @@ def test_table1_mn_distribution_rows_match_render_and_migrate(tmp_path: Path) ->
         assert row.identity.composition.is_unknown
         assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.fO2_Pa.is_unknown
-    assert sum(map(len, result.context_by_work.values())) == 3
+    gamma = migrated["simeonov_sano_1985_gamma_mn_carbon_saturated_iron"]
+    assert gamma.value.point == Decimal("0.510")
+    assert gamma.identity.quantity.value.value == "activity_coefficient"
+    gamma_source = doc["species"]["Mn"]["observations"][0]
+    assert gamma_source["values"]["method_class"] == "measured_reduced"
+    assert gamma_source["derivation"]["parameters"][0][1]["state"]["value"] == "1.07"
+    assert gamma_source["derivation"]["parameters"][1][1]["state"]["value"] == "0.544"
+    assert sum(map(len, result.context_by_work.values())) == 5
+    assert not any("phase string 'slag'" in entry.why for entry in result.queue)
 
 
 def test_na2o_prose_conflict_and_figure_values_stay_typed_refused() -> None:
@@ -97,6 +120,8 @@ def test_na2o_prose_conflict_and_figure_values_stay_typed_refused() -> None:
     assert context[1]["values"]["distribution_ratio_as_published"] == (
         "0.37 and 0.32, respectively"
     )
+    assert context[1]["locator"]["page"] == 5
+    assert context[1]["locator"]["published_page"] == 1120
     capacity = doc["species"]["Mn"]["context"][0]
     assert capacity["values"]["admission_status"] == "typed_refusal"
     assert "no existing quantity token" in capacity["values"]["schema_gap"].lower()

@@ -58,17 +58,22 @@ species:
           row_label: '10'
           column_header: L_Mn
           printed_cell: '0.80'
-        phase: slag
+        phase: l
         units: dimensionless
+        derivation:
+          relation: (MnO)/[Mn]
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 5, published_page: 1120, pdf_page_index: 4, table: '1', note: 'Per-row slag and metal assay values are not printed.'}
         values:
           quantity: distribution_ratio
-          formula: MnO / Mn
+          formula: Mn
           phase_label: slag
           counter_phase_label: metal
           basis: wt_percent
           distribution_ratio: '0.80'
           distribution_ratio_as_published: '0.80'
-          method_class: measured_direct
+          method_class: measured_reduced
           admission_status: admitted
           T_C: '1300'
           point_conditions:
@@ -90,17 +95,22 @@ species:
           row_label: '15'
           column_header: L_Mn
           printed_cell: '0.64'
-        phase: slag
+        phase: l
         units: dimensionless
+        derivation:
+          relation: (MnO)/[Mn]
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 5, published_page: 1120, pdf_page_index: 4, table: '1', note: 'Per-row slag and metal assay values are not printed.'}
         values:
           quantity: distribution_ratio
-          formula: MnO / Mn
+          formula: Mn
           phase_label: slag
           counter_phase_label: metal
           basis: wt_percent
           distribution_ratio: '0.64'
           distribution_ratio_as_published: '0.64'
-          method_class: measured_direct
+          method_class: measured_reduced
           admission_status: admitted
           T_C: '1300'
           point_conditions:
@@ -122,17 +132,22 @@ species:
           row_label: '20'
           column_header: L_Mn
           printed_cell: '0.53'
-        phase: slag
+        phase: l
         units: dimensionless
+        derivation:
+          relation: (MnO)/[Mn]
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 5, published_page: 1120, pdf_page_index: 4, table: '1', note: 'Per-row slag and metal assay values are not printed.'}
         values:
           quantity: distribution_ratio
-          formula: MnO / Mn
+          formula: Mn
           phase_label: slag
           counter_phase_label: metal
           basis: wt_percent
           distribution_ratio: '0.53'
           distribution_ratio_as_published: '0.53'
-          method_class: measured_direct
+          method_class: measured_reduced
           admission_status: admitted
           T_C: '1300'
           point_conditions:
@@ -154,17 +169,22 @@ species:
           row_label: '25'
           column_header: L_Mn
           printed_cell: '0.41'
-        phase: slag
+        phase: l
         units: dimensionless
+        derivation:
+          relation: (MnO)/[Mn]
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 5, published_page: 1120, pdf_page_index: 4, table: '1', note: 'Per-row slag and metal assay values are not printed.'}
         values:
           quantity: distribution_ratio
-          formula: MnO / Mn
+          formula: Mn
           phase_label: slag
           counter_phase_label: metal
           basis: wt_percent
           distribution_ratio: '0.41'
           distribution_ratio_as_published: '0.41'
-          method_class: measured_direct
+          method_class: measured_reduced
           admission_status: admitted
           T_C: '1300'
           point_conditions:
@@ -205,9 +225,9 @@ species:
       - observation_id: simeonov_sano_1985_na2o_text_statement
         type: figure_context
         locator:
-          page: 4
-          published_page: 1119
-          pdf_page_index: 3
+          page: 5
+          published_page: 1120
+          pdf_page_index: 4
           section: 'IV. Discussion'
         units: wt% Na2O and dimensionless distribution ratio as printed
         values:
@@ -221,7 +241,36 @@ species:
           temperature_C: '1300'
           note: 'The authors relate these results to Fig. 6; no complete per-run slag compositions, metal assays, or pressure are printed.'
   Mn:
-    observations: []
+    observations:
+      - observation_id: simeonov_sano_1985_gamma_mn_carbon_saturated_iron
+        type: activity_coefficient
+        experiment: simeonov-sano-1985-table1-mn-distribution
+        locator: {page: 2, published_page: 1117, pdf_page_index: 1, section: 'III.1'}
+        derivation:
+          relation: 'Eq. (2), using the Fig. 2 slope and the manganese activity coefficient in copper reported by Hultgren and Desai'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 2, published_page: 1117, pdf_page_index: 1, figure: '2', note: 'The underlying paired alloy assays are plotted, not tabulated.'}
+          parameters:
+            - [Fig. 2 slope, {state: {tag: value, value: '1.07'}, locator: {page: 2, published_page: 1117, pdf_page_index: 1, section: 'III.1'}}]
+            - [gamma_Mn_in_copper, {state: {tag: value, value: '0.544'}, locator: {page: 2, published_page: 1117, pdf_page_index: 1, section: 'III.1', note: 'Quoted from Hultgren and Desai, reference 6.'}}]
+        phase: l
+        units: dimensionless
+        standard_state: not stated in the paper for the reported gamma_Mn coefficient
+        T_C: '1300'
+        point_conditions:
+          temperature_C: {state: {tag: value, value: '1300'}, locator: {page: 2, published_page: 1117, pdf_page_index: 1, section: 'III.1'}}
+          gas_mix: {state: {tag: value, value: CO}, locator: {page: 2, published_page: 1117, pdf_page_index: 1, section: 'II.1'}}
+          total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '101325'}}, locator: {page: 2, published_page: 1117, pdf_page_index: 1, section: 'II.1', note: 'Printed P_CO = 1 atm; exact conversion to Pa.'}}
+          composition: {state: {tag: unknown, reason: experiment_melt_composition_not_printed}, locator: {page: 2, published_page: 1117, pdf_page_index: 1, figure: '2'}}
+        values:
+          quantity: activity_coefficient
+          formula: Mn
+          activity_coefficient: '0.510'
+          reference_state_as_printed: gamma°_Mn in carbon-saturated iron; the paper does not name its reference endmember
+          method_class: measured_reduced
+          admission_status: admitted
+
     context:
       - observation_id: simeonov_sano_1985_t1_manganous_capacity_schema_gap
         type: measured_table_context
@@ -248,3 +297,32 @@ species:
             - {row_label: '15', caF2_wt_percent: '15', log_C_Mn2_plus: '10.52'}
             - {row_label: '20', caF2_wt_percent: '20', log_C_Mn2_plus: '10.50'}
             - {row_label: '25', caF2_wt_percent: '25', log_C_Mn2_plus: '10.53'}
+      - observation_id: simeonov_sano_1985_mn_distribution_temperature_relation_context
+        type: derived_relation_context
+        locator: {page: 3, published_page: 1118, pdf_page_index: 2, equation: '5'}
+        units: log distribution ratio and kcal/mol as printed
+        values:
+          log_distribution_relation_as_printed: 'log((MnO)/[Mn]) = 5548/T − 3.87'
+          heat_of_reaction_3_as_printed: '−53 kcal/mol'
+          relative_partial_heat_of_solution_of_MnO_as_printed: '+31 kcal/mol'
+          relation_locator: {page: 3, published_page: 1118, pdf_page_index: 2, equation: '5'}
+          heat_of_reaction_locator: {page: 3, published_page: 1118, pdf_page_index: 2, section: 'III.4'}
+          partial_heat_locator: {page: 4, published_page: 1119, pdf_page_index: 3, equation: '11'}
+          method_class: typed_refusal
+          reason: Printed relation and heats are context only; no compatible observation token represents these fitted quantities.
+      - observation_id: simeonov_sano_1985_initial_bof_slag_composition_context
+        type: composition_context
+        locator: {page: 5, published_page: 1120, pdf_page_index: 4, section: 'V'}
+        units: wt% as printed
+        values:
+          composition_as_printed:
+            CaO: '46.70'
+            SiO2: '14.20'
+            MnO: '15.90'
+            MgO: '5.65'
+            Al2O3: '1.90'
+            P2O5: '1.22'
+            FeO: '10.69'
+          material: initial BOF slag
+          method_class: typed_refusal
+          reason: This initial slag analysis is not the final row-specific composition of the modified equilibrium slags; it is not bound to the Table 1 observation identities.
