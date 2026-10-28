@@ -28,19 +28,20 @@ def _project_requirements(project: dict) -> list[str]:
     return requirements
 
 
-def _declared_git_pins(requirements: list[str]) -> list[tuple[str, str]]:
+def _declared_git_pins(
+    requirements: list[tuple[str, str]],
+) -> list[tuple[str, str, str]]:
     pins = []
-    for requirement in requirements:
+    for requirement, origin in requirements:
         match = _DIRECT_GIT_REQUIREMENT.match(requirement)
         if not match:
             continue
-        url = match.group("url").split("#", 1)[0]
-        path = urlsplit(url[4:]).path
+        path = urlsplit(match.group("url")[4:]).path
         if "@" not in path:
             continue
         revision = path.rsplit("@", 1)[1]
         if revision:
-            pins.append((_canonical_name(match.group("name")), revision))
+            pins.append((_canonical_name(match.group("name")), revision, origin))
     return pins
 
 
@@ -57,12 +58,9 @@ def _locked_git_revision(source: dict) -> str | None:
     return parsed.fragment or None
 
 
-def test_git_dependency_revisions_match_uv_lock() -> None:
-    with (ROOT / "pyproject.toml").open("rb") as project_file:
-        project = tomllib.load(project_file)["project"]
-    with (ROOT / "uv.lock").open("rb") as lock_file:
-        lock = tomllib.load(lock_file)
-
+def _assert_git_dependency_revisions_match(
+    project: dict, lock: dict, requirements_root: Path = ROOT
+) -> None:
     locked_git = defaultdict(list)
     for package in lock.get("package", []):
         source = package.get("source", {})
@@ -72,19 +70,19 @@ def test_git_dependency_revisions_match_uv_lock() -> None:
             )
 
     mismatches = []
-    for name, declared_revision in _declared_git_pins(
-        _project_requirements(project)
-    ):
+    declarations = _all_declared_requirements(project, requirements_root)
+    for name, declared_revision, origin in _declared_git_pins(declarations):
         locked_revisions = locked_git.get(name, [])
         if not locked_revisions:
             mismatches.append(
-                f"{name}: pyproject rev {declared_revision}; uv.lock rev <missing>"
+                f"{origin}: {name}: declared rev {declared_revision}; "
+                "uv.lock rev <missing>"
             )
             continue
         for locked_revision in locked_revisions:
             if locked_revision != declared_revision:
                 mismatches.append(
-                    f"{name}: pyproject rev {declared_revision}; "
+                    f"{origin}: {name}: declared rev {declared_revision}; "
                     f"uv.lock rev {locked_revision or '<missing>'}"
                 )
 
@@ -93,22 +91,61 @@ def test_git_dependency_revisions_match_uv_lock() -> None:
     )
 
 
-def _all_declared_requirements(project: dict) -> list[tuple[str, str]]:
+def test_git_dependency_revisions_match_uv_lock() -> None:
+    with (ROOT / "pyproject.toml").open("rb") as project_file:
+        project = tomllib.load(project_file)["project"]
+    with (ROOT / "uv.lock").open("rb") as lock_file:
+        lock = tomllib.load(lock_file)
+
+    _assert_git_dependency_revisions_match(project, lock)
+
+
+def _all_declared_requirements(
+    project: dict, requirements_root: Path = ROOT
+) -> list[tuple[str, str]]:
     requirements = [
         (requirement, "pyproject.toml")
         for requirement in _project_requirements(project)
     ]
-    requirements_file = ROOT / "requirements.txt"
-    if requirements_file.exists():
+    for requirements_file in sorted(requirements_root.glob("requirements*.txt")):
         for line_number, raw_line in enumerate(
             requirements_file.read_text().splitlines(), start=1
         ):
-            requirement = raw_line.split("#", 1)[0].strip()
+            requirement = re.split(r"\s+#", raw_line, maxsplit=1)[0].strip()
             if requirement and not requirement.startswith("-"):
                 requirements.append(
-                    (requirement, f"requirements.txt:{line_number}")
+                    (
+                        requirement,
+                        f"{requirements_file.name}:{line_number}",
+                    )
                 )
     return requirements
+
+
+def test_requirements_file_git_revision_mismatch_is_rejected(tmp_path: Path) -> None:
+    requirements_file = tmp_path / "requirements.txt"
+    requirements_file.write_text(
+        "synthetic-dep @ git+https://example.com/synthetic-dep@declared-rev\n"
+    )
+    lock = tomllib.loads(
+        """
+        [[package]]
+        name = "synthetic-dep"
+        version = "1.0.0"
+        source = { git = "https://example.com/synthetic-dep?rev=locked-rev#locked-rev" }
+        """
+    )
+
+    with pytest.raises(AssertionError) as error:
+        _assert_git_dependency_revisions_match(
+            {"dependencies": [], "optional-dependencies": {}}, lock, tmp_path
+        )
+
+    message = str(error.value)
+    assert "requirements.txt:1" in message
+    assert "synthetic-dep" in message
+    assert "declared-rev" in message
+    assert "locked-rev" in message
 
 
 def test_declared_version_requirements_match_uv_lock() -> None:
