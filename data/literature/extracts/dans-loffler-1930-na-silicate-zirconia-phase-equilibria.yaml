@@ -7392,6 +7392,7 @@ species:
         quantity: transition_temperature
         property_kind: transition
         method_class: measured_direct
+        approximate: true
         admission_status: admitted
         T_C: '1477'
         value: '1477'
@@ -7476,6 +7477,7 @@ species:
         quantity: transition_temperature
         property_kind: transition
         method_class: measured_direct
+        approximate: true
         admission_status: admitted
         T_C: '1477'
         value: '1477'
@@ -7560,6 +7562,7 @@ species:
         quantity: transition_temperature
         property_kind: transition
         method_class: measured_direct
+        approximate: true
         admission_status: admitted
         T_C: '1472'
         value: '1472'
@@ -7656,9 +7659,9 @@ species:
           ZrO2: '0.05'
         composition_as_published: Na2O 56,2 mol%; SiO2 38,7 mol%; ZrO2 5,0 mol%
         composition_columns:
-          Na2O: 3
-          SiO2: 4
-          ZrO2: 5
+          ZrO2: 3
+          Na2O: 4
+          SiO2: 5
         note: Thermal effect as printed in Table 5.
     - observation_id: dans1930_p026_t09_r04_c07_point_31
       type: transition_point
@@ -7740,9 +7743,9 @@ species:
           ZrO2: '0.05'
         composition_as_published: Na2O 56,2 mol%; SiO2 38,7 mol%; ZrO2 5,0 mol%
         composition_columns:
-          Na2O: 3
-          SiO2: 4
-          ZrO2: 5
+          ZrO2: 3
+          Na2O: 4
+          SiO2: 5
         note: Thermal effect as printed in Table 5.
     - observation_id: dans1930_p026_t09_r04_c08_point_31
       type: transition_point
@@ -7811,7 +7814,32 @@ species:
       values:
         quantity: transition_temperature
         property_kind: liquidus
-        method_class: measured_direct
+        method_class: model_derived
+        derivation:
+          relation: "The source marks this parenthesized point temperature as derived (p. 13) and names no numerical input for this row."
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 26
+              pdf_page_index: 25
+              table: '5'
+              row: "point 31"
+              note: "No numerical inputs for this value are printed."
+          method:
+            state:
+              tag: value
+              value: "The authors state that parenthetical values are only derived."
+            locator:
+              source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+              page: 13
+              pdf_page_index: 12
+              published_page: 13
+              table: '3'
+              equation: "parentheses mark values as only derived"
+              note: 'The source states: “In der Tabelle sind ferner die ausgezeichneten Punkte der ganzen Grenzkurve hervorgehoben, zum Teil sind deren Werte nur abgeleitet, was durch Einklammern der Zahlen kenntlich gemacht ist.”'
+          references:
+          - "D’Ans and Löffler (1930), p. 13"
+          output_unit: "°C"
         admission_status: admitted
         T_C: '1038'
         value: '1038'
@@ -7824,10 +7852,10 @@ species:
           ZrO2: '0.05'
         composition_as_published: Na2O 56,2 mol%; SiO2 38,7 mol%; ZrO2 5,0 mol%
         composition_columns:
-          Na2O: 3
-          SiO2: 4
-          ZrO2: 5
-        note: Parentheses as printed for cooling-curve primary effect.
+          ZrO2: 3
+          Na2O: 4
+          SiO2: 5
+        note: 'Parentheses mark this value as derived per the page-13 statement; no calculation inputs or parent observation are printed.'
     - observation_id: dans1930_p026_t09_r05_c07_point_32
       type: transition_point
       locator:
@@ -7896,6 +7924,7 @@ species:
         quantity: transition_temperature
         property_kind: eutectic
         method_class: measured_direct
+        approximate: true
         admission_status: admitted
         T_C: '1056'
         value: '1056'
@@ -7908,9 +7937,9 @@ species:
           ZrO2: '0.125'
         composition_as_published: Na2O 54,0 mol%; SiO2 33,5 mol%; ZrO2 12,5 mol%
         composition_columns:
-          Na2O: 3
-          SiO2: 4
-          ZrO2: 5
+          ZrO2: 3
+          Na2O: 4
+          SiO2: 5
         note: U marks an indistinct thermal effect.
     - observation_id: dans1930_p026_t09_r05_c08_point_32
       type: transition_point
@@ -7923,7 +7952,7 @@ species:
         column: '8'
         table_row_number: 5
         table_column_number: 8
-        note: Parentheses as printed for cooling-curve primary effect.
+        note: The printed cooling-curve primary effect is 1050 without parentheses.
       phase: l
       units: °C as printed
       point_conditions:
@@ -7940,7 +7969,7 @@ species:
             column: '8'
             table_row_number: 5
             table_column_number: 8
-            note: Parentheses as printed for cooling-curve primary effect.
+            note: The printed cooling-curve primary effect is 1050 without parentheses.
         fO2_Pa:
           state:
             tag: unknown
@@ -7954,7 +7983,7 @@ species:
             column: '8'
             table_row_number: 5
             table_column_number: 8
-            note: Parentheses as printed for cooling-curve primary effect.
+            note: The printed cooling-curve primary effect is 1050 without parentheses.
         composition:
           state:
             tag: value
@@ -7983,7 +8012,7 @@ species:
         admission_status: admitted
         T_C: '1050'
         value: '1050'
-        T_C_as_published: (1050)
+        T_C_as_published: '1050'
         system_as_published: Na2O-SiO2-ZrO2
         composition_mol:
           basis: printed_mole_fraction
@@ -7992,10 +8021,10 @@ species:
           ZrO2: '0.125'
         composition_as_published: Na2O 54,0 mol%; SiO2 33,5 mol%; ZrO2 12,5 mol%
         composition_columns:
-          Na2O: 3
-          SiO2: 4
-          ZrO2: 5
-        note: Parentheses as printed for cooling-curve primary effect.
+          ZrO2: 3
+          Na2O: 4
+          SiO2: 5
+        note: The printed cooling-curve primary effect is 1050 without parentheses.
     - observation_id: dans1930_p028_t10_r05_c06_point_34_detectable
       type: transition_point
       locator:
@@ -9549,7 +9578,31 @@ species:
       values:
         quantity: transition_temperature
         property_kind: eutectic
-        method_class: measured_direct
+        method_class: model_derived
+        derivation:
+          relation: "The source marks this parenthesized point temperature as derived and names no numerical input for this row."
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 34
+              pdf_page_index: 33
+              row: "B"
+              note: "No numerical inputs for this value are printed."
+          method:
+            state:
+              tag: value
+              value: "The authors state that parenthetical values are only derived."
+            locator:
+              source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+              page: 13
+              pdf_page_index: 12
+              published_page: 13
+              table: '3'
+              equation: "parentheses mark values as only derived"
+              note: 'The source states: “In der Tabelle sind ferner die ausgezeichneten Punkte der ganzen Grenzkurve hervorgehoben, zum Teil sind deren Werte nur abgeleitet, was durch Einklammern der Zahlen kenntlich gemacht ist.”'
+          references:
+          - "D’Ans and Löffler (1930), p. 13"
+          output_unit: "°C"
         admission_status: admitted
         T_C: '1000'
         value: '1000'
@@ -9563,7 +9616,7 @@ species:
         composition_columns: &id008
           Na2O: 4
           SiO2: 5
-        note: Parentheses/approximation are printed qualifiers; component values remain as printed.
+        note: 'Parentheses mark this value as derived per the page-13 statement; no calculation inputs or parent observation are printed.'
     - observation_id: dans1930_p034_t13_r02_c04_B_Na2O_equilibrium_mol_fraction
       type: composition_series
       locator:
@@ -9832,7 +9885,7 @@ species:
         column: '3'
         table_row_number: 4
         table_column_number: 3
-        note: Parentheses/approximation are printed qualifiers; component values remain as printed.
+        note: Approximate invariant temperature is ca. 1500 °C; the composition values stay as printed.
       phase: l
       units: °C as printed
       point_conditions:
@@ -9848,7 +9901,7 @@ species:
             column: '3'
             table_row_number: 4
             table_column_number: 3
-            note: Parentheses/approximation are printed qualifiers; component values remain as printed.
+            note: Approximate invariant temperature is ca. 1500 °C; the composition values stay as printed.
         fO2_Pa:
           state:
             tag: unknown
@@ -9861,7 +9914,7 @@ species:
             column: '3'
             table_row_number: 4
             table_column_number: 3
-            note: Parentheses/approximation are printed qualifiers; component values remain as printed.
+            note: Approximate invariant temperature is ca. 1500 °C; the composition values stay as printed.
         composition:
           state:
             tag: value
@@ -9884,10 +9937,11 @@ species:
         quantity: transition_temperature
         property_kind: transition
         method_class: measured_direct
+        approximate: true
         admission_status: admitted
-        T_C: '1600'
-        value: '1600'
-        T_C_as_published: ca. 1600
+        T_C: '1500'
+        value: '1500'
+        T_C_as_published: "ca. 1500"
         system_as_published: Na2O-SiO2-ZrO2
         composition_mol:
           basis: printed_mole_fraction
@@ -9897,7 +9951,7 @@ species:
         composition_columns: &id010
           Na2O: 4
           ZrO2: 6
-        note: Parentheses/approximation are printed qualifiers; component values remain as printed.
+        note: Approximate invariant temperature is ca. 1500 °C; the composition values stay as printed.
     - observation_id: dans1930_p034_t13_r04_c04_O_Na2O_equilibrium_mol_fraction
       type: composition_series
       locator:
@@ -9908,14 +9962,14 @@ species:
         column: '4'
         table_row_number: 4
         table_column_number: 4
-        note: Binary invariant summary composition; values retain the printed component basis.
+        note: Parenthesized composition is derived with no printed inputs; temperature is ca. 1500 °C.
       phase: l
       units: mole fraction (dimensionless); source reports mol%
       point_conditions:
         temperature_K:
           state:
             tag: value
-            value: '1873.15'
+            value: '1773.15'
           locator:
             source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
             pdf_page_index: 33
@@ -9936,7 +9990,7 @@ species:
             column: '4'
             table_row_number: 4
             table_column_number: 4
-            note: Binary invariant summary composition; values retain the printed component basis.
+            note: Parenthesized composition is derived with no printed inputs; temperature is ca. 1500 °C.
         fO2_Pa:
           state:
             tag: unknown
@@ -9949,7 +10003,7 @@ species:
             column: '4'
             table_row_number: 4
             table_column_number: 4
-            note: Binary invariant summary composition; values retain the printed component basis.
+            note: Parenthesized composition is derived with no printed inputs; temperature is ca. 1500 °C.
         composition:
           state:
             tag: value
@@ -9969,7 +10023,7 @@ species:
             column: '4'
             table_row_number: 4
             table_column_number: 4
-            note: Binary invariant summary composition; values retain the printed component basis.
+            note: Parenthesized composition is derived with no printed inputs; temperature is ca. 1500 °C.
       values:
         quantity: equilibrium_phase_composition
         formula: Na2O
@@ -9979,8 +10033,34 @@ species:
         component_amount_as_published: (57) mol%
         component_amount_printed_unit: mol%
         value: '57'
-        T_C: '1600'
-        method_class: measured_direct
+        T_C: '1500'
+        T_C_as_published: "ca. 1500"
+        method_class: model_derived
+        derivation:
+          relation: "The source marks this parenthesized composition as derived and names no numerical input for this row."
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 34
+              pdf_page_index: 33
+              row: "O"
+              note: "No numerical inputs for this value are printed."
+          method:
+            state:
+              tag: value
+              value: "The authors state that parenthetical values are only derived."
+            locator:
+              source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+              page: 13
+              pdf_page_index: 12
+              published_page: 13
+              table: '3'
+              equation: "parentheses mark values as only derived"
+              note: 'The source states: “In der Tabelle sind ferner die ausgezeichneten Punkte der ganzen Grenzkurve hervorgehoben, zum Teil sind deren Werte nur abgeleitet, was durch Einklammern der Zahlen kenntlich gemacht ist.”'
+          references:
+          - "D’Ans and Löffler (1930), p. 13"
+          output_unit: "mole fraction"
+        approximate: true
         admission_status: admitted
         point_label_as_published: O
         system_as_published: Na2O-SiO2-ZrO2
@@ -9990,7 +10070,7 @@ species:
           basis: printed_mole_fraction
           Na2O: '0.57'
           ZrO2: '0.43'
-        note: Binary invariant summary composition; values retain the printed component basis.
+        note: 'Parenthesized composition is derived per the page-13 statement; no calculation inputs or parent observation are printed. Temperature is ca. 1500 °C.'
     - observation_id: dans1930_p035_t14_r02_c03_G
       type: transition_point
       locator:
@@ -10054,7 +10134,31 @@ species:
       values:
         quantity: transition_temperature
         property_kind: eutectic
-        method_class: measured_direct
+        method_class: model_derived
+        derivation:
+          relation: "The source marks this parenthesized point temperature as derived and names no numerical input for this row."
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 35
+              pdf_page_index: 34
+              row: "G"
+              note: "No numerical inputs for this value are printed."
+          method:
+            state:
+              tag: value
+              value: "The authors state that parenthetical values are only derived."
+            locator:
+              source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+              page: 13
+              pdf_page_index: 12
+              published_page: 13
+              table: '3'
+              equation: "parentheses mark values as only derived"
+              note: 'The source states: “In der Tabelle sind ferner die ausgezeichneten Punkte der ganzen Grenzkurve hervorgehoben, zum Teil sind deren Werte nur abgeleitet, was durch Einklammern der Zahlen kenntlich gemacht ist.”'
+          references:
+          - "D’Ans and Löffler (1930), p. 13"
+          output_unit: "°C"
         admission_status: admitted
         T_C: '998'
         value: '998'
@@ -10070,7 +10174,7 @@ species:
           Na2O: 4
           SiO2: 5
           ZrO2: 6
-        note: Temperature parenthetical is retained as printed.
+        note: 'Parentheses mark this value as derived per the page-13 statement; no calculation inputs or parent observation are printed.'
       related_locator:
         source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
         pdf_page_index: 12
@@ -11183,7 +11287,31 @@ species:
       values:
         quantity: transition_temperature
         property_kind: eutectic
-        method_class: measured_direct
+        method_class: model_derived
+        derivation:
+          relation: "The source marks this parenthesized point temperature as derived and names no numerical input for this row."
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 35
+              pdf_page_index: 34
+              row: "F"
+              note: "No numerical inputs for this value are printed."
+          method:
+            state:
+              tag: value
+              value: "The authors state that parenthetical values are only derived."
+            locator:
+              source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+              page: 13
+              pdf_page_index: 12
+              published_page: 13
+              table: '3'
+              equation: "parentheses mark values as only derived"
+              note: 'The source states: “In der Tabelle sind ferner die ausgezeichneten Punkte der ganzen Grenzkurve hervorgehoben, zum Teil sind deren Werte nur abgeleitet, was durch Einklammern der Zahlen kenntlich gemacht ist.”'
+          references:
+          - "D’Ans and Löffler (1930), p. 13"
+          output_unit: "°C"
         admission_status: admitted
         T_C: '1058'
         value: '1058'
@@ -11199,7 +11327,7 @@ species:
           Na2O: 4
           SiO2: 5
           ZrO2: 6
-        note: Temperature parenthetical is retained as printed.
+        note: 'Parentheses mark this value as derived per the page-13 statement; no calculation inputs or parent observation are printed.'
       related_locator:
         source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
         pdf_page_index: 12
@@ -11220,7 +11348,7 @@ species:
         column: '4'
         table_row_number: 2
         table_column_number: 4
-        note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+        note: Table 3 page 13 brackets the full composition as derived; page 35 cross-lists the values.
       related_locator:
         source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
         pdf_page_index: 12
@@ -11258,7 +11386,7 @@ species:
             column: '4'
             table_row_number: 2
             table_column_number: 4
-            note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+            note: Table 3 page 13 brackets the full composition as derived; page 35 cross-lists the values.
         fO2_Pa:
           state:
             tag: unknown
@@ -11271,7 +11399,7 @@ species:
             column: '4'
             table_row_number: 2
             table_column_number: 4
-            note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+            note: Table 3 page 13 brackets the full composition as derived; page 35 cross-lists the values.
         composition:
           state:
             tag: value
@@ -11293,7 +11421,7 @@ species:
             column: '4'
             table_row_number: 2
             table_column_number: 4
-            note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+            note: Table 3 page 13 brackets the full composition as derived; page 35 cross-lists the values.
       values:
         quantity: equilibrium_phase_composition
         formula: Na2O
@@ -11304,7 +11432,32 @@ species:
         component_amount_printed_unit: mol%
         value: '66.2'
         T_C: '1058'
-        method_class: measured_direct
+        method_class: model_derived
+        derivation:
+          relation: "Table 3 on page 13 brackets the full point F composition as derived; no numerical input is named."
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 13
+              pdf_page_index: 12
+              table: '3'
+              row: "F"
+              note: "No numerical inputs for this value are printed."
+          method:
+            state:
+              tag: value
+              value: "The authors state that parenthetical values are only derived."
+            locator:
+              source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+              page: 13
+              pdf_page_index: 12
+              published_page: 13
+              table: '3'
+              equation: "parentheses mark values as only derived"
+              note: 'The source states: “In der Tabelle sind ferner die ausgezeichneten Punkte der ganzen Grenzkurve hervorgehoben, zum Teil sind deren Werte nur abgeleitet, was durch Einklammern der Zahlen kenntlich gemacht ist.”'
+          references:
+          - "D’Ans and Löffler (1930), p. 13"
+          output_unit: "mole fraction"
         admission_status: admitted
         point_label_as_published: F
         system_as_published: Na2O-SiO2-ZrO2
@@ -11318,7 +11471,7 @@ species:
           Na2O: '0.662'
           SiO2: '0.325'
           ZrO2: '0.012'
-        note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+        note: 'Page 13 brackets the complete point F composition as derived; no calculation inputs or parent observation are printed.'
     - observation_id: dans1930_p035_t15_r03_c03_H
       type: transition_point
       locator:
@@ -12286,6 +12439,7 @@ species:
         quantity: transition_temperature
         property_kind: melting_point
         method_class: measured_direct
+        approximate: true
         admission_status: admitted
         T_C: '1500'
         value: '1500'
@@ -13221,7 +13375,7 @@ species:
         column: '5'
         table_row_number: 2
         table_column_number: 5
-        note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+        note: Table 3 page 13 brackets the full composition as derived; page 35 cross-lists the values.
       related_locator:
         source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
         pdf_page_index: 12
@@ -13259,7 +13413,7 @@ species:
             column: '5'
             table_row_number: 2
             table_column_number: 5
-            note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+            note: Table 3 page 13 brackets the full composition as derived; page 35 cross-lists the values.
         fO2_Pa:
           state:
             tag: unknown
@@ -13272,7 +13426,7 @@ species:
             column: '5'
             table_row_number: 2
             table_column_number: 5
-            note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+            note: Table 3 page 13 brackets the full composition as derived; page 35 cross-lists the values.
         composition:
           state:
             tag: value
@@ -13294,7 +13448,7 @@ species:
             column: '5'
             table_row_number: 2
             table_column_number: 5
-            note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+            note: Table 3 page 13 brackets the full composition as derived; page 35 cross-lists the values.
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -13305,7 +13459,32 @@ species:
         component_amount_printed_unit: mol%
         value: '32.5'
         T_C: '1058'
-        method_class: measured_direct
+        method_class: model_derived
+        derivation:
+          relation: "Table 3 on page 13 brackets the full point F composition as derived; no numerical input is named."
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 13
+              pdf_page_index: 12
+              table: '3'
+              row: "F"
+              note: "No numerical inputs for this value are printed."
+          method:
+            state:
+              tag: value
+              value: "The authors state that parenthetical values are only derived."
+            locator:
+              source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+              page: 13
+              pdf_page_index: 12
+              published_page: 13
+              table: '3'
+              equation: "parentheses mark values as only derived"
+              note: 'The source states: “In der Tabelle sind ferner die ausgezeichneten Punkte der ganzen Grenzkurve hervorgehoben, zum Teil sind deren Werte nur abgeleitet, was durch Einklammern der Zahlen kenntlich gemacht ist.”'
+          references:
+          - "D’Ans and Löffler (1930), p. 13"
+          output_unit: "mole fraction"
         admission_status: admitted
         point_label_as_published: F
         system_as_published: Na2O-SiO2-ZrO2
@@ -13319,7 +13498,7 @@ species:
           Na2O: '0.662'
           SiO2: '0.325'
           ZrO2: '0.012'
-        note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+        note: 'Page 13 brackets the complete point F composition as derived; no calculation inputs or parent observation are printed.'
     - observation_id: dans1930_p035_t15_r03_c05_H_SiO2_equilibrium_mol_fraction
       type: composition_series
       locator:
@@ -13645,14 +13824,14 @@ species:
         column: '6'
         table_row_number: 4
         table_column_number: 6
-        note: Binary invariant summary composition; values retain the printed component basis.
+        note: Parenthesized composition is derived with no printed inputs; temperature is ca. 1500 °C.
       phase: l
       units: mole fraction (dimensionless); source reports mol%
       point_conditions:
         temperature_K:
           state:
             tag: value
-            value: '1873.15'
+            value: '1773.15'
           locator:
             source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
             pdf_page_index: 33
@@ -13673,7 +13852,7 @@ species:
             column: '6'
             table_row_number: 4
             table_column_number: 6
-            note: Binary invariant summary composition; values retain the printed component basis.
+            note: Parenthesized composition is derived with no printed inputs; temperature is ca. 1500 °C.
         fO2_Pa:
           state:
             tag: unknown
@@ -13686,7 +13865,7 @@ species:
             column: '6'
             table_row_number: 4
             table_column_number: 6
-            note: Binary invariant summary composition; values retain the printed component basis.
+            note: Parenthesized composition is derived with no printed inputs; temperature is ca. 1500 °C.
         composition:
           state:
             tag: value
@@ -13706,7 +13885,7 @@ species:
             column: '6'
             table_row_number: 4
             table_column_number: 6
-            note: Binary invariant summary composition; values retain the printed component basis.
+            note: Parenthesized composition is derived with no printed inputs; temperature is ca. 1500 °C.
       values:
         quantity: equilibrium_phase_composition
         formula: ZrO2
@@ -13716,8 +13895,34 @@ species:
         component_amount_as_published: (43) mol%
         component_amount_printed_unit: mol%
         value: '43'
-        T_C: '1600'
-        method_class: measured_direct
+        T_C: '1500'
+        T_C_as_published: "ca. 1500"
+        method_class: model_derived
+        derivation:
+          relation: "The source marks this parenthesized composition as derived and names no numerical input for this row."
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 34
+              pdf_page_index: 33
+              row: "O"
+              note: "No numerical inputs for this value are printed."
+          method:
+            state:
+              tag: value
+              value: "The authors state that parenthetical values are only derived."
+            locator:
+              source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+              page: 13
+              pdf_page_index: 12
+              published_page: 13
+              table: '3'
+              equation: "parentheses mark values as only derived"
+              note: 'The source states: “In der Tabelle sind ferner die ausgezeichneten Punkte der ganzen Grenzkurve hervorgehoben, zum Teil sind deren Werte nur abgeleitet, was durch Einklammern der Zahlen kenntlich gemacht ist.”'
+          references:
+          - "D’Ans and Löffler (1930), p. 13"
+          output_unit: "mole fraction"
+        approximate: true
         admission_status: admitted
         point_label_as_published: O
         system_as_published: Na2O-SiO2-ZrO2
@@ -13727,7 +13932,7 @@ species:
           basis: printed_mole_fraction
           Na2O: '0.57'
           ZrO2: '0.43'
-        note: Binary invariant summary composition; values retain the printed component basis.
+        note: 'Parenthesized composition is derived per the page-13 statement; no calculation inputs or parent observation are printed. Temperature is ca. 1500 °C.'
     - observation_id: dans1930_p035_t14_r02_c06_G_ZrO2_equilibrium_mol_fraction
       type: composition_series
       locator:
@@ -14362,7 +14567,7 @@ species:
         column: '6'
         table_row_number: 2
         table_column_number: 6
-        note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+        note: Table 3 page 13 brackets the full composition as derived; page 35 cross-lists the values.
       related_locator:
         source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
         pdf_page_index: 12
@@ -14400,7 +14605,7 @@ species:
             column: '6'
             table_row_number: 2
             table_column_number: 6
-            note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+            note: Table 3 page 13 brackets the full composition as derived; page 35 cross-lists the values.
         fO2_Pa:
           state:
             tag: unknown
@@ -14413,7 +14618,7 @@ species:
             column: '6'
             table_row_number: 2
             table_column_number: 6
-            note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+            note: Table 3 page 13 brackets the full composition as derived; page 35 cross-lists the values.
         composition:
           state:
             tag: value
@@ -14435,7 +14640,7 @@ species:
             column: '6'
             table_row_number: 2
             table_column_number: 6
-            note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+            note: Table 3 page 13 brackets the full composition as derived; page 35 cross-lists the values.
       values:
         quantity: equilibrium_phase_composition
         formula: ZrO2
@@ -14446,7 +14651,32 @@ species:
         component_amount_printed_unit: mol%
         value: '1.2'
         T_C: '1058'
-        method_class: measured_direct
+        method_class: model_derived
+        derivation:
+          relation: "Table 3 on page 13 brackets the full point F composition as derived; no numerical input is named."
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 13
+              pdf_page_index: 12
+              table: '3'
+              row: "F"
+              note: "No numerical inputs for this value are printed."
+          method:
+            state:
+              tag: value
+              value: "The authors state that parenthetical values are only derived."
+            locator:
+              source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+              page: 13
+              pdf_page_index: 12
+              published_page: 13
+              table: '3'
+              equation: "parentheses mark values as only derived"
+              note: 'The source states: “In der Tabelle sind ferner die ausgezeichneten Punkte der ganzen Grenzkurve hervorgehoben, zum Teil sind deren Werte nur abgeleitet, was durch Einklammern der Zahlen kenntlich gemacht ist.”'
+          references:
+          - "D’Ans and Löffler (1930), p. 13"
+          output_unit: "mole fraction"
         admission_status: admitted
         point_label_as_published: F
         system_as_published: Na2O-SiO2-ZrO2
@@ -14460,7 +14690,7 @@ species:
           Na2O: '0.662'
           SiO2: '0.325'
           ZrO2: '0.012'
-        note: Page 35 summary prints the point and composition; the same values are cross-listed in Table 3.
+        note: 'Page 13 brackets the complete point F composition as derived; no calculation inputs or parent observation are printed.'
     - observation_id: dans1930_p035_t15_r03_c06_H_ZrO2_equilibrium_mol_fraction
       type: composition_series
       locator:

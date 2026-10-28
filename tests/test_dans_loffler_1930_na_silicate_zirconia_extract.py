@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, Quantity
+from simulator.battery.enums import EvidenceClass, Phase, Quantity
 from simulator.battery.migrate import (
     Migrator,
     REPO_ROOT,
@@ -39,9 +39,37 @@ RENDER_PINS = {
     "dans1930_p013_t03_r06_c08_point_14": (13, "3", "T_C", "959"),
     "dans1930_p028_t10_r19_c06_point_47_detectable": (28, "6", "T_C", "1446"),
     "dans1930_p035_t14_r03_c03_K": (35, None, "T_C", "1007"),
-    "dans1930_p034_t13_r04_c03_O": (34, None, "T_C", "1600"),
+    "dans1930_p034_t13_r04_c03_O": (34, None, "T_C", "1500"),
 }
 COMPOSITION_PIN = "dans1930_p035_t14_r03_c04_K_Na2O_equilibrium_mol_fraction"
+O_POINT_IDS = (
+    "dans1930_p034_t13_r04_c03_O",
+    "dans1930_p034_t13_r04_c04_O_Na2O_equilibrium_mol_fraction",
+    "dans1930_p034_t13_r04_c06_O_ZrO2_equilibrium_mol_fraction",
+)
+APPROXIMATE_IDS = frozenset(
+    {
+        "dans1930_p018_t05_r14_c07_point_28_run_125_123",
+        "dans1930_p018_t05_r15_c07_point_29_run_124_65",
+        "dans1930_p018_t05_r16_c07_point_29_continuation_run_127_131",
+        "dans1930_p026_t09_r05_c07_point_32",
+        *O_POINT_IDS,
+        "dans1930_p034_t12_r05_c03_Na2ZrO3",
+    }
+)
+MODEL_DERIVED_IDS = frozenset(
+    {
+        "dans1930_p026_t09_r04_c08_point_31",
+        "dans1930_p034_t13_r02_c03_B",
+        "dans1930_p034_t13_r04_c04_O_Na2O_equilibrium_mol_fraction",
+        "dans1930_p034_t13_r04_c06_O_ZrO2_equilibrium_mol_fraction",
+        "dans1930_p035_t14_r02_c03_G",
+        "dans1930_p035_t15_r02_c03_F",
+        "dans1930_p035_t15_r02_c04_F_Na2O_equilibrium_mol_fraction",
+        "dans1930_p035_t15_r02_c05_F_SiO2_equilibrium_mol_fraction",
+        "dans1930_p035_t15_r02_c06_F_ZrO2_equilibrium_mol_fraction",
+    }
+)
 
 
 def _source_observations(document: dict) -> dict[str, dict]:
@@ -64,7 +92,25 @@ def _assert_render_pins(document: dict) -> None:
     assert "table" not in composition["locator"]
     assert composition["values"]["component_amount_as_published"] == "54,0 mol%"
     assert Decimal(composition["values"]["component_amount"]) == Decimal("0.54")
-    assert rows["dans1930_p034_t13_r04_c03_O"]["values"]["T_C_as_published"] == "ca. 1600"
+    for observation_id in O_POINT_IDS:
+        row = rows[observation_id]
+        assert row["values"]["T_C"] == "1500"
+        assert row["values"]["T_C_as_published"] == "ca. 1500"
+        assert str(row["point_conditions"]["temperature_K"]["state"]["value"]) == "1773.15"
+    assert rows["dans1930_p034_t13_r04_c04_O_Na2O_equilibrium_mol_fraction"]["values"]["component_amount_as_published"] == "(57) mol%"
+    assert rows["dans1930_p034_t13_r04_c06_O_ZrO2_equilibrium_mol_fraction"]["values"]["component_amount_as_published"] == "(43) mol%"
+
+    table5_rows = [
+        row
+        for row in rows.values()
+        if row["locator"]["page"] == 26 and row["locator"].get("table") == "5"
+    ]
+    assert len(table5_rows) == 5
+    assert all(
+        row["values"].get("composition_columns") == {"ZrO2": 3, "Na2O": 4, "SiO2": 5}
+        for row in table5_rows
+    )
+    assert rows["dans1930_p026_t09_r05_c08_point_32"]["values"]["T_C_as_published"] == "1050"
 
 
 @pytest.fixture(scope="module")
@@ -87,6 +133,12 @@ def test_render_pins_row_counts_and_expected_mutation_failure(migrated) -> None:
     rows["dans1930_p009_t01_r04_c10_experiment_1_run_135_6"]["values"]["T_C"] = "1081"
     with pytest.raises(AssertionError):
         _assert_render_pins(mutant)
+
+    wrong_invariant = deepcopy(document)
+    rows = _source_observations(wrong_invariant)
+    rows["dans1930_p034_t13_r04_c03_O"]["values"]["T_C"] = "1600"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(wrong_invariant)
 
 
 def test_isolated_migration_has_typed_rows_and_printed_conditions(migrated) -> None:
@@ -113,6 +165,59 @@ def test_isolated_migration_has_typed_rows_and_printed_conditions(migrated) -> N
     assert all(row.identity.quantity.is_value for row in rows)
     assert all(row.identity.species.phase.is_value for row in rows)
     assert all(row.identity.species.phase.value in {Phase.L, Phase.CR} for row in rows)
+
+    migrated_by_id = {row.observation_id.rsplit("::", 1)[-1]: row for row in rows}
+    approximate_ids = {
+        observation_id
+        for observation_id, row in migrated_by_id.items()
+        if row.value.approximate
+    }
+    model_derived_ids = {
+        observation_id
+        for observation_id, row in migrated_by_id.items()
+        if row.evidence.class_.is_value
+        and row.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    }
+    assert approximate_ids == APPROXIMATE_IDS
+    assert model_derived_ids == MODEL_DERIVED_IDS
+    assert len(approximate_ids | model_derived_ids) == 15
+
+    source_rows = _source_observations(document)
+    for observation_id in APPROXIMATE_IDS:
+        assert source_rows[observation_id]["values"]["approximate"] is True
+        assert migrated_by_id[observation_id].value.approximate
+    for observation_id in MODEL_DERIVED_IDS:
+        values = source_rows[observation_id]["values"]
+        assert values["method_class"] == "model_derived"
+        assert "evidence_class" not in values
+        derivation = values["derivation"]
+        assert derivation["raw_inputs"]["state"] == {"tag": "value", "value": "not_printed"}
+        assert derivation["raw_inputs"]["locator"]["page"] in {13, 26, 34, 35}
+        migrated_row = migrated_by_id[observation_id]
+        assert migrated_row.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert migrated_row.derived_from is None
+        assert migrated_row.derivation is not None
+        assert migrated_row.derivation.method is not None
+        method = migrated_row.derivation.method
+        assert method.state.value == "The authors state that parenthetical values are only derived."
+        assert method.locator is not None
+        assert method.locator.page == 13
+        assert method.locator.pdf_page_index == 12
+        assert method.locator.published_page == 13
+        assert method.locator.equation == "parentheses mark values as only derived"
+        assert method.locator.note is not None
+        assert "Einklammern der Zahlen kenntlich gemacht ist" in method.locator.note
+        assert migrated_row.derivation.references == ("D’Ans and Löffler (1930), p. 13",)
+
+    u_point_id = "dans1930_p026_t09_r05_c07_point_32"
+    assert source_rows[u_point_id]["values"]["T_C_as_published"] == "U 1056"
+    assert migrated_by_id[u_point_id].value.approximate
+
+    point_31 = source_rows["dans1930_p026_t09_r04_c08_point_31"]
+    assert point_31["values"]["T_C_as_published"] == "(1038)"
+    point_32 = source_rows["dans1930_p026_t09_r05_c08_point_32"]
+    assert point_32["values"]["T_C_as_published"] == "1050"
+    assert point_32["values"]["method_class"] == "measured_direct"
 
     source_rows = _source_observations(document)
     for row in rows:
