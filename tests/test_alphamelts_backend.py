@@ -9989,24 +9989,44 @@ def test_project_local_alphamelts_cold_c0_step_returns_when_installed(capsys):
     )
     with capsys.disabled():
         print(
-            "cold C0 step timing: "
+            "cold C0 step timing (expected_parallelism=1 solver lane): "
             f"cpu={cpu_elapsed_s:.2f}s wall={wall_elapsed_s:.2f}s "
             f"wall/cpu={wall_cpu_ratio:.2f}x",
             flush=True,
         )
 
     assert snapshot.hour == 1
-    # RUSAGE_CHILDREN sees solver CPU only after wait: the subprocess transport
-    # reaps each child before returning from communicate() in
-    # simulator/melt_backend/alphamelts.py:563-578. Provisional premise: this
-    # serialized, CPU-bound solve uses CPU close to its whole-step wall time.
-    # Historical measurements were 30.8 s quiesced and 32.6 s under load; use
-    # the 32.6 s maximum as a provisional CPU baseline, then add 1.5x headroom
-    # (32.6 x 1.5 = 48.9, rounded to 50 s). Under this premise, a second full
-    # solver pass is about 65.2 s and exceeds the cap. Replace this estimate
-    # with the controller's multi-run Studio-2 CPU measurements.
-    assert cpu_elapsed_s < 50.0, (
-        f"cold C0 CPU time {cpu_elapsed_s:.2f}s exceeded 50.0s; "
+    # This metric is this process plus children it has reaped. The test selects
+    # the AlphaMELTS subprocess path at
+    # simulator/melt_backend/alphamelts.py:1754-1769;
+    # _run_alphamelts_subprocess waits in communicate() before returning at
+    # simulator/melt_backend/alphamelts.py:563-578. The test therefore counts
+    # the authoritative AlphaMELTS executable. It does not use the
+    # ThermoEngine worker path.
+    #
+    # A separate optional diagnostic is excluded: core registers a MAGEMin
+    # shadow at simulator/core.py:2424-2463, and the kernel dispatches shadows
+    # before the authoritative provider at
+    # simulator/chemistry/kernel/planner.py:180-242.
+    # If MAGEMin is installed, that shadow can leave a warm worker alive
+    # (engines/magemin/provider.py:513-553;
+    # simulator/melt_backend/magemin.py:1403-1406), so RUSAGE_CHILDREN cannot
+    # yet include its process or its nested MAGEMin executable. The shadow is
+    # diagnostic-only and cannot change the authoritative AlphaMELTS result;
+    # this CPU gate targets doubled AlphaMELTS solver work. The printed wall/CPU
+    # ratio retains the full step's serialization diagnostic, including time
+    # spent waiting for that shadow and host scheduling.
+    #
+    # Measured premise: Mac-Studio-256-2, this test with xdist off, three runs
+    # measured 18.18, 18.23, and 19.13 s CPU. The observed spread is
+    # 19.13 - 18.18 = 0.95 s. Allow five observed spreads (5 x 0.95 = 4.75 s)
+    # beyond the maximum, a 25% margin over the largest run while remaining
+    # well below a doubled solver pass: 19.13 + 4.75 = 23.88 s, rounded up to
+    # 24 s. Unit check: seconds + five x seconds = seconds. Sanity case: two
+    # full AlphaMELTS passes at the largest measured cost 2 x 19.13 = 38.26 s,
+    # which exceeds the cap.
+    assert cpu_elapsed_s < 24.0, (
+        f"cold C0 CPU time {cpu_elapsed_s:.2f}s exceeded 24.0s; "
         f"wall={wall_elapsed_s:.2f}s ({wall_cpu_ratio:.2f}x wall/CPU)"
     )
 
