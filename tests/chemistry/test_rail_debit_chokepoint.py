@@ -157,46 +157,51 @@ def test_c0b_coevaporation_uses_hot_train_flux_and_debits_ledger(
 ):
     from simulator.state import Atmosphere, CampaignPhase
 
-    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
-    sim._get_turbine_spec()
-    sim.melt.temperature_C = temperature_C
-    sim.melt.p_total_mbar = sim.melt.pO2_mbar = 9.0
-    sim.melt.background_gas_species = "O2"
-    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2_FLOW
-    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
-    sim.melt.campaign = CampaignPhase.C2B
-    hot_flux = sim._calculate_evaporation(sim._get_equilibrium())
-    sim.melt.campaign = CampaignPhase.C0B
-    cleanup_flux = sim._calculate_evaporation(sim._get_equilibrium())
+    raw_by_campaign = {}
+    committed_by_campaign = {}
+    for campaign in (CampaignPhase.C2B, CampaignPhase.C0B):
+        sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+        sim._get_turbine_spec()
+        sim.melt.temperature_C = temperature_C
+        sim.melt.p_total_mbar = sim.melt.pO2_mbar = 9.0
+        sim.melt.background_gas_species = "O2"
+        sim.melt.atmosphere = Atmosphere.CONTROLLED_O2_FLOW
+        sim.melt.campaign = campaign
+        sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        raw_flux = sim._calculate_evaporation(sim._get_equilibrium())
+        raw_by_campaign[campaign] = dict(raw_flux.species_kg_hr)
+        if campaign is CampaignPhase.C0B:
+            for species in ("Na", "K", "SiO"):
+                assert raw_flux.carrier_authority_by_species[species]["is_flux_active"]
+            assert raw_flux.species_kg_hr["PO"] > 0.0
+            assert raw_flux.species_kg_hr["PO2"] > 0.0
 
-    # Same source state and gas cover: the cleanup label adds P carriers,
-    # but must not suppress the ordinary hot-train evaporating species.
+        effective_flux = sim._apply_analytic_evaporation_depletion(raw_flux)
+        before = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+        sim._route_to_condensation(effective_flux)
+        committed = sim._ledger_committed_evap_flux_this_tick.species_kg_hr
+        committed_by_campaign[campaign] = dict(committed)
+        after = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+        for species, parent in (("Na", "Na2O"), ("K", "K2O"), ("SiO", "SiO2")):
+            if committed.get(species, 0.0) > 0.0:
+                assert after[parent] < before[parent]
+                assert sim.condensation_model.last_condensation_authority_by_species[species]["status"] != "refused"
+        sim.atom_ledger.assert_balanced()
+
+    # Compare both source and actual commitment owners: tiny SiO can clear
+    # the source/depletion floor while remaining below the transition floor.
     for species in ("Na", "K", "SiO"):
-        assert hot_flux.species_kg_hr[species] > 0.0
-        assert cleanup_flux.species_kg_hr.get(species, 0.0) == pytest.approx(
-            hot_flux.species_kg_hr[species], rel=1e-12, abs=0.0,
+        assert raw_by_campaign[CampaignPhase.C2B][species] > 0.0
+        assert raw_by_campaign[CampaignPhase.C0B].get(species, 0.0) == pytest.approx(
+            raw_by_campaign[CampaignPhase.C2B][species], rel=1e-12, abs=0.0,
         )
-        assert cleanup_flux.carrier_authority_by_species[species]["is_flux_active"]
-    assert cleanup_flux.species_kg_hr["PO"] > 0.0
-    assert cleanup_flux.species_kg_hr["PO2"] > 0.0
-
-    hot_depleted = sim._apply_analytic_evaporation_depletion(hot_flux)
-    cleanup_flux = sim._apply_analytic_evaporation_depletion(cleanup_flux)
-    assert hot_depleted.species_kg_hr["Na"] > 0.0
-    assert hot_depleted.species_kg_hr["K"] > 0.0
+        assert committed_by_campaign[CampaignPhase.C0B].get(species, 0.0) == pytest.approx(
+            committed_by_campaign[CampaignPhase.C2B].get(species, 0.0), rel=1e-12, abs=0.0,
+        )
+    assert committed_by_campaign[CampaignPhase.C0B]["Na"] > 0.0
+    assert committed_by_campaign[CampaignPhase.C0B]["K"] > 0.0
     if temperature_C == 1320.0:
-        assert hot_depleted.species_kg_hr["SiO"] > 0.0
-    before = sim.atom_ledger.mol_by_account("process.cleaned_melt")
-    sim._route_to_condensation(cleanup_flux)
-    committed = sim._ledger_committed_evap_flux_this_tick.species_kg_hr
-    after = sim.atom_ledger.mol_by_account("process.cleaned_melt")
-    for species, parent in (("Na", "Na2O"), ("K", "K2O"), ("SiO", "SiO2")):
-        expected = hot_depleted.species_kg_hr.get(species, 0.0)
-        assert committed.get(species, 0.0) == pytest.approx(expected, rel=1e-12, abs=0.0)
-        if expected > 0.0:
-            assert after[parent] < before[parent]
-            assert sim.condensation_model.last_condensation_authority_by_species[species]["status"] != "refused"
-    sim.atom_ledger.assert_balanced()
+        assert committed_by_campaign[CampaignPhase.C0B]["SiO"] > 0.0
 
 
 def test_stage3_extrapolation_flag_reaches_product_ledger(
