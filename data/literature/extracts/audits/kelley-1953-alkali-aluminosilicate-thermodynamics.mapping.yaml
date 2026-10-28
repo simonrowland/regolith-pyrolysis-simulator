@@ -1,0 +1,233 @@
+source_id: kelley-1953-alkali-aluminosilicate-thermodynamics
+source_locator_basis: absolute PDF page plus printed table number
+transcription: MinerU table drafts cross-checked against pdftotext-layout.txt
+render_checks:
+  pages: [16, 17, 18, 19, 22, 23, 28, 29, 32, 33, 34]
+  reason: >-
+    Table layout and every printed value were visually checked. Tables 26 through 33
+    include comma-grouped thousands and phase-labelled equal-temperature cells.
+    The converted scratch CSVs preserve the original cell text and normalize only
+    render-confirmed thousands separators for compare.
+tables:
+  - page: 16
+    table: '9'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: quoted_attributed
+    unit: cal/mol/K
+    mineral: albite
+    attribution: >-
+      Kelley et al. (1953), corrected experimental values as published; pre-correction
+      cells are not tabulated
+    printed_rows: 29
+  - page: 16
+    table: '10'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: quoted_attributed
+    unit: cal/mol/K
+    mineral: albite
+    derived_from: ['table 9']
+    printed_rows: 11
+  - page: 17
+    table: '11'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: measured_direct
+    unit: cal/mol/K
+    mineral: jadeite
+    printed_rows: 29
+  - page: 17
+    table: '12'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: measured_reduced
+    unit: cal/mol/K
+    mineral: jadeite
+    derived_from: ['table 11']
+    printed_rows: 11
+  - page: 17
+    table: '13'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: measured_direct
+    unit: cal/mol/K
+    mineral: synthetic nephelite
+    printed_rows: 29
+  - page: 18
+    table: '14'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: measured_reduced
+    unit: cal/mol/K
+    mineral: synthetic nephelite
+    derived_from: ['table 13']
+    printed_rows: 11
+  - page: 18
+    table: '15'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: quoted_attributed
+    unit: cal/mol/K
+    mineral: natural nephelite
+    attribution: >-
+      Kelley et al. (1953), corrected experimental values as published; pre-correction
+      cells are not tabulated
+    printed_rows: 29
+  - page: 18
+    table: '16'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: quoted_attributed
+    unit: cal/mol/K
+    mineral: natural nephelite
+    derived_from: ['table 15']
+    printed_rows: 11
+  - page: 19
+    table: '17'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: quoted_attributed
+    unit: cal/mol/K
+    mineral: adularia
+    attribution: >-
+      Kelley et al. (1953), corrected experimental values as published; pre-correction
+      cells are not tabulated
+    printed_rows: 29
+  - page: 19
+    table: '18'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: quoted_attributed
+    unit: cal/mol/K
+    mineral: adularia
+    derived_from: ['table 17']
+    printed_rows: 11
+  - page: 19
+    table: '19'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: quoted_attributed
+    unit: cal/mol/K
+    mineral: ferriferous orthoclase
+    attribution: >-
+      Kelley et al. (1953), corrected experimental values as published; pre-correction
+      cells are not tabulated
+    printed_rows: 29
+  - page: 22
+    table: '20'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: quoted_attributed
+    unit: cal/mol/K
+    mineral: leucite
+    attribution: >-
+      Kelley et al. (1953), corrected experimental values as published; pre-correction
+      cells are not tabulated
+    printed_rows: 29
+  - page: 22
+    table: '21'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: quoted_attributed
+    unit: cal/mol/K
+    mineral: leucite
+    derived_from: ['table 20']
+    printed_rows: 11
+  - page: 22
+    table: '22'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: measured_direct
+    unit: cal/mol/K
+    mineral: kaliophilite
+    printed_rows: 29
+  - page: 23
+    table: '23'
+    type: heat_capacity_and_heat_content_series
+    quantity: cp
+    evidence_class: measured_reduced
+    unit: cal/mol/K
+    mineral: kaliophilite
+    derived_from: ['table 22']
+    printed_rows: 11
+  - page: 28
+    table: '26'
+    type: heat_capacity_and_heat_content_series
+    quantity: H_minus_H298
+    evidence_class: measured_direct
+    unit: cal/mol
+    mineral: albite
+    printed_rows: 5
+  - page: 28
+    table: '26'
+    type: heat_capacity_and_heat_content_series
+    quantity: H_minus_H298
+    evidence_class: quoted_attributed
+    unit: cal/mol
+    mineral: albite
+    attribution: W. P. White
+    printed_rows: 6
+  - page: 28
+    table: '27'
+    type: heat_capacity_and_heat_content_series
+    quantity: H_minus_H298
+    evidence_class: measured_reduced
+    unit: cal/mol
+    mineral: albite
+    derived_from: ['table 26 present measurements', 'table 26 White values']
+    printed_rows: 11
+  - page: 29
+    table: '28'
+    type: heat_capacity_and_heat_content_series
+    quantity: H_minus_H298
+    evidence_class: measured_direct
+    unit: cal/mol
+    mineral: jadeite
+    printed_rows: 11
+  - page: 29
+    table: '29'
+    type: heat_capacity_and_heat_content_series
+    quantity: H_minus_H298
+    evidence_class: measured_reduced
+    unit: cal/mol
+    mineral: jadeite
+    derived_from: ['table 28']
+    printed_rows: 9
+  - page: 32
+    table: '30'
+    type: heat_capacity_and_heat_content_series
+    quantity: H_minus_H298
+    evidence_class: measured_direct
+    unit: cal/mol
+    mineral: synthetic nephelite
+    printed_rows: 25
+  - page: 33
+    table: '31'
+    type: heat_capacity_and_heat_content_series
+    quantity: H_minus_H298
+    evidence_class: measured_reduced
+    unit: cal/mol
+    mineral: synthetic nephelite
+    derived_from: ['table 30']
+    polymorphs: [delta, beta, gamma]
+    printed_rows: 19
+  - page: 33
+    table: '32'
+    type: heat_capacity_and_heat_content_series
+    quantity: H_minus_H298
+    evidence_class: measured_direct
+    unit: cal/mol
+    mineral: carnegieite
+    polymorphs: [delta, beta]
+    printed_rows: 23
+  - page: 34
+    table: '33'
+    type: heat_capacity_and_heat_content_series
+    quantity: H_minus_H298
+    evidence_class: measured_reduced
+    unit: cal/mol
+    mineral: carnegieite
+    derived_from: ['table 32']
+    polymorphs: [delta, beta]
+    printed_rows: 16

@@ -1,0 +1,4841 @@
+schema_version: literature_extract.v1
+source_id: kelley-1953-alkali-aluminosilicate-thermodynamics
+source:
+  citation: Kelley, K. K., Todd, S. S., Orr, R. L., King, E. G., and Bonnickson, K.
+    R. (1953), Thermodynamic Properties of Sodium-Aluminum and Potassium-Aluminum
+    Silicates, U.S. Bureau of Mines Report of Investigations 4955.
+  year: 1953
+extraction:
+  method: MinerU table draft transcription cross-checked with pdftotext-layout
+  date: '2026-10-28'
+  worker: w1028naF-kelley53-alsil
+  provenance_path: text/kelley-1953-alkali-aluminosilicate-thermodynamics/pdftotext-layout.txt
+  source_note: Temperatures, heat capacities and heat-content increments retained
+    in printed cal-based units. Table 26 separates the present measurements from W.
+    P. White comparison values. Composition-corrected tables whose inputs are not
+    tabulated are quoted_attributed; smooth series from stored measurements are measured_reduced
+    and link to those tables.
+review_status: draft
+fidelity_samples:
+- path: species.NaAlSi3O8.observations[kelley_1953_table09_cp].values.points[0].value
+  value: 8.77
+  locator: {page: 16, table: '9'}
+- path: species.NaAlSi2O6.observations[kelley_1953_table11_cp].values.points[0].value
+  value: 3.155
+  locator: {page: 17, table: '11'}
+- path: species.NaAlSi3O8.observations[kelley_1953_table26_heat_content].values.points[0].value
+  value: 9660.0
+  locator: {page: 28, table: '26'}
+- path: species.NaAlSiO4.observations[kelley_1953_table32_heat_content_delta].values.points[0].value
+  value: 2755.0
+  locator: {page: 33, table: '32'}
+species:
+  NaAlSi3O8:
+    observations:
+    - observation_id: kelley_1953_table09_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 16
+        pdf_page_index: 15
+        table: '9'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: albite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: corrected experimental heat-capacity results reported by
+        the authors
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 53.92
+          value: 8.77
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 53.92 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+        - T_K: 114.8
+          value: 22.51
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 114.80 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+        - T_K: 216.13
+          value: 39.5
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 216.13 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+        - T_K: 57.87
+          value: 9.7
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 57.87 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+        - T_K: 124.88
+          value: 24.55
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 124.88 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+        - T_K: 226.24
+          value: 40.8
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 226.24 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+        - T_K: 62.24
+          value: 10.74
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 62.24 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+        - T_K: 135.82
+          value: 26.67
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 135.82 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+        - T_K: 236.16
+          value: 41.99
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 236.16 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+        - T_K: 66.78
+          value: 11.82
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 66.78 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+        - T_K: 146.04
+          value: 28.57
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 146.04 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+        - T_K: 245.87
+          value: 43.37
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 245.87 K; MinerU row 5 col 5
+          table_row_number: 5
+          phase: null
+        - T_K: 71.3
+          value: 12.9
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 71.30 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+        - T_K: 155.93
+          value: 30.29
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 155.93 K; MinerU row 6 col 3
+          table_row_number: 6
+          phase: null
+        - T_K: 256.3
+          value: 44.52
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 256.30 K; MinerU row 6 col 5
+          table_row_number: 6
+          phase: null
+        - T_K: 76.01
+          value: 14.01
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 76.01 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+        - T_K: 166.14
+          value: 32.04
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 166.14 K; MinerU row 7 col 3
+          table_row_number: 7
+          phase: null
+        - T_K: 266.36
+          value: 45.64
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 266.36 K; MinerU row 7 col 5
+          table_row_number: 7
+          phase: null
+        - T_K: 80.48
+          value: 15.02
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 80.48 K; MinerU row 8 col 1
+          table_row_number: 8
+          phase: null
+        - T_K: 176.04
+          value: 33.69
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 176.04 K; MinerU row 8 col 3
+          table_row_number: 8
+          phase: null
+        - T_K: 276.59
+          value: 46.73
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 276.59 K; MinerU row 8 col 5
+          table_row_number: 8
+          phase: null
+        - T_K: 84.83
+          value: 16.0
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 84.83 K; MinerU row 9 col 1
+          table_row_number: 9
+          phase: null
+        - T_K: 186.05
+          value: 35.17
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 186.05 K; MinerU row 9 col 3
+          table_row_number: 9
+          phase: null
+        - T_K: 286.66
+          value: 47.83
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 286.66 K; MinerU row 9 col 5
+          table_row_number: 9
+          phase: null
+        - T_K: 94.91
+          value: 18.22
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 94.91 K; MinerU row 10 col 1
+          table_row_number: 10
+          phase: null
+        - T_K: 196.01
+          value: 36.64
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 196.01 K; MinerU row 10 col 3
+          table_row_number: 10
+          phase: null
+        - T_K: 296.79
+          value: 48.78
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 296.79 K; MinerU row 10 col 5
+          table_row_number: 10
+          phase: null
+        - T_K: 104.66
+          value: 20.36
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 104.66 K; MinerU row 11 col 1
+          table_row_number: 11
+          phase: null
+        - T_K: 206.29
+          value: 38.15
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '9'
+            row: 206.29 K; MinerU row 11 col 3
+          table_row_number: 11
+          phase: null
+        attribution: Kelley et al. (1953), corrected experimental values as published;
+          pre-correction cells are not tabulated
+    - observation_id: kelley_1953_table10_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 16
+        pdf_page_index: 15
+        table: '10'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: albite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: smooth values from author-corrected results
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 50.0
+          value: 7.86
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '10'
+            row: 50 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 150.0
+          value: 29.23
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '10'
+            row: 150 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 250.0
+          value: 43.75
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '10'
+            row: 250 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 75.0
+          value: 13.74
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '10'
+            row: 75 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 175.0
+          value: 33.47
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '10'
+            row: 175 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 275.0
+          value: 46.53
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '10'
+            row: 275 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 100.0
+          value: 19.32
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '10'
+            row: 100 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 200.0
+          value: 37.26
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '10'
+            row: 200 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 298.16
+          value: 48.97
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '10'
+            row: 298.16 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 125.0
+          value: 24.52
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '10'
+            row: 125 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 225.0
+          value: 40.63
+          locator:
+            page: 16
+            pdf_page_index: 15
+            table: '10'
+            row: 225 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        attribution: Kelley et al. (1953), corrected experimental values as published;
+          pre-correction cells are not tabulated
+      derived_from:
+      - kelley_1953_table09_cp
+    - observation_id: kelley_1953_table26_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        pdf_page_index: 27
+        table: '26'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: albite
+      units: cal/mol
+      per: mol_species
+      method_as_published: high-temperature heat-content calorimetry
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 472.7
+          value: 9660.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '26'
+            row: 472.7 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+        - T_K: 1094.1
+          value: 53340.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '26'
+            row: 1094.1 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+        - T_K: 674.7
+          value: 22860.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '26'
+            row: 674.7 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+        - T_K: 1270.1
+          value: 66820.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '26'
+            row: 1270.1 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+        - T_K: 875.3
+          value: 37060.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '26'
+            row: 875.3 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+    - observation_id: kelley_1953_table26_white_comparison
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        pdf_page_index: 27
+        table: '26'
+        row: Measurements of White
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: albite
+      units: cal/mol
+      per: mol_species
+      method_as_published: heat-content measurements reported by W. P. White
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        reference_temperature_K: 298.16
+        attribution: W. P. White
+        points:
+        - T_K: 373.2
+          value: 3920.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '26'
+            row: Measurements of White; 373.2 K
+          phase: null
+        - T_K: 973.2
+          value: 44230.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '26'
+            row: Measurements of White; 973.2 K
+          phase: null
+        - T_K: 573.2
+          value: 16160.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '26'
+            row: Measurements of White; 573.2 K
+          phase: null
+        - T_K: 1173.2
+          value: 59250.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '26'
+            row: Measurements of White; 1173.2 K
+          phase: null
+        - T_K: 773.2
+          value: 29800.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '26'
+            row: Measurements of White; 773.2 K
+          phase: null
+        - T_K: 1373.2
+          value: 74680.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '26'
+            row: Measurements of White; 1373.2 K
+          phase: null
+    - observation_id: kelley_1953_table27_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        pdf_page_index: 27
+        table: '27'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: albite
+      units: cal/mol
+      per: mol_species
+      method_as_published: Shomate smoothing of experimental heat-content data
+      values:
+        quantity: H_minus_H298
+        method_class: measured_reduced
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 400.0
+          value: 5410.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 400 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1000.0
+          value: 46220.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 1000 K; MinerU row 2 col 4
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 500.0
+          value: 11390.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 500 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1100.0
+          value: 53720.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 1100 K; MinerU row 3 col 4
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 600.0
+          value: 17900.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 600 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1200.0
+          value: 61340.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 1200 K; MinerU row 4 col 4
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 700.0
+          value: 24690.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 700 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1300.0
+          value: 69060.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 1300 K; MinerU row 5 col 4
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 800.0
+          value: 31690.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 800 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1400.0
+          value: 76860.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 1400 K; MinerU row 6 col 4
+          table_row_number: 6
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 900.0
+          value: 38870.0
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 900 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+      derived_from:
+      - kelley_1953_table26_heat_content
+      - kelley_1953_table26_white_comparison
+  NaAlSi2O6:
+    observations:
+    - observation_id: kelley_1953_table11_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 17
+        pdf_page_index: 16
+        table: '11'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: jadeite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: low-temperature calorimetric heat-capacity measurements
+      values:
+        quantity: cp
+        method_class: measured_direct
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 53.84
+          value: 3.155
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 53.84 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+        - T_K: 114.99
+          value: 14.24
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 114.99 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+        - T_K: 216.31
+          value: 29.96
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 216.31 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+        - T_K: 58.0
+          value: 3.78
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 58.00 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+        - T_K: 124.71
+          value: 16.06
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 124.71 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+        - T_K: 226.21
+          value: 31.15
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 226.21 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+        - T_K: 62.59
+          value: 4.515
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 62.59 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+        - T_K: 135.94
+          value: 18.09
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 135.94 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+        - T_K: 236.17
+          value: 32.2
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 236.17 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+        - T_K: 67.34
+          value: 5.304
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 67.34 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+        - T_K: 146.55
+          value: 19.89
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 146.55 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+        - T_K: 245.98
+          value: 33.3
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 245.98 K; MinerU row 5 col 5
+          table_row_number: 5
+          phase: null
+        - T_K: 71.87
+          value: 6.118
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 71.87 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+        - T_K: 155.9
+          value: 21.46
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 155.90 K; MinerU row 6 col 3
+          table_row_number: 6
+          phase: null
+        - T_K: 256.26
+          value: 34.42
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 256.26 K; MinerU row 6 col 5
+          table_row_number: 6
+          phase: null
+        - T_K: 76.5
+          value: 6.959
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 76.50 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+        - T_K: 166.05
+          value: 23.08
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 166.05 K; MinerU row 7 col 3
+          table_row_number: 7
+          phase: null
+        - T_K: 266.15
+          value: 35.38
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 266.15 K; MinerU row 7 col 5
+          table_row_number: 7
+          phase: null
+        - T_K: 81.1
+          value: 7.794
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 81.10 K; MinerU row 8 col 1
+          table_row_number: 8
+          phase: null
+        - T_K: 176.13
+          value: 24.62
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 176.13 K; MinerU row 8 col 3
+          table_row_number: 8
+          phase: null
+        - T_K: 276.26
+          value: 36.33
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 276.26 K; MinerU row 8 col 5
+          table_row_number: 8
+          phase: null
+        - T_K: 86.87
+          value: 8.865
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 86.87 K; MinerU row 9 col 1
+          table_row_number: 9
+          phase: null
+        - T_K: 186.14
+          value: 26.03
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 186.14 K; MinerU row 9 col 3
+          table_row_number: 9
+          phase: null
+        - T_K: 286.45
+          value: 37.19
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 286.45 K; MinerU row 9 col 5
+          table_row_number: 9
+          phase: null
+        - T_K: 95.79
+          value: 10.57
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 95.79 K; MinerU row 10 col 1
+          table_row_number: 10
+          phase: null
+        - T_K: 196.07
+          value: 27.34
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 196.07 K; MinerU row 10 col 3
+          table_row_number: 10
+          phase: null
+        - T_K: 296.42
+          value: 38.13
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 296.42 K; MinerU row 10 col 5
+          table_row_number: 10
+          phase: null
+        - T_K: 104.99
+          value: 12.34
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 104.99 K; MinerU row 11 col 1
+          table_row_number: 11
+          phase: null
+        - T_K: 206.46
+          value: 28.71
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '11'
+            row: 206.46 K; MinerU row 11 col 3
+          table_row_number: 11
+          phase: null
+    - observation_id: kelley_1953_table12_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 17
+        pdf_page_index: 16
+        table: '12'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: jadeite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: smooth values read from curve through measurements
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 50.0
+          value: 2.61
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '12'
+            row: 50 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 150.0
+          value: 20.48
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '12'
+            row: 150 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 250.0
+          value: 33.76
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '12'
+            row: 250 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 75.0
+          value: 6.67
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '12'
+            row: 75 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 175.0
+          value: 24.43
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '12'
+            row: 175 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 275.0
+          value: 36.22
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '12'
+            row: 275 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 100.0
+          value: 11.35
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '12'
+            row: 100 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 200.0
+          value: 27.88
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '12'
+            row: 200 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 298.16
+          value: 38.23
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '12'
+            row: 298.16 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 125.0
+          value: 16.11
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '12'
+            row: 125 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 225.0
+          value: 30.98
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '12'
+            row: 225 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+      derived_from:
+      - kelley_1953_table11_cp
+    - observation_id: kelley_1953_table28_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 29
+        pdf_page_index: 28
+        table: '28'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: jadeite
+      units: cal/mol
+      per: mol_species
+      method_as_published: high-temperature heat-content calorimetry
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 393.4
+          value: 3940.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '28'
+            row: 393.4 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+        - T_K: 969.0
+          value: 34470.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '28'
+            row: 969.0 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+        - T_K: 493.7
+          value: 8670.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '28'
+            row: 493.7 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+        - T_K: 1026.1
+          value: 37770.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '28'
+            row: 1026.1 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+        - T_K: 600.7
+          value: 14070.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '28'
+            row: 600.7 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+        - T_K: 1074.0
+          value: 40580.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '28'
+            row: 1074.0 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+        - T_K: 678.7
+          value: 18220.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '28'
+            row: 678.7 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+        - T_K: 1134.7
+          value: 44190.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '28'
+            row: 1134.7 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+        - T_K: 771.0
+          value: 23240.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '28'
+            row: 771.0 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+        - T_K: 1189.6
+          value: 47530.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '28'
+            row: 1189.6 K; MinerU row 6 col 3
+          table_row_number: 6
+          phase: null
+        - T_K: 868.4
+          value: 28690.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '28'
+            row: 868.4 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+    - observation_id: kelley_1953_table29_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 29
+        pdf_page_index: 28
+        table: '29'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: jadeite
+      units: cal/mol
+      per: mol_species
+      method_as_published: Shomate smoothing of experimental heat-content data
+      values:
+        quantity: H_minus_H298
+        method_class: measured_reduced
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 400.0
+          value: 4250.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 400 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 900.0
+          value: 30490.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 900 K; MinerU row 2 col 4
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 500.0
+          value: 8970.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 500 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1000.0
+          value: 36240.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 1000 K; MinerU row 3 col 4
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 600.0
+          value: 14040.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 600 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1100.0
+          value: 42120.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 1100 K; MinerU row 4 col 4
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 700.0
+          value: 19360.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 700 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1200.0
+          value: 48160.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 1200 K; MinerU row 5 col 4
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 800.0
+          value: 24860.0
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 800 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+      derived_from:
+      - kelley_1953_table28_heat_content
+  NaAlSiO4:
+    observations:
+    - observation_id: kelley_1953_table13_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 17
+        pdf_page_index: 16
+        table: '13'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: synthetic nephelite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: low-temperature calorimetric heat-capacity measurements
+      values:
+        quantity: cp
+        method_class: measured_direct
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 53.99
+          value: 5.214
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 53.99 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+        - T_K: 114.72
+          value: 13.62
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 114.72 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+        - T_K: 216.24
+          value: 23.2
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 216.24 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+        - T_K: 57.88
+          value: 5.842
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 57.88 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+        - T_K: 124.75
+          value: 14.79
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 124.75 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+        - T_K: 226.29
+          value: 23.96
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 226.29 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+        - T_K: 62.4
+          value: 6.492
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 62.40 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+        - T_K: 136.12
+          value: 16.06
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 136.12 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+        - T_K: 236.29
+          value: 24.61
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 236.29 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+        - T_K: 67.24
+          value: 7.229
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 67.24 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+        - T_K: 146.17
+          value: 17.07
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 146.17 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+        - T_K: 246.07
+          value: 25.27
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 246.07 K; MinerU row 5 col 5
+          table_row_number: 5
+          phase: null
+        - T_K: 71.93
+          value: 7.926
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 71.93 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+        - T_K: 156.05
+          value: 18.1
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 156.05 K; MinerU row 6 col 3
+          table_row_number: 6
+          phase: null
+        - T_K: 256.21
+          value: 25.98
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 256.21 K; MinerU row 6 col 5
+          table_row_number: 6
+          phase: null
+        - T_K: 76.52
+          value: 8.593
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 76.52 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+        - T_K: 166.05
+          value: 19.05
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 166.05 K; MinerU row 7 col 3
+          table_row_number: 7
+          phase: null
+        - T_K: 266.33
+          value: 26.6
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 266.33 K; MinerU row 7 col 5
+          table_row_number: 7
+          phase: null
+        - T_K: 79.88
+          value: 9.087
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 79.88 K; MinerU row 8 col 1
+          table_row_number: 8
+          phase: null
+        - T_K: 176.18
+          value: 20.01
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 176.18 K; MinerU row 8 col 3
+          table_row_number: 8
+          phase: null
+        - T_K: 276.27
+          value: 27.17
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 276.27 K; MinerU row 8 col 5
+          table_row_number: 8
+          phase: null
+        - T_K: 83.91
+          value: 9.64
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 83.91 K; MinerU row 9 col 1
+          table_row_number: 9
+          phase: null
+        - T_K: 186.41
+          value: 20.86
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 186.41 K; MinerU row 9 col 3
+          table_row_number: 9
+          phase: null
+        - T_K: 286.59
+          value: 27.79
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 286.59 K; MinerU row 9 col 5
+          table_row_number: 9
+          phase: null
+        - T_K: 95.02
+          value: 11.13
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 95.02 K; MinerU row 10 col 1
+          table_row_number: 10
+          phase: null
+        - T_K: 195.98
+          value: 21.65
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 195.98 K; MinerU row 10 col 3
+          table_row_number: 10
+          phase: null
+        - T_K: 296.6
+          value: 28.31
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 296.60 K; MinerU row 10 col 5
+          table_row_number: 10
+          phase: null
+        - T_K: 104.15
+          value: 12.3
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 104.15 K; MinerU row 11 col 1
+          table_row_number: 11
+          phase: null
+        - T_K: 206.25
+          value: 22.47
+          locator:
+            page: 17
+            pdf_page_index: 16
+            table: '13'
+            row: 206.25 K; MinerU row 11 col 3
+          table_row_number: 11
+          phase: null
+    - observation_id: kelley_1953_table14_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 18
+        pdf_page_index: 17
+        table: '14'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: synthetic nephelite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: smooth values read from curve through measurements
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 50.0
+          value: 4.56
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '14'
+            row: 50 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 150.0
+          value: 17.46
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '14'
+            row: 150 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 250.0
+          value: 25.61
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '14'
+            row: 250 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 75.0
+          value: 8.35
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '14'
+            row: 75 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 175.0
+          value: 19.86
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '14'
+            row: 175 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 275.0
+          value: 27.15
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '14'
+            row: 275 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 100.0
+          value: 11.74
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '14'
+            row: 100 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 200.0
+          value: 21.98
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '14'
+            row: 200 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 298.16
+          value: 28.39
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '14'
+            row: 298.16 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 125.0
+          value: 14.8
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '14'
+            row: 125 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 225.0
+          value: 23.88
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '14'
+            row: 225 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+      derived_from:
+      - kelley_1953_table13_cp
+    - observation_id: kelley_1953_table15_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 18
+        pdf_page_index: 17
+        table: '15'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: natural nephelite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: corrected experimental heat-capacity results reported by
+        the authors
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 54.07
+          value: 5.186
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 54.07 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+        - T_K: 114.65
+          value: 13.55
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 114.65 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+        - T_K: 216.25
+          value: 23.15
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 216.25 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+        - T_K: 58.15
+          value: 5.804
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 58.15 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+        - T_K: 124.78
+          value: 14.74
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 124.78 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+        - T_K: 226.27
+          value: 23.84
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 226.27 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+        - T_K: 62.53
+          value: 6.467
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 62.53 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+        - T_K: 135.72
+          value: 15.98
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 135.72 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+        - T_K: 236.36
+          value: 24.52
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 236.36 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+        - T_K: 67.25
+          value: 7.177
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 67.25 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+        - T_K: 146.15
+          value: 17.05
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 146.15 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+        - T_K: 245.83
+          value: 25.19
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 245.83 K; MinerU row 5 col 5
+          table_row_number: 5
+          phase: null
+        - T_K: 71.97
+          value: 7.882
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 71.97 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+        - T_K: 155.53
+          value: 18.0
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 155.53 K; MinerU row 6 col 3
+          table_row_number: 6
+          phase: null
+        - T_K: 256.15
+          value: 25.89
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 256.15 K; MinerU row 6 col 5
+          table_row_number: 6
+          phase: null
+        - T_K: 76.69
+          value: 8.566
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 76.69 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+        - T_K: 165.93
+          value: 19.0
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 165.93 K; MinerU row 7 col 3
+          table_row_number: 7
+          phase: null
+        - T_K: 266.17
+          value: 26.54
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 266.17 K; MinerU row 7 col 5
+          table_row_number: 7
+          phase: null
+        - T_K: 80.34
+          value: 9.066
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 80.34 K; MinerU row 8 col 1
+          table_row_number: 8
+          phase: null
+        - T_K: 175.99
+          value: 19.93
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 175.99 K; MinerU row 8 col 3
+          table_row_number: 8
+          phase: null
+        - T_K: 276.08
+          value: 27.02
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 276.08 K; MinerU row 8 col 5
+          table_row_number: 8
+          phase: null
+        - T_K: 85.0
+          value: 9.704
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 85.00 K; MinerU row 9 col 1
+          table_row_number: 9
+          phase: null
+        - T_K: 185.91
+          value: 20.74
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 185.91 K; MinerU row 9 col 3
+          table_row_number: 9
+          phase: null
+        - T_K: 286.27
+          value: 27.59
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 286.27 K; MinerU row 9 col 5
+          table_row_number: 9
+          phase: null
+        - T_K: 94.27
+          value: 10.96
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 94.27 K; MinerU row 10 col 1
+          table_row_number: 10
+          phase: null
+        - T_K: 195.98
+          value: 21.55
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 195.98 K; MinerU row 10 col 3
+          table_row_number: 10
+          phase: null
+        - T_K: 296.78
+          value: 28.16
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 296.78 K; MinerU row 10 col 5
+          table_row_number: 10
+          phase: null
+        - T_K: 104.46
+          value: 12.28
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 104.46 K; MinerU row 11 col 1
+          table_row_number: 11
+          phase: null
+        - T_K: 206.26
+          value: 22.38
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '15'
+            row: 206.26 K; MinerU row 11 col 3
+          table_row_number: 11
+          phase: null
+        attribution: Kelley et al. (1953), corrected experimental values as published;
+          pre-correction cells are not tabulated
+    - observation_id: kelley_1953_table16_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 18
+        pdf_page_index: 17
+        table: '16'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: natural nephelite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: smooth values from author-corrected results
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 50.0
+          value: 4.54
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '16'
+            row: 50 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 150.0
+          value: 17.46
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '16'
+            row: 150 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 250.0
+          value: 25.46
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '16'
+            row: 250 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 75.0
+          value: 8.31
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '16'
+            row: 75 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 175.0
+          value: 19.79
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '16'
+            row: 175 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 275.0
+          value: 26.96
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '16'
+            row: 275 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 100.0
+          value: 11.71
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '16'
+            row: 100 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 200.0
+          value: 21.88
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '16'
+            row: 200 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 298.16
+          value: 28.23
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '16'
+            row: 298.16 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 125.0
+          value: 14.75
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '16'
+            row: 125 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 225.0
+          value: 23.77
+          locator:
+            page: 18
+            pdf_page_index: 17
+            table: '16'
+            row: 225 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        attribution: Kelley et al. (1953), corrected experimental values as published;
+          pre-correction cells are not tabulated
+      derived_from:
+      - kelley_1953_table15_cp
+    - observation_id: kelley_1953_table30_heat_content_delta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 32
+        pdf_page_index: 31
+        table: '30'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: synthetic nephelite
+        polymorph: delta
+      units: cal/mol
+      per: mol_species
+      method_as_published: high-temperature heat-content calorimetry
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 387.1
+          value: 2690.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 387.1 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+        - T_K: 388.0
+          value: 2705.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 388.0 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+        - T_K: 439.6
+          value: 4490.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 439.6 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+        - T_K: 455.4
+          value: 5145.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 455.4 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+        - T_K: 460.5
+          value: 5385.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 460.5 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+        - T_K: 465.2
+          value: 5590.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 465.2 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+    - observation_id: kelley_1953_table30_heat_content_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 32
+        pdf_page_index: 31
+        table: '30'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: synthetic nephelite
+        polymorph: beta
+      units: cal/mol
+      per: mol_species
+      method_as_published: high-temperature heat-content calorimetry
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 1088.8
+          value: 29840.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 1088.8 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+        - T_K: 1115.2
+          value: 31070.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 1115.2 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+        - T_K: 1130.1
+          value: 31850.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 1130.1 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+        - T_K: 1140.3
+          value: 32340.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 1140.3 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+        - T_K: 1157.2
+          value: 33110.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 1157.2 K; MinerU row 6 col 3
+          table_row_number: 6
+          phase: null
+        - T_K: 1172.4
+          value: 33800.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 1172.4 K; MinerU row 7 col 3
+          table_row_number: 7
+          phase: null
+        - T_K: 469.8
+          value: 5775.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 469.8 K; MinerU row 8 col 1
+          table_row_number: 8
+          phase: null
+        - T_K: 495.4
+          value: 6660.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 495.4 K; MinerU row 9 col 1
+          table_row_number: 9
+          phase: null
+        - T_K: 592.7
+          value: 10170.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 592.7 K; MinerU row 10 col 1
+          table_row_number: 10
+          phase: null
+        - T_K: 678.9
+          value: 13360.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 678.9 K; MinerU row 11 col 1
+          table_row_number: 11
+          phase: null
+        - T_K: 785.2
+          value: 17420.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 785.2 K; MinerU row 12 col 1
+          table_row_number: 12
+          phase: null
+        - T_K: 880.8
+          value: 21200.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 880.8 K; MinerU row 13 col 1
+          table_row_number: 13
+          phase: null
+        - T_K: 987.3
+          value: 25540.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 987.3 K; MinerU row 14 col 1
+          table_row_number: 14
+          phase: null
+    - observation_id: kelley_1953_table30_heat_content_gamma
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 32
+        pdf_page_index: 31
+        table: '30'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: synthetic nephelite
+        polymorph: gamma
+      units: cal/mol
+      per: mol_species
+      method_as_published: high-temperature heat-content calorimetry
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 1187.9
+          value: 34570.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 1187.9 K; MinerU row 8 col 3
+          table_row_number: 8
+          phase: null
+        - T_K: 1222.2
+          value: 35980.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 1222.2 K; MinerU row 9 col 3
+          table_row_number: 9
+          phase: null
+        - T_K: 1280.5
+          value: 38520.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 1280.5 K; MinerU row 10 col 3
+          table_row_number: 10
+          phase: null
+        - T_K: 1381.2
+          value: 42810.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 1381.2 K; MinerU row 11 col 3
+          table_row_number: 11
+          phase: null
+        - T_K: 1475.5
+          value: 46860.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 1475.5 K; MinerU row 12 col 3
+          table_row_number: 12
+          phase: null
+        - T_K: 1509.5
+          value: 48320.0
+          locator:
+            page: 32
+            pdf_page_index: 31
+            table: '30'
+            row: 1509.5 K; MinerU row 13 col 3
+          table_row_number: 13
+          phase: null
+    - observation_id: kelley_1953_table31_heat_content_delta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 33
+        pdf_page_index: 32
+        table: '31'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: synthetic nephelite
+        polymorph: delta
+      units: cal/mol
+      per: mol_species
+      method_as_published: Shomate smoothing of experimental heat-content data
+      values:
+        quantity: H_minus_H298
+        method_class: measured_reduced
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 350.0
+          value: 1530.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 350 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 400.0
+          value: 3095.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 400 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 450.0
+          value: 4915.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 450 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 467.0
+          value: 5680.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 467(δ) K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+      derived_from:
+      - kelley_1953_table30_heat_content_delta
+    - observation_id: kelley_1953_table31_heat_content_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 33
+        pdf_page_index: 32
+        table: '31'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: synthetic nephelite
+        polymorph: beta
+      units: cal/mol
+      per: mol_species
+      method_as_published: Shomate smoothing of experimental heat-content data
+      values:
+        quantity: H_minus_H298
+        method_class: measured_reduced
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 1000.0
+          value: 26050.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 1000 K; MinerU row 2 col 4
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1100.0
+          value: 30370.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 1100 K; MinerU row 3 col 4
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1180.0
+          value: 34200.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 1,180(β) K; MinerU row 4 col 4
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 467.0
+          value: 5680.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 467(β) K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 500.0
+          value: 6820.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 500 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 600.0
+          value: 10420.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 600 K; MinerU row 8 col 1
+          table_row_number: 8
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 700.0
+          value: 14150.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 700 K; MinerU row 9 col 1
+          table_row_number: 9
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 800.0
+          value: 18000.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 800 K; MinerU row 10 col 1
+          table_row_number: 10
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 900.0
+          value: 21970.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 900 K; MinerU row 11 col 1
+          table_row_number: 11
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+      derived_from:
+      - kelley_1953_table30_heat_content_beta
+    - observation_id: kelley_1953_table31_heat_content_gamma
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 33
+        pdf_page_index: 32
+        table: '31'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: synthetic nephelite
+        polymorph: gamma
+      units: cal/mol
+      per: mol_species
+      method_as_published: Shomate smoothing of experimental heat-content data
+      values:
+        quantity: H_minus_H298
+        method_class: measured_reduced
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 1180.0
+          value: 34200.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 1,180(γ) K; MinerU row 5 col 4
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1200.0
+          value: 35050.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 1200 K; MinerU row 6 col 4
+          table_row_number: 6
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1300.0
+          value: 39330.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 1300 K; MinerU row 7 col 4
+          table_row_number: 7
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1400.0
+          value: 43620.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 1400 K; MinerU row 8 col 4
+          table_row_number: 8
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1500.0
+          value: 47920.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 1500 K; MinerU row 9 col 4
+          table_row_number: 9
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1525.0
+          value: 49000.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 1525 K; MinerU row 10 col 4
+          table_row_number: 10
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+      derived_from:
+      - kelley_1953_table30_heat_content_gamma
+    - observation_id: kelley_1953_table32_heat_content_delta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 33
+        pdf_page_index: 32
+        table: '32'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: carnegieite
+        polymorph: delta
+      units: cal/mol
+      per: mol_species
+      method_as_published: high-temperature heat-content calorimetry
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 389.0
+          value: 2755.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 389.0 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+        - T_K: 487.0
+          value: 6080.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 487.0 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+        - T_K: 598.9
+          value: 10210.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 598.9 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+        - T_K: 689.9
+          value: 13800.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 689.9 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+        - T_K: 808.3
+          value: 18700.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 808.3 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+        - T_K: 902.0
+          value: 22740.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 902.0 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+        - T_K: 940.4
+          value: 24530.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 940.4 K; MinerU row 8 col 1
+          table_row_number: 8
+          phase: null
+        - T_K: 966.2
+          value: 25910.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 966.2 K; MinerU row 9 col 1
+          table_row_number: 9
+          phase: null
+        - T_K: 973.9
+          value: 27780.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 973.9 K; MinerU row 10 col 1
+          table_row_number: 10
+          phase: null
+        - T_K: 978.1
+          value: 28140.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 978.1 K; MinerU row 11 col 1
+          table_row_number: 11
+          phase: null
+    - observation_id: kelley_1953_table32_heat_content_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 33
+        pdf_page_index: 32
+        table: '32'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: carnegieite
+        polymorph: beta
+      units: cal/mol
+      per: mol_species
+      method_as_published: high-temperature heat-content calorimetry
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 1099.7
+          value: 33640.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 1099.7 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+        - T_K: 1191.2
+          value: 37730.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 1191.2 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+        - T_K: 1500.0
+          value: 51540.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 1500.0 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+        - T_K: 1523.7
+          value: 52610.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 1523.7 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+        - T_K: 1535.8
+          value: 53180.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 1535.8 K; MinerU row 6 col 3
+          table_row_number: 6
+          phase: null
+        - T_K: 1551.0
+          value: 53910.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 1551.0 K; MinerU row 7 col 3
+          table_row_number: 7
+          phase: null
+        - T_K: 1561.0
+          value: 54240.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 1561.0 K; MinerU row 8 col 3
+          table_row_number: 8
+          phase: null
+        - T_K: 1579.1
+          value: 55120.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 1579.1 K; MinerU row 9 col 3
+          table_row_number: 9
+          phase: null
+        - T_K: 1610.5
+          value: 56520.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 1610.5 K; MinerU row 10 col 3
+          table_row_number: 10
+          phase: null
+        - T_K: 1651.6
+          value: 58440.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 1651.6 K; MinerU row 11 col 3
+          table_row_number: 11
+          phase: null
+        - T_K: 984.0
+          value: 28500.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 984.0 K; MinerU row 12 col 1
+          table_row_number: 12
+          phase: null
+        - T_K: 1697.2
+          value: 60470.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 1697.2 K; MinerU row 12 col 3
+          table_row_number: 12
+          phase: null
+        - T_K: 999.1
+          value: 29130.0
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '32'
+            row: 999.1 K; MinerU row 13 col 1
+          table_row_number: 13
+          phase: null
+    - observation_id: kelley_1953_table33_heat_content_delta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 34
+        pdf_page_index: 33
+        table: '33'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: carnegieite
+        polymorph: delta
+      units: cal/mol
+      per: mol_species
+      method_as_published: Shomate smoothing of experimental heat-content data
+      values:
+        quantity: H_minus_H298
+        method_class: measured_reduced
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 400.0
+          value: 3110.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 400 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 500.0
+          value: 6540.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 500 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 600.0
+          value: 10260.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 600 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 700.0
+          value: 14210.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 700 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 800.0
+          value: 18350.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 800 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 900.0
+          value: 22660.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 900 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 980.0
+          value: 26260.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 980(δ) K; MinerU row 8 col 1
+          table_row_number: 8
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+      derived_from:
+      - kelley_1953_table32_heat_content_delta
+    - observation_id: kelley_1953_table33_heat_content_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 34
+        pdf_page_index: 33
+        table: '33'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: carnegieite
+        polymorph: beta
+      units: cal/mol
+      per: mol_species
+      method_as_published: Shomate smoothing of experimental heat-content data
+      values:
+        quantity: H_minus_H298
+        method_class: measured_reduced
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 1000.0
+          value: 29190.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 1000 K; MinerU row 2 col 4
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1100.0
+          value: 33650.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 1100 K; MinerU row 3 col 4
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1200.0
+          value: 38120.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 1200 K; MinerU row 4 col 4
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1300.0
+          value: 42590.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 1300 K; MinerU row 5 col 4
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1400.0
+          value: 47070.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 1400 K; MinerU row 6 col 4
+          table_row_number: 6
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1500.0
+          value: 51560.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 1500 K; MinerU row 7 col 4
+          table_row_number: 7
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1600.0
+          value: 56070.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 1600 K; MinerU row 8 col 4
+          table_row_number: 8
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 980.0
+          value: 28300.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 980(β) K; MinerU row 9 col 1
+          table_row_number: 9
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 1700.0
+          value: 60600.0
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 1700 K; MinerU row 9 col 4
+          table_row_number: 9
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+      derived_from:
+      - kelley_1953_table32_heat_content_beta
+  KAlSi3O8:
+    observations:
+    - observation_id: kelley_1953_table17_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        table: '17'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: adularia
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: corrected experimental heat-capacity results reported by
+        the authors
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 54.07
+          value: 10.09
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 54.07 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+        - T_K: 114.64
+          value: 23.38
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 114.64 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+        - T_K: 216.07
+          value: 39.61
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 216.07 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+        - T_K: 57.81
+          value: 10.99
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 57.81 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+        - T_K: 124.28
+          value: 25.26
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 124.28 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+        - T_K: 226.16
+          value: 40.82
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 226.16 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+        - T_K: 61.92
+          value: 11.97
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 61.92 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+        - T_K: 135.76
+          value: 27.38
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 135.76 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+        - T_K: 236.13
+          value: 42.02
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 236.13 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+        - T_K: 66.38
+          value: 13.04
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 66.38 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+        - T_K: 146.07
+          value: 29.18
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 146.07 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+        - T_K: 245.89
+          value: 43.2
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 245.89 K; MinerU row 5 col 5
+          table_row_number: 5
+          phase: null
+        - T_K: 71.11
+          value: 14.14
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 71.11 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+        - T_K: 155.49
+          value: 30.76
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 155.49 K; MinerU row 6 col 3
+          table_row_number: 6
+          phase: null
+        - T_K: 256.18
+          value: 44.42
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 256.18 K; MinerU row 6 col 5
+          table_row_number: 6
+          phase: null
+        - T_K: 76.04
+          value: 15.31
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 76.04 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+        - T_K: 165.88
+          value: 32.45
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 165.88 K; MinerU row 7 col 3
+          table_row_number: 7
+          phase: null
+        - T_K: 266.36
+          value: 45.52
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 266.36 K; MinerU row 7 col 5
+          table_row_number: 7
+          phase: null
+        - T_K: 80.32
+          value: 16.23
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 80.32 K; MinerU row 8 col 1
+          table_row_number: 8
+          phase: null
+        - T_K: 175.88
+          value: 34.06
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 175.88 K; MinerU row 8 col 3
+          table_row_number: 8
+          phase: null
+        - T_K: 276.31
+          value: 46.49
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 276.31 K; MinerU row 8 col 5
+          table_row_number: 8
+          phase: null
+        - T_K: 85.06
+          value: 17.25
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 85.06 K; MinerU row 9 col 1
+          table_row_number: 9
+          phase: null
+        - T_K: 185.81
+          value: 35.49
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 185.81 K; MinerU row 9 col 3
+          table_row_number: 9
+          phase: null
+        - T_K: 286.38
+          value: 47.41
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 286.38 K; MinerU row 9 col 5
+          table_row_number: 9
+          phase: null
+        - T_K: 94.38
+          value: 19.26
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 94.38 K; MinerU row 10 col 1
+          table_row_number: 10
+          phase: null
+        - T_K: 195.85
+          value: 36.87
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 195.85 K; MinerU row 10 col 3
+          table_row_number: 10
+          phase: null
+        - T_K: 296.53
+          value: 48.43
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 296.53 K; MinerU row 10 col 5
+          table_row_number: 10
+          phase: null
+        - T_K: 104.52
+          value: 21.35
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 104.52 K; MinerU row 11 col 1
+          table_row_number: 11
+          phase: null
+        - T_K: 206.14
+          value: 38.3
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '17'
+            row: 206.14 K; MinerU row 11 col 3
+          table_row_number: 11
+          phase: null
+        attribution: Kelley et al. (1953), corrected experimental values as published;
+          pre-correction cells are not tabulated
+    - observation_id: kelley_1953_table18_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        table: '18'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: adularia
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: smooth values from author-corrected results
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 50.0
+          value: 9.12
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '18'
+            row: 50 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 150.0
+          value: 29.86
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '18'
+            row: 150 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 250.0
+          value: 43.6
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '18'
+            row: 250 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 75.0
+          value: 15.04
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '18'
+            row: 75 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 175.0
+          value: 33.91
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '18'
+            row: 175 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 275.0
+          value: 46.28
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '18'
+            row: 275 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 100.0
+          value: 20.38
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '18'
+            row: 100 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 200.0
+          value: 37.45
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '18'
+            row: 200 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 298.16
+          value: 48.62
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '18'
+            row: 298.16 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 125.0
+          value: 25.33
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '18'
+            row: 125 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 225.0
+          value: 40.66
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '18'
+            row: 225 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        attribution: Kelley et al. (1953), corrected experimental values as published;
+          pre-correction cells are not tabulated
+      derived_from:
+      - kelley_1953_table17_cp
+    - observation_id: kelley_1953_table19_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        pdf_page_index: 18
+        table: '19'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: ferriferous orthoclase
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: corrected experimental heat-capacity results reported by
+        the authors
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 53.99
+          value: 10.07
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 53.99 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+        - T_K: 114.61
+          value: 23.35
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 114.61 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+        - T_K: 216.25
+          value: 39.58
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 216.25 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+        - T_K: 57.85
+          value: 11.02
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 57.85 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+        - T_K: 124.64
+          value: 25.29
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 124.64 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+        - T_K: 226.3
+          value: 40.77
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 226.30 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+        - T_K: 62.19
+          value: 12.06
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 62.19 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+        - T_K: 136.01
+          value: 27.39
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 136.01 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+        - T_K: 236.44
+          value: 42.0
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 236.44 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+        - T_K: 66.83
+          value: 13.16
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 66.83 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+        - T_K: 146.14
+          value: 29.13
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 146.14 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+        - T_K: 245.85
+          value: 43.1
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 245.85 K; MinerU row 5 col 5
+          table_row_number: 5
+          phase: null
+        - T_K: 71.56
+          value: 14.27
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 71.56 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+        - T_K: 156.02
+          value: 30.87
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 156.02 K; MinerU row 6 col 3
+          table_row_number: 6
+          phase: null
+        - T_K: 256.26
+          value: 44.27
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 256.26 K; MinerU row 6 col 5
+          table_row_number: 6
+          phase: null
+        - T_K: 76.44
+          value: 15.38
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 76.44 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+        - T_K: 166.03
+          value: 32.41
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 166.03 K; MinerU row 7 col 3
+          table_row_number: 7
+          phase: null
+        - T_K: 267.6
+          value: 45.55
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 267.60 K; MinerU row 7 col 5
+          table_row_number: 7
+          phase: null
+        - T_K: 80.36
+          value: 16.23
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 80.36 K; MinerU row 8 col 1
+          table_row_number: 8
+          phase: null
+        - T_K: 176.17
+          value: 34.05
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 176.17 K; MinerU row 8 col 3
+          table_row_number: 8
+          phase: null
+        - T_K: 276.24
+          value: 46.38
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 276.24 K; MinerU row 8 col 5
+          table_row_number: 8
+          phase: null
+        - T_K: 85.11
+          value: 17.26
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 85.11 K; MinerU row 9 col 1
+          table_row_number: 9
+          phase: null
+        - T_K: 186.2
+          value: 35.45
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 186.20 K; MinerU row 9 col 3
+          table_row_number: 9
+          phase: null
+        - T_K: 287.74
+          value: 47.58
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 287.74 K; MinerU row 9 col 5
+          table_row_number: 9
+          phase: null
+        - T_K: 94.94
+          value: 19.33
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 94.94 K; MinerU row 10 col 1
+          table_row_number: 10
+          phase: null
+        - T_K: 195.99
+          value: 36.81
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 195.99 K; MinerU row 10 col 3
+          table_row_number: 10
+          phase: null
+        - T_K: 296.47
+          value: 48.28
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 296.47 K; MinerU row 10 col 5
+          table_row_number: 10
+          phase: null
+        - T_K: 104.49
+          value: 21.32
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 104.49 K; MinerU row 11 col 1
+          table_row_number: 11
+          phase: null
+        - T_K: 206.31
+          value: 38.26
+          locator:
+            page: 19
+            pdf_page_index: 18
+            table: '19'
+            row: 206.31 K; MinerU row 11 col 3
+          table_row_number: 11
+          phase: null
+        attribution: Kelley et al. (1953), corrected experimental values as published;
+          pre-correction cells are not tabulated
+  KAlSi2O6:
+    observations:
+    - observation_id: kelley_1953_table20_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 22
+        pdf_page_index: 21
+        table: '20'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: leucite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: corrected experimental heat-capacity results reported by
+        the authors
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 53.07
+          value: 9.019
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 53.07 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+        - T_K: 114.81
+          value: 19.47
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 114.81 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+        - T_K: 216.43
+          value: 31.96
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 216.43 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+        - T_K: 57.49
+          value: 9.812
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 57.49 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+        - T_K: 124.68
+          value: 20.88
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 124.68 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+        - T_K: 226.31
+          value: 32.91
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 226.31 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+        - T_K: 62.24
+          value: 10.76
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 62.24 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+        - T_K: 136.01
+          value: 22.5
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 136.01 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+        - T_K: 236.08
+          value: 33.88
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 236.08 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+        - T_K: 66.88
+          value: 11.64
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 66.88 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+        - T_K: 146.35
+          value: 23.93
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 146.35 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+        - T_K: 245.92
+          value: 34.81
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 245.92 K; MinerU row 5 col 5
+          table_row_number: 5
+          phase: null
+        - T_K: 71.4
+          value: 12.43
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 71.40 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+        - T_K: 155.69
+          value: 25.08
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 155.69 K; MinerU row 6 col 3
+          table_row_number: 6
+          phase: null
+        - T_K: 256.16
+          value: 35.69
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 256.16 K; MinerU row 6 col 5
+          table_row_number: 6
+          phase: null
+        - T_K: 76.17
+          value: 13.25
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 76.17 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+        - T_K: 166.13
+          value: 26.41
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 166.13 K; MinerU row 7 col 3
+          table_row_number: 7
+          phase: null
+        - T_K: 266.37
+          value: 36.66
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 266.37 K; MinerU row 7 col 5
+          table_row_number: 7
+          phase: null
+        - T_K: 79.55
+          value: 13.84
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 79.55 K; MinerU row 8 col 1
+          table_row_number: 8
+          phase: null
+        - T_K: 175.91
+          value: 27.53
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 175.91 K; MinerU row 8 col 3
+          table_row_number: 8
+          phase: null
+        - T_K: 276.25
+          value: 37.54
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 276.25 K; MinerU row 8 col 5
+          table_row_number: 8
+          phase: null
+        - T_K: 83.2
+          value: 14.46
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 83.20 K; MinerU row 9 col 1
+          table_row_number: 9
+          phase: null
+        - T_K: 185.87
+          value: 28.7
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 185.87 K; MinerU row 9 col 3
+          table_row_number: 9
+          phase: null
+        - T_K: 286.35
+          value: 38.35
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 286.35 K; MinerU row 9 col 5
+          table_row_number: 9
+          phase: null
+        - T_K: 93.66
+          value: 16.19
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 93.66 K; MinerU row 10 col 1
+          table_row_number: 10
+          phase: null
+        - T_K: 195.93
+          value: 29.78
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 195.93 K; MinerU row 10 col 3
+          table_row_number: 10
+          phase: null
+        - T_K: 296.26
+          value: 39.05
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 296.26 K; MinerU row 10 col 5
+          table_row_number: 10
+          phase: null
+        - T_K: 104.46
+          value: 17.87
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 104.46 K; MinerU row 11 col 1
+          table_row_number: 11
+          phase: null
+        - T_K: 206.23
+          value: 30.84
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '20'
+            row: 206.23 K; MinerU row 11 col 3
+          table_row_number: 11
+          phase: null
+        attribution: Kelley et al. (1953), corrected experimental values as published;
+          pre-correction cells are not tabulated
+    - observation_id: kelley_1953_table21_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 22
+        pdf_page_index: 21
+        table: '21'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: leucite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: smooth values from author-corrected results
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 50.0
+          value: 8.37
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '21'
+            row: 50 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 150.0
+          value: 24.37
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '21'
+            row: 150 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 250.0
+          value: 35.17
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '21'
+            row: 250 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 75.0
+          value: 13.05
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '21'
+            row: 75 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 175.0
+          value: 27.44
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '21'
+            row: 175 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 275.0
+          value: 37.37
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '21'
+            row: 275 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 100.0
+          value: 17.16
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '21'
+            row: 100 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 200.0
+          value: 30.23
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '21'
+            row: 200 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 298.16
+          value: 39.23
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '21'
+            row: 298.16 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 125.0
+          value: 20.94
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '21'
+            row: 125 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 225.0
+          value: 32.78
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '21'
+            row: 225 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        attribution: Kelley et al. (1953), corrected experimental values as published;
+          pre-correction cells are not tabulated
+      derived_from:
+      - kelley_1953_table20_cp
+  KAlSiO4:
+    observations:
+    - observation_id: kelley_1953_table22_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 22
+        pdf_page_index: 21
+        table: '22'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: kaliophilite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: low-temperature calorimetric heat-capacity measurements
+      values:
+        quantity: cp
+        method_class: measured_direct
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 52.73
+          value: 6.131
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 52.73 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+        - T_K: 114.72
+          value: 14.45
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 114.72 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+        - T_K: 216.28
+          value: 23.43
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 216.28 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+        - T_K: 57.06
+          value: 6.757
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 57.06 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+        - T_K: 124.52
+          value: 15.5
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 124.52 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+        - T_K: 227.41
+          value: 24.31
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 227.41 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+        - T_K: 61.67
+          value: 7.49
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 61.67 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+        - T_K: 136.03
+          value: 16.7
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 136.03 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+        - T_K: 236.93
+          value: 24.92
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 236.93 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+        - T_K: 66.16
+          value: 8.201
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 66.16 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+        - T_K: 146.56
+          value: 17.75
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 146.56 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+        - T_K: 246.04
+          value: 25.51
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 246.04 K; MinerU row 5 col 5
+          table_row_number: 5
+          phase: null
+        - T_K: 70.75
+          value: 8.852
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 70.75 K; MinerU row 6 col 1
+          table_row_number: 6
+          phase: null
+        - T_K: 155.98
+          value: 18.63
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 155.98 K; MinerU row 6 col 3
+          table_row_number: 6
+          phase: null
+        - T_K: 256.74
+          value: 26.16
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 256.74 K; MinerU row 6 col 5
+          table_row_number: 6
+          phase: null
+        - T_K: 75.55
+          value: 9.513
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 75.55 K; MinerU row 7 col 1
+          table_row_number: 7
+          phase: null
+        - T_K: 166.01
+          value: 19.55
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 166.01 K; MinerU row 7 col 3
+          table_row_number: 7
+          phase: null
+        - T_K: 266.51
+          value: 26.8
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 266.51 K; MinerU row 7 col 5
+          table_row_number: 7
+          phase: null
+        - T_K: 80.46
+          value: 10.19
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 80.46 K; MinerU row 8 col 1
+          table_row_number: 8
+          phase: null
+        - T_K: 175.95
+          value: 20.4
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 175.95 K; MinerU row 8 col 3
+          table_row_number: 8
+          phase: null
+        - T_K: 276.36
+          value: 27.36
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 276.36 K; MinerU row 8 col 5
+          table_row_number: 8
+          phase: null
+        - T_K: 84.56
+          value: 10.74
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 84.56 K; MinerU row 9 col 1
+          table_row_number: 9
+          phase: null
+        - T_K: 185.97
+          value: 21.22
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 185.97 K; MinerU row 9 col 3
+          table_row_number: 9
+          phase: null
+        - T_K: 286.65
+          value: 28.02
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 286.65 K; MinerU row 9 col 5
+          table_row_number: 9
+          phase: null
+        - T_K: 93.82
+          value: 11.92
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 93.82 K; MinerU row 10 col 1
+          table_row_number: 10
+          phase: null
+        - T_K: 195.97
+          value: 22.02
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 195.97 K; MinerU row 10 col 3
+          table_row_number: 10
+          phase: null
+        - T_K: 296.41
+          value: 28.53
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 296.41 K; MinerU row 10 col 5
+          table_row_number: 10
+          phase: null
+        - T_K: 105.07
+          value: 13.25
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 105.07 K; MinerU row 11 col 1
+          table_row_number: 11
+          phase: null
+        - T_K: 206.38
+          value: 22.77
+          locator:
+            page: 22
+            pdf_page_index: 21
+            table: '22'
+            row: 206.38 K; MinerU row 11 col 3
+          table_row_number: 11
+          phase: null
+    - observation_id: kelley_1953_table23_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 23
+        pdf_page_index: 22
+        table: '23'
+        row: all printed rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: kaliophilite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: smooth values read from curve through measurements
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        reference_temperature_K: 298.16
+        points:
+        - T_K: 50.0
+          value: 5.685
+          locator:
+            page: 23
+            pdf_page_index: 22
+            table: '23'
+            row: 50 K; MinerU row 2 col 1
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 150.0
+          value: 18.08
+          locator:
+            page: 23
+            pdf_page_index: 22
+            table: '23'
+            row: 150 K; MinerU row 2 col 3
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 250.0
+          value: 25.78
+          locator:
+            page: 23
+            pdf_page_index: 22
+            table: '23'
+            row: 250 K; MinerU row 2 col 5
+          table_row_number: 2
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 75.0
+          value: 9.46
+          locator:
+            page: 23
+            pdf_page_index: 22
+            table: '23'
+            row: 75 K; MinerU row 3 col 1
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 175.0
+          value: 20.32
+          locator:
+            page: 23
+            pdf_page_index: 22
+            table: '23'
+            row: 175 K; MinerU row 3 col 3
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 275.0
+          value: 27.29
+          locator:
+            page: 23
+            pdf_page_index: 22
+            table: '23'
+            row: 275 K; MinerU row 3 col 5
+          table_row_number: 3
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 100.0
+          value: 12.65
+          locator:
+            page: 23
+            pdf_page_index: 22
+            table: '23'
+            row: 100 K; MinerU row 4 col 1
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 200.0
+          value: 22.31
+          locator:
+            page: 23
+            pdf_page_index: 22
+            table: '23'
+            row: 200 K; MinerU row 4 col 3
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 298.16
+          value: 28.63
+          locator:
+            page: 23
+            pdf_page_index: 22
+            table: '23'
+            row: 298.16 K; MinerU row 4 col 5
+          table_row_number: 4
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 125.0
+          value: 15.56
+          locator:
+            page: 23
+            pdf_page_index: 22
+            table: '23'
+            row: 125 K; MinerU row 5 col 1
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+        - T_K: 225.0
+          value: 24.11
+          locator:
+            page: 23
+            pdf_page_index: 22
+            table: '23'
+            row: 225 K; MinerU row 5 col 3
+          table_row_number: 5
+          phase: null
+          derivation_note: Author-smoothed value; derived from the listed experimental
+            table.
+      derived_from:
+      - kelley_1953_table22_cp
