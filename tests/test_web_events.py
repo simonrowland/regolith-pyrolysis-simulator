@@ -23,6 +23,7 @@ from simulator.electrolysis import (
 )
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.core import PyrolysisSimulator
+from simulator.config import load_config_bundle
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.recipe_io import load_recipe_patch, read_recipe_metadata, write_recipe_patch
 from simulator.runner import PyrolysisRun, build_per_hour_summary
@@ -54,6 +55,93 @@ _RENDEZVOUS_TIMEOUT_S = 30.0
 _DELETE = object()
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _RECIPE_DIR = _REPO_ROOT / "data" / "recipes"
+
+
+def test_runtime_override_numeric_boundary_pin():
+    assert web_events._coerce_runtime_campaign_overrides({
+        "C4": {"hold_temp_C": "1600.125", "ramp_rate": -2, "pO2_mbar": 0,
+               "stage3_product_purity": "0.999", "stage3_instantaneous_purity": 0.99},
+    }) == {"C4": {"hold_temp_C": 1600.125, "ramp_rate": -2.0, "pO2_mbar": 0.0,
+                  "stage3_product_purity": 0.999, "stage3_instantaneous_purity": 0.99}}
+
+
+@pytest.mark.parametrize(("value", "suffix"), [
+    (None, "is required"), ("", "is required"),
+    (True, "must be numeric"), ("bad", "must be numeric"),
+    ("nan", "must be finite"), ("inf", "must be finite"),
+    (-1, "must be >= 0"),
+])
+def test_runtime_override_numeric_error_pin(value, suffix):
+    with pytest.raises(web_events.InputValidationError) as caught:
+        web_events._coerce_runtime_campaign_overrides({"C4": {"pO2_mbar": value}})
+    assert str(caught.value) == f"runtime_campaign_overrides.C4.pO2_mbar {suffix}"
+
+
+@pytest.mark.parametrize("field", ["stage3_product_purity", "stage3_instantaneous_purity"])
+@pytest.mark.parametrize(
+    ("value", "message"),
+    [
+        (0, "must be in (0, 1]"),
+        (1.0000001, "must be in (0, 1]"),
+        (1.5, "must be in (0, 1]"),
+        (True, "must be numeric"),
+        (float("nan"), "must be finite"),
+        ("not-a-number", "must be numeric"),
+    ],
+)
+def test_runtime_override_purity_refusal_is_qualified(field, value, message):
+    with pytest.raises(web_events.InputValidationError) as caught:
+        web_events._coerce_runtime_campaign_overrides({"C4": {field: value}})
+    assert str(caught.value) == f"runtime_campaign_overrides.C4.{field} {message}"
+
+
+@pytest.mark.parametrize("field", ["stage3_product_purity", "stage3_instantaneous_purity"])
+@pytest.mark.parametrize("value", [0.0001, 1.0])
+def test_runtime_override_purity_accepts_open_lower_and_closed_upper_end(field, value):
+    assert web_events._coerce_runtime_campaign_overrides({"C4": {field: value}}) == {
+        "C4": {field: value},
+    }
+
+
+@pytest.mark.parametrize("route", ["divert", "through", "garbage"])
+def test_web_start_and_replay_stage3_route(monkeypatch, route):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    client.get_received()
+    before = set(_simulations)
+    payload = {
+        "backend": "internal-analytical", "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1, "speed": 0, "track": "pyrolysis",
+        "runtime_campaign_overrides": {"C2A_staged": {"stage3_route": route}},
+    }
+    try:
+        for _ in range(2):
+            client.emit("start_simulation", payload)
+            statuses = [event["args"][0] for event in client.get_received()
+                        if event["name"] == "simulation_status"]
+            assert statuses
+            if route == "garbage":
+                assert statuses[-1]["status"] == "error"
+                assert statuses[-1]["message"] == (
+                    "runtime_campaign_overrides.C2A_staged.stage3_route "
+                    "must be divert or through"
+                )
+                assert set(_simulations) == before
+            else:
+                assert statuses[-1]["status"] == "started", statuses
+                sid, = set(_simulations) - before
+                state, _ = _current_simulation_state(sid)
+                overrides = {"C2A_staged": {"stage3_route": route}}
+                assert state["recipe_inputs"]["runtime_campaign_overrides"] == overrides
+                assert state["session"].simulator.campaign_mgr.overrides == overrides
+                # Replay the JSON-serialized startup identity retained by the web.
+                payload = json.loads(json.dumps(state["recipe_inputs"]))
+                _clear_simulation_state(sid)
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
 
 
 def test_product_story_bucket_omits_species_rounded_to_zero() -> None:
@@ -174,9 +262,11 @@ def _assert_recipe_defining_marker(source: str, element_id: str) -> None:
 def _sim_with_mass_balance_snapshot(error_pct, category=None):
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    setpoints = load_config_bundle().setpoints
+    setpoints["campaigns"] = {}
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        setpoints,
         {
             "s_type": {
                 "label": "S type",
@@ -4393,27 +4483,7 @@ def test_loop_projection_and_emit_failures_stop_current_run(
 
 
 def test_completion_payload_exposes_final_mass_reconciliation():
-    backend = InternalAnalyticalBackend()
-    backend.initialize({})
-    sim = PyrolysisSimulator(
-        backend,
-        {"campaigns": {}},
-        {
-            "s_type": {
-                "label": "S type",
-                "composition_wt_pct": {
-                    "SiO2": 51.5,
-                    "FeO": 13.0,
-                    "MgO": 34.0,
-                },
-                "bulk_additions": {
-                    "metallic_FeNi_wt_pct": 15.0,
-                },
-            }
-        },
-        {"metals": {}, "oxide_vapors": {}},
-    )
-    sim.load_batch("s_type")
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
 
     payload = _completion_payload(sim)
 
@@ -4561,29 +4631,8 @@ def test_completion_ceramic_panel_classifies_product_story_refractory_slice(
 def test_web_payloads_preserve_full_precision_mass_balance_error(
     monkeypatch,
 ):
-    backend = InternalAnalyticalBackend()
-    backend.initialize({})
-    sim = PyrolysisSimulator(
-        backend,
-        {"campaigns": {}},
-        {
-            "s_type": {
-                "label": "S type",
-                "composition_wt_pct": {
-                    "SiO2": 51.5,
-                    "FeO": 13.0,
-                    "MgO": 34.0,
-                },
-                "bulk_additions": {
-                    "metallic_FeNi_wt_pct": 15.0,
-                },
-            }
-        },
-        {"metals": {}, "oxide_vapors": {}},
-    )
-    sim.load_batch("s_type")
-    snapshot = sim._make_snapshot()
-    snapshot.mass_balance_error_pct = 6.25e-12
+    sim, snapshot = _sim_with_mass_balance_snapshot(6.25e-12)
+
     monkeypatch.setattr(sim, "_make_snapshot", lambda: snapshot)
 
     tick_payload = _tick_payload(
@@ -4861,34 +4910,9 @@ def test_web_mass_balance_non_finite_error_fails_closed(error_pct):
 def test_completion_payload_exposes_mass_balance_category_when_pct_none(
     monkeypatch,
 ):
-    backend = InternalAnalyticalBackend()
-    backend.initialize({})
-    sim = PyrolysisSimulator(
-        backend,
-        {"campaigns": {}},
-        {
-            "s_type": {
-                "label": "S type",
-                "composition_wt_pct": {
-                    "SiO2": 51.5,
-                    "FeO": 13.0,
-                    "MgO": 34.0,
-                },
-                "bulk_additions": {
-                    "metallic_FeNi_wt_pct": 15.0,
-                },
-            }
-        },
-        {"metals": {}, "oxide_vapors": {}},
-    )
-    sim.load_batch("s_type")
-    snapshot = sim._make_snapshot()
-    snapshot.mass_balance_error_pct = None
-    setattr(
-        snapshot,
-        "mass_balance_error_category",
-        "zero_input_basis_breach",
-    )
+    sim, snapshot = _sim_with_mass_balance_snapshot(
+        None, category="zero_input_basis_breach")
+
     monkeypatch.setattr(sim, "_make_snapshot", lambda: snapshot)
 
     payload = _completion_payload(sim)
@@ -5598,9 +5622,11 @@ class RaisingCleanedMeltLedger:
 def _cleaned_melt_test_sim():
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    setpoints = load_config_bundle().setpoints
+    setpoints["campaigns"] = {}
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        setpoints,
         {
             "s_type": {
                 "label": "S type",

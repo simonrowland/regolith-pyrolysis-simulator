@@ -50,7 +50,8 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         )
         for index in range(8)
     )
-    assert [len(item.patch.values) for item in batch] == [59, 65] * 4
+    # c3 adds the four per-substage Stage-3 route controls to both subspaces.
+    assert [len(item.patch.values) for item in batch] == [63, 69] * 4
     assert [item.patch.canonical_json() for item in batch] == [
         item.patch.canonical_json() for item in indexed
     ]
@@ -72,6 +73,7 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         }
         for item in batch
     ]
+    # Recomputed with the production resolver for c3's four Stage-3 route dims.
     # Pin of sample_recipe_candidates(RecipeSchema(), n=8, seed=19, scipy-sobol).
     # C3 leaves C0.temp_range_C and the C2A early-ramp rate in the vocabulary
     # but disables both for search, removing two dimensions from each subspace.
@@ -95,7 +97,7 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
     # patch path, mask, subspace digest, or effective pin differs.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "dc098af5a43044412f15665c955a96ed036840ef0528c4f26f9f3869122d9efb"
+    ).hexdigest() == "b7af102e84b54ddf7922569ae581a319fbe7e63d20c38d710270b7f555dda520"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -127,7 +129,7 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
     # two disabled search paths also change this sampled stream.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "1b92c2122fda21526afea93379dd6619991ff0aa7f4d7fb9cdfa077bb85a6028"
+    ).hexdigest() == "1c3ea5e70ee85e3757130c2640f0571ba83d6a607dec06c5aeb457afb1010160"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():

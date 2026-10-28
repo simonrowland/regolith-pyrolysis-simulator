@@ -156,6 +156,8 @@ def test_stage3_extrapolation_flag_reaches_product_ledger(
 ):
     sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
     model = sim.condensation_model
+    # d-268: this direct SiO-only route explicitly opens the silica cartridge.
+    model.train.collection_route["stage3_route"] = "through"
     model.configure_operating_conditions(
         wall_temperature_C=1500.0, overhead_pressure_mbar=1.0,
         species_partial_pressures_mbar={"SiO": 1.0},

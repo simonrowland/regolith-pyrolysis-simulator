@@ -16,7 +16,9 @@ from enum import Enum, auto
 from typing import Any, Dict, Iterable, List, Mapping, Tuple
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
-from simulator.condensation_routing import target_species_for_stage_number
+from simulator.condensation_routing import (
+    STAGE3_BYPASS_SEGMENT_NAME, target_species_for_stage_number,
+)
 from simulator.config import resolve_collector_bands_C
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -712,7 +714,7 @@ class CondensationStage:
 PIPE_SEGMENT_NAMES = tuple(
     f'stage_{stage_number}_to_stage_{stage_number + 1}'
     for stage_number in range(7)
-)
+) + (STAGE3_BYPASS_SEGMENT_NAME,)
 PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX = 'process.wall_deposit_segment_'
 PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS = tuple(
     f'{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}{name}'
@@ -833,6 +835,16 @@ class CondensationTrain:
     after devolatilisation.
     """
     stages: List[CondensationStage] = field(default_factory=list)
+
+    # Ideal isolation of both ends of the fused-silica cartridge.
+    collection_route: dict[str, Any] = field(
+        default_factory=lambda: {"stage3_route": "divert"})
+
+    @property
+    def active_stages(self) -> List[CondensationStage]:
+        return [stage for stage in self.stages
+                if stage.stage_number != 3
+                or self.collection_route["stage3_route"] == "through"]
 
     # Volatiles train (sealed after C0/C0b)
     volatiles_collected_kg: Dict[str, float] = field(default_factory=dict)

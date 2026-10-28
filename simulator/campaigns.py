@@ -16,12 +16,14 @@ Each campaign has:
 
 from __future__ import annotations
 
+from simulator.condensation_routing import STAGE3_ROUTES, STAGE3_PURITY_FIELDS, validate_stage3_purity
+
 import ast
 import math
 from collections.abc import Mapping, Sequence
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Literal, Optional, Tuple, TypedDict
+from typing import Any, Dict, List, Literal, Optional, Tuple, TypedDict
 
 from simulator import mre_ladder
 from simulator.accounting import UnknownSpeciesError, resolve_species_formula
@@ -63,6 +65,21 @@ from simulator.state import (
     clamp_stir_factor,
     clamp_stir_state,
 )
+
+
+def parse_campaign_override_value(
+    field: str, value: Any, label: str | None = None,
+) -> float | str:
+    """Parse scalar override values at every runtime boundary by field type."""
+    from simulator.scalar_boundary import require_finite_float
+    if field == 'stage3_route':
+        if value not in STAGE3_ROUTES:
+            raise ValueError('stage3_route must be divert or through')
+        return value
+    if field in STAGE3_PURITY_FIELDS:
+        return validate_stage3_purity(value, field)
+    return require_finite_float(value, label or str(field))
+
 
 C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
 C2A_STAGED_DEPLETION_YIELD_FLOOR_MOL = 1.0e-12
@@ -536,6 +553,8 @@ class CampaignManager:
         'ramp_rate_C_per_h',
         'ramp_rate_C_per_hr',
         'setpoints',
+        'stage3_route',
+        *STAGE3_PURITY_FIELDS,
         'stir_factor',
         'stir_state',
         'temperature_ramp_C_per_h',
@@ -1673,6 +1692,57 @@ class CampaignManager:
         if not math.isfinite(delta) or delta < 0.0:
             raise ValueError('target_delta_below_ceiling_C must be finite and non-negative')
         return min(self.furnace_max_T_C, process_high_C) - delta
+
+    def apply_collection_route(self, melt: MeltState, train: CondensationTrain) -> None:
+        """Apply config < active substage < runtime override before a parcel."""
+        campaign = melt.campaign
+        if campaign == CampaignPhase.IDLE:
+            campaign = CampaignPhase.C0
+        cfg = self._campaign_config(campaign)
+        command = cfg.get('stage3_route', 'divert')
+        substage = ''
+        if campaign in (CampaignPhase.C3_NA, CampaignPhase.C3_K):
+            substage = 'Na_phase' if campaign == CampaignPhase.C3_NA else 'K_phase'
+            command = cfg.get(substage, {}).get('stage3_route', command)
+        elif campaign == CampaignPhase.C2A_STAGED and 'stages' in cfg:
+            stage = self._c2a_staged_active_stage(melt.campaign_hour)
+            if stage:
+                substage = self._c2a_staged_stage_label(stage)
+                command = stage.get('stage3_route', command)
+        ovr = self._campaign_overrides(campaign)
+        command = ovr.get('stage3_route', command)
+        train_config = self.setpoints.get('condensation_train', {})
+        if not isinstance(train_config, Mapping):
+            raise MalformedRecipeError('condensation_train must be a mapping')
+        if any(field not in train_config for field in STAGE3_PURITY_FIELDS):
+            from simulator.config import DEFAULT_DATA_DIR, _load_setpoints_file
+            train_config = {
+                **_load_setpoints_file(DEFAULT_DATA_DIR / 'setpoints.yaml')['condensation_train'],
+                **train_config,
+            }
+        purity_defaults = {field: cfg.get(field,
+            train_config[field]) for field in STAGE3_PURITY_FIELDS}
+        # Literal reads keep both consumers visible to the override-field guard.
+        purities = {
+            'stage3_product_purity': ovr.get('stage3_product_purity',
+                purity_defaults['stage3_product_purity']),
+            'stage3_instantaneous_purity': ovr.get('stage3_instantaneous_purity',
+                purity_defaults['stage3_instantaneous_purity']),
+        }
+        purities = {field: validate_stage3_purity(value, field)
+                    for field, value in purities.items()}
+        if command not in STAGE3_ROUTES:
+            raise ValueError('stage3_route must be divert or through')
+        refused = train.collection_route.get('opening_refused_hour')
+        isolation = ({'opening_refused_hour': refused}
+                     if refused == melt.hour else {})
+        train.collection_route = {
+            'stage3_route': 'divert' if isolation else command,
+            **isolation,
+            **purities,
+            'campaign': campaign.name,
+            'substage': substage,
+        }
 
     def configure_campaign(self, melt: MeltState, campaign: CampaignPhase):
         """

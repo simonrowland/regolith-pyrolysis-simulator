@@ -14,6 +14,7 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
+from simulator.campaigns import parse_campaign_override_value
 from simulator.backends import BackendSelectionPolicy
 from simulator.config import load_config_bundle
 from simulator.runner import DATA_DIR, RunnerError, build_per_hour_summary
@@ -168,10 +169,10 @@ class SessionScriptRunner:
                     "adjust campaign_override requires campaign field value"
                 )
             campaign, field = args[1], args[2]
-            value = " ".join(args[3:])
+            value = parse_campaign_override_value(field, " ".join(args[3:]))
             self.session.adjust(
                 "campaign_override",
-                float(value),
+                value,
                 campaign=campaign,
                 field=field,
             )
@@ -180,7 +181,7 @@ class SessionScriptRunner:
                 "param": param,
                 "campaign": campaign,
                 "field": field,
-                "value": float(value),
+                "value": value,
             }
         if len(args) != 2:
             raise ValueError(f"adjust {param} requires exactly one value")
@@ -417,8 +418,8 @@ def _parse_setpoint_overrides(
     setpoints: list[str],
     legacy_raw_json: str | None,
     runtime_raw_json: str | None,
-) -> dict[str, dict[str, float]]:
-    overrides: dict[str, dict[str, float]] = {}
+) -> dict[str, dict[str, Any]]:
+    overrides: dict[str, dict[str, Any]] = {}
     legacy = _parse_override_json(
         legacy_raw_json,
         flag_name="--setpoints-overrides",
@@ -438,15 +439,15 @@ def _parse_setpoint_overrides(
     for item in setpoints:
         if "=" not in item or "." not in item.split("=", 1)[0]:
             raise ValueError(
-                f"expected CAMPAIGN.FIELD=FLOAT setpoint, got {item!r}"
+                f"expected CAMPAIGN.FIELD=VALUE setpoint, got {item!r}"
             )
         lhs, value = item.split("=", 1)
         campaign, field = lhs.split(".", 1)
         if not campaign or not field:
             raise ValueError(
-                f"expected CAMPAIGN.FIELD=FLOAT setpoint, got {item!r}"
+                f"expected CAMPAIGN.FIELD=VALUE setpoint, got {item!r}"
             )
-        overrides.setdefault(campaign, {})[field] = float(value)
+        overrides.setdefault(campaign, {})[field] = parse_campaign_override_value(field, value)
     return overrides
 
 
@@ -454,19 +455,19 @@ def _parse_override_json(
     raw_json: str | None,
     *,
     flag_name: str,
-) -> dict[str, dict[str, float]] | None:
+) -> dict[str, dict[str, Any]] | None:
     if not raw_json:
         return None
     loaded = json.loads(raw_json)
     if not isinstance(loaded, Mapping):
         raise ValueError(f"{flag_name} must decode to an object")
-    overrides: dict[str, dict[str, float]] = {}
+    overrides: dict[str, dict[str, Any]] = {}
     for campaign, fields in loaded.items():
         if not isinstance(fields, Mapping):
             raise ValueError(f"{flag_name}[{campaign!r}] must be an object")
         target = overrides.setdefault(str(campaign), {})
         for field, value in fields.items():
-            target[str(field)] = float(value)
+            target[str(field)] = parse_campaign_override_value(str(field), value)
     return overrides
 
 

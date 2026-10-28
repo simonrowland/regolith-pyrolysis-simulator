@@ -3224,7 +3224,9 @@ def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> No
 
 def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> None:
     sim = _make_sim()
-    sim.campaign_mgr.overrides["C2A_staged"] = {"hold_temp_C": 1700.0}
+    # This contamination probe explicitly exposes the otherwise isolated cartridge.
+    sim.campaign_mgr.overrides["C2A_staged"] = {
+        "hold_temp_C": 1700.0, "stage3_route": "through"}
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     sim.melt.temperature_C = 1650.0
     sim.melt.campaign_hour = 7

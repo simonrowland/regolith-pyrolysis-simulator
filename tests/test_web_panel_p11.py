@@ -686,15 +686,14 @@ def test_p11_silica_state_chips_are_mutually_exclusive() -> None:
     mars_card = _card(_render(_wrapped(mars_block)), "silica")
     assert _assert_exclusive_silica_chips(mars_card) == ["flagged capture · not a product"]
 
+    # C0 now isolates Stage 3. Declare incidental capture explicitly to test
+    # the no-switch classification without relying on that run's valve state.
     lunar_block, lunar_cls = _lunar()
     lunar_silica = lunar_cls["pure_silica_glass"]
+    lunar_silica["stage_3_capture_kg"] = 4.5
+    lunar_silica["stage_3_kg_by_species"] = {"SiO": 4.5}
     assert lunar_silica["stage_3_capture_kg"] > 0
     lunar_card = _card(_render(_wrapped(lunar_block)), "silica")
-    # Classification axis, not certification: this C0 24 h golden never
-    # executed the pO2-hold -> pN2 SiO-release switch (mandate section 5,
-    # class 2 is on-demand by that switch), so its incidental Stage-3 capture
-    # is non-product inventory and the chip is derived, not a snapshot. The
-    # Separate certification flags do not change this no-switch classification.
     assert _assert_exclusive_silica_chips(lunar_card) == [
         "flagged capture · not a product"
     ]

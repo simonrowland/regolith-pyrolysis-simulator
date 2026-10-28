@@ -28,6 +28,19 @@ def is_declared_real_scalar(
     return True
 
 
+def require_finite_float(value: Any, label: str) -> float:
+    """Require a declared finite scalar, preserving session numeric errors."""
+    try:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise TypeError
+        number = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{label} must be numeric") from exc
+    if not math.isfinite(number):
+        raise ValueError(f"{label} must be finite")
+    return number
+
+
 def finite_float(value: Any) -> float | None:
     """Return the float value when it is finite, otherwise ``None``."""
 
