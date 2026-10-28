@@ -1836,7 +1836,7 @@ def test_empty_na_targets_dispatch_reduces_nothing_not_default_set(
     assert result.transition is None
 
 
-def test_c3_na_shuttle_returns_na2o_to_spent_reductant_residue(
+def test_c3_na_shuttle_returns_na2o_to_cleaned_melt(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     sim = _build_sim(
@@ -1853,11 +1853,78 @@ def test_c3_na_shuttle_returns_na2o_to_spent_reductant_residue(
 
     assert result.status == "ok"
     assert result.transition is not None
-    assert result.transition.credits[SPENT_REDUCTANT_RESIDUE_ACCOUNT]["Na2O"] > 0.0
+    assert result.transition.credits["process.cleaned_melt"]["Na2O"] > 0.0
+    assert SPENT_REDUCTANT_RESIDUE_ACCOUNT not in result.transition.credits
+    assert result.diagnostic["spent_reductant_residue_account"] == "process.cleaned_melt"
     assert "Na2O" not in result.transition.credits.get(
         "process.reagent_inventory", {}
     )
-    assert "Na2O" not in result.transition.credits.get("process.cleaned_melt", {})
+
+
+def test_c3_na_shuttle_bakes_out_reaction_product_after_native_na2o(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data,
+        setpoints_data, additives_kg={"Na": 12.0},
+    )
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.record.path = "A_staged"
+    sim.melt.temperature_C = 1150.0
+    ledger = sim.atom_ledger
+    native_na2o_kg = ledger.kg_by_account("process.cleaned_melt")["Na2O"]
+    initial_na_mol = sum(
+        ledger.atom_moles_by_account(account).get("Na", 0.0)
+        for account in ledger.mol_by_account()
+    )
+    reagent_na_before = ledger.mol_by_account("process.reagent_inventory")["Na"]
+
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
+
+    assert ledger.origin_attribution_methods_by_account()["process.cleaned_melt"]["Na"] == "pool_ratio"
+    na_dosed_mol = reagent_na_before - ledger.mol_by_account(
+        "process.reagent_inventory"
+    )["Na"]
+    assert na_dosed_mol > 0.0
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 0.2
+    sp_data = sim.vapor_pressures["metals"]["Na"]
+    stoich = sim._evaporation_stoich("Na", sp_data)
+    native_na_kg = native_na2o_kg / stoich["oxide_per_product_kg"]
+    _, native_transition = sim._credit_evaporation_transition(
+        "Na", native_na_kg, 0.0, sp_data, return_transition=True,
+    )
+    assert native_transition is not None
+
+    # Independent atom balance: 2 Na + FeO -> Na2O + Fe, then
+    # Na2O -> 2 Na(g) + 1/2 O2. Every dosed Na atom must be recoverable.
+    na_kg = na_dosed_mol * MOLAR_MASS["Na"] / 1000.0
+    o2_before = ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0)
+    captured_before = ledger.mol_by_account("process.condensation_train")["Na"]
+    _, transition = sim._credit_evaporation_transition(
+        "Na", na_kg, 0.0, sp_data, return_transition=True,
+    )
+
+    assert transition is not None
+    transition.validate_conservation(sim.species_formula_registry)
+    assert ledger.mol_by_account("process.condensation_train")["Na"] == pytest.approx(
+        captured_before + na_dosed_mol
+    )
+    assert ledger.mol_by_account("reservoir.fo2_buffer")["O2"] - o2_before == pytest.approx(
+        na_dosed_mol / 4.0
+    )
+    assert ledger.mol_by_account("process.cleaned_melt").get(
+        "Na2O", 0.0
+    ) == pytest.approx(0.0, abs=1e-10)
+    assert ledger.mol_by_account(SPENT_REDUCTANT_RESIDUE_ACCOUNT).get(
+        "Na2O", 0.0
+    ) == 0.0
+    assert sum(
+        ledger.atom_moles_by_account(account).get("Na", 0.0)
+        for account in ledger.mol_by_account()
+    ) == pytest.approx(initial_na_mol)
+    ledger.assert_balanced()
 
 
 def test_c3_k_shuttle_primary_refuses_no_liquid_before_ellingham(

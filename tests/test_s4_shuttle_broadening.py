@@ -247,8 +247,8 @@ def test_na_shuttle_reduces_feo_to_fe_atom_balanced(liquid_fraction):
     mol_na_used = proposal.debits["process.reagent_inventory"]["Na"]
     mol_feo_reduced = proposal.debits["process.cleaned_melt"]["FeO"]
     assert mol_na_used == pytest.approx(2.0 * mol_feo_reduced)
-    # Na2O is melt-resident but provenance-isolated from feedstock recovery.
-    assert proposal.credits[SPENT_REDUCTANT_RESIDUE_ACCOUNT]["Na2O"] == pytest.approx(
+    # Dissolved Na2O shares the native oxide's debitable melt account.
+    assert proposal.credits["process.cleaned_melt"]["Na2O"] == pytest.approx(
         mol_feo_reduced
     )
     assert "Na2O" not in proposal.credits.get("process.reagent_inventory", {})
@@ -313,7 +313,7 @@ def test_metallothermic_provider_call_sites_integrate_dt_hr(
     assert 3.0 * (1.0 - (1.0 - half / 3.0) ** 2) == pytest.approx(full)
 
 
-def test_na_shuttle_spent_residue_fills_solubility_cap_across_ticks():
+def test_na_shuttle_product_fills_solubility_cap_across_ticks():
     sim = _build_provider_sim()
     provider = BuiltinMetallothermicStepProvider()
     accounts = {
@@ -346,7 +346,7 @@ def test_na_shuttle_spent_residue_fills_solubility_cap_across_ticks():
     first = dispatch()
     assert first.status == "ok"
     assert first.transition is not None
-    assert first.transition.credits[SPENT_REDUCTANT_RESIDUE_ACCOUNT]["Na2O"] > 0.0
+    assert first.transition.credits["process.cleaned_melt"]["Na2O"] > 0.0
     _apply_mol_proposal(accounts, first.transition)
 
     second = dispatch()
@@ -514,7 +514,7 @@ def test_s1c_step_shuttle_recycles_condensed_na_into_reagent_inventory():
     # Mass conservation: total Na atoms across all accounts unchanged
     # after the tick. The recycle is a within-system move (train ->
     # reagent_inventory); inject moves Na out of reagent_inventory and
-    # into the melt-resident spent-reductant residue as Na2O, so the Na
+    # into the cleaned melt as dissolved Na2O, so the Na
     # ATOM count is conserved across (Na + the Na portion of Na2O).
     # Within FP tolerance.
     post_full = sim.atom_ledger.kg_by_account()

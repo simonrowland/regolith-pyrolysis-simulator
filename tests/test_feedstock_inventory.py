@@ -1587,9 +1587,18 @@ def test_c3_na_dose_draws_reagent_inventory_and_commits_balanced_transition():
     assert sim._c3_alkali_credit_outstanding_kg_by_species()["Na"] == (
         pytest.approx(12.0)
     )
+    # Every consumed Na atom enters dissolved Na2O. The formula resolver
+    # supplies atoms per formula unit and kg/mol, independently of routing.
+    # (mol Na)/(Na per unit)*(kg/mol Na2O) gives kg; zero use adds zero.
+    na2o_formula = resolve_species_formula("Na2O", registry)
+    na2o_added_kg = (
+        _mol("Na", process_before - process_after)
+        / na2o_formula.elements["Na"]
+        * na2o_formula.molar_mass_kg_per_mol()
+    )
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
         "Na2O", 0.0
-    ) == pytest.approx(cleaned_na2o_before)
+    ) == pytest.approx(cleaned_na2o_before + na2o_added_kg)
     assert process_after < process_before
     assert sim.shuttle_Na_inventory_kg == pytest.approx(process_after)
     assert sim.atom_ledger.kg_by_account("process.metal_phase")["Fe"] > 0.0
