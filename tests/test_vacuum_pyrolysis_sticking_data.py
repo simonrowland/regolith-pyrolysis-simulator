@@ -343,8 +343,20 @@ def test_sio_stage_band_flux_uses_cold_wall_gate(
     )
 
 
-def test_non_sio_sticking_alpha_s_keeps_scalar_value():
-    assert condensation.alpha_s("Fe", 1500.0, {}) == pytest.approx(0.02)
+@pytest.mark.xfail(strict=True, reason="b-878: olivine evaporation proxy used for Fe capture")
+def test_fe_stage_one_uses_reviewed_metal_condensation_fit():
+    # Reviewed b-878 pin; Tachibana et al. 2001, LPSC #1767, p. 2 Fig. 1.
+    stage = next(s for s in CondensationTrain.create_default().stages if s.stage_number == 1)
+    record = condensation._stage_alpha_record(stage, "Fe")
+    assert record["alpha_s"] == pytest.approx(0.878170956)
+    assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert record["citation_status"] == "CITED"
+
+
+def test_explicit_fe_evaporation_coefficient_is_independent_of_sticking():
+    assert condensation.alpha_s(
+        "Fe", 1500.0, {"coefficient_spec": 0.02}
+    ) == pytest.approx(0.02)
 
 
 def test_malformed_sticking_coefficient_spec_fails_loud():
