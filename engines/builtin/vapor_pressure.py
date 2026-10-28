@@ -33,8 +33,9 @@ profile says "I CAN be authoritative"; the kernel wiring decides
 whether this build session actually uses this provider as the
 authority or as fallback.
 
-Account declaration: the canonical melt-resident accounts, including
-provenance-isolated spent oxide in the same physical melt. The provider must
+Account declaration: the canonical debitable melt account, cleaned_melt.
+Dissolved shuttle oxides share this account; historical residue is separate.
+The provider must
 not see gas / metal / sulfide / salt accounts -- the kernel filter
 enforces this.  Mirrors the same constraint AlphaMELTS has (binding
 spec §7).
