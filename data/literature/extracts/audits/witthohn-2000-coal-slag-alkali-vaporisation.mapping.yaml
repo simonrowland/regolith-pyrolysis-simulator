@@ -1,0 +1,19 @@
+source_id: witthohn-2000-coal-slag-alkali-vaporisation
+extraction_mode: machine_text_audited_render_for_table_layout
+mappings:
+- table: '1'
+  page: 15
+  columns:
+  - Sample
+  - Lignite ashes A-D; hard-coal ash E; plant slags F-G
+  - Temperature (ashing or local maximum particle temperature)
+  - Ash content
+  - Oxide and minor-component mass fractions [%]
+  disposition: sample characterization only; not a numeric vapor-pressure or activity table
+  basis: mass_fraction_percent
+  reason: >-
+    Table 1 identifies seven ash/slag samples and their composition. The requested
+    Na(g)/K(g) and oxide-activity values occur only as plotted points in Figures 2-5;
+    Figure 6 is model output. Figure-derived numeric values are excluded by the wave rules.
+  rows: 13
+  sample_columns: 7

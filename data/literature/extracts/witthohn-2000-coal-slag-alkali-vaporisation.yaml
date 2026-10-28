@@ -1,0 +1,427 @@
+schema_version: literature_extract.v1
+source_id: witthohn-2000-coal-slag-alkali-vaporisation
+source:
+  citation: >-
+    Witthohn, A., Oltjen, L., Biedenkopf, P. & Hilpert, K. (2000),
+    "Thermodynamic activities of Na and K in coal slags and their vaporisation",
+    Sixth International Conference on Molten Slags, Fluxes and Salts, paper 041.
+  year: 2000
+extraction:
+  method: >-
+    MinerU table draft and QA, pdftotext layout, and a render check of printed
+    Table 1. No numeric values were taken from figures.
+  date: '2026-10-28'
+  worker: w1028naD-witthohn00-na-k
+review_status: draft
+fidelity_samples:
+- species: Na
+  observation_id: witthohn_2000_na_g_fig2_figure_only
+  field: status
+  value: typed_refusal
+  locator: {page: 16, figure: '2'}
+- species: K
+  observation_id: witthohn_2000_k_g_fig2_figure_only
+  field: status
+  value: typed_refusal
+  locator: {page: 16, figure: '2'}
+- species: Na2O
+  observation_id: witthohn_2000_na2o_fig4_figure_only
+  field: status
+  value: typed_refusal
+  locator: {page: 18, figure: '4'}
+- species: K2O
+  observation_id: witthohn_2000_k2o_fig6_model_figure_only
+  field: status
+  value: typed_refusal
+  locator: {page: 18, figure: '6'}
+- species: Na
+  observation_id: witthohn_2000_table1_sample_A_composition
+  field: SiO2_mass_fraction_percent
+  value: '42.4'
+  locator: {page: 15, table: '1'}
+- species: Na
+  observation_id: witthohn_2000_table1_sample_C_composition
+  field: K2O_mass_fraction_percent
+  value: '0.5'
+  locator: {page: 15, table: '1'}
+- species: Na
+  observation_id: witthohn_2000_table1_sample_G_composition
+  field: CaO_mass_fraction_percent
+  value: '9.7'
+  locator: {page: 15, table: '1'}
+species:
+  Na:
+    context:
+    - observation_id: witthohn_2000_kems_pressure_method_context
+      type: method
+      locator: {page: 5, section: 'Mass spectrometric measurement'}
+      units: as printed
+      values:
+        quantity: kems_pressure_method_and_calibration
+        technique: Knudsen effusion mass spectrometry
+        partial_pressure_relation_as_published: 'p_i = K I_i T_i / (a_i sigma_i)'
+        detector_signal_unit_as_published: 1/s or A
+        calibration_reference: pure silver
+    - observation_id: witthohn_2000_activity_standard_state_context
+      type: method
+      locator: {page: 9, section: Procedure}
+      units: dimensionless activity
+      values:
+        quantity: alkali_oxide_activity_reference_state
+        activity_relation_as_published: 'a_i = p_i / p_i0'
+        standard_state_as_published: vapour pressure of the pure component
+        note: The paper defines activity against the pure-oxide vapour pressure.
+    - observation_id: witthohn_2000_table1_sample_A_composition
+      type: composition
+      locator: {page: 15, table: '1', note: 'Lignite Rheinland laboratory ash; mass fraction [%] as printed.'}
+      units: as printed
+      values:
+        quantity: coal_ash_and_slag_composition_table1
+        sample: A
+        sample_group: lignites_Rheinland
+        sample_form: laboratory_ash
+        sample_temperature_as_published: '450 °C'
+        ash_content_as_published: 'ad 9.6'
+        SiO2_mass_fraction_percent: '42.4'
+        Al2O3_mass_fraction_percent: '2.8'
+        Fe2O3_mass_fraction_percent: '8.9'
+        CaO_mass_fraction_percent: '19.3'
+        MgO_mass_fraction_percent: '3.0'
+        Na2O_mass_fraction_percent: '<0.1'
+        K2O_mass_fraction_percent: '0.3'
+        SO3_mass_fraction_percent: '12.5'
+        P2O5_mass_fraction_percent: '<0.1'
+        CO2_mass_fraction_percent: '5.9'
+        Cl_mass_fraction_percent: '0.3'
+        Rest_mass_fraction_percent: '1.8'
+        Sum_mass_fraction_percent: '97.2'
+    - observation_id: witthohn_2000_table1_sample_B_composition
+      type: composition
+      locator: {page: 15, table: '1', note: 'Lignite Rheinland laboratory ash; mass fraction [%] as printed.'}
+      units: as printed
+      values:
+        quantity: coal_ash_and_slag_composition_table1
+        sample: B
+        sample_group: lignites_Rheinland
+        sample_form: laboratory_ash
+        sample_temperature_as_published: '450 °C'
+        ash_content_as_published: 'ad 12.6'
+        SiO2_mass_fraction_percent: '46.7'
+        Al2O3_mass_fraction_percent: '3.1'
+        Fe2O3_mass_fraction_percent: '7.0'
+        CaO_mass_fraction_percent: '15.5'
+        MgO_mass_fraction_percent: '4.3'
+        Na2O_mass_fraction_percent: '0.5'
+        K2O_mass_fraction_percent: '0.4'
+        SO3_mass_fraction_percent: '15.0'
+        P2O5_mass_fraction_percent: '<0.1'
+        CO2_mass_fraction_percent: '3.0'
+        Cl_mass_fraction_percent: '0.1'
+        Rest_mass_fraction_percent: '0.8'
+        Sum_mass_fraction_percent: '96.4'
+    - observation_id: witthohn_2000_table1_sample_C_composition
+      type: composition
+      locator: {page: 15, table: '1', note: 'Lignite Rheinland laboratory ash; mass fraction [%] as printed.'}
+      units: as printed
+      values:
+        quantity: coal_ash_and_slag_composition_table1
+        sample: C
+        sample_group: lignites_Rheinland
+        sample_form: laboratory_ash
+        sample_temperature_as_published: '450 °C'
+        ash_content_as_published: 'ad 9.9'
+        SiO2_mass_fraction_percent: '36.4'
+        Al2O3_mass_fraction_percent: '4.2'
+        Fe2O3_mass_fraction_percent: '10.2'
+        CaO_mass_fraction_percent: '17.4'
+        MgO_mass_fraction_percent: '7.6'
+        Na2O_mass_fraction_percent: '1.5'
+        K2O_mass_fraction_percent: '0.5'
+        SO3_mass_fraction_percent: '11.6'
+        P2O5_mass_fraction_percent: '<0.1'
+        CO2_mass_fraction_percent: '5.1'
+        Cl_mass_fraction_percent: '0.3'
+        Rest_mass_fraction_percent: '1.2'
+        Sum_mass_fraction_percent: '96.0'
+    - observation_id: witthohn_2000_table1_sample_D_composition
+      type: composition
+      locator: {page: 15, table: '1', note: 'Lignite Rheinland laboratory ash; mass fraction [%] as printed.'}
+      units: as printed
+      values:
+        quantity: coal_ash_and_slag_composition_table1
+        sample: D
+        sample_group: lignites_Rheinland
+        sample_form: laboratory_ash
+        sample_temperature_as_published: '550 °C'
+        ash_content_as_published: 'ad 6.2'
+        SiO2_mass_fraction_percent: '12.7'
+        Al2O3_mass_fraction_percent: '2.1'
+        Fe2O3_mass_fraction_percent: '11.1'
+        CaO_mass_fraction_percent: '38.1'
+        MgO_mass_fraction_percent: '3.5'
+        Na2O_mass_fraction_percent: '0.3'
+        K2O_mass_fraction_percent: '0.1'
+        SO3_mass_fraction_percent: '14.4'
+        P2O5_mass_fraction_percent: '0.1'
+        CO2_mass_fraction_percent: 'not analyzed'
+        Cl_mass_fraction_percent: '0.5'
+        Rest_mass_fraction_percent: '0.5'
+        Sum_mass_fraction_percent: '83.4'
+    - observation_id: witthohn_2000_table1_sample_E_composition
+      type: composition
+      locator: {page: 15, table: '1', note: 'Hard coal Saar laboratory ash; mass fraction [%] as printed.'}
+      units: as printed
+      values:
+        quantity: coal_ash_and_slag_composition_table1
+        sample: E
+        sample_group: hard_coal_Saar
+        sample_form: laboratory_ash
+        sample_temperature_as_published: '575 °C'
+        ash_content_as_published: 'ad 8.4'
+        SiO2_mass_fraction_percent: '38.3'
+        Al2O3_mass_fraction_percent: '18.3'
+        Fe2O3_mass_fraction_percent: '11.4'
+        CaO_mass_fraction_percent: '8.5'
+        MgO_mass_fraction_percent: '2.8'
+        Na2O_mass_fraction_percent: '1.1'
+        K2O_mass_fraction_percent: '1.7'
+        SO3_mass_fraction_percent: '9.2'
+        P2O5_mass_fraction_percent: '0.2'
+        CO2_mass_fraction_percent: '12.5'
+        Cl_mass_fraction_percent: '<0.1'
+        Rest_mass_fraction_percent: '2.8'
+        Sum_mass_fraction_percent: '106.8'
+    - observation_id: witthohn_2000_table1_sample_F_composition
+      type: composition
+      locator: {page: 15, table: '1', note: 'Hard coal Saar plant slag; mass fraction [%] as printed.'}
+      units: as printed
+      values:
+        quantity: coal_ash_and_slag_composition_table1
+        sample: F
+        sample_group: hard_coal_Saar
+        sample_form: plant_slag
+        sample_temperature_as_published: '≈1500 °C'
+        ash_content_as_published: '-'
+        SiO2_mass_fraction_percent: '42.0'
+        Al2O3_mass_fraction_percent: '24.3'
+        Fe2O3_mass_fraction_percent: '14.9'
+        CaO_mass_fraction_percent: '9.4'
+        MgO_mass_fraction_percent: '2.6'
+        Na2O_mass_fraction_percent: '1.2'
+        K2O_mass_fraction_percent: '1.7'
+        SO3_mass_fraction_percent: '<0.1'
+        P2O5_mass_fraction_percent: '0.3'
+        CO2_mass_fraction_percent: '<0.1'
+        Cl_mass_fraction_percent: '-'
+        Rest_mass_fraction_percent: '1.4'
+        Sum_mass_fraction_percent: '97.8'
+    - observation_id: witthohn_2000_table1_sample_G_composition
+      type: composition
+      locator: {page: 15, table: '1', note: 'Hard coal Saar plant slag; mass fraction [%] as printed.'}
+      units: as printed
+      values:
+        quantity: coal_ash_and_slag_composition_table1
+        sample: G
+        sample_group: hard_coal_Saar
+        sample_form: plant_slag
+        sample_temperature_as_published: '≈1400 °C'
+        ash_content_as_published: '-'
+        SiO2_mass_fraction_percent: '40.9'
+        Al2O3_mass_fraction_percent: '24.3'
+        Fe2O3_mass_fraction_percent: '11.2'
+        CaO_mass_fraction_percent: '9.7'
+        MgO_mass_fraction_percent: '3.0'
+        Na2O_mass_fraction_percent: '1.5'
+        K2O_mass_fraction_percent: '1.7'
+        SO3_mass_fraction_percent: '<0.1'
+        P2O5_mass_fraction_percent: '0.3'
+        CO2_mass_fraction_percent: '<0.1'
+        Cl_mass_fraction_percent: '-'
+        Rest_mass_fraction_percent: '2.1'
+        Sum_mass_fraction_percent: '94.7'
+    observations:
+    - observation_id: witthohn_2000_na_g_fig2_figure_only
+      type: partial_pressure
+      locator:
+        page: 16
+        figure: '2'
+        note: >-
+          Alkali release from laboratory ashes A-D. Plotted marker values only;
+          no numeric table is printed.
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: measured_na_g_partial_pressure_series
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            Partial pressure reduced from detector signal using temperature,
+            isotopic abundance, ionisation cross-section and the pure-silver
+            calibration constant.
+          output_unit: Pa
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 5, section: 'Mass spectrometric measurement', note: 'Detector-signal rows and calibration inputs are not tabulated.'}
+        status: typed_refusal
+        reason: Figure-only plotted values are outside this extraction wave.
+        admission_status: rejected_no_figure_reading
+        plotted_series: Na(g) over samples A-D during heat-up, shown on a logarithmic pressure axis
+        value_cells_printed: false
+    - observation_id: witthohn_2000_na_g_fig3_figure_only
+      type: partial_pressure
+      locator:
+        page: 17
+        figure: '3'
+        note: >-
+          Alkali release from hard-coal ash E and plant slags F-G. Plotted marker
+          values only; no numeric table is printed.
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: measured_na_g_partial_pressure_series
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            Partial pressure reduced from detector signal using temperature,
+            isotopic abundance, ionisation cross-section and the pure-silver
+            calibration constant.
+          output_unit: Pa
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 5, section: 'Mass spectrometric measurement', note: 'Detector-signal rows and calibration inputs are not tabulated.'}
+        status: typed_refusal
+        reason: Figure-only plotted values are outside this extraction wave.
+        admission_status: rejected_no_figure_reading
+        plotted_series: Na(g) over samples E-G during heat-up, shown on a logarithmic pressure axis
+        value_cells_printed: false
+  K:
+    observations:
+    - observation_id: witthohn_2000_k_g_fig2_figure_only
+      type: partial_pressure
+      locator:
+        page: 16
+        figure: '2'
+        note: >-
+          Alkali release from laboratory ashes A-D. Plotted marker values only;
+          no numeric table is printed.
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: measured_k_g_partial_pressure_series
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            Partial pressure reduced from detector signal using temperature,
+            isotopic abundance, ionisation cross-section and the pure-silver
+            calibration constant.
+          output_unit: Pa
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 5, section: 'Mass spectrometric measurement', note: 'Detector-signal rows and calibration inputs are not tabulated.'}
+        status: typed_refusal
+        reason: Figure-only plotted values are outside this extraction wave.
+        admission_status: rejected_no_figure_reading
+        plotted_series: K(g) over samples A-D during heat-up, shown on a logarithmic pressure axis
+        value_cells_printed: false
+    - observation_id: witthohn_2000_k_g_fig3_figure_only
+      type: partial_pressure
+      locator:
+        page: 17
+        figure: '3'
+        note: >-
+          Alkali release from hard-coal ash E and plant slags F-G. Plotted marker
+          values only; no numeric table is printed.
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: measured_k_g_partial_pressure_series
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            Partial pressure reduced from detector signal using temperature,
+            isotopic abundance, ionisation cross-section and the pure-silver
+            calibration constant.
+          output_unit: Pa
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 5, section: 'Mass spectrometric measurement', note: 'Detector-signal rows and calibration inputs are not tabulated.'}
+        status: typed_refusal
+        reason: Figure-only plotted values are outside this extraction wave.
+        admission_status: rejected_no_figure_reading
+        plotted_series: K(g) over samples E-G during heat-up, shown on a logarithmic pressure axis
+        value_cells_printed: false
+  Na2O:
+    observations:
+    - observation_id: witthohn_2000_na2o_fig4_figure_only
+      type: activity_coefficient
+      locator:
+        page: 18
+        figure: '4'
+        note: >-
+          Quasi-binary Na2O-SiO2 comparison; experimental points attributed in
+          the legend to prior studies. No numeric table is printed.
+      phase: liquid
+      standard_state: vapour pressure of pure Na2O
+      units: dimensionless activity
+      values:
+        quantity: na2o_activity_literature_comparison
+        method_as_published: >-
+          Experimental points from emf measurements (Neudorf and Elliott, 1980;
+          Yamaguchi et al., 1982), transpiration (Rego et al., 1985), and chemical
+          equilibration (Tsukihashi and Sano, 1985).
+        method_class: quoted_attributed
+        attribution: >-
+          Neudorf and Elliott (1980); Yamaguchi et al. (1982); Rego et al. (1985);
+          Tsukihashi and Sano (1985)
+        status: typed_refusal
+        reason: Figure-only plotted values are outside this extraction wave.
+        admission_status: rejected_no_figure_reading
+        value_cells_printed: false
+    - observation_id: witthohn_2000_na2o_fig5_figure_only
+      type: activity_coefficient
+      locator:
+        page: 18
+        figure: '5'
+        note: >-
+          Quasi-ternary Na2O-SiO2-CaO comparison; experimental points attributed
+          to Neudorf and Elliott (1980). No numeric table is printed.
+      phase: liquid
+      standard_state: vapour pressure of pure Na2O
+      units: dimensionless activity
+      values:
+        quantity: na2o_activity_literature_comparison
+        method_as_published: emf measurements (Neudorf and Elliott, 1980)
+        method_class: quoted_attributed
+        attribution: Neudorf and Elliott (1980)
+        status: typed_refusal
+        reason: Figure-only plotted values are outside this extraction wave.
+        admission_status: rejected_no_figure_reading
+        value_cells_printed: false
+  K2O:
+    observations:
+    - observation_id: witthohn_2000_k2o_fig6_model_figure_only
+      type: activity_coefficient
+      locator:
+        page: 18
+        figure: '6'
+        note: >-
+          FACT calculation curves for K2O-SiO2-Al2O3; the paper describes these
+          as calculated activities, not measured activity points.
+      phase: liquid
+      standard_state: vapour pressure of pure K2O
+      units: dimensionless activity
+      values:
+        quantity: calculated_k2o_activity_model_curves
+        method_as_published: >-
+          FACT 2.1 thermodynamic modelling with the modified quasi-chemical model
+          and the ChemSage delta-G minimiser.
+        method_class: quoted_attributed
+        attribution: Witthohn et al. (2000), Fig. 6; FACT calculation curves
+        status: typed_refusal
+        reason: Figure-only model values are outside this extraction wave; no measured K2O activity data are tabulated.
+        admission_status: rejected_no_figure_reading
+        value_cells_printed: false
