@@ -677,15 +677,39 @@ def test_reference_anchor_reproduces_controller_join_and_kems_column():
 def test_magma_report_discloses_alkali_exclusion_cost():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     reference_rows = benchmark.run_reference_anchors(fixture)
+    summary = benchmark.summarize_reference_anchors(fixture, reference_rows)
+    model_rows = [
+        row
+        for row in reference_rows
+        if row["evidence_class"] == "model_model_MAGMA"
+    ]
+    alkali_rows = [row for row in model_rows if row["species"] in {"Na", "K"}]
+    alkali_rmse = benchmark._rmse(
+        float(row["imcc_residual_dex"]) for row in alkali_rows
+    )
+    all_species_rmse = benchmark._rmse(
+        float(row["imcc_residual_dex"]) for row in model_rows
+    )
+
+    assert summary["alkali_in_domain_count"] == len(alkali_rows) == 72
+    assert summary["alkali_in_domain_imcc_rmse_dex"] == pytest.approx(alkali_rmse)
+    assert summary["alkali_exclusion_delta_dex"] == pytest.approx(
+        all_species_rmse - summary["controller_pool_imcc_rmse_dex"]
+    )
 
     report = benchmark.generate_report(
         fixture, [], [], [], reference_rows=reference_rows
     )
-
-    assert (
-        "alkali exclusion cost: +0.63 dex; in-domain alkali RMSE: 1.72 dex"
-        in report
+    pool_line = next(
+        line for line in report.splitlines()
+        if line.startswith("Controller regression pool")
     )
+    assert (
+        f"alkali exclusion cost +{summary['alkali_exclusion_delta_dex']:.4f} dex; "
+        f"in-domain alkali RMSE {summary['alkali_in_domain_imcc_rmse_dex']:.4f} dex"
+        in pool_line
+    )
+    assert "imcc-sf04-v1.0.2.json" in pool_line
 
 
 def test_reference_anchor_refuses_tracked_snapshot_hash_mismatch():
