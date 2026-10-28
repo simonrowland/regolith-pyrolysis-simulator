@@ -25,10 +25,11 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Quantity,
-    ReferenceStateConvention,
     RefusalReason,
+    ReferenceStateConvention,
     ResidualStatus,
 )
+from simulator.battery.generators.bench import activity_request_for_engine
 from simulator.battery.generators.janaf import (
     JANAF_R_J_PER_MOL_K,
     _fusion_table_points,
@@ -54,6 +55,7 @@ from simulator.battery.score import (
     Execution,
     FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
     ScoreContext,
+    _activity_contract_refusal,
     compile_residual,
     flagged_strata,
     fusion_comparison_reference,
@@ -512,6 +514,42 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
         ("species.phase",): 24,
     }
     assert extrapolated == 32
+
+
+def test_distin_activity_refuses_without_source_oxygen_potential(migration) -> None:
+    observation = next(
+        row
+        for row in _feo_rows(migration)
+        if row.source_id == _DISTIN
+        and row.observation_id.endswith("distin1971_t1_1880_1_4")
+    )
+    converted = fusion_comparison_reference(
+        observation, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    experiment = migration.experiments[converted.experiment_id]
+    generated = activity_request_for_engine(
+        experiment, converted, Engine.INTERNAL_ANALYTICAL.value
+    )
+
+    assert generated is not None
+    assert generated.payload is None
+    oxygen_gap = next(
+        gap for gap in generated.readiness.gaps if gap.waypoint == "oxygen_condition"
+    )
+    assert oxygen_gap.reason.value == "missing_evidence"
+    assert "FeO" in oxygen_gap.missing
+
+    refusal = _activity_contract_refusal(
+        Engine.INTERNAL_ANALYTICAL,
+        channel="melt_activity",
+        sources=(),
+        identity=converted.identity,
+        requested=converted.identity.composition,
+        generated=generated,
+    )
+    assert refusal.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert refusal.refusal_detail["reason"] == "missing_evidence"
+    assert refusal.refusal_detail["gaps"][0]["waypoint"] == "oxygen_condition"
 
 
 def _fingerprint(residual) -> tuple:
