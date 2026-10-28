@@ -1,0 +1,3136 @@
+schema_version: literature_extract.v1
+source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+source:
+  citation: Shtenberg, M. V., Bychinsky, V. A., Tupitsyn, A. A., and Koroleva, O. N. (2020). Evaluation of Thermodynamic
+    Properties of Alkaline Borogermanates and Germanosilicates Using the Regression Analysis Method. International
+    Journal of Thermodynamics, 23(4), 252–258.
+  doi: 10.5541/ijot.764760
+  url: https://doi.org/10.5541/ijot.764760
+  year: 2020
+  provenance_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  note: The reference-data columns in Tables 1–2 and the Ref. value column in Table 4 are source-attributed literature
+    values. NKR/Zhuang estimates, regression outputs, deviations, and Table 3 calculated properties are retained
+    in context, not typed as measurements.
+extraction:
+  method: Manual transcription from MinerU table drafts and pdftotext-layout, with render checks for every table
+    locator and all numeric cells.
+  date: '2026-10-28'
+  worker: w1028naE-shtenberg20
+review_status: draft
+fidelity_samples:
+- path: species.K2B4O7.observations[shtenberg20_table1_K2B4O7_reference_cp].values.points[0].value
+  value: 170.5
+  locator:
+    page: 3
+    table: '1'
+    row: K2B4O7
+    column: Cp° reference data
+- path: species.Li2B8O13.observations[shtenberg20_table1_Li2B8O13_reference_cp].values.points[0].value
+  value: 325.5
+  locator:
+    page: 3
+    table: '1'
+    row: Li2B8O13
+    column: Cp° reference data
+- path: species.K2Si2O5.observations[shtenberg20_table2_K2Si2O5_reference_delta_fH].values.points[0].value
+  value: -2496.0
+  locator:
+    page: 4
+    table: '2'
+    row: K2Si2O5
+    column: ΔfH° reference data
+- path: species.K2B2Ge3O10.observations[shtenberg20_table4_K2B2Ge3O10_reference_delta_fH].values.points[0].value
+  value: -3937.1
+  locator:
+    page: 6
+    table: '4'
+    row: K2B2Ge3O10
+    column: reference ΔfH°
+notes:
+- text: Tables 1 and 2 each print 24 compound rows. Table 1's reference Cp column and Table 2's reference ΔfH column
+    are quoted_attributed to [28–30] as printed; the three em-dash ΔfH reference cells for Li2GeO3, Na2GeO3, and
+    K2GeO3 are not observations. Table 3 prints 16 model-calculated rows; Table 4 prints 2 comparison rows. Regression
+    and estimate columns are retained as context, not experimental evidence.
+  locator:
+    page: 3
+    table: '1'
+- text: All four table locators were render-checked. The row/column layout agrees with the born-digital pdftotext
+    text layer. MinerU QA reported numeric mismatches driven by LaTeX cell text (Tables 1–2); those cells were checked
+    against the page renders. Table 3 and Table 4 numeric columns agreed with pdftotext. The draft's invented details
+    block under Figure 3 was excluded.
+  locator:
+    page: 6
+    table: '4'
+species:
+  K2B4O7:
+    observations:
+    - observation_id: shtenberg20_table1_K2B4O7_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2B4O7
+        column: Cp° (ref. data)
+        table_row_number: 3
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 170.5
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: K2B4O7
+            column: Cp° (ref. data)
+            table_row_number: 3
+            table_phase_column: 2
+      uncertainty:
+        value: 1.7
+        basis: absolute
+        as_printed: ±1.7
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_K2B4O7_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2B4O7
+        column: ΔfH° reference data
+        table_row_number: 3
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -3334.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: K2B4O7
+            column: ΔfH° reference data
+            table_row_number: 3
+            table_phase_column: 2
+      uncertainty:
+        value: 6.3
+        basis: absolute
+        as_printed: ±6.3
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_K2B4O7_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2B4O7
+        column: NKR, deviations, regression
+      values:
+        compound: K2B4O7
+        nkr_cp_J_per_mol_K_as_printed: '210.49'
+        nkr_deviation_percent_as_printed: '23.45'
+        regression_cp_J_per_mol_K_as_printed: '191.94'
+        regression_deviation_percent_as_printed: '12.58'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_K2B4O7_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2B4O7
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: K2B4O7
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-3290.06'
+        zhuang_deviation_percent_as_printed: '-1.32'
+        regression_enthalpy_kJ_per_mol_as_printed: '-3334.45'
+        regression_deviation_percent_as_printed: '0.01'
+        reference_delta_fH_cell_as_printed: -3334 ± 6.3
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  K2B6O10:
+    observations:
+    - observation_id: shtenberg20_table1_K2B6O10_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2B6O10
+        column: Cp° (ref. data)
+        table_row_number: 4
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 261.9
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: K2B6O10
+            column: Cp° (ref. data)
+            table_row_number: 4
+            table_phase_column: 2
+      uncertainty:
+        value: 2.5
+        basis: absolute
+        as_printed: ±2.5
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_K2B6O10_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2B6O10
+        column: ΔfH° reference data
+        table_row_number: 4
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -4633.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: K2B6O10
+            column: ΔfH° reference data
+            table_row_number: 4
+            table_phase_column: 2
+      uncertainty:
+        value: 10.4
+        basis: absolute
+        as_printed: ±10.4
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_K2B6O10_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2B6O10
+        column: NKR, deviations, regression
+      values:
+        compound: K2B6O10
+        nkr_cp_J_per_mol_K_as_printed: '273.47'
+        nkr_deviation_percent_as_printed: '4.42'
+        regression_cp_J_per_mol_K_as_printed: '250.05'
+        regression_deviation_percent_as_printed: '-4.53'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_K2B6O10_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2B6O10
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: K2B6O10
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-4609.87'
+        zhuang_deviation_percent_as_printed: '-0.50'
+        regression_enthalpy_kJ_per_mol_as_printed: '-4639.75'
+        regression_deviation_percent_as_printed: '0.15'
+        reference_delta_fH_cell_as_printed: -4633 ± 10.4
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  K2B8O13:
+    observations:
+    - observation_id: shtenberg20_table1_K2B8O13_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2B8O13
+        column: Cp° (ref. data)
+        table_row_number: 5
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 321.3
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: K2B8O13
+            column: Cp° (ref. data)
+            table_row_number: 5
+            table_phase_column: 2
+      uncertainty:
+        value: 3.35
+        basis: absolute
+        as_printed: ±3.35
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_K2B8O13_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2B8O13
+        column: ΔfH° reference data
+        table_row_number: 5
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -5945.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: K2B8O13
+            column: ΔfH° reference data
+            table_row_number: 5
+            table_phase_column: 2
+      uncertainty:
+        value: 5.9
+        basis: absolute
+        as_printed: ±5.9
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_K2B8O13_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2B8O13
+        column: NKR, deviations, regression
+      values:
+        compound: K2B8O13
+        nkr_cp_J_per_mol_K_as_printed: '336.45'
+        nkr_deviation_percent_as_printed: '4.72'
+        regression_cp_J_per_mol_K_as_printed: '308.15'
+        regression_deviation_percent_as_printed: '-4.09'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_K2B8O13_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2B8O13
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: K2B8O13
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-5910.53'
+        zhuang_deviation_percent_as_printed: '-0.58'
+        regression_enthalpy_kJ_per_mol_as_printed: '-5945.05'
+        regression_deviation_percent_as_printed: '0.00'
+        reference_delta_fH_cell_as_printed: -5945 ± 5.9
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  KBO2:
+    observations:
+    - observation_id: shtenberg20_table1_KBO2_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: KBO2
+        column: Cp° (ref. data)
+        table_row_number: 6
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 67.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: KBO2
+            column: Cp° (ref. data)
+            table_row_number: 6
+            table_phase_column: 2
+      uncertainty:
+        value: 0.21
+        basis: absolute
+        as_printed: ±0.21
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_KBO2_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: KBO2
+        column: ΔfH° reference data
+        table_row_number: 6
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -995.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: KBO2
+            column: ΔfH° reference data
+            table_row_number: 6
+            table_phase_column: 2
+      uncertainty:
+        value: 8.0
+        basis: absolute
+        as_printed: ±8.0
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_KBO2_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: KBO2
+        column: NKR, deviations, regression
+      values:
+        compound: KBO2
+        nkr_cp_J_per_mol_K_as_printed: '73.76'
+        nkr_deviation_percent_as_printed: '10.09'
+        regression_cp_J_per_mol_K_as_printed: '66.92'
+        regression_deviation_percent_as_printed: '-0.12'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_KBO2_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: KBO2
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: KBO2
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-961.184'
+        zhuang_deviation_percent_as_printed: '-3.40'
+        regression_enthalpy_kJ_per_mol_as_printed: '-1014.58'
+        regression_deviation_percent_as_printed: '1.97'
+        reference_delta_fH_cell_as_printed: -995 ± 8
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Li2B4O7:
+    observations:
+    - observation_id: shtenberg20_table1_Li2B4O7_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li2B4O7
+        column: Cp° (ref. data)
+        table_row_number: 7
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 183.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Li2B4O7
+            column: Cp° (ref. data)
+            table_row_number: 7
+            table_phase_column: 2
+      uncertainty:
+        value: 1.67
+        basis: absolute
+        as_printed: ±1.67
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_Li2B4O7_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li2B4O7
+        column: ΔfH° reference data
+        table_row_number: 7
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -3362.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: Li2B4O7
+            column: ΔfH° reference data
+            table_row_number: 7
+            table_phase_column: 2
+      uncertainty:
+        value: 6.3
+        basis: absolute
+        as_printed: ±6.3
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Li2B4O7_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li2B4O7
+        column: NKR, deviations, regression
+      values:
+        compound: Li2B4O7
+        nkr_cp_J_per_mol_K_as_printed: '180.21'
+        nkr_deviation_percent_as_printed: '-1.52'
+        regression_cp_J_per_mol_K_as_printed: '179.12'
+        regression_deviation_percent_as_printed: '-2.12'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Li2B4O7_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li2B4O7
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Li2B4O7
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-3431.74'
+        zhuang_deviation_percent_as_printed: '2.07'
+        regression_enthalpy_kJ_per_mol_as_printed: '-3348.65'
+        regression_deviation_percent_as_printed: '-0.40'
+        reference_delta_fH_cell_as_printed: -3362 ± 6.3
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Li2B8O13:
+    observations:
+    - observation_id: shtenberg20_table1_Li2B8O13_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li2B8O13
+        column: Cp° (ref. data)
+        table_row_number: 8
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 325.5
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Li2B8O13
+            column: Cp° (ref. data)
+            table_row_number: 8
+            table_phase_column: 2
+      uncertainty:
+        value: 4.2
+        basis: absolute
+        as_printed: ±4.2
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_Li2B8O13_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li2B8O13
+        column: ΔfH° reference data
+        table_row_number: 8
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -5914.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: Li2B8O13
+            column: ΔfH° reference data
+            table_row_number: 8
+            table_phase_column: 2
+      uncertainty:
+        value: 6.8
+        basis: absolute
+        as_printed: ±6.8
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Li2B8O13_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li2B8O13
+        column: NKR, deviations, regression
+      values:
+        compound: Li2B8O13
+        nkr_cp_J_per_mol_K_as_printed: '306.17'
+        nkr_deviation_percent_as_printed: '-5.94'
+        regression_cp_J_per_mol_K_as_printed: '295.33'
+        regression_deviation_percent_as_printed: '-9.27'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Li2B8O13_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li2B8O13
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Li2B8O13
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-6033.44'
+        zhuang_deviation_percent_as_printed: '2.02'
+        regression_enthalpy_kJ_per_mol_as_printed: '-5959.24'
+        regression_deviation_percent_as_printed: '0.77'
+        reference_delta_fH_cell_as_printed: -5914 ± 6.8
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Li2B6O10:
+    observations:
+    - observation_id: shtenberg20_table1_Li2B6O10_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li2B6O10
+        column: Cp° (ref. data)
+        table_row_number: 9
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 293.2
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Li2B6O10
+            column: Cp° (ref. data)
+            table_row_number: 9
+            table_phase_column: 2
+      uncertainty:
+        value: 1.5
+        basis: absolute
+        as_printed: ±1.5
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_Li2B6O10_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li2B6O10
+        column: ΔfH° reference data
+        table_row_number: 9
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -4660.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: Li2B6O10
+            column: ΔfH° reference data
+            table_row_number: 9
+            table_phase_column: 2
+      uncertainty:
+        value: 5.6
+        basis: absolute
+        as_printed: ±5.6
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Li2B6O10_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li2B6O10
+        column: NKR, deviations, regression
+      values:
+        compound: Li2B6O10
+        nkr_cp_J_per_mol_K_as_printed: '243.2'
+        nkr_deviation_percent_as_printed: '-17.05'
+        regression_cp_J_per_mol_K_as_printed: '237.23'
+        regression_deviation_percent_as_printed: '-19.09'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Li2B6O10_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li2B6O10
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Li2B6O10
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-4739.82'
+        zhuang_deviation_percent_as_printed: '1.71'
+        regression_enthalpy_kJ_per_mol_as_printed: '-4653.95'
+        regression_deviation_percent_as_printed: '-0.13'
+        reference_delta_fH_cell_as_printed: -4660 ± 5.6
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  LiBO2:
+    observations:
+    - observation_id: shtenberg20_table1_LiBO2_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: LiBO2
+        column: Cp° (ref. data)
+        table_row_number: 10
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 60.37
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: LiBO2
+            column: Cp° (ref. data)
+            table_row_number: 10
+            table_phase_column: 2
+      uncertainty:
+        value: 0.6
+        basis: absolute
+        as_printed: ±0.6
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_LiBO2_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: LiBO2
+        column: ΔfH° reference data
+        table_row_number: 10
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -1019.2
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: LiBO2
+            column: ΔfH° reference data
+            table_row_number: 10
+            table_phase_column: 2
+      uncertainty:
+        value: 0.8
+        basis: absolute
+        as_printed: ±0.8
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_LiBO2_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: LiBO2
+        column: NKR, deviations, regression
+      values:
+        compound: LiBO2
+        nkr_cp_J_per_mol_K_as_printed: '58.62'
+        nkr_deviation_percent_as_printed: '-2.90'
+        regression_cp_J_per_mol_K_as_printed: '60.51'
+        regression_deviation_percent_as_printed: '0.23'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_LiBO2_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: LiBO2
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: LiBO2
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-1043.76'
+        zhuang_deviation_percent_as_printed: '2.41'
+        regression_enthalpy_kJ_per_mol_as_printed: '-1021.68'
+        regression_deviation_percent_as_printed: '0.24'
+        reference_delta_fH_cell_as_printed: -1019.2 ± 0.8
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Na2B4O7:
+    observations:
+    - observation_id: shtenberg20_table1_Na2B4O7_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na2B4O7
+        column: Cp° (ref. data)
+        table_row_number: 11
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 186.77
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Na2B4O7
+            column: Cp° (ref. data)
+            table_row_number: 11
+            table_phase_column: 2
+      uncertainty:
+        value: 0.63
+        basis: absolute
+        as_printed: ±0.63
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_Na2B4O7_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na2B4O7
+        column: ΔfH° reference data
+        table_row_number: 11
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -3277.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: Na2B4O7
+            column: ΔfH° reference data
+            table_row_number: 11
+            table_phase_column: 2
+      uncertainty:
+        value: 8.0
+        basis: absolute
+        as_printed: ±8.0
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Na2B4O7_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na2B4O7
+        column: NKR, deviations, regression
+      values:
+        compound: Na2B4O7
+        nkr_cp_J_per_mol_K_as_printed: '194.52'
+        nkr_deviation_percent_as_printed: '4.15'
+        regression_cp_J_per_mol_K_as_printed: '188.45'
+        regression_deviation_percent_as_printed: '0.90'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Na2B4O7_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na2B4O7
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Na2B4O7
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-3278.91'
+        zhuang_deviation_percent_as_printed: '0.06'
+        regression_enthalpy_kJ_per_mol_as_printed: '-3289.09'
+        regression_deviation_percent_as_printed: '0.37'
+        reference_delta_fH_cell_as_printed: -3277 ± 8
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Na2B6O10:
+    observations:
+    - observation_id: shtenberg20_table1_Na2B6O10_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na2B6O10
+        column: Cp° (ref. data)
+        table_row_number: 12
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 243.5
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Na2B6O10
+            column: Cp° (ref. data)
+            table_row_number: 12
+            table_phase_column: 2
+      uncertainty:
+        value: 2.5
+        basis: absolute
+        as_printed: ±2.5
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_Na2B6O10_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na2B6O10
+        column: ΔfH° reference data
+        table_row_number: 12
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -4580.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: Na2B6O10
+            column: ΔfH° reference data
+            table_row_number: 12
+            table_phase_column: 2
+      uncertainty:
+        value: 9.2
+        basis: absolute
+        as_printed: ±9.2
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Na2B6O10_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na2B6O10
+        column: NKR, deviations, regression
+      values:
+        compound: Na2B6O10
+        nkr_cp_J_per_mol_K_as_printed: '257.5'
+        nkr_deviation_percent_as_printed: '5.75'
+        regression_cp_J_per_mol_K_as_printed: '246.56'
+        regression_deviation_percent_as_printed: '1.26'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Na2B6O10_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na2B6O10
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Na2B6O10
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-4590.48'
+        zhuang_deviation_percent_as_printed: '0.23'
+        regression_enthalpy_kJ_per_mol_as_printed: '-4594.39'
+        regression_deviation_percent_as_printed: '0.31'
+        reference_delta_fH_cell_as_printed: -4580 ± 9.2
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Na2B8O13:
+    observations:
+    - observation_id: shtenberg20_table1_Na2B8O13_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na2B8O13
+        column: Cp° (ref. data)
+        table_row_number: 13
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 304.89
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Na2B8O13
+            column: Cp° (ref. data)
+            table_row_number: 13
+            table_phase_column: 2
+      uncertainty:
+        value: 8.4
+        basis: absolute
+        as_printed: ±8.4
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_Na2B8O13_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na2B8O13
+        column: ΔfH° reference data
+        table_row_number: 13
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -5912.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: Na2B8O13
+            column: ΔfH° reference data
+            table_row_number: 13
+            table_phase_column: 2
+      uncertainty:
+        value: 8.0
+        basis: absolute
+        as_printed: ±8.0
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Na2B8O13_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na2B8O13
+        column: NKR, deviations, regression
+      values:
+        compound: Na2B8O13
+        nkr_cp_J_per_mol_K_as_printed: '320.48'
+        nkr_deviation_percent_as_printed: '5.11'
+        regression_cp_J_per_mol_K_as_printed: '304.66'
+        regression_deviation_percent_as_printed: '-0.07'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Na2B8O13_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na2B8O13
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Na2B8O13
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-5886.2'
+        zhuang_deviation_percent_as_printed: '-0.44'
+        regression_enthalpy_kJ_per_mol_as_printed: '-5899.69'
+        regression_deviation_percent_as_printed: '-0.21'
+        reference_delta_fH_cell_as_printed: -5912 ± 8
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  NaBO2:
+    observations:
+    - observation_id: shtenberg20_table1_NaBO2_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: NaBO2
+        column: Cp° (ref. data)
+        table_row_number: 14
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 65.94
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: NaBO2
+            column: Cp° (ref. data)
+            table_row_number: 14
+            table_phase_column: 2
+      uncertainty:
+        value: 0.21
+        basis: absolute
+        as_printed: ±0.21
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_NaBO2_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: NaBO2
+        column: ΔfH° reference data
+        table_row_number: 14
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -975.7
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: NaBO2
+            column: ΔfH° reference data
+            table_row_number: 14
+            table_phase_column: 2
+      uncertainty:
+        value: 2.1
+        basis: absolute
+        as_printed: ±2.1
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_NaBO2_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: NaBO2
+        column: NKR, deviations, regression
+      values:
+        compound: NaBO2
+        nkr_cp_J_per_mol_K_as_printed: '65.77'
+        nkr_deviation_percent_as_printed: '-0.26'
+        regression_cp_J_per_mol_K_as_printed: '65.18'
+        regression_deviation_percent_as_printed: '-1.16'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_NaBO2_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: NaBO2
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: NaBO2
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-963.857'
+        zhuang_deviation_percent_as_printed: '-1.21'
+        regression_enthalpy_kJ_per_mol_as_printed: '-991.899'
+        regression_deviation_percent_as_printed: '1.66'
+        reference_delta_fH_cell_as_printed: -975.7 ± 2.1
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  K2Si2O5:
+    observations:
+    - observation_id: shtenberg20_table1_K2Si2O5_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2Si2O5
+        column: Cp° (ref. data)
+        table_row_number: 15
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 160.95
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: K2Si2O5
+            column: Cp° (ref. data)
+            table_row_number: 15
+            table_phase_column: 2
+      uncertainty:
+        value: 0.44
+        basis: absolute
+        as_printed: ±0.44
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_K2Si2O5_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2Si2O5
+        column: ΔfH° reference data
+        table_row_number: 15
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -2496.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: K2Si2O5
+            column: ΔfH° reference data
+            table_row_number: 15
+            table_phase_column: 2
+      uncertainty:
+        value: 18.0
+        basis: absolute
+        as_printed: ±18.0
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_K2Si2O5_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2Si2O5
+        column: NKR, deviations, regression
+      values:
+        compound: K2Si2O5
+        nkr_cp_J_per_mol_K_as_printed: '173.37'
+        nkr_deviation_percent_as_printed: '7.72'
+        regression_cp_J_per_mol_K_as_printed: '160.69'
+        regression_deviation_percent_as_printed: '-0.16'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_K2Si2O5_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2Si2O5
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: K2Si2O5
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-2410'
+        zhuang_deviation_percent_as_printed: '-3.45'
+        regression_enthalpy_kJ_per_mol_as_printed: '-2490.54'
+        regression_deviation_percent_as_printed: '-0.22'
+        reference_delta_fH_cell_as_printed: -2496 ± 18
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  K2Si4O9:
+    observations:
+    - observation_id: shtenberg20_table1_K2Si4O9_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2Si4O9
+        column: Cp° (ref. data)
+        table_row_number: 16
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 247.2
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: K2Si4O9
+            column: Cp° (ref. data)
+            table_row_number: 16
+            table_phase_column: 2
+      uncertainty:
+        value: 2.0
+        basis: absolute
+        as_printed: ±2.0
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_K2Si4O9_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2Si4O9
+        column: ΔfH° reference data
+        table_row_number: 16
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -4325.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: K2Si4O9
+            column: ΔfH° reference data
+            table_row_number: 16
+            table_phase_column: 2
+      uncertainty:
+        value: 11.0
+        basis: absolute
+        as_printed: ±11.0
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_K2Si4O9_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2Si4O9
+        column: NKR, deviations, regression
+      values:
+        compound: K2Si4O9
+        nkr_cp_J_per_mol_K_as_printed: '262.21'
+        nkr_deviation_percent_as_printed: '6.07'
+        regression_cp_J_per_mol_K_as_printed: '248.00'
+        regression_deviation_percent_as_printed: '0.32'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_K2Si4O9_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2Si4O9
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: K2Si4O9
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-4276.74'
+        zhuang_deviation_percent_as_printed: '-1.12'
+        regression_enthalpy_kJ_per_mol_as_printed: '-4330.11'
+        regression_deviation_percent_as_printed: '0.12'
+        reference_delta_fH_cell_as_printed: -4325 ± 11
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  K2SiO3:
+    observations:
+    - observation_id: shtenberg20_table1_K2SiO3_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2SiO3
+        column: Cp° (ref. data)
+        table_row_number: 17
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 118.7
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: K2SiO3
+            column: Cp° (ref. data)
+            table_row_number: 17
+            table_phase_column: 2
+      uncertainty:
+        value: 0.62
+        basis: absolute
+        as_printed: ±0.62
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_K2SiO3_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2SiO3
+        column: ΔfH° reference data
+        table_row_number: 17
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -1568.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: K2SiO3
+            column: ΔfH° reference data
+            table_row_number: 17
+            table_phase_column: 2
+      uncertainty:
+        value: 12.0
+        basis: absolute
+        as_printed: ±12.0
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_K2SiO3_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2SiO3
+        column: NKR, deviations, regression
+      values:
+        compound: K2SiO3
+        nkr_cp_J_per_mol_K_as_printed: '128.95'
+        nkr_deviation_percent_as_printed: '8.64'
+        regression_cp_J_per_mol_K_as_printed: '117.03'
+        regression_deviation_percent_as_printed: '-1.41'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_K2SiO3_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2SiO3
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: K2SiO3
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-1442.86'
+        zhuang_deviation_percent_as_printed: '-7.98'
+        regression_enthalpy_kJ_per_mol_as_printed: '-1570.75'
+        regression_deviation_percent_as_printed: '0.18'
+        reference_delta_fH_cell_as_printed: -1568 ± 12
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Li2Si2O5:
+    observations:
+    - observation_id: shtenberg20_table1_Li2Si2O5_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li2Si2O5
+        column: Cp° (ref. data)
+        table_row_number: 18
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 138.77
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Li2Si2O5
+            column: Cp° (ref. data)
+            table_row_number: 18
+            table_phase_column: 2
+      uncertainty:
+        value: 0.42
+        basis: absolute
+        as_printed: ±0.42
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_Li2Si2O5_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li2Si2O5
+        column: ΔfH° reference data
+        table_row_number: 18
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -2561.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: Li2Si2O5
+            column: ΔfH° reference data
+            table_row_number: 18
+            table_phase_column: 2
+      uncertainty:
+        value: 4.0
+        basis: absolute
+        as_printed: ±4.0
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Li2Si2O5_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li2Si2O5
+        column: NKR, deviations, regression
+      values:
+        compound: Li2Si2O5
+        nkr_cp_J_per_mol_K_as_printed: '143.09'
+        nkr_deviation_percent_as_printed: '3.11'
+        regression_cp_J_per_mol_K_as_printed: '144.73'
+        regression_deviation_percent_as_printed: '4.29'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Li2Si2O5_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li2Si2O5
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Li2Si2O5
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-2583.8'
+        zhuang_deviation_percent_as_printed: '0.89'
+        regression_enthalpy_kJ_per_mol_as_printed: '-2560.28'
+        regression_deviation_percent_as_printed: '-0.03'
+        reference_delta_fH_cell_as_printed: -2561 ± 4
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Li2SiO3:
+    observations:
+    - observation_id: shtenberg20_table1_Li2SiO3_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li2SiO3
+        column: Cp° (ref. data)
+        table_row_number: 19
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 100.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Li2SiO3
+            column: Cp° (ref. data)
+            table_row_number: 19
+            table_phase_column: 2
+      uncertainty:
+        value: 0.29
+        basis: absolute
+        as_printed: ±0.29
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_Li2SiO3_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li2SiO3
+        column: ΔfH° reference data
+        table_row_number: 19
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -1630.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: Li2SiO3
+            column: ΔfH° reference data
+            table_row_number: 19
+            table_phase_column: 2
+      uncertainty:
+        value: 24.0
+        basis: absolute
+        as_printed: ±24.0
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Li2SiO3_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li2SiO3
+        column: NKR, deviations, regression
+      values:
+        compound: Li2SiO3
+        nkr_cp_J_per_mol_K_as_printed: '98.67'
+        nkr_deviation_percent_as_printed: '-1.33'
+        regression_cp_J_per_mol_K_as_printed: '101.07'
+        regression_deviation_percent_as_printed: '1.07'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Li2SiO3_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li2SiO3
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Li2SiO3
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-1632.1'
+        zhuang_deviation_percent_as_printed: '0.13'
+        regression_enthalpy_kJ_per_mol_as_printed: '-1640.49'
+        regression_deviation_percent_as_printed: '0.64'
+        reference_delta_fH_cell_as_printed: -1630 ± 24
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Li4SiO4:
+    observations:
+    - observation_id: shtenberg20_table1_Li4SiO4_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li4SiO4
+        column: Cp° (ref. data)
+        table_row_number: 20
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 155.23
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Li4SiO4
+            column: Cp° (ref. data)
+            table_row_number: 20
+            table_phase_column: 2
+      uncertainty:
+        value: 2.0
+        basis: absolute
+        as_printed: ±2.0
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_Li4SiO4_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li4SiO4
+        column: ΔfH° reference data
+        table_row_number: 20
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -2311.66
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: Li4SiO4
+            column: ΔfH° reference data
+            table_row_number: 20
+            table_phase_column: 2
+      uncertainty:
+        value: 2.1
+        basis: absolute
+        as_printed: ±2.1
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Li4SiO4_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li4SiO4
+        column: NKR, deviations, regression
+      values:
+        compound: Li4SiO4
+        nkr_cp_J_per_mol_K_as_printed: '152.92'
+        nkr_deviation_percent_as_printed: '-1.49'
+        regression_cp_J_per_mol_K_as_printed: '158.48'
+        regression_deviation_percent_as_printed: '2.09'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Li4SiO4_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li4SiO4
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Li4SiO4
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-2271.67'
+        zhuang_deviation_percent_as_printed: '-1.73'
+        regression_enthalpy_kJ_per_mol_as_printed: '-2361.2'
+        regression_deviation_percent_as_printed: '2.14'
+        reference_delta_fH_cell_as_printed: -2311.66 ± 2.1
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Na2Si2O5:
+    observations:
+    - observation_id: shtenberg20_table1_Na2Si2O5_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na2Si2O5
+        column: Cp° (ref. data)
+        table_row_number: 21
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 156.5
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Na2Si2O5
+            column: Cp° (ref. data)
+            table_row_number: 21
+            table_phase_column: 2
+      uncertainty:
+        value: 0.87
+        basis: absolute
+        as_printed: ±0.87
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_Na2Si2O5_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na2Si2O5
+        column: ΔfH° reference data
+        table_row_number: 21
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -2439.5
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: Na2Si2O5
+            column: ΔfH° reference data
+            table_row_number: 21
+            table_phase_column: 2
+      uncertainty:
+        value: 39.5
+        basis: absolute
+        as_printed: ±39.5
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Na2Si2O5_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na2Si2O5
+        column: NKR, deviations, regression
+      values:
+        compound: Na2Si2O5
+        nkr_cp_J_per_mol_K_as_printed: '157.4'
+        nkr_deviation_percent_as_printed: '0.58'
+        regression_cp_J_per_mol_K_as_printed: '156.74'
+        regression_deviation_percent_as_printed: '0.15'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Na2Si2O5_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na2Si2O5
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Na2Si2O5
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-2421.29'
+        zhuang_deviation_percent_as_printed: '-0.75'
+        regression_enthalpy_kJ_per_mol_as_printed: '-2464.96'
+        regression_deviation_percent_as_printed: '1.04'
+        reference_delta_fH_cell_as_printed: -2439.5 ± 39.5
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Na2SiO3:
+    observations:
+    - observation_id: shtenberg20_table1_Na2SiO3_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na2SiO3
+        column: Cp° (ref. data)
+        table_row_number: 22
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 111.81
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Na2SiO3
+            column: Cp° (ref. data)
+            table_row_number: 22
+            table_phase_column: 2
+      uncertainty:
+        value: 0.26
+        basis: absolute
+        as_printed: ±0.26
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_Na2SiO3_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na2SiO3
+        column: ΔfH° reference data
+        table_row_number: 22
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -1544.5
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: Na2SiO3
+            column: ΔfH° reference data
+            table_row_number: 22
+            table_phase_column: 2
+      uncertainty:
+        value: 23.5
+        basis: absolute
+        as_printed: ±23.5
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Na2SiO3_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na2SiO3
+        column: NKR, deviations, regression
+      values:
+        compound: Na2SiO3
+        nkr_cp_J_per_mol_K_as_printed: '112.98'
+        nkr_deviation_percent_as_printed: '1.05'
+        regression_cp_J_per_mol_K_as_printed: '113.08'
+        regression_deviation_percent_as_printed: '1.14'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Na2SiO3_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na2SiO3
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Na2SiO3
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-1465.03'
+        zhuang_deviation_percent_as_printed: '-5.15'
+        regression_enthalpy_kJ_per_mol_as_printed: '-1545.17'
+        regression_deviation_percent_as_printed: '0.04'
+        reference_delta_fH_cell_as_printed: -1544.5 ± 23.5
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Na4SiO4:
+    observations:
+    - observation_id: shtenberg20_table1_Na4SiO4_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na4SiO4
+        column: Cp° (ref. data)
+        table_row_number: 23
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 184.72
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Na4SiO4
+            column: Cp° (ref. data)
+            table_row_number: 23
+            table_phase_column: 2
+      uncertainty:
+        value: 0.84
+        basis: absolute
+        as_printed: ±0.84
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    - observation_id: shtenberg20_table2_Na4SiO4_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na4SiO4
+        column: ΔfH° reference data
+        table_row_number: 23
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 2, reference-data column
+        points:
+        - T_K: 298.15
+          value: -2180.0
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 3
+            page: 4
+            published_page: 255
+            table: '2'
+            row: Na4SiO4
+            column: ΔfH° reference data
+            table_row_number: 23
+            table_phase_column: 2
+      uncertainty:
+        value: 50.0
+        basis: absolute
+        as_printed: ±50.0
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Na4SiO4_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na4SiO4
+        column: NKR, deviations, regression
+      values:
+        compound: Na4SiO4
+        nkr_cp_J_per_mol_K_as_printed: '181.54'
+        nkr_deviation_percent_as_printed: '-1.72'
+        regression_cp_J_per_mol_K_as_printed: '182.51'
+        regression_deviation_percent_as_printed: '-1.19'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Na4SiO4_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na4SiO4
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Na4SiO4
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-1928.41'
+        zhuang_deviation_percent_as_printed: '-11.54'
+        regression_enthalpy_kJ_per_mol_as_printed: '-2170.56'
+        regression_deviation_percent_as_printed: '-0.43'
+        reference_delta_fH_cell_as_printed: -2180 ± 50
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Li2GeO3:
+    observations:
+    - observation_id: shtenberg20_table1_Li2GeO3_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li2GeO3
+        column: Cp° (ref. data)
+        table_row_number: 24
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 101.8
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Li2GeO3
+            column: Cp° (ref. data)
+            table_row_number: 24
+            table_phase_column: 2
+      uncertainty:
+        value: 0.42
+        basis: absolute
+        as_printed: ±0.42
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Li2GeO3_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Li2GeO3
+        column: NKR, deviations, regression
+      values:
+        compound: Li2GeO3
+        nkr_cp_J_per_mol_K_as_printed: '106.2'
+        nkr_deviation_percent_as_printed: '4.32'
+        regression_cp_J_per_mol_K_as_printed: '106.42'
+        regression_deviation_percent_as_printed: '4.53'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Li2GeO3_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Li2GeO3
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Li2GeO3
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-1332.45'
+        zhuang_deviation_percent_as_printed: '-'
+        regression_enthalpy_kJ_per_mol_as_printed: '-1325.25'
+        regression_deviation_percent_as_printed: '-'
+        reference_delta_fH_cell_as_printed: '-'
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  Na2GeO3:
+    observations:
+    - observation_id: shtenberg20_table1_Na2GeO3_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na2GeO3
+        column: Cp° (ref. data)
+        table_row_number: 25
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 121.75
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: Na2GeO3
+            column: Cp° (ref. data)
+            table_row_number: 25
+            table_phase_column: 2
+      uncertainty:
+        value: 0.42
+        basis: absolute
+        as_printed: ±0.42
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_Na2GeO3_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: Na2GeO3
+        column: NKR, deviations, regression
+      values:
+        compound: Na2GeO3
+        nkr_cp_J_per_mol_K_as_printed: '120.51'
+        nkr_deviation_percent_as_printed: '-1.02'
+        regression_cp_J_per_mol_K_as_printed: '120.41'
+        regression_deviation_percent_as_printed: '-1.10'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_Na2GeO3_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: Na2GeO3
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: Na2GeO3
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-1166.97'
+        zhuang_deviation_percent_as_printed: '-'
+        regression_enthalpy_kJ_per_mol_as_printed: '-1206.28'
+        regression_deviation_percent_as_printed: '-'
+        reference_delta_fH_cell_as_printed: '-'
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  K2GeO3:
+    observations:
+    - observation_id: shtenberg20_table1_K2GeO3_reference_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2GeO3
+        column: Cp° (ref. data)
+        table_row_number: 26
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        attribution: References [28–30] as cited in Table 1, reference-data column
+        points:
+        - T_K: 298.15
+          value: 129.08
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 2
+            page: 3
+            published_page: 254
+            table: '1'
+            row: K2GeO3
+            column: Cp° (ref. data)
+            table_row_number: 26
+            table_phase_column: 2
+      uncertainty:
+        value: 0.42
+        basis: absolute
+        as_printed: ±0.42
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table1_K2GeO3_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 2
+        page: 3
+        published_page: 254
+        table: '1'
+        row: K2GeO3
+        column: NKR, deviations, regression
+      values:
+        compound: K2GeO3
+        nkr_cp_J_per_mol_K_as_printed: '136.48'
+        nkr_deviation_percent_as_printed: '5.73'
+        regression_cp_J_per_mol_K_as_printed: '128.47'
+        regression_deviation_percent_as_printed: '-0.48'
+        classification: NKR estimate, regression output, and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table2_K2GeO3_comparison_columns
+      type: regression_comparison_context
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 3
+        page: 4
+        published_page: 255
+        table: '2'
+        row: K2GeO3
+        column: Zhuang estimate, deviations, regression
+      values:
+        compound: K2GeO3
+        zhuang_enthalpy_kJ_per_mol_as_printed: '-1148.3'
+        zhuang_deviation_percent_as_printed: '-'
+        regression_enthalpy_kJ_per_mol_as_printed: '-1196.33'
+        regression_deviation_percent_as_printed: '-'
+        reference_delta_fH_cell_as_printed: '-'
+        classification: estimated or regression output and printed deviations; not experimental measurements
+      units: See field labels; values retained as printed
+  K2B2Ge3O10:
+    observations:
+    - observation_id: shtenberg20_table4_K2B2Ge3O10_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '4'
+        row: K2B2Ge3O10
+        column: reference ΔfH°
+        table_row_number: 3
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: Reference [16] as cited in Table 4
+        points:
+        - T_K: 298.15
+          value: -3937.1
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 5
+            page: 6
+            published_page: 257
+            table: '4'
+            row: K2B2Ge3O10
+            column: reference ΔfH°
+            table_row_number: 3
+            table_phase_column: 2
+      uncertainty:
+        value: 4.7
+        basis: absolute
+        as_printed: ±4.7
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table3_K2B2Ge3O10_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: K2B2Ge3O10
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: K2B2Ge3O10
+        entropy_S_J_per_mol_K_as_printed: '306.4'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3794'
+        heat_capacity_cp_J_per_mol_K_as_printed: '290.3'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-3509'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table4_K2B2Ge3O10_regression_comparison
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '4'
+        row: K2B2Ge3O10
+        column: Eq. (9–11), deviation
+      values:
+        compound: K2B2Ge3O10
+        regression_enthalpy_kJ_per_mol_as_printed: '-3793.5'
+        deviation_percent_as_printed: '3.6'
+        method_class: model_derived
+        reason_not_typed: Fitted output; this extract does not store the regression's input rows and coefficients
+          as observations.
+      units: See field labels; values retained as printed
+  K2B4GeO9:
+    observations:
+    - observation_id: shtenberg20_table4_K2B4GeO9_reference_delta_fH
+      type: gibbs_table
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '4'
+        row: K2B4GeO9
+        column: reference ΔfH°
+        table_row_number: 4
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        attribution: Reference [17] as cited in Table 4
+        points:
+        - T_K: 298.15
+          value: -3960.8
+          locator:
+            source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+            pdf_page_index: 5
+            page: 6
+            published_page: 257
+            table: '4'
+            row: K2B4GeO9
+            column: reference ΔfH°
+            table_row_number: 4
+            table_phase_column: 2
+      uncertainty:
+        value: 3.4
+        basis: absolute
+        as_printed: ±3.4
+        confidence_level: not_stated
+        note: Printed width; confidence level not stated
+    context:
+    - observation_id: shtenberg20_table3_K2B4GeO9_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: K2B4GeO9
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: K2B4GeO9
+        entropy_S_J_per_mol_K_as_printed: '252.4'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3910'
+        heat_capacity_cp_J_per_mol_K_as_printed: '244.2'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-3655'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+    - observation_id: shtenberg20_table4_K2B4GeO9_regression_comparison
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '4'
+        row: K2B4GeO9
+        column: Eq. (9–11), deviation
+      values:
+        compound: K2B4GeO9
+        regression_enthalpy_kJ_per_mol_as_printed: '-3909.7'
+        deviation_percent_as_printed: '1.3'
+        method_class: model_derived
+        reason_not_typed: Fitted output; this extract does not store the regression's input rows and coefficients
+          as observations.
+      units: See field labels; values retained as printed
+  Li2B2Ge3O10:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_Li2B2Ge3O10_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: Li2B2Ge3O10
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: Li2B2Ge3O10
+        entropy_S_J_per_mol_K_as_printed: '237.9'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3894'
+        heat_capacity_cp_J_per_mol_K_as_printed: '270.6'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-3610'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  Na2B2Ge3O10:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_Na2B2Ge3O10_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: Na2B2Ge3O10
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: Na2B2Ge3O10
+        entropy_S_J_per_mol_K_as_printed: '277.6'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3790'
+        heat_capacity_cp_J_per_mol_K_as_printed: '283.4'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-3505'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  Li2B4GeO9:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_Li2B4GeO9_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: Li2B4GeO9
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: Li2B4GeO9
+        entropy_S_J_per_mol_K_as_printed: '190.6'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3962'
+        heat_capacity_cp_J_per_mol_K_as_printed: '228.3'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-3710'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  Na2B4GeO9:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_Na2B4GeO9_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: Na2B4GeO9
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: Na2B4GeO9
+        entropy_S_J_per_mol_K_as_printed: '231.7'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3883'
+        heat_capacity_cp_J_per_mol_K_as_printed: '239.2'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-3630'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  K4B8Ge2O18:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_K4B8Ge2O18_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: K4B8Ge2O18
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: K4B8Ge2O18
+        entropy_S_J_per_mol_K_as_printed: '504.8'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-7819'
+        heat_capacity_cp_J_per_mol_K_as_printed: '488.3'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-7310'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  Li2SiGe3O9:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_Li2SiGe3O9_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: Li2SiGe3O9
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: Li2SiGe3O9
+        entropy_S_J_per_mol_K_as_printed: '232.2'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3504'
+        heat_capacity_cp_J_per_mol_K_as_printed: '254.7'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-3247'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  Na2SiGe3O9:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_Na2SiGe3O9_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: Na2SiGe3O9
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: Na2SiGe3O9
+        entropy_S_J_per_mol_K_as_printed: '270.1'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3391'
+        heat_capacity_cp_J_per_mol_K_as_printed: '268.2'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-3132'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  K2SiGe3O9:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_K2SiGe3O9_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: K2SiGe3O9
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: K2SiGe3O9
+        entropy_S_J_per_mol_K_as_printed: '302.9'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3390'
+        heat_capacity_cp_J_per_mol_K_as_printed: '275.3'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-3133'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  Li4SiGe2O8:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_Li4SiGe2O8_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: Li4SiGe2O8
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: Li4SiGe2O8
+        entropy_S_J_per_mol_K_as_printed: '225.5'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3585'
+        heat_capacity_cp_J_per_mol_K_as_printed: '258.5'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-3349'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  Na4SiGe2O8:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_Na4SiGe2O8_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: Na4SiGe2O8
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: Na4SiGe2O8
+        entropy_S_J_per_mol_K_as_printed: '300.9'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3363'
+        heat_capacity_cp_J_per_mol_K_as_printed: '285.1'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-3123'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  K4SiGe2O8:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_K4SiGe2O8_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: K4SiGe2O8
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: K4SiGe2O8
+        entropy_S_J_per_mol_K_as_printed: '365.7'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3367'
+        heat_capacity_cp_J_per_mol_K_as_printed: '298.5'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-3130'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  Li2Si2GeO7:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_Li2Si2GeO7_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: Li2Si2GeO7
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: Li2Si2GeO7
+        entropy_S_J_per_mol_K_as_printed: '175.4'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3180'
+        heat_capacity_cp_J_per_mol_K_as_printed: '195.7'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-2980'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  Na2Si2GeO7:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_Na2Si2GeO7_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: Na2Si2GeO7
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: Na2Si2GeO7
+        entropy_S_J_per_mol_K_as_printed: '212.0'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3076'
+        heat_capacity_cp_J_per_mol_K_as_printed: '208.4'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-2874'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
+  K2Si2GeO7:
+    observations: []
+    context:
+    - observation_id: shtenberg20_table3_K2Si2GeO7_calculated_thermodynamics
+      type: regression_model_output
+      locator:
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+        pdf_page_index: 5
+        page: 6
+        published_page: 257
+        table: '3'
+        row: K2Si2GeO7
+        column: S°, ΔfH°, Cp°, ΔfG°
+      values:
+        compound: K2Si2GeO7
+        entropy_S_J_per_mol_K_as_printed: '243.0'
+        formation_enthalpy_delta_fH_kJ_per_mol_as_printed: '-3090'
+        heat_capacity_cp_J_per_mol_K_as_printed: '213.7'
+        formation_gibbs_energy_delta_fG_kJ_per_mol_as_printed: '-2889'
+        method_class: model_derived
+        equations_as_printed: Eq. (6–8), (9–11), and (12–14); no row-level equation inputs stored
+        reason_not_typed: Printed model outputs retained as context because the cited regression inputs and coefficients
+          are not stored as source observations in this extract.
+      units: See field labels; values retained as printed
