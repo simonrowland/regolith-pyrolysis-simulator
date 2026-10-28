@@ -14,6 +14,7 @@ import multiprocessing
 import os
 import signal
 import queue
+import socket
 import sys
 import threading
 import time
@@ -90,11 +91,18 @@ def _discard_engine_pool(pool: 'EngineWorkerPool') -> None:
 class EngineWorkerRemoteError(RuntimeError):
     """An engine request raised inside its isolated worker."""
 
-    def __init__(self, exc_name: str, detail: str, remote_traceback: str):
+    def __init__(
+        self,
+        exc_name: str,
+        detail: str,
+        remote_traceback: str,
+        failure_disposition: Optional[str] = None,
+    ):
         super().__init__(detail)
         self.exc_name = exc_name
         self.detail = detail
         self.remote_traceback = remote_traceback
+        self.failure_disposition = failure_disposition
 
 
 class EngineWorkerPoolLifecycleError(RuntimeError):
@@ -274,6 +282,7 @@ def _run_engine_worker(
                 connection.send((
                     'error', type(exc).__name__, str(exc),
                     traceback.format_exc(),
+                    getattr(exc, 'failure_disposition', None),
                 ))
     except EngineWorkerTimeout as exc:  # pragma: no cover - nested bootstrap
         try:
@@ -289,6 +298,7 @@ def _run_engine_worker(
         try:
             connection.send((
                 'error', type(exc).__name__, str(exc), traceback.format_exc(),
+                getattr(exc, 'failure_disposition', None),
             ))
         except BaseException:
             pass
@@ -382,6 +392,8 @@ class WarmEngineWorker:
         self._state_lock = threading.Lock()
         self._pending_reap: list[Any] = []
         self._pool_call_abort_event: threading.Event | None = None
+        self._active_frame_readers: dict[int, int] = {}
+        self._close_after_frame_read: set[int] = set()
 
     def _begin_pool_call(self) -> threading.Event:
         """Install the cancellation token before the pool enters ``call``."""
@@ -396,6 +408,215 @@ class WarmEngineWorker:
         with self._state_lock:
             if self._pool_call_abort_event is abort_event:
                 self._pool_call_abort_event = None
+
+    def _finish_frame_reader(self, connection: Any) -> None:
+        connection_id = id(connection)
+        with self._state_lock:
+            active = self._active_frame_readers.get(connection_id, 0)
+            if active > 1:
+                self._active_frame_readers[connection_id] = active - 1
+                return
+            self._active_frame_readers.pop(connection_id, None)
+            if connection_id in self._close_after_frame_read:
+                self._close_after_frame_read.remove(connection_id)
+                try:
+                    connection.close()
+                except OSError:
+                    pass
+
+    def _close_connection_or_defer(self, connection: Any) -> None:
+        connection_id = id(connection)
+        with self._state_lock:
+            if self._active_frame_readers.get(connection_id, 0):
+                self._close_after_frame_read.add(connection_id)
+                self._shutdown_connection_reader(connection)
+                return
+            else:
+                try:
+                    connection.close()
+                except OSError:
+                    pass
+                return
+
+    def _shutdown_connection_reader(self, connection: Any) -> None:
+        """Try to wake a POSIX Pipe reader without closing its descriptor."""
+        if os.name != 'posix':
+            return
+        shutdown_socket = None
+        try:
+            fd = connection.fileno()
+            if not isinstance(fd, int) or fd < 0:
+                return
+            shutdown_socket = socket.socket(fileno=fd)
+            shutdown_socket.shutdown(socket.SHUT_RDWR)
+        except (AttributeError, OSError, TypeError, ValueError):
+            pass
+        finally:
+            if shutdown_socket is not None:
+                try:
+                    shutdown_socket.detach()
+                except (OSError, ValueError):
+                    pass
+
+    def _receive_frame_with_deadline(
+        self,
+        connection: Any,
+        process: Any,
+        *,
+        deadline: float,
+        timeout_s: float,
+        phase: str,
+        abort_event: threading.Event | None = None,
+        debug_timeout_s: float | None = None,
+    ) -> Any:
+        """Receive one complete frame without letting ``recv`` overrun its wall."""
+        reply_lock = threading.Lock()
+        reply: tuple[float, Any, BaseException | None] | None = None
+        reply_ready = threading.Event()
+        connection_id = id(connection)
+
+        with self._state_lock:
+            aborted = (
+                abort_event is not None and abort_event.is_set()
+            )
+            current = (
+                not self.disabled
+                and self.process is process
+                and self.connection is connection
+            )
+            if (
+                current
+                and not aborted
+                and connection_id not in self._close_after_frame_read
+            ):
+                self._active_frame_readers[connection_id] = (
+                    self._active_frame_readers.get(connection_id, 0) + 1
+                )
+                registered = True
+            else:
+                registered = False
+        if not registered:
+            if aborted:
+                self._discard_current(
+                    diagnostic=False,
+                    expected_process=process,
+                    expected_connection=connection,
+                )
+                raise EngineWorkerTimeout(
+                    self.name,
+                    timeout_s if phase == 'job' else self.call_timeout_s,
+                    phase='job',
+                )
+            if phase == 'job':
+                raise EngineWorkerDied(
+                    'call',
+                    f'{self.name} worker exited without a result',
+                    returncode=getattr(process, 'exitcode', None),
+                )
+            raise RuntimeError(f'{self.name} worker is disabled')
+
+        def receive_frame() -> None:
+            nonlocal reply
+            try:
+                try:
+                    message = connection.recv()
+                except BaseException as exc:
+                    outcome = (time.monotonic(), None, exc)
+                else:
+                    outcome = (time.monotonic(), message, None)
+                with reply_lock:
+                    reply = outcome
+                reply_ready.set()
+            finally:
+                self._finish_frame_reader(connection)
+
+        receiver = threading.Thread(
+            target=receive_frame,
+            name=f'{self.name} {phase} reader',
+            daemon=True,
+        )
+        try:
+            receiver.start()
+        except BaseException:
+            self._finish_frame_reader(connection)
+            raise
+        try:
+            while True:
+                with reply_lock:
+                    outcome = reply
+                if outcome is not None:
+                    receiver.join()
+                    completed_at, message, receive_error = outcome
+                    # A complete receipt at the deadline is on time.
+                    if completed_at <= deadline:
+                        if receive_error is not None:
+                            raise receive_error
+                        return message
+                    break
+                with self._state_lock:
+                    aborted = (
+                        abort_event is not None and abort_event.is_set()
+                    )
+                    current = (
+                        not self.disabled
+                        and self.process is process
+                        and self.connection is connection
+                    )
+                if aborted:
+                    raise EngineWorkerTimeout(
+                        self.name,
+                        timeout_s if phase == 'job' else self.call_timeout_s,
+                        phase='job',
+                    )
+                if phase == 'job' and not current:
+                    raise EngineWorkerDied(
+                        'call',
+                        f'{self.name} worker exited without a result',
+                        returncode=getattr(process, 'exitcode', None),
+                    )
+                remaining = deadline - time.monotonic()
+                if remaining <= 0.0:
+                    # Recheck after reading the clock so an outcome
+                    # published while the caller resumed is not lost.
+                    with reply_lock:
+                        outcome = reply
+                    if outcome is not None:
+                        continue
+                    break
+                reply_ready.wait(min(
+                    ENGINE_WORKER_CANCEL_POLL_S,
+                    remaining,
+                ))
+            if debug_timeout_s is not None:
+                _pool_debug(
+                    f'{self.name}: reply receive timeout after '
+                    f'{debug_timeout_s:.2f}s (wall {timeout_s:.2f}s) — '
+                    'discarding worker'
+                )
+            self._discard_current(
+                diagnostic=debug_timeout_s is not None,
+                expected_process=process,
+                expected_connection=connection,
+            )
+            raise EngineWorkerTimeout(
+                self.name,
+                timeout_s,
+                phase=phase,
+            )
+        finally:
+            if receiver.is_alive():
+                self._discard_current(
+                    diagnostic=False,
+                    expected_process=process,
+                    expected_connection=connection,
+                )
+                # The worker group is reaped before this join. If recv has
+                # not returned, the reader keeps the old fd and closes it
+                # from _finish_frame_reader after recv returns.
+                receiver.join(
+                    timeout=max(0.0, deadline - time.monotonic())
+                    + ENGINE_WORKER_CANCEL_POLL_S
+                )
 
     def start(self, *, timeout_s: Optional[float] = None) -> Any:
         """Start a fresh worker and wait for its bootstrap acknowledgement."""
@@ -541,7 +762,14 @@ class WarmEngineWorker:
                     )
                 if parent.poll(min(ENGINE_WORKER_CANCEL_POLL_S, remaining)):
                     break
-            message = parent.recv()
+            message = self._receive_frame_with_deadline(
+                parent,
+                process,
+                deadline=deadline,
+                timeout_s=startup_timeout,
+                phase='initialization',
+                abort_event=abort_event,
+            )
         except (EOFError, OSError, TimeoutError) as exc:
             self._discard_current(
                 diagnostic=False,
@@ -575,8 +803,11 @@ class WarmEngineWorker:
                 expected_process=process,
                 expected_connection=parent,
             )
-            _tag, exc_name, detail, remote_traceback = message
-            raise EngineWorkerRemoteError(exc_name, detail, remote_traceback)
+            _tag, exc_name, detail, remote_traceback, *metadata = message
+            failure_disposition = metadata[0] if metadata else None
+            raise EngineWorkerRemoteError(
+                exc_name, detail, remote_traceback, failure_disposition,
+            )
         with self._state_lock:
             if (
                 self.disabled
@@ -748,7 +979,15 @@ class WarmEngineWorker:
                     min(ENGINE_WORKER_CANCEL_POLL_S, poll_remaining)
                 ):
                     break
-            message = connection.recv()
+            message = self._receive_frame_with_deadline(
+                connection,
+                process,
+                deadline=deadline,
+                timeout_s=timeout,
+                phase='job',
+                abort_event=abort_event,
+                debug_timeout_s=remaining,
+            )
         except TimeoutError:
             raise
         except (BrokenPipeError, EOFError, OSError) as exc:
@@ -797,7 +1036,8 @@ class WarmEngineWorker:
                 timeout_s,
                 phase=phase,
             )
-        _tag, exc_name, detail, remote_traceback = message
+        _tag, exc_name, detail, remote_traceback, *metadata = message
+        failure_disposition = metadata[0] if metadata else None
         _pool_debug(
             f'{self.name}: remote error {exc_name}: {str(detail)[:120]}'
         )
@@ -806,7 +1046,9 @@ class WarmEngineWorker:
             expected_process=process,
             expected_connection=connection,
         )
-        raise EngineWorkerRemoteError(exc_name, detail, remote_traceback)
+        raise EngineWorkerRemoteError(
+            exc_name, detail, remote_traceback, failure_disposition,
+        )
 
     def _discard_current(
         self,
@@ -897,18 +1139,28 @@ class WarmEngineWorker:
                     process.join(timeout=1.0)
         finally:
             if connection is not None:
-                try:
-                    connection.close()
-                except OSError:
-                    pass
+                self._close_connection_or_defer(connection)
 
     def close(self) -> None:
         """Idempotently stop the worker and release its pipe."""
         with self._state_lock:
             process, connection = self.process, self.connection
+            active_reader = (
+                connection is not None
+                and self._active_frame_readers.get(id(connection), 0) > 0
+            )
             self.process = None
             self.connection = None
             self.ready_payload = None
+        if active_reader:
+            self._stop_pair(
+                process,
+                connection,
+                diagnostic=False,
+                cleanup_group=True,
+            )
+            self._reap_pending(timeout_s=1.0)
+            return
         try:
             if connection is not None:
                 try:
@@ -949,28 +1201,38 @@ class WarmEngineWorker:
         with self._state_lock:
             self.disabled = True
             process, connection = self.process, self.connection
+            active_reader = (
+                connection is not None
+                and self._active_frame_readers.get(id(connection), 0) > 0
+            )
             self.process = None
             self.connection = None
             self.ready_payload = None
             if process is not None and process not in self._pending_reap:
                 self._pending_reap.append(process)
+        if active_reader:
+            self._stop_pair(
+                process,
+                connection,
+                diagnostic=False,
+                cleanup_group=True,
+            )
+            return
         if connection is not None:
             try:
                 connection.close()
             except OSError:
                 pass
-        if process is None:
-            return
-        pid = _process_pid(process)
-        if pid is None:
-            return
-        try:
-            os.killpg(pid, signal.SIGKILL)
-        except (AttributeError, OSError, ProcessLookupError):
-            try:
-                process.kill()
-            except (AttributeError, OSError, ProcessLookupError):
-                pass
+        if process is not None:
+            pid = _process_pid(process)
+            if pid is not None:
+                try:
+                    os.killpg(pid, signal.SIGKILL)
+                except (AttributeError, OSError, ProcessLookupError):
+                    try:
+                        process.kill()
+                    except (AttributeError, OSError, ProcessLookupError):
+                        pass
 
     def _reap_pending(self, *, timeout_s: float) -> bool:
         deadline = time.monotonic() + max(0.0, float(timeout_s))

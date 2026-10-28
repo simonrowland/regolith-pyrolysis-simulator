@@ -11,7 +11,7 @@ import pytest
 
 import simulator.reduced_real_determinism as rrd
 from simulator.corpus_version import current_corpus_version
-from simulator.evaporation import EvaporationFluxRefusal
+from simulator.evaporation import EvaporationFluxRefusal, EvaporationMixin
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -590,78 +590,29 @@ def test_real_backend_out_of_domain_case_gap_is_classified():
     assert gap["reason"] == "non_silicate_feedstock"
 
 
-def test_gate_liquidus_unavailable_is_isolated_per_case(
-    tmp_path,
-    monkeypatch,
-    capsys,
-):
+def test_gate_liquidus_provider_failure_propagates(tmp_path, monkeypatch):
     emitted = []
     _patch_common(monkeypatch, emitted)
-    target_db = tmp_path / "target.db"
-
-    def fake_load_yaml(path):
-        path = Path(path)
-        if path.name == "dummy-profile.yaml":
-            return {"feedstock": "fake_feedstock"}
-        return {"feedstock": path.stem}
-
-    monkeypatch.setattr(driver, "_load_yaml", fake_load_yaml)
-
-    gate_message = (
-        "freeze_gate.enabled requires a liquid_fraction(T) source; "
-        "no liquidus engine produced usable solidus/liquidus bounds. "
-        "gate liquid fraction unavailable: status=not_converged"
+    refusal = EvaporationFluxRefusal(
+        "liquid_fraction_provider_failed",
+        {"reason": "liquid_fraction_provider_failed", "outcome": "failed"},
     )
 
-    def fake_run_case(*, db_path, feedstock, campaign, mode, **kwargs):
-        assert mode == "capture"
-        if feedstock == "mars_sulfate_rich":
-            raise RuntimeError(gate_message)
-        _write_magemin_row(db_path, f"{feedstock}-{campaign}")
-        return _result(marker=f"{feedstock}-{campaign}", mode=mode)
+    def fake_run_case(**kwargs):
+        raise refusal
 
     monkeypatch.setattr(driver, "_run_case", fake_run_case)
 
-    rc = driver.main(
-        [
-            "--profile",
-            "unused",
-            "--db",
-            str(target_db),
-            "--hours",
-            "1",
-            "--feedstock",
-            "mars_sulfate_rich",
-            "--feedstock",
-            "lunar_mare_low_ti",
-            "--campaign",
-            "C2A_staged",
-        ]
-    )
+    with pytest.raises(EvaporationFluxRefusal) as error:
+        driver.main(
+            [
+                "--profile", "unused", "--db", str(tmp_path / "target.db"),
+                "--hours", "1",
+            ]
+        )
 
-    assert rc == 0
-    assert emitted[-1]["status"] == "complete"
-    assert driver._cache_row_summary(target_db)["rows"] == 1
-    assert emitted[-1]["domain_gaps"] == emitted[-1]["case_gaps"]
-    assert emitted[-1]["domain_gap_count"] == 1
-    assert emitted[-1]["domain_gaps"][0] == {
-        "feedstock": "mars_sulfate_rich",
-        "campaign": "C2A_staged",
-        "reason": "gate_liquidus_unavailable",
-        "detail": gate_message,
-    }
-    out = capsys.readouterr().out
-    assert "[case] feedstock=mars_sulfate_rich campaign=C2A_staged start" in out
-    assert (
-        "[case] feedstock=mars_sulfate_rich campaign=C2A_staged "
-        "status=gate_liquidus_unavailable hours=0"
-    ) in out
-    assert "[case] feedstock=lunar_mare_low_ti campaign=C2A_staged start" in out
-    assert (
-        "[case] feedstock=lunar_mare_low_ti campaign=C2A_staged "
-        "status=ok hours=1"
-    ) in out
-    assert "CASE-GAP: mars_sulfate_rich/C2A_staged gate_liquidus_unavailable" in out
+    assert error.value is refusal
+    assert not any(row.get("case_gaps") for row in emitted)
 
 
 def test_freeze_gate_no_authority_refusal_is_isolated_per_case(
@@ -787,13 +738,25 @@ def test_non_prefix_gate_liquidus_runtime_error_still_aborts(tmp_path, monkeypat
 
 
 def test_gate_liquidus_message_prefix_pinned_to_upstream_source():
-    assert driver.GATE_LIQUIDUS_UNAVAILABLE_PREFIX == (
-        "freeze_gate.enabled requires a liquid_fraction(T) source"
+    # b-1043 replaced the RuntimeError prefix with a typed refusal. Pin the
+    # executable producer and keep environment failures out of physics gaps.
+    sim = SimpleNamespace(
+        _liquid_fraction_provider="magemin",
+        _dispatch_only=lambda *_args, **_kwargs: SimpleNamespace(
+            status="unavailable",
+            diagnostic={"reason": "environment", "exception_class": "OSError"},
+            warnings=(),
+        ),
     )
-    evaporation_source = (
-        REPO_ROOT / "simulator" / "evaporation.py"
-    ).read_text(encoding="utf-8")
-    assert driver.GATE_LIQUIDUS_UNAVAILABLE_PREFIX in evaporation_source
+    with pytest.raises(EvaporationFluxRefusal) as error:
+        EvaporationMixin._freeze_gate_curve_from_gate_dispatch(
+            sim, [], fO2_log=-9.0,
+        )
+
+    assert str(error.value) == "liquid_fraction_provider_failed"
+    assert error.value.diagnostic["provider_diagnostic"]["reason"] == "environment"
+    assert error.value.diagnostic["outcome"] == "failed"
+    assert driver._known_chemistry_case_gap(error.value) is None
 
 
 def test_unrelated_runtime_error_still_propagates(tmp_path, monkeypatch):

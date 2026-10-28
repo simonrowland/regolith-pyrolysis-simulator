@@ -709,6 +709,10 @@ def _lunar_profile_for_hours(hours: int, *, gates: tuple[str, ...] | None = None
     return profile
 
 
+# Two full 60-hour lunar campaigns: campaign-length physics. On the studio PR
+# tier it takes 277-301 s against the 300 s per-test limit (green 287 s), so it
+# runs in the nightly tier, which covers it in full.
+@pytest.mark.nightly
 def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> None:
     furnace_path = ("furnace_max_T_C",)
     schema = RecipeSchema(
